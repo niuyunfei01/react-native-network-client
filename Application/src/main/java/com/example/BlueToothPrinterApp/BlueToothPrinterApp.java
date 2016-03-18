@@ -11,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.android.actionbarcompat.styled.R;
+import cn.cainiaoshicai.crm.R;
 
 public class BlueToothPrinterApp extends Activity
 {

@@ -20,6 +20,8 @@ dependencies {
     compile "com.android.support:gridlayout-v7:23.1.0"
     compile "com.android.support:cardview-v7:23.1.0"
     compile 'com.android.support:appcompat-v7:18.0.+'
+
+    compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 // The sample build uses multiple directories to
@@ -50,7 +52,10 @@ android {
                 java.srcDirs "src/${dir}/java"
                 res.srcDirs "src/${dir}/res"
             }
+
+            jniLibs.srcDirs = ['libs']
         }
+
         androidTest.setRoot('tests')
         androidTest.java.srcDirs = ['tests/src']
 

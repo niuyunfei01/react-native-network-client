@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.example.android.actionbarcompat.styled.tests;
+package cn.cainiaoshicai.crm.tests;
 
-import com.example.android.actionbarcompat.styled.*;
+import cn.cainiaoshicai.crm.*;
 
 import android.test.ActivityInstrumentationTestCase2;
 
