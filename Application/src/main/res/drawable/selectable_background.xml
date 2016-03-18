@@ -16,7 +16,7 @@
 -->
 
 <!--
-  This drawable is used as the main touch feedback drawable for the Action Bar. By default it is
+  This drawable is used as the print touch feedback drawable for the Action Bar. By default it is
   used as the action item button background, amongst other things.
 
   The different items in this drawable are displayed when their selector state matches the view's

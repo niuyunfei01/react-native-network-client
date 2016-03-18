@@ -16,11 +16,15 @@
 
 package com.example.android.actionbarcompat.styled;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
+import android.view.MenuItem;
+
+import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
 
 /**
  * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
@@ -54,7 +58,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate menu from menu resource (res/menu/main)
+        // Inflate menu from menu resource (res/menu/print)
         getMenuInflater().inflate(R.menu.main, menu);
 
         return super.onCreateOptionsMenu(menu);
@@ -76,5 +80,26 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // This is called when a previously selected tab is selected again.
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_print:
+                startPrint();
+                return true;
+            case R.id.menu_settings:
+//                showHelp();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void startPrint() {
+        Intent printAct = new Intent(getApplicationContext(), BlueToothPrinterApp.class);
+        printAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(printAct);
+        finish();
     }
 }
