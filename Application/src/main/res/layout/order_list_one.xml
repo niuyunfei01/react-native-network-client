@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:id="@+id/one_order"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5.0dip"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10.0dp"
+        android:layout_marginRight="5dp"
+        android:baselineAligned="false"
+        android:background="@drawable/list_item_bg"
+        android:onClick="onClick">
+
+        <LinearLayout
+            android:background="@color/order_head_styled"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+            <TextView
+                android:textSize="20.0sp"
+                android:textStyle="bold"
+                android:textColor="#ff141414"
+                android:ellipsize="middle"
+                android:id="@+id/dayNo"
+                android:paddingLeft="5.0dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5.0dip"
+                android:layout_marginRight="2.0dip"
+                android:maxWidth="125.0dip"
+                android:text="#13"
+                android:singleLine="true"
+                android:layout_marginBottom="5dip"/>
+            <TextView
+                android:textColor="#555555"
+                android:ellipsize="middle"
+                android:paddingLeft="5.0dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5.0dip"
+                android:layout_marginRight="2.0dip"
+                android:maxWidth="125.0dip"
+                android:text="期望"
+                android:singleLine="true"/>
+
+            <TextView
+                    android:textSize="18.0sp"
+                    android:textStyle="bold"
+                    android:textColor="#ff141414"
+                    android:ellipsize="middle"
+                    android:id="@+id/expect_time"
+                    android:paddingLeft="5.0dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5.0dip"
+                    android:layout_marginRight="2.0dip"
+                    android:maxWidth="125.0dip"
+                    android:text="立即"
+                    android:singleLine="true"/>
+
+            <TextView
+                    android:textSize="15.0sp"
+                    android:textColor="#555555"
+                    android:ellipsize="middle"
+                    android:paddingLeft="5.0dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5.0dip"
+                    android:layout_marginRight="2.0dip"
+                    android:maxWidth="125.0dip"
+                    android:text="送达"
+                    android:singleLine="true"/>
+
+            <LinearLayout
+                    android:gravity="right"
+                    android:orientation="horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5.0dip"
+                    android:layout_weight="1.0">
+
+                <TextView
+                        android:textSize="12.0sp"
+                        android:textColor="#FFFF8800"
+                        android:layout_gravity="top|right|center"
+                        android:id="@+id/createdAt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3.0dip"
+                        android:layout_marginRight="6.669983dip"
+                        android:text="" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+                android:textColor="#ff000000"
+                android:id="@+id/userAddr"
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8.0dip"
+                android:text="龙腾苑四区43号楼 3单元202"
+                android:textSize="16.0sp"
+                android:lineSpacingExtra="2.669983dip"/>
+
+        <TextView
+                android:textColor="#ff000000"
+                android:id="@+id/userName"
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8.0dip"
+                android:text="耿秋刚"
+                android:textSize="16.0sp"
+                android:lineSpacingExtra="2.669983dip"/>
+
+        <TextView
+                android:textColor="#ff000000"
+                android:id="@+id/gender_text"
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8.0dip"
+                android:text="先生"
+                android:textSize="16.0sp"
+                android:lineSpacingExtra="2.669983dip"/>
+
+        <TextView
+                android:textColor="#ff000000"
+                android:id="@+id/phone_text"
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8.0dip"
+                android:text="18910275339"
+                android:textSize="16.0sp"
+                android:lineSpacingExtra="2.669983dip"
+            android:linksClickable="true" />
+
+        <TextView
+                android:textColor="#ff000000"
+                android:id="@+id/user_times"
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8.0dip"
+                android:text="门店新客"
+                android:textSize="16.0sp"
+                android:lineSpacingExtra="2.669983dip"/>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/post_footer"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6.669983dip">
+
+            <TextView
+                    android:textSize="12.0sp"
+                    android:textColor="#ff808080"
+                    android:paddingLeft="5.0dip"
+                    android:paddingRight="5.0dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="订单总额 ￥"/>
+
+            <TextView
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                    android:textSize="12.0sp"
+                    android:textColor="#ff808080"
+                    android:id="@+id/total_money"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="59.95"/>
+            <TextView
+                    android:textSize="12.0sp"
+                    android:textColor="#ff808080"
+                    android:paddingLeft="5.0dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="下单时间"/>
+            <TextView
+                android:paddingLeft="5.0dip"
+                android:paddingRight="5.0dip"
+                android:id="@+id/orderTime"
+                    android:textSize="12.0sp"
+                    android:textColor="#ff808080"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="17:06"/>
+        </LinearLayout>
+    </LinearLayout>

@@ -16,15 +16,20 @@
 
 package cn.cainiaoshicai.crm;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
+
+import cn.cainiaoshicai.crm.orders.OrderListFragment;
 
 /**
  * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
@@ -41,19 +46,21 @@ import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
+    private int fragmentIdToPrepare, getFragmentIdToShip, getFragmentIdToArrive;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sample_main);
+        setContentView(R.layout.order_crm_main);
 
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Add three tabs to the Action Bar for display
-        ab.addTab(ab.newTab().setText("Tab 1").setTabListener(this));
-        ab.addTab(ab.newTab().setText("Tab 2").setTabListener(this));
-        ab.addTab(ab.newTab().setText("Tab 3").setTabListener(this));
+        ab.addTab(ab.newTab().setText("待打包").setTabListener(this));
+        ab.addTab(ab.newTab().setText("待配送").setTabListener(this));
+        ab.addTab(ab.newTab().setText("待送达").setTabListener(this));
     }
 
     @Override
@@ -67,7 +74,27 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     // Implemented from ActionBar.TabListener
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // This is called when a tab is selected.
+        Log.d("Main", String.valueOf(tab.getText()));
+
+        int fragmentId = 0, listType = Constants.ORDER_LIST_PREPARE;
+        if (tab.getPosition() == 0) {
+            fragmentId = this.fragmentIdToPrepare;
+
+        } else if (tab.getPosition() == 1) {
+            fragmentId = this.getFragmentIdToShip;
+            listType = Constants.ORDER_LIST_SHIP;
+        } else if (tab.getPosition() == 2) {
+            fragmentId = this.getFragmentIdToArrive;
+            listType = Constants.ORDER_LIST_ARRIVE;
+        }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment found = (OrderListFragment) fragmentManager.findFragmentById(fragmentId);
+        if (found == null) {
+            found = new OrderListFragment();
+            ((OrderListFragment)found).setListType(listType);
+        }
+        fragmentManager.beginTransaction().replace(R.id.order_crm_desc, found).commit();
     }
 
     // Implemented from ActionBar.TabListener

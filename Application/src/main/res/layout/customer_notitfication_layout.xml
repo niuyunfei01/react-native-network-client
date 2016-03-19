@@ -12,7 +12,7 @@
          android:orientation="vertical"
          android:layout_marginLeft="10dip"
          >
-    <TextView android:id="@+id/title"
+    <TextView android:id="@+id/expect_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#286CA6"

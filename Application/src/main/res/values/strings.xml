@@ -36,4 +36,14 @@
     <string name="logining">Running in background. Please see log.</string>
     <string name="setting_su">Succeed to set</string>
 
+    <string name="WidgetProvider_timestamp_today">今天</string>
+    <string name="WidgetProvider_timestamp_yesterday">昨天</string>
+    <string name="WidgetProvider_timestamp_hour_ago">%s小时前</string>
+    <string name="WidgetProvider_timestamp_hours_ago">%s小时前</string>
+    <string name="WidgetProvider_timestamp_minutes_ago">%s分钟前</string>
+    <string name="WidgetProvider_timestamp_just_now">刚刚</string>
+    <string name="WidgetProvider_timestamp_month">%d月</string>
+    <string name="WidgetProvider_timestamp_day">%d号</string>
+    <string name="WidgetProvider_datetime_short">%m月d%日 %H:%M</string>
+
 </resources>

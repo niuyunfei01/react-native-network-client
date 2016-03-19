@@ -1,0 +1,321 @@
+package cn.cainiaoshicai.crm.orders.adapter;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.text.format.DateUtils;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.Singleton;
+import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.service.Utils;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+
+/**
+ */
+public class OrderAdapter extends BaseAdapter {
+
+    private final Activity activity;
+    private ArrayList<Order> orders = new ArrayList<>();
+    private static LayoutInflater inflater = null;
+
+    public OrderAdapter(Activity activity, ArrayList<Order> orders) {
+        this.activity = activity;
+        this.orders = orders;
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    @Override
+    public int getCount() {
+        return orders.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return orders.get(i);
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public View getView(int i, View vi, ViewGroup viewGroup) {
+
+        if (vi == null)
+            vi = inflater.inflate(R.layout.order_list_one, null);
+
+        TextView expect_time = (TextView) vi.findViewById(R.id.expect_time);
+        TextView orderAddr = (TextView) vi.findViewById(R.id.userAddr);
+        TextView userName = (TextView) vi.findViewById(R.id.userName);
+        TextView phone = (TextView) vi.findViewById(R.id.phone_text);
+        TextView genderText = (TextView) vi.findViewById(R.id.gender_text);
+        TextView orderMoney = (TextView) vi.findViewById(R.id.total_money);
+        TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
+        TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
+
+
+//        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
+
+        final Order order = orders.get(i);
+
+//        thumb_image.setImageUrl(order.getThumbnailUrl(), mImageLoader);
+
+        DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
+        
+        Date expectTime = order.getExpectTime();
+        expect_time.setText(expectTime == null ? "立即" : instance.getShortFullTime(expectTime));
+
+        orderAddr.setText(order.getUserAddr());
+        userName.setText(order.getUserName());
+        phone.setText(order.getPhone());
+        genderText.setText(order.getGenderText());
+        orderMoney.setText(String.valueOf(order.getTotalPay()));
+
+        orderTime.setText(instance.getShortTime(order.getReceivedTime()));
+        dayNo.setText(order.getDayId());
+
+        /*
+        long time = order.getCreatedAt().getTime();
+        Log.d(Singleton.ORDERS_TAG, "created at " + order.getCreatedAt());
+        createdAtTxt.setText(DateUtils.getRelativeTimeSpanString(time, System.currentTimeMillis(), 0));
+        ((TextView) vi.findViewById(R.id.post_address)).setText(order.getAddress());
+        if (order.getAddress() != null && !"".equals(order.getAddress().trim())) {
+            (vi.findViewById(R.id.post_address_pic)).setVisibility(View.VISIBLE);
+        } else {
+            (vi.findViewById(R.id.post_address_pic)).setVisibility(View.GONE);
+        }*/
+
+//        ExpandGridView grid = (ExpandGridView) vi.findViewById(R.id.mygallery);
+//        if (order.getImages().size() > 0) {
+//            ThumbnailsLoader adapter = new ThumbnailsLoader(this.activity, null);
+//            adapter.addImageUrls(order.getImages());
+//            adapter.addFullImages(order.fullImages());
+//            ((BaseActivity) activity).getDaifanApplication().getImageLoader();
+//            grid.setAdapter(adapter);
+//            grid.setExpanded(true);
+//            grid.setVisibility(View.VISIBLE);
+//        } else {
+//            grid.setVisibility(View.GONE);
+//        }
+
+        /*
+        NetworkImageView imageV = (NetworkImageView) vi.findViewById(R.id.list_row_image);
+        if (order.hasImage()) {
+            imageV.setImageUrl(order.getImages().get(0), mImageLoader);
+            imageV.setVisibility(View.VISIBLE);
+        } else {
+            imageV.setVisibility(View.GONE);
+        }
+
+        imageV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent login = new Intent(activity.getApplicationContext(), ImagesActivity.class);
+                login.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                ArrayList<String> fullImages = order.fullImages();
+                login.putExtra("images", fullImages.toArray(new String[0]));
+                activity.startActivity(login);
+            }
+        });  */
+
+        /*
+        TextView postTotalNum = (TextView) vi.findViewById(R.id.post_total_num);
+        postTotalNum.setText(String.valueOf(order.getCount()));
+
+        final TextView postLeftNumTxt = (TextView) vi.findViewById(R.id.post_left_num);
+
+        final LinearLayout orderLayout = (LinearLayout) vi.findViewById(R.id.subOrderLayout);
+        final TextView bookedUNameTxt = (TextView) vi.findViewById(R.id.booked_uname_txts);
+        final ImageView bookedNamePic = (ImageView) vi.findViewById(R.id.book_pic);
+        final ImageButton bookBtn = (ImageButton) vi.findViewById(R.id.btnBooked);
+        reLayoutBooked(order, bookedUNameTxt, orderLayout, postLeftNumTxt, bookBtn);
+
+        final RelativeLayout commentContainers = (RelativeLayout) vi.findViewById(R.id.list_row_comments_container);
+        commentContainers.removeViews(0, commentContainers.getChildCount());
+
+        if (order.getComments().size() > 0) {
+            View pre = bookedNamePic;
+            for (Comment cm : order.getComments()) {
+                pre = appendComment(commentContainers, cm, pre);
+            }
+            commentContainers.setVisibility(View.VISIBLE);
+        }
+
+        final User currU = Singleton.getInstance().getCurrUser();
+        boolean booked = (currU == null ? false : order.booked(currU.getId()));
+        if (booked) {
+            // bookBtn.setImageDrawable(R.d);
+            // TODO: 需要已经订阅的提示
+        }
+
+        bookBtn.setOnClickListener(new View.OnClickListener() {
+
+            private boolean doing = false;
+
+            @Override
+            public void onClick(View v) {
+
+                if (doing) {
+                    Log.d(Singleton.ORDERS_TAG, "canceling a duplicated clicked.");
+                    return;
+                }
+
+                if (order.isInactive()) {
+                    Toast.makeText(activity, R.string.not_active_any_more, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (order.outofOrder() && !order.booked(currU.getId())) {
+                    Toast.makeText(activity, R.string.out_of_order, Toast.LENGTH_LONG).show();
+                    bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_outoforder));
+                    return;
+                }
+
+                if (currU == null) {
+                    Toast.makeText(activity, R.string.login_required, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                boolean isUndo = false;
+                if (order.booked(currU.getId())) {
+                    order.undoBook(currU);
+                    Toast.makeText(activity, R.string.book_undo_op, Toast.LENGTH_LONG).show();
+                    isUndo = true;
+                } else {
+                    order.addBooked(currU);
+                    Toast.makeText(activity, R.string.book_book_op, Toast.LENGTH_LONG).show();
+                }
+
+
+                final boolean nowBooked = order.booked(currU.getId());
+//                bookBtn.setHint(nowBooked ? R.string.bookBtn_cancel : R.string.bookBtn_book);
+                if (order.outofOrder())
+                    bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_outoforder));
+
+                reLayoutBooked(order, bookedUNameTxt, orderLayout, postLeftNumTxt, bookBtn);
+
+                new AsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    protected void onPreExecute() {
+                        doing = true;
+                    }
+
+                    @Override
+                    protected Boolean doInBackground(Void... params) {
+                        PostService postService = Singleton.getInstance().getOrderService();
+                        return nowBooked ?
+                                postService.book(order)
+                                : postService.undoBook(order);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        Log.i(Singleton.ORDERS_TAG, "onPostExecute of book:" + result);
+                        doing = false;
+                        if (result) {
+//                            order.removeComment(currU.getId());
+                            OrderAdapter.this.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    protected void onCancelled(Boolean aBoolean) {
+                        doing = false;
+                    }
+                }.execute();
+            }
+        });
+
+        final ImageButton commentBtn = (ImageButton) vi.findViewById(R.id.btnComment);
+
+        commentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(Singleton.ORDERS_TAG, "accepted commentBtn onclick event");
+
+                //if (!order.booked(Singleton.getInstance().getCurrUid())) {
+//                    AlertUtil.showAlert(activity, R.string.comment_block_title, R.string.comment_block_error);
+                // Toast.makeText(activity, R.string.comment_block_error, Toast.LENGTH_LONG).show();
+                //return;
+                //}
+
+                commentComp.showForPost(order, OrderAdapter.this);
+            }
+        });
+        */
+
+        return vi;
+    }
+
+//    private void reLayoutBooked(Post post, TextView bookedUNameTxt, LinearLayout orderLayout, TextView postLeftNumTxt, ImageButton bookBtn) {
+//
+//        Log.d(Singleton.ORDERS_TAG, "relayoutBooked" + post);
+//
+//        postLeftNumTxt.setText(String.valueOf(post.getLeft()));
+//        if (post.outofOrder()) {
+//            bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_outoforder));
+//        } else {
+//            bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_go));
+//        }
+//
+//        if (bookedUNameTxt == null) {
+//            Log.e(Singleton.ORDERS_TAG, "booked name text view is null");
+//            return;
+//        }
+//
+//        if (post.getBookedUids().length > 0) {
+//            bookedUNameTxt.setText(post.getBookedUNames());
+//            orderLayout.setVisibility(View.VISIBLE);
+//        } else {
+//            bookedUNameTxt.setText("");
+//            orderLayout.setVisibility(View.GONE);
+//        }
+//    }
+//
+//    private TextView appendComment(RelativeLayout commentContainers, Comment cm, View pre) {
+//        TextView textLabel = (TextView) new TextView(activity);
+//        TextView textView = new TextView(activity);
+//        textLabel.setId(pre != null ? pre.getId() + 2 : 1);
+//        textView.setId(textLabel.getId() + 1);
+//
+//        LayoutParams p1 = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        p1.addRule(RelativeLayout.BELOW, pre != null ? pre.getId() : R.id.book_pic);
+//        p1.addRule(RelativeLayout.ALIGN_BOTTOM, textView.getId());
+//        p1.addRule(RelativeLayout.ALIGN_TOP, textView.getId());
+//
+//        textLabel.setLayoutParams(p1);
+//        textLabel.setTextColor(activity.getResources().getColor(R.color.post_anota_num_color));
+//        textLabel.setPadding(5, 2, 5, 2);
+//        textLabel.setGravity(Gravity.CENTER_VERTICAL);
+//
+//        LayoutParams p2 = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        p2.addRule(RelativeLayout.BELOW, pre != null ? pre.getId() : R.id.book_pic);
+//        p2.addRule(RelativeLayout.RIGHT_OF, textLabel.getId());
+//        textView.setLayoutParams(p2);
+//        textView.setPadding(0, 2, 0, 2);
+//
+//        textLabel.setText(Singleton.getInstance().getUNameById(String.valueOf(cm.getUid())) + ": ");
+//        textView.setText(cm.getComment());
+//        commentContainers.addView(textLabel);
+//        commentContainers.addView(textView);
+//        return textLabel;
+//    }
+}

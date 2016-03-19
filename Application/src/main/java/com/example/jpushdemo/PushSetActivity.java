@@ -140,7 +140,7 @@ public class PushSetActivity extends InstrumentedActivity implements OnClickList
 	 *设置通知栏样式 - 定义通知栏Layout
 	 */
 	private void setStyleCustom(){
-		CustomPushNotificationBuilder builder = new CustomPushNotificationBuilder(PushSetActivity.this, R.layout.customer_notitfication_layout, R.id.icon, R.id.title, R.id.text);
+		CustomPushNotificationBuilder builder = new CustomPushNotificationBuilder(PushSetActivity.this, R.layout.customer_notitfication_layout, R.id.icon, R.id.expect_time, R.id.text);
 		builder.layoutIconDrawable = R.drawable.ic_launcher;
 		builder.developerArg0 = "developerArg2";
 		JPushInterface.setPushNotificationBuilder(2, builder);

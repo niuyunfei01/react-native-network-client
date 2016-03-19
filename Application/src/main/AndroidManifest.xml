@@ -18,8 +18,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
     android:versionCode="210"
-    android:versionName="2.1.0"
-    >
+    android:versionName="2.1.0">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
 
@@ -61,9 +60,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Styled"
-        android:name=".ExampleApplication">
+        android:name=".CrmApplication">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"  android:screenOrientation="portrait">
 
             <!-- Launcher Intent filter -->
             <intent-filter>

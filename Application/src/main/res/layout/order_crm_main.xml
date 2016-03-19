@@ -14,11 +14,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/order_crm_desc"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp" >
 
-<resources>
-
-    <color name="pressed_styled">#CC669900</color>
-    <color name="order_head_styled">#cccccc</color>
-    <color name="order_list_bg">#eee</color>
-
-</resources>
+<!--<TextView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:text="@string/main_description"
+    android:padding="16dp"
+    android:gravity="center"/>-->
+</RelativeLayout>
