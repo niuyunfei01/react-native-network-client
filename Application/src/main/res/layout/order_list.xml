@@ -18,13 +18,15 @@
     android:id="@+id/list_order_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/orderListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:footerDividersEnabled="false" />
+        android:footerDividersEnabled="false"
+        android:divider="@null"
+        android:dividerHeight="8dp"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>
 

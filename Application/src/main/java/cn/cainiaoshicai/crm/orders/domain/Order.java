@@ -1,63 +1,36 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
-import android.text.TextUtils;
-import android.util.Log;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Order {
 
-    @JsonProperty("objectId")
-    private int id;
-
-    @JsonProperty("dayId")
-    private String dayId;
-
-    @JsonProperty("userId")
+    private String id;
     private int userId;
-
-    @JsonProperty("userName")
-    private String userName;
-
-    @JsonProperty("userAddr")
-    private String userAddr;
-
-    @JsonProperty("area")
     private String area;
-
-    @JsonProperty("phone")
-    private String phone;
-
-    @JsonProperty("gender")
     private int gender;
-
-    @JsonProperty("totalPay")
-    private double totalPay;
-
-
-    //TODO: timezone 保持服务器端一致
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd kk:mm:ss", timezone = "GMT+08:00")
-    @JsonProperty("expectTime")
-    private Date expectTime;
-
-    @JsonProperty("receivedTime")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd kk:mm:ss", timezone = "GMT+08:00")
     private Date receivedTime;
 
-    public int getId() {
+    private String dayId;
+    private String userName;
+    private String address;
+    private String mobile;
+    private double orderMoney;
+    private Date expectTime;
+    private Date orderTime;
+    private String remark;
+    private int orderStatus;
+    private int platform;
+    private String platform_oid;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -85,12 +58,12 @@ public class Order {
         this.userName = userName;
     }
 
-    public String getUserAddr() {
-        return userAddr;
+    public String getAddress() {
+        return address;
     }
 
-    public void setUserAddr(String userAddr) {
-        this.userAddr = userAddr;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getArea() {
@@ -101,12 +74,12 @@ public class Order {
         this.area = area;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public Date getExpectTime() {
@@ -129,11 +102,59 @@ public class Order {
         return this.gender == 1 ? "先生" : "女士";
     }
 
-    public void setTotalPay(double pay) {
-        this.totalPay = pay;
+    public void setOrderMoney(double pay) {
+        this.orderMoney = pay;
     }
 
-    public double getTotalPay() {
-        return totalPay;
+    public double getOrderMoney() {
+        return orderMoney;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
+    public Date getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(Date orderTime) {
+        this.orderTime = orderTime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public int getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(int orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public int getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(int platform) {
+        this.platform = platform;
+    }
+
+    public String getPlatform_oid() {
+        return platform_oid;
+    }
+
+    public void setPlatform_oid(String platform_oid) {
+        this.platform_oid = platform_oid;
     }
 }

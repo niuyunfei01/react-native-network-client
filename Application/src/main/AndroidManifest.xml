@@ -34,9 +34,11 @@
         android:protectionLevel="signature" />
 
     <!-- Required  一些系统要求的权限，如访问网络等-->
+    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -60,7 +62,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Styled"
-        android:name=".CrmApplication">
+        android:name=".GlobalCtx">
 
         <activity android:name=".MainActivity"  android:screenOrientation="portrait">
 
@@ -83,6 +85,8 @@
 
         <activity android:name="com.example.BlueToothPrinterApp.BlueToothPrinterApp"/>
         <activity android:name="com.example.BlueToothPrinterApp.BTDeviceList"/>
+
+        <activity android:name=".orders.view.OrderSingleActivity"/>
 
         <!-- For test only 测试的主程序-->
         <activity
@@ -107,19 +111,19 @@
 
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity
-            android:name="cn.jpush.android.ui.PopWinActivity"
+            android:name="cn.jpush.android.cn.cainiaoshicai.crm.ui.PopWinActivity"
             android:theme="@style/MyDialogStyle"
             android:exported="false">
         </activity>
 
         <!-- Required SDK核心功能-->
         <activity
-            android:name="cn.jpush.android.ui.PushActivity"
+            android:name="cn.jpush.android.cn.cainiaoshicai.crm.ui.PushActivity"
             android:configChanges="orientation|keyboardHidden"
             android:theme="@android:style/Theme.NoTitleBar"
             android:exported="false">
             <intent-filter>
-                <action android:name="cn.jpush.android.ui.PushActivity" />
+                <action android:name="cn.jpush.android.cn.cainiaoshicai.crm.ui.PushActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="cn.cainiaoshicai.crm" />
             </intent-filter>

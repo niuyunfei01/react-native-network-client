@@ -14,7 +14,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.cainiaoshicai.crm.orders.Singleton;
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.dao.UserDao;
 import cn.cainiaoshicai.crm.orders.domain.ApiInvokeResult;
 import cn.cainiaoshicai.crm.orders.domain.LoginResult;
@@ -43,7 +44,7 @@ public class UserService {
     }
 
     public User login(String email, String password) {
-        final String url = String.format(Singleton.REST_API + "/login?email=%s&password=%s&ver=1", email.trim(), password);
+        final String url = String.format(URLHelper.API_ROOT + "/login?email=%s&password=%s&ver=1", email.trim(), password);
         HttpHeaders requestHeaders = getHttpHeaders();
 
         HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
@@ -55,7 +56,7 @@ public class UserService {
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
                     LoginResult.class);
 
-            Log.d(Singleton.ORDERS_TAG, "LoginResult:" + responseEntity.getBody());
+            Log.d(GlobalCtx.ORDERS_TAG, "LoginResult:" + responseEntity.getBody());
 
             User u = responseEntity.getBody().getUser();
             if (responseEntity.getBody().getSuccess() == 1
@@ -65,14 +66,14 @@ public class UserService {
                 return u;
             }
         } catch (RestClientException e) {
-            Log.e(Singleton.ORDERS_TAG, "failed to post login ", e);
+            Log.e(GlobalCtx.ORDERS_TAG, "failed to post login ", e);
         }
 
         return null;
     }
 
     public User register(String name, String email, String password) {
-        final String url = String.format(Singleton.REST_API + "/register?name=%s&email=%s&password=%s",
+        final String url = String.format(URLHelper.API_ROOT + "/register?name=%s&email=%s&password=%s",
                 name.trim(), email.trim(), password);
         HttpHeaders requestHeaders = getHttpHeaders();
 
@@ -105,7 +106,7 @@ public class UserService {
         User user = userDao.getUser();
         String userId = user.getId();
 
-        final String url = String.format(Singleton.REST_API + "/push_register?userId=%s&pushUserId=%s&pushChannelId=%s",
+        final String url = String.format(URLHelper.API_ROOT + "/push_register?userId=%s&pushUserId=%s&pushChannelId=%s",
                 userId, pushUserId.trim(), pushChannelId.trim());
         HttpHeaders requestHeaders = getHttpHeaders();
 

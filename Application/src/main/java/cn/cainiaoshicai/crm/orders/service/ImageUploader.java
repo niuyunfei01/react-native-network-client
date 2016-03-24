@@ -2,7 +2,7 @@ package cn.cainiaoshicai.crm.orders.service;
 
 import android.util.Log;
 
-//import com.daifan.Singleton;
+//import com.daifan.GlobalCtx;
 //
 //import org.apache.http.HttpResponse;
 //import org.apache.http.StatusLine;
@@ -23,7 +23,7 @@ public class ImageUploader {
 
     public String upload(String filename) {
 
-//        Log.d(Singleton.DAIFAN_TAG, "start writing filename:" + filename + " to server");
+//        Log.d(GlobalCtx.DAIFAN_TAG, "start writing filename:" + filename + " to server");
 //
 //        HttpClient httpClient = new DefaultHttpClient();
 //        HttpContext httpContext = new BasicHttpContext();
@@ -44,13 +44,13 @@ public class ImageUploader {
 //                if (con.startsWith(CON_START_FILEID)) {
 //                    return con.substring(CON_START_FILEID.length());
 //                } else {
-//                    Log.e(Singleton.DAIFAN_TAG, "response incorrect:" + con);
+//                    Log.e(GlobalCtx.DAIFAN_TAG, "response incorrect:" + con);
 //                }
 //            } else {
-//                Log.d(Singleton.DAIFAN_TAG, "uploading failed for status line:" + statusLine.toString());
+//                Log.d(GlobalCtx.DAIFAN_TAG, "uploading failed for status line:" + statusLine.toString());
 //            }
 //        } catch (Exception e) {
-//            Log.d(Singleton.DAIFAN_TAG, "Uploading filename" + filename + " failed", e);
+//            Log.d(GlobalCtx.DAIFAN_TAG, "Uploading filename" + filename + " failed", e);
 //        }
         return null;
     }

@@ -2,30 +2,19 @@ package cn.cainiaoshicai.crm.orders.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.text.format.DateUtils;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.orders.Singleton;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.service.Utils;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 /**
  */
@@ -63,7 +52,7 @@ public class OrderAdapter extends BaseAdapter {
             vi = inflater.inflate(R.layout.order_list_one, null);
 
         TextView expect_time = (TextView) vi.findViewById(R.id.expect_time);
-        TextView orderAddr = (TextView) vi.findViewById(R.id.userAddr);
+        TextView orderAddr = (TextView) vi.findViewById(R.id.address);
         TextView userName = (TextView) vi.findViewById(R.id.userName);
         TextView phone = (TextView) vi.findViewById(R.id.phone_text);
         TextView genderText = (TextView) vi.findViewById(R.id.gender_text);
@@ -74,27 +63,31 @@ public class OrderAdapter extends BaseAdapter {
 
 //        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
 
-        final Order order = orders.get(i);
+        try {
+            final Order order = orders.get(i);
 
 //        thumb_image.setImageUrl(order.getThumbnailUrl(), mImageLoader);
 
-        DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
-        
-        Date expectTime = order.getExpectTime();
-        expect_time.setText(expectTime == null ? "立即" : instance.getShortFullTime(expectTime));
+            DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
-        orderAddr.setText(order.getUserAddr());
-        userName.setText(order.getUserName());
-        phone.setText(order.getPhone());
-        genderText.setText(order.getGenderText());
-        orderMoney.setText(String.valueOf(order.getTotalPay()));
+            Date expectTime = order.getExpectTime();
+            expect_time.setText(expectTime == null ? "立即" : instance.getShortFullTime(expectTime));
 
-        orderTime.setText(instance.getShortTime(order.getReceivedTime()));
-        dayNo.setText(order.getDayId());
+            orderAddr.setText(order.getAddress());
+            userName.setText(order.getUserName());
+            phone.setText(order.getMobile());
+            genderText.setText(order.getGenderText());
+            orderMoney.setText(String.valueOf(order.getOrderMoney()));
+
+            orderTime.setText(instance.getShortTime(order.getOrderTime()));
+            dayNo.setText("#" + order.getDayId());
+        }catch (Exception e) {
+            AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
+        }
 
         /*
         long time = order.getCreatedAt().getTime();
-        Log.d(Singleton.ORDERS_TAG, "created at " + order.getCreatedAt());
+        Log.d(GlobalCtx.ORDERS_TAG, "created at " + order.getCreatedAt());
         createdAtTxt.setText(DateUtils.getRelativeTimeSpanString(time, System.currentTimeMillis(), 0));
         ((TextView) vi.findViewById(R.id.post_address)).setText(order.getAddress());
         if (order.getAddress() != null && !"".equals(order.getAddress().trim())) {
@@ -159,7 +152,7 @@ public class OrderAdapter extends BaseAdapter {
             commentContainers.setVisibility(View.VISIBLE);
         }
 
-        final User currU = Singleton.getInstance().getCurrUser();
+        final User currU = GlobalCtx.getInstance().getCurrUser();
         boolean booked = (currU == null ? false : order.booked(currU.getId()));
         if (booked) {
             // bookBtn.setImageDrawable(R.d);
@@ -174,7 +167,7 @@ public class OrderAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 if (doing) {
-                    Log.d(Singleton.ORDERS_TAG, "canceling a duplicated clicked.");
+                    Log.d(GlobalCtx.ORDERS_TAG, "canceling a duplicated clicked.");
                     return;
                 }
 
@@ -220,7 +213,7 @@ public class OrderAdapter extends BaseAdapter {
 
                     @Override
                     protected Boolean doInBackground(Void... params) {
-                        PostService postService = Singleton.getInstance().getOrderService();
+                        PostService postService = GlobalCtx.getInstance().getOrderService();
                         return nowBooked ?
                                 postService.book(order)
                                 : postService.undoBook(order);
@@ -228,7 +221,7 @@ public class OrderAdapter extends BaseAdapter {
 
                     @Override
                     protected void onPostExecute(Boolean result) {
-                        Log.i(Singleton.ORDERS_TAG, "onPostExecute of book:" + result);
+                        Log.i(GlobalCtx.ORDERS_TAG, "onPostExecute of book:" + result);
                         doing = false;
                         if (result) {
 //                            order.removeComment(currU.getId());
@@ -249,9 +242,9 @@ public class OrderAdapter extends BaseAdapter {
         commentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(Singleton.ORDERS_TAG, "accepted commentBtn onclick event");
+                Log.d(GlobalCtx.ORDERS_TAG, "accepted commentBtn onclick event");
 
-                //if (!order.booked(Singleton.getInstance().getCurrUid())) {
+                //if (!order.booked(GlobalCtx.getInstance().getCurrUid())) {
 //                    AlertUtil.showAlert(activity, R.string.comment_block_title, R.string.comment_block_error);
                 // Toast.makeText(activity, R.string.comment_block_error, Toast.LENGTH_LONG).show();
                 //return;
@@ -267,7 +260,7 @@ public class OrderAdapter extends BaseAdapter {
 
 //    private void reLayoutBooked(Post post, TextView bookedUNameTxt, LinearLayout orderLayout, TextView postLeftNumTxt, ImageButton bookBtn) {
 //
-//        Log.d(Singleton.ORDERS_TAG, "relayoutBooked" + post);
+//        Log.d(GlobalCtx.ORDERS_TAG, "relayoutBooked" + post);
 //
 //        postLeftNumTxt.setText(String.valueOf(post.getLeft()));
 //        if (post.outofOrder()) {
@@ -277,7 +270,7 @@ public class OrderAdapter extends BaseAdapter {
 //        }
 //
 //        if (bookedUNameTxt == null) {
-//            Log.e(Singleton.ORDERS_TAG, "booked name text view is null");
+//            Log.e(GlobalCtx.ORDERS_TAG, "booked name text view is null");
 //            return;
 //        }
 //
@@ -312,7 +305,7 @@ public class OrderAdapter extends BaseAdapter {
 //        textView.setLayoutParams(p2);
 //        textView.setPadding(0, 2, 0, 2);
 //
-//        textLabel.setText(Singleton.getInstance().getUNameById(String.valueOf(cm.getUid())) + ": ");
+//        textLabel.setText(GlobalCtx.getInstance().getUNameById(String.valueOf(cm.getUid())) + ": ");
 //        textView.setText(cm.getComment());
 //        commentContainers.addView(textLabel);
 //        commentContainers.addView(textView);

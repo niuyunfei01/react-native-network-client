@@ -16,91 +16,111 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import cn.cainiaoshicai.crm.orders.Singleton;
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.domain.PostContainer;
+import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.PostNew;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 
 public class OrderService {
 
     public ArrayList<Order> getOrders() {
-        final String url = Singleton.REST_API + "/orders?type=0";
+        final String url = URLHelper.API_ROOT + "/orders?type=0";
         return getInternalPosts(url);
     }
 
-    public ArrayList<Order> getOrders(int orderStatus) {
-        final String url = Singleton.REST_API + "/orders?status=" + orderStatus;
+    public ArrayList<Order> getOrders(Date orderDay, int orderStatus) {
+        final String url = URLHelper.API_ROOT + "/orders/" + DateTimeUtils.shortYmd(orderDay) + "?status=" + orderStatus;
         return getInternalPosts(url);
     }
 
     public ArrayList<Order> getLatestPosts(int latestId) {
-        final String url = Singleton.REST_API + "/orders?type=1&currentId=" + latestId;
+        final String url = URLHelper.API_ROOT + "/orders?type=1&currentId=" + latestId;
         return getInternalPosts(url);
     }
 
     public ArrayList<Order> getOldestPosts(int oldestId) {
-        final String url = Singleton.REST_API + "/orders?type=2&currentId=" + oldestId;
+        final String url = URLHelper.API_ROOT + "/orders?type=2&currentId=" + oldestId;
         return getInternalPosts(url);
     }
 
     private ArrayList<Order> getInternalPosts(String url) {
-
+        Log.v(GlobalCtx.ORDERS_TAG, "try to get posts:" + url);
         try {
-            ResponseEntity<PostContainer> responseEntity = http(url, PostContainer.class);
+            ResponseEntity<OrderContainer> responseEntity = http(url, OrderContainer.class);
             if (responseEntity == null)
                 return new ArrayList<>();
 
-            PostContainer resp = responseEntity.getBody();
-            Singleton.getInstance().addCommentUidNames(resp.getBookedUidNames());
-            return resp.getPosts();
+            OrderContainer resp = responseEntity.getBody();
+//            GlobalCtx.getInstance().addCommentUidNames(resp.getBookedUidNames());
+            return resp.getOrders();
+//            ArrayList<Order> orders = new ArrayList<>();
+//            Order order = new Order();
+//            order.setArea("回龙观店");
+//            order.setDayId("1");
+//            order.setExpectTime(new Date());
+//            order.setMobile("18910275329");
+//            order.setReceivedTime(new Date());
+//            order.setOrderMoney(300.0);
+//            order.setAddress("龙景苑二区 30-3-301");
+//            order.setUserName("张");
+//            order.setGender(0);
+//            orders.add(order);
+//            orders.add(order);
+//            return orders;
         } catch (RestClientException e) {
-            Log.e(Singleton.ORDERS_TAG, "get orders failed for url " + url, e);
+            Log.e(GlobalCtx.ORDERS_TAG, "get orders failed for url " + url, e);
+            return new ArrayList<>();
+        } catch (ServiceException e) {
+            Log.e(GlobalCtx.ORDERS_TAG, "error to post service exception", e);
             return new ArrayList<>();
         }
     }
 //
 //    public boolean book(Post post) {
 //
-//        User u = Singleton.getInstance().getCurrUser();
+//        User u = GlobalCtx.getInstance().getCurrUser();
 //
 //        String params = String.format("postId=%s&food_owner_id=%s&food_owner_name=%s&userId=%s&userName=%s"
 //                , post.getId(), post.getUserId(), post.getUserName(), u.getId(), u.getName());
 //
-//        String url = Singleton.REST_API + "/book?" + params;
+//        String url = GlobalCtx.API_ROOT + "/book?" + params;
 //
 //        try {
-//            ResponseEntity<PostContainer> responseEntity = http(url, PostContainer.class);
-//            return responseEntity != null && Singleton.isSucc(responseEntity.getBody().getSuccess());
+//            ResponseEntity<OrderContainer> responseEntity = http(url, OrderContainer.class);
+//            return responseEntity != null && GlobalCtx.isSucc(responseEntity.getBody().getSuccess());
 //        } catch (Exception e) {
-//            Log.e(Singleton.ORDERS_TAG, "post failed:" + e.getMessage(), e);
+//            Log.e(GlobalCtx.ORDERS_TAG, "post failed:" + e.getMessage(), e);
 //            return false;
 //        }
 //    }
 //    public boolean undoBook(Post post) {
 //
-//        User u = Singleton.getInstance().getCurrUser();
+//        User u = GlobalCtx.getInstance().getCurrUser();
 //
 //        String params = String.format("postId=%s&userId=%s", post.getId(), u.getId());
 //
-//        String url = Singleton.REST_API + "/undo-book?" + params;
+//        String url = GlobalCtx.API_ROOT + "/undo-book?" + params;
 //
 //        try {
-//            ResponseEntity<PostContainer> responseEntity = http(url, PostContainer.class);
-//            return responseEntity != null && Singleton.isSucc(responseEntity.getBody().getSuccess());
+//            ResponseEntity<OrderContainer> responseEntity = http(url, OrderContainer.class);
+//            return responseEntity != null && GlobalCtx.isSucc(responseEntity.getBody().getSuccess());
 //        } catch (Exception e) {
-//            Log.e(Singleton.ORDERS_TAG, "post failed:" + e.getMessage(), e);
+//            Log.e(GlobalCtx.ORDERS_TAG, "post failed:" + e.getMessage(), e);
 //            return false;
 //        }
 //    }
 
-    public boolean postNew(String countStr, String eatDateStr, String nameStr, String descStr, String currUid, List<String> imgs) {
-        Log.d(Singleton.ORDERS_TAG, String.format("postNew count=%s, eatDate=%s, name=%s, desc=%s, uid=%s"
+    public boolean postNew(String countStr, String eatDateStr, String nameStr, String descStr, String currUid, List<String> imgs) throws ServiceException {
+        Log.d(GlobalCtx.ORDERS_TAG, String.format("postNew count=%s, eatDate=%s, name=%s, desc=%s, uid=%s"
                 , countStr, eatDateStr, nameStr, descStr, currUid));
 
         String params = String.format("count=%s&eatDate=%s&name=%s&desc=%s&uid=%s", countStr, eatDateStr, nameStr, descStr, currUid);
-        String url = Singleton.REST_API + "/post?" + params;
+        String url = URLHelper.API_ROOT + "/post?" + params;
 
         MultiValueMap<String, String> imgMap = new LinkedMultiValueMap<String, String>();;
 
@@ -112,11 +132,11 @@ public class OrderService {
         ResponseEntity<PostNew> responseEntity = http(url, PostNew.class, imgMap);
 
         return responseEntity != null
-                && Singleton.isSucc(responseEntity.getBody().getSuccess())
+                && GlobalCtx.isSucc(responseEntity.getBody().getSuccess())
                 && responseEntity.getBody().getNewPostId()>0;
     }
 
-    private <T> ResponseEntity<T> http(String url, Class<T> responseType) {
+    private <T> ResponseEntity<T> http(String url, Class<T> responseType) throws ServiceException {
         return this.http(url, responseType, null);
     }
     /**
@@ -126,9 +146,10 @@ public class OrderService {
      * @param <T>
      * @return null if exception
      */
-    private <T> ResponseEntity<T> http(String url, Class<T> responseType, MultiValueMap posts) {
+    private <T> ResponseEntity<T> http(String url, Class<T> responseType, MultiValueMap posts)
+            throws ServiceException {
 
-        Log.d(Singleton.ORDERS_TAG, url);
+        Log.d(GlobalCtx.ORDERS_TAG, url);
 
         //TODO: url encoding for names
         HttpHeaders reqHead = new HttpHeaders();
@@ -151,24 +172,27 @@ public class OrderService {
                 rtn = restTemplate.exchange(url, HttpMethod.GET, requestEntity, responseType);
             }
 
-            Log.d(Singleton.ORDERS_TAG, "response:" + rtn);
+            Log.d(GlobalCtx.ORDERS_TAG, "response:" + rtn);
             return rtn;
         }catch (HttpMessageNotReadableException e){
-            Log.e(Singleton.ORDERS_TAG, "Post service reading message exception", e);
+            Log.e(GlobalCtx.ORDERS_TAG, "Post service reading message exception", e);
             return null;
+        } catch(Exception ex) {
+            Log.e(GlobalCtx.ORDERS_TAG, "error to execute http request:" + ex.getMessage(), ex);
+            throw new ServiceException(ex);
         }
     }
 
 //    public Comment postComment(Post post, int currUid, String comment) {
 //
-//        Log.d(Singleton.ORDERS_TAG, "postComment to post " + post.getId() + " from uid " + currUid);
-//        Singleton.getInstance().addCommentUidNames(Singleton.getInstance().getCurrUser());
+//        Log.d(GlobalCtx.ORDERS_TAG, "postComment to post " + post.getId() + " from uid " + currUid);
+//        GlobalCtx.getInstance().addCommentUidNames(GlobalCtx.getInstance().getCurrUser());
 //
 //        //TODO: could run in background
 //        //TODO: replace uid with uid in session!
 //        String url = null;
 //        try {
-//            url = new StringBuffer().append(Singleton.REST_API).append("/comment?")
+//            url = new StringBuffer().append(GlobalCtx.API_ROOT).append("/comment?")
 //                    .append("userId=").append(currUid)
 //                    .append("&postId=").append(post.getId())
 //                    .append("&comment=").append(URLEncoder.encode(comment, "UTF-8"))
@@ -179,12 +203,12 @@ public class OrderService {
 //
 //        boolean ok = false;
 //        try {
-//            ResponseEntity<PostContainer> rtnEntity = this.http(url, PostContainer.class);
-//            ok = rtnEntity != null && Singleton.isSucc(rtnEntity.getBody().getSuccess());
+//            ResponseEntity<OrderContainer> rtnEntity = this.http(url, OrderContainer.class);
+//            ok = rtnEntity != null && GlobalCtx.isSucc(rtnEntity.getBody().getSuccess());
 //        } catch (Exception e) {
-//           Log.e(Singleton.ORDERS_TAG, "error when post comment", e);
+//           Log.e(GlobalCtx.ORDERS_TAG, "error when post comment", e);
 //        }
-//        Log.d(Singleton.ORDERS_TAG, "postComment " + comment + " result: " + ok);
+//        Log.d(GlobalCtx.ORDERS_TAG, "postComment " + comment + " result: " + ok);
 //
 //        return post.addComment(currUid, comment);
 //    }

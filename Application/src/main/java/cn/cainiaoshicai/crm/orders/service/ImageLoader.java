@@ -8,7 +8,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.orders.Singleton;
+import cn.cainiaoshicai.crm.GlobalCtx;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +33,7 @@ public class ImageLoader {
     ExecutorService executorService;
 
     public ImageLoader(Context context){
-        fileCache= Singleton.getFileCache();
+        fileCache= GlobalCtx.getFileCache();
         executorService= Executors.newFixedThreadPool(5);
     }
 
@@ -75,7 +75,7 @@ public class ImageLoader {
         if(b!=null)
             return b;
 
-        Log.d(Singleton.ORDERS_TAG, "loading image " + url);
+        Log.d(GlobalCtx.ORDERS_TAG, "loading image " + url);
 
         //from web
         HttpURLConnection conn = null;

@@ -6,6 +6,7 @@ import android.text.format.DateUtils;
 import cn.cainiaoshicai.crm.R;
 
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -35,7 +36,7 @@ public class DateTimeUtils extends DateUtils {
 	private static DateTimeUtils sInstance = null;
 
 	/**
-	 * Singleton contructor. needed to get access to the application context &
+	 * GlobalCtx contructor. needed to get access to the application context &
 	 * strings for i18n
 	 * 
 	 * @param context
@@ -95,6 +96,11 @@ public class DateTimeUtils extends DateUtils {
 																				// names
 	public static final long millisInADay = 1000 * 60 * 60 * 24;
 
+	public static String shortYmd(Date orderDay) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(orderDay);
+    }
+
 	/**
 	 * Displays a user-friendly date difference string.
 	 * 
@@ -143,12 +149,13 @@ public class DateTimeUtils extends DateUtils {
     }
 
 	public String getShortFullTime(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        return String.format(datetime_short, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+        return String.format(datetime_short, date, date, date, date);
 	}
 
     public String getShortTime(Date date) {
+		if (date == null) {
+			return "";
+		}
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         return cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE);

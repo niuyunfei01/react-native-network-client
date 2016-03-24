@@ -30,6 +30,8 @@ import android.view.MenuItem;
 import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 
 /**
  * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
@@ -46,12 +48,23 @@ import cn.cainiaoshicai.crm.orders.OrderListFragment;
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
-    private int fragmentIdToPrepare, getFragmentIdToShip, getFragmentIdToArrive;
+    private int fragmentIdToPrepare=0, getFragmentIdToShip=1, getFragmentIdToArrive=2;
+
+
+    public static Intent newIntent() {
+        return new Intent(GlobalCtx.getInstance(), MainActivity.class);
+    }
+
+    public static Intent newIntent(AccountBean accountBean) {
+        Intent intent = newIntent();
+        intent.putExtra(BundleArgsConstants.ACCOUNT_EXTRA, accountBean);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.order_crm_main);
+        setContentView(R.layout.order_list_main);
 
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
@@ -74,7 +87,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     // Implemented from ActionBar.TabListener
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Log.d("Main", String.valueOf(tab.getText()));
+        Log.d(GlobalCtx.ORDERS_TAG, String.valueOf(tab.getText()));
 
         int fragmentId = 0, listType = Constants.ORDER_LIST_PREPARE;
         if (tab.getPosition() == 0) {
@@ -88,13 +101,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             listType = Constants.ORDER_LIST_ARRIVE;
         }
 
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment found = (OrderListFragment) fragmentManager.findFragmentById(fragmentId);
+        FragmentManager fm = getFragmentManager();
+        Fragment found = fm.findFragmentById(fragmentId);
         if (found == null) {
             found = new OrderListFragment();
             ((OrderListFragment)found).setListType(listType);
         }
-        fragmentManager.beginTransaction().replace(R.id.order_crm_desc, found).commit();
+        fm.beginTransaction().replace(R.id.order_list_main, found).commit();
     }
 
     // Implemented from ActionBar.TabListener
@@ -125,7 +138,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     private void startPrint() {
         Intent printAct = new Intent(getApplicationContext(), BlueToothPrinterApp.class);
-        printAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        printAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(printAct);
         finish();
     }

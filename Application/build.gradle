@@ -37,7 +37,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 17
         targetSdkVersion 23
     }
 
@@ -69,4 +69,45 @@ android {
         exclude 'META-INF/notice.txt'
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+
+        release {
+            if (System.getenv("KEYSTORE") != null) {
+                storeFile file(System.getenv("KEYSTORE"))
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            resValue "string", "applicationId", "org.qii.weiciyuan" + getApplicationIdSuffix()
+            resValue "string", "weiciyuanOfficalWeiboName",
+                    "org.qii.weiciyuan" + getApplicationIdSuffix() + ".mention://@四次元App"
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
+        release {
+            resValue "string", "applicationId", "cn.cainiaoshicai.crm"
+            resValue "string", "Cainiaoshicai.cn",
+                    "cn.cainiaoshicai.crm" + ".mention://@Cainiao-CRM"
+            debuggable false
+            signingConfig signingConfigs.release
+        }
+
+    }
 }
