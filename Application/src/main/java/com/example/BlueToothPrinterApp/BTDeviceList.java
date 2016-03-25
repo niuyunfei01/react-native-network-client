@@ -1,6 +1,7 @@
 package com.example.BlueToothPrinterApp;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 public class BTDeviceList extends ListActivity {
 
@@ -56,8 +58,7 @@ public class BTDeviceList extends ListActivity {
 			return;
 		}
 
-		IntentFilter btIntentFilter = new IntentFilter(
-				BluetoothDevice.ACTION_FOUND);
+		IntentFilter btIntentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		registerReceiver(mBTReceiver, btIntentFilter);
 	}
 
@@ -90,8 +91,8 @@ public class BTDeviceList extends ListActivity {
 
 			finalize();
 
-		} catch (Exception ex) {
 		} catch (Throwable e) {
+            AppLogger.e("exception to flush data:" + e.getMessage(), e);
 		}
 
 	}
@@ -122,6 +123,7 @@ public class BTDeviceList extends ListActivity {
 		try {
 			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		} catch (Exception ex) {
+
 			return -2;
 		}
 
@@ -147,7 +149,7 @@ public class BTDeviceList extends ListActivity {
 					if (btDeviceList.size() > 0) {
 
 						for (BluetoothDevice device : btDeviceList) {
-							if (btDeviceList.contains(device) == false) {
+							if (!btDeviceList.contains(device)) {
 
 								btDevices.add(device);
 
@@ -179,8 +181,7 @@ public class BTDeviceList extends ListActivity {
 
 				try {
 					if (btDevices == null) {
-						btDevices = new ArrayAdapter<BluetoothDevice>(
-								getApplicationContext(), android.R.id.text1);
+						btDevices = new ArrayAdapter<BluetoothDevice>(getApplicationContext(), android.R.layout.simple_list_item_1);
 					}
 
 					if (btDevices.getPosition(device) < 0) {
@@ -191,6 +192,7 @@ public class BTDeviceList extends ListActivity {
 					}
 				} catch (Exception ex) {
 					// ex.fillInStackTrace();
+                    throw ex;
 				}
 			}
 		}
@@ -219,31 +221,38 @@ public class BTDeviceList extends ListActivity {
 
 			@Override
 			public void run() {
+                    BluetoothDevice device = btDevices.getItem(position);
 				try {
-					boolean gotuuid = btDevices.getItem(position)
+                    boolean gotuuid = device
 							.fetchUuidsWithSdp();
-					UUID uuid = btDevices.getItem(position).getUuids()[0]
+                    UUID uuid = device.getUuids()[0]
 							.getUuid();
-					mbtSocket = btDevices.getItem(position)
+					mbtSocket = device
 							.createRfcommSocketToServiceRecord(uuid);
 
 					mbtSocket.connect();
 				} catch (IOException ex) {
-					runOnUiThread(socketErrorRunnable);
-					try {
-						mbtSocket.close();
-					} catch (IOException e) {
-						// e.printStackTrace();
-					}
-					mbtSocket = null;
-					return;
+                    AppLogger.e("exception to connect bluebooth device：" + device.getName(), ex);
+                    try {
+                        mbtSocket = (BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(device, 2);
+                        mbtSocket.connect();
+                        AppLogger.e("connected to " + device.getName());
+                    }catch (Exception exx) {
+                        AppLogger.e("exception to connect BT device:" + device.getName(), ex);
+                        runOnUiThread(socketErrorRunnable);
+                        try {
+                            mbtSocket.close();
+                        } catch (IOException e) {
+                            // e.printStackTrace();
+                        }
+                        mbtSocket = null;
+                    }
 				} finally {
 					runOnUiThread(new Runnable() {
 
 						@Override
 						public void run() {
-							finish();
-
+							//finish();
 						}
 					});
 				}

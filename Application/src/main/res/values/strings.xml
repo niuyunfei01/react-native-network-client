@@ -164,5 +164,13 @@
 
 
     <string name="sans_serif" translatable="false">sans-serif</string>
+    <string name="bt_not_enabled_leaving">请开启蓝牙</string>
+    <string name="lab_bluetoothetting">蓝牙设置</string>
+    <string name="menu_searchbluetooth">搜索设备</string>
+    <string name="menu_clearbluetooth">清除蓝牙设备</string>
+    <string name="not_connected">未连接到蓝牙打印机</string>
+    <string name="title_connected_to">链接到</string>
+    <string name="title_connecting">连接中...</string>
+    <string name="title_not_connected">未连接</string>
 
 </resources>

@@ -28,6 +28,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
+
 import java.util.Date;
 import java.util.HashMap;
 
@@ -179,6 +181,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.menu_settings:
 //                showHelp();
                 return true;
+            case R.id.menu_print:
+                startActivity(new Intent(getApplicationContext(), BlueToothPrinterApp.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -192,13 +197,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
         if (requestCode == REQUEST_DAY) {
-            // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
-                // Do something with the contact here (bigger example below)
                 if (data != null) {
                     Date day = (Date)data.getSerializableExtra("daytime");
                     if (day != null) {
