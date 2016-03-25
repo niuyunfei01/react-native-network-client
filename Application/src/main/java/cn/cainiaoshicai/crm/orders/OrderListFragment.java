@@ -3,7 +3,6 @@ package cn.cainiaoshicai.crm.orders;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
@@ -21,14 +20,11 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.dao.OrdersDao;
-import cn.cainiaoshicai.crm.orders.domain.MessageBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
-import cn.cainiaoshicai.crm.orders.service.OrderService;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
-import cn.cainiaoshicai.crm.support.database.table.MentionWeiboTimeLineDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 public class OrderListFragment extends Fragment {
@@ -37,7 +33,6 @@ public class OrderListFragment extends Fragment {
 	private ListView listView;
 	private OrderAdapter adapter;
 	private ArrayList<Order> data = new ArrayList<Order>();;
-    private OrderService orderService = GlobalCtx.getInstance().getOrderService();
 
     private int listType;
     private Date orderDay = new Date();

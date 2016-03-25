@@ -1,15 +1,10 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class OrderContainer extends ApiInvokeResult {
+public class OrderContainer {
 
-    @JsonProperty("orders")
     private ArrayList<Order> orders;
 
     public ArrayList<Order> getOrders() {
@@ -23,8 +18,6 @@ public class OrderContainer extends ApiInvokeResult {
     @Override
     public String toString() {
         return "OrderContainer{" +
-                ", success=" + success +
-                ", error=" + error +
                 ", orders=" + orders +
                 '}';
     }

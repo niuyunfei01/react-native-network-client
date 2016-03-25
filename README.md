@@ -8,7 +8,7 @@ split action bar when running on a device with a narrow display, and shows three
 Introduction
 ------------
 
-This sample shows how to style an ActionBar using the [support library][1] on devices running 
+This sample shows how to style an ActionBar using the [support com.andexert.calendarlistview.library][1] on devices running
 Android v2.1+ using a custom theme.
 
 This Activity extends from ActionBarActivity, which provides all of the function 
@@ -17,7 +17,7 @@ A custom application theme and styles are defined in XML.
 
 Assets have been generated using the ['Android Action Bar Style Generator'][2].
 
-[1]: http://developer.android.com/tools/support-library/
+[1]: http://developer.android.com/tools/support-com.andexert.calendarlistview.library/
 [2]: http://jgilfelt.github.io/android-actionbarstylegenerator
 
 Pre-requisites

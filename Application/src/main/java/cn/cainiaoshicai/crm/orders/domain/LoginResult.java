@@ -1,11 +1,7 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class LoginResult {
 
-
-public class LoginResult extends ApiInvokeResult {
-
-    @JsonProperty("user")
     private User user;
 
     public User getUser() {

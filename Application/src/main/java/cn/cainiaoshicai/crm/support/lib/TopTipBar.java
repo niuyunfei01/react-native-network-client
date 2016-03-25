@@ -99,9 +99,9 @@ public class TopTipBar extends TextView {
     }
 
     /**
-     * the json library gson has a bug, may convert database value to Double type,
+     * the json com.andexert.calendarlistview.library gson has a bug, may convert database value to Double type,
      * so I have to force cast to Long type;
-     * todo use other json library
+     * todo use other json com.andexert.calendarlistview.library
      */
     public void setValue(Set<Long> values) {
         this.ids.clear();

@@ -1,23 +1,15 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Date;
 
 public class Comment {
 
-    @JsonProperty("uid")
     private int uid;
 
-    @JsonProperty("commentTime")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd kk:mm:ss")
     private Date commentDate;
 
-    @JsonProperty("rate")
     private int rate;
 
-    @JsonProperty("comment")
     private String comment;
 
     public Comment() {

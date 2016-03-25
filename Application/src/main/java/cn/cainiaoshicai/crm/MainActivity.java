@@ -26,8 +26,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.andexert.calendarlistview.library.DatePickerController;
+import com.andexert.calendarlistview.library.DayPickerView;
+import com.andexert.calendarlistview.library.SimpleMonthAdapter;
 import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
+
+import java.text.BreakIterator;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
@@ -49,6 +55,9 @@ import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     private int fragmentIdToPrepare=0, getFragmentIdToShip=1, getFragmentIdToArrive=2;
+    private DayPickerView dayPickerView;
+    private TextView selectedText;
+    private TextView selectedDaysText;
 
 
     public static Intent newIntent() {

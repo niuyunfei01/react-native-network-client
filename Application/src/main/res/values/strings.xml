@@ -162,4 +162,7 @@
     <string name="m">男</string>
     <string name="f">女</string>
 
+
+    <string name="sans_serif" translatable="false">sans-serif</string>
+
 </resources>

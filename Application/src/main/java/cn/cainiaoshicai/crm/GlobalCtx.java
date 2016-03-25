@@ -20,7 +20,6 @@ import cn.cainiaoshicai.crm.orders.domain.User;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
-import cn.cainiaoshicai.crm.orders.service.OrderService;
 import cn.cainiaoshicai.crm.orders.service.StatusService;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -54,14 +53,12 @@ public class GlobalCtx extends Application {
      */
     private Map<Integer, String> uidNames = new HashMap<Integer, String>();
     private User currUser;
-    private OrderService postService;
     private StatusService statusService;
 
     public boolean tokenExpiredDialogIsShowing = false;
     private AccountBean accountBean;
 
     public GlobalCtx() {
-        this.postService = new OrderService();
         this.statusService=new StatusService();
     }
 
@@ -103,14 +100,6 @@ public class GlobalCtx extends Application {
 
     public void addCommentUidNames(User currU) {
         this.uidNames.put(Integer.parseInt(currU.getId()), currU.getName());
-    }
-
-    public OrderService getOrderService() {
-        return postService;
-    }
-
-    public void setPostService(OrderService postService) {
-        this.postService = postService;
     }
 
     public StatusService getStatusService() {

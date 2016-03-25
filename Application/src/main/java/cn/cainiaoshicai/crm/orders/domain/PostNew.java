@@ -1,9 +1,6 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class PostNew extends ApiInvokeResult {
-    @JsonProperty("postid")
+public class PostNew {
     private int newPostId;
 
     public int getNewPostId() {
