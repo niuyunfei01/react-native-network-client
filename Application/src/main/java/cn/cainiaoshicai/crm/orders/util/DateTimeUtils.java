@@ -96,6 +96,9 @@ public class DateTimeUtils extends DateUtils {
 																				// names
 	public static final long millisInADay = 1000 * 60 * 60 * 24;
 
+	public static String dayOfMonth(Date daytime) {
+		return new SimpleDateFormat("dd").format(daytime);
+	}
 	public static String shortYmd(Date orderDay) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(orderDay);

@@ -55,12 +55,12 @@ public class OrdersDao {
     private int listType;
     private String day;
 
-    public OrdersDao(String access_token, Date orderDay, int listType) {
+    public OrdersDao(String access_token, String orderDay, int listType) {
         if (orderDay == null) {
             throw new IllegalArgumentException("orderDay cant be null");
         }
 
-        this.day = DateTimeUtils.shortYmd(orderDay);
+        this.day = orderDay;
         this.listType = listType;
         this.access_token = access_token;
     }

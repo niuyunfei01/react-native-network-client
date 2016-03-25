@@ -85,6 +85,8 @@
         <activity android:name="com.example.BlueToothPrinterApp.BlueToothPrinterApp"/>
         <activity android:name="com.example.BlueToothPrinterApp.BTDeviceList"/>
 
+        <activity android:name=".ui.activity.DatepickerActivity"/>
+
         <activity android:name=".orders.view.OrderSingleActivity"/>
 
         <!-- For test only 测试的主程序-->

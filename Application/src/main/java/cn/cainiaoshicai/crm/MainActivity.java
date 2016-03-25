@@ -16,28 +16,27 @@
 
 package cn.cainiaoshicai.crm;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
 
-import com.andexert.calendarlistview.library.DatePickerController;
-import com.andexert.calendarlistview.library.DayPickerView;
-import com.andexert.calendarlistview.library.SimpleMonthAdapter;
-import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
-
-import java.text.BreakIterator;
+import java.util.Date;
+import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
+import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 
 /**
  * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
@@ -54,11 +53,11 @@ import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
-    private int fragmentIdToPrepare=0, getFragmentIdToShip=1, getFragmentIdToArrive=2;
-    private DayPickerView dayPickerView;
-    private TextView selectedText;
-    private TextView selectedDaysText;
+    private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
+    public static final int REQUEST_DAY = 1;
+    public static final int REQUEST_INFO = 1;
 
+    private Date day = new Date();
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.getInstance(), MainActivity.class);
@@ -73,11 +72,28 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this));
+
         setContentView(R.layout.order_list_main);
 
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        View barTitleView = findViewById(R.id.action_bar_title);
+        if (barTitleView == null) {
+            final int abTitleId = getResources().getIdentifier("action_bar_title", "id", "android");
+            barTitleView = findViewById(abTitleId);
+        }
+
+        if (barTitleView != null) {
+            barTitleView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startPicker();
+                }
+            });
+        }
 
         // Add three tabs to the Action Bar for display
         ab.addTab(ab.newTab().setText("待打包").setTabListener(this));
@@ -98,24 +114,47 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         Log.d(GlobalCtx.ORDERS_TAG, String.valueOf(tab.getText()));
 
-        int fragmentId = 0, listType = Constants.ORDER_LIST_PREPARE;
-        if (tab.getPosition() == 0) {
-            fragmentId = this.fragmentIdToPrepare;
+        int position = tab.getPosition();
+        ListType listType = getListTypeByTab(position);
 
-        } else if (tab.getPosition() == 1) {
-            fragmentId = this.getFragmentIdToShip;
-            listType = Constants.ORDER_LIST_SHIP;
-        } else if (tab.getPosition() == 2) {
-            fragmentId = this.getFragmentIdToArrive;
-            listType = Constants.ORDER_LIST_ARRIVE;
+        onDayAndTypeChanged(listType, this.day);
+    }
+
+    @NonNull
+    private ListType getListTypeByTab(int position) {
+        ListType listType = ListType.NONE;
+        if (position == 0) {
+            listType = ListType.WAITING_READY;
+        } else if (position == 1) {
+            listType = ListType.WAITING_SENT;
+        } else if (position == 2) {
+            listType = ListType.WAITING_ARRIVE;
+        }
+        return listType;
+    }
+
+    private void onDayAndTypeChanged(ListType listType, Date orderDay) {
+
+        if (listType == null) {
+            listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
+        }
+
+        if (orderDay != null) {
+            this.day = orderDay;
+            this.getSupportActionBar().setTitle(DateTimeUtils.shortYmd(this.day));
         }
 
         FragmentManager fm = getFragmentManager();
-        Fragment found = fm.findFragmentById(fragmentId);
+        Integer fragmentId = fragmentMap.get(listType.getValue());
+        OrderListFragment found = null;
+        if (fragmentId != null) {
+           found =(OrderListFragment) fm.findFragmentById(fragmentId);
+        }
         if (found == null) {
             found = new OrderListFragment();
-            ((OrderListFragment)found).setListType(listType);
+            fragmentMap.put(listType.getValue(), found.getId());
         }
+        found.setDayAndType(listType, DateTimeUtils.shortYmd(this.day));
         fm.beginTransaction().replace(R.id.order_list_main, found).commit();
     }
 
@@ -134,8 +173,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.menu_print:
-                startPrint();
+            case R.id.menu_refresh:
+                onDayAndTypeChanged(null, null);
                 return true;
             case R.id.menu_settings:
 //                showHelp();
@@ -145,10 +184,42 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
     }
 
-    private void startPrint() {
-        Intent printAct = new Intent(getApplicationContext(), BlueToothPrinterApp.class);
-//        printAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(printAct);
-        finish();
+    private void startPicker() {
+        Intent pickerIntent = new Intent(getApplicationContext(), DatepickerActivity.class);
+        pickerIntent.putExtra("daytime", this.day);
+        startActivityForResult(pickerIntent, REQUEST_DAY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == REQUEST_DAY) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+                // Do something with the contact here (bigger example below)
+                if (data != null) {
+                    Date day = (Date)data.getSerializableExtra("daytime");
+                    if (day != null) {
+                        onDayAndTypeChanged(null, day);
+                    }
+                }
+            }
+        }
+    }
+
+    public enum ListType {
+        NONE(0), WAITING_READY(1), WAITING_SENT(2), WAITING_ARRIVE(3);
+
+        private int value;
+
+        ListType(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 }

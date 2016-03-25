@@ -29,12 +29,5 @@
         android:footerDividersEnabled="false"
         android:divider="@null"
         android:dividerHeight="8dp"/>
-
-    <com.andexert.calendarlistview.library.DayPickerView
-        android:id="@+id/activity_daypicker"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        calendar:drawRoundRect="true"/>
-
 </android.support.v4.widget.SwipeRefreshLayout>
 

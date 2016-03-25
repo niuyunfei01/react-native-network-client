@@ -17,12 +17,14 @@ import java.util.Date;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.dao.OrdersDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -32,13 +34,16 @@ public class OrderListFragment extends Fragment {
 	private SwipeRefreshLayout swipeRefreshLayout;
 	private ListView listView;
 	private OrderAdapter adapter;
-	private ArrayList<Order> data = new ArrayList<Order>();;
+	private ArrayList<Order> data = new ArrayList<Order>();
+
 
     private int listType;
-    private Date orderDay = new Date();
+    private String orderDay;
 
-    public void setListType(final int listType) {
-        this.listType = listType;
+    public void setDayAndType(final MainActivity.ListType listType, String orderDay) {
+        this.listType = listType.getValue();
+        this.orderDay = orderDay;
+        onTypeOrDayChanged();
     }
 
     @Override
@@ -71,7 +76,7 @@ public class OrderListFragment extends Fragment {
             }
         });
 
-        onListTypeChanged();
+        onTypeOrDayChanged();
 
 		swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.list_order_view);
 		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -79,21 +84,21 @@ public class OrderListFragment extends Fragment {
 			swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    new RefreshOrderListTask().executeOnNormal();
+                    onTypeOrDayChanged();
                 }
             });
 
 	}
 
-    private void onListTypeChanged() {
-        new RefreshOrderListTask().executeOnNormal();
+    private void onTypeOrDayChanged() {
+        if (adapter != null) {
+            new RefreshOrderListTask().executeOnNormal();
+        }
     }
 
 
     private class RefreshOrderListTask
             extends MyAsyncTask<Void, List<Order>, List<Order>> {
-
-//        List<String> msgIds;
 
         @Override
         protected void onPreExecute() {
@@ -110,7 +115,8 @@ public class OrderListFragment extends Fragment {
         @Override
         protected List<Order> doInBackground(Void... params) {
             try {
-                OrderContainer oc = new OrdersDao(GlobalCtx.getInstance().getSpecialToken(),
+                String token = GlobalCtx.getInstance().getSpecialToken();
+                OrderContainer oc = new OrdersDao(token,
                         orderDay, listType).get();
                 ArrayList<Order> orders = new ArrayList<>();
                 if (oc != null) {
