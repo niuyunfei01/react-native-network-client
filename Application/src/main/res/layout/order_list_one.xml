@@ -82,7 +82,7 @@
                 android:paddingLeft="5.0dip"
                 android:paddingRight="5.0dip"
                 android:layout_width="fill_parent"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="8dp"
                 android:text="龙腾苑四区43号楼 3单元202"
                 android:textSize="16.0sp"/>
