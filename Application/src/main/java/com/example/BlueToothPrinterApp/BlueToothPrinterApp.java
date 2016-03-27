@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import java.io.IOException;
 import java.io.OutputStream;
-import android.bluetooth.BluetoothSocket;
+
 import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
+import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
+import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 
 public class BlueToothPrinterApp extends Activity
 {
@@ -20,8 +24,6 @@ public class BlueToothPrinterApp extends Activity
 	Button printbtn;
 
 	byte FONT_TYPE;
-	private static BluetoothSocket btsocket;
-	private static OutputStream btoutputstream;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -39,27 +41,18 @@ public class BlueToothPrinterApp extends Activity
 	}
 
 	protected void connect() {
+		BluetoothConnector.BluetoothSocketWrapper btsocket = BluetoothPrinters.INS.getCurrentPrinterSocket();
 		if(btsocket == null){
-			Intent BTIntent = new Intent(getApplicationContext(), BTDeviceList.class);
-			this.startActivityForResult(BTIntent, BTDeviceList.REQUEST_CONNECT_BT);
+			Intent BTIntent = new Intent(getApplicationContext(), BTDeviceListActivity.class);
+			this.startActivityForResult(BTIntent, BTDeviceListActivity.REQUEST_CONNECT_BT);
 		}
 		else{
-
-			OutputStream opstream = null;
-			try {
-				opstream = btsocket.getOutputStream();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			btoutputstream = opstream;
-			print_bt();
-
+			print_bt(btsocket);
 		}
-
 	}
 
 
-	private void print_bt() {
+	private void print_bt(BluetoothConnector.BluetoothSocketWrapper btsocket) {
 		try {
 			try {
 				Thread.sleep(1000);
@@ -67,47 +60,53 @@ public class BlueToothPrinterApp extends Activity
 				e.printStackTrace();
 			}
 
-			btoutputstream = btsocket.getOutputStream();
+			OutputStream btos = btsocket.getOutputStream();
 
 			byte[] printformat = { 0x1B, 0x21, FONT_TYPE };
-			btoutputstream.write(printformat);
+			btos.write(printformat);
+			byte[] newLine = "\n".getBytes();
+			final byte[] starLine = "********************************".getBytes();
+
+			btos.write(starLine);
+			btos.write(newLine);
+			btos.write("菜鸟食材".getBytes());
+			btos.write(newLine);
+			btos.write("【在线支付】".getBytes());
+			btos.write(newLine);
+
+			btos.write(starLine);
+			btos.write(newLine);
+			btos.write(("期望送达时间：" + "立即送餐").getBytes());
+			btos.write(newLine);
+			btos.write(starLine);
+			btos.write("订单编号：XXXXXXXXXXXXXXXX".getBytes());
+
+			btos.write(newLine);
+
+			btos.write("下单时间：2016-03-26 15：52".getBytes());
+			btos.write(newLine);
+			btos.write(starLine);
+			btos.write(newLine);
+
+			btos.write("食材名称           数量     金额".getBytes());
+			btos.write(newLine);
+			btos.write(String.format("%s %d ￥d.2f", "香葱 约100克", 2, 4.60).getBytes());
+			btos.write(newLine);
+
+
+
+
+
 			String msg = message.getText().toString();
-			btoutputstream.write(msg.getBytes());
-			btoutputstream.write(0x0D);
-			btoutputstream.write(0x0D);
-			btoutputstream.write(0x0D);
-			btoutputstream.flush();
+			btos.write(msg.getBytes("gbk"));
+			btos.write(0x0D);
+			btos.write(0x0D);
+			btos.write(0x0D);
+			btos.write(GPrinterCommand.walkPaper((byte) 4));
+			btos.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		try {
-			if(btsocket!= null){
-				btoutputstream.close();
-				btsocket.close();
-				btsocket = null;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		try {
-			btsocket = BTDeviceList.getSocket();
-			if(btsocket != null){
-				print_bt();
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}         
+}

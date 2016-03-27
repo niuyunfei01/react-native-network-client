@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
 
 import java.util.Date;
@@ -180,6 +181,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 return true;
             case R.id.menu_settings:
 //                showHelp();
+                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
                 return true;
             case R.id.menu_print:
                 startActivity(new Intent(getApplicationContext(), BlueToothPrinterApp.class));

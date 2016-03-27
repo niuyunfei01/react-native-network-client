@@ -172,5 +172,6 @@
     <string name="title_connected_to">链接到</string>
     <string name="title_connecting">连接中...</string>
     <string name="title_not_connected">未连接</string>
+    <string name="title_bluetooth_setting">蓝牙打印设置</string>
 
 </resources>

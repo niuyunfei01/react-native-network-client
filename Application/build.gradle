@@ -22,6 +22,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.0'
     compile 'com.android.support:appcompat-v7:18.0.+'
 
+    compile 'in.srain.cube:ultra-ptr:1.0.11'
+
     compile fileTree(dir: 'libs', include: '*.jar', exclude: ['*-javadoc.jar', '*-sources.jar'])
 }
 
