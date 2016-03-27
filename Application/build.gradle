@@ -97,7 +97,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            applicationIdSuffix ""
             versionNameSuffix "-debug"
             resValue "string", "applicationId", "cn.cainiaoshicai.crm" + getApplicationIdSuffix()
             resValue "string", "weiciyuanOfficalWeiboName",

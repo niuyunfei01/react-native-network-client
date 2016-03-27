@@ -108,7 +108,7 @@ public class MyReceiver extends BroadcastReceiver {
 			if (!ExampleUtil.isEmpty(extras)) {
 				try {
 					JSONObject extraJson = new JSONObject(extras);
-					if (null != extraJson && extraJson.length() > 0) {
+					if (extraJson.length() > 0) {
 						msgIntent.putExtra(MainActivity.KEY_EXTRAS, extras);
 					}
 				} catch (JSONException e) {

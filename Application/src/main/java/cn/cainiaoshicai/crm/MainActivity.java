@@ -17,7 +17,10 @@
 package cn.cainiaoshicai.crm;
 
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
@@ -28,8 +31,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
+import com.example.jpushdemo.ExampleUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -102,6 +107,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         ab.addTab(ab.newTab().setText("待打包").setTabListener(this));
         ab.addTab(ab.newTab().setText("待配送").setTabListener(this));
         ab.addTab(ab.newTab().setText("待送达").setTabListener(this));
+
+        registerMessageReceiver();
     }
 
     @Override
@@ -209,6 +216,48 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 }
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
+    }
+
+    //for receive customer msg from jpush server
+    private MessageReceiver mMessageReceiver;
+    public static final String MESSAGE_RECEIVED_ACTION = "com.example.jpushdemo.MESSAGE_RECEIVED_ACTION";
+    public static final String KEY_TITLE = "title";
+    public static final String KEY_MESSAGE = "message";
+    public static final String KEY_EXTRAS = "extras";
+
+    public void registerMessageReceiver() {
+        mMessageReceiver = new MessageReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        filter.addAction(MESSAGE_RECEIVED_ACTION);
+        registerReceiver(mMessageReceiver, filter);
+    }
+
+    public class MessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (MESSAGE_RECEIVED_ACTION.equals(intent.getAction())) {
+                String messge = intent.getStringExtra(KEY_MESSAGE);
+                String extras = intent.getStringExtra(KEY_EXTRAS);
+                StringBuilder showMsg = new StringBuilder();
+                showMsg.append(KEY_MESSAGE + " : " + messge + "\n");
+                if (!ExampleUtil.isEmpty(extras)) {
+                    showMsg.append(KEY_EXTRAS + " : " + extras + "\n");
+                }
+                setCostomMsg(showMsg.toString());
+            }
+        }
+    }
+
+    private void setCostomMsg(String msg){
+        AppLogger.e("received push message:" + msg);
     }
 
     public enum ListType {
