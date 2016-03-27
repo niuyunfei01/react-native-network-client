@@ -1,9 +1,15 @@
 package com.example.jpushdemo;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -11,6 +17,8 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.R;
 import cn.jpush.android.api.JPushInterface;
 
 /**
@@ -23,11 +31,13 @@ import cn.jpush.android.api.JPushInterface;
 public class MyReceiver extends BroadcastReceiver {
 	private static final String TAG = "JPush";
 
+    public static final int NOTIFICATION_ID = 1;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
 		Log.d(TAG, "[MyReceiver] onReceive - " + intent.getAction() + ", extras: " + printBundle(bundle));
-		
+		this.sendNotification("xxxxxxxxx");
         if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
             String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
             Log.d(TAG, "[MyReceiver] 接收Registration Id : " + regId);
@@ -62,6 +72,28 @@ public class MyReceiver extends BroadcastReceiver {
         } else {
         	Log.d(TAG, "[MyReceiver] Unhandled intent - " + intent.getAction());
         }
+	}
+
+	private void sendNotification(String msg)
+	{
+		Log.d(TAG, "Preparing to send notification...: " + msg);
+
+        //Define Notification Manager
+        NotificationManager notificationManager = (NotificationManager) GlobalCtx.getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //Define sound URI
+        Uri soundUri =  Uri.parse("android.resource://cn.cainiaoshicai.crm/" + R.raw.new_order_sound);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(GlobalCtx.getApplication().getApplicationContext())
+//                .setSmallIcon(icon)
+                .setContentTitle(msg + " title")
+                .setContentText(msg)
+                .setSound(soundUri, AudioManager.STREAM_NOTIFICATION); //This sets the sound to play
+
+        //Display notification
+        notificationManager.notify(0, mBuilder.build());
+
+		Log.d(TAG, "Notification sent successfully.");
 	}
 
 	// 打印所有的 intent extra 数据
