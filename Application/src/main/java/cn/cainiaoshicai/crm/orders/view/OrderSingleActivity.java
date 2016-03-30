@@ -12,6 +12,7 @@ import cn.cainiaoshicai.crm.R;
 /**
  */
 public class OrderSingleActivity extends Activity {
+    private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private WebView mWebView;
 
     @Override
@@ -25,12 +26,12 @@ public class OrderSingleActivity extends Activity {
 
         mWebView.setWebViewClient(new MyAppWebViewClient());
 
-        mWebView.addJavascriptInterface(new WebAppInterface(this), "Android");
+        mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         Intent intent = getIntent();
         String oid = intent.getStringExtra("order_id");
-
-        mWebView.loadUrl("http://www.cainiaoshicai.cn/stores/set_store.html");
+        String source = intent.getStringExtra("order_source");
+        mWebView.loadUrl(String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, source, oid));
     }
 
     @Override

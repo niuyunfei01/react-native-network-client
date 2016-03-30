@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -24,7 +23,6 @@ import cn.cainiaoshicai.crm.orders.dao.OrdersDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
-import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -67,7 +65,9 @@ public class OrderListFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
-                openOrder.putExtra("order_id", ((Order)adapter.getItem(position)).getId());
+                Order item = (Order) adapter.getItem(position);
+                openOrder.putExtra("order_id", item.getId());
+                openOrder.putExtra("order_source", "weixin");
                 try {
                     getActivity().startActivity(openOrder);
                 }catch (Exception e){
