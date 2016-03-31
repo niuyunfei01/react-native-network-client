@@ -21,6 +21,7 @@ public class Order {
     private int orderStatus;
     private int platform;
     private String platform_oid;
+    private String platform_dayId;
 
     public String getId() {
         return id;
@@ -152,5 +153,13 @@ public class Order {
 
     public void setPlatform_oid(String platform_oid) {
         this.platform_oid = platform_oid;
+    }
+
+    public String getPlatform_dayId() {
+        return platform_dayId;
+    }
+
+    public void setPlatform_dayId(String platform_dayId) {
+        this.platform_dayId = platform_dayId;
     }
 }

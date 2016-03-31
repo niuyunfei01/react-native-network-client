@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Date;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
@@ -45,6 +49,7 @@ public class OrderAdapter extends BaseAdapter {
         return i;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int i, View vi, ViewGroup viewGroup) {
 
@@ -59,6 +64,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView orderMoney = (TextView) vi.findViewById(R.id.total_money);
         TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
         TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
+        TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
 
 
 //        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
@@ -81,6 +87,10 @@ public class OrderAdapter extends BaseAdapter {
 
             orderTime.setText(instance.getShortTime(order.getOrderTime()));
             dayNo.setText("#" + order.getDayId());
+
+            String platformName = Constants.Platform.find(order.getPlatform()).name;
+            String platformDayId = order.getPlatform_dayId();
+            sourcePlatform.setText(platformName + (platformDayId != null? String.format(" #%s", platformDayId) : ""));
         }catch (Exception e) {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
         }

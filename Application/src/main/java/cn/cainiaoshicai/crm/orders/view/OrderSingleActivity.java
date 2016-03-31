@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Button;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.R;
 
 /**
@@ -31,7 +33,24 @@ public class OrderSingleActivity extends Activity {
         Intent intent = getIntent();
         String oid = intent.getStringExtra("order_id");
         String source = intent.getStringExtra("order_source");
+        int status = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
+
+        Button actionButton = (Button) findViewById(R.id.button2);
+        actionButton.setText(getActionText(status));
+
         mWebView.loadUrl(String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, source, oid));
+    }
+
+    private String getActionText(int status) {
+        switch(status) {
+            case Constants.WM_ORDER_STATUS_TO_SHIP:
+                return getString(R.string.action_start_ship);
+            case Constants.WM_ORDER_STATUS_TO_ARRIVE:
+                return getString(R.string.action_set_arrived);
+            case Constants.WM_ORDER_STATUS_TO_READY:
+                return getString(R.string.action_package_done);
+        }
+        return "";
     }
 
     @Override

@@ -107,6 +107,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         ab.addTab(ab.newTab().setText("待打包").setTabListener(this));
         ab.addTab(ab.newTab().setText("待配送").setTabListener(this));
         ab.addTab(ab.newTab().setText("待送达").setTabListener(this));
+        ab.addTab(ab.newTab().setText("已送达").setTabListener(this));
 
         registerMessageReceiver();
     }
@@ -139,6 +140,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             listType = ListType.WAITING_SENT;
         } else if (position == 2) {
             listType = ListType.WAITING_ARRIVE;
+        } else if (position == 3) {
+            listType = ListType.ARRIVED;
         }
         return listType;
     }
@@ -261,7 +264,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     public enum ListType {
-        NONE(0), WAITING_READY(1), WAITING_SENT(2), WAITING_ARRIVE(3);
+        NONE(0), WAITING_READY(1), WAITING_SENT(2), WAITING_ARRIVE(3), ARRIVED(4);
 
         private int value;
 

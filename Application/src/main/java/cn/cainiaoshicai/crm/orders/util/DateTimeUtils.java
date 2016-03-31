@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.format.DateUtils;
 
@@ -159,8 +160,8 @@ public class DateTimeUtils extends DateUtils {
 		if (date == null) {
 			return "";
 		}
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        return cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE);
+
+		@SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        return sdf.format(date);
     }
 }

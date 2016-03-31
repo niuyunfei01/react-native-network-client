@@ -67,7 +67,8 @@ public class OrderListFragment extends Fragment {
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
                 Order item = (Order) adapter.getItem(position);
                 openOrder.putExtra("order_id", item.getId());
-                openOrder.putExtra("order_source", "weixin");
+                openOrder.putExtra("order_source", item.getPlatform());
+                openOrder.putExtra("order_status", item.getOrderStatus());
                 try {
                     getActivity().startActivity(openOrder);
                 }catch (Exception e){
