@@ -19,6 +19,7 @@ import java.util.Iterator;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.jpush.android.api.JPushInterface;
 
 /**
@@ -56,9 +57,8 @@ public class MyReceiver extends BroadcastReceiver {
             Log.d(TAG, "[MyReceiver] 用户点击打开了通知");
             
         	//打开自定义的Activity
-        	Intent i = new Intent(context, TestActivity.class);
+        	Intent i = new Intent(context, RemindersActivity.class);
         	i.putExtras(bundle);
-        	//i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         	i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
         	context.startActivity(i);
         	
