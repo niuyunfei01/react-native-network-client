@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.cainiaoshicai.crm;
+package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
@@ -31,6 +31,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 import com.example.jpushdemo.ExampleUtil;
@@ -45,9 +48,6 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
-import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
-import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
-import cn.cainiaoshicai.crm.ui.activity.StorePerformActivity;
 
 /**
  * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
@@ -62,7 +62,7 @@ import cn.cainiaoshicai.crm.ui.activity.StorePerformActivity;
  * Many of the drawables used in this sample were generated with the
  * 'Android Action Bar Style Generator': http://jgilfelt.github.io/android-actionbarstylegenerator
  */
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class RemindersActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
     public static final int REQUEST_DAY = 1;
@@ -71,7 +71,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     private Date day = new Date();
 
     public static Intent newIntent() {
-        return new Intent(GlobalCtx.getInstance(), MainActivity.class);
+        return new Intent(GlobalCtx.getInstance(), RemindersActivity.class);
     }
 
     public static Intent newIntent(AccountBean accountBean) {
@@ -90,24 +90,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        View barTitleView = findViewById(R.id.action_bar_title);
-        if (barTitleView == null) {
-            final int abTitleId = getResources().getIdentifier("action_bar_title", "id", "android");
-            barTitleView = findViewById(abTitleId);
-        }
-
-        if (barTitleView != null) {
-            barTitleView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startPicker();
-                }
-            });
-        }
+        ab.setDisplayHomeAsUpEnabled(false);
 
         // Add three tabs to the Action Bar for display
-        for(ListType type : Arrays.asList(ListType.WAITING_READY, ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED)) {
+        for(ListType type : Arrays.asList(ListType.NEW_ORDER, ListType.CUSTOMER_NOTIFY, ListType.REMINDER)) {
             ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
         }
 
@@ -158,17 +144,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @NonNull
     private ListType getListTypeByTab(int position) {
-        ListType listType = ListType.NONE;
-        if (position == 0) {
-            listType = ListType.WAITING_READY;
-        } else if (position == 1) {
-            listType = ListType.WAITING_SENT;
-        } else if (position == 2) {
-            listType = ListType.WAITING_ARRIVE;
-        } else if (position == 3) {
-            listType = ListType.ARRIVED;
-        }
-        return listType;
+        return RemindersActivity.ListType.findByType(position + 1);
     }
 
     private void onDayAndTypeChanged(ListType listType, Date orderDay) {
@@ -192,8 +168,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             found = new OrderListFragment();
             fragmentMap.put(listType.getValue(), found.getId());
         }
-        found.setDayAndType(listType, DateTimeUtils.shortYmd(this.day));
-        fm.beginTransaction().replace(R.id.order_list_main, found).commit();
+//        found.setDayAndType(listType, DateTimeUtils.shortYmd(this.day));
+//        fm.beginTransaction().replace(R.id.order_list_main, found).commit();
     }
 
     // Implemented from ActionBar.TabListener
@@ -212,14 +188,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_process:
-                onDayAndTypeChanged(null, null);
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 return true;
             case R.id.menu_accept:
-                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
                 return true;
             case R.id.menu_manage:
                 startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
-                return true;
 //            case R.id.menu_settings:
 //                showHelp();
 //                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
@@ -292,7 +266,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     public enum ListType {
-        NONE(0, "ALL"), WAITING_READY(1, "待打包"), WAITING_SENT(2, "待配送"), WAITING_ARRIVE(3, "待送达"), ARRIVED(4, "已完成");
+            NEW_ORDER(1, "新订单"), CUSTOMER_NOTIFY(2, "用户催单"), REMINDER(3, "提醒");
 
         private int value;
         private String name;
@@ -311,12 +285,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
         static public ListType findByType(int type) {
-            if (type == 0) return NONE;
-            if (type == 1) return WAITING_READY;
-            if (type == 2) return WAITING_SENT;
-            if (type == 3) return WAITING_ARRIVE;
-            if (type == 4) return ARRIVED;
-            return null;
+            if (type == 1) return NEW_ORDER;
+            if (type == 2) return CUSTOMER_NOTIFY;
+            if (type == 3) return REMINDER;
+            throw new IllegalArgumentException("incorrect argument:" + type);
         }
     }
 }

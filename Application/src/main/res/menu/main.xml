@@ -3,12 +3,17 @@
     xmlns:support="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/menu_refresh"
+        android:id="@+id/menu_accept"
+        android:title="@string/menu_reminders"
+        support:showAsAction="always|withText"/>
+
+    <item
+        android:id="@+id/menu_process"
         android:title="@string/menu_manage_order"
         support:showAsAction="always|withText"/>
 
     <item
-        android:id="@+id/menu_location"
+        android:id="@+id/menu_manage"
         android:title="@string/menu_store_manage"
         support:showAsAction="always|withText"/>
 
@@ -16,10 +21,10 @@
         android:id="@+id/menu_mine"
         android:title="@string/menu_mine"
         support:showAsAction="always|withText"/>
-    <item
-        android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
-        support:showAsAction="ifRoom|withText"/>
+    <!--<item-->
+        <!--android:id="@+id/menu_settings"-->
+        <!--android:title="@string/menu_settings"-->
+        <!--support:showAsAction="ifRoom|withText"/>-->
 
     <!--
        Here we create all of the items to be displayed in the menu, setting support:showAsAction to

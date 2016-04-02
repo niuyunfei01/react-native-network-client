@@ -79,7 +79,7 @@ public class OAuthActivity extends AbstractAppActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.actionbar_menu_oauthactivity, menu);
-        refreshItem = menu.findItem(R.id.menu_refresh);
+        refreshItem = menu.findItem(R.id.menu_process);
         refresh();
         return true;
     }
@@ -92,7 +92,7 @@ public class OAuthActivity extends AbstractAppActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 return true;
-            case R.id.menu_refresh:
+            case R.id.menu_process:
                 refresh();
                 return true;
             default:

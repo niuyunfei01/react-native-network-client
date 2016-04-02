@@ -177,8 +177,10 @@
     <string name="action_package_done">打包完成</string>
     <string name="action_start_ship">开始配送</string>
     <string name="action_set_arrived">标记送达</string>
-    <string name="menu_manage_order">订单管理</string>
-    <string name="menu_store_manage">店铺管理</string>
+    <string name="menu_manage_order">订单</string>
+    <string name="menu_accept_order">接单</string>
+    <string name="menu_store_manage">店铺</string>
     <string name="menu_mine">我的</string>
+    <string name="menu_reminders">提醒</string>
 
 </resources>

@@ -8,7 +8,7 @@ public class WebAppInterface {
     Context mContext;
 
     /** Instantiate the interface and set the context */
-    WebAppInterface(Context c) {
+    public WebAppInterface(Context c) {
         mContext = c;
     }
 
