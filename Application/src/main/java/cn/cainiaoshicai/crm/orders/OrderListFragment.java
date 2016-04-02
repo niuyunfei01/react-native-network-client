@@ -66,9 +66,10 @@ public class OrderListFragment extends Fragment {
                 Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
                 Order item = (Order) adapter.getItem(position);
-                openOrder.putExtra("order_id", item.getId());
-                openOrder.putExtra("order_source", item.getPlatform());
+                openOrder.putExtra("platform_oid", item.getPlatform_oid());
+                openOrder.putExtra("platform_id", item.getPlatform());
                 openOrder.putExtra("order_status", item.getOrderStatus());
+                openOrder.putExtra("list_type", listType);
                 try {
                     getActivity().startActivity(openOrder);
                 }catch (Exception e){
@@ -93,37 +94,27 @@ public class OrderListFragment extends Fragment {
 
     private void onTypeOrDayChanged() {
         if (adapter != null) {
-            new RefreshOrderListTask().executeOnNormal();
+            new RefreshOrderListTask(this.listView).executeOnNormal();
         }
     }
 
 
     private class RefreshOrderListTask
-            extends MyAsyncTask<Void, List<Order>, List<Order>> {
+            extends MyAsyncTask<Void,List<Order>,OrderContainer> {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-//            msgIds = new ArrayList<String>();
-//            List<Order> msgList = getList().getItemList();
-//            for (MessageBean msg : msgList) {
-//                if (msg != null) {
-//                    msgIds.add(msg.getId());
-//                }
-//            }
+        private ListView listView;
+
+        public RefreshOrderListTask(ListView listView) {
+
+            this.listView = listView;
         }
 
         @Override
-        protected List<Order> doInBackground(Void... params) {
+        protected OrderContainer doInBackground(Void... params) {
             try {
                 String token = GlobalCtx.getInstance().getSpecialToken();
-                OrderContainer oc = new OrdersDao(token,
+                return new OrdersDao(token,
                         orderDay, listType).get();
-                ArrayList<Order> orders = new ArrayList<>();
-                if (oc != null) {
-                    orders.addAll(oc.getOrders());
-                }
-                 return orders;
             } catch (ServiceException e) {
                 cancel(true);
                 return null;
@@ -131,16 +122,25 @@ public class OrderListFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<Order> value) {
+        protected void onPostExecute(final OrderContainer value) {
             super.onPostExecute(value);
             if (getActivity() == null || value == null) {
                 return;
             }
 
 //            MentionWeiboTimeLineDBTask.asyncReplace(getList(), accountBean.getUid());
-            data.addAll(value);
+            data.clear();
+            data.addAll(value.getOrders());
             getAdapter().notifyDataSetChanged();
             swipeRefreshLayout.setRefreshing(false);
+
+            final MainActivity context = (MainActivity) this.listView.getContext();
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    context.updateStatusCnt(value.getTotals());
+                }
+            });
 
             AppLogger.d("display data:" + data.size());
         }

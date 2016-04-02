@@ -8,11 +8,19 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
 
 import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 /**
  */
@@ -34,9 +42,10 @@ public class OrderSingleActivity extends Activity {
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         Intent intent = getIntent();
-        String oid = intent.getStringExtra("order_id");
-        String source = intent.getStringExtra("order_source");
-        int status = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
+        final int platform = intent.getIntExtra("platform_id", 0);
+        final String platformOid = intent.getStringExtra("platform_oid");
+        final int listType = intent.getIntExtra("list_type", 0);
+        final int status = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
 
         Button printButton = (Button) findViewById(R.id.button1);
         printButton.setOnClickListener(new View.OnClickListener() {
@@ -48,10 +57,18 @@ public class OrderSingleActivity extends Activity {
 
 
 
-        Button actionButton = (Button) findViewById(R.id.button2);
+        final Button actionButton = (Button) findViewById(R.id.button2);
         actionButton.setText(getActionText(status));
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new OrderActionOp(platform, platformOid, v, listType).executeOnNormal(status);
+            }
+        });
 
-        mWebView.loadUrl(String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, source, oid));
+        String url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid);
+        AppLogger.i("loading url:" + url);
+        mWebView.loadUrl(url);
     }
 
     private String getActionText(int status) {
@@ -86,5 +103,61 @@ public class OrderSingleActivity extends Activity {
         // If it wasn't the Back key or there's no web page history, bubble up to the default
         // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
+    }
+
+    static public class OrderActionOp extends MyAsyncTask<Integer, ResultBean, ResultBean> {
+        final int oid;
+        final String platformOid;
+        private View button;
+        private int listType;
+
+        public OrderActionOp(int oid, String platformOid, View v, int listType) {
+            this.oid = oid;
+            this.platformOid = platformOid;
+            button = v;
+            this.listType = listType;
+        }
+
+        @Override
+        protected ResultBean doInBackground(Integer... params) {
+            int status = params[0];
+            String token = GlobalCtx.getInstance().getSpecialToken();
+            ResultBean oc;
+            try {
+                switch (status) {
+                    case Constants.WM_ORDER_STATUS_TO_SHIP:
+                        oc = new OrderActionDao(token).startShip(Constants.Platform.find(oid), platformOid);
+                        break;
+                    case Constants.WM_ORDER_STATUS_TO_ARRIVE:
+                        oc = new OrderActionDao(token).setArrived(Constants.Platform.find(oid), platformOid);
+                        break;
+                    case Constants.WM_ORDER_STATUS_TO_READY:
+                        oc = new OrderActionDao(token).setReady(Constants.Platform.find(oid), platformOid);
+                        break;
+                    default:
+                        throw new ServiceException("incorrect status:" + status);
+                }
+                return oc;
+            } catch (Exception ex) {
+                AppLogger.e("error on handle click action: status=" + status, ex);
+                return ResultBean.exception();
+
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final ResultBean oc) {
+            super.onPostExecute(oc);
+            final Activity activity = (Activity) button.getContext();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(GlobalCtx.getInstance(), MainActivity.class);
+                    intent.putExtra("list_type", listType);
+                    activity.startActivity(intent);
+                }
+            });
+        }
     }
 }

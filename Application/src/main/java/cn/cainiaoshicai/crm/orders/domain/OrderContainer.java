@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class OrderContainer {
 
     private ArrayList<Order> orders;
+    private HashMap<Integer, Integer> totals;
 
     public ArrayList<Order> getOrders() {
         return orders;
@@ -15,10 +16,19 @@ public class OrderContainer {
         this.orders = orders;
     }
 
+    public HashMap<Integer, Integer> getTotals() {
+        return totals;
+    }
+
+    public void setTotals(HashMap<Integer, Integer> totals) {
+        this.totals = totals;
+    }
+
     @Override
     public String toString() {
         return "OrderContainer{" +
                 ", orders=" + orders +
+                ", totals=" + totals +
                 '}';
     }
 }

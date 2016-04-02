@@ -33,11 +33,13 @@ import android.view.View;
 
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
-import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
+
 import com.example.jpushdemo.ExampleUtil;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
@@ -104,10 +106,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
         // Add three tabs to the Action Bar for display
-        ab.addTab(ab.newTab().setText("待打包").setTabListener(this));
-        ab.addTab(ab.newTab().setText("待配送").setTabListener(this));
-        ab.addTab(ab.newTab().setText("待送达").setTabListener(this));
-        ab.addTab(ab.newTab().setText("已送达").setTabListener(this));
+        for(ListType type : Arrays.asList(ListType.WAITING_READY, ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED)) {
+            ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
+        }
+
+        Intent intent = this.getIntent();
+        if (intent != null) {
+            int list_type = intent.getIntExtra("list_type", 0);
+            if (list_type > 0) {
+                ActionBar.Tab tabAt = ab.getTabAt(list_type - 1);
+                if (tabAt != null) {
+                    ab.selectTab(tabAt);
+                }
+            }
+        }
 
         registerMessageReceiver();
     }
@@ -130,6 +142,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         onDayAndTypeChanged(listType, this.day);
     }
+
+    public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
+        for (Map.Entry<Integer, Integer> en : totalByStatus.entrySet()) {
+            Integer status = en.getKey();
+            ActionBar.Tab tabAt = this.getSupportActionBar().getTabAt(status - 1);
+            ListType type = ListType.findByType(status);
+            if (tabAt != null && type != null) {
+                tabAt.setText(type.getName() + "(" + en.getValue() + ")");
+            }
+        }
+    }
+
 
     @NonNull
     private ListType getListTypeByTab(int position) {
@@ -261,16 +285,31 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     public enum ListType {
-        NONE(0), WAITING_READY(1), WAITING_SENT(2), WAITING_ARRIVE(3), ARRIVED(4);
+        NONE(0, "ALL"), WAITING_READY(1, "待打包"), WAITING_SENT(2, "待配送"), WAITING_ARRIVE(3, "待送达"), ARRIVED(4, "已完成");
 
         private int value;
+        private String name;
 
-        ListType(int value) {
+        ListType(int value, String name) {
             this.value = value;
+            this.name = name;
         }
 
         public int getValue() {
             return value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        static public ListType findByType(int type) {
+            if (type == 0) return NONE;
+            if (type == 1) return WAITING_READY;
+            if (type == 2) return WAITING_SENT;
+            if (type == 3) return WAITING_ARRIVE;
+            if (type == 4) return ARRIVED;
+            return null;
         }
     }
 }
