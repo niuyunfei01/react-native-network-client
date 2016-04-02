@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
+
+import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.R;
@@ -34,6 +37,16 @@ public class OrderSingleActivity extends Activity {
         String oid = intent.getStringExtra("order_id");
         String source = intent.getStringExtra("order_source");
         int status = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
+
+        Button printButton = (Button) findViewById(R.id.button1);
+        printButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), BlueToothPrinterApp.class));
+            }
+        });
+
+
 
         Button actionButton = (Button) findViewById(R.id.button2);
         actionButton.setText(getActionText(status));

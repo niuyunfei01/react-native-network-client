@@ -193,9 +193,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 //                showHelp();
                 startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
                 return true;
-            case R.id.menu_print:
-                startActivity(new Intent(getApplicationContext(), BlueToothPrinterApp.class));
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
