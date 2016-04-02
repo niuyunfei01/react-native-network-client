@@ -18,10 +18,12 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.NewOrderReminder;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 
 /**
  */
@@ -60,18 +62,54 @@ public class OrderSingleActivity extends Activity {
         });
 
 
-
         final Button actionButton = (Button) findViewById(R.id.button2);
-        if (status == Constants.WM_ORDER_STATUS_ARRIVED) {
-            actionButton.setVisibility(View.INVISIBLE);
-        } else {
-            actionButton.setText(getActionText(status));
+        if("new_order".equals(intent.getStringExtra("from"))) {
+            actionButton.setText("确认接单");
             actionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    new OrderActionOp(platform, platformOid, v, listType).executeOnNormal(status);
+                public void onClick(final View v) {
+                    new MyAsyncTask<Void, ResultBean, ResultBean>(){
+                        @Override
+                        protected ResultBean doInBackground(Void... params) {
+                            String token = GlobalCtx.getInstance().getSpecialToken();
+                            try {
+                                return new OrderActionDao(token).confirmAccepted(Constants.Platform.find(platform), platformOid);
+                            } catch (Exception ex) {
+                                AppLogger.e("error on handle click action: status=" + status, ex);
+                                return ResultBean.exception();
+                            }
+                        }
+
+                        @Override
+                        protected void onPostExecute(final ResultBean oc) {
+                            super.onPostExecute(oc);
+                            final Activity activity = (Activity)v.getContext();
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
+                                    Intent intent = new Intent(GlobalCtx.getInstance(), RemindersActivity.class);
+                                    intent.putExtra("list_type", listType);
+                                    activity.startActivity(intent);
+                                }
+                            });
+                        }
+
+                    }.executeOnNormal();
                 }
             });
+        } else {
+            if (status == Constants.WM_ORDER_STATUS_ARRIVED) {
+                actionButton.setVisibility(View.INVISIBLE);
+            } else {
+                actionButton.setText(getActionText(status));
+                actionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new OrderActionOp(platform, platformOid, v, listType).executeOnNormal(status);
+                    }
+                });
+            }
         }
 
         String url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid);
@@ -149,7 +187,6 @@ public class OrderSingleActivity extends Activity {
             } catch (Exception ex) {
                 AppLogger.e("error on handle click action: status=" + status, ex);
                 return ResultBean.exception();
-
             }
         }
 

@@ -37,7 +37,7 @@ public class NewOrderFragment extends Fragment {
 
     public void setType(final RemindersActivity.ListType listType) {
         this.listType = listType.getValue();
-        onTypeOrDayChanged();
+        onTypeChanged();
     }
 
     @Override
@@ -61,11 +61,11 @@ public class NewOrderFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
-                Order item = (Order) adapter.getItem(position);
+                NewOrderReminder item = (NewOrderReminder) adapter.getItem(position);
                 openOrder.putExtra("platform_oid", item.getPlatform_oid());
                 openOrder.putExtra("platform_id", item.getPlatform());
-                openOrder.putExtra("order_status", item.getOrderStatus());
                 openOrder.putExtra("list_type", listType);
+                openOrder.putExtra("from", "new_order");
                 try {
                     getActivity().startActivity(openOrder);
                 }catch (Exception e){
@@ -74,7 +74,7 @@ public class NewOrderFragment extends Fragment {
             }
         });
 
-        onTypeOrDayChanged();
+        onTypeChanged();
 
 		swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.list_order_view);
 		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -82,13 +82,13 @@ public class NewOrderFragment extends Fragment {
 			swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    onTypeOrDayChanged();
+                    onTypeChanged();
                 }
             });
 
 	}
 
-    private void onTypeOrDayChanged() {
+    private void onTypeChanged() {
         if (adapter != null) {
             new RefreshOrderListTask(this.listView).executeOnNormal();
         }
@@ -96,7 +96,7 @@ public class NewOrderFragment extends Fragment {
 
 
     private class RefreshOrderListTask
-            extends MyAsyncTask<Void,List<Order>,List<NewOrderReminder>> {
+            extends MyAsyncTask<Void,List<NewOrderReminder>,List<NewOrderReminder>> {
 
         private ListView listView;
 

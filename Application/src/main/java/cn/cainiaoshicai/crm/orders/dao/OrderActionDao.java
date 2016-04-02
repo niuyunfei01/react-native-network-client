@@ -67,4 +67,8 @@ public class OrderActionDao {
     public OrderActionDao(String access_token) {
         this.access_token = access_token;
     }
+
+    public ResultBean confirmAccepted(Constants.Platform platform, String platformOid) throws ServiceException {
+        return actionWithResult(platform, platformOid, "/order_confirm_accepted");
+    }
 }
