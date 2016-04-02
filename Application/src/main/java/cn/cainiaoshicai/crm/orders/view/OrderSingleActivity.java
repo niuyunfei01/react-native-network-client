@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.orders.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -21,6 +22,7 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.Constant;
 
 /**
  */
@@ -33,6 +35,9 @@ public class OrderSingleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_single);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         mWebView = (WebView) findViewById(R.id.activity_main_webview);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -58,13 +63,17 @@ public class OrderSingleActivity extends Activity {
 
 
         final Button actionButton = (Button) findViewById(R.id.button2);
-        actionButton.setText(getActionText(status));
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new OrderActionOp(platform, platformOid, v, listType).executeOnNormal(status);
-            }
-        });
+        if (status == Constants.WM_ORDER_STATUS_ARRIVED) {
+            actionButton.setVisibility(View.INVISIBLE);
+        } else {
+            actionButton.setText(getActionText(status));
+            actionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new OrderActionOp(platform, platformOid, v, listType).executeOnNormal(status);
+                }
+            });
+        }
 
         String url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid);
         AppLogger.i("loading url:" + url);
