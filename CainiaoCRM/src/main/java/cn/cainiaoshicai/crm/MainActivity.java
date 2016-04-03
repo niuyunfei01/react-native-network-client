@@ -49,19 +49,6 @@ import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorePerformActivity;
 
-/**
- * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
- * action bar when running on a device with a narrow display, and show three tabs.
- *
- * This Activity extends from {@link ActionBarActivity}, which provides all of the function
- * necessary to display a compatible Action Bar on devices running Android v2.1+.
- *
- * The interesting bits of this sample start in the theme files
- * ('res/values/styles.xml' and 'res/values-v14</styles.xml').
- *
- * Many of the drawables used in this sample were generated with the
- * 'Android Action Bar Style Generator': http://jgilfelt.github.io/android-actionbarstylegenerator
- */
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
@@ -121,8 +108,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 }
             }
         }
-
-        registerMessageReceiver();
     }
 
     @Override
@@ -251,44 +236,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(mMessageReceiver);
         super.onDestroy();
-    }
-
-    //for receive customer msg from jpush server
-    private MessageReceiver mMessageReceiver;
-    public static final String MESSAGE_RECEIVED_ACTION = "com.example.jpushdemo.MESSAGE_RECEIVED_ACTION";
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_MESSAGE = "message";
-    public static final String KEY_EXTRAS = "extras";
-
-    public void registerMessageReceiver() {
-        mMessageReceiver = new MessageReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-        filter.addAction(MESSAGE_RECEIVED_ACTION);
-        registerReceiver(mMessageReceiver, filter);
-    }
-
-    public class MessageReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (MESSAGE_RECEIVED_ACTION.equals(intent.getAction())) {
-                String messge = intent.getStringExtra(KEY_MESSAGE);
-                String extras = intent.getStringExtra(KEY_EXTRAS);
-                StringBuilder showMsg = new StringBuilder();
-                showMsg.append(KEY_MESSAGE + " : " + messge + "\n");
-                if (!ExampleUtil.isEmpty(extras)) {
-                    showMsg.append(KEY_EXTRAS + " : " + extras + "\n");
-                }
-                setCostomMsg(showMsg.toString());
-            }
-        }
-    }
-
-    private void setCostomMsg(String msg){
-        AppLogger.e("received push message:" + msg);
     }
 
     public enum ListType {

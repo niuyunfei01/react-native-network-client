@@ -1,4 +1,4 @@
-package com.example.jpushdemo;
+package cn.cainiaoshicai.crm.othercomp;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -7,10 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.example.jpushdemo.ExampleUtil;
+import com.example.jpushdemo.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,32 +33,40 @@ import cn.jpush.android.api.JPushInterface;
  * 1) 默认用户会打开主界面
  * 2) 接收不到自定义消息
  */
-public class MyReceiver extends BroadcastReceiver {
-	private static final String TAG = "JPush";
+public class NotificationReceiver extends BroadcastReceiver {
+	public static SoundPool sound;
+	public static int soundId;
+	private static final String TAG = GlobalCtx.ORDERS_TAG;
 
-    public static final int NOTIFICATION_ID = 1;
+	public NotificationReceiver() {
+		sound = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+		soundId = sound.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.new_order_sound, 1);
+	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
-		Log.d(TAG, "[MyReceiver] onReceive - " + intent.getAction() + ", extras: " + printBundle(bundle));
-		this.sendNotification("xxxxxxxxx");
+		Log.d(TAG, "[NotificationReceiver] onReceive - " + intent.getAction() + ", extras: " + printBundle(bundle));
         if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
             String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
-            Log.d(TAG, "[MyReceiver] 接收Registration Id : " + regId);
+            Log.d(TAG, "[NotificationReceiver] 接收Registration Id : " + regId);
             //send the Registration Id to your server...
                         
         } else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
-        	Log.d(TAG, "[MyReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
+        	Log.d(TAG, "[NotificationReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
         	processCustomMessage(context, bundle);
         
         } else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
-            Log.d(TAG, "[MyReceiver] 接收到推送下来的通知");
+            Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知");
             int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
-            Log.d(TAG, "[MyReceiver] 接收到推送下来的通知的ID: " + notifactionId);
-        	
+            Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
+
+			String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
+
+			sound.play(soundId , 1.0f, 1.0f, 1, 0, 1.0f);
+
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
-            Log.d(TAG, "[MyReceiver] 用户点击打开了通知");
+            Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
             
         	//打开自定义的Activity
         	Intent i = new Intent(context, RemindersActivity.class);
@@ -63,37 +75,15 @@ public class MyReceiver extends BroadcastReceiver {
         	context.startActivity(i);
         	
         } else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
-            Log.d(TAG, "[MyReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
+            Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
             //在这里根据 JPushInterface.EXTRA_EXTRA 的内容处理代码，比如打开新的Activity， 打开一个网页等..
         	
         } else if(JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
         	boolean connected = intent.getBooleanExtra(JPushInterface.EXTRA_CONNECTION_CHANGE, false);
-        	Log.w(TAG, "[MyReceiver]" + intent.getAction() +" connected state change to "+connected);
+        	Log.w(TAG, "[NotificationReceiver]" + intent.getAction() +" connected state change to "+connected);
         } else {
-        	Log.d(TAG, "[MyReceiver] Unhandled intent - " + intent.getAction());
+        	Log.d(TAG, "[NotificationReceiver] Unhandled intent - " + intent.getAction());
         }
-	}
-
-	private void sendNotification(String msg)
-	{
-		Log.d(TAG, "Preparing to send notification...: " + msg);
-
-        //Define Notification Manager
-        NotificationManager notificationManager = (NotificationManager) GlobalCtx.getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //Define sound URI
-        Uri soundUri =  Uri.parse("android.resource://cn.cainiaoshicai.crm/" + R.raw.new_order_sound);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(GlobalCtx.getApplication().getApplicationContext())
-//                .setSmallIcon(icon)
-                .setContentTitle(msg + " title")
-                .setContentText(msg)
-                .setSound(soundUri, AudioManager.STREAM_NOTIFICATION); //This sets the sound to play
-
-        //Display notification
-        notificationManager.notify(0, mBuilder.build());
-
-		Log.d(TAG, "Notification sent successfully.");
 	}
 
 	// 打印所有的 intent extra 数据

@@ -8,7 +8,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -154,8 +157,6 @@ public class GlobalCtx extends Application {
         JPushInterface.setDebugMode(true); 	// 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);     		// 初始化 JPush
         application = this;
-//        BasicPushNotificationBuilder notifyBuilder = new CustomPushNotificationBuilder();
-//        JPushInterface.setDefaultPushNotificationBuilder(notifyBuilder);
     }
 
     public Handler getUIHandler() {

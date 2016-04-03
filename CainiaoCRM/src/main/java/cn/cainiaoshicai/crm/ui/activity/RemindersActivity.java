@@ -17,10 +17,7 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
@@ -29,46 +26,22 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.support.debug.AppLogger;
-
-import com.example.jpushdemo.ExampleUtil;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 
-/**
- * This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a split
- * action bar when running on a device with a narrow display, and show three tabs.
- *
- * This Activity extends from {@link ActionBarActivity}, which provides all of the function
- * necessary to display a compatible Action Bar on devices running Android v2.1+.
- *
- * The interesting bits of this sample start in the theme files
- * ('res/values/styles.xml' and 'res/values-v14</styles.xml').
- *
- * Many of the drawables used in this sample were generated with the
- * 'Android Action Bar Style Generator': http://jgilfelt.github.io/android-actionbarstylegenerator
- */
 public class RemindersActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
-    public static final int REQUEST_DAY = 1;
-    public static final int REQUEST_INFO = 1;
-
-    private Date day = new Date();
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.getInstance(), RemindersActivity.class);
@@ -123,9 +96,8 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
         Log.d(GlobalCtx.ORDERS_TAG, String.valueOf(tab.getText()));
 
         int position = tab.getPosition();
-        ListType listType = getListTypeByTab(position);
 
-        onDayAndTypeChanged(listType, this.day);
+        onListChanged(getListTypeByTab(position));
     }
 
     public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
@@ -145,7 +117,7 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
         return RemindersActivity.ListType.findByType(position + 1);
     }
 
-    private void onDayAndTypeChanged(ListType listType, Date orderDay) {
+    private void onListChanged(ListType listType) {
 
         if (listType == null) {
             listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
@@ -187,38 +159,13 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
                 return true;
             case R.id.menu_manage:
                 startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
-//            case R.id.menu_settings:
-//                showHelp();
-//                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
-//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void startPicker() {
-        Intent pickerIntent = new Intent(getApplicationContext(), DatepickerActivity.class);
-        pickerIntent.putExtra("daytime", this.day);
-        startActivityForResult(pickerIntent, REQUEST_DAY);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_DAY) {
-            if (resultCode == RESULT_OK) {
-                if (data != null) {
-                    Date day = (Date)data.getSerializableExtra("daytime");
-                    if (day != null) {
-                        onDayAndTypeChanged(null, day);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     public enum ListType {
