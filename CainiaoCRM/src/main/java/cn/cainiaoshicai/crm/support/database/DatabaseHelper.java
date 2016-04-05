@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.support.database.table.AccountTable;
 
 /**
  * User: qii
@@ -14,19 +15,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper singleton = null;
 
-    private static final String DATABASE_NAME = "weibo.db";
+    private static final String DATABASE_NAME = "cainiao_crm.db";
 
     private static final int DATABASE_VERSION = 37;
 
-    static final String CREATE_ACCOUNT_TABLE_SQL = "create table "// + AccountTable.TABLE_NAME
+    static final String CREATE_ACCOUNT_TABLE_SQL = "create table " + AccountTable.TABLE_NAME
             + "("
-//            + AccountTable.UID + " integer primary key autoincrement,"
-//            + AccountTable.OAUTH_TOKEN + " text,"
-//            + AccountTable.OAUTH_TOKEN_EXPIRES_TIME + " text,"
-//            + AccountTable.OAUTH_TOKEN_SECRET + " text,"
-//            + AccountTable.BLACK_MAGIC + " boolean,"
-//            + AccountTable.NAVIGATION_POSITION + " integer,"
-//            + AccountTable.INFOJSON + " text"
+            + AccountTable.UID + " integer primary key autoincrement,"
+            + AccountTable.OAUTH_TOKEN + " text,"
+            + AccountTable.OAUTH_TOKEN_EXPIRES_TIME + " text,"
+            + AccountTable.OAUTH_TOKEN_SECRET + " text,"
+            + AccountTable.BLACK_MAGIC + " boolean,"
+            + AccountTable.NAVIGATION_POSITION + " integer,"
+            + AccountTable.INFOJSON + " text"
             + ");";
 
     static final String CREATE_GROUP_TABLE_SQL = "create table "// + GroupTable.TABLE_NAME
@@ -318,7 +319,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_ACCOUNT_TABLE_SQL);
 
-        createOtherTable(db);
+//        createOtherTable(db);
     }
 
     @Override

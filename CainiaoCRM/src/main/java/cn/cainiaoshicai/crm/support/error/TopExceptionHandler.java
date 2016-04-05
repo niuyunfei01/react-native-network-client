@@ -12,9 +12,9 @@ public class TopExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private Thread.UncaughtExceptionHandler defaultUEH;
 
-    private Activity app = null;
+    private Context app = null;
 
-    public TopExceptionHandler(Activity app) {
+    public TopExceptionHandler(Context app) {
         this.defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
         this.app = app;
     }

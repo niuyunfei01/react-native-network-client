@@ -25,6 +25,7 @@ import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.service.StatusService;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
+import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.jpush.android.api.BasicPushNotificationBuilder;
 import cn.jpush.android.api.CustomPushNotificationBuilder;
@@ -153,7 +154,7 @@ public class GlobalCtx extends Application {
     public void onCreate() {
         Log.d(ORDERS_TAG, "[GlobalCtx] onCreate");
         super.onCreate();
-
+        Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
         JPushInterface.setDebugMode(true); 	// 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);     		// 初始化 JPush
         application = this;
@@ -210,8 +211,7 @@ public class GlobalCtx extends Application {
     }
 
     public String getCurrentAccountName() {
-        return "小菜鸟";
-//        return getAccountBean().getUsernick();
+        return getAccountBean().getUsernick();
     }
 
     public void setActivity(Activity activity) {
@@ -227,12 +227,11 @@ public class GlobalCtx extends Application {
     }
 
     public String getSpecialToken() {
-        return "test_token";
-//        if (getAccountBean() != null) {
-//            return getAccountBean().getAccess_token();
-//        } else {
-//            return "";
-//        }
+        if (getAccountBean() != null) {
+            return getAccountBean().getAccess_token();
+        } else {
+            return "";
+        }
     }
 
     public DisplayMetrics getDisplayMetrics() {

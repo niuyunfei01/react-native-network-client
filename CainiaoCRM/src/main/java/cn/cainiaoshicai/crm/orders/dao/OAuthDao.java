@@ -3,9 +3,6 @@ package cn.cainiaoshicai.crm.orders.dao;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,22 +26,10 @@ public class OAuthDao {
     }
 
     public UserBean getOAuthUserInfo() throws ServiceException {
-
-        String uidJson = getOAuthUserUIDJsonData();
-        String uid = "";
-
-        try {
-            JSONObject jsonObject = new JSONObject(uidJson);
-            uid = jsonObject.optString("uid");
-        } catch (JSONException e) {
-            AppLogger.e(e.getMessage());
-        }
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("uid", uid);
+        Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
 
-        String url = URLHelper.USER_SHOW;
+        String url = URLHelper.USER_INFO;
         String result = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
 
         Gson gson = new Gson();

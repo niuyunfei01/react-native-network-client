@@ -7,15 +7,12 @@ import android.text.TextUtils;
 import cn.cainiaoshicai.crm.support.utils.ObjectToStringUtility;
 
 /**
- * User: Jiang Qi
- * Date: 12-7-30
  */
 public class AccountBean implements Parcelable {
 
     private String access_token;
     private long expires_time;
     private UserBean info;
-    private boolean black_magic;
     private int navigationPosition;
 
     public String getUid() {
@@ -24,10 +21,6 @@ public class AccountBean implements Parcelable {
 
     public String getUsernick() {
         return (info != null ? info.getScreen_name() : "");
-    }
-
-    public String getAvatar_url() {
-        return (info != null ? info.getProfile_image_url() : "");
     }
 
     public String getAccess_token() {
@@ -54,14 +47,6 @@ public class AccountBean implements Parcelable {
         this.info = info;
     }
 
-    public boolean isBlack_magic() {
-        return black_magic;
-    }
-
-    public void setBlack_magic(boolean black_magic) {
-        this.black_magic = black_magic;
-    }
-
     public int getNavigationPosition() {
         return navigationPosition;
     }
@@ -85,7 +70,6 @@ public class AccountBean implements Parcelable {
         dest.writeString(access_token);
         dest.writeLong(expires_time);
         dest.writeInt(navigationPosition);
-        dest.writeBooleanArray(new boolean[]{this.black_magic});
         dest.writeParcelable(info, flags);
     }
 
@@ -96,11 +80,6 @@ public class AccountBean implements Parcelable {
                     accountBean.access_token = in.readString();
                     accountBean.expires_time = in.readLong();
                     accountBean.navigationPosition = in.readInt();
-
-                    boolean[] booleans = new boolean[1];
-                    in.readBooleanArray(booleans);
-                    accountBean.black_magic = booleans[0];
-
                     accountBean.info = in.readParcelable(UserBean.class.getClassLoader());
 
                     return accountBean;
@@ -122,5 +101,9 @@ public class AccountBean implements Parcelable {
     @Override
     public int hashCode() {
         return info.hashCode();
+    }
+
+    public CharSequence getAvatar_url() {
+        return this.getInfo().getCover_image();
     }
 }

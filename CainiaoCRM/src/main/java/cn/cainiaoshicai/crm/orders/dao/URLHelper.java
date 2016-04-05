@@ -8,8 +8,12 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
  */
 public class URLHelper {
     public static final String API_ROOT = "http://www.cainiaoshicai.cn/api";
-    //base url
+    public static final String OAUTH2_TOKEN = "http://www.cainiaoshicai.cn/oauth/token";
+    public static final String USER_INFO = API_ROOT +  "/user_info";
+
     private static final String URL_SINA_WEIBO = "https://api.weibo.com/2/";
+
+
 
     //login
     public static final String UID = URL_SINA_WEIBO + "account/get_uid.json";
@@ -43,7 +47,6 @@ public class URLHelper {
 
     //user profile
     public static final String STATUSES_TIMELINE_BY_ID = URL_SINA_WEIBO + "statuses/user_timeline.json";
-    public static final String USER_SHOW = URL_SINA_WEIBO + "users/show.json";
     public static final String USER_DOMAIN_SHOW = URL_SINA_WEIBO + "users/domain_show.json";
 
 

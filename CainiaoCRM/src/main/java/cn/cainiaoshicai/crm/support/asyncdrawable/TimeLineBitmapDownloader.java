@@ -125,13 +125,8 @@ public class TimeLineBitmapDownloader {
 
         String url;
         FileLocationMethod method;
-        if (SettingUtility.getEnableBigAvatar()) {
-            url = user.getAvatar_large();
-            method = FileLocationMethod.avatar_large;
-        } else {
-            url = user.getProfile_image_url();
-            method = FileLocationMethod.avatar_small;
-        }
+        url = user.getCover_image();
+        method = FileLocationMethod.avatar_small;
         displayImageView(view, url, method, isFling, false);
     }
 

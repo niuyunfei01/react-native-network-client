@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -44,6 +45,7 @@ import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
@@ -56,6 +58,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public static final int REQUEST_INFO = 1;
 
     private Date day = new Date();
+    private AccountBean accountBean;
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.getInstance(), MainActivity.class);
@@ -70,7 +73,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this));
+        if (savedInstanceState != null) {
+            accountBean = savedInstanceState.getParcelable(BundleArgsConstants.ACCOUNT_EXTRA);
+        } else {
+            Intent intent = getIntent();
+            accountBean = intent
+                    .getParcelableExtra(BundleArgsConstants.ACCOUNT_EXTRA);
+        }
+
+        if (accountBean == null) {
+            accountBean = GlobalCtx.getInstance().getAccountBean();
+        }
+
+//        GlobalCtx.getInstance().setGroup(null);
+        GlobalCtx.getInstance().setAccountBean(accountBean);
+        SettingUtility.setDefaultAccountId(accountBean.getUid());
 
         setContentView(R.layout.order_list_main);
 

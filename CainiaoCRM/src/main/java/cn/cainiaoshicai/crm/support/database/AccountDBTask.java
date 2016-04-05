@@ -16,7 +16,7 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.support.database.table.AccountTable;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.ui.activity.OAuthActivity;
+import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 
 /**
  * User: qii
@@ -38,7 +38,7 @@ public class AccountDBTask {
         return databaseHelper.getReadableDatabase();
     }
 
-    public static OAuthActivity.DBResult addOrUpdateAccount(AccountBean account,
+    public static LoginActivity.DBResult addOrUpdateAccount(AccountBean account,
             boolean blackMagic) {
         ContentValues cv = new ContentValues();
         cv.put(AccountTable.UID, account.getUid());
@@ -55,12 +55,12 @@ public class AccountDBTask {
         if (c != null && c.getCount() > 0) {
             String[] args = {account.getUid()};
             getWsd().update(AccountTable.TABLE_NAME, cv, AccountTable.UID + "=?", args);
-            return OAuthActivity.DBResult.update_successfully;
+            return LoginActivity.DBResult.update_successfully;
         } else {
 
             getWsd().insert(AccountTable.TABLE_NAME,
                     AccountTable.UID, cv);
-            return OAuthActivity.DBResult.add_successfuly;
+            return LoginActivity.DBResult.add_successfuly;
         }
     }
 
@@ -108,9 +108,6 @@ public class AccountDBTask {
             colid = c.getColumnIndex(AccountTable.OAUTH_TOKEN_EXPIRES_TIME);
             account.setExpires_time(Long.valueOf(c.getString(colid)));
 
-            colid = c.getColumnIndex(AccountTable.BLACK_MAGIC);
-            account.setBlack_magic(c.getInt(colid) == 1);
-
             colid = c.getColumnIndex(AccountTable.NAVIGATION_POSITION);
             account.setNavigationPosition(c.getInt(colid));
 
@@ -141,9 +138,6 @@ public class AccountDBTask {
 
             colid = c.getColumnIndex(AccountTable.OAUTH_TOKEN_EXPIRES_TIME);
             account.setExpires_time(Long.valueOf(c.getString(colid)));
-
-            colid = c.getColumnIndex(AccountTable.BLACK_MAGIC);
-            account.setBlack_magic(c.getInt(colid) == 1);
 
             colid = c.getColumnIndex(AccountTable.NAVIGATION_POSITION);
             account.setNavigationPosition(c.getInt(colid));

@@ -24,4 +24,9 @@
     <dimen name="emotion_size">30dp</dimen>
     <dimen name="emotion_bg_size">50dp</dimen>
 
+    <dimen name="screen_edge_horizontal_margin">24dp</dimen>
+
+    <item name="weight_1_when_phone" type="dimen" format="float">0</item>
+    <item name="weight_1_when_tablet" type="dimen" format="float">1</item>
+
 </resources>

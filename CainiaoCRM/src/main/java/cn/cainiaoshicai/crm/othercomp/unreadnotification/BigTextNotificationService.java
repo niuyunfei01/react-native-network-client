@@ -242,7 +242,7 @@ public class BigTextNotificationService extends NotificationServiceHelper {
                     getApplicationContext().getString(R.string.reply_to_comment), pendingIntent);
         } */
 
-        String avatar = ((ItemBean) itemBean).getUser().getAvatar_large();
+        String avatar = ((ItemBean) itemBean).getUser().getCover_image();
         String avatarPath = FileManager.getFilePathFromUrl(avatar, FileLocationMethod.avatar_large);
         if (ImageUtility.isThisBitmapCanRead(avatarPath) && TaskCache
                 .isThisUrlTaskFinished(avatar)) {

@@ -529,7 +529,7 @@ public abstract class AbstractAppListAdapter<T extends ItemBean> extends BaseAda
     }
 
     protected void buildAvatar(ImageView view, int position, final UserBean user) {
-        String image_url = user.getProfile_image_url();
+        String image_url = user.getCover_image();
         if (!TextUtils.isEmpty(image_url)) {
             view.setVisibility(View.VISIBLE);
             TimeLineBitmapDownloader.getInstance()
