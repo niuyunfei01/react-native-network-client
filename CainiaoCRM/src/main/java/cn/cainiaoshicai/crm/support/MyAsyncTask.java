@@ -230,7 +230,7 @@ public abstract class MyAsyncTask<Params, Progress, Result> {
             @Override
             protected void done() {
                 try {
-                    final Result result = get();
+                     final Result result = get();
 
                     postResultIfNotInvoked(result);
                 } catch (InterruptedException e) {

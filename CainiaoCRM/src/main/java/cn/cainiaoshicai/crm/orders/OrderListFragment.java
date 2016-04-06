@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,7 @@ public class OrderListFragment extends Fragment {
             extends MyAsyncTask<Void,List<Order>,OrderContainer> {
 
         private ListView listView;
+        private String error;
 
         public RefreshOrderListTask(ListView listView) {
 
@@ -116,33 +118,48 @@ public class OrderListFragment extends Fragment {
                 return new OrdersDao(token,
                         orderDay, listType).get();
             } catch (ServiceException e) {
-                cancel(true);
+//                cancel(true);
+                this.error = e.getMessage();
                 return null;
             }
         }
 
         @Override
+        protected void onCancelled(OrderContainer orderContainer) {
+            this.onCancelled();
+        }
+
+        @Override
+        protected void onCancelled() {
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getActivity(), "已取消：" + this.error, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
         protected void onPostExecute(final OrderContainer value) {
             super.onPostExecute(value);
-            if (getActivity() == null || value == null) {
+            if (getActivity() == null) {
                 return;
             }
 
-//            MentionWeiboTimeLineDBTask.asyncReplace(getList(), accountBean.getUid());
-            data.clear();
-            data.addAll(value.getOrders());
-            getAdapter().notifyDataSetChanged();
+            if (value != null) {
+                data.clear();
+                data.addAll(value.getOrders());
+                getAdapter().notifyDataSetChanged();
+
+                final MainActivity context = (MainActivity) this.listView.getContext();
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        context.updateStatusCnt(value.getTotals());
+                    }
+                });
+
+                AppLogger.d("display data:" + data.size());
+            } else {
+                Toast.makeText(getActivity(), "发生错误：" + this.error, Toast.LENGTH_LONG).show();
+            }
             swipeRefreshLayout.setRefreshing(false);
-
-            final MainActivity context = (MainActivity) this.listView.getContext();
-            context.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    context.updateStatusCnt(value.getTotals());
-                }
-            });
-
-            AppLogger.d("display data:" + data.size());
         }
     }
 

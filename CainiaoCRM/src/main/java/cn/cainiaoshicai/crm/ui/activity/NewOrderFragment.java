@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +100,7 @@ public class NewOrderFragment extends Fragment {
             extends MyAsyncTask<Void,List<NewOrderReminder>,List<NewOrderReminder>> {
 
         private ListView listView;
+        private String error;
 
         public RefreshOrderListTask(ListView listView) {
 
@@ -112,23 +114,39 @@ public class NewOrderFragment extends Fragment {
                 return new NewOrderDao(token).newOrders();
             } catch (ServiceException e) {
                 cancel(true);
+                this.error = e.getMessage();
                 return null;
             }
         }
 
         @Override
+        protected void onCancelled(List<NewOrderReminder> newOrderReminders) {
+            swipeRefreshLayout.setRefreshing(false);
+            if (error != null) {
+                Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            this.onCancelled(null);
+        }
+
+        @Override
         protected void onPostExecute(final List<NewOrderReminder> value) {
             super.onPostExecute(value);
-            if (getActivity() == null || value == null) {
+            if (getActivity() == null) {
                 return;
             }
 
-            data.clear();
-            data.addAll(value);
-            getAdapter().notifyDataSetChanged();
-            swipeRefreshLayout.setRefreshing(false);
+            if (value != null) {
+                data.clear();
+                data.addAll(value);
+                getAdapter().notifyDataSetChanged();
+                AppLogger.d("display data:" + data.size());
+            }
 
-            AppLogger.d("display data:" + data.size());
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
