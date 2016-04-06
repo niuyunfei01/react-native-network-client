@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -11,24 +12,32 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.BlueToothPrinterApp.BlueToothPrinterApp;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
-import cn.cainiaoshicai.crm.orders.domain.NewOrderReminder;
+import cn.cainiaoshicai.crm.orders.domain.CartItem;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
+import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
+import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 
 /**
  */
 public class OrderSingleActivity extends Activity {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
+    private static final String GBK = "gbk";
     private WebView mWebView;
 
     @Override
@@ -57,7 +66,11 @@ public class OrderSingleActivity extends Activity {
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), BlueToothPrinterApp.class));
+
+                connect(platform, platformOid);
+
+
+
             }
         });
 
@@ -65,39 +78,7 @@ public class OrderSingleActivity extends Activity {
         final Button actionButton = (Button) findViewById(R.id.button2);
         if("new_order".equals(intent.getStringExtra("from"))) {
             actionButton.setText("确认接单");
-            actionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    new MyAsyncTask<Void, ResultBean, ResultBean>(){
-                        @Override
-                        protected ResultBean doInBackground(Void... params) {
-                            String token = GlobalCtx.getInstance().getSpecialToken();
-                            try {
-                                return new OrderActionDao(token).confirmAccepted(Constants.Platform.find(platform), platformOid);
-                            } catch (Exception ex) {
-                                AppLogger.e("error on handle click action: status=" + status, ex);
-                                return ResultBean.exception();
-                            }
-                        }
-
-                        @Override
-                        protected void onPostExecute(final ResultBean oc) {
-                            super.onPostExecute(oc);
-                            final Activity activity = (Activity)v.getContext();
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(GlobalCtx.getInstance(), RemindersActivity.class);
-                                    intent.putExtra("list_type", listType);
-                                    activity.startActivity(intent);
-                                }
-                            });
-                        }
-
-                    }.executeOnNormal();
-                }
-            });
+            actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, status, listType));
         } else {
             if (status == Constants.WM_ORDER_STATUS_ARRIVED) {
                 actionButton.setVisibility(View.INVISIBLE);
@@ -116,6 +97,118 @@ public class OrderSingleActivity extends Activity {
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }
+
+    protected void connect(final int platform, final String platformOid) {
+        final BluetoothConnector.BluetoothSocketWrapper btsocket = BluetoothPrinters.INS.getCurrentPrinterSocket();
+        if(btsocket == null){
+            Intent BTIntent = new Intent(getApplicationContext(), BTDeviceListActivity.class);
+            this.startActivityForResult(BTIntent, BTDeviceListActivity.REQUEST_CONNECT_BT);
+        }
+        else{
+            new MyAsyncTask<Void,Order, Boolean>(){
+                private String error;
+                private Order order;
+
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
+                    Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                    if (order == null) {
+                        this.error = getApplication().getString(R.string.error_get_order);
+                        return false;
+                    } else {
+                        this.order = order;
+                        return printOrder(btsocket, order);
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(Boolean aBoolean) {
+                    super.onPostExecute(aBoolean);
+                    if (!aBoolean) {
+                        Toast.makeText(getApplication(), "操作失败：" + this.error, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }.executeOnNormal();
+        }
+    }
+
+    private boolean printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) {
+        try {
+            OutputStream btos = btsocket.getOutputStream();
+
+            btos.write(new byte[]{0x1B, 0x21, 1});
+            byte[] newLine = "\n".getBytes();
+            final byte[] starLine = "********************************".getBytes();
+
+            btos.write(starLine);
+            btos.write(newLine);
+            btos.write(GPrinterCommand.center);
+            btos.write(GPrinterCommand.text_big_size);
+            btos.write(bytes("菜鸟食材"));
+            btos.write(GPrinterCommand.text_normal_size);
+            btos.write(GPrinterCommand.left);
+            btos.write(newLine);
+
+            btos.write(starLine);
+            btos.write(newLine);
+            btos.write(bytes(order.getUserName() + " " + order.getMobile()));
+
+            btos.write(newLine);
+            btos.write(bytes(order.getAddress()));
+            btos.write(newLine);
+
+            if (!TextUtils.isEmpty(order.getRemark())) {
+                btos.write(starLine);
+                btos.write(newLine);
+                btos.write(bytes("用户备注"));
+                btos.write(newLine);
+                btos.write(bytes(order.getRemark()));
+            }
+
+            btos.write(starLine);
+            btos.write(newLine);
+            btos.write((bytes("期望送达时间：" + order.getExpectTime())));
+            btos.write(newLine);
+            btos.write(starLine);
+            btos.write(bytes("订单编号：" + order.getPlatform() + "-" + order.getPlatform_oid()));
+
+            btos.write(newLine);
+
+            btos.write(bytes("下单时间：2016-03-26 15：52"));
+            btos.write(newLine);
+            btos.write(starLine);
+            btos.write(newLine);
+
+            btos.write(bytes("食材名称                数量"));
+            btos.write(newLine);
+            btos.write(bytes("---------------------------"));
+            btos.write(newLine);
+
+            for(CartItem item : order.getItems()) {
+                btos.write(bytes(String.format("%s x%d", item.getProduct_name(), item.getNum())));
+                btos.write(newLine);
+            }
+
+            btos.write(starLine);
+            btos.write(newLine);
+            btos.write(bytes(String.format("实付金额：%.2f", order.getOrderMoney())));
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(GPrinterCommand.walkPaper((byte) 4));
+            btos.flush();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private byte[] bytes(String msg) throws UnsupportedEncodingException {
+        return msg.getBytes(GBK);
+    }
+
 
     private String getActionText(int status) {
         switch(status) {
@@ -203,6 +296,52 @@ public class OrderSingleActivity extends Activity {
                     activity.startActivity(intent);
                 }
             });
+        }
+    }
+
+    private static class AccpetOrderButtonClicked implements View.OnClickListener {
+        private final int platform;
+        private final String platformOid;
+        private final int status;
+        private final int listType;
+
+        public AccpetOrderButtonClicked(int platform, String platformOid, int status, int listType) {
+            this.platform = platform;
+            this.platformOid = platformOid;
+            this.status = status;
+            this.listType = listType;
+        }
+
+        @Override
+        public void onClick(final View v) {
+            new MyAsyncTask<Void, ResultBean, ResultBean>(){
+                @Override
+                protected ResultBean doInBackground(Void... params) {
+                    String token = GlobalCtx.getInstance().getSpecialToken();
+                    try {
+                        return new OrderActionDao(token).confirmAccepted(Constants.Platform.find(platform), platformOid);
+                    } catch (Exception ex) {
+                        AppLogger.e("error on handle click action: status=" + status, ex);
+                        return ResultBean.exception();
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(final ResultBean oc) {
+                    super.onPostExecute(oc);
+                    final Activity activity = (Activity)v.getContext();
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(GlobalCtx.getInstance(), RemindersActivity.class);
+                            intent.putExtra("list_type", listType);
+                            activity.startActivity(intent);
+                        }
+                    });
+                }
+
+            }.executeOnNormal();
         }
     }
 }

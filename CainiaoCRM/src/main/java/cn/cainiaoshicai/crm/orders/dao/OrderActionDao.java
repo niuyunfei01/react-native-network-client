@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -70,5 +71,20 @@ public class OrderActionDao {
 
     public ResultBean confirmAccepted(Constants.Platform platform, String platformOid) throws ServiceException {
         return actionWithResult(platform, platformOid, "/order_confirm_accepted");
+    }
+
+    public Order getOrder(int platform, String platformOid) {
+        try {
+            String json = getJson("/order/" + platform + "/" + platformOid, new HashMap<String, String>());
+            AppLogger.v("action: order "  + json);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<Order>() {}.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e(e.getMessage(), e);
+        } catch (ServiceException e) {
+            AppLogger.e("exception to get order:" + e.getMessage(), e);
+        }
+
+        return null;
     }
 }

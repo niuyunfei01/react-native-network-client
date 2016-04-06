@@ -130,6 +130,7 @@ public class BTDeviceListActivity extends ListActivity {
 						}
 					}
 				} catch (Exception ex) {
+					AppLogger.e("error to enable bluebooth", ex);
 				}
 			}
 

@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
 import java.util.Date;
+import java.util.List;
 
 public class Order {
 
@@ -22,6 +23,8 @@ public class Order {
     private int platform;
     private String platform_oid;
     private String platform_dayId;
+
+    private List<CartItem> items;
 
     public String getId() {
         return id;
@@ -161,5 +164,13 @@ public class Order {
 
     public void setPlatform_dayId(String platform_dayId) {
         this.platform_dayId = platform_dayId;
+    }
+
+    public List<CartItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<CartItem> items) {
+        this.items = items;
     }
 }
