@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Order {
 
-    private String id;
+    private int id;
     private int userId;
     private String area;
     private int gender;
@@ -26,11 +26,11 @@ public class Order {
 
     private List<CartItem> items;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

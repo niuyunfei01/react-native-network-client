@@ -39,6 +39,7 @@ import com.example.jpushdemo.ExampleUtil;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
@@ -53,6 +54,7 @@ import cn.cainiaoshicai.crm.ui.activity.StorePerformActivity;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
+    private static final List<ListType> TAB_LIST_TYPES = Arrays.asList(ListType.WAITING_READY, ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
     private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
     public static final int REQUEST_DAY = 1;
     public static final int REQUEST_INFO = 1;
@@ -77,8 +79,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             accountBean = savedInstanceState.getParcelable(BundleArgsConstants.ACCOUNT_EXTRA);
         } else {
             Intent intent = getIntent();
-            accountBean = intent
-                    .getParcelableExtra(BundleArgsConstants.ACCOUNT_EXTRA);
+            accountBean = intent.getParcelableExtra(BundleArgsConstants.ACCOUNT_EXTRA);
         }
 
         if (accountBean == null) {
@@ -93,25 +94,27 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(false);
+        ab.setDisplayShowHomeEnabled(false);
+        ab.setDisplayShowTitleEnabled(false);
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//
+//        View barTitleView = findViewById(R.id.action_bar_title);
+//        if (barTitleView == null) {
+//            final int abTitleId = getResources().getIdentifier("action_bar_title", "id", "android");
+//            barTitleView = findViewById(abTitleId);
+//        }
+//
+//        if (barTitleView != null) {
+//            barTitleView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    startPicker();
+//                }
+//            });
+//        }
 
-        View barTitleView = findViewById(R.id.action_bar_title);
-        if (barTitleView == null) {
-            final int abTitleId = getResources().getIdentifier("action_bar_title", "id", "android");
-            barTitleView = findViewById(abTitleId);
-        }
-
-        if (barTitleView != null) {
-            barTitleView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startPicker();
-                }
-            });
-        }
-
-        // Add three tabs to the Action Bar for display
-        for(ListType type : Arrays.asList(ListType.WAITING_READY, ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED)) {
+        for(ListType type : TAB_LIST_TYPES) {
             ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
         }
 
@@ -135,7 +138,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         return super.onCreateOptionsMenu(menu);
     }
 
-    // Implemented from ActionBar.TabListener
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         Log.d(GlobalCtx.ORDERS_TAG, String.valueOf(tab.getText()));
@@ -147,16 +149,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
-        for (Map.Entry<Integer, Integer> en : totalByStatus.entrySet()) {
-            Integer status = en.getKey();
-            ActionBar.Tab tabAt = this.getSupportActionBar().getTabAt(status - 1);
-            ListType type = ListType.findByType(status);
-            if (tabAt != null && type != null) {
-                tabAt.setText(type.getName() + "(" + en.getValue() + ")");
+        for(ListType listType : TAB_LIST_TYPES) {
+            Integer count = totalByStatus.get(listType.getValue());
+            if (count == null) count = 0;
+
+            ActionBar.Tab tab = this.getSupportActionBar().getTabAt(listType.getValue() - 1);
+            if (tab != null) {
+                tab.setText(listType.getName() + "\n(" + count + ")");
             }
         }
     }
-
 
     @NonNull
     private ListType getListTypeByTab(int position) {
@@ -179,11 +181,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
         }
 
-        if (orderDay != null) {
-            this.day = orderDay;
-            this.getSupportActionBar().setTitle(DateTimeUtils.shortYmd(this.day));
-        }
-
         FragmentManager fm = getFragmentManager();
         Integer fragmentId = fragmentMap.get(listType.getValue());
         OrderListFragment found = null;
@@ -194,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             found = new OrderListFragment();
             fragmentMap.put(listType.getValue(), found.getId());
         }
-        found.setDayAndType(listType, DateTimeUtils.shortYmd(this.day));
+        found.setDayAndType(listType);
         fm.beginTransaction().replace(R.id.order_list_main, found).commit();
     }
 
@@ -257,7 +254,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     public enum ListType {
-        NONE(0, "ALL"), WAITING_READY(1, "待打包"), WAITING_SENT(2, "待配送"), WAITING_ARRIVE(3, "待送达"), ARRIVED(4, "已完成");
+        NONE(0, "ALL"), WAITING_READY(1, "待打包"), WAITING_SENT(2, "待配送"), WAITING_ARRIVE(3, "待送达"), ARRIVED(4, "送达");
 
         private int value;
         private String name;

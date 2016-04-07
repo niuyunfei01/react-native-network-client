@@ -19,7 +19,7 @@ public class Constants {
 
 
     public static final Platform PLAT_BD = new Platform("百度", 1);
-    public static final Platform PLAT_WX = new Platform("微信自营", 2);
+    public static final Platform PLAT_WX = new Platform("微信", 2);
     public static final Platform PLAT_MT  = new Platform("美团", 3);
     public static final Platform PLAT_ELEME  = new Platform("饿了么", 4);
     public static final Platform PLAT_UNKNOWN  = new Platform("-", 5);

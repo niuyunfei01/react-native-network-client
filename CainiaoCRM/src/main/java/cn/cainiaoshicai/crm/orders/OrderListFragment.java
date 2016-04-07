@@ -35,14 +35,11 @@ public class OrderListFragment extends Fragment {
 	private OrderAdapter adapter;
 	private ArrayList<Order> data = new ArrayList<Order>();
 
-
     private int listType;
-    private String orderDay;
 
-    public void setDayAndType(final MainActivity.ListType listType, String orderDay) {
+    public void setDayAndType(final MainActivity.ListType listType) {
         this.listType = listType.getValue();
-        this.orderDay = orderDay;
-        onTypeOrDayChanged();
+        onTypeChanged();
     }
 
     @Override
@@ -79,21 +76,21 @@ public class OrderListFragment extends Fragment {
             }
         });
 
-        onTypeOrDayChanged();
+        onTypeChanged();
 
 		swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.list_order_view);
 		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
+                android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
 			swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    onTypeOrDayChanged();
+                    onTypeChanged();
                 }
             });
 
 	}
 
-    private void onTypeOrDayChanged() {
+    private void onTypeChanged() {
         if (adapter != null) {
             new RefreshOrderListTask(this.listView).executeOnNormal();
         }
@@ -107,7 +104,6 @@ public class OrderListFragment extends Fragment {
         private String error;
 
         public RefreshOrderListTask(ListView listView) {
-
             this.listView = listView;
         }
 
@@ -115,8 +111,7 @@ public class OrderListFragment extends Fragment {
         protected OrderContainer doInBackground(Void... params) {
             try {
                 String token = GlobalCtx.getInstance().getSpecialToken();
-                return new OrdersDao(token,
-                        orderDay, listType).get();
+                return new OrdersDao(token, listType).get();
             } catch (ServiceException e) {
 //                cancel(true);
                 this.error = e.getMessage();

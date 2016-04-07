@@ -21,12 +21,11 @@ import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 
 /**
- * Date: 13-2-14
  */
 public class OrdersDao {
 
     private String getJson() throws ServiceException {
-        String url = URLHelper.API_ROOT + "/orders/" + this.day + ".json" ;
+        String url = URLHelper.API_ROOT + "/orders.json" ;
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("access_token", access_token);
@@ -53,14 +52,8 @@ public class OrdersDao {
 
     private String access_token;
     private int listType;
-    private String day;
 
-    public OrdersDao(String access_token, String orderDay, int listType) {
-        if (orderDay == null) {
-            throw new IllegalArgumentException("orderDay cant be null");
-        }
-
-        this.day = orderDay;
+    public OrdersDao(String access_token, int listType) {
         this.listType = listType;
         this.access_token = access_token;
     }

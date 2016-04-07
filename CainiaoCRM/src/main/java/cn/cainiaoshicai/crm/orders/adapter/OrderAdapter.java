@@ -1,13 +1,19 @@
 package cn.cainiaoshicai.crm.orders.adapter;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -82,15 +88,38 @@ public class OrderAdapter extends BaseAdapter {
             orderAddr.setText(order.getAddress());
             userName.setText(order.getUserName());
             phone.setText(order.getMobile());
+            phone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse("tel:" + order.getMobile()));
+                    Context context = v.getContext();
+                    if (context == null) {
+                        return;
+                    }
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        Toast.makeText(context, "没有呼叫权限", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    context.startActivity(callIntent);
+                }
+            });
             genderText.setText(order.getGenderText());
             orderMoney.setText(String.valueOf(order.getOrderMoney()));
 
             orderTime.setText(instance.getShortTime(order.getOrderTime()));
-            dayNo.setText("#" + order.getDayId());
+            dayNo.setText("#" + order.getId()%100);
 
             String platformName = Constants.Platform.find(order.getPlatform()).name;
             String platformDayId = order.getPlatform_dayId();
-            sourcePlatform.setText(platformName + (platformDayId != null? String.format(" #%s", platformDayId) : ""));
+            sourcePlatform.setText(platformName + (platformDayId != null && order.getPlatform() != Constants.PLAT_WX.id? String.format(" #%s", platformDayId) : ""));
         }catch (Exception e) {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
         }

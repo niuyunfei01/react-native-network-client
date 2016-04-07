@@ -63,6 +63,8 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
         ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         ab.setDisplayHomeAsUpEnabled(false);
+        ab.setDisplayShowHomeEnabled(false);
+        ab.setDisplayShowTitleEnabled(false);
 
         // Add three tabs to the Action Bar for display
         for(ListType type : Arrays.asList(ListType.NEW_ORDER, ListType.CUSTOMER_NOTIFY, ListType.REMINDER)) {
