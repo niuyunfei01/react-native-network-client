@@ -10,6 +10,7 @@ import android.media.RingtoneManager;
 import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -66,10 +67,9 @@ public class NotificationReceiver extends BroadcastReceiver {
             int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
             Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
 
-			String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
-			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-			Notify notify = gson.fromJson(extraJson, new TypeToken<Notify>() {}.getType());
+            Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null && "new_order".equals(notify.getType())) {
+                GlobalCtx.newOrderNotifies.add(notifactionId);
                 sound.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
                     @Override
                     public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
@@ -80,7 +80,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
-            
+
+            GlobalCtx.clearNewOrderNotifies(context);
+
         	//打开自定义的Activity
         	Intent i = new Intent(context, RemindersActivity.class);
         	i.putExtras(bundle);
@@ -99,7 +101,14 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
 	}
 
-	// 打印所有的 intent extra 数据
+    @Nullable
+    private Notify getNotifyFromBundle(Bundle bundle) {
+        String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        return gson.fromJson(extraJson, new TypeToken<Notify>() {}.getType());
+    }
+
+    // 打印所有的 intent extra 数据
 	private static String printBundle(Bundle bundle) {
 		StringBuilder sb = new StringBuilder();
 		for (String key : bundle.keySet()) {

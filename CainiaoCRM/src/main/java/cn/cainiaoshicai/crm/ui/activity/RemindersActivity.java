@@ -56,7 +56,6 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this));
 
         setContentView(R.layout.order_list_main);
 
@@ -69,6 +68,8 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
         for(ListType type : Arrays.asList(ListType.NEW_ORDER, ListType.CUSTOMER_NOTIFY, ListType.REMINDER)) {
             ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
         }
+
+        GlobalCtx.clearNewOrderNotifies(this);
 
         Intent intent = this.getIntent();
         if (intent != null) {

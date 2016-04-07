@@ -34,6 +34,8 @@ import cn.jpush.android.api.JPushInterface;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GlobalCtx extends Application {
@@ -42,6 +44,8 @@ public class GlobalCtx extends Application {
     public static final String ORDERS_TAG = "cn.cainiaoshicai.crm";
     public static final int INT_SUCESS_API = 1;
 
+    public static final CopyOnWriteArrayList<Integer> newOrderNotifies = new CopyOnWriteArrayList<>();
+;
     private static GlobalCtx application;
 
     private Activity activity = null;
@@ -252,6 +256,12 @@ public class GlobalCtx extends Application {
                 metrics.heightPixels = 800;
                 return metrics;
             }
+        }
+    }
+
+    public static void clearNewOrderNotifies(Context context) {
+        for(Object notifyId : GlobalCtx.newOrderNotifies.toArray()) {
+            JPushInterface.clearNotificationById(context, (Integer) notifyId);
         }
     }
 
