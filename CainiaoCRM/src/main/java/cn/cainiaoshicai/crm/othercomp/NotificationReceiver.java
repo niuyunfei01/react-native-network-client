@@ -70,7 +70,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 			Notify notify = gson.fromJson(extraJson, new TypeToken<Notify>() {}.getType());
 			if (notify != null && "new_order".equals(notify.getType())) {
-				sound.play(soundId, 5.0f, 5.0f, 1, 0, 1.0f);
+                sound.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+                    @Override
+                    public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+				        sound.play(soundId, 100.0f, 100.0f, 1, 0, 1.0f);
+                    }
+                });
 			}
 
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
