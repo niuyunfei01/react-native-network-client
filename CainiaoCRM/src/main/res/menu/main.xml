@@ -12,10 +12,10 @@
         android:title="@string/menu_manage_order"
         support:showAsAction="always|withText"/>
 
-    <item
-        android:id="@+id/menu_manage"
-        android:title="@string/menu_store_manage"
-        support:showAsAction="always|withText"/>
+    <!--<item-->
+        <!--android:id="@+id/menu_manage"-->
+        <!--android:title="@string/menu_store_manage"-->
+        <!--support:showAsAction="always|withText"/>-->
 
     <item
         android:id="@+id/menu_mine"

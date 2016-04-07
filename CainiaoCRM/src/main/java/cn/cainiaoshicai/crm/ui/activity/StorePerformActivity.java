@@ -67,8 +67,8 @@ public class StorePerformActivity extends ActionBarActivity {
             case R.id.menu_accept:
                 startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
                 return true;
-            case R.id.menu_manage:
-                return true;
+//            case R.id.menu_manage:
+//                return true;
 //            case R.id.menu_settings:
 //                showHelp();
 //                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));

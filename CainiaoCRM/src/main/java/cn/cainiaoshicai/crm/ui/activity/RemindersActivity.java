@@ -160,8 +160,8 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
                 return true;
             case R.id.menu_accept:
                 return true;
-            case R.id.menu_manage:
-                startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
+//            case R.id.menu_manage:
+//                startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -216,9 +216,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.menu_accept:
                 startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
                 return true;
-            case R.id.menu_manage:
-                startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
-                return true;
+//            case R.id.menu_manage:
+//                startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
+//                return true;
 //            case R.id.menu_settings:
 //                showHelp();
 //                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
