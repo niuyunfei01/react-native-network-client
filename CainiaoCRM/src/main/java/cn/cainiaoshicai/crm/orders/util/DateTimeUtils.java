@@ -104,6 +104,11 @@ public class DateTimeUtils extends DateUtils {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(orderDay);
     }
+	public static String shortYmdHourMin(Date orderDay) {
+		if (orderDay == null) return "";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        return sdf.format(orderDay);
+    }
 
 	/**
 	 * Displays a user-friendly date difference string.

@@ -25,11 +25,13 @@ import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
+import cn.cainiaoshicai.crm.support.utils.TimeUtility;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 
@@ -38,6 +40,7 @@ import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 public class OrderSingleActivity extends Activity {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private static final String GBK = "gbk";
+    private static final int MAX_TITLE_PART = 16;
     private WebView mWebView;
 
     @Override
@@ -133,82 +136,150 @@ public class OrderSingleActivity extends Activity {
         }
     }
 
+
+    static public class OrderPrinter {
+        private final OutputStream btos;
+        private byte[] newLine = "\n".getBytes();
+        private final byte[] starLine = "********************************".getBytes();
+        private final String split_line = "--------------------------------";
+        private final String space_line = "                                ";
+
+        public OrderPrinter(OutputStream btos) {
+            this.btos = btos;
+        }
+
+        public OrderPrinter newLine() throws IOException {
+            btos.write(newLine);
+            return this;
+        }
+
+        public OrderPrinter starLine() throws IOException {
+            btos.write(GPrinterCommand.text_normal_size);
+            btos.write(starLine);
+            btos.write(newLine);
+
+            return this;
+        }
+
+        public OrderPrinter highText(String s) throws IOException {
+            btos.write(GPrinterCommand.text_big_height);
+            btos.write(bytes(s));
+            return this;
+        }
+
+        public OrderPrinter highBigText(String s) throws IOException {
+            btos.write(GPrinterCommand.text_big_size);
+            btos.write(bytes(s));
+            return this;
+        }
+
+
+        byte[] bytes(String msg) throws UnsupportedEncodingException {
+            return msg.getBytes(GBK);
+        }
+
+        public OrderPrinter normalText(String text) throws IOException {
+            btos.write(GPrinterCommand.text_normal_size);
+            btos.write(bytes(text));
+            return this;
+        }
+
+        public OrderPrinter splitLine() throws IOException {
+            btos.write(GPrinterCommand.text_normal_size);
+            btos.write(bytes(split_line));
+            this.newLine();
+            return this;
+        }
+
+        public OrderPrinter spaceLine() throws IOException {
+            btos.write(GPrinterCommand.text_normal_size);
+            btos.write(bytes(space_line));
+            this.newLine();
+            return this;
+        }
+
+        public int printWidth(String text) {
+            if (text == null) return 0;
+            int width = 0;
+            for(int idx = 0; idx < text.length(); idx++) {
+                char c = text.charAt(idx);
+                if (c < 256) {
+                    width++;
+                } else {
+                    width += 2;
+                }
+            }
+            return width;
+        }
+    }
+
     private boolean printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) {
         try {
             OutputStream btos = btsocket.getOutputStream();
+        OrderPrinter printer = new OrderPrinter(btos);
 
             btos.write(new byte[]{0x1B, 0x21, 1});
-            byte[] newLine = "\n".getBytes();
-            final byte[] starLine = "********************************".getBytes();
 
-            btos.write(starLine);
-            btos.write(newLine);
-            btos.write(GPrinterCommand.center);
-            btos.write(GPrinterCommand.text_big_size);
-            btos.write(bytes("菜鸟食材"));
-            btos.write(GPrinterCommand.text_normal_size);
+            printer.starLine().highBigText("   菜鸟食材").newLine();
+
             btos.write(GPrinterCommand.left);
-            btos.write(newLine);
 
-            btos.write(starLine);
-            btos.write(newLine);
-            btos.write(bytes(order.getUserName() + " " + order.getMobile()));
+            printer.starLine()
+                    .highText(order.getUserName() + " " + order.getMobile())
+                    .newLine()
+                    .highText(order.getAddress())
+                    .newLine();
 
-            btos.write(newLine);
-            btos.write(bytes(order.getAddress()));
-            btos.write(newLine);
-
+            printer.starLine().highText("期望送达：" + DateTimeUtils.shortYmdHourMin(order.getExpectTime())).newLine();
             if (!TextUtils.isEmpty(order.getRemark())) {
-                btos.write(starLine);
-                btos.write(newLine);
-                btos.write(bytes("用户备注"));
-                btos.write(newLine);
-                btos.write(bytes(order.getRemark()));
+                        printer.highText("用户备注：" + order.getRemark())
+                        .newLine();
             }
 
-            btos.write(starLine);
-            btos.write(newLine);
-            btos.write((bytes("期望送达时间：" + order.getExpectTime())));
-            btos.write(newLine);
-            btos.write(starLine);
-            btos.write(bytes("订单编号：" + order.getPlatform() + "-" + order.getPlatform_oid()));
+            printer.starLine()
+                    .normalText("订单编号：" + order.getPlatform() + "-" + order.getPlatform_oid())
+                    .newLine()
+                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+                    .newLine();
 
-            btos.write(newLine);
+            printer.starLine().highText(String.format("食材名称%20s", "数量")).newLine().splitLine();
 
-            btos.write(bytes("下单时间：2016-03-26 15：52"));
-            btos.write(newLine);
-            btos.write(starLine);
-            btos.write(newLine);
+            int total = 0;
+            for (CartItem item : order.getItems()) {
+                String name = item.getProduct_name();
+                for (int idx = 0; idx < name.length(); ) {
+                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                    if (isEnd) {
+                        text = String.format("%s%" + (32 - (printer.printWidth(text))) + "s", text, "x" + item.getNum());
+                    }
+                    printer.highText(text).newLine();
+                    if (isEnd) {
+                        printer.spaceLine();
+                    }
 
-            btos.write(bytes("食材名称                数量"));
-            btos.write(newLine);
-            btos.write(bytes("---------------------------"));
-            btos.write(newLine);
-
-            for(CartItem item : order.getItems()) {
-                btos.write(bytes(String.format("%s x%d", item.getProduct_name(), item.getNum())));
-                btos.write(newLine);
+                    idx += MAX_TITLE_PART;
+                }
+                total += item.getNum();
             }
 
-            btos.write(starLine);
-            btos.write(newLine);
-            btos.write(bytes(String.format("实付金额：%.2f", order.getOrderMoney())));
+            printer.highText(String.format("合计 %26s%d", 'x', total)).newLine();
+
+            printer.starLine().highText(String.format("实付金额：%22.2f", order.getOrderMoney())).newLine();
+
+            printer.starLine().normalText("我们承诺坏一赔二，请您放心买菜。").newLine().normalText("客服电话：400-018-6069");
+
             btos.write(0x0D);
             btos.write(0x0D);
             btos.write(0x0D);
             btos.write(GPrinterCommand.walkPaper((byte) 4));
             btos.flush();
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            AppLogger.e("error in printing order", e);
             return false;
         }
     }
-
-    private byte[] bytes(String msg) throws UnsupportedEncodingException {
-        return msg.getBytes(GBK);
-    }
-
 
     private String getActionText(int status) {
         switch(status) {
