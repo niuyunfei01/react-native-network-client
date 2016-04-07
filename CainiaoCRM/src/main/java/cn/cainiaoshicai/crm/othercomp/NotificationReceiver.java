@@ -15,14 +15,19 @@ import android.util.Log;
 
 import com.example.jpushdemo.ExampleUtil;
 import com.example.jpushdemo.MainActivity;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.jpush.android.api.JPushInterface;
 
@@ -62,8 +67,11 @@ public class NotificationReceiver extends BroadcastReceiver {
             Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
 
 			String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
-
-			sound.play(soundId , 1.0f, 1.0f, 1, 0, 1.0f);
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+			Notify notify = gson.fromJson(extraJson, new TypeToken<Notify>() {}.getType());
+			if (notify != null && "new_order".equals(notify.getType())) {
+				sound.play(soundId, 5.0f, 5.0f, 1, 0, 1.0f);
+			}
 
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
@@ -140,5 +148,35 @@ public class NotificationReceiver extends BroadcastReceiver {
 			}
 			context.sendBroadcast(msgIntent);
 		}
+	}
+}
+
+class Notify {
+	private String type;
+	private int platform;
+	private String platform_oid;
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public int getPlatform() {
+		return platform;
+	}
+
+	public void setPlatform(int platform) {
+		this.platform = platform;
+	}
+
+	public String getPlatform_oid() {
+		return platform_oid;
+	}
+
+	public void setPlatform_oid(String platform_oid) {
+		this.platform_oid = platform_oid;
 	}
 }
