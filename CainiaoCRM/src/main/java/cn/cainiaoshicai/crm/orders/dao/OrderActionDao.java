@@ -32,8 +32,8 @@ public class OrderActionDao {
         return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
     }
 
-    public ResultBean startShip(Constants.Platform platform, String platformId) throws ServiceException {
-        return actionWithResult(platform, platformId, "/order_start_ship");
+    public ResultBean startShip(Constants.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
+        return actionWithResult(platform, platformId, "/order_start_ship/" + ship_worker_id);
     }
 
     public ResultBean setArrived(Constants.Platform platform, String platform_oid) throws ServiceException {

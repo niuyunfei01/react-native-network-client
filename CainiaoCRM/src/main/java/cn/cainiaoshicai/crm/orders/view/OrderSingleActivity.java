@@ -219,10 +219,9 @@ public class OrderSingleActivity extends Activity {
         OrderPrinter printer = new OrderPrinter(btos);
 
             btos.write(new byte[]{0x1B, 0x21, 1});
+            btos.write(GPrinterCommand.left);
 
             printer.starLine().highBigText("   菜鸟食材").newLine();
-
-            btos.write(GPrinterCommand.left);
 
             printer.starLine()
                     .highText(order.getUserName() + " " + order.getMobile())
@@ -248,10 +247,13 @@ public class OrderSingleActivity extends Activity {
             for (CartItem item : order.getItems()) {
                 String name = item.getProduct_name();
                 for (int idx = 0; idx < name.length(); ) {
+
                     String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
                     boolean isEnd = idx + MAX_TITLE_PART >= name.length();
                     if (isEnd) {
-                        text = String.format("%s%" + (32 - (printer.printWidth(text))) + "s", text, "x" + item.getNum());
+                        String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                        text = String.format(format, text, "x" + item.getNum());
                     }
                     printer.highText(text).newLine();
                     if (isEnd) {
@@ -320,6 +322,7 @@ public class OrderSingleActivity extends Activity {
         final String platformOid;
         private View button;
         private int listType;
+        private int ship_worker_id;
 
         public OrderActionOp(int oid, String platformOid, View v, int listType) {
             this.oid = oid;
@@ -336,7 +339,7 @@ public class OrderSingleActivity extends Activity {
             try {
                 switch (status) {
                     case Constants.WM_ORDER_STATUS_TO_SHIP:
-                        oc = new OrderActionDao(token).startShip(Constants.Platform.find(oid), platformOid);
+                        oc = new OrderActionDao(token).startShip(Constants.Platform.find(oid), platformOid, ship_worker_id);
                         break;
                     case Constants.WM_ORDER_STATUS_TO_ARRIVE:
                         oc = new OrderActionDao(token).setArrived(Constants.Platform.find(oid), platformOid);
@@ -367,6 +370,10 @@ public class OrderSingleActivity extends Activity {
                     activity.startActivity(intent);
                 }
             });
+        }
+
+        public void setShip_worker_id(int ship_worker_id) {
+            this.ship_worker_id = ship_worker_id;
         }
     }
 
