@@ -75,6 +75,9 @@
         <activity android:name=".ui.activity.StorePerformActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
+        <activity android:name=".ui.activity.MineActivity" android:screenOrientation="portrait">
+            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        </activity>
 
         <activity android:name="com.example.BlueToothPrinterApp.BlueToothPrinterApp"/>
         <activity android:name=".ui.activity.BTDeviceListActivity" android:screenOrientation="portrait"/>

@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 
-public class ImageAdapter<T extends BluetoothPrinters.DeviceStatus> extends ArrayAdapter<T> {
+public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extends ArrayAdapter<T> {
     Activity context;
     int layoutId;
     int textId;
     int imageId;
 
-    public ImageAdapter(Activity context, int layoutId, int textId, int imageId) {
+    public MineItemsAdapter(Activity context, int layoutId, int textId, int imageId) {
         super(context, layoutId, new ArrayList<T>());
 
         this.context = context;
@@ -35,11 +35,12 @@ public class ImageAdapter<T extends BluetoothPrinters.DeviceStatus> extends Arra
 
         TextView statusLabel = (TextView) row.findViewById(R.id.text_device_status);
 
-        BluetoothPrinters.DeviceStatus deviceStatus = this.getItem(pos);
-        label.setText(deviceStatus.getName() + " " + deviceStatus.getAddr());
+        T item = this.getItem(pos);
+        label.setText(item.getName());
 
-        String statusText = deviceStatus.isBound() ? (deviceStatus.isConnected() ? "已连接" : "未连接") : "未配对";
-        statusLabel.setText(statusText);
+        if (item.getCount() >= 0) {
+            statusLabel.setText(String.valueOf(item.getCount()));
+        }
 
         ImageView icon = (ImageView) row.findViewById(imageId);
         icon.setImageResource(R.drawable.arrow);
@@ -52,4 +53,40 @@ public class ImageAdapter<T extends BluetoothPrinters.DeviceStatus> extends Arra
         super.clear();
     }
 
+
+    static public class PerformanceItem {
+        private String name;
+        private int count;
+        private int type;
+
+        public PerformanceItem(String name, int count, int type) {
+            this.name = name;
+            this.count = count;
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+    }
 }

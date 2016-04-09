@@ -5,11 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.security.Permission;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.orders.domain.NewOrderReminder;
+import cn.cainiaoshicai.crm.orders.domain.PerformStat;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -47,6 +49,23 @@ public class NewOrderDao {
 
     public NewOrderDao(String access_token) {
         this.access_token = access_token;
+    }
+
+    public PerformStat getStat() {
+
+        try {
+            String url = URLHelper.API_ROOT + "/perm_stats.json" ;
+
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("access_token", access_token);
+            String json =  HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<PerformStat>(){}.getType());
+        } catch (ServiceException e) {
+            AppLogger.e(e.getMessage(), e);
+            return new PerformStat();
+        }
     }
 
     static public class NewOrderContainer {

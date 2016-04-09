@@ -5,9 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import android.app.ListActivity;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +21,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
-import cn.cainiaoshicai.crm.ui.adapter.ImageAdapter;
+import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
 
 public class BTDeviceListActivity extends ListActivity {
 
@@ -31,9 +29,9 @@ public class BTDeviceListActivity extends ListActivity {
 
 	static private final int REQUEST_ENABLE_BT = 0x1000;
 
-	static private BluetoothAdapter btAdapter = null;
+	static private android.bluetooth.BluetoothAdapter btAdapter = null;
 
-    private ImageAdapter<BluetoothPrinters.DeviceStatus> listAdapter;
+    private BluetoothItemAdapter<BluetoothPrinters.DeviceStatus> listAdapter;
 
 	private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9b66");
 	// UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -43,7 +41,7 @@ public class BTDeviceListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 
 		setTitle(R.string.title_bluetooth_setting);
-        listAdapter = new ImageAdapter<>(this, R.layout.listview_btd_list, R.id.text1, R.id.image1);
+        listAdapter = new BluetoothItemAdapter<>(this, R.layout.listview_btd_list, R.id.text1, R.id.image1);
         setListAdapter(listAdapter);
 
 		try {
@@ -83,7 +81,7 @@ public class BTDeviceListActivity extends ListActivity {
 
 		flushData();
 
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
+		btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null) {
 			Toast.makeText(getApplicationContext(),
 					"Bluetooth not supported!!", Toast.LENGTH_LONG).show();
@@ -94,7 +92,7 @@ public class BTDeviceListActivity extends ListActivity {
 			btAdapter.cancelDiscovery();
 		}
 
-		Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		Intent enableBtIntent = new Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE);
 		try {
 			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		} catch (Exception ex) {

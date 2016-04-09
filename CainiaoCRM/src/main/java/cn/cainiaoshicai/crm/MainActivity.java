@@ -17,12 +17,8 @@
 package cn.cainiaoshicai.crm;
 
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -30,27 +26,19 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
-import cn.cainiaoshicai.crm.support.debug.AppLogger;
-
-import com.example.jpushdemo.ExampleUtil;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
-import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
+import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
-import cn.cainiaoshicai.crm.ui.activity.StorePerformActivity;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
@@ -219,10 +207,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 //            case R.id.menu_manage:
 //                startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
 //                return true;
-//            case R.id.menu_settings:
-//                showHelp();
-//                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
-//                return true;
+            case R.id.menu_mine:
+                startActivity(new Intent(getApplicationContext(), MineActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
