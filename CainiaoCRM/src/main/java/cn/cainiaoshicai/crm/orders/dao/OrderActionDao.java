@@ -33,23 +33,24 @@ public class OrderActionDao {
     }
 
     public ResultBean startShip(Constants.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
-        return actionWithResult(platform, platformId, "/order_start_ship/" + ship_worker_id);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("ship_worker_id", String.valueOf(ship_worker_id));
+        return actionWithResult(platform, platformId, "/order_start_ship/", params);
     }
 
     public ResultBean setArrived(Constants.Platform platform, String platform_oid) throws ServiceException {
-        return actionWithResult(platform, platform_oid, "/order_set_arrived");
+        return actionWithResult(platform, platform_oid, "/order_set_arrived", new HashMap<String, String>());
     }
 
     public ResultBean setReady(Constants.Platform platform, String platform_oid) throws ServiceException {
-        return actionWithResult(platform, platform_oid, "/order_set_ready");
+        return actionWithResult(platform, platform_oid, "/order_set_ready", new HashMap<String, String>());
     }
 
     @Nullable
-    private ResultBean actionWithResult(Constants.Platform platform, String platformId, String pathSuffix) throws ServiceException {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("platform", String.valueOf(platform.id));
-        params.put("platform_oid", platformId);
-
+    private ResultBean actionWithResult(Constants.Platform platform, String platformId, String pathSuffix, HashMap<String, String> params) throws ServiceException {
+        if (params == null) {
+            params = new HashMap<>();
+        }
         String json = getJson(pathSuffix + "/" + platform.id + "/" + platformId, params);
 
         AppLogger.v("action" + pathSuffix + ":" + json);
@@ -70,7 +71,7 @@ public class OrderActionDao {
     }
 
     public ResultBean confirmAccepted(Constants.Platform platform, String platformOid) throws ServiceException {
-        return actionWithResult(platform, platformOid, "/order_confirm_accepted");
+        return actionWithResult(platform, platformOid, "/order_confirm_accepted", null);
     }
 
     public Order getOrder(int platform, String platformOid) {
