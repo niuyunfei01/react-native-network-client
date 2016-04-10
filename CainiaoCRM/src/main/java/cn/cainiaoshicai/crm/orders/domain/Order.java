@@ -17,6 +17,7 @@ public class Order {
     private String mobile;
     private double orderMoney;
     private Date expectTime;
+    private String expectTimeStr;
     private Date orderTime;
     private String remark;
     private int orderStatus;
@@ -172,5 +173,13 @@ public class Order {
 
     public void setItems(List<CartItem> items) {
         this.items = items;
+    }
+
+    public String getExpectTimeStr() {
+        return expectTimeStr;
+    }
+
+    public void setExpectTimeStr(String expectTimeStr) {
+        this.expectTimeStr = expectTimeStr;
     }
 }
