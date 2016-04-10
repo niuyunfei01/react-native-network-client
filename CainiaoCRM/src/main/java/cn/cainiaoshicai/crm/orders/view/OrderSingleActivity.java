@@ -229,7 +229,7 @@ public class OrderSingleActivity extends Activity {
                     .highText(order.getAddress())
                     .newLine();
 
-            printer.starLine().highText("期望送达：" + DateTimeUtils.shortYmdHourMin(order.getExpectTime())).newLine();
+            printer.starLine().highText("期望送达：" + DateTimeUtils.mdHourMinCh(order.getExpectTime())).newLine();
             if (!TextUtils.isEmpty(order.getRemark())) {
                         printer.highText("用户备注：" + order.getRemark())
                         .newLine();
@@ -241,7 +241,7 @@ public class OrderSingleActivity extends Activity {
                     .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
                     .newLine();
 
-            printer.starLine().highText(String.format("食材名称%20s", "数量")).newLine().splitLine();
+            printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
 
             int total = 0;
             for (CartItem item : order.getItems()) {
@@ -265,7 +265,7 @@ public class OrderSingleActivity extends Activity {
                 total += item.getNum();
             }
 
-            printer.highText(String.format("合计 %26s%d", 'x', total)).newLine();
+            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
 
             printer.starLine().highText(String.format("实付金额：%22.2f", order.getOrderMoney())).newLine();
 

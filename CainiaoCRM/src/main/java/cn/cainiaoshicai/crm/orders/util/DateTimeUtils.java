@@ -104,10 +104,15 @@ public class DateTimeUtils extends DateUtils {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(orderDay);
     }
-	public static String shortYmdHourMin(Date orderDay) {
-		if (orderDay == null) return "";
+	public static String shortYmdHourMin(Date datetime) {
+		if (datetime == null) return "";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        return sdf.format(orderDay);
+        return sdf.format(datetime);
+    }
+
+	public static String mdHourMinCh(Date datetime) {
+		if (datetime == null) return "";
+		return new SimpleDateFormat("M月d日 HH:mm").format(datetime);
     }
 
 	/**
