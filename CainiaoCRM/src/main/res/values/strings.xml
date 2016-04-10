@@ -190,5 +190,9 @@
     <string name="auth_error_empty_password">请输入密码</string>
     <string name="auth_error_invalid_response">服务器应答无效</string>
     <string name="error_get_order">获取订单信息失败</string>
+    <string name="really_quit">退出登录</string>
+    <string name="quit">退出登录</string>
+    <string name="yes">确定</string>
+    <string name="no">取消</string>
 
 </resources>

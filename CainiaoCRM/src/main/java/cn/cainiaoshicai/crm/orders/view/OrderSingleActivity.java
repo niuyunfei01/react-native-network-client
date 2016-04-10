@@ -121,8 +121,16 @@ public class OrderSingleActivity extends Activity {
                         return false;
                     } else {
                         this.order = order;
-                        return printOrder(btsocket, order);
+                        try {
+                            printOrder(btsocket, order);
+                        } catch (Exception e) {
+                            AppLogger.e("error IOException:" + e.getMessage(), e);
+                            this.error = "打印错误:" + e.getMessage();
+                            return false;
+                        }
                     }
+
+                    return true;
                 }
 
                 @Override
@@ -213,10 +221,10 @@ public class OrderSingleActivity extends Activity {
         }
     }
 
-    private boolean printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) {
+    private void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
         try {
             OutputStream btos = btsocket.getOutputStream();
-        OrderPrinter printer = new OrderPrinter(btos);
+            OrderPrinter printer = new OrderPrinter(btos);
 
             btos.write(new byte[]{0x1B, 0x21, 1});
             btos.write(GPrinterCommand.left);
@@ -276,10 +284,9 @@ public class OrderSingleActivity extends Activity {
             btos.write(0x0D);
             btos.write(GPrinterCommand.walkPaper((byte) 4));
             btos.flush();
-            return true;
         } catch (Exception e) {
             AppLogger.e("error in printing order", e);
-            return false;
+            throw e;
         }
     }
 

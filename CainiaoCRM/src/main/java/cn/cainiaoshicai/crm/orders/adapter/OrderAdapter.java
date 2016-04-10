@@ -83,7 +83,7 @@ public class OrderAdapter extends BaseAdapter {
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
             Date expectTime = order.getExpectTime();
-            expect_time.setText(expectTime == null ? "立即" : instance.getShortFullTime(expectTime));
+            expect_time.setText(expectTime == null ? "立即" : DateTimeUtils.mdHourMinCh(expectTime));
 
             orderAddr.setText(order.getAddress());
             userName.setText(order.getUserName());

@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ public class MineActivity extends ActionBarActivity {
 	static private final int REQUEST_ENABLE_BT = 0x1000;
 	private static final int TYPE_PRINT_SETTINGS = 1;
 	private static final int TYPE_VERSION_UPDATE = 2;
+	private static final int TYPE_VERSION_LOGOUT = 3;
 	private MineItemsAdapter listAdapter;
 	private ListView listView;
 
@@ -46,6 +49,22 @@ public class MineActivity extends ActionBarActivity {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
 							Uri.parse("http://www.cainiaoshicai.cn/CainiaoCRM-release.apk"));
 					startActivity(intent);
+				} else if (item.getType() == TYPE_VERSION_LOGOUT) {
+					new AlertDialog.Builder(getApplication())
+							.setIcon(android.R.drawable.ic_dialog_alert)
+							.setTitle(R.string.quit)
+							.setMessage(R.string.really_quit)
+							.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									GlobalCtx.getApplication().setAccountBean(null);
+									startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+								}
+
+							})
+							.setNegativeButton(R.string.no, null)
+							.show();
 				}
 			}
 		});
@@ -75,6 +94,7 @@ public class MineActivity extends ActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("打印设置", -1, TYPE_PRINT_SETTINGS));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("版本更新", -1, TYPE_VERSION_UPDATE));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT));
 	}
 
 
