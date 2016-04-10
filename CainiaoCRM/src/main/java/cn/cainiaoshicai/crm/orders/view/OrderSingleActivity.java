@@ -102,8 +102,8 @@ public class OrderSingleActivity extends Activity {
     }
 
     protected void connect(final int platform, final String platformOid) {
-        final BluetoothConnector.BluetoothSocketWrapper btsocket = BluetoothPrinters.INS.getCurrentPrinterSocket();
-        if(btsocket == null){
+        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+        if(ds == null){
             Intent BTIntent = new Intent(getApplicationContext(), BTDeviceListActivity.class);
             this.startActivityForResult(BTIntent, BTDeviceListActivity.REQUEST_CONNECT_BT);
         }
@@ -122,10 +122,19 @@ public class OrderSingleActivity extends Activity {
                     } else {
                         this.order = order;
                         try {
-                            printOrder(btsocket, order);
+                            printOrder(ds.getSocket(), order);
                         } catch (Exception e) {
                             AppLogger.e("error IOException:" + e.getMessage(), e);
                             this.error = "打印错误:" + e.getMessage();
+
+                            if (e instanceof IOException) {
+                                try {
+                                    ds.getSocket().close();
+                                } catch (IOException e1) {
+                                    //
+                                }
+                            }
+
                             return false;
                         }
                     }

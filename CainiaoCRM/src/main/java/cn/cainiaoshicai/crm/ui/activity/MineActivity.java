@@ -19,6 +19,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
 import cn.cainiaoshicai.crm.orders.domain.PerformStat;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.adapter.MineItemsAdapter;
 
 public class MineActivity extends ActionBarActivity {
@@ -50,7 +51,7 @@ public class MineActivity extends ActionBarActivity {
 							Uri.parse("http://www.cainiaoshicai.cn/CainiaoCRM-release.apk"));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_VERSION_LOGOUT) {
-					new AlertDialog.Builder(getApplication())
+					new AlertDialog.Builder(MineActivity.this)
 							.setIcon(android.R.drawable.ic_dialog_alert)
 							.setTitle(R.string.quit)
 							.setMessage(R.string.really_quit)
@@ -58,7 +59,7 @@ public class MineActivity extends ActionBarActivity {
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									GlobalCtx.getApplication().setAccountBean(null);
+									SettingUtility.setDefaultAccountId("");
 									startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 								}
 

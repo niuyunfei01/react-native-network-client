@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.support.print;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,17 +21,24 @@ public class BluetoothPrinters {
     private List<DeviceStatus> printers = new ArrayList<>();
 
     public BluetoothConnector.BluetoothSocketWrapper getCurrentPrinterSocket() {
+        DeviceStatus printer = getCurrentPrinter();
+        if (printer != null) return printer.getSocket();
+
+        return null;
+    }
+
+    @Nullable
+    public DeviceStatus getCurrentPrinter() {
         if (currentPrinter.get() != null) {
-            return currentPrinter.get().getSocket();
+            return currentPrinter.get();
         } else {
             for (DeviceStatus printer: printers) {
                 if (printer.isConnected()) {
                     currentPrinter.set(printer);
-                    return printer.getSocket();
+                    return printer;
                 }
             }
         }
-
         return null;
     }
 
