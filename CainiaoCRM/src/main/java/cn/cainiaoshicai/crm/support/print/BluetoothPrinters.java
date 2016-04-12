@@ -1,7 +1,6 @@
 package cn.cainiaoshicai.crm.support.print;
 
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
@@ -111,7 +110,7 @@ public class BluetoothPrinters {
             INS.printers.add(this);
         }
 
-        private void closeSocket() {
+        public void closeSocket() {
             if (this.mbtSocket != null) {
                 try {
                     this.mbtSocket.close();
@@ -122,6 +121,7 @@ public class BluetoothPrinters {
 
                 INS.printers.remove(this);
             }
+            this.connected = false;
         }
     }
 }

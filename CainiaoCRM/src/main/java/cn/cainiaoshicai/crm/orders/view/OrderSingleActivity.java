@@ -149,7 +149,7 @@ public class OrderSingleActivity extends Activity {
 
     protected void connect(final int platform, final String platformOid) {
         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-        if(ds == null){
+        if(ds == null || ds.getSocket() == null){
             Intent BTIntent = new Intent(getApplicationContext(), BTDeviceListActivity.class);
             this.startActivityForResult(BTIntent, BTDeviceListActivity.REQUEST_CONNECT_BT);
         }
@@ -174,11 +174,7 @@ public class OrderSingleActivity extends Activity {
                             this.error = "打印错误:" + e.getMessage();
 
                             if (e instanceof IOException) {
-                                try {
-                                    ds.getSocket().close();
-                                } catch (IOException e1) {
-                                    //
-                                }
+                                ds.closeSocket();
                             }
 
                             return false;
