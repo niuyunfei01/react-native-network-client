@@ -169,7 +169,7 @@ public class OrderAdapter extends BaseAdapter {
                 if (order.getTime_arrived() != null) {
                     int gap_minutes = (int) ((order.getExpectTime().getTime() - order.getTime_arrived().getTime()) / (60 * 1000));
                     boolean good = gap_minutes >= 0;
-                    inTimeView.setText(good ? (gap_minutes <= 5 ? "准时" : "提前") : "延误");
+                    inTimeView.setText(good ? (gap_minutes <= 5 ? "准时" : "提前") : ( gap_minutes >= -30 ? "延误":"严重延误") );
                     int colorResource = good ? R.color.green : R.color.red;
                     inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
                     inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), good ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
