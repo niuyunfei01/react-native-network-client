@@ -92,6 +92,20 @@ public class DateTimeUtils extends DateUtils {
 						.get(Calendar.DAY_OF_YEAR);
 	}
 
+	public static boolean sameDay(long date1, long date2) {
+
+		final Calendar currentDate = Calendar.getInstance();
+		currentDate.setTimeInMillis(date1);
+
+		final Calendar yesterdayDate = Calendar.getInstance();
+		yesterdayDate.setTimeInMillis(date2);
+
+		return yesterdayDate.get(Calendar.YEAR) == currentDate
+				.get(Calendar.YEAR)
+				&& yesterdayDate.get(Calendar.DAY_OF_YEAR) == currentDate
+						.get(Calendar.DAY_OF_YEAR);
+	}
+
 	public static String[] sWeekdays = new DateFormatSymbols().getWeekdays(); // get
 																				// day
 																				// names

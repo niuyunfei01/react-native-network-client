@@ -6,12 +6,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.net.Uri;
-import android.support.annotation.ColorRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import cn.cainiaoshicai.crm.Constants;
@@ -31,7 +29,6 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.print.Constant;
 
 /**
  */
@@ -137,10 +134,15 @@ public class OrderAdapter extends BaseAdapter {
                     workerText.setText(order.getShip_worker_name());
                 } else {
                     workerText.setVisibility(View.GONE);
+                    vi.findViewById(R.id.start_ship_text).setVisibility(View.GONE);
                 }
 
-                TextView packTime = (TextView) vi.findViewById(R.id.pack_time);
-                packTime.setText(order.getTime_ready() != null ? DateTimeUtils.hourMin(order.getTime_ready()) : "");
+                TextView packTime = (TextView) vi.findViewById(R.id.start_ship_time);
+                if (order.getTime_start_ship() != null) {
+                    packTime.setText(DateTimeUtils.hourMin(order.getTime_start_ship()));
+                } else {
+                    packTime.setVisibility(View.GONE);
+                }
 
                 TextView shipTimeText = (TextView) vi.findViewById(R.id.ship_time_text);
                 TextView text_ship_start = (TextView) vi.findViewById(R.id.text_ship_start);
@@ -148,9 +150,9 @@ public class OrderAdapter extends BaseAdapter {
                 TextView shipTimeCost = (TextView) vi.findViewById(R.id.ship_time_cost);
                 if (order.getTime_arrived() != null && order.getTime_start_ship() != null) {
                     shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
-                    int minutes = (int) ((order.getTime_arrived().getTime() - order.getTime_start_ship().getTime())/(60 * 1000));
+                    int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) /(60 * 1000));
                     shipTimeCost.setText(String.valueOf(minutes));
-                    int colorResource = minutes <= 40 ? R.color.green : R.color.red;
+                    int colorResource = minutes <= Constants.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
                     shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
                 } else {
                     shipTimeCost.setVisibility(View.GONE);
@@ -166,10 +168,11 @@ public class OrderAdapter extends BaseAdapter {
             if (order.getExpectTime() != null ) {
                 if (order.getTime_arrived() != null) {
                     int gap_minutes = (int) ((order.getExpectTime().getTime() - order.getTime_arrived().getTime()) / (60 * 1000));
-                    inTimeView.setText(gap_minutes >= 0 ? (gap_minutes >= 10 ? "准时" : "提前") : "延误");
-                    int colorResource = gap_minutes >= 0 ? R.color.green : R.color.red;
+                    boolean good = gap_minutes >= 0;
+                    inTimeView.setText(good ? (gap_minutes <= 5 ? "准时" : "提前") : "延误");
+                    int colorResource = good ? R.color.green : R.color.red;
                     inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
-                    inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), gap_minutes > 0 ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
+                    inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), good ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
                 } else {
                     if (order.getOrderTime() != null) {
                         inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime())/(60 * 1000)) + "分钟");
@@ -355,6 +358,14 @@ public class OrderAdapter extends BaseAdapter {
 
         return vi;
     }
+
+//    private long spentInMilliSeconds(Order order) {
+//        if (DateTimeUtils.sameDay(order.getOrderTime().getTime(), order.getExpectTime().getTime())) {
+//            return order.getTime_arrived().getTime() - order.getOrderTime().getTime();
+//        } else {
+//            Calendar cal = Calendar.getInstance();
+//        }
+//    }
 
 //    private void reLayoutBooked(Post post, TextView bookedUNameTxt, LinearLayout orderLayout, TextView postLeftNumTxt, ImageButton bookBtn) {
 //

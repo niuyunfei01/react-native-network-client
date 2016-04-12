@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class Constants {
 
+    public static final int MAX_EXCELL_SPENT_TIME = 50;
+
     public static final int WM_ORDER_STATUS_UNKNOWN = -1;
     public static final int WM_ORDER_STATUS_TO_READY = 1;
     public static final int WM_ORDER_STATUS_TO_SHIP = 2;
