@@ -241,7 +241,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     public enum ListType {
-        NONE(0, "ALL"), WAITING_READY(1, "待打包"), WAITING_SENT(2, "待配送"), WAITING_ARRIVE(3, "待送达"), ARRIVED(4, "送达");
+        NONE(0, "ALL"), WAITING_READY(1, "打包中"), WAITING_SENT(2, "待送"), WAITING_ARRIVE(3, "在途"), ARRIVED(4, "送达");
 
         private int value;
         private String name;

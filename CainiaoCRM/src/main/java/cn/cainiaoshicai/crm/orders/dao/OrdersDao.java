@@ -43,8 +43,8 @@ public class OrdersDao {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             value = gson.fromJson(json, new TypeToken<OrderContainer>() {}.getType());
-        } catch (JsonSyntaxException e) {
-            AppLogger.e(e.getMessage());
+        } catch (Exception e) {
+            AppLogger.e(e.getMessage(), e);
         }
 
         return value;

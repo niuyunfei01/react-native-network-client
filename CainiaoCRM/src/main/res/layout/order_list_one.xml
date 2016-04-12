@@ -144,7 +144,6 @@
                     android:text="金额 ￥"/>
 
             <TextView
-                android:paddingLeft="5.0dip"
                 android:paddingRight="5.0dip"
                     android:id="@+id/total_money"
                     android:layout_width="wrap_content"
@@ -171,4 +170,60 @@
                 android:layout_height="wrap_content"
                 android:text="微信 #01"/>
         </LinearLayout>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/order_status_state"
+                android:background="@color/order_head_styled"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            <TextView
+                android:paddingLeft="5.0dip"
+                android:id="@+id/pack_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="16"/>
+            <TextView android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="备齐"/>
+
+            <TextView
+                android:paddingLeft="5.0dip"
+                android:id="@+id/ship_worker_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="王小强"/>
+            <TextView
+                android:id="@+id/ship_time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:23"/>
+            <TextView android:id="@+id/text_ship_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="送达("/>
+            <TextView
+                android:id="@+id/ship_time_cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="32"/>
+            <TextView android:id="@+id/text_ship_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分)"/>
+
+
+
+            <TextView
+                android:id="@+id/is_in_time"
+                android:layout_marginStart="10dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="延时送达"/>
+        </LinearLayout>
+
+
     </LinearLayout>

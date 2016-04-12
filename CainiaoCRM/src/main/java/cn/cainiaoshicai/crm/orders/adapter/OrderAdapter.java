@@ -6,12 +6,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.support.annotation.ColorRes;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,10 +26,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.Constant;
 
 /**
  */
@@ -83,7 +90,7 @@ public class OrderAdapter extends BaseAdapter {
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
             Date expectTime = order.getExpectTime();
-            expect_time.setText(expectTime == null ? "立即" : DateTimeUtils.mdHourMinCh(expectTime));
+            expect_time.setText( TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.mdHourMinCh(expectTime)) : order.getExpectTimeStr());
 
             orderAddr.setText(order.getAddress());
             userName.setText(order.getUserName());
@@ -119,8 +126,60 @@ public class OrderAdapter extends BaseAdapter {
 
             String platformName = Constants.Platform.find(order.getPlatform()).name;
             String platformDayId = order.getPlatform_dayId();
-            sourcePlatform.setText(platformName + (platformDayId != null && order.getPlatform() != Constants.PLAT_WX.id? String.format(" #%s", platformDayId) : ""));
-        }catch (Exception e) {
+            sourcePlatform.setText(platformName + (platformDayId != null && order.getPlatform() != Constants.PLAT_WX.id? String.format("#%s", platformDayId) : ""));
+
+            if (order.getOrderStatus() != Constants.WM_ORDER_STATUS_TO_READY
+                    && order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
+                LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
+
+                    TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
+                if (!TextUtils.isEmpty(order.getShip_worker_name())) {
+                    workerText.setText(order.getShip_worker_name());
+                } else {
+                    workerText.setVisibility(View.GONE);
+                }
+
+                TextView packTime = (TextView) vi.findViewById(R.id.pack_time);
+                packTime.setText(order.getTime_ready() != null ? DateTimeUtils.hourMin(order.getTime_ready()) : "");
+
+                TextView shipTimeText = (TextView) vi.findViewById(R.id.ship_time_text);
+                TextView text_ship_start = (TextView) vi.findViewById(R.id.text_ship_start);
+                TextView text_ship_end = (TextView) vi.findViewById(R.id.text_ship_end);
+                TextView shipTimeCost = (TextView) vi.findViewById(R.id.ship_time_cost);
+                if (order.getTime_arrived() != null && order.getTime_start_ship() != null) {
+                    shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
+                    int minutes = (int) ((order.getTime_arrived().getTime() - order.getTime_start_ship().getTime())/(60 * 1000));
+                    shipTimeCost.setText(String.valueOf(minutes));
+                    int colorResource = minutes <= 40 ? R.color.green : R.color.red;
+                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
+                } else {
+                    shipTimeCost.setVisibility(View.GONE);
+                    shipTimeText.setVisibility(View.GONE);
+                    text_ship_start.setVisibility(View.GONE);
+                    text_ship_end.setVisibility(View.GONE);
+                }
+
+                ll.setVisibility(View.VISIBLE);
+            }
+
+            TextView inTimeView = (TextView) vi.findViewById(R.id.is_in_time);
+            if (order.getExpectTime() != null ) {
+                if (order.getTime_arrived() != null) {
+                    int gap_minutes = (int) ((order.getExpectTime().getTime() - order.getTime_arrived().getTime()) / (60 * 1000));
+                    inTimeView.setText(gap_minutes >= 0 ? (gap_minutes >= 10 ? "准时" : "提前") : "延误");
+                    int colorResource = gap_minutes >= 0 ? R.color.green : R.color.red;
+                    inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
+                    inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), gap_minutes > 0 ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
+                } else {
+                    if (order.getOrderTime() != null) {
+                        inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime())/(60 * 1000)) + "分钟");
+                    }
+                }
+            } else {
+                inTimeView.setText("");
+            }
+
+         }catch (Exception e) {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
         }
 

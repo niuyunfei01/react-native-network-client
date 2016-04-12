@@ -115,6 +115,16 @@ public class DateTimeUtils extends DateUtils {
 		return new SimpleDateFormat("M月d日 HH:mm").format(datetime);
     }
 
+	public static String dHourMinCh(Date datetime) {
+		if (datetime == null) return "";
+		return new SimpleDateFormat("d日 HH:mm").format(datetime);
+    }
+
+	public static String hourMin(Date datetime) {
+		if (datetime == null) return "";
+		return new SimpleDateFormat("HH:mm").format(datetime);
+    }
+
 	/**
 	 * Displays a user-friendly date difference string.
 	 * 
