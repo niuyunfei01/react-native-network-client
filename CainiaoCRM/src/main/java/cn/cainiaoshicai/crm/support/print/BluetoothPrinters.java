@@ -119,8 +119,8 @@ public class BluetoothPrinters {
                     AppLogger.e(("error to close mbt socket"));
                 }
 
-                INS.printers.remove(this);
             }
+                INS.printers.remove(this);
             this.connected = false;
         }
     }

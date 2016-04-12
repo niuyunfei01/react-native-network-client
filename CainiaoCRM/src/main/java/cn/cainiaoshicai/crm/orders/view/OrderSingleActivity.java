@@ -32,7 +32,10 @@ import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.orders.service.Utils;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
@@ -277,18 +280,22 @@ public class OrderSingleActivity extends Activity {
             OutputStream btos = btsocket.getOutputStream();
             OrderPrinter printer = new OrderPrinter(btos);
 
-            btos.write(new byte[]{0x1B, 0x21, 1});
+            btos.write(new byte[]{0x1B, 0x21, 0});
             btos.write(GPrinterCommand.left);
 
             printer.starLine().highBigText("   菜鸟食材").newLine();
 
             printer.starLine()
-                    .highText(order.getUserName() + " " + order.getMobile())
-                    .newLine()
-                    .highText(order.getAddress())
-                    .newLine();
+                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
+                            .newLine()
+                            .highText(TextUtil.replaceWhiteStr(order.getAddress()))
+                            .newLine();
 
-            printer.starLine().highText("期望送达：" + DateTimeUtils.mdHourMinCh(order.getExpectTime())).newLine();
+            String expectedStr = order.getExpectTimeStr();
+            if (expectedStr == null) {
+                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+            }
+            printer.starLine().highText("期望送达：" + expectedStr).newLine();
             if (!TextUtils.isEmpty(order.getRemark())) {
                         printer.highText("用户备注：" + order.getRemark())
                         .newLine();

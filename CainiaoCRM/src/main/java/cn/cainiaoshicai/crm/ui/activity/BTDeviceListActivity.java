@@ -119,10 +119,10 @@ public class BTDeviceListActivity extends ListActivity {
 				Set<BluetoothDevice> btDeviceList = btAdapter.getBondedDevices();
 				try {
 					if (btDeviceList.size() > 0) {
-
 						for (BluetoothDevice device : btDeviceList) {
-							if (!btDeviceList.contains(device)) {
-								this.listAdapter.add(new BluetoothPrinters.DeviceStatus(device, false));
+							BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(device, false);
+							if (this.listAdapter.getPosition(deviceStatus) < 0) {
+								this.listAdapter.add(deviceStatus);
 								this.listAdapter.notifyDataSetInvalidated();
 							}
 						}
@@ -149,7 +149,6 @@ public class BTDeviceListActivity extends ListActivity {
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                 try {
-
                     BluetoothPrinters.DeviceStatus ds = new BluetoothPrinters.DeviceStatus(device, false);
                     if (listAdapter.getPosition(ds) < 0) {
                         listAdapter.add(ds);

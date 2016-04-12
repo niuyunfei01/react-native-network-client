@@ -1,7 +1,10 @@
 package cn.cainiaoshicai.crm.orders.util;
 
 public class TextUtil {
-	
+    public static String replaceWhiteStr(String str) {
+        return str == null ? "" : str.replaceAll("\n ", "");
+    }
+
 //	/**
 //	 * 将text中@某人的字体加亮，匹配的表情文字以表情显示
 //	 * @return
