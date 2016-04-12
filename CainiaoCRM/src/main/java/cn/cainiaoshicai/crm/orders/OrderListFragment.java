@@ -67,6 +67,7 @@ public class OrderListFragment extends Fragment {
                 openOrder.putExtra("platform_oid", item.getPlatform_oid());
                 openOrder.putExtra("platform_id", item.getPlatform());
                 openOrder.putExtra("order_status", item.getOrderStatus());
+                openOrder.putExtra("ship_worker_name", item.getShip_worker_name());
                 openOrder.putExtra("list_type", listType);
                 try {
                     getActivity().startActivity(openOrder);

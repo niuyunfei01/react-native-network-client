@@ -175,8 +175,8 @@
     <string name="title_bluetooth_setting">蓝牙打印设置</string>
 
     <string name="action_package_done">打包完成</string>
-    <string name="action_start_ship">开始配送</string>
-    <string name="action_set_arrived">标记送达</string>
+    <string name="action_start_ship">提醒出发</string>
+    <string name="action_set_arrived">提醒送达</string>
     <string name="menu_manage_order">订单</string>
     <string name="menu_accept_order">接单</string>
     <string name="menu_store_manage">店铺</string>

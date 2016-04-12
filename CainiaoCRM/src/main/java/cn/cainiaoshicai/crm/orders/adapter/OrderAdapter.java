@@ -129,7 +129,7 @@ public class OrderAdapter extends BaseAdapter {
                     && order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
 
-                    TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
+                TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
                 if (!TextUtils.isEmpty(order.getShip_worker_name())) {
                     workerText.setText(order.getShip_worker_name());
                 } else {

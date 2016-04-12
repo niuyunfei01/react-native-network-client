@@ -71,14 +71,13 @@ public class NewOrderReminderAdapter extends BaseAdapter {
 
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
-            Date expectTime = null;
-            expect_time.setText(expectTime == null ? "立即" : instance.getShortFullTime(expectTime));
+            expect_time.setText(order.getExpectTimeStr());
 
             orderAddr.setText(order.getConsignee_address());
             userName.setText(order.getConsignee_name());
             phone.setText(order.getConsignee_mobilephone());
             genderText.setText("");
-            orderMoney.setText(String.valueOf(order.getTotal_all_price()));
+            orderMoney.setText(String.format("%.2f", order.getTotal_all_price()));
 
             orderTime.setText(instance.getShortTime(order.getPay_time()));
 

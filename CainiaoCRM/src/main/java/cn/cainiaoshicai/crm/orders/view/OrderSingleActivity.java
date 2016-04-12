@@ -32,15 +32,12 @@ import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
-import cn.cainiaoshicai.crm.orders.service.Utils;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
-import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
-import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
@@ -72,6 +69,7 @@ public class OrderSingleActivity extends Activity {
         Intent intent = getIntent();
         final int platform = intent.getIntExtra("platform_id", 0);
         final String platformOid = intent.getStringExtra("platform_oid");
+        final String shipWorkerName = intent.getStringExtra("ship_worker_name");
         final int listType = intent.getIntExtra("list_type", 0);
         final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
 
@@ -98,14 +96,15 @@ public class OrderSingleActivity extends Activity {
                     public void onClick(final View v) {
                         AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
                         if (fromStatus == Constants.WM_ORDER_STATUS_TO_ARRIVE) {
-                            adb.setTitle("确认已经送达，提醒用户验货评价吗？");
-                            adb.setPositiveButton("确认送达", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
-                                    orderActionOp.executeOnNormal(fromStatus);
-                                }
-                            });
+                            adb.setTitle("送达提醒")
+                                .setMessage(String.format("您的食材已由快递小哥【%s】送到，如有缺漏、品质或其他问题请立即联系店长【%s(%s)】。春风十里，不如赐个好评就送个金菠萝给你 :)", shipWorkerName, "青青", "18910275329"))
+                                .setPositiveButton("发送", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
+                                        orderActionOp.executeOnNormal(fromStatus);
+                                    }
+                                });
                         } else {
                             final ArrayList<WorkersDao.Worker> workerList = new ArrayList<>();
                             HashMap<Integer, WorkersDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
@@ -119,24 +118,30 @@ public class OrderSingleActivity extends Activity {
                                 workerList.add(new WorkersDao.Worker(accountBean.getUsernick(), "", currUid));
                             }
 
-                            int selected = 0;
+                            final int[] checkedIdx = {0};
                             List<String> items = new ArrayList<>();
                             for (int i = 0; i < workerList.size(); i++) {
                                 WorkersDao.Worker worker = workerList.get(i);
                                 items.add(worker.getNickname());
                                 if (currUid == worker.getId()) {
-                                    selected = i;
+                                    checkedIdx[0] = i;
                                 }
                             }
-                            adb.setSingleChoiceItems(items.toArray(new String[items.size()]), selected, new DialogInterface.OnClickListener() {
+                            adb.setSingleChoiceItems(items.toArray(new String[items.size()]), checkedIdx[0], new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
-                                    orderActionOp.setWorkerId(workerList.get(which).getId());
-                                    orderActionOp.executeOnNormal(fromStatus);
+                                    checkedIdx[0] = which;
                                 }
                             });
-                            adb.setTitle(fromStatus == Constants.WM_ORDER_STATUS_TO_READY ? "谁打包的？" : "标记发货并给用户发送配送员联系信息吗？");
+                            adb.setTitle(fromStatus == Constants.WM_ORDER_STATUS_TO_READY ? "谁打包的？" : "选择快递小哥")
+                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
+                                            orderActionOp.setWorkerId(workerList.get(checkedIdx[0]).getId());
+                                            orderActionOp.executeOnNormal(fromStatus);
+                                        }
+                                    });
                         }
                         adb.setNegativeButton("取消", null);
                         adb.show();

@@ -13,6 +13,7 @@ public class NewOrderReminder {
     private String consignee_address;
     private Date pay_time;
     private double total_all_price;
+    private String expectTimeStr;
 
     public int getPlatform() {
         return platform;
@@ -68,5 +69,13 @@ public class NewOrderReminder {
 
     public void setTotal_all_price(double total_all_price) {
         this.total_all_price = total_all_price;
+    }
+
+    public String getExpectTimeStr() {
+        return expectTimeStr;
+    }
+
+    public void setExpectTimeStr(String expectTimeStr) {
+        this.expectTimeStr = expectTimeStr;
     }
 }
