@@ -1,6 +1,8 @@
 package cn.cainiaoshicai.crm.orders.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,12 +17,17 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.WorkersDao;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -30,8 +37,8 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
-import cn.cainiaoshicai.crm.support.utils.TimeUtility;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 
@@ -63,17 +70,13 @@ public class OrderSingleActivity extends Activity {
         final int platform = intent.getIntExtra("platform_id", 0);
         final String platformOid = intent.getStringExtra("platform_oid");
         final int listType = intent.getIntExtra("list_type", 0);
-        final int status = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
+        final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
 
         Button printButton = (Button) findViewById(R.id.button1);
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 connect(platform, platformOid);
-
-
-
             }
         });
 
@@ -81,16 +84,59 @@ public class OrderSingleActivity extends Activity {
         final Button actionButton = (Button) findViewById(R.id.button2);
         if("new_order".equals(intent.getStringExtra("from"))) {
             actionButton.setText("确认接单");
-            actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, status, listType));
+            actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, fromStatus, listType));
         } else {
-            if (status == Constants.WM_ORDER_STATUS_ARRIVED) {
+            if (fromStatus == Constants.WM_ORDER_STATUS_ARRIVED) {
                 actionButton.setVisibility(View.INVISIBLE);
             } else {
-                actionButton.setText(getActionText(status));
+                actionButton.setText(getActionText(fromStatus));
                 actionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        new OrderActionOp(platform, platformOid, v, listType).executeOnNormal(status);
+                    public void onClick(final View v) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
+                        if (fromStatus == Constants.WM_ORDER_STATUS_TO_ARRIVE) {
+                            adb.setTitle("确认已经送达，提醒用户验货评价吗？");
+                            adb.setPositiveButton("确认送达", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
+                                    orderActionOp.executeOnNormal(fromStatus);
+                                }
+                            });
+                        } else {
+                            final ArrayList<WorkersDao.Worker> workerList = new ArrayList<>();
+                            HashMap<Integer, WorkersDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
+                            if (workers != null && !workers.isEmpty()) {
+                                workerList.addAll(workers.values());
+                            }
+
+                            AccountBean accountBean = GlobalCtx.getApplication().getAccountBean();
+                            int currUid = Integer.parseInt(accountBean.getUid());
+                            if (workerList.isEmpty()) {
+                                workerList.add(new WorkersDao.Worker(accountBean.getUsernick(), "", currUid));
+                            }
+
+                            int selected = 0;
+                            List<String> items = new ArrayList<>();
+                            for (int i = 0; i < workerList.size(); i++) {
+                                WorkersDao.Worker worker = workerList.get(i);
+                                items.add(worker.getNickname());
+                                if (currUid == worker.getId()) {
+                                    selected = i;
+                                }
+                            }
+                            adb.setSingleChoiceItems(items.toArray(new String[items.size()]), selected, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
+                                    orderActionOp.setWorkerId(workerList.get(which).getId());
+                                    orderActionOp.executeOnNormal(fromStatus);
+                                }
+                            });
+                            adb.setTitle(fromStatus == Constants.WM_ORDER_STATUS_TO_READY ? "谁打包的？" : "标记发货并给用户发送配送员联系信息吗？");
+                        }
+                        adb.setNegativeButton("取消", null);
+                        adb.show();
                     }
                 });
             }
@@ -338,7 +384,7 @@ public class OrderSingleActivity extends Activity {
         final String platformOid;
         private View button;
         private int listType;
-        private int ship_worker_id;
+        private int workerId;
 
         public OrderActionOp(int oid, String platformOid, View v, int listType) {
             this.oid = oid;
@@ -349,26 +395,26 @@ public class OrderSingleActivity extends Activity {
 
         @Override
         protected ResultBean doInBackground(Integer... params) {
-            int status = params[0];
+            int fromStatus = params[0];
             String token = GlobalCtx.getInstance().getSpecialToken();
             ResultBean oc;
             try {
-                switch (status) {
+                switch (fromStatus) {
                     case Constants.WM_ORDER_STATUS_TO_SHIP:
-                        oc = new OrderActionDao(token).startShip(Constants.Platform.find(oid), platformOid, ship_worker_id);
+                        oc = new OrderActionDao(token).startShip(Constants.Platform.find(oid), platformOid, workerId);
                         break;
                     case Constants.WM_ORDER_STATUS_TO_ARRIVE:
                         oc = new OrderActionDao(token).setArrived(Constants.Platform.find(oid), platformOid);
                         break;
                     case Constants.WM_ORDER_STATUS_TO_READY:
-                        oc = new OrderActionDao(token).setReady(Constants.Platform.find(oid), platformOid);
+                        oc = new OrderActionDao(token).setReady(Constants.Platform.find(oid), platformOid, workerId);
                         break;
                     default:
-                        throw new ServiceException("incorrect status:" + status);
+                        throw new ServiceException("incorrect status:" + fromStatus);
                 }
                 return oc;
             } catch (Exception ex) {
-                AppLogger.e("error on handle click action: status=" + status, ex);
+                AppLogger.e("error on handle click action: status=" + fromStatus, ex);
                 return ResultBean.exception();
             }
         }
@@ -388,8 +434,8 @@ public class OrderSingleActivity extends Activity {
             });
         }
 
-        public void setShip_worker_id(int ship_worker_id) {
-            this.ship_worker_id = ship_worker_id;
+        public void setWorkerId(int workerId) {
+            this.workerId = workerId;
         }
     }
 

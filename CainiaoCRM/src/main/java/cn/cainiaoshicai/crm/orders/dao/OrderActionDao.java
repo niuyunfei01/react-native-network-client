@@ -34,7 +34,7 @@ public class OrderActionDao {
 
     public ResultBean startShip(Constants.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
-        params.put("ship_worker_id", String.valueOf(ship_worker_id));
+        params.put("worker_id", String.valueOf(ship_worker_id));
         return actionWithResult(platform, platformId, "/order_start_ship/", params);
     }
 
@@ -42,8 +42,10 @@ public class OrderActionDao {
         return actionWithResult(platform, platform_oid, "/order_set_arrived", new HashMap<String, String>());
     }
 
-    public ResultBean setReady(Constants.Platform platform, String platform_oid) throws ServiceException {
-        return actionWithResult(platform, platform_oid, "/order_set_ready", new HashMap<String, String>());
+    public ResultBean setReady(Constants.Platform platform, String platform_oid, int workerId) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("worker_id", String.valueOf(workerId));
+        return actionWithResult(platform, platform_oid, "/order_set_ready", params);
     }
 
     @Nullable

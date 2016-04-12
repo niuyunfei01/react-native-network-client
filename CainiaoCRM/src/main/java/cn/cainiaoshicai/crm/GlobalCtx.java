@@ -8,35 +8,33 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.Display;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
+
+import cn.cainiaoshicai.crm.dao.WorkersDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.User;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
+import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.service.StatusService;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.jpush.android.api.BasicPushNotificationBuilder;
-import cn.jpush.android.api.CustomPushNotificationBuilder;
 import cn.jpush.android.api.JPushInterface;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class GlobalCtx extends Application {
 
@@ -51,6 +49,8 @@ public class GlobalCtx extends Application {
     private Activity activity = null;
     private Activity currentRunningActivity = null;
     private Handler handler = new Handler();
+
+    private HashMap<Integer, WorkersDao.Worker> workers = new HashMap<>();
 
     private DisplayMetrics displayMetrics = null;
 
@@ -162,6 +162,40 @@ public class GlobalCtx extends Application {
         JPushInterface.setDebugMode(BuildConfig.DEBUG); 	// 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);     		// 初始化 JPush
         application = this;
+
+        initWorkers();
+    }
+
+    public void initAfterLogin() {
+        this.initWorkers();
+    }
+
+    private void initWorkers() {
+        new MyAsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    String token = GlobalCtx.getInstance().getSpecialToken();
+                    if (!TextUtils.isEmpty(token)) {
+                        HashMap<Integer, WorkersDao.Worker> workers = new WorkersDao(token).get();
+                        if (workers != null) {
+                            GlobalCtx.this.workers = workers;
+                        }
+                    }
+                } catch (ServiceException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.executeOnNormal();
+    }
+
+    public HashMap<Integer, WorkersDao.Worker> getWorkers() {
+        if (workers == null || workers.isEmpty()) {
+            initWorkers();
+        }
+
+        return this.workers == null ? new HashMap<Integer, WorkersDao.Worker>() : this.workers;
     }
 
     public Handler getUIHandler() {

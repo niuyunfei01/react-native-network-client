@@ -199,6 +199,7 @@ public class LoginActivity extends ActionBarActivity {
                     if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
                         SettingUtility.setDefaultAccountId(account.getUid());
                     }
+                    GlobalCtx.getApplication().initAfterLogin();
                     return dbResult;
                 } else {
                     AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()) );
