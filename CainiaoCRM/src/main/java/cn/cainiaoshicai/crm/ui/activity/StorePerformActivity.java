@@ -53,7 +53,7 @@ public class StorePerformActivity extends ActionBarActivity {
 
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
-        String url = String.format("%s/store_perform.html", HTTP_MOBILE_STORES);
+        String url = String.format("%s/store_perform.html", HTTP_MOBILE_STORES) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + GlobalCtx.getInstance().getCurrentAccountId();
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }
