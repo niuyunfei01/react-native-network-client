@@ -28,6 +28,8 @@ public class MineActivity extends ActionBarActivity {
 	private static final int TYPE_PRINT_SETTINGS = 1;
 	private static final int TYPE_VERSION_UPDATE = 2;
 	private static final int TYPE_VERSION_LOGOUT = 3;
+	private static final int TYPE_STORE_PERF = 4;
+	private static final int TYPE_STORE_STORAGE = 5;
 	private MineItemsAdapter listAdapter;
 	private ListView listView;
 
@@ -66,6 +68,10 @@ public class MineActivity extends ActionBarActivity {
 							})
 							.setNegativeButton(R.string.no, null)
 							.show();
+				} else if (item.getType() == TYPE_STORE_PERF) {
+					startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
+				} else if (item.getType() == TYPE_STORE_STORAGE) {
+					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				}
 			}
 		});
@@ -90,8 +96,10 @@ public class MineActivity extends ActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("个人送单(本月)", performStat.getMyShipTotal(), 0));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("个人打包(本月)", performStat.getMyPackageTotal(), 0));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("全店延单(今日)", performStat.getGlobalLateTotalD(), 0));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", performStat.getGlobalLateTotalD(), TYPE_STORE_PERF));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全店延单(本月)", performStat.getGlobalLateTotal(), 0));
+
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("打印设置", -1, TYPE_PRINT_SETTINGS));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("版本更新", -1, TYPE_VERSION_UPDATE));
