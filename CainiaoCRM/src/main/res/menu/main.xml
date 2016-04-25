@@ -5,12 +5,14 @@
     <item
         android:id="@+id/menu_accept"
         android:title="@string/menu_reminders"
-        support:showAsAction="always|withText"/>
+        android:icon="@drawable/ic_action_refresh"
+        support:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/menu_process"
         android:title="@string/menu_manage_order"
-        support:showAsAction="always|withText"/>
+        android:icon="@drawable/ic_action_view_as_list"
+        support:showAsAction="ifRoom"/>
 
     <!--<item-->
         <!--android:id="@+id/menu_manage"-->
@@ -20,7 +22,8 @@
     <item
         android:id="@+id/menu_mine"
         android:title="@string/menu_mine"
-        support:showAsAction="always|withText"/>
+        android:icon="@drawable/ic_action_settings"
+        support:showAsAction="ifRoom"/>
     <!--<item-->
         <!--android:id="@+id/menu_settings"-->
         <!--android:title="@string/menu_settings"-->
@@ -54,5 +57,9 @@
         android:title="@string/menu_print"
         support:showAsAction="never"/>
        -->
+    <item android:id="@+id/menu_search"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_action_search"
+        support:showAsAction="ifRoom|collapseActionView" />
 
 </menu>

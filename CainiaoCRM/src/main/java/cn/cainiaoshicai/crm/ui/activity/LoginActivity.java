@@ -1,12 +1,7 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -30,7 +25,6 @@ import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
@@ -155,14 +149,14 @@ public class LoginActivity extends ActionBarActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    public static enum DBResult {
+    public enum DBResult {
         add_successfuly, update_successfully
     }
 
     private static class OAuthTask extends MyAsyncTask<String, UserBean, DBResult> {
 
         private ServiceException e;
-        private ProgressFragment progressFragment = ProgressFragment.newInstance();
+        private ProgressFragment progressFragment = ProgressFragment.newInstance(R.string.oauthing);
         private WeakReference<LoginActivity> oAuthActivityWeakReference;
 
         private OAuthTask(LoginActivity activity) {
@@ -258,38 +252,4 @@ public class LoginActivity extends ActionBarActivity {
         }
     }
 
-    public static class ProgressFragment extends DialogFragment {
-
-        MyAsyncTask asyncTask = null;
-
-        public static ProgressFragment newInstance() {
-            ProgressFragment frag = new ProgressFragment();
-            frag.setRetainInstance(true);
-            Bundle args = new Bundle();
-            frag.setArguments(args);
-            return frag;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            ProgressDialog dialog = new ProgressDialog(getActivity());
-            dialog.setMessage(getString(R.string.oauthing));
-            dialog.setIndeterminate(false);
-            dialog.setCancelable(true);
-            return dialog;
-        }
-
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            if (asyncTask != null) {
-                asyncTask.cancel(true);
-            }
-            super.onCancel(dialog);
-        }
-
-        void setAsyncTask(MyAsyncTask task) {
-            asyncTask = task;
-        }
-    }
 }

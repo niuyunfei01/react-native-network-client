@@ -3,8 +3,10 @@ package cn.cainiaoshicai.crm.orders;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,8 @@ import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.utils.Utility;
+import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 
 public class OrderListFragment extends Fragment {
 
@@ -36,9 +40,11 @@ public class OrderListFragment extends Fragment {
 	private ArrayList<Order> data = new ArrayList<Order>();
 
     private int listType;
+    private String searchTerm;
 
     public void setDayAndType(final MainActivity.ListType listType) {
         this.listType = listType.getValue();
+        this.searchTerm = "";
         onTypeChanged();
     }
 
@@ -97,22 +103,49 @@ public class OrderListFragment extends Fragment {
         }
     }
 
+    public void executeSearch(MainActivity.ListType listType, String query) {
+        this.listType = listType.getValue();
+        this.searchTerm = query;
+    }
 
     private class RefreshOrderListTask
             extends MyAsyncTask<Void,List<Order>,OrderContainer> {
 
         private ListView listView;
         private String error;
+        private ProgressFragment progressFragment;
 
         public RefreshOrderListTask(ListView listView) {
             this.listView = listView;
+
+            if (!TextUtils.isEmpty(searchTerm)) {
+               progressFragment = ProgressFragment.newInstance(R.string.running);
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (progressFragment != null) {
+                if (this.listView != null) {
+                    FragmentActivity context = (FragmentActivity) this.listView.getContext();
+                    Utility.forceShowDialog(context, progressFragment);
+                }
+                progressFragment.setAsyncTask(this);
+            }
         }
 
         @Override
         protected OrderContainer doInBackground(Void... params) {
             try {
                 String token = GlobalCtx.getInstance().getSpecialToken();
-                return new OrdersDao(token, listType).get();
+                OrdersDao ordersDao = new OrdersDao(token, listType);
+                if (TextUtils.isEmpty(searchTerm)) {
+                    return ordersDao.get();
+                } else {
+                    return ordersDao.search(searchTerm);
+                }
             } catch (ServiceException e) {
 //                cancel(true);
                 this.error = e.getMessage();
@@ -128,12 +161,19 @@ public class OrderListFragment extends Fragment {
         @Override
         protected void onCancelled() {
             swipeRefreshLayout.setRefreshing(false);
+            if (progressFragment != null) {
+                progressFragment.dismissAllowingStateLoss();
+            }
             Toast.makeText(getActivity(), "已取消：" + this.error, Toast.LENGTH_LONG).show();
         }
 
         @Override
         protected void onPostExecute(final OrderContainer value) {
             super.onPostExecute(value);
+            swipeRefreshLayout.setRefreshing(false);
+            if (progressFragment != null) {
+                progressFragment.dismissAllowingStateLoss();
+            }
             if (getActivity() == null) {
                 return;
             }
@@ -155,7 +195,6 @@ public class OrderListFragment extends Fragment {
             } else {
                 Toast.makeText(getActivity(), "发生错误：" + this.error, Toast.LENGTH_LONG).show();
             }
-            swipeRefreshLayout.setRefreshing(false);
         }
     }
 

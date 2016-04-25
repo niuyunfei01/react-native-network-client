@@ -17,12 +17,16 @@
 package cn.cainiaoshicai.crm;
 
 import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,44 +90,34 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         ab.setDisplayShowHomeEnabled(false);
         ab.setDisplayShowTitleEnabled(false);
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//
-//        View barTitleView = findViewById(R.id.action_bar_title);
-//        if (barTitleView == null) {
-//            final int abTitleId = getResources().getIdentifier("action_bar_title", "id", "android");
-//            barTitleView = findViewById(abTitleId);
-//        }
-//
-//        if (barTitleView != null) {
-//            barTitleView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    startPicker();
-//                }
-//            });
-//        }
 
         for(ListType type : TAB_LIST_TYPES) {
             ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
         }
 
-        Intent intent = this.getIntent();
-        if (intent != null) {
-            int list_type = intent.getIntExtra("list_type", 0);
-            if (list_type > 0) {
-                ActionBar.Tab tabAt = ab.getTabAt(list_type - 1);
-                if (tabAt != null) {
-                    ab.selectTab(tabAt);
-                }
-            }
-        }
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        handleIntent(ab, intent);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate menu from menu resource (res/menu/print)
-        getMenuInflater().inflate(R.menu.main, menu);
+    private void handleIntent(ActionBar ab, Intent intent) {
+        int list_type = intent.getIntExtra("list_type", 0);
 
-        return super.onCreateOptionsMenu(menu);
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            list_type = ListType.ARRIVED.getValue();
+        }
+
+        if (list_type > 0) {
+            ActionBar.Tab tabAt = ab.getTabAt(list_type - 1);
+            if (tabAt != null) {
+                ab.selectTab(tabAt);
+            }
+        }
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            this.onDayAndTypeChanged(null, query);
+        }
     }
 
     @Override
@@ -133,7 +127,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         int position = tab.getPosition();
         ListType listType = getListTypeByTab(position);
 
-        onDayAndTypeChanged(listType, this.day);
+        onDayAndTypeChanged(listType, null);
     }
 
     public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
@@ -163,7 +157,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         return listType;
     }
 
-    private void onDayAndTypeChanged(ListType listType, Date orderDay) {
+    private void onDayAndTypeChanged(ListType listType, String query) {
 
         if (listType == null) {
             listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
@@ -179,8 +173,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             found = new OrderListFragment();
             fragmentMap.put(listType.getValue(), found.getId());
         }
-        found.setDayAndType(listType);
+        if (TextUtils.isEmpty(query)) {
+            found.setDayAndType(listType);
+        } else {
+            found.executeSearch(listType, query);
+        }
         fm.beginTransaction().replace(R.id.order_list_main, found).commit();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(this.getSupportActionBar(), intent);
     }
 
     // Implemented from ActionBar.TabListener
@@ -204,15 +208,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.menu_accept:
                 startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
                 return true;
-//            case R.id.menu_manage:
-//                startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
-//                return true;
+            case R.id.menu_search:
+                this.onSearchRequested();
+                return true;
             case R.id.menu_mine:
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void startPicker() {
@@ -228,7 +238,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 if (data != null) {
                     Date day = (Date)data.getSerializableExtra("daytime");
                     if (day != null) {
-                        onDayAndTypeChanged(null, day);
+                        onDayAndTypeChanged(null, null);
                     }
                 }
             }

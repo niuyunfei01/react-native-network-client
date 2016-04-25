@@ -163,6 +163,9 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
             case R.id.menu_mine:
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
+            case R.id.menu_search:
+                this.onSearchRequested();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

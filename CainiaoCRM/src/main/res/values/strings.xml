@@ -194,5 +194,9 @@
     <string name="quit">退出登录</string>
     <string name="yes">确定</string>
     <string name="no">取消</string>
+    <string name="search_hint">手机/商品/地址搜索</string>
+    <string name="action_search">搜索</string>
+    <string name="searching">搜索中</string>
+    <string name="running">等待中</string>
 
 </resources>
