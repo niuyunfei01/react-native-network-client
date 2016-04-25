@@ -93,17 +93,12 @@ public class MineActivity extends ActionBarActivity {
 	}
 
 	private void initPerformList(PerformStat performStat) {
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("个人送单(今日)", performStat.getMyShipTotalD(), 0));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("个人打包(今日)", performStat.getMyPackageTotalD(), 0));
-
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("个人送单(本月)", performStat.getMyShipTotal(), 0));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("个人打包(本月)", performStat.getMyPackageTotal(), 0));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("今日送单%s 打包%s", performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, 0));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", performStat.getGlobalLateTotalD(), TYPE_STORE_PERF));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全店延单(本月)", performStat.getGlobalLateTotal(), 0));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("订单搜索", -1, TYPE_ORDER_SEARCH));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("打印设置", -1, TYPE_PRINT_SETTINGS));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("版本更新", -1, TYPE_VERSION_UPDATE));
