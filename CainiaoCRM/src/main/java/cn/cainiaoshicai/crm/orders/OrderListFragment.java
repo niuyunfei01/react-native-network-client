@@ -119,7 +119,7 @@ public class OrderListFragment extends Fragment {
             this.listView = listView;
 
             if (!TextUtils.isEmpty(searchTerm)) {
-               progressFragment = ProgressFragment.newInstance(R.string.running);
+               progressFragment = ProgressFragment.newInstance(R.string.searching);
             }
         }
 
