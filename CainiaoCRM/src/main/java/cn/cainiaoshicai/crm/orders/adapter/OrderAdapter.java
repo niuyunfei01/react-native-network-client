@@ -119,7 +119,7 @@ public class OrderAdapter extends BaseAdapter {
             orderMoney.setText(String.valueOf(order.getOrderMoney()));
 
             orderTime.setText(instance.getShortTime(order.getOrderTime()));
-            dayNo.setText("#" + order.getId()%100);
+            dayNo.setText("#" + order.getId()%1000);
 
             String platformName = Constants.Platform.find(order.getPlatform()).name;
             String platformDayId = order.getPlatform_dayId();
