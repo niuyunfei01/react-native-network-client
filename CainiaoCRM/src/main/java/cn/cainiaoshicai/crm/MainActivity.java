@@ -215,7 +215,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
             default:
-                return super.onOptionsItemSelected(item);
+                return super. onOptionsItemSelected(item);
         }
     }
 
