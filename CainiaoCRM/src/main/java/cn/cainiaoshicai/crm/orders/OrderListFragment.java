@@ -74,6 +74,8 @@ public class OrderListFragment extends Fragment {
                 openOrder.putExtra("platform_id", item.getPlatform());
                 openOrder.putExtra("order_status", item.getOrderStatus());
                 openOrder.putExtra("ship_worker_name", item.getShip_worker_name());
+                int gap_minutes = (int) ((item.getExpectTime().getTime() - item.getTime_arrived().getTime()) / (60 * 1000));
+                openOrder.putExtra("is_delay", gap_minutes >= -30);
                 openOrder.putExtra("list_type", listType);
                 try {
                     getActivity().startActivity(openOrder);

@@ -43,6 +43,7 @@ import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
+import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 
 /**
@@ -75,7 +76,7 @@ public class OrderSingleActivity extends Activity {
         final String shipWorkerName = intent.getStringExtra("ship_worker_name");
         final int listType = intent.getIntExtra("list_type", 0);
         final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
-
+        final boolean isDelay = intent.getBooleanExtra("is_delay", false);
         Button printButton = (Button) findViewById(R.id.button1);
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +85,18 @@ public class OrderSingleActivity extends Activity {
             }
         });
 
+        Button delayFaqButton = (Button) findViewById(R.id.button3);
+        if(!isDelay){
+            delayFaqButton.setVisibility(View.INVISIBLE);
+        }else{
+            delayFaqButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DelayFaqFragment delayFaqFragment = DelayFaqFragment.newInstance("选择延误原因");
+                    delayFaqFragment.show(getFragmentManager(), "dialog");
+                }
+            });
+        }
 
         final Button actionButton = (Button) findViewById(R.id.button2);
         if("new_order".equals(intent.getStringExtra("from"))) {
