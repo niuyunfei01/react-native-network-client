@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -102,7 +103,7 @@ public class DelayFaqFragment extends DialogFragment {
                     }
                 })
                 .create();
-        
+
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
@@ -160,12 +161,7 @@ public class DelayFaqFragment extends DialogFragment {
             @Override
             protected void onPostExecute(final ResultBean oc) {
                 super.onPostExecute(oc);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
-                    }
-                });
+                Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
             }
 
         }.executeOnNormal();
