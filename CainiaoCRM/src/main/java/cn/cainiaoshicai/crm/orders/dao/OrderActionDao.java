@@ -76,6 +76,10 @@ public class OrderActionDao {
         return actionWithResult(platform, platformOid, "/order_confirm_accepted", null);
     }
 
+    public ResultBean saveDelayReason(Constants.Platform platform, String platformOid, HashMap<String, String> params) throws ServiceException {
+        return actionWithResult(platform, platformOid, "/save_order_delay_reason", params);
+    }
+
     public Order getOrder(int platform, String platformOid) {
         try {
             String json = getJson("/order/" + platform + "/" + platformOid, new HashMap<String, String>());

@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -53,6 +52,7 @@ public class OrderSingleActivity extends Activity {
     private static final String GBK = "gbk";
     private static final int MAX_TITLE_PART = 16;
     private WebView mWebView;
+    private DelayFaqFragment delayFaqFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,9 @@ public class OrderSingleActivity extends Activity {
             delayFaqButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DelayFaqFragment delayFaqFragment = DelayFaqFragment.newInstance("选择延误原因");
+                    delayFaqFragment = DelayFaqFragment.newInstance("选择延误原因");
+                    delayFaqFragment.setPlatform(platform);
+                    delayFaqFragment.setPlatformOid(platformOid);
                     delayFaqFragment.show(getFragmentManager(), "dialog");
                 }
             });
