@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -76,7 +77,7 @@ public class DelayFaqFragment extends DialogFragment {
         Arrays.fill(delayReasonCheckState, false);
         editText = new EditText(getActivity());
         editText.setVisibility(View.INVISIBLE);
-        return new AlertDialog.Builder(getActivity())
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setIcon(R.drawable.ic_launcher)
                 .setTitle(title)
                 .setMultiChoiceItems(delayReasons, delayReasonCheckState, new DialogInterface.OnMultiChoiceClickListener() {
@@ -93,22 +94,33 @@ public class DelayFaqFragment extends DialogFragment {
                     }
                 })
                 .setView(editText)
-                .setPositiveButton("提交", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        setCheckedReasonStr();
-                        if(validateDelayReason()){
-                            postDelayReason();
-                        }
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.submit, null)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 })
                 .create();
+        
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        setCheckedReasonStr();
+                        if(validateDelayReason()){
+                            postDelayReason();
+                            dialog.dismiss();
+                        }
+                    }
+                });
+            }
+        });
+
+        return dialog;
     }
 
     private boolean validateDelayReason(){
