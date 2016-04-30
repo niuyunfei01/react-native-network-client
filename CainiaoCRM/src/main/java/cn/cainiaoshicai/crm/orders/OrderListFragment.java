@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
@@ -16,6 +17,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -74,8 +76,16 @@ public class OrderListFragment extends Fragment {
                 openOrder.putExtra("platform_id", item.getPlatform());
                 openOrder.putExtra("order_status", item.getOrderStatus());
                 openOrder.putExtra("ship_worker_name", item.getShip_worker_name());
-                int gap_minutes = (int) ((item.getExpectTime().getTime() - item.getTime_arrived().getTime()) / (60 * 1000));
-                openOrder.putExtra("is_delay", gap_minutes >= -30&&gap_minutes < 0);
+                boolean isDelay = false;
+                if (item.getExpectTime() != null) {
+                    if (item.getTime_arrived() != null) {
+                        int gap_minutes = (int) ((item.getExpectTime().getTime() - item.getTime_arrived().getTime()) / (60 * 1000));
+                        if (gap_minutes >= -30 && gap_minutes < 0) {
+                            isDelay = true;
+                        }
+                    }
+                }
+                openOrder.putExtra("is_delay", isDelay);
                 openOrder.putExtra("list_type", listType);
                 try {
                     getActivity().startActivity(openOrder);
