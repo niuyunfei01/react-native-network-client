@@ -130,13 +130,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         onDayAndTypeChanged(listType, null);
     }
 
-    public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
+    public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus, boolean isSearch) {
         for(ListType listType : TAB_LIST_TYPES) {
             Integer count = totalByStatus.get(listType.getValue());
             if (count == null) count = 0;
 
             ActionBar.Tab tab = this.getSupportActionBar().getTabAt(listType.getValue() - 1);
-            if (tab != null && !listType.equals(ListType.ARRIVED)) {
+            if (tab != null && (isSearch || !listType.equals(ListType.ARRIVED))) {
                 tab.setText(listType.getName() + "\n(" + count + ")");
             }
         }

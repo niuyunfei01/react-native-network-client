@@ -199,7 +199,7 @@ public class OrderListFragment extends Fragment {
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        context.updateStatusCnt(value.getTotals());
+                        context.updateStatusCnt(value.getTotals(), searchTerm != null);
                     }
                 });
 
