@@ -49,13 +49,21 @@ public class OrderActionDao {
     }
 
     @Nullable
-    private ResultBean actionWithResult(Constants.Platform platform, String platformId, String pathSuffix, HashMap<String, String> params) throws ServiceException {
+    private ResultBean actionWithResult(Constants.Platform platform, String platformId, String pathSuffix,
+                                        HashMap<String, String> params) throws ServiceException {
+        String path = pathSuffix + "/" + platform.id + "/" + platformId;
+        return actionWithResult(path, params);
+    }
+
+    @Nullable
+    private ResultBean actionWithResult(String path, HashMap<String, String> params) throws ServiceException {
         if (params == null) {
             params = new HashMap<>();
         }
-        String json = getJson(pathSuffix + "/" + platform.id + "/" + platformId, params);
 
-        AppLogger.v("action" + pathSuffix + ":" + json);
+        String json = getJson(path, params);
+
+        AppLogger.v("action" + path + ":" + json);
 
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -93,5 +101,9 @@ public class OrderActionDao {
         }
 
         return null;
+    }
+
+    public ResultBean setOrderInvalid(int orderId) throws ServiceException {
+        return actionWithResult("/order_set_invalid/"+orderId, new HashMap<String, String>());
     }
 }

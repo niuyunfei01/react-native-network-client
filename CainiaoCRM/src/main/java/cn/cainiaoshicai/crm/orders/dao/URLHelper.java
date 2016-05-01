@@ -27,7 +27,7 @@ public class URLHelper {
             .rot47("9EEADi^^2A:]H6:3@]4@>^@2FE9a^5672F=E]9E>=");
 
 
-    //main timeline
+    //main_menu timeline
     public static final String FRIENDS_TIMELINE = URL_SINA_WEIBO + "statuses/friends_timeline.json";
     public static final String COMMENTS_MENTIONS_TIMELINE = URL_SINA_WEIBO + "comments/mentions.json";
     public static final String STATUSES_MENTIONS_TIMELINE = URL_SINA_WEIBO + "statuses/mentions.json";

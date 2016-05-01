@@ -54,6 +54,11 @@ public class OrderSingleActivity extends Activity {
     private WebView mWebView;
     private DelayFaqFragment delayFaqFragment;
 
+    private int orderId;
+    private String platformOid;
+    private String shipWorkerName;
+    private int platform;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +76,10 @@ public class OrderSingleActivity extends Activity {
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         Intent intent = getIntent();
-        final int platform = intent.getIntExtra("platform_id", 0);
-        final String platformOid = intent.getStringExtra("platform_oid");
-        final String shipWorkerName = intent.getStringExtra("ship_worker_name");
+        platform = intent.getIntExtra("platform_id", 0);
+        this.orderId = intent.getIntExtra("id", 0);
+        platformOid = intent.getStringExtra("platform_oid");
+        shipWorkerName = intent.getStringExtra("ship_worker_name");
         final int listType = intent.getIntExtra("list_type", 0);
         final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
         final boolean isDelay = intent.getBooleanExtra("is_delay", false);
@@ -221,7 +227,6 @@ public class OrderSingleActivity extends Activity {
         }
     }
 
-
     private void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
         try {
             OutputStream btos = btsocket.getOutputStream();
@@ -309,20 +314,56 @@ public class OrderSingleActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        menu.add(0, Menu.FIRST, Menu.NONE, "用户反馈");
-
-        return true;
+        getMenuInflater().inflate(R.menu.single_order_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
-            case Menu.FIRST :
+            case R.id.menu_user_feedback:
                 UserFeedbackDialogFragment dlg = new UserFeedbackDialogFragment();
                 dlg.show(getFragmentManager(), "userFeedbackDlg");
+                break;
+            case R.id.menu_set_invalid:
+                AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                adb.setTitle("置为无效")
+                        .setMessage("确定设置此订单为无效订单吗？此操作不可撤销！")
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    private String errorDesc = null;
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                        try {
+                                            ResultBean resultBean = dao.setOrderInvalid(orderId);
+                                            if(!resultBean.isOk()) {
+                                                errorDesc = "err:" + resultBean.getDesc();
+                                            }
+                                        } catch (ServiceException e) {
+                                            AppLogger.e("error:" + e.getMessage(), e);
+                                            errorDesc = "操作失败:" + e.getMessage();
+                                        }
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void aVoid) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                String text = TextUtils.isEmpty(errorDesc) ? "操作成功" : errorDesc;
+                                                Toast.makeText(OrderSingleActivity.this, text, Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                }.executeOnNormal();
+                            }
+                        }).setNegativeButton(R.string.cancel, null);
+                adb.show();
                 break;
         }
         return true;

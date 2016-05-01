@@ -74,6 +74,7 @@ public class OrderListFragment extends Fragment {
                 Order item = (Order) adapter.getItem(position);
                 openOrder.putExtra("platform_oid", item.getPlatform_oid());
                 openOrder.putExtra("platform_id", item.getPlatform());
+                openOrder.putExtra("id", item.getId());
                 openOrder.putExtra("order_status", item.getOrderStatus());
                 openOrder.putExtra("ship_worker_name", item.getShip_worker_name());
                 boolean isDelay = false;

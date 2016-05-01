@@ -50,7 +50,7 @@ import android.widget.Toast;
 import cn.cainiaoshicai.crm.R;
 
 /**
- * This is the main Activity that displays the current chat session.
+ * This is the main_menu Activity that displays the current chat session.
  */
 public class BluetoothChat extends Activity {
     // Debugging

@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 
 public class RemindersActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -88,7 +87,7 @@ public class RemindersActivity extends ActionBarActivity implements ActionBar.Ta
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate menu from menu resource (res/menu/print)
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
 
         return super.onCreateOptionsMenu(menu);
     }

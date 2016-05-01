@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:support="http://schemas.android.com/apk/res-auto" >
+    <item
+        android:id="@+id/menu_accept"
+        android:title="@string/menu_reminders"
+        android:icon="@drawable/ic_action_refresh"
+        support:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_process"
+        android:title="@string/menu_manage_order"
+        android:icon="@drawable/ic_action_view_as_list"
+        support:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_mine"
+        android:title="@string/menu_mine"
+        android:icon="@drawable/ic_action_settings"
+        support:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_search"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_action_search"
+        support:showAsAction="ifRoom|collapseActionView" />
+
+</menu>

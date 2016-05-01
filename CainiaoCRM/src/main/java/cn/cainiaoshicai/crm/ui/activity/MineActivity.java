@@ -129,7 +129,7 @@ public class MineActivity extends ActionBarActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate menu from menu resource (res/menu/print)
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.main_menu, menu);
 
 		return super.onCreateOptionsMenu(menu);
 	}
