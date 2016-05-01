@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             if (count == null) count = 0;
 
             ActionBar.Tab tab = this.getSupportActionBar().getTabAt(listType.getValue() - 1);
-            if (tab != null) {
+            if (tab != null && !listType.equals(ListType.ARRIVED)) {
                 tab.setText(listType.getName() + "\n(" + count + ")");
             }
         }
