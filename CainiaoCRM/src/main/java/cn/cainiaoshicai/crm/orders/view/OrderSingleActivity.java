@@ -44,6 +44,7 @@ import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
+import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
  */
@@ -310,6 +311,8 @@ public class OrderSingleActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
+        menu.add(0, Menu.FIRST, Menu.NONE, "用户反馈");
+
         return true;
     }
 
@@ -318,7 +321,8 @@ public class OrderSingleActivity extends Activity {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case Menu.FIRST :
-                System.out.println("click menu");
+                UserFeedbackDialogFragment dlg = new UserFeedbackDialogFragment();
+                dlg.show(getFragmentManager(), "userFeedbackDlg");
                 break;
         }
         return true;
