@@ -111,6 +111,16 @@
                 android:text="18910275339"
                 android:linksClickable="true" />
 
+
+        <TextView
+            android:id="@+id/user_order_times"
+            android:paddingLeft="5.0dip"
+            android:paddingRight="5.0dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/list_text_border_grey"
+            android:text="第几次下单"/>
+
         <!--<LinearLayout-->
                 <!--android:gravity="right"-->
                 <!--android:orientation="horizontal"-->

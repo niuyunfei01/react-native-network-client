@@ -31,6 +31,7 @@ public class Order {
 
     private List<CartItem> items;
     private String ship_worker_name;
+    private int order_times;
 
     public int getId() {
         return id;
@@ -218,5 +219,13 @@ public class Order {
 
     public void setShip_worker_name(String ship_worker_name) {
         this.ship_worker_name = ship_worker_name;
+    }
+
+    public int getOrder_times() {
+        return order_times;
+    }
+
+    public void setOrder_times(int order_times) {
+        this.order_times = order_times;
     }
 }

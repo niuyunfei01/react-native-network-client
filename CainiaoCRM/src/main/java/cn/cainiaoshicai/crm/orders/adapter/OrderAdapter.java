@@ -75,6 +75,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
         TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
         TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
+        TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
 
 
 //        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
@@ -117,6 +118,7 @@ public class OrderAdapter extends BaseAdapter {
             });
             genderText.setText(order.getGenderText());
             orderMoney.setText(String.valueOf(order.getOrderMoney()));
+            orderTimesTxt.setText(order.getOrder_times() > 1 ? "第"+order.getOrder_times()+"次下单" : "新用户");
 
             orderTime.setText(instance.getShortTime(order.getOrderTime()));
             dayNo.setText("#" + order.getId()%1000);
