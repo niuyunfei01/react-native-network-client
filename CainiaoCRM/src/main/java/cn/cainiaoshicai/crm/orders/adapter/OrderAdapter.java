@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.orders.adapter;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,6 +26,7 @@ import java.util.Date;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
@@ -61,7 +63,7 @@ public class OrderAdapter extends BaseAdapter {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View getView(int i, View vi, ViewGroup viewGroup) {
+    public View getView(int i, View vi, final ViewGroup viewGroup) {
 
         if (vi == null)
             vi = inflater.inflate(R.layout.order_list_one, null);
@@ -120,7 +122,17 @@ public class OrderAdapter extends BaseAdapter {
             orderMoney.setText(String.valueOf(order.getOrderMoney()));
             orderTimesTxt.setText(order.getOrder_times() > 1 ? "第"+order.getOrder_times()+"次下单" : "新用户");
 
-            orderTime.setText(instance.getShortTime(order.getOrderTime()));
+            orderTimesTxt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), MainActivity.class);
+                    intent.setAction(Intent.ACTION_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, order.getMobile());
+                    v.getContext().startActivity(intent);
+                }
+            });
+
+            orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
             dayNo.setText("#" + order.getId()%1000);
 
             String platformName = Constants.Platform.find(order.getPlatform()).name;

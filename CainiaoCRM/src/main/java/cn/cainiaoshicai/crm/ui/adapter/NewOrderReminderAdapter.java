@@ -64,6 +64,8 @@ public class NewOrderReminderAdapter extends BaseAdapter {
         TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
         TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
         TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
+        TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
+        orderTimesTxt.setVisibility(View.GONE);
 
 
         try {

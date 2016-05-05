@@ -67,7 +67,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" android:screenOrientation="portrait"  android:launchMode="singleTop">
+        <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

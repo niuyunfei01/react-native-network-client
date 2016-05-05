@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -45,6 +46,10 @@ public class OrdersDao {
             value = gson.fromJson(json, new TypeToken<OrderContainer>() {}.getType());
         } catch (Exception e) {
             AppLogger.e(e.getMessage(), e);
+
+            if (e instanceof JsonSyntaxException) {
+                AppLogger.e("json:" + json);
+            }
         }
 
         return value;
