@@ -2,18 +2,23 @@ package cn.cainiaoshicai.crm.orders.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -48,16 +53,18 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
  */
-public class OrderSingleActivity extends Activity {
+public class OrderSingleActivity extends Activity implements DelayFaqFragment.NoticeDialogListener {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private static final int MAX_TITLE_PART = 16;
     private WebView mWebView;
     private DelayFaqFragment delayFaqFragment;
+    private MenuItem refreshItem;
 
     private int orderId;
     private String platformOid;
     private String shipWorkerName;
     private int platform;
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,9 +181,46 @@ public class OrderSingleActivity extends Activity {
             }
         }
 
-        String url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken()+"&client_id="+GlobalCtx.getInstance().getCurrentAccountId();
+        url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken()+"&client_id="+GlobalCtx.getInstance().getCurrentAccountId();
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing()) {
+            this.mWebView.stopLoading();
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.mWebView.clearCache(true);
+    }
+
+    public void refresh() {
+        this.mWebView.clearView();
+        this.mWebView.loadUrl("about:blank");
+        LayoutInflater inflater = (LayoutInflater) getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+        ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
+
+        Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh);
+        iv.startAnimation(rotation);
+
+        refreshItem.setActionView(iv);
+        this.mWebView.loadUrl(this.url);
+    }
+
+    private void completeRefresh() {
+        if (refreshItem.getActionView() != null) {
+            refreshItem.getActionView().clearAnimation();
+            refreshItem.setActionView(null);
+        }
     }
 
     protected void connect(final int platform, final String platformOid) {
@@ -317,12 +361,13 @@ public class OrderSingleActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.single_order_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        refreshItem = menu.findItem(R.id.menu_refresh);
+        refresh();
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.menu_user_feedback:
                 UserFeedbackDialogFragment dlg = new UserFeedbackDialogFragment();
@@ -367,6 +412,11 @@ public class OrderSingleActivity extends Activity {
                         }).setNegativeButton(R.string.cancel, null);
                 adb.show();
                 break;
+            case R.id.menu_refresh:
+                refresh();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }
@@ -391,6 +441,11 @@ public class OrderSingleActivity extends Activity {
         // If it wasn't the Back key or there's no web page history, bubble up to the default
         // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void afterDelayReasonSaved() {
+        this.refresh();
     }
 
     static public class OrderActionOp extends MyAsyncTask<Integer, ResultBean, ResultBean> {

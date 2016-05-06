@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -39,6 +40,12 @@ public class DelayFaqFragment extends DialogFragment {
 
     public HashSet<String> checkedReason = new HashSet<>();
 
+    private NoticeDialogListener mListener;
+
+    public interface NoticeDialogListener {
+        void afterDelayReasonSaved();
+    }
+
     public ArrayList<String> setCheckedReasonStr() {
         ArrayList<String> reasons = new ArrayList<>();
         int i = 0;
@@ -70,6 +77,20 @@ public class DelayFaqFragment extends DialogFragment {
 
     public void setPlatformOid(String platformOid) {
         this.platformOid = platformOid;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            mListener = (NoticeDialogListener) activity;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(activity.toString()
+                    + " must implement NoticeDialogListener");
+        }
     }
 
     @Override
@@ -163,7 +184,10 @@ public class DelayFaqFragment extends DialogFragment {
             @Override
             protected void onPostExecute(final ResultBean oc) {
                 super.onPostExecute(oc);
-                Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
+                Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功，正在刷新页面..." : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
+                if (oc.isOk()) {
+                    mListener.afterDelayReasonSaved();
+                }
             }
 
         }.executeOnNormal();
