@@ -26,7 +26,7 @@ import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.dao.WorkersDao;
+import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
@@ -130,8 +130,8 @@ public class OrderSingleActivity extends Activity {
                                     }
                                 });
                         } else {
-                            final ArrayList<WorkersDao.Worker> workerList = new ArrayList<>();
-                            HashMap<Integer, WorkersDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
+                            final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
+                            HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
                             if (workers != null && !workers.isEmpty()) {
                                 workerList.addAll(workers.values());
                             }
@@ -139,13 +139,13 @@ public class OrderSingleActivity extends Activity {
                             AccountBean accountBean = GlobalCtx.getApplication().getAccountBean();
                             int currUid = Integer.parseInt(accountBean.getUid());
                             if (workerList.isEmpty()) {
-                                workerList.add(new WorkersDao.Worker(accountBean.getUsernick(), "", currUid));
+                                workerList.add(new CommonConfigDao.Worker(accountBean.getUsernick(), "", currUid));
                             }
 
                             final int[] checkedIdx = {0};
                             List<String> items = new ArrayList<>();
                             for (int i = 0; i < workerList.size(); i++) {
-                                WorkersDao.Worker worker = workerList.get(i);
+                                CommonConfigDao.Worker worker = workerList.get(i);
                                 items.add(worker.getNickname());
                                 if (currUid == worker.getId()) {
                                     checkedIdx[0] = i;

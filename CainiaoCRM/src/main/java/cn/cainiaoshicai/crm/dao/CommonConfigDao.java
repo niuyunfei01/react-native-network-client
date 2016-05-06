@@ -16,16 +16,16 @@ import cn.cainiaoshicai.crm.support.http.HttpUtility;
 /**
  * Created by liuzhr on 4/12/16.
  */
-public class WorkersDao {
+public class CommonConfigDao {
 
     private String access_token;
 
-    public WorkersDao(String access_token) {
+    public CommonConfigDao(String access_token) {
         this.access_token = access_token;
     }
 
-    public HashMap<Integer, Worker> get() throws ServiceException {
-        String url = URLHelper.API_ROOT + "/get_workers.json" ;
+    public Config get() throws ServiceException {
+        String url = URLHelper.API_ROOT + "/common_config.json" ;
 
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
@@ -34,15 +34,33 @@ public class WorkersDao {
 
         AppLogger.v("get wokers:" + json);
 
-        HashMap<Integer, Worker> value = null;
+        Config value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<HashMap<Integer, Worker>>() {}.getType());
+            value = gson.fromJson(json, new TypeToken<Config>() {}.getType());
         } catch (Exception e) {
             AppLogger.e(e.getMessage(), e);
         }
 
         return value;
+    }
+
+    static public class Config {
+        private HashMap<Integer, Worker> workers;
+        private String[] delayReasons;
+
+        public Config(HashMap<Integer, Worker> workers, String[] delayReasons) {
+            this.workers = workers;
+            this.delayReasons = delayReasons;
+        }
+
+        public HashMap<Integer, Worker> getWorkers() {
+            return workers;
+        }
+
+        public String[] getDelayReasons() {
+            return delayReasons;
+        }
     }
 
     static public class Worker {

@@ -27,7 +27,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 public class DelayFaqFragment extends DialogFragment {
 
-    String[] delayReasons = {"备货时间太长", "备货分拣后没有运力", "配送速度太慢", "配送人员未依合理顺序", "其他原因"};
+    String[] delayReasons = new String[0];
 
     boolean[] delayReasonCheckState = new boolean[delayReasons.length];
 
@@ -59,6 +59,7 @@ public class DelayFaqFragment extends DialogFragment {
         DelayFaqFragment delayFaqFragment = new DelayFaqFragment();
         Bundle args = new Bundle();
         args.putString("title", title);
+        args.putStringArray("reasons", GlobalCtx.getInstance().getDelayReasons());
         delayFaqFragment.setArguments(args);
         return delayFaqFragment;
     }
@@ -74,6 +75,8 @@ public class DelayFaqFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         String title = getArguments().getString("title");
+        this.delayReasons = getArguments().getStringArray("reasons");
+        this.delayReasonCheckState = new boolean[this.delayReasons.length];
         Arrays.fill(delayReasonCheckState, false);
         editText = new EditText(getActivity());
         editText.setVisibility(View.INVISIBLE);

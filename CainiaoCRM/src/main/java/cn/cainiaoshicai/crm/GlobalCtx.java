@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-import cn.cainiaoshicai.crm.dao.WorkersDao;
+import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.User;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -29,7 +29,6 @@ import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.service.StatusService;
-import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
@@ -50,7 +49,8 @@ public class GlobalCtx extends Application {
     private Activity currentRunningActivity = null;
     private Handler handler = new Handler();
 
-    private HashMap<Integer, WorkersDao.Worker> workers = new HashMap<>();
+    private HashMap<Integer, CommonConfigDao.Worker> workers = new HashMap<>();
+    private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
 
     private DisplayMetrics displayMetrics = null;
 
@@ -163,24 +163,26 @@ public class GlobalCtx extends Application {
         JPushInterface.init(this);     		// 初始化 JPush
         application = this;
 
-        initWorkers();
+        initConfigs();
     }
 
     public void initAfterLogin() {
-        this.initWorkers();
+        this.initConfigs();
     }
 
-    private void initWorkers() {
-        new MyAsyncTask<Void, Void, Void>(){
+    private void initConfigs() {
+        new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
                     String token = GlobalCtx.getInstance().getSpecialToken();
                     if (!TextUtils.isEmpty(token)) {
-                        HashMap<Integer, WorkersDao.Worker> workers = new WorkersDao(token).get();
+                        CommonConfigDao.Config config = new CommonConfigDao(token).get();
+                        HashMap<Integer, CommonConfigDao.Worker> workers = config.getWorkers();
                         if (workers != null) {
                             GlobalCtx.this.workers = workers;
                         }
+                        GlobalCtx.this.delayReasons.set(config.getDelayReasons());
                     }
                 } catch (ServiceException e) {
                     e.printStackTrace();
@@ -190,12 +192,16 @@ public class GlobalCtx extends Application {
         }.executeOnNormal();
     }
 
-    public HashMap<Integer, WorkersDao.Worker> getWorkers() {
+    public HashMap<Integer, CommonConfigDao.Worker> getWorkers() {
         if (workers == null || workers.isEmpty()) {
-            initWorkers();
+            initConfigs();
         }
 
-        return this.workers == null ? new HashMap<Integer, WorkersDao.Worker>() : this.workers;
+        return this.workers == null ? new HashMap<Integer, CommonConfigDao.Worker>() : this.workers;
+    }
+
+    public String[] getDelayReasons() {
+        return this.delayReasons.get();
     }
 
     public Handler getUIHandler() {
