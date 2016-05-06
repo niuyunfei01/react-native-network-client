@@ -237,6 +237,8 @@ public class OrderSingleActivity extends Activity {
 
             printer.starLine().highBigText("   菜鸟食材").newLine();
 
+            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
+
             printer.starLine()
                     .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
                             .newLine()
@@ -254,7 +256,7 @@ public class OrderSingleActivity extends Activity {
             }
 
             printer.starLine()
-                    .normalText("订单编号：" + order.getPlatform() + "-" + order.getPlatform_oid())
+                    .normalText("订单编号：" + Constants.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
                     .newLine()
                     .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
                     .newLine();

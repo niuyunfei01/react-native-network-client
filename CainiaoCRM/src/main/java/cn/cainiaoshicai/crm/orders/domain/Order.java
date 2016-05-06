@@ -32,6 +32,7 @@ public class Order {
     private List<CartItem> items;
     private String ship_worker_name;
     private int order_times;
+    private int paid_done;
 
     public int getId() {
         return id;
@@ -228,4 +229,17 @@ public class Order {
     public void setOrder_times(int order_times) {
         this.order_times = order_times;
     }
+
+    public int isPaid_done() {
+        return paid_done;
+    }
+
+    public void setPaid_done(int paid_done) {
+        this.paid_done = paid_done;
+    }
+
+    public boolean isPaidDone() {
+        return this.paid_done == 1;
+    }
 }
+

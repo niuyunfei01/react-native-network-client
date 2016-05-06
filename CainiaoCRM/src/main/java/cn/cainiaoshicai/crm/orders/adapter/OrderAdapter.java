@@ -38,11 +38,13 @@ public class OrderAdapter extends BaseAdapter {
 
     private final Activity activity;
     private ArrayList<Order> orders = new ArrayList<>();
+    private final int listType;
     private static LayoutInflater inflater = null;
 
-    public OrderAdapter(Activity activity, ArrayList<Order> orders) {
+    public OrderAdapter(Activity activity, ArrayList<Order> orders, int listType) {
         this.activity = activity;
         this.orders = orders;
+        this.listType = listType;
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -78,7 +80,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
         TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
         TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
-
+        TextView paidDoneTxt = (TextView)vi.findViewById(R.id.paid_done);
 
 //        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
 
@@ -90,7 +92,16 @@ public class OrderAdapter extends BaseAdapter {
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
             Date expectTime = order.getExpectTime();
-            expect_time.setText( TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.mdHourMinCh(expectTime)) : order.getExpectTimeStr());
+            expect_time.setText(TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.mdHourMinCh(expectTime)) : order.getExpectTimeStr());
+
+            boolean paid_done = order.isPaidDone();
+            if (paid_done) {
+                paidDoneTxt.setVisibility(View.VISIBLE);
+                paidDoneTxt.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), R.color.green));
+//                paidDoneTxt.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), R.drawable.list_text_border_green));
+            } else {
+                paidDoneTxt.setVisibility(View.GONE);
+            }
 
             orderAddr.setText(order.getAddress());
             userName.setText(order.getUserName());

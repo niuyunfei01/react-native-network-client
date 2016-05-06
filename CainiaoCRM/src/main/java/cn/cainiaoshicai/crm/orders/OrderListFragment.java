@@ -63,7 +63,7 @@ public class OrderListFragment extends Fragment {
 
     private void init(View v) {
 		listView = (ListView) v.findViewById(R.id.orderListView);
-		adapter = new OrderAdapter(getActivity(), data);
+		adapter = new OrderAdapter(getActivity(), data, this.listType);
 		listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
