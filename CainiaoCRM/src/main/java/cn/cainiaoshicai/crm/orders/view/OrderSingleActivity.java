@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.orders.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,7 +54,7 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
  */
-public class OrderSingleActivity extends Activity implements DelayFaqFragment.NoticeDialogListener {
+public class OrderSingleActivity extends Activity implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private static final int MAX_TITLE_PART = 16;
     private WebView mWebView;
@@ -446,6 +447,16 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     @Override
     public void afterDelayReasonSaved() {
         this.refresh();
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
     }
 
     static public class OrderActionOp extends MyAsyncTask<Integer, ResultBean, ResultBean> {
