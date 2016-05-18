@@ -26,6 +26,8 @@ public class Constants {
     public static final Platform PLAT_ELEME  = new Platform("饿了么", 4);
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", 5);
 
+    public static final String ERR_INVALID_GRANT = "invalid_grant";
+
 
     static public class Platform {
         public final String name;
