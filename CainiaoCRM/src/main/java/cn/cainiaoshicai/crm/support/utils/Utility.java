@@ -87,6 +87,7 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
 import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
+import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 
 public class Utility {
 
@@ -757,37 +758,18 @@ public class Utility {
         }
         if (number > thousandInt) {
             NumberFormat nf = NumberFormat.getNumberInstance();
-            return nf.format(Long.valueOf(number));
+            return nf.format((long) number);
         }
         return String.valueOf(number);
     }
 
     public static void showExpiredTokenDialogOrNotification() {
         final Activity activity = GlobalCtx.getInstance().getCurrentRunningActivity();
-        boolean currentAccountTokenIsExpired = true;
-        AccountBean currentAccount = GlobalCtx.getInstance().getAccountBean();
-        if (currentAccount != null) {
-            currentAccountTokenIsExpired = !Utility.isTokenValid(currentAccount);
-        }
-
-        if (currentAccountTokenIsExpired && activity != null && !GlobalCtx
+        if (activity != null && !GlobalCtx
                 .getInstance().tokenExpiredDialogIsShowing) {
-            if (activity.getClass() == AccountActivity.class) {
+            if (activity.getClass() == LoginActivity.class) {
                 return;
             }
-//            if (activity.getClass() == OAuthActivity.class) {
-//                return;
-//            }
-//            if (activity.getClass() == BlackMagicActivity.class) {
-//                return;
-//            }
-//
-//            if (activity.getClass() == SSOActivity.class) {
-//                return;
-//            }
-
-            final AccountBean needRefreshTokenAccount = currentAccount;
-
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -797,12 +779,9 @@ public class Utility {
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            activity.startActivity(
-                                                    AccountActivity
-                                                            .newIntent(needRefreshTokenAccount));
+                                            activity.startActivity(LoginActivity.newIntent());
                                             activity.finish();
-                                             GlobalCtx.getInstance().tokenExpiredDialogIsShowing
-                                                    = false;
+                                             GlobalCtx.getInstance().tokenExpiredDialogIsShowing = false;
                                         }
                                     }).setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
@@ -813,7 +792,7 @@ public class Utility {
                     GlobalCtx.getInstance().tokenExpiredDialogIsShowing = true;
                 }
             });
-        } else if (!currentAccountTokenIsExpired || activity == null) {
+        } else if (activity == null) {
 
             Intent i = AccountActivity.newIntent();
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -149,6 +149,10 @@ public class LoginActivity extends ActionBarActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    public static Intent newIntent() {
+        return new Intent(GlobalCtx.getInstance(), LoginActivity.class);
+    }
+
     public enum DBResult {
         add_successfuly, update_successfully
     }

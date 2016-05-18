@@ -42,6 +42,7 @@ import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.file.FileDownloaderHttpHelper;
 import cn.cainiaoshicai.crm.support.file.FileManager;
 import cn.cainiaoshicai.crm.support.file.FileUploaderHttpHelper;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.imageutility.ImageUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
@@ -193,6 +194,7 @@ public class JavaHttpUtility {
             exception.setOriError(err);
 
             if (Constants.ERR_INVALID_GRANT.equals(json.optString("error")) || errCode == ErrorCode.EXPIRED_TOKEN || errCode == ErrorCode.INVALID_TOKEN) {
+                SettingUtility.setDefaultAccountId("");
                 Utility.showExpiredTokenDialogOrNotification();
             }
 

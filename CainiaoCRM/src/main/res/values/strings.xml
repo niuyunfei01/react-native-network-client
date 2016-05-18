@@ -84,11 +84,11 @@
     <string name="token_expires_in_time">请注意，根据新浪微博的平台政策，刚添加的帐号会在 %s
         天后过期，到时需要重新登录，在授权过期之前重复登陆不会刷新剩余天数
     </string>
-    <string name="your_token_is_expired">检测到你的授权信息已经过期了，请重新授权一次</string>
-    <string name="logout_to_login_again">返回帐号管理页面，重新授权</string>
+    <string name="your_token_is_expired">检测到你的授权信息已经过期了，请重新登录</string>
+    <string name="logout_to_login_again">重新登录</string>
     <string name="dialog_title_error">出错啦</string>
-    <string name="login_again">重新授权</string>
-    <string name="have_account_whose_token_is_expired">有帐号已经过期，无法收取新消息</string>
+    <string name="login_again">重新登录</string>
+    <string name="have_account_whose_token_is_expired">登录帐号已经过期，无法收取新消息</string>
     <string name="token_has_expired">已过期</string>
     <string name="account_token_has_expired">%s 的授权已经过期，请重新授权</string>
     <string name="dont_have_other_account">没有多余帐号可供切换</string>
