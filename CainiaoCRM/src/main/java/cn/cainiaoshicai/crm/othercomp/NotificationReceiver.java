@@ -30,6 +30,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
+import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.jpush.android.api.JPushInterface;
 
 /**
@@ -83,12 +84,18 @@ public class NotificationReceiver extends BroadcastReceiver {
 
             GlobalCtx.clearNewOrderNotifies(context);
 
-        	//打开自定义的Activity
-        	Intent i = new Intent(context, RemindersActivity.class);
-        	i.putExtras(bundle);
-        	i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
+        	final Intent i;
+			Notify notify = getNotifyFromBundle(bundle);
+			if (notify != null && "new_comment".equals(notify.getType())) {
+				i = new Intent(context, UserCommentsActivity.class);
+			} else {
+				i = new Intent(context, RemindersActivity.class);
+			}
+
+			i.putExtras(bundle);
+			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
         	context.startActivity(i);
-        	
+
         } else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
             //在这里根据 JPushInterface.EXTRA_EXTRA 的内容处理代码，比如打开新的Activity， 打开一个网页等..
