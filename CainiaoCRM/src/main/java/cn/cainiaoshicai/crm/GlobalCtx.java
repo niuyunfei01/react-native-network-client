@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.User;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -32,6 +33,7 @@ import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.service.StatusService;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.jpush.android.api.JPushInterface;
@@ -185,11 +187,15 @@ public class GlobalCtx extends Application {
                             GlobalCtx.this.workers = workers;
                         }
                         GlobalCtx.this.delayReasons.set(config.getDelayReasons());
-                        GlobalCtx.this.configUrls.clear();;
-                        GlobalCtx.this.configUrls.putAll(config.getConfigUrls());
+                        GlobalCtx.this.configUrls.clear();
+                        HashMap<String, String> configUrls = config.getConfigUrls();
+                        if (configUrls != null) {
+                            GlobalCtx.this.configUrls.putAll(configUrls);
+                        }
                     }
-                } catch (ServiceException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
+                    AppLogger.w("error to init config:" + e.getMessage(), e);
                 }
                 return null;
             }
@@ -325,6 +331,6 @@ public class GlobalCtx extends Application {
     }
 
     public String getUrl(String key) {
-        return this.configUrls.get(key);
+        return URLHelper.WEB_URL_ROOT + this.configUrls.get(key);
     }
 }

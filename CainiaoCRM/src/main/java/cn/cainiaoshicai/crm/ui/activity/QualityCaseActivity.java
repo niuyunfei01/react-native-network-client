@@ -20,6 +20,11 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 /**
  */
 public class QualityCaseActivity  extends WebViewActivity   {
+
+    public QualityCaseActivity() {
+        this.contentViewRes = R.layout.quality_case_list;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -8,7 +8,7 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
  */
 public class URLHelper {
 
-    public static final String WEB_URL_ROOT = "http://www.cainiaoshicai.cn/";
+    public static final String WEB_URL_ROOT = "http://www.cainiaoshicai.cn";
     public static final String API_ROOT = "http://www.cainiaoshicai.cn/api";
     public static final String OAUTH2_TOKEN = "http://www.cainiaoshicai.cn/oauth/token";
     public static final String USER_INFO = API_ROOT +  "/user_info";

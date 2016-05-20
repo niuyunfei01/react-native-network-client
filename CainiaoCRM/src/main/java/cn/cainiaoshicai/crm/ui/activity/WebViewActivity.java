@@ -17,10 +17,12 @@ import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
  */
 public class WebViewActivity extends ActionBarActivity {
     protected WebView mWebView;
+    protected int contentViewRes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(this.contentViewRes);
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
 
