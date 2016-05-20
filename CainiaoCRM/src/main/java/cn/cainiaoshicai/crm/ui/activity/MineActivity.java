@@ -35,6 +35,7 @@ public class MineActivity extends ActionBarActivity {
 	private static final int TYPE_STORE_PERF = 4;
 	private static final int TYPE_STORE_STORAGE = 5;
 	private static final int TYPE_ORDER_SEARCH = 6;
+	private static final int TYPE_USER_COMMENTS = 7;
 	private MineItemsAdapter listAdapter;
 	private ListView listView;
 
@@ -75,6 +76,8 @@ public class MineActivity extends ActionBarActivity {
 							.show();
 				} else if (item.getType() == TYPE_STORE_PERF) {
 					startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
+				} else if (item.getType() == TYPE_USER_COMMENTS) {
+					startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
 				} else if (item.getType() == TYPE_STORE_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				} else if (item.getType() == TYPE_ORDER_SEARCH) {
@@ -103,6 +106,8 @@ public class MineActivity extends ActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全店延单(本月)", performStat.getGlobalLateTotal(), 0));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE));
+
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("用户评价", -1, TYPE_USER_COMMENTS));
 
 		String versionDesc = getVersionDesc();
 
