@@ -48,10 +48,12 @@ public class CommonConfigDao {
     static public class Config {
         private HashMap<Integer, Worker> workers;
         private String[] delayReasons;
+        private HashMap<String, String> configUrls;
 
-        public Config(HashMap<Integer, Worker> workers, String[] delayReasons) {
+        public Config(HashMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
             this.workers = workers;
             this.delayReasons = delayReasons;
+            this.configUrls = configUrls;
         }
 
         public HashMap<Integer, Worker> getWorkers() {
@@ -60,6 +62,10 @@ public class CommonConfigDao {
 
         public String[] getDelayReasons() {
             return delayReasons;
+        }
+
+        public HashMap<String, String> getConfigUrls() {
+            return configUrls;
         }
     }
 

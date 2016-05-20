@@ -18,6 +18,7 @@ import android.view.Display;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -51,6 +52,7 @@ public class GlobalCtx extends Application {
 
     private HashMap<Integer, CommonConfigDao.Worker> workers = new HashMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
+    private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
 
     private DisplayMetrics displayMetrics = null;
 
@@ -183,6 +185,8 @@ public class GlobalCtx extends Application {
                             GlobalCtx.this.workers = workers;
                         }
                         GlobalCtx.this.delayReasons.set(config.getDelayReasons());
+                        GlobalCtx.this.configUrls.clear();;
+                        GlobalCtx.this.configUrls.putAll(config.getConfigUrls());
                     }
                 } catch (ServiceException e) {
                     e.printStackTrace();
@@ -318,5 +322,9 @@ public class GlobalCtx extends Application {
                 return bitmap.getByteCount();
             }
         };
+    }
+
+    public String getUrl(String key) {
+        return this.configUrls.get(key);
     }
 }

@@ -36,6 +36,7 @@ public class MineActivity extends ActionBarActivity {
 	private static final int TYPE_STORE_STORAGE = 5;
 	private static final int TYPE_ORDER_SEARCH = 6;
 	private static final int TYPE_USER_COMMENTS = 7;
+	private static final int TYPE_QUALITY_CASE = 8;
 	private MineItemsAdapter listAdapter;
 	private ListView listView;
 
@@ -77,9 +78,11 @@ public class MineActivity extends ActionBarActivity {
 				} else if (item.getType() == TYPE_STORE_PERF) {
 					startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
 				} else if (item.getType() == TYPE_USER_COMMENTS) {
-					startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
+					startActivity(new Intent(getApplicationContext(), UserCommentsActivity.class));
 				} else if (item.getType() == TYPE_STORE_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+				} else if (item.getType() == TYPE_QUALITY_CASE) {
+					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
 				} else if (item.getType() == TYPE_ORDER_SEARCH) {
 					onSearchRequested();
 				}
@@ -108,6 +111,8 @@ public class MineActivity extends ActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("用户评价", -1, TYPE_USER_COMMENTS));
+
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("案例跟踪", -1, TYPE_QUALITY_CASE));
 
 		String versionDesc = getVersionDesc();
 
