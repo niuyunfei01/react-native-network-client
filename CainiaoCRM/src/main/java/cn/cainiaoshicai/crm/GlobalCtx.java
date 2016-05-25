@@ -65,7 +65,7 @@ public class GlobalCtx extends Application {
     /**
      * Cached for booked user uid=>name mapping.
      */
-    private Map<Integer, String> uidNames = new HashMap<Integer, String>();
+    private Map<Integer, String> uidNames = new HashMap<>();
     private User currUser;
     private StatusService statusService;
 
