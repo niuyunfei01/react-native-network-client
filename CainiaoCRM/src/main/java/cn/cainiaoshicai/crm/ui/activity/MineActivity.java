@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -37,6 +38,7 @@ public class MineActivity extends ActionBarActivity {
 	private static final int TYPE_ORDER_SEARCH = 6;
 	private static final int TYPE_USER_COMMENTS = 7;
 	private static final int TYPE_QUALITY_CASE = 8;
+	private static final int TYPE_ORDER_DELAYED = 9;
 	private MineItemsAdapter listAdapter;
 	private ListView listView;
 
@@ -85,6 +87,11 @@ public class MineActivity extends ActionBarActivity {
 					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
 				} else if (item.getType() == TYPE_ORDER_SEARCH) {
 					onSearchRequested();
+				} else if (item.getType() == TYPE_ORDER_DELAYED) {
+					Intent intent = new Intent(MineActivity.this, MainActivity.class);
+					intent.setAction(Intent.ACTION_SEARCH);
+					intent.putExtra(SearchManager.QUERY, "delayed:yes");
+					MineActivity.this.startActivity(intent);
 				}
 			}
 		});
@@ -106,7 +113,7 @@ public class MineActivity extends ActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("今日送单%s 打包%s", performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, 0));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", performStat.getGlobalLateTotalD(), TYPE_STORE_PERF));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("全店延单(本月)", performStat.getGlobalLateTotal(), 0));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("本月延单", performStat.getGlobalLateTotal(), TYPE_ORDER_DELAYED));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE));
 
