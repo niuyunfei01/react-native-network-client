@@ -413,6 +413,10 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                         }).setNegativeButton(R.string.cancel, null);
                 adb.show();
                 break;
+            case R.id.menu_chg_pack_worker:
+                break;
+            case R.id.menu_chg_ship_worker:
+                break;
             case R.id.menu_refresh:
                 refresh();
                 return true;

@@ -206,5 +206,7 @@
     <string name="feedback_hint">输入用户反馈信息</string>
     <string name="menu_user_feedback">用户反馈</string>
     <string name="menu_invalid">置为无效</string>
+    <string name="menu_order_chg_pack">修改分拣员</string>
+    <string name="menu_order_chg_ship">修改送货员</string>
 
 </resources>
