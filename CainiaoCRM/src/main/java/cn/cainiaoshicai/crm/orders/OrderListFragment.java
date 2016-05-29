@@ -81,7 +81,7 @@ public class OrderListFragment extends Fragment {
                 if (item.getExpectTime() != null) {
                     if (item.getTime_arrived() != null) {
                         int gap_minutes = (int) ((item.getExpectTime().getTime() - item.getTime_arrived().getTime()) / (60 * 1000));
-                        if (gap_minutes < 0 && gap_minutes >= -30) {
+                        if (gap_minutes < 0) {
                             isDelay = true;
                         }
                     }
