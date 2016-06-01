@@ -29,7 +29,7 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends AbstractActionBarActivity {
 
     private static final String KEY_PREFIX = LoginActivity.class.getName() + '.';
     private static final int REQUEST_CODE_AUTH = 0;

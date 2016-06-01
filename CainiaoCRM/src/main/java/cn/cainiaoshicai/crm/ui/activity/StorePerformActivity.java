@@ -30,7 +30,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 /**
  */
-public class StorePerformActivity extends ActionBarActivity {
+public class StorePerformActivity extends AbstractActionBarActivity {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private WebView mWebView;
 

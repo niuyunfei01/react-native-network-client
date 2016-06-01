@@ -15,7 +15,7 @@ import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
 /**
  * Created by liuzhr on 5/17/16.
  */
-public class WebViewActivity extends ActionBarActivity {
+public class WebViewActivity extends AbstractActionBarActivity {
     protected WebView mWebView;
     protected int contentViewRes;
 

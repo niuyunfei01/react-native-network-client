@@ -38,7 +38,7 @@ import java.util.Map;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 
-public class RemindersActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class RemindersActivity extends AbstractActionBarActivity implements ActionBar.TabListener {
 
     private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
 

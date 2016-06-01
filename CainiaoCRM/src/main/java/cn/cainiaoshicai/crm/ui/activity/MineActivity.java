@@ -27,7 +27,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.adapter.MineItemsAdapter;
 
-public class MineActivity extends ActionBarActivity {
+public class MineActivity extends AbstractActionBarActivity {
 
 	static private final int REQUEST_ENABLE_BT = 0x1000;
 	private static final int TYPE_PRINT_SETTINGS = 1;
