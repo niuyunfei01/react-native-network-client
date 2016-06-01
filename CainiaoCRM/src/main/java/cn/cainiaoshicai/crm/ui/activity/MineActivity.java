@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +38,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_USER_COMMENTS = 7;
 	private static final int TYPE_QUALITY_CASE = 8;
 	private static final int TYPE_ORDER_DELAYED = 9;
+	private static final int TYPE_TOTAL_SCORE = 10;
 	private MineItemsAdapter listAdapter;
 	private ListView listView;
 
@@ -92,6 +92,8 @@ public class MineActivity extends AbstractActionBarActivity {
 					intent.setAction(Intent.ACTION_SEARCH);
 					intent.putExtra(SearchManager.QUERY, "delayed:yes");
 					MineActivity.this.startActivity(intent);
+				} else if (item.getType() == TYPE_TOTAL_SCORE) {
+					MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
 				}
 			}
 		});
@@ -110,7 +112,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	}
 
 	private void initPerformList(PerformStat performStat) {
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("今日送单%s 打包%s", performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, 0));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s, 今日送单%s 打包%s", performStat.getTotalMonthScore(), performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, 0));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", performStat.getGlobalLateTotalD(), TYPE_STORE_PERF));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("本月延单", performStat.getGlobalLateTotal(), TYPE_ORDER_DELAYED));

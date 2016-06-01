@@ -16,6 +16,7 @@ public class PerformStat {
     private int myPackageTotalD;
     private int globalLateTotalD;
     private int globalInTimeTotalD;
+    private int totalMonthScore;
 
     public int getGlobalOrder() {
         return globalOrder;
@@ -55,6 +56,14 @@ public class PerformStat {
 
     public void setGlobalInTimeTotal(int globalInTimeTotal) {
         this.globalInTimeTotal = globalInTimeTotal;
+    }
+
+    public int getTotalMonthScore() {
+        return totalMonthScore;
+    }
+
+    public void setTotalMonthScore(int totalMonthScore) {
+        this.totalMonthScore = totalMonthScore;
     }
 
     public int getGlobalOrderD() {
