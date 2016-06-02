@@ -112,7 +112,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	}
 
 	private void initPerformList(PerformStat performStat) {
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s, 今日送单%s 打包%s", performStat.getTotalMonthScore(), performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, 0));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s, 今日送单%s 打包%s", performStat.getTotalMonthScore(), performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, TYPE_TOTAL_SCORE));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", performStat.getGlobalLateTotalD(), TYPE_STORE_PERF));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("本月延单", performStat.getGlobalLateTotal(), TYPE_ORDER_DELAYED));
