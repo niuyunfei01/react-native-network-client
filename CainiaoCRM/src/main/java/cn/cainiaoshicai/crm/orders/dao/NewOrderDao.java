@@ -52,7 +52,6 @@ public class NewOrderDao {
     }
 
     public PerformStat getStat() {
-
         try {
             String url = URLHelper.API_ROOT + "/perm_stats.json" ;
 
@@ -65,6 +64,22 @@ public class NewOrderDao {
         } catch (ServiceException e) {
             AppLogger.e(e.getMessage(), e);
             return new PerformStat();
+        }
+    }
+
+    public HashMap<String, String> getStatMap() {
+        try {
+            String url = URLHelper.API_ROOT + "/perm_stats.json" ;
+
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("access_token", access_token);
+            String json =  HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
+        } catch (ServiceException e) {
+            AppLogger.e(e.getMessage(), e);
+            return new HashMap<>();
         }
     }
 

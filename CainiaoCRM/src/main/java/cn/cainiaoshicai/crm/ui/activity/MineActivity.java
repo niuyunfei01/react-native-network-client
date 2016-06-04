@@ -16,6 +16,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
@@ -37,9 +42,9 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_ORDER_SEARCH = 6;
 	private static final int TYPE_USER_COMMENTS = 7;
 	private static final int TYPE_QUALITY_CASE = 8;
-	private static final int TYPE_ORDER_DELAYED = 9;
+	public static final int TYPE_ORDER_DELAYED = 9;
 	private static final int TYPE_TOTAL_SCORE = 10;
-	private MineItemsAdapter listAdapter;
+	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
 	@Override
@@ -87,54 +92,76 @@ public class MineActivity extends AbstractActionBarActivity {
 					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
 				} else if (item.getType() == TYPE_ORDER_SEARCH) {
 					onSearchRequested();
-				} else if (item.getType() == TYPE_ORDER_DELAYED) {
-					Intent intent = new Intent(MineActivity.this, MainActivity.class);
-					intent.setAction(Intent.ACTION_SEARCH);
-					intent.putExtra(SearchManager.QUERY, "delayed:yes");
-					MineActivity.this.startActivity(intent);
 				} else if (item.getType() == TYPE_TOTAL_SCORE) {
 					MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
 				}
 			}
 		});
-		new MyAsyncTask<Void,PerformStat, PerformStat>() {
+		new MyAsyncTask<Void,HashMap<String, String>, HashMap<String, String>>() {
 
 			@Override
-			protected PerformStat doInBackground(Void... params) {
-				return new NewOrderDao(GlobalCtx.getInstance().getSpecialToken()).getStat();
+			protected HashMap<String, String> doInBackground(Void... params) {
+				return new NewOrderDao(GlobalCtx.getInstance().getSpecialToken()).getStatMap();
 			}
 
 			@Override
-			protected void onPostExecute(PerformStat performStat) {
+			protected void onPostExecute(HashMap<String, String> performStat) {
 				initPerformList(performStat);
 			}
 		}.executeOnNormal();
 	}
 
-	private void initPerformList(PerformStat performStat) {
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s, 今日送单%s 打包%s", performStat.getTotalMonthScore(), performStat.getMyShipTotalD(), performStat.getMyPackageTotalD()), -1, TYPE_TOTAL_SCORE));
+	private void initPerformList(HashMap<String, String> performStat) {
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s, 今日送单%s 打包%s", performStat.get("totalMonthScore"), performStat.get("myShipTotalD"), performStat.get("myPackageTotalD")), -1, TYPE_TOTAL_SCORE, null));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", performStat.getGlobalLateTotalD(), TYPE_STORE_PERF));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("本月延单", performStat.getGlobalLateTotal(), TYPE_ORDER_DELAYED));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", -1 /*Integer.parseInt(performStat.get("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE));
+		Double lastWeekInTimeRatio = null;
+		try {
+			lastWeekInTimeRatio = Double.valueOf(performStat.get("lastWeekInTimeRatio"));
+		} catch (Exception ignored) {
+		}
+		Double todayInTimeRatio = null;
+		try {
+			todayInTimeRatio = Double.valueOf(performStat.get("todayInTimeRatio"));
+		} catch (Exception ignored) {
+		}
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("用户评价", -1, TYPE_USER_COMMENTS));
+		Integer todayAvgReadyTime = null;
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("案例跟踪", -1, TYPE_QUALITY_CASE));
+		try {
+			todayAvgReadyTime = Integer.valueOf(performStat.get("todayAvgReadyTime"));
+		} catch (Exception ignore) {
+		}
+
+		Integer lastWeekAvgReadyTime = 0;
+		try {
+			lastWeekAvgReadyTime = Integer.valueOf(performStat.get("lastWeekAvgReadyTime"));
+		} catch (Exception ignore) {
+		}
+
+		ArrayList<Object> inTimeParams = new ArrayList<>();
+		inTimeParams.add(new StatInTime(lastWeekInTimeRatio, todayInTimeRatio, lastWeekAvgReadyTime, todayAvgReadyTime));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
+
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE, null));
+
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("用户评价", -1, TYPE_USER_COMMENTS, null));
+
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("案例跟踪", -1, TYPE_QUALITY_CASE, null));
 
 		String versionDesc = getVersionDesc();
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("打印设置", -1, TYPE_PRINT_SETTINGS));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("打印设置", -1, TYPE_PRINT_SETTINGS, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));
 	}
 
 	@NonNull
 	public String getVersionDesc() {
 		String versionDesc = "unknown";
 		try {
-			PackageInfo pInfo = null;
+			PackageInfo pInfo;
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 			int verCode = pInfo.versionCode;
 			String version = pInfo.versionName;
@@ -169,6 +196,20 @@ public class MineActivity extends AbstractActionBarActivity {
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	static public class StatInTime {
+		public final Double inTimeRatioLastWeek;
+		public final Double inTimeRatioToday;
+		public final Integer avgReadyTimeLastWeek;
+		public final Integer avgReadyTimeToday;
+
+		public StatInTime(Double inTimeRatioLastWeek, Double inTimeRatioToday, Integer avgReadyTimeLastWeek, Integer avgReadyTimeToday) {
+			this.inTimeRatioLastWeek = inTimeRatioLastWeek;
+			this.inTimeRatioToday = inTimeRatioToday;
+			this.avgReadyTimeLastWeek = avgReadyTimeLastWeek;
+			this.avgReadyTimeToday = avgReadyTimeToday;
 		}
 	}
 }
