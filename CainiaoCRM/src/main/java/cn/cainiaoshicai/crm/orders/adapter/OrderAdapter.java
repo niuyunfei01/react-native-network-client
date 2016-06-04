@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import cn.cainiaoshicai.crm.Constants;
@@ -31,6 +29,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.Constant;
 
 /**
  */
@@ -177,8 +176,8 @@ public class OrderAdapter extends BaseAdapter {
                     shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
                     int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) /(60 * 1000));
                     shipTimeCost.setText(String.valueOf(minutes));
-                    int colorResource = minutes <= Constants.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
-                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
+//                    int colorResource = minutes <= Constants.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
+//                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
                 } else {
                     shipTimeCost.setVisibility(View.GONE);
                     shipTimeText.setVisibility(View.GONE);
@@ -192,12 +191,13 @@ public class OrderAdapter extends BaseAdapter {
             TextView inTimeView = (TextView) vi.findViewById(R.id.is_in_time);
             if (order.getExpectTime() != null ) {
                 if (order.getTime_arrived() != null) {
-                    int gap_minutes = (int) ((order.getExpectTime().getTime() - order.getTime_arrived().getTime()) / (60 * 1000));
-                    boolean good = gap_minutes >= 0;
-                    inTimeView.setText(good ? (gap_minutes <= 5 ? "准时" : "提前") : ( gap_minutes >= -30 ? "延误":"严重延误") );
-                    int colorResource = good ? R.color.green : R.color.red;
-                    inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
-                    inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), good ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
+                    Constants.DeliverReview reviewDeliver = Constants.DeliverReview.find(order.getReview_deliver());
+                    int colorResource = (reviewDeliver.isGood()) ? R.color.green : R.color.red;
+                    inTimeView.setText(reviewDeliver.name);
+                    if (reviewDeliver.value != Constants.DELIVER_UNKNOWN.value) {
+                        inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
+                        inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
+                    }
                 } else {
                     if (order.getOrderTime() != null) {
                         inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime())/(60 * 1000)) + "分钟");

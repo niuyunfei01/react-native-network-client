@@ -50,4 +50,36 @@ public class Constants {
         }
     }
 
+    public static final DeliverReview DELIVER_UNKNOWN = new DeliverReview("-", 0);
+    public static final DeliverReview DELIVER_GOOD = new DeliverReview("提前", 1);
+    public static final DeliverReview DELIVER_OK = new DeliverReview("准时", 2);
+    public static final DeliverReview DELIVER_LATE = new DeliverReview("延误", 3);
+    public static final DeliverReview DELIVER_SERIOUS = new DeliverReview("严重延误", 4);
+
+    static public class DeliverReview {
+        public final String name;
+        public final int value;
+
+        public DeliverReview(String name, int value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        static public DeliverReview find(int val) {
+            for (DeliverReview next : Arrays.asList(DELIVER_GOOD, DELIVER_LATE, DELIVER_OK, DELIVER_SERIOUS)) {
+                if (next.value == val) {
+                    return next;
+                }
+            }
+
+            return DELIVER_UNKNOWN;
+        }
+
+        public boolean isGood() {
+            return this.value == DELIVER_GOOD.value || this.value == DELIVER_OK.value;
+        }
+    }
+
+
+
 }

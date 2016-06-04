@@ -28,6 +28,7 @@ public class Order {
     private Date time_start_ship;
     private Date time_ready;
     private Date time_arrived;
+    private int review_deliver;
 
     private List<CartItem> items;
     private String ship_worker_name;
@@ -240,6 +241,18 @@ public class Order {
 
     public boolean isPaidDone() {
         return this.paid_done == 1;
+    }
+
+    public int getReview_deliver() {
+        return review_deliver;
+    }
+
+    public void setReview_deliver(int review_deliver) {
+        this.review_deliver = review_deliver;
+    }
+
+    public int getPaid_done() {
+        return paid_done;
     }
 }
 
