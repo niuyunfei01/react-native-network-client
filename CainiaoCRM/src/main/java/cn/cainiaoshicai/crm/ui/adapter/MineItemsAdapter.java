@@ -75,9 +75,10 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
                 statusLabel.setText(String.valueOf(item.getCount()));
             }
 
-            ImageView icon = (ImageView) row.findViewById(imageId);
-            icon.setImageResource(R.drawable.arrow);
         }
+
+        ImageView icon = (ImageView) row.findViewById(imageId);
+        icon.setImageResource(R.drawable.arrow);
 
         return (row);
     }

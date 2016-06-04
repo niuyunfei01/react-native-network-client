@@ -90,6 +90,9 @@
         <activity android:name=".ui.activity.MonthPerfActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
+        <activity android:name=".ui.activity.InTimeStatsActivity" android:screenOrientation="portrait">
+            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        </activity>
         <activity android:name=".ui.activity.UserCommentsActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>

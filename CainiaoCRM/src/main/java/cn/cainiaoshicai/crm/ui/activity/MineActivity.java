@@ -59,7 +59,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
-				MineItemsAdapter.PerformanceItem item = (MineItemsAdapter.PerformanceItem) listAdapter.getItem(position);
+				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
 					startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
@@ -94,6 +94,8 @@ public class MineActivity extends AbstractActionBarActivity {
 					onSearchRequested();
 				} else if (item.getType() == TYPE_TOTAL_SCORE) {
 					MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
+				} else if (item.getType() == TYPE_ORDER_DELAYED) {
+					MineActivity.this.startActivity(new Intent(getApplicationContext(), InTimeStatsActivity.class));
 				}
 			}
 		});
