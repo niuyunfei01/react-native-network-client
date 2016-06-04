@@ -114,9 +114,6 @@ public class MineActivity extends AbstractActionBarActivity {
 	}
 
 	private void initPerformList(HashMap<String, String> performStat) {
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s, 今日送单%s 打包%s", performStat.get("totalMonthScore"), performStat.get("myShipTotalD"), performStat.get("myPackageTotalD")), -1, TYPE_TOTAL_SCORE, null));
-
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("今日业绩", -1 /*Integer.parseInt(performStat.get("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
 
 		Double lastWeekInTimeRatio = null;
 		try {
@@ -146,6 +143,8 @@ public class MineActivity extends AbstractActionBarActivity {
 		inTimeParams.add(new StatInTime(lastWeekInTimeRatio, todayInTimeRatio, lastWeekAvgReadyTime, todayAvgReadyTime));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
 
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.get("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE, null));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("用户评价", -1, TYPE_USER_COMMENTS, null));
