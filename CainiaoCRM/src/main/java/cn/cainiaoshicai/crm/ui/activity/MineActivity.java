@@ -126,21 +126,24 @@ public class MineActivity extends AbstractActionBarActivity {
 		} catch (Exception ignored) {
 		}
 
-		Integer todayAvgReadyTime = null;
+		Double todayAvgReadyTime = null;
 
 		try {
-			todayAvgReadyTime = Integer.valueOf(performStat.get("todayAvgReadyTime"));
+			todayAvgReadyTime = Double.valueOf(performStat.get("inTimeReadyRatioT"));
 		} catch (Exception ignore) {
 		}
 
-		Integer lastWeekAvgReadyTime = 0;
+		Double lastWeekAvgReadyTime = null;
 		try {
-			lastWeekAvgReadyTime = Integer.valueOf(performStat.get("lastWeekAvgReadyTime"));
+			lastWeekAvgReadyTime = Double.valueOf(performStat.get("inTimeReadyRatioW"));
 		} catch (Exception ignore) {
 		}
 
 		ArrayList<Object> inTimeParams = new ArrayList<>();
-		inTimeParams.add(new StatInTime(lastWeekInTimeRatio, todayInTimeRatio, lastWeekAvgReadyTime, todayAvgReadyTime));
+		StatInTime statInTime = new StatInTime(lastWeekInTimeRatio, todayInTimeRatio, lastWeekAvgReadyTime, todayAvgReadyTime);
+		statInTime.setTotalLate(Integer.parseInt(performStat.get("totalLate")));
+		statInTime.setTotalSeriousLate(Integer.parseInt(performStat.get("totalSeriousLate")));
+		inTimeParams.add(statInTime);
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
@@ -203,14 +206,32 @@ public class MineActivity extends AbstractActionBarActivity {
 	static public class StatInTime {
 		public final Double inTimeRatioLastWeek;
 		public final Double inTimeRatioToday;
-		public final Integer avgReadyTimeLastWeek;
-		public final Integer avgReadyTimeToday;
+		public final Double avgReadyTimeLastWeek;
+		public final Double avgReadyTimeToday;
+		private Integer totalLate;
+		private Integer totalSeriousLate;
 
-		public StatInTime(Double inTimeRatioLastWeek, Double inTimeRatioToday, Integer avgReadyTimeLastWeek, Integer avgReadyTimeToday) {
+		public StatInTime(Double inTimeRatioLastWeek, Double inTimeRatioToday, Double avgReadyTimeLastWeek, Double avgReadyTimeToday) {
 			this.inTimeRatioLastWeek = inTimeRatioLastWeek;
 			this.inTimeRatioToday = inTimeRatioToday;
 			this.avgReadyTimeLastWeek = avgReadyTimeLastWeek;
 			this.avgReadyTimeToday = avgReadyTimeToday;
+		}
+
+		public Integer getTotalLate() {
+			return totalLate;
+		}
+
+		public void setTotalLate(Integer totalLate) {
+			this.totalLate = totalLate;
+		}
+
+		public Integer getTotalSeriousLate() {
+			return totalSeriousLate;
+		}
+
+		public void setTotalSeriousLate(Integer totalSeriousLate) {
+			this.totalSeriousLate = totalSeriousLate;
 		}
 	}
 }

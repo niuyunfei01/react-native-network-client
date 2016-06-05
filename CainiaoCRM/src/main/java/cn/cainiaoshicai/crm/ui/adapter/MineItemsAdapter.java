@@ -62,11 +62,13 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
 
             TextView lastWeekReadyTime = (TextView) row.findViewById(R.id.last_week_avg_ready_time);
             TextView todayReadyTime = (TextView) row.findViewById(R.id.toady_avg_ready_time);
-            lastWeekReadyTime.setText("出库耗时:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f分", statInTime.avgReadyTimeLastWeek/60.0) : "-"));
-            todayReadyTime.setText("出库耗时:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f分", statInTime.avgReadyTimeToday/60.0) : "-"));
+            lastWeekReadyTime.setText("上周20分出库率:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f%%", statInTime.avgReadyTimeLastWeek * 100) : "-"));
+            todayReadyTime.setText("今日20分出库率:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f%%", statInTime.avgReadyTimeToday * 100) : "-"));
 
             Button viewAllLate = (Button) row.findViewById(R.id.btn_view_all_late);
             Button viewAllSerious = (Button) row.findViewById(R.id.btn_view_all_serious);
+            viewAllLate.setText("延误" + ((statInTime.getTotalLate() != null && statInTime.getTotalLate() > 0) ? String.format("%s单", statInTime.getTotalLate()) : "订单"));
+            viewAllSerious.setText("严重延误" + ((statInTime.getTotalSeriousLate() != null && statInTime.getTotalSeriousLate() > 0) ? String.format("%s单", statInTime.getTotalSeriousLate()) : "订单"));
 
             viewAllLate.setOnClickListener(new ToSearchBtnListener("delayed:yes"));
             viewAllSerious.setOnClickListener(new ToSearchBtnListener("delayed:serious"));
