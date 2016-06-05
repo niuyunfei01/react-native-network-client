@@ -168,8 +168,9 @@ public class MineActivity extends AbstractActionBarActivity {
 			PackageInfo pInfo;
 			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 			int verCode = pInfo.versionCode;
-			String version = pInfo.versionName;
-			versionDesc = version + "-" + verCode;
+			return String.valueOf(verCode);
+//			String version = pInfo.versionName;
+//			versionDesc = version + "-" + verCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			AppLogger.e("error to get package info:" + e.getMessage(), e);
 		}
