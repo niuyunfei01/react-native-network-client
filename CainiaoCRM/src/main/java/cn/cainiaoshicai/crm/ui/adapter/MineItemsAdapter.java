@@ -62,8 +62,8 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
 
             TextView lastWeekReadyTime = (TextView) row.findViewById(R.id.last_week_avg_ready_time);
             TextView todayReadyTime = (TextView) row.findViewById(R.id.toady_avg_ready_time);
-            lastWeekReadyTime.setText("上周20分出库率:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f%%", statInTime.avgReadyTimeLastWeek * 100) : "-"));
-            todayReadyTime.setText("今日20分出库率:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f%%", statInTime.avgReadyTimeToday * 100) : "-"));
+            lastWeekReadyTime.setText("上周25分出库率:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f%%", statInTime.avgReadyTimeLastWeek * 100) : "-"));
+            todayReadyTime.setText("今日25分出库率:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f%%", statInTime.avgReadyTimeToday * 100) : "-"));
 
             Button viewAllLate = (Button) row.findViewById(R.id.btn_view_all_late);
             Button viewAllSerious = (Button) row.findViewById(R.id.btn_view_all_serious);
