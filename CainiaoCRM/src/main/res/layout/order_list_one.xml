@@ -170,11 +170,6 @@
 
             <TextView
                 android:paddingLeft="5.0dip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="平台:"/>
-            <TextView
                 android:id="@+id/source_platform"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -232,6 +227,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="延时送达"/>
+
+            <TextView android:id="@+id/ready_delay_warn"
+                android:background="@drawable/list_text_border_red"
+                android:textColor="@color/red"
+                android:layout_marginStart="5.0dip"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
         </LinearLayout>
 
 

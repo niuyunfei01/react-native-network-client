@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +30,6 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.print.Constant;
 
 /**
  */
@@ -149,8 +149,7 @@ public class OrderAdapter extends BaseAdapter {
             String platformDayId = order.getPlatform_dayId();
             sourcePlatform.setText(platformName + (platformDayId != null && order.getPlatform() != Constants.PLAT_WX.id? String.format("#%s", platformDayId) : ""));
 
-            if (order.getOrderStatus() != Constants.WM_ORDER_STATUS_TO_READY
-                    && order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
+            if (order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
 
                 TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
@@ -201,6 +200,15 @@ public class OrderAdapter extends BaseAdapter {
                 } else {
                     if (order.getOrderTime() != null) {
                         inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime())/(60 * 1000)) + "分钟");
+                    }
+
+                    TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
+                    if ((order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
+                            || order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_SHIP) && order.isShowReadyDelay()) {
+                        readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
+                        readyDelayWarn.setVisibility(View.VISIBLE);
+                    } else {
+                        readyDelayWarn.setVisibility(View.GONE);
                     }
                 }
             } else {

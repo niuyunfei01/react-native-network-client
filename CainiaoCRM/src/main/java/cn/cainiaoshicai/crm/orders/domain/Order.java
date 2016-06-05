@@ -34,6 +34,8 @@ public class Order {
     private String ship_worker_name;
     private int order_times;
     private int paid_done;
+    private boolean showReadyDelay;
+    private int readyLeftMin;
 
     public int getId() {
         return id;
@@ -253,6 +255,22 @@ public class Order {
 
     public int getPaid_done() {
         return paid_done;
+    }
+
+    public boolean isShowReadyDelay() {
+        return showReadyDelay;
+    }
+
+    public void setShowReadyDelay(boolean showReadyDelay) {
+        this.showReadyDelay = showReadyDelay;
+    }
+
+    public int getReadyLeftMin() {
+        return readyLeftMin;
+    }
+
+    public void setReadyLeftMin(int readyLeftMin) {
+        this.readyLeftMin = readyLeftMin;
     }
 }
 
