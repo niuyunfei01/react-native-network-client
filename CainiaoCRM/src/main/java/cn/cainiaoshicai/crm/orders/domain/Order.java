@@ -30,6 +30,8 @@ public class Order {
     private Date time_arrived;
     private int review_deliver;
 
+    private int print_times;
+
     private List<CartItem> items;
     private String ship_worker_name;
     private int order_times;
@@ -271,6 +273,18 @@ public class Order {
 
     public void setReadyLeftMin(int readyLeftMin) {
         this.readyLeftMin = readyLeftMin;
+    }
+
+    public int getPrint_times() {
+        return print_times;
+    }
+
+    public void setPrint_times(int print_times) {
+        this.print_times = print_times;
+    }
+
+    public void incrPrintTimes() {
+        this.print_times ++;
     }
 }
 

@@ -106,4 +106,8 @@ public class OrderActionDao {
     public ResultBean setOrderInvalid(int orderId) throws ServiceException {
         return actionWithResult("/order_set_invalid/"+orderId, new HashMap<String, String>());
     }
+
+    public ResultBean logOrderPrinted(int orderId) throws ServiceException {
+        return actionWithResult("/order_log_print/"+orderId, new HashMap<String, String>());
+    }
 }

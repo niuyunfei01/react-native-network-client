@@ -66,6 +66,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     private String shipWorkerName;
     private int platform;
     private String url;
+    private Button printButton = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +92,8 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         final int listType = intent.getIntExtra("list_type", 0);
         final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
         final boolean isDelay = intent.getBooleanExtra("is_delay", false);
-        Button printButton = (Button) findViewById(R.id.button1);
+        printButton = (Button) findViewById(R.id.button1);
+
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,8 +246,11 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                         return false;
                     } else {
                         this.order = order;
+                        boolean ok = false;
                         try {
                             printOrder(ds.getSocket(), order);
+                            order.incrPrintTimes();
+                            ok = true;
                         } catch (Exception e) {
                             AppLogger.e("error IOException:" + e.getMessage(), e);
                             this.error = "打印错误:" + e.getMessage();
@@ -255,6 +260,14 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                             }
 
                             return false;
+                        }
+
+                        if (ok) {
+                            try {
+                                new OrderActionDao(access_token).logOrderPrinted(order.getId());
+                            } catch (ServiceException e) {
+                                AppLogger.e("error Service Exception:" + e.getMessage());
+                            }
                         }
                     }
 
@@ -267,6 +280,13 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                     if (!aBoolean) {
                         Toast.makeText(getApplication(), "操作失败：" + this.error, Toast.LENGTH_SHORT).show();
                     }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            printButton.setText(getString(R.string.menu_print) + String.format("(%d)", order.getPrint_times()));
+                        }
+                    });
                 }
             }.executeOnNormal();
         }
