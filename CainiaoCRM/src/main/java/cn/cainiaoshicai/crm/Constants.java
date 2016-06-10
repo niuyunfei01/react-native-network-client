@@ -81,5 +81,8 @@ public class Constants {
     }
 
 
+    public static final String PUSH_TYPE_NEW_ORDER = "new_order";
+    public static final String PUSH_TYPE_NEW_COMMENT = "'new_comment'";
+    public static final String PUSH_TYPE_REDY_TIMEOUT = "'ready_timeout'";
 
 }
