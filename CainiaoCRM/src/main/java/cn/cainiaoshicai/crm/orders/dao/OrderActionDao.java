@@ -89,9 +89,17 @@ public class OrderActionDao {
     }
 
     public Order getOrder(int platform, String platformOid) {
+        return _order("/order/" + platform + "/" + platformOid);
+    }
+
+    public Order getOrder(int orderId) {
+        return _order("/order/" + orderId);
+    }
+
+    private Order _order(String path) {
         try {
-            String json = getJson("/order/" + platform + "/" + platformOid, new HashMap<String, String>());
-            AppLogger.v("action: order "  + json);
+            String json = getJson(path, new HashMap<String, String>());
+            AppLogger.v("action: order " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             return gson.fromJson(json, new TypeToken<Order>() {}.getType());
         } catch (JsonSyntaxException e) {

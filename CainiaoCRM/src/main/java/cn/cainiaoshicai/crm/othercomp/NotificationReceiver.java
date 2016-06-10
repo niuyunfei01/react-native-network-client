@@ -20,13 +20,21 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.Constant;
+import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.jpush.android.api.JPushInterface;
@@ -78,6 +86,45 @@ public class NotificationReceiver extends BroadcastReceiver {
 							NotificationReceiver.soundPool.play(newOrderSound, 100.0f, 100.0f, 1, 0, 1.0f);
 						}
 					});
+
+					final int platform = notify.getPlatform();
+					final String platformOid = notify.getPlatform_oid();
+
+					new MyAsyncTask<Void,Order, Boolean>() {
+						@Override
+						protected Boolean doInBackground(Void... params) {
+							final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+							if (ds != null && ds.getSocket() != null) {
+								String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
+								Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+								if (order == null) {
+									AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+									return false;
+								}
+
+								try {
+									OrderSingleActivity.printOrder(ds.getSocket(), order);
+								} catch (Exception e) {
+									AppLogger.e("[print]error IOException:" + e.getMessage(), e);
+
+									if (e instanceof IOException) {
+										ds.closeSocket();
+										ds.reconnect();
+									}
+
+									return false;
+								}
+
+								try {
+									new OrderActionDao(access_token).logOrderPrinted(order.getId());
+								} catch (ServiceException e) {
+									AppLogger.e("error Service Exception:" + e.getMessage());
+								}
+							}
+							return null;
+						}
+					}.executeOnNormal();
+
 				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
 					soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
 						@Override

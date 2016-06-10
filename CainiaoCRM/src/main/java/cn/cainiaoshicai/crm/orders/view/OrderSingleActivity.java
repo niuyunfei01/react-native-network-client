@@ -246,7 +246,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                         return false;
                     } else {
                         this.order = order;
-                        boolean ok = false;
+                        boolean ok;
                         try {
                             printOrder(ds.getSocket(), order);
                             order.incrPrintTimes();
@@ -284,7 +284,11 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            printButton.setText(getString(R.string.menu_print) + String.format("(%d)", order.getPrint_times()));
+                            if (printButton != null) {
+                                printButton.setText(getString(R.string.menu_print) + String.format("(%d)", order.getPrint_times()));
+                            } else {
+                                AppLogger.w("printButton is null");
+                            }
                         }
                     });
                 }
@@ -292,7 +296,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         }
     }
 
-    private void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
+    public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
         try {
             OutputStream btos = btsocket.getOutputStream();
             OrderPrinter printer = new OrderPrinter(btos);

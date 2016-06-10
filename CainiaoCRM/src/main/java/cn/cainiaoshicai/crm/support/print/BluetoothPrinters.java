@@ -123,5 +123,9 @@ public class BluetoothPrinters {
                 INS.printers.remove(this);
             this.connected = false;
         }
+
+        public void reconnect() {
+            AppLogger.i("reconnect printer....");
+        }
     }
 }
