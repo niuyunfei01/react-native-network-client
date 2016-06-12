@@ -214,7 +214,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
             default:
-                return super. onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
     }
 

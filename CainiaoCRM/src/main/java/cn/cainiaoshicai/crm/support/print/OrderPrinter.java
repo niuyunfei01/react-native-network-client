@@ -4,7 +4,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 /**
  * Created by liuzhr on 4/30/16.
@@ -14,11 +20,75 @@ public class OrderPrinter {
     private final OutputStream btos;
     private byte[] newLine = "\n".getBytes();
     private final byte[] starLine = "********************************".getBytes();
-    private final String split_line = "--------------------------------";
-    private final String space_line = "                                ";
 
     public OrderPrinter(OutputStream btos) {
         this.btos = btos;
+    }
+
+    public static void printWhenNeverPrinted(final int platform, final String platformOid) {
+
+        new MyAsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                final String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
+                final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                if (order != null) {
+                    _print(order, true);
+                } else {
+                    AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                }
+                return null;
+            }
+        }.executeOnNormal();
+    }
+
+    public static void print(final Order order) {
+        _print(order, false);
+    }
+
+
+    /**
+     *
+     * @param order Must contain items!!!!
+     * @param onlyPrintIfNot
+     */
+    private static void _print(final Order order, final boolean onlyPrintIfNot) {
+        final String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
+        new MyAsyncTask<Void, Order, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                if (order.getPrint_times() == 0 || !onlyPrintIfNot) {
+                    final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+                    if (ds != null && ds.getSocket() != null) {
+                        try {
+                            OrderSingleActivity.printOrder(ds.getSocket(), order);
+                        } catch (Exception e) {
+                            AppLogger.e("[print]error IOException:" + e.getMessage(), e);
+
+                            if (e instanceof IOException) {
+                                ds.closeSocket();
+                                ds.reconnect();
+                            }
+
+                            return false;
+                        }
+
+                        try {
+                            new OrderActionDao(access_token).logOrderPrinted(order.getId());
+                        } catch (ServiceException e) {
+                            AppLogger.e("error Service Exception:" + e.getMessage());
+                        }
+                    } else {
+                        AppLogger.e("Printer is not connected!");
+                    }
+                } else {
+                    AppLogger.e("order is already printed!");
+                }
+                return null;
+            }
+        }.executeOnNormal();
     }
 
     public OrderPrinter newLine() throws IOException {
@@ -59,6 +129,7 @@ public class OrderPrinter {
 
     public OrderPrinter splitLine() throws IOException {
         btos.write(GPrinterCommand.text_normal_size);
+        String split_line = "--------------------------------";
         btos.write(bytes(split_line));
         this.newLine();
         return this;
@@ -66,6 +137,7 @@ public class OrderPrinter {
 
     public OrderPrinter spaceLine() throws IOException {
         btos.write(GPrinterCommand.text_normal_size);
+        String space_line = "                                ";
         btos.write(bytes(space_line));
         this.newLine();
         return this;

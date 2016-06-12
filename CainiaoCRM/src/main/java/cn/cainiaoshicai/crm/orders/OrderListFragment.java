@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
@@ -31,6 +32,7 @@ import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 
@@ -195,6 +197,12 @@ public class OrderListFragment extends Fragment {
                 data.clear();
                 data.addAll(value.getOrders());
                 getAdapter().notifyDataSetChanged();
+
+                for(Order order: value.getOrders()) {
+                    if (order.getPrint_times() < 1 && order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY) {
+                       OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid());
+                    }
+                }
 
                 final MainActivity context = (MainActivity) this.listView.getContext();
                 context.runOnUiThread(new Runnable() {
