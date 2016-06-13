@@ -28,6 +28,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -39,6 +41,7 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
+import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
@@ -83,6 +86,8 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
 
         setContentView(R.layout.order_list_main);
 
+        resetPrinterStatusBar();
+
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(false);
@@ -97,6 +102,27 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         handleIntent(ab, intent);
+
+    }
+
+    private void resetPrinterStatusBar() {
+        TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
+        if ((SettingUtility.isAutoPrintYYC() || SettingUtility.isAutoPrintHLG())
+                && !BTDeviceListActivity.isPrinterConnected()) {
+            String storeDesc = SettingUtility.isAutoPrintHLG() ? "回龙观店" : "";
+            storeDesc += SettingUtility.isAutoPrintYYC() ? (("".equals(storeDesc) ? "" : ", ") + "亚运村店") : "";
+            printerStatus.setText("已设自动打印(" + storeDesc + ")，点此连接打印机！");
+            printerStatus.setVisibility(View.VISIBLE);
+            printerStatus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(getApplicationContext(), BTDeviceListActivity.class);
+                    MainActivity.this.startActivity(i);
+                }
+            });
+        } else {
+            printerStatus.setVisibility(View.GONE);
+        }
     }
 
     private void handleIntent(ActionBar ab, Intent intent) {
@@ -161,6 +187,8 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         if (listType == null) {
             listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
         }
+
+        this.resetPrinterStatusBar();
 
         FragmentManager fm = getFragmentManager();
         Integer fragmentId = fragmentMap.get(listType.getValue());

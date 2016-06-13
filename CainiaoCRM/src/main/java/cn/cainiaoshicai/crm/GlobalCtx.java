@@ -36,6 +36,7 @@ import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.jpush.android.api.JPushInterface;
 
 public class GlobalCtx extends Application {
@@ -194,7 +195,6 @@ public class GlobalCtx extends Application {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     AppLogger.w("error to init config:" + e.getMessage(), e);
                 }
                 return null;
@@ -332,5 +332,11 @@ public class GlobalCtx extends Application {
 
     public String getUrl(String key) {
         return URLHelper.WEB_URL_ROOT + this.configUrls.get(key);
+    }
+
+    public static boolean isAutoPrint(int store_id) {
+        return store_id == Constants.STORE_UNKNOWN
+                || (SettingUtility.isAutoPrintHLG() && store_id == Constants.STORE_HLG)
+                || (SettingUtility.isAutoPrintYYC() && store_id == Constants.STORE_YYC);
     }
 }

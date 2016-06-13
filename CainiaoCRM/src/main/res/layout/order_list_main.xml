@@ -15,11 +15,23 @@
   limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/order_list_main"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_marginTop="8dp"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    android:gravity="center">
+    android:layout_height="fill_parent">
+    <TextView
+        android:id="@+id/head_status_printer"
+        android:textColor="@color/white"
+        android:background="@color/red"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="30dp" />
+    <RelativeLayout
+        android:id="@+id/order_list_main"
+        android:layout_marginTop="2dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_below="@id/head_status_printer"
+        android:layout_height="fill_parent"
+        android:layout_width="match_parent">
+    </RelativeLayout>
 </RelativeLayout>

@@ -313,6 +313,22 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), BLACK_MAGIC, true);
     }
 
+    public static boolean isAutoPrintHLG() {
+        return SettingHelper.getSharedPreferences(getContext(), "auto_print_hlg", false);
+    }
+
+    public static void setAutoPrintHLG(boolean value) {
+        SettingHelper.setEditor(getContext(), "auto_print_hlg", value);
+    }
+
+    public static void setAutoPrintYYC(boolean value) {
+        SettingHelper.setEditor(getContext(), "auto_print_yyc", value);
+    }
+
+    public static boolean isAutoPrintYYC() {
+        return SettingHelper.getSharedPreferences(getContext(), "auto_print_yyc", false);
+    }
+
     public static boolean isFollowingOrFanListFirstShow() {
         boolean result = SettingHelper
                 .getSharedPreferences(getContext(), "is_following_or_fan_list_first_show", true);
@@ -330,5 +346,13 @@ public class SettingUtility {
     public static boolean isFilterSinaAd() {
         return SettingHelper
                 .getSharedPreferences(getContext(), SettingActivity.FILTER_SINA_AD, false);
+    }
+
+    public static String getLastConnectedPrinterAddress() {
+        return SettingHelper.getSharedPreferences(getContext(), "last_printer_address", "");
+    }
+
+    public static void setLastConnectedPrinterAddress(String address) {
+        SettingHelper.setEditor(getContext(), "last_printer_address", address);
     }
 }

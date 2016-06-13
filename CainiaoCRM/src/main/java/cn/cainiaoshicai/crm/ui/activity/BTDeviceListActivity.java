@@ -11,14 +11,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
@@ -31,7 +36,7 @@ public class BTDeviceListActivity extends ListActivity {
 
 	static private android.bluetooth.BluetoothAdapter btAdapter = null;
 
-    private BluetoothItemAdapter<BluetoothPrinters.DeviceStatus> listAdapter;
+    static private BluetoothItemAdapter<BluetoothPrinters.DeviceStatus> listAdapter;
 
 	private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9b66");
 	// UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -40,9 +45,28 @@ public class BTDeviceListActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		this.setContentView(R.layout.settings_print);
+
 		setTitle(R.string.title_bluetooth_setting);
         listAdapter = new BluetoothItemAdapter<>(this, R.layout.listview_btd_list, R.id.text1, R.id.image1);
         setListAdapter(listAdapter);
+
+		Switch toggleHLG = (Switch) findViewById(R.id.togglePrintHLG);
+		Switch toggleYYC = (Switch) findViewById(R.id.togglePrintYYC);
+		toggleHLG.setChecked(SettingUtility.isAutoPrintHLG());
+		toggleYYC.setChecked(SettingUtility.isAutoPrintYYC());
+
+		toggleHLG.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				SettingUtility.setAutoPrintHLG(isChecked);
+			}
+		});
+		toggleYYC.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				SettingUtility.setAutoPrintYYC(isChecked);
+			}
+		});
 
 		try {
 			if (initDevicesList() != 0) {
@@ -57,6 +81,35 @@ public class BTDeviceListActivity extends ListActivity {
 
 		IntentFilter btIntentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		registerReceiver(mBTReceiver, btIntentFilter);
+
+		connectToLastOne();
+	}
+
+	private void connectToLastOne() {
+		String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
+		if (!TextUtils.isEmpty(lastAddress)) {
+			for (int pos = 0; pos < listAdapter.getCount(); pos++) {
+				BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
+				if (lastAddress.equals(item.getAddr())) {
+					connectPrinter(item);
+					break;
+				}
+			}
+		}
+	}
+
+	public static boolean isPrinterConnected() {
+		String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
+		if (!TextUtils.isEmpty(lastAddress) && listAdapter != null) {
+			for (int pos = 0; pos < listAdapter.getCount(); pos++) {
+				BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
+				if (lastAddress.equals(item.getAddr())) {
+					return item.isConnected();
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private void flushData() {
@@ -75,7 +128,6 @@ public class BTDeviceListActivity extends ListActivity {
 		}
 
 	}
-
 
 	private int initDevicesList() {
 
@@ -114,18 +166,19 @@ public class BTDeviceListActivity extends ListActivity {
 
 		switch (reqCode) {
 		case REQUEST_ENABLE_BT:
-
 			if (resultCode == RESULT_OK) {
 				Set<BluetoothDevice> btDeviceList = btAdapter.getBondedDevices();
 				try {
 					if (btDeviceList.size() > 0) {
 						for (BluetoothDevice device : btDeviceList) {
 							BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(device, false);
-							if (this.listAdapter.getPosition(deviceStatus) < 0) {
-								this.listAdapter.add(deviceStatus);
-								this.listAdapter.notifyDataSetInvalidated();
+							if (listAdapter.getPosition(deviceStatus) < 0) {
+								listAdapter.add(deviceStatus);
+								listAdapter.notifyDataSetInvalidated();
 							}
 						}
+
+						connectToLastOne();
 					}
 				} catch (Exception ex) {
 					AppLogger.e("error to enable bluebooth", ex);
@@ -166,6 +219,10 @@ public class BTDeviceListActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, final int position, long id) {
 		super.onListItemClick(l, v, position, id);
 
+		connectPrinter(listAdapter.getItem(position));
+	}
+
+	private void connectPrinter(final BluetoothPrinters.DeviceStatus item) {
 		if (btAdapter == null) {
 			return;
 		}
@@ -175,32 +232,65 @@ public class BTDeviceListActivity extends ListActivity {
 		}
 
 		Toast.makeText(getApplicationContext(),
-				"Connecting to " + listAdapter.getItem(position).getName() + ","
-						+ listAdapter.getItem(position).getAddr(),
+				String.format("Connecting to %s,%s", item.getName(), item.getAddr()),
 				Toast.LENGTH_SHORT).show();
 
 		Thread connectThread = new Thread(new Runnable() {
-
 			@Override
 			public void run() {
-				final BluetoothPrinters.DeviceStatus item = listAdapter.getItem(position);
 				final BluetoothDevice device = item.getDevice();
 				try {
 					final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
 					final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
 					item.resetSocket(socketWrapper);
+					SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
 					AppLogger.e("connect with wrapper: connected");
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(getApplicationContext(),
+									String.format("已连接到 %s", item.getName()),
+									Toast.LENGTH_SHORT).show();
+						}
+					});
 				} catch (IOException ex) {
 					AppLogger.e("exception to connect BT device:" + device.getName(), ex);
 					runOnUiThread(socketErrorRunnable);
 				} finally {
 					runOnUiThread(new Runnable() {
-
 						@Override
 						public void run() {
 							listAdapter.notifyDataSetChanged();
 						}
 					});
+				}
+			}
+		});
+
+		connectThread.start();
+	}
+
+	private static void connectPrinterNoUI(final BluetoothPrinters.DeviceStatus item) {
+		if (btAdapter == null) {
+			return;
+		}
+
+		if (btAdapter.isDiscovering()) {
+			btAdapter.cancelDiscovery();
+		}
+
+		Thread connectThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				final BluetoothDevice device = item.getDevice();
+				try {
+					final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
+					final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+					item.resetSocket(socketWrapper);
+					SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
+					AppLogger.e("connect with wrapper: connected");
+				} catch (IOException ex) {
+					AppLogger.e("exception to connect BT device:" + device.getName(), ex);
 				}
 			}
 		});

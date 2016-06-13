@@ -233,6 +233,7 @@
                 android:layout_marginStart="5dip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:text="未打印"/>
 
             <TextView android:id="@+id/ready_delay_warn"

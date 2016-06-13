@@ -203,10 +203,10 @@ public class OrderAdapter extends BaseAdapter {
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
                     if ((order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
                             || order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_SHIP)) {
-                        if (order.isShowReadyDelay()) {
                             readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
                             readyDelayWarn.setVisibility(View.VISIBLE);
-                        }
+//                        if (order.isShowReadyDelay()) {
+//                        }
                         print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
                         print_times.setVisibility(View.VISIBLE);
                     } else {

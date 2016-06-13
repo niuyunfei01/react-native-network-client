@@ -32,6 +32,8 @@ public class Order {
 
     private int print_times;
 
+    private int store_id;
+
     private List<CartItem> items;
     private String ship_worker_name;
     private int order_times;
@@ -285,6 +287,14 @@ public class Order {
 
     public void incrPrintTimes() {
         this.print_times ++;
+    }
+
+    public int getStore_id() {
+        return store_id;
+    }
+
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
     }
 }
 
