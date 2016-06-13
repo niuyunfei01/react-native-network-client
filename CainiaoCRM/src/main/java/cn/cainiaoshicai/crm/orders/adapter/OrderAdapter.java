@@ -199,16 +199,22 @@ public class OrderAdapter extends BaseAdapter {
                     }
                 } else {
                     if (order.getOrderTime() != null) {
-                        inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime())/(60 * 1000)) + "分钟");
+                        inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime()) / (60 * 1000)) + "分钟");
                     }
 
+                    TextView print_times = (TextView) vi.findViewById(R.id.print_times);
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
                     if ((order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
-                            || order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_SHIP) && order.isShowReadyDelay()) {
-                        readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
-                        readyDelayWarn.setVisibility(View.VISIBLE);
+                            || order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_SHIP)) {
+                        if (order.isShowReadyDelay()) {
+                            readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
+                            readyDelayWarn.setVisibility(View.VISIBLE);
+                        }
+                        print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
+                        print_times.setVisibility(View.VISIBLE);
                     } else {
                         readyDelayWarn.setVisibility(View.GONE);
+                        print_times.setVisibility(View.GONE);
                     }
                 }
             } else {
