@@ -198,10 +198,7 @@ public class OrderAdapter extends BaseAdapter {
                         inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
                     }
                 } else {
-                    if (order.getOrderTime() != null) {
-                        inTimeView.setText("已下单" + ((new Date().getTime() - order.getOrderTime().getTime()) / (60 * 1000)) + "分钟");
-                    }
-
+                    inTimeView.setVisibility(View.GONE);
                     TextView print_times = (TextView) vi.findViewById(R.id.print_times);
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
                     if ((order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
