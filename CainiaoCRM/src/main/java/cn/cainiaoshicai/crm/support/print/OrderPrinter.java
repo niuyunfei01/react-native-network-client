@@ -88,7 +88,7 @@ public class OrderPrinter {
                 }
                 return null;
             }
-        }.executeOnNormal();
+        }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
     }
 
     public OrderPrinter newLine() throws IOException {
