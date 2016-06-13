@@ -16,17 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -108,24 +109,7 @@ public class OrderAdapter extends BaseAdapter {
             phone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:" + order.getMobile()));
-                    Context context = v.getContext();
-                    if (context == null) {
-                        return;
-                    }
-                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        Toast.makeText(context, "没有呼叫权限", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    context.startActivity(callIntent);
+                    callMobilePhone(v, order.getMobile());
                 }
             });
             genderText.setText(order.getGenderText());
@@ -151,13 +135,16 @@ public class OrderAdapter extends BaseAdapter {
 
             if (order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
+                ShipWorkerOnClickListener shipWorkerClicked = new ShipWorkerOnClickListener(order);
 
                 TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
                 if (!TextUtils.isEmpty(order.getShip_worker_name())) {
                     workerText.setText(order.getShip_worker_name());
+                    workerText.setOnClickListener(shipWorkerClicked);
                 } else {
                     workerText.setVisibility(View.GONE);
-                    vi.findViewById(R.id.start_ship_text).setVisibility(View.GONE);
+                    View shipTextView = vi.findViewById(R.id.start_ship_text);
+                    shipTextView.setVisibility(View.GONE);
                 }
 
                 TextView packTime = (TextView) vi.findViewById(R.id.start_ship_time);
@@ -166,11 +153,18 @@ public class OrderAdapter extends BaseAdapter {
                 } else {
                     packTime.setVisibility(View.GONE);
                 }
+                packTime.setOnClickListener(shipWorkerClicked);
 
                 TextView shipTimeText = (TextView) vi.findViewById(R.id.ship_time_text);
                 TextView text_ship_start = (TextView) vi.findViewById(R.id.text_ship_start);
                 TextView text_ship_end = (TextView) vi.findViewById(R.id.text_ship_end);
                 TextView shipTimeCost = (TextView) vi.findViewById(R.id.ship_time_cost);
+
+                shipTimeCost.setOnClickListener(shipWorkerClicked);
+                text_ship_start.setOnClickListener(shipWorkerClicked);
+                text_ship_end.setOnClickListener(shipWorkerClicked);
+                shipTimeCost.setOnClickListener(shipWorkerClicked);
+
                 if (order.getTime_arrived() != null && order.getTime_start_ship() != null) {
                     shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
                     int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) /(60 * 1000));
@@ -203,10 +197,16 @@ public class OrderAdapter extends BaseAdapter {
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
                     if ((order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
                             || order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_SHIP)) {
-                            readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
-                            readyDelayWarn.setVisibility(View.VISIBLE);
-//                        if (order.isShowReadyDelay()) {
+                        int leftMin = order.getReadyLeftMin();
+                        if (leftMin < 10) {
+                            readyDelayWarn.setBackground(ContextCompat.getDrawable(activity, R.drawable.list_text_border_red));
+                            readyDelayWarn.setTextColor(ContextCompat.getColor(activity, R.color.red));
+                        }
+//                        else if (leftMin < 30) {
+//                            readyDelayWarn.setBackground(ContextCompat.getDrawable(activity, R.drawable.list_text_border_green));
 //                        }
+                        readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
+                        readyDelayWarn.setVisibility(View.VISIBLE);
                         print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
                         print_times.setVisibility(View.VISIBLE);
                     } else {
@@ -393,6 +393,48 @@ public class OrderAdapter extends BaseAdapter {
         */
 
         return vi;
+    }
+
+    private void callMobilePhone(View v, String mobile) {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel:" + mobile));
+        Context context = v.getContext();
+        if (context == null) {
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(context, "没有呼叫权限", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        context.startActivity(callIntent);
+    }
+
+    private class ShipWorkerOnClickListener implements View.OnClickListener {
+        private final Order order;
+
+        public ShipWorkerOnClickListener(Order order) {
+            this.order = order;
+        }
+
+        @Override
+        public void onClick(View v) {
+            HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
+            if (workers != null) {
+                CommonConfigDao.Worker worker = workers.get(order.getShip_worker_id());
+                if (worker != null) {
+                    callMobilePhone(v, worker.getMobilephone());
+                    return;
+                }
+            }
+            Toast.makeText(activity, "未找到配送员电话", Toast.LENGTH_LONG).show();
+        }
     }
 
 //    private long spentInMilliSeconds(Order order) {

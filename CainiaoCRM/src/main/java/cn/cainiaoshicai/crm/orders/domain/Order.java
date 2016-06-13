@@ -36,6 +36,7 @@ public class Order {
 
     private List<CartItem> items;
     private String ship_worker_name;
+    private int ship_worker_id;
     private int order_times;
     private int paid_done;
     private boolean showReadyDelay;
@@ -295,6 +296,14 @@ public class Order {
 
     public void setStore_id(int store_id) {
         this.store_id = store_id;
+    }
+
+    public int getShip_worker_id() {
+        return ship_worker_id;
+    }
+
+    public void setShip_worker_id(int ship_worker_id) {
+        this.ship_worker_id = ship_worker_id;
     }
 }
 
