@@ -79,6 +79,7 @@ public class OrderListFragment extends Fragment {
                 openOrder.putExtra("id", item.getId());
                 openOrder.putExtra("order_status", item.getOrderStatus());
                 openOrder.putExtra("ship_worker_name", item.getShip_worker_name());
+                openOrder.putExtra("print_times", item.getPrint_times());
                 boolean isDelay = false;
                 if (item.getExpectTime() != null) {
                     if (item.getTime_arrived() != null) {

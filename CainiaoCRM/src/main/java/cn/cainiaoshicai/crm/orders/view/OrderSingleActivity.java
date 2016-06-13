@@ -93,6 +93,8 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
         final boolean isDelay = intent.getBooleanExtra("is_delay", false);
         printButton = (Button) findViewById(R.id.button1);
+        int printTimes = intent.getIntExtra("print_times", 0);
+        this.showPrintTimes(printTimes);
 
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,6 +228,10 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         }
     }
 
+    public void showPrintTimes(int print_times) {
+        printButton.setText(getString(R.string.menu_print) + (print_times > 0 ? String.format("(%d)", print_times) : ""));
+    }
+
     protected void connect(final int platform, final String platformOid) {
         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
         if(ds == null || ds.getSocket() == null){
@@ -285,7 +291,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                         @Override
                         public void run() {
                             if (printButton != null) {
-                                printButton.setText(getString(R.string.menu_print) + String.format("(%d)", order.getPrint_times()));
+                                showPrintTimes(order.getPrint_times());
                             } else {
                                 AppLogger.w("printButton is null");
                             }
