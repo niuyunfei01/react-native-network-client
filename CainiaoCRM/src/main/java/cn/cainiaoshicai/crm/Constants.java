@@ -12,7 +12,7 @@ public class Constants {
 
     public static final int STORE_HLG = 1;
     public static final int STORE_YYC = 2;
-    public static final int STORE_UNKNOWN = 0;
+    public static final int STORE_UNKNOWN = -1;
 
     public static final int MAX_EXCELL_SPENT_TIME = 50;
 
