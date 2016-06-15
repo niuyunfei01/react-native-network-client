@@ -66,7 +66,7 @@ public class OrderPrinter {
 
                 boolean result = false;
                 String reason = "";
-                if (order.getPrint_times() == 0 || !isAutoPrint) {
+                if (!isAutoPrint || (order.shouldTryAutoPrint()) ) {
 
                     if (isAutoPrint && !GlobalCtx.isAutoPrint(order.getStore_id())) {
                             AppLogger.e("[print] auto print failed for store");

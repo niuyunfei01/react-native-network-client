@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.support.print.Constant;
+
 public class Order {
 
     private int id;
@@ -309,6 +312,11 @@ public class Order {
 
     public int getSimplifiedId() {
         return getId()%1000;
+    }
+
+    public boolean shouldTryAutoPrint() {
+        return (this.store_id == Constants.STORE_UNKNOWN && print_times <= 2)
+                || this.print_times < 1;
     }
 }
 

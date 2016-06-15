@@ -200,7 +200,7 @@ public class OrderListFragment extends Fragment {
                 getAdapter().notifyDataSetChanged();
 
                 for(final Order order: value.getOrders()) {
-                    if (order.getPrint_times() < 1
+                    if (order.shouldTryAutoPrint()
                             && order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
                             && GlobalCtx.isAutoPrint(order.getStore_id())) {
                        OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new OrderPrinter.PrintCallback() {
