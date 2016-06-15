@@ -41,12 +41,41 @@ public class NotificationReceiver extends BroadcastReceiver {
 	public static SoundPool soundPool;
 	public static int newOrderSound;
 	public static int readyDelayWarnSound;
+	public static int storeSoundUnknown;
+	public static int storeSoundhlg;
+	public static int storeSoundYyc;
+	public static int notPrintSound;
+	public static int syncNotWorkSound;
+	public static int shipDelayWarn;
+	public static int number1Sound;
+	public static int number2Sound;
+	public static int number3Sound;
+	public static int number4Sound;
+	public static int number5Sound;
+	public static int number6Sound;
+	public static int number7Sound;
+	public static int number8Sound;
+	public static int number9Sound;
+
+	private static volatile boolean soundLoaded = false;
+
 	private static final String TAG = GlobalCtx.ORDERS_TAG;
 
 	public NotificationReceiver() {
 		soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
 		newOrderSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.new_order_sound, 1);
 		readyDelayWarnSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
+		storeSoundUnknown = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.store_unknown, 1);
+		storeSoundYyc = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.store_yyc, 1);
+		storeSoundhlg = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.store_hlg, 1);
+		notPrintSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.new_order_not_print, 1);
+		syncNotWorkSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.sync_not_work, 1);
+		soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+			@Override
+			public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+				soundLoaded = true;
+			}
+		});
 	}
 
 	@Override
@@ -67,30 +96,18 @@ public class NotificationReceiver extends BroadcastReceiver {
             int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
             Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
 
-            Notify notify = getNotifyFromBundle(bundle);
+            final Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null) {
 				if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notifactionId);
-					soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-						@Override
-						public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-							NotificationReceiver.soundPool.play(newOrderSound, 100.0f, 100.0f, 1, 0, 1.0f);
-						}
-					});
-
+					play_double_sound(getStoreSound(notify.getStore_id()), newOrderSound);
 					OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
-
 				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
-					soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-						@Override
-						public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-							NotificationReceiver.soundPool.play(readyDelayWarnSound, 100.0f, 100.0f, 1, 0, 1.0f);
-						}
-					});
+					play_double_sound(getStoreSound(notify.getStore_id()), readyDelayWarnSound);
+				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
+					soundPool.play(syncNotWorkSound, 1.0f, 1.0f, 1, 0, 1.0f);
 				}
 			}
-
-
 
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
@@ -109,13 +126,16 @@ public class NotificationReceiver extends BroadcastReceiver {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 //					i.setAction(Intent.ACTION_SEARCH);
 //					i.putExtra(SearchManager.QUERY, "ready_delayed:");
-				} else {
+				} else if(Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())){
+					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
+				}else {
 					i = new Intent(context, RemindersActivity.class);
 				}
 				i.putExtras(bundle);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
 				context.startActivity(i);
 			} else {
+				AppLogger.e("error to get notify from bundle!");
 			}
         } else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
@@ -127,6 +147,30 @@ public class NotificationReceiver extends BroadcastReceiver {
         } else {
         	Log.d(TAG, "[NotificationReceiver] Unhandled intent - " + intent.getAction());
         }
+	}
+
+	private void play_double_sound(int storeSound, int sufffixSound) {
+		if (soundLoaded) {
+            soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            soundPool.play(sufffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+        } else {
+			AppLogger.e("no sound");
+		}
+	}
+
+	private int getStoreSound(int store_id) {
+		if (store_id == Constants.STORE_HLG) {
+			return storeSoundhlg;
+		} else if (store_id == Constants.STORE_YYC) {
+			return storeSoundYyc;
+		} else {
+			return storeSoundUnknown;
+		}
 	}
 
 	@Nullable
@@ -183,7 +227,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 						msgIntent.putExtra(MainActivity.KEY_EXTRAS, extras);
 					}
 				} catch (JSONException e) {
-
+					AppLogger.e("[processCustomMessage] json error:", e);
 				}
 
 			}
@@ -196,6 +240,7 @@ class Notify {
 	private String type;
 	private int platform;
 	private String platform_oid;
+	private int store_id;
 
 	public String getType() {
 		return type;
@@ -227,6 +272,15 @@ class Notify {
 				"type='" + type + '\'' +
 				", platform=" + platform +
 				", platform_oid='" + platform_oid + '\'' +
+				", store_id='" + store_id + '\'' +
 				'}';
+	}
+
+	public int getStore_id() {
+		return store_id;
+	}
+
+	public void setStore_id(int store_id) {
+		this.store_id = store_id;
 	}
 }
