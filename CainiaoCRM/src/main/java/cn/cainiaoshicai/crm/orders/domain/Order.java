@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class Order {
 
     private int store_id;
 
-    private List<CartItem> items;
+    private List<CartItem> items = new ArrayList<>();
     private String ship_worker_name;
     private int ship_worker_id;
     private int order_times;
@@ -304,6 +305,10 @@ public class Order {
 
     public void setShip_worker_id(int ship_worker_id) {
         this.ship_worker_id = ship_worker_id;
+    }
+
+    public int getSimplifiedId() {
+        return getId()%1000;
     }
 }
 

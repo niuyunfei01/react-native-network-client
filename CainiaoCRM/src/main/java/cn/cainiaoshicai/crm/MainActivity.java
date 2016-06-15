@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -86,8 +87,6 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
 
         setContentView(R.layout.order_list_main);
 
-        resetPrinterStatusBar();
-
         // Set the Action Bar to use tabs for navigation
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(false);
@@ -102,16 +101,25 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         handleIntent(ab, intent);
-
     }
 
-    private void resetPrinterStatusBar() {
+    private void resetPrinterStatusBar(boolean show) {
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
-        if ((SettingUtility.isAutoPrintYYC() || SettingUtility.isAutoPrintHLG())
-                && !BTDeviceListActivity.isPrinterConnected()) {
+        if (show && (SettingUtility.isAutoPrintYYC() || SettingUtility.isAutoPrintHLG())) {
             String storeDesc = SettingUtility.isAutoPrintHLG() ? "回龙观店" : "";
             storeDesc += SettingUtility.isAutoPrintYYC() ? (("".equals(storeDesc) ? "" : ", ") + "亚运村店") : "";
-            printerStatus.setText("已设自动打印(" + storeDesc + ")，点此连接打印机！");
+
+            final String printStatusTxt;
+            final int bgColorResId;
+            if (BTDeviceListActivity.isPrinterConnected()) {
+                printStatusTxt = "已设自动打印(" + storeDesc + ")，打印机已就绪！";
+                bgColorResId = R.color.green;
+            } else {
+                printStatusTxt = "已设自动打印(" + storeDesc + ")，点此连接打印机！";
+                bgColorResId = R.color.red;
+            }
+            printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
+            printerStatus.setText(printStatusTxt);
             printerStatus.setVisibility(View.VISIBLE);
             printerStatus.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -142,6 +150,8 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             this.onDayAndTypeChanged(null, query);
+        } else {
+            this.resetPrinterStatusBar(true);
         }
     }
 
@@ -188,7 +198,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
         }
 
-        this.resetPrinterStatusBar();
+        this.resetPrinterStatusBar(ListType.WAITING_READY.equals(listType));
 
         FragmentManager fm = getFragmentManager();
         Integer fragmentId = fragmentMap.get(listType.getValue());

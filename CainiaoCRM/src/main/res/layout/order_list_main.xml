@@ -20,7 +20,6 @@
     <TextView
         android:id="@+id/head_status_printer"
         android:textColor="@color/white"
-        android:background="@color/red"
         android:visibility="gone"
         android:gravity="center"
         android:layout_width="match_parent"
