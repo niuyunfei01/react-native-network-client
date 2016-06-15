@@ -177,6 +177,13 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        this.resetPrinterStatusBar(ListType.WAITING_READY.equals(getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition())));
+    }
+
     @NonNull
     private ListType getListTypeByTab(int position) {
         ListType listType = ListType.NONE;
