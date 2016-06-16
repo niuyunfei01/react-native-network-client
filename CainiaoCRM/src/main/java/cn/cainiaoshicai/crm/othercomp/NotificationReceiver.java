@@ -3,8 +3,6 @@ package cn.cainiaoshicai.crm.othercomp;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -23,7 +21,6 @@ import java.util.Iterator;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
@@ -59,10 +56,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
             Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
 
-            final Notify notify = getNotifyFromBundle(bundle);
+			final Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null) {
 
-					GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
+				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
 				if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notifactionId);
 					soundManager.play_new_order_sound(notify.getStore_id());

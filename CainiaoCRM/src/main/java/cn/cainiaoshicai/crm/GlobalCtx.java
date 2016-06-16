@@ -232,8 +232,6 @@ public class GlobalCtx extends Application {
         return application;
     }
 
-
-
     public void setAccountBean(final AccountBean accountBean) {
         this.accountBean = accountBean;
     }
@@ -363,7 +361,7 @@ public class GlobalCtx extends Application {
         private volatile boolean soundLoaded = false;
 
         public void load(GlobalCtx ctx) {
-            soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+            soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
             newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
 
             //readyDelayWarnSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
@@ -394,15 +392,17 @@ public class GlobalCtx extends Application {
             });
         }
 
-        private boolean play_double_sound(int firstSound, int sufffixSound) {
+        private boolean play_double_sound(final int firstSound, final int suffixSound) {
             if (soundLoaded) {
-                soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                soundPool.play(sufffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                new MyAsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        pause(1000);
+                        soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        return null;
+                    }
+                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
                 return true;
             } else {
                 AppLogger.e("no sound");
@@ -410,25 +410,32 @@ public class GlobalCtx extends Application {
             }
         }
 
-        private boolean play_three_sound(int storeSound, int numberSound, int sufffixSound) {
+        private boolean play_three_sound(final int storeSound, final int numberSound, final int suffixSound) {
             if (soundLoaded) {
-                soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                soundPool.play(numberSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                soundPool.play(sufffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                new MyAsyncTask<Void, Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        pause(1500);
+                        soundPool.play(numberSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        pause(1000);
+                        soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        pause(4000);
+                        return null;
+                    }
+                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);;
                 return true;
             } else {
                 AppLogger.e("no sound");
                 return false;
+            }
+        }
+
+        private void pause(int time) {
+            try {
+                Thread.sleep(time);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
@@ -452,7 +459,13 @@ public class GlobalCtx extends Application {
 
         public boolean play_sync_not_work_sound() {
             if (soundLoaded) {
-                soundPool.play(syncNotWorkSound, 1.0f, 1.0f, 1, 0, 1.0f);
+                new MyAsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        soundPool.play(syncNotWorkSound, 1.0f, 1.0f, 1, 0, 1.0f);
+                        return null;
+                    }
+                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
                 return true;
             } else {
                 AppLogger.e("no sound");
