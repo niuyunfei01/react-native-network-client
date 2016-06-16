@@ -20,6 +20,7 @@ import android.view.Display;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,14 +32,12 @@ import cn.cainiaoshicai.crm.orders.domain.User;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.service.StatusService;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.jpush.android.api.JPushInterface;
 
 public class GlobalCtx extends Application {
@@ -355,7 +354,7 @@ public class GlobalCtx extends Application {
         private int storeSoundUnknown;
         private int storeSoundhlg;
         private int storeSoundYyc;
-        private int notPrintSound;
+        private int seriousTimeoutSound;
         private int syncNotWorkSound;
         private int[] numberSound = new int[10];
         private volatile boolean soundLoaded = false;
@@ -370,7 +369,7 @@ public class GlobalCtx extends Application {
             storeSoundUnknown = soundPool.load(ctx, R.raw.store_unknown, 1);
             storeSoundYyc = soundPool.load(ctx, R.raw.store_yyc, 1);
             storeSoundhlg = soundPool.load(ctx, R.raw.store_hlg, 1);
-            notPrintSound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
+            seriousTimeoutSound = soundPool.load(ctx, R.raw.serious_timeout, 1);
             syncNotWorkSound = soundPool.load(ctx, R.raw.sync_not_work, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
@@ -469,6 +468,38 @@ public class GlobalCtx extends Application {
                 return true;
             } else {
                 AppLogger.e("no sound");
+                return false;
+            }
+        }
+
+        public boolean play_serious_timeout(Set<Integer> notifyWorkers) {
+            if (soundLoaded) {
+                boolean shouldWarn = false;
+                if (notifyWorkers != null && !notifyWorkers.isEmpty()) {
+                    AccountBean accountBean = GlobalCtx.getInstance().getAccountBean();
+                    if (accountBean != null) {
+                        int currUid = Integer.parseInt(accountBean.getUid());
+                        if (notifyWorkers.contains(currUid)) {
+                            shouldWarn = true;
+                        }
+                    }
+                }
+
+                if (shouldWarn) {
+                    new MyAsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            soundPool.play(seriousTimeoutSound, 1.0f, 1.0f, 1, 0, 1.0f);
+                            return null;
+                        }
+                    }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
+                    return true;
+                } else {
+                    AppLogger.e("error: not notify worker_id");
+                    return  false;
+                }
+            } else {
+                AppLogger.e("error: no sound!");
                 return false;
             }
         }

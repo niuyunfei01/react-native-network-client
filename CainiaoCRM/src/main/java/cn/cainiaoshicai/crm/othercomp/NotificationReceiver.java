@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -40,21 +41,21 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-        Bundle bundle = intent.getExtras();
+		Bundle bundle = intent.getExtras();
 		Log.d(TAG, "[NotificationReceiver] onReceive - " + intent.getAction() + ", extras: " + printBundle(bundle));
-        if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
-            String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
-            Log.d(TAG, "[NotificationReceiver] 接收Registration Id : " + regId);
-            //send the Registration Id to your server...
-                        
-        } else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
-        	Log.d(TAG, "[NotificationReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
-        	processCustomMessage(context, bundle);
-        
-        } else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
-            Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知");
-            int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
-            Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
+		if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
+			String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
+			Log.d(TAG, "[NotificationReceiver] 接收Registration Id : " + regId);
+			//send the Registration Id to your server...
+
+		} else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
+			Log.d(TAG, "[NotificationReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
+			processCustomMessage(context, bundle);
+
+		} else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
+			Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知");
+			int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
+			Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
 
 			final Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null) {
@@ -70,18 +71,19 @@ public class NotificationReceiver extends BroadcastReceiver {
 						totalLate = 10;
 					}
 					soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
-
 				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
 					soundManager.play_sync_not_work_sound();
+				} else if (Constants.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
+					soundManager.play_serious_timeout(notify.getNotify_workers());
 				}
 			}
 
-        } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
-            Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
+		} else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
+			Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
 
-            GlobalCtx.clearNewOrderNotifies(context);
+			GlobalCtx.clearNewOrderNotifies(context);
 
-        	final Intent i;
+			final Intent i;
 			Notify notify = getNotifyFromBundle(bundle);
 
 			AppLogger.w("open notify:" + notify);
@@ -93,27 +95,27 @@ public class NotificationReceiver extends BroadcastReceiver {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 //					i.setAction(Intent.ACTION_SEARCH);
 //					i.putExtra(SearchManager.QUERY, "ready_delayed:");
-				} else if(Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())){
+				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
-				}else {
+				} else {
 					i = new Intent(context, RemindersActivity.class);
 				}
 				i.putExtras(bundle);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP );
+				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				context.startActivity(i);
 			} else {
 				AppLogger.e("error to get notify from bundle!");
 			}
-        } else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
-            Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
-            //在这里根据 JPushInterface.EXTRA_EXTRA 的内容处理代码，比如打开新的Activity， 打开一个网页等..
-        	
-        } else if(JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
-        	boolean connected = intent.getBooleanExtra(JPushInterface.EXTRA_CONNECTION_CHANGE, false);
-        	Log.w(TAG, "[NotificationReceiver]" + intent.getAction() +" connected state change to "+connected);
-        } else {
-        	Log.d(TAG, "[NotificationReceiver] Unhandled intent - " + intent.getAction());
-        }
+		} else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
+			Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
+			//在这里根据 JPushInterface.EXTRA_EXTRA 的内容处理代码，比如打开新的Activity， 打开一个网页等..
+
+		} else if (JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
+			boolean connected = intent.getBooleanExtra(JPushInterface.EXTRA_CONNECTION_CHANGE, false);
+			Log.w(TAG, "[NotificationReceiver]" + intent.getAction() + " connected state change to " + connected);
+		} else {
+			Log.d(TAG, "[NotificationReceiver] Unhandled intent - " + intent.getAction());
+		}
 	}
 
 	@Nullable
@@ -185,6 +187,7 @@ class Notify {
 	private String platform_oid;
 	private int store_id;
 	private int total_late;
+	private Set<Integer> notify_workers;
 
 	public String getType() {
 		return type;
@@ -234,5 +237,13 @@ class Notify {
 
 	public void setTotal_late(int total_late) {
 		this.total_late = total_late;
+	}
+
+	public Set<Integer> getNotify_workers() {
+		return notify_workers;
+	}
+
+	public void setNotify_workers(Set<Integer> notify_workers) {
+		this.notify_workers = notify_workers;
 	}
 }
