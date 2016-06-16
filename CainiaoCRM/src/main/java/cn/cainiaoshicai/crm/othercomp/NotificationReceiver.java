@@ -38,45 +38,8 @@ import cn.jpush.android.api.JPushInterface;
  * 2) 接收不到自定义消息
  */
 public class NotificationReceiver extends BroadcastReceiver {
-	public static SoundPool soundPool;
-	public static int newOrderSound;
-	public static int readyDelayWarnSound;
-	public static int storeSoundUnknown;
-	public static int storeSoundhlg;
-	public static int storeSoundYyc;
-	public static int notPrintSound;
-	public static int syncNotWorkSound;
-	public static int shipDelayWarn;
-	public static int number1Sound;
-	public static int number2Sound;
-	public static int number3Sound;
-	public static int number4Sound;
-	public static int number5Sound;
-	public static int number6Sound;
-	public static int number7Sound;
-	public static int number8Sound;
-	public static int number9Sound;
-
-	private static volatile boolean soundLoaded = false;
 
 	private static final String TAG = GlobalCtx.ORDERS_TAG;
-
-	public NotificationReceiver() {
-		soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
-		newOrderSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.new_order_sound, 1);
-		readyDelayWarnSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
-		storeSoundUnknown = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.store_unknown, 1);
-		storeSoundYyc = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.store_yyc, 1);
-		storeSoundhlg = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.store_hlg, 1);
-		notPrintSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.new_order_not_print, 1);
-		syncNotWorkSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.sync_not_work, 1);
-		soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-			@Override
-			public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-				soundLoaded = true;
-			}
-		});
-	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -98,14 +61,21 @@ public class NotificationReceiver extends BroadcastReceiver {
 
             final Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null) {
+
+					GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
 				if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notifactionId);
-					play_double_sound(getStoreSound(notify.getStore_id()), newOrderSound);
+					soundManager.play_new_order_sound(notify.getStore_id());
 					OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
 				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
-					play_double_sound(getStoreSound(notify.getStore_id()), readyDelayWarnSound);
+					int totalLate = notify.getTotal_late();
+					if (totalLate > 10) {
+						totalLate = 10;
+					}
+					soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
+
 				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
-					soundPool.play(syncNotWorkSound, 1.0f, 1.0f, 1, 0, 1.0f);
+					soundManager.play_sync_not_work_sound();
 				}
 			}
 
@@ -147,30 +117,6 @@ public class NotificationReceiver extends BroadcastReceiver {
         } else {
         	Log.d(TAG, "[NotificationReceiver] Unhandled intent - " + intent.getAction());
         }
-	}
-
-	private void play_double_sound(int storeSound, int sufffixSound) {
-		if (soundLoaded) {
-            soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            soundPool.play(sufffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
-        } else {
-			AppLogger.e("no sound");
-		}
-	}
-
-	private int getStoreSound(int store_id) {
-		if (store_id == Constants.STORE_HLG) {
-			return storeSoundhlg;
-		} else if (store_id == Constants.STORE_YYC) {
-			return storeSoundYyc;
-		} else {
-			return storeSoundUnknown;
-		}
 	}
 
 	@Nullable
@@ -241,6 +187,7 @@ class Notify {
 	private int platform;
 	private String platform_oid;
 	private int store_id;
+	private int total_late;
 
 	public String getType() {
 		return type;
@@ -282,5 +229,13 @@ class Notify {
 
 	public void setStore_id(int store_id) {
 		this.store_id = store_id;
+	}
+
+	public int getTotal_late() {
+		return total_late;
+	}
+
+	public void setTotal_late(int total_late) {
+		this.total_late = total_late;
 	}
 }

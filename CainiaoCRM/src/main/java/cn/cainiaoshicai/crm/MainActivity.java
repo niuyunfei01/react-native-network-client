@@ -49,7 +49,8 @@ import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 
 public class MainActivity extends AbstractActionBarActivity implements ActionBar.TabListener {
 
-    private static final List<ListType> TAB_LIST_TYPES = Arrays.asList(ListType.WAITING_READY, ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
+    private static final List<ListType> TAB_LIST_TYPES = Arrays.asList(ListType.WAITING_READY,
+            ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
     private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
     public static final int REQUEST_DAY = 1;
     public static final int REQUEST_INFO = 1;

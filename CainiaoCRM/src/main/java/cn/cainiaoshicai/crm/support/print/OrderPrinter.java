@@ -59,6 +59,12 @@ public class OrderPrinter {
      * @param printedCallback
      */
     private static void _print(final Order order, final boolean isAutoPrint, final PrintCallback printedCallback) {
+
+        if (order == null || order.getId() <=0 ) {
+            AppLogger.e("order is null, skip print!");
+            return;
+        }
+
         final String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
         new MyAsyncTask<Void, Order, Boolean>() {
             @Override

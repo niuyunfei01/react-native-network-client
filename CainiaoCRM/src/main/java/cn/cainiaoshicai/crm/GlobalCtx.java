@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -72,6 +74,7 @@ public class GlobalCtx extends Application {
 
     public boolean tokenExpiredDialogIsShowing = false;
     private AccountBean accountBean;
+    private SoundManager soundManager;
 
     public GlobalCtx() {
         this.statusService=new StatusService();
@@ -169,6 +172,9 @@ public class GlobalCtx extends Application {
         application = this;
 
         initConfigs();
+
+        this.soundManager = new SoundManager();
+        this.soundManager.load(this);
     }
 
     public void initAfterLogin() {
@@ -339,4 +345,120 @@ public class GlobalCtx extends Application {
                 || (SettingUtility.isAutoPrintHLG() && store_id == Constants.STORE_HLG)
                 || (SettingUtility.isAutoPrintYYC() && store_id == Constants.STORE_YYC);
     }
+
+    public SoundManager getSoundManager() {
+        return soundManager;
+    }
+
+    public static class SoundManager {
+        private SoundPool soundPool;
+        private int newOrderSound;
+        private int readyDelayWarnSound;
+        private int storeSoundUnknown;
+        private int storeSoundhlg;
+        private int storeSoundYyc;
+        private int notPrintSound;
+        private int syncNotWorkSound;
+        private int[] numberSound = new int[10];
+        private volatile boolean soundLoaded = false;
+
+        public void load(GlobalCtx ctx) {
+            soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+            newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
+
+            //readyDelayWarnSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
+            readyDelayWarnSound = soundPool.load(ctx, R.raw.should_be_ready, 1);
+
+            storeSoundUnknown = soundPool.load(ctx, R.raw.store_unknown, 1);
+            storeSoundYyc = soundPool.load(ctx, R.raw.store_yyc, 1);
+            storeSoundhlg = soundPool.load(ctx, R.raw.store_hlg, 1);
+            notPrintSound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
+            syncNotWorkSound = soundPool.load(ctx, R.raw.sync_not_work, 1);
+
+            numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
+            numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
+            numberSound[2] = soundPool.load(ctx, R.raw.n3, 1);
+            numberSound[3] = soundPool.load(ctx, R.raw.n4, 1);
+            numberSound[4] = soundPool.load(ctx, R.raw.n5, 1);
+            numberSound[5] = soundPool.load(ctx, R.raw.n6, 1);
+            numberSound[6] = soundPool.load(ctx, R.raw.n7, 1);
+            numberSound[7] = soundPool.load(ctx, R.raw.n8, 1);
+            numberSound[8] = soundPool.load(ctx, R.raw.n9, 1);
+            numberSound[9] = soundPool.load(ctx, R.raw.n10, 1);
+
+            soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+                @Override
+                public void onLoadComplete(SoundPool soundPool	, int sampleId, int status) {
+                    soundLoaded = true;
+                }
+            });
+        }
+
+        private boolean play_double_sound(int firstSound, int sufffixSound) {
+            if (soundLoaded) {
+                soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                soundPool.play(sufffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                return true;
+            } else {
+                AppLogger.e("no sound");
+                return false;
+            }
+        }
+
+        private boolean play_three_sound(int storeSound, int numberSound, int sufffixSound) {
+            if (soundLoaded) {
+                soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                soundPool.play(numberSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                soundPool.play(sufffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                return true;
+            } else {
+                AppLogger.e("no sound");
+                return false;
+            }
+        }
+
+        private int getStoreSound(int store_id) {
+            if (store_id == Constants.STORE_HLG) {
+                return storeSoundhlg;
+            } else if (store_id == Constants.STORE_YYC) {
+                return storeSoundYyc;
+            } else {
+                return storeSoundUnknown;
+            }
+        }
+
+        public boolean play_new_order_sound(int store_id) {
+            return this.play_double_sound(getStoreSound(store_id), newOrderSound);
+        }
+
+        public boolean play_will_ready_timeout(int store_id, int totalLate) {
+            return this.play_three_sound(getStoreSound(store_id), numberSound[totalLate - 1], readyDelayWarnSound);
+        }
+
+        public boolean play_sync_not_work_sound() {
+            if (soundLoaded) {
+                soundPool.play(syncNotWorkSound, 1.0f, 1.0f, 1, 0, 1.0f);
+                return true;
+            } else {
+                AppLogger.e("no sound");
+                return false;
+            }
+        }
+    }
 }
+
