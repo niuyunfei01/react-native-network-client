@@ -54,15 +54,15 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 		} else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
 			Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知");
-			int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
-			Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notifactionId);
+			int notificationId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
+			Log.d(TAG, "[NotificationReceiver] 接收到推送下来的通知的ID: " + notificationId);
 
 			final Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null) {
 
 				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
 				if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
-					GlobalCtx.newOrderNotifies.add(notifactionId);
+					GlobalCtx.newOrderNotifies.add(notificationId);
 					soundManager.play_new_order_sound(notify.getStore_id());
 					OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
 				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {

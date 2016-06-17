@@ -30,6 +30,11 @@ public class OrderPrinter {
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final PrintCallback printedCallback) {
+        BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+        if (printer == null || !printer.isConnected()) {
+            AppLogger.e("skip to print for printer is not connected!");
+            return;
+        }
 
         new MyAsyncTask<Void, Void, Void>() {
 
@@ -79,7 +84,7 @@ public class OrderPrinter {
                         reason = "此订单不在您设置的自动打印店面中！";
                     } else {
                         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-                        if (ds != null && ds.getSocket() != null) {
+                        if (ds != null && ds.getSocket() != null && ds.isConnected()) {
                             try {
                                 OrderSingleActivity.printOrder(ds.getSocket(), order);
                                 try {
