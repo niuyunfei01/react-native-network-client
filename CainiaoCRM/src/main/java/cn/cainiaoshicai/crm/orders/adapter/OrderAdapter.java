@@ -205,7 +205,7 @@ public class OrderAdapter extends BaseAdapter {
 //                        else if (leftMin < 30) {
 //                            readyDelayWarn.setBackground(ContextCompat.getDrawable(activity, R.drawable.list_text_border_green));
 //                        }
-                        readyDelayWarn.setText(order.getReadyLeftMin() > 0 ? order.getReadyLeftMin() + "分后出库延误" : "出库已延误");
+                        readyDelayWarn.setText(leftMin > 0 ? leftMin + "分后出库延误" : "已延误" + Math.abs(leftMin) + "分钟");
                         readyDelayWarn.setVisibility(View.VISIBLE);
                         print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
                         print_times.setVisibility(View.VISIBLE);

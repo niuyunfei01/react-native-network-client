@@ -348,6 +348,8 @@ public class GlobalCtx extends Application {
     }
 
     public static class SoundManager {
+        private static final int STORE_SOUND_LEN = 1700;
+        private static final int NUMBER_SOUND_LENGTH = 1000;
         private SoundPool soundPool;
         private int newOrderSound;
         private int readyDelayWarnSound;
@@ -397,7 +399,7 @@ public class GlobalCtx extends Application {
                     @Override
                     protected Void doInBackground(Void... params) {
                         soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(1500);
+                        pause(STORE_SOUND_LEN);
                         soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
                         return null;
                     }
@@ -415,9 +417,9 @@ public class GlobalCtx extends Application {
                     @Override
                     protected Void doInBackground(Void... params) {
                         soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(1500);
+                        pause(STORE_SOUND_LEN);
                         soundPool.play(numberSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(1000);
+                        pause(NUMBER_SOUND_LENGTH);
                         soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
                         pause(4000);
                         return null;
