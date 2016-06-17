@@ -397,7 +397,7 @@ public class GlobalCtx extends Application {
                     @Override
                     protected Void doInBackground(Void... params) {
                         soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
-                        pause(1000);
+                        pause(1500);
                         soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
                         return null;
                     }
