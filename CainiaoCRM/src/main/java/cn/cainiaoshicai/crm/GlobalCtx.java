@@ -362,7 +362,7 @@ public class GlobalCtx extends Application {
         private volatile boolean soundLoaded = false;
 
         public void load(GlobalCtx ctx) {
-            soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+            soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
             newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
 
             //readyDelayWarnSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
