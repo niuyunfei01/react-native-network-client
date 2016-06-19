@@ -1,13 +1,19 @@
 package cn.cainiaoshicai.crm.support.print;
 
+import android.text.TextUtils;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -17,6 +23,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
  */
 public class OrderPrinter {
     private static final String GBK = "gbk";
+    private static final int MAX_TITLE_PART = 16;
     private final OutputStream btos;
     private byte[] newLine = "\n".getBytes();
     private final byte[] starLine = "********************************".getBytes();
@@ -86,7 +93,7 @@ public class OrderPrinter {
                         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         if (ds != null && ds.getSocket() != null && ds.isConnected()) {
                             try {
-                                OrderSingleActivity.printOrder(ds.getSocket(), order);
+                                printOrder(ds.getSocket(), order);
                                 try {
                                     new OrderActionDao(access_token).logOrderPrinted(order.getId());
                                 } catch (ServiceException e) {
@@ -118,6 +125,88 @@ public class OrderPrinter {
                 return result;
             }
         }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
+    }
+
+    public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
+        try {
+            OutputStream btos = btsocket.getOutputStream();
+            OrderPrinter printer = new OrderPrinter(btos);
+
+            String platformName = Constants.Platform.find(order.getPlatform()).name;
+
+
+            btos.write(new byte[]{0x1B, 0x21, 0});
+            btos.write(GPrinterCommand.left);
+
+            printer.starLine().highBigText("   菜鸟食材").newLine()
+                    .newLine().highBigText("  #" + order.getSimplifiedId());
+
+            boolean dayIdInvalid = TextUtil.isEmpty(order.getPlatform_dayId()) || "0".equals(order.getPlatform_dayId());
+            printer.normalText(String.format("(%s#%s)", platformName, dayIdInvalid ? order.getPlatform_oid() : order.getPlatform_dayId())).newLine();
+
+            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
+
+            printer.starLine()
+                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
+                            .newLine()
+                            .highText(TextUtil.replaceWhiteStr(order.getAddress()))
+                            .newLine();
+
+            String expectedStr = order.getExpectTimeStr();
+            if (expectedStr == null) {
+                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+            }
+            printer.starLine().highText("期望送达：" + expectedStr).newLine();
+            if (!TextUtils.isEmpty(order.getRemark())) {
+                        printer.highText("用户备注：" + order.getRemark())
+                        .newLine();
+            }
+
+            printer.starLine()
+                    .normalText("订单编号：" + platformName + "-" + order.getPlatform_oid())
+                    .newLine()
+                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+                    .newLine();
+
+            printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
+
+            int total = 0;
+            for (CartItem item : order.getItems()) {
+                String name = item.getProduct_name();
+                for (int idx = 0; idx < name.length(); ) {
+
+                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
+                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                    if (isEnd) {
+                        String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                        text = String.format(format, text, "x" + item.getNum());
+                    }
+                    printer.highText(text).newLine();
+                    if (isEnd) {
+                        printer.spaceLine();
+                    }
+
+                    idx += MAX_TITLE_PART;
+                }
+                total += item.getNum();
+            }
+
+            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
+
+            printer.starLine().highText(String.format("实付金额：%22.2f", order.getOrderMoney())).newLine();
+
+            printer.starLine().normalText("我们承诺坏一赔二，请您放心买菜。").newLine().normalText("客服电话：400-018-6069");
+
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(GPrinterCommand.walkPaper((byte) 4));
+            btos.flush();
+        } catch (Exception e) {
+            AppLogger.e("error in printing order", e);
+            throw e;
+        }
     }
 
     public interface PrintCallback {

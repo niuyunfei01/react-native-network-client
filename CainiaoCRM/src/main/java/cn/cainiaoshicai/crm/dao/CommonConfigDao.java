@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -73,6 +74,7 @@ public class CommonConfigDao {
         private String nickname;
         private String mobilephone;
         private int id;
+        private int position;
 
         public Worker(String nickname, String mobilephone, int userId) {
             this.nickname = nickname;
@@ -102,6 +104,18 @@ public class CommonConfigDao {
 
         public void setId(int id) {
             this.id = id;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
+        public boolean isExtShipWorker() {
+            return this.getPosition() == Constants.POSITION_EXT_SHIP;
         }
     }
 

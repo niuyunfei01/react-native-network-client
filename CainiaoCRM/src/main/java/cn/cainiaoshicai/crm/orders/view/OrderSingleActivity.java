@@ -19,11 +19,12 @@ import android.view.animation.AnimationUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,17 +36,13 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
-import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
-import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
-import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
@@ -56,7 +53,6 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
  */
 public class OrderSingleActivity extends Activity implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
-    private static final int MAX_TITLE_PART = 16;
     private WebView mWebView;
     private DelayFaqFragment delayFaqFragment;
     private MenuItem refreshItem;
@@ -67,6 +63,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     private int platform;
     private String url;
     private Button printButton = null;
+    private Switch sourceReadyButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +86,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         this.orderId = intent.getIntExtra("id", 0);
         platformOid = intent.getStringExtra("platform_oid");
         shipWorkerName = intent.getStringExtra("ship_worker_name");
+        int sourceReady = intent.getIntExtra("source_ready", 0);
         final int listType = intent.getIntExtra("list_type", 0);
         final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
         final boolean isDelay = intent.getBooleanExtra("is_delay", false);
@@ -102,6 +100,10 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                 connect(platform, platformOid);
             }
         });
+        sourceReadyButton = (Switch) findViewById(R.id.button_source_ready);
+        final boolean isWaitingReady = fromStatus == Constants.WM_ORDER_STATUS_TO_READY;
+        this.showSourceReady(sourceReady > 0, isWaitingReady);
+        sourceReadyButton.setVisibility(isWaitingReady ? View.VISIBLE : View.GONE);
 
         Button delayFaqButton = (Button) findViewById(R.id.button3);
         if(!isDelay){
@@ -157,10 +159,13 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                             final int[] checkedIdx = {0};
                             List<String> items = new ArrayList<>();
                             for (int i = 0; i < workerList.size(); i++) {
-                                CommonConfigDao.Worker worker = workerList.get(i);
-                                items.add(worker.getNickname());
-                                if (currUid == worker.getId()) {
-                                    checkedIdx[0] = i;
+                                    CommonConfigDao.Worker worker = workerList.get(i);
+
+                                if (!isWaitingReady || !worker.isExtShipWorker()) {
+                                    items.add(worker.getNickname());
+                                    if (currUid == worker.getId()) {
+                                        checkedIdx[0] = items.size() - 1;
+                                    }
                                 }
                             }
                             adb.setSingleChoiceItems(items.toArray(new String[items.size()]), checkedIdx[0], new DialogInterface.OnClickListener() {
@@ -169,7 +174,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                                     checkedIdx[0] = which;
                                 }
                             });
-                            adb.setTitle(fromStatus == Constants.WM_ORDER_STATUS_TO_READY ? "谁打包的？" : "选择快递小哥")
+                            adb.setTitle(isWaitingReady ? "谁打包的？" : "选择快递小哥")
                                     .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -191,6 +196,18 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         mWebView.loadUrl(url);
     }
 
+    private void showSourceReady(final boolean isSourceReady, boolean isWaitingReady) {
+        this.sourceReadyButton.setTextOn("已备货");
+        this.sourceReadyButton.setTextOff("备货中");
+        this.sourceReadyButton.setChecked(isSourceReady);
+        if (!isWaitingReady) {
+            this.sourceReadyButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    SettingUtility.setAutoPrintHLG(isChecked);
+                }
+            });
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -254,7 +271,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                         this.order = order;
                         boolean ok;
                         try {
-                            printOrder(ds.getSocket(), order);
+                            OrderPrinter.printOrder(ds.getSocket(), order);
                             order.incrPrintTimes();
                             ok = true;
                         } catch (Exception e) {
@@ -299,88 +316,6 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                     });
                 }
             }.executeOnNormal();
-        }
-    }
-
-    public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
-        try {
-            OutputStream btos = btsocket.getOutputStream();
-            OrderPrinter printer = new OrderPrinter(btos);
-
-            String platformName = Constants.Platform.find(order.getPlatform()).name;
-
-
-            btos.write(new byte[]{0x1B, 0x21, 0});
-            btos.write(GPrinterCommand.left);
-
-            printer.starLine().highBigText("   菜鸟食材").newLine()
-                    .newLine().highBigText("  #" + order.getSimplifiedId());
-
-            boolean dayIdInvalid = TextUtil.isEmpty(order.getPlatform_dayId()) || "0".equals(order.getPlatform_dayId());
-            printer.normalText(String.format("(%s#%s)", platformName, dayIdInvalid ? order.getPlatform_oid() : order.getPlatform_dayId())).newLine();
-
-            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
-
-            printer.starLine()
-                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
-                            .newLine()
-                            .highText(TextUtil.replaceWhiteStr(order.getAddress()))
-                            .newLine();
-
-            String expectedStr = order.getExpectTimeStr();
-            if (expectedStr == null) {
-                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
-            }
-            printer.starLine().highText("期望送达：" + expectedStr).newLine();
-            if (!TextUtils.isEmpty(order.getRemark())) {
-                        printer.highText("用户备注：" + order.getRemark())
-                        .newLine();
-            }
-
-            printer.starLine()
-                    .normalText("订单编号：" + platformName + "-" + order.getPlatform_oid())
-                    .newLine()
-                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
-                    .newLine();
-
-            printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
-
-            int total = 0;
-            for (CartItem item : order.getItems()) {
-                String name = item.getProduct_name();
-                for (int idx = 0; idx < name.length(); ) {
-
-                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
-
-                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
-                    if (isEnd) {
-                        String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
-                        text = String.format(format, text, "x" + item.getNum());
-                    }
-                    printer.highText(text).newLine();
-                    if (isEnd) {
-                        printer.spaceLine();
-                    }
-
-                    idx += MAX_TITLE_PART;
-                }
-                total += item.getNum();
-            }
-
-            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
-
-            printer.starLine().highText(String.format("实付金额：%22.2f", order.getOrderMoney())).newLine();
-
-            printer.starLine().normalText("我们承诺坏一赔二，请您放心买菜。").newLine().normalText("客服电话：400-018-6069");
-
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(GPrinterCommand.walkPaper((byte) 4));
-            btos.flush();
-        } catch (Exception e) {
-            AppLogger.e("error in printing order", e);
-            throw e;
         }
     }
 

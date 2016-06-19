@@ -22,7 +22,9 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
@@ -63,16 +65,22 @@ public class NotificationReceiver extends BroadcastReceiver {
 				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
 				if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notificationId);
-					soundManager.play_new_order_sound(notify.getStore_id());
-					OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
+					if (GlobalCtx.getInstance().acceptNotifyNew()) {
+						soundManager.play_new_order_sound(notify.getStore_id());
+						OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
+					}
 				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
 					int totalLate = notify.getTotal_late();
 					if (totalLate > 10) {
 						totalLate = 10;
 					}
-					soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
+					if (GlobalCtx.getInstance().acceptReadyTimeoutNotify()) {
+						soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
+					}
 				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
-					soundManager.play_sync_not_work_sound();
+					if (GlobalCtx.getInstance().acceptTechNotify()) {
+						soundManager.play_sync_not_work_sound();
+					}
 				} else if (Constants.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
 					soundManager.play_serious_timeout(notify.getNotify_workers());
 				}

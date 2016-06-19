@@ -32,6 +32,7 @@ public class Constants {
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", -1);
 
     public static final String ERR_INVALID_GRANT = "invalid_grant";
+    public static final int POSITION_EXT_SHIP = 3;
 
 
     static public class Platform {

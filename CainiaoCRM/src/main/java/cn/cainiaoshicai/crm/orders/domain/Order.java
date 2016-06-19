@@ -46,6 +46,8 @@ public class Order {
     private boolean showReadyDelay;
     private int readyLeftMin;
 
+    private int source_ready;
+
     public int getId() {
         return id;
     }
@@ -312,6 +314,14 @@ public class Order {
 
     public int getSimplifiedId() {
         return getId()%1000;
+    }
+
+    public int getSource_ready() {
+        return source_ready;
+    }
+
+    public void setSource_ready(int source_ready) {
+        this.source_ready = source_ready;
     }
 
     public boolean shouldTryAutoPrint() {

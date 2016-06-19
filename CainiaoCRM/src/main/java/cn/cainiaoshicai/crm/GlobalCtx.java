@@ -347,6 +347,32 @@ public class GlobalCtx extends Application {
         return soundManager;
     }
 
+    public CommonConfigDao.Worker getCurrentWorker() {
+        String currUid = GlobalCtx.getApplication().getCurrUid();
+        if (currUid != null) {
+            try {
+                int iUid = Integer.parseInt(currUid);
+                return this.workers.get(iUid);
+            }catch (NumberFormatException e) {
+                AppLogger.e("error to parse currUid:" + currUid, e);
+            }
+        }
+        return null;
+    }
+
+    public boolean acceptNotifyNew() {
+        CommonConfigDao.Worker currentWorker = this.getCurrentWorker();
+        return currentWorker == null || currentWorker.getPosition() != Constants.POSITION_EXT_SHIP;
+    }
+
+    public boolean acceptReadyTimeoutNotify() {
+        return this.acceptNotifyNew();
+    }
+
+    public boolean acceptTechNotify() {
+        return this.acceptNotifyNew();
+    }
+
     public static class SoundManager {
         private static final int STORE_SOUND_LEN = 1700;
         private static final int NUMBER_SOUND_LENGTH = 1000;
