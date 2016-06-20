@@ -118,4 +118,12 @@ public class OrderActionDao {
     public ResultBean logOrderPrinted(int orderId) throws ServiceException {
         return actionWithResult("/order_log_print/"+orderId, new HashMap<String, String>());
     }
+
+    public ResultBean chg_ship_worker(int orderId, int oldWorker, int newWorker) throws ServiceException {
+        return actionWithResult("/order_chg_ship_worker/" + orderId + "/" + oldWorker + "/" + newWorker, new HashMap<String, String>());
+    }
+
+    public ResultBean order_chg_pack_worker(int orderId, int oldWorker, int newWorker) throws ServiceException {
+        return actionWithResult("/order_chg_pack_worker/" + orderId + "/" + oldWorker + "/" + newWorker, new HashMap<String, String>());
+    }
 }

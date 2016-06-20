@@ -69,27 +69,11 @@ public class OrderListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
                 Order item = (Order) adapter.getItem(position);
-                openOrder.putExtra("platform_oid", item.getPlatform_oid());
-                openOrder.putExtra("platform_id", item.getPlatform());
                 openOrder.putExtra("id", item.getId());
-                openOrder.putExtra("order_status", item.getOrderStatus());
-                openOrder.putExtra("ship_worker_name", item.getShip_worker_name());
-                openOrder.putExtra("print_times", item.getPrint_times());
-                openOrder.putExtra("source_ready", item.getSource_ready());
-                boolean isDelay = false;
-                if (item.getExpectTime() != null) {
-                    if (item.getTime_arrived() != null) {
-                        int gap_minutes = (int) ((item.getExpectTime().getTime() - item.getTime_arrived().getTime()) / (60 * 1000));
-                        if (gap_minutes < 0) {
-                            isDelay = true;
-                        }
-                    }
-                }
-                openOrder.putExtra("is_delay", isDelay);
                 openOrder.putExtra("list_type", listType);
+                openOrder.putExtra("order", item);
                 try {
                     getActivity().startActivity(openOrder);
                 }catch (Exception e){

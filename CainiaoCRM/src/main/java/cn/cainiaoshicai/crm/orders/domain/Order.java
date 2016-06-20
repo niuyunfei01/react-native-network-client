@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.support.print.Constant;
 
-public class Order {
+public class Order implements Serializable {
 
     private int id;
     private int userId;
@@ -41,6 +42,7 @@ public class Order {
     private List<CartItem> items = new ArrayList<>();
     private String ship_worker_name;
     private int ship_worker_id;
+    private int 	pack_operator;
     private int order_times;
     private int paid_done;
     private boolean showReadyDelay;
@@ -322,6 +324,14 @@ public class Order {
 
     public void setSource_ready(int source_ready) {
         this.source_ready = source_ready;
+    }
+
+    public int getPack_operator() {
+        return pack_operator;
+    }
+
+    public void setPack_operator(int pack_operator) {
+        this.pack_operator = pack_operator;
     }
 
     public boolean shouldTryAutoPrint() {

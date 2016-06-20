@@ -64,6 +64,15 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     private String url;
     private Button printButton = null;
     private Switch sourceReadyButton;
+    private int listType;
+    private int fromStatus;
+    private int ship_worker_id;
+    private int pack_worker_id;
+
+    private static final int ACTION_NORMAL = 0;
+    private static final int ACTION_EDIT_SHIP_WORKER = 1;
+    private static final int ACTION_EDIT_PACK_WORKER = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +91,19 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         Intent intent = getIntent();
-        platform = intent.getIntExtra("platform_id", 0);
-        this.orderId = intent.getIntExtra("id", 0);
-        platformOid = intent.getStringExtra("platform_oid");
-        shipWorkerName = intent.getStringExtra("ship_worker_name");
-        int sourceReady = intent.getIntExtra("source_ready", 0);
-        final int listType = intent.getIntExtra("list_type", 0);
-        final int fromStatus = intent.getIntExtra("order_status", Constants.WM_ORDER_STATUS_UNKNOWN);
+        Order order = (Order) intent.getSerializableExtra("order");
+        ship_worker_id = order.getShip_worker_id();
+        pack_worker_id = order.getPack_operator();
+        platform = order.getPlatform();
+        this.orderId = order.getId();
+        platformOid = order.getPlatform_oid();
+        shipWorkerName = order.getShip_worker_name();
+        int sourceReady = order.getSource_ready();
+        listType = intent.getIntExtra("list_type", 0);
+        fromStatus = order.getOrderStatus();
         final boolean isDelay = intent.getBooleanExtra("is_delay", false);
         printButton = (Button) findViewById(R.id.button1);
-        int printTimes = intent.getIntExtra("print_times", 0);
+        int printTimes = order.getPrint_times();
         this.showPrintTimes(printTimes);
 
         printButton.setOnClickListener(new View.OnClickListener() {
@@ -132,60 +144,21 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                 actionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
-                        AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
                         if (fromStatus == Constants.WM_ORDER_STATUS_TO_ARRIVE) {
+                            AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
                             adb.setTitle("送达提醒")
                                 .setMessage(String.format("您的食材已由快递小哥【%s】送到，如有缺漏、品质或其他问题请立即联系店长【%s(%s)】。春风十里，不如赐个好评就送个金菠萝给你 :)", shipWorkerName, "青青", "18910275329"))
                                 .setPositiveButton("发送", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
-                                        orderActionOp.executeOnNormal(fromStatus);
+                                        new OrderActionOp(platform, platformOid, (Activity)v.getContext(), listType).executeOnNormal(fromStatus);
                                     }
                                 });
+                            adb.setNegativeButton(getString(R.string.cancel), null);
+                            adb.show();
                         } else {
-                            final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
-                            HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
-                            if (workers != null && !workers.isEmpty()) {
-                                workerList.addAll(workers.values());
-                            }
-
-                            AccountBean accountBean = GlobalCtx.getApplication().getAccountBean();
-                            int currUid = Integer.parseInt(accountBean.getUid());
-                            if (workerList.isEmpty()) {
-                                workerList.add(new CommonConfigDao.Worker(accountBean.getUsernick(), "", currUid));
-                            }
-
-                            final int[] checkedIdx = {0};
-                            List<String> items = new ArrayList<>();
-                            for (int i = 0; i < workerList.size(); i++) {
-                                    CommonConfigDao.Worker worker = workerList.get(i);
-
-                                if (!isWaitingReady || !worker.isExtShipWorker()) {
-                                    items.add(worker.getNickname());
-                                    if (currUid == worker.getId()) {
-                                        checkedIdx[0] = items.size() - 1;
-                                    }
-                                }
-                            }
-                            adb.setSingleChoiceItems(items.toArray(new String[items.size()]), checkedIdx[0], new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    checkedIdx[0] = which;
-                                }
-                            });
-                            adb.setTitle(isWaitingReady ? "谁打包的？" : "选择快递小哥")
-                                    .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, v, listType);
-                                            orderActionOp.setWorkerId(workerList.get(checkedIdx[0]).getId());
-                                            orderActionOp.executeOnNormal(fromStatus);
-                                        }
-                                    });
+                            chooseWorker((Activity) v.getContext(), listType, fromStatus);
                         }
-                        adb.setNegativeButton(getString(R.string.cancel), null);
-                        adb.show();
                     }
                 });
             }
@@ -194,6 +167,80 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken()+"&client_id="+GlobalCtx.getInstance().getCurrentAccountId();
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
+    }
+
+    private void showToast(final String msg) {
+        this.showToast(msg, false);
+    }
+
+    private void showToast(final String msg, final boolean refresh) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(OrderSingleActivity.this, msg, Toast.LENGTH_LONG).show();
+                if (refresh) {
+                    OrderSingleActivity.this.refresh();
+                }
+            }
+        });
+    }
+
+    private void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus) {
+        this.chooseWorker(activity, orderListTypeToJump, fromStatus, ACTION_NORMAL);
+    }
+    private void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action) {
+
+        final boolean isWaitingReady = fromStatus == Constants.WM_ORDER_STATUS_TO_READY;
+        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+        final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
+        HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
+        if (workers != null && !workers.isEmpty()) {
+            workerList.addAll(workers.values());
+        }
+
+        AccountBean accountBean = GlobalCtx.getApplication().getAccountBean();
+        int currUid = Integer.parseInt(accountBean.getUid());
+        if (workerList.isEmpty()) {
+            workerList.add(new CommonConfigDao.Worker(accountBean.getUsernick(), "", currUid));
+        }
+
+        final int[] checkedIdx = {0};
+        List<String> items = new ArrayList<>();
+        for (int i = 0; i < workerList.size(); i++) {
+            CommonConfigDao.Worker worker = workerList.get(i);
+
+            if (!isWaitingReady || !worker.isExtShipWorker()) {
+                items.add(worker.getNickname());
+                if (currUid == worker.getId()) {
+                    checkedIdx[0] = items.size() - 1;
+                }
+            }
+        }
+        adb.setSingleChoiceItems(items.toArray(new String[items.size()]), checkedIdx[0], new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                checkedIdx[0] = which;
+            }
+        });
+        adb.setTitle(isWaitingReady ? "谁打包的？" : "选择快递小哥")
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        final int selectedWorker = workerList.get(checkedIdx[0]).getId();
+                        if (action == ACTION_EDIT_SHIP_WORKER ) {
+                            new EditShipWorkerTask(selectedWorker, activity).executeOnIO();
+                        } else if (action == ACTION_EDIT_PACK_WORKER) {
+                            new EditPackWorkerTask(selectedWorker, activity).executeOnIO();
+                        } else {
+                            OrderActionOp orderActionOp = new OrderActionOp(platform, platformOid, activity, orderListTypeToJump);
+                            orderActionOp.setWorkerId(selectedWorker);
+                            orderActionOp.executeOnNormal(fromStatus);
+                        }
+                    }
+                });
+        adb.setNegativeButton(getString(R.string.cancel), null);
+        adb.show();
     }
 
     private void showSourceReady(final boolean isSourceReady, boolean isWaitingReady) {
@@ -386,8 +433,18 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                 adb.show();
                 break;
             case R.id.menu_chg_pack_worker:
+                if (pack_worker_id <= 0) {
+                    Toast.makeText(this, "该订单尚未指定过打包员，请先打包出库", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+                chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER);
                 break;
             case R.id.menu_chg_ship_worker:
+                if (ship_worker_id <= 0) {
+                    Toast.makeText(this, "该订单尚未指定过配送员，请先打包出库", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+                chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_SHIP_WORKER);
                 break;
             case R.id.menu_refresh:
                 refresh();
@@ -438,14 +495,14 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     static public class OrderActionOp extends MyAsyncTask<Integer, ResultBean, ResultBean> {
         final int oid;
         final String platformOid;
-        private View button;
+        private Activity activity;
         private int listType;
         private int workerId;
 
-        public OrderActionOp(int oid, String platformOid, View v, int listType) {
+        public OrderActionOp(int oid, String platformOid, Activity v, int listType) {
             this.oid = oid;
             this.platformOid = platformOid;
-            button = v;
+            activity = v;
             this.listType = listType;
         }
 
@@ -478,7 +535,6 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         @Override
         protected void onPostExecute(final ResultBean oc) {
             super.onPostExecute(oc);
-            final Activity activity = (Activity) button.getContext();
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -538,6 +594,75 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                 }
 
             }.executeOnNormal();
+        }
+    }
+
+    private class EditShipWorkerTask extends MyAsyncTask<Integer, Void, Boolean> {
+        private final int selectedWorker;
+        private final Activity activity;
+
+        public EditShipWorkerTask(int selectedWorker, Activity activity) {
+            this.selectedWorker = selectedWorker;
+            this.activity = activity;
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... params) {
+            String error = "";
+            OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+            try {
+                ResultBean result = dao.chg_ship_worker(orderId, ship_worker_id, selectedWorker);
+                if (result.isOk()) {
+                    showToast("修改配送员成功！", true);
+                    return true;
+                } else {
+                    error = result.getDesc();
+                }
+            } catch (ServiceException e) {
+                error = "错误：" + e.getMessage();
+                AppLogger.e("error to edit ship worker:", e);
+            }
+
+            final String msg = "修改配送员失败:" + error;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+                }
+            });
+            return Boolean.FALSE;
+        }
+
+    }
+
+    private class EditPackWorkerTask extends MyAsyncTask<Integer, Void, Boolean> {
+        private final int selectedWorker;
+        private final Activity activity;
+
+        public EditPackWorkerTask(int selectedWorker, Activity activity) {
+            this.selectedWorker = selectedWorker;
+            this.activity = activity;
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... params) {
+            String error = "";
+            OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+            try {
+                ResultBean result = dao.order_chg_pack_worker(orderId, pack_worker_id, selectedWorker);
+                if (result.isOk()) {
+                    showToast("修改打包员成功！", true);
+                    return true;
+                } else {
+                    error = result.getDesc();
+                }
+            } catch (ServiceException e) {
+                error = "错误：" + e.getMessage();
+                AppLogger.e("error to edit ship worker:", e);
+            }
+
+            showToast("修改打包员失败:" + error);
+            return Boolean.FALSE;
         }
     }
 }
