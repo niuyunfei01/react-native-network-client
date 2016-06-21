@@ -15,7 +15,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.GPrinterCommand;
-import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
+import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 
 public class BlueToothPrinterApp extends Activity
 {
@@ -43,8 +43,8 @@ public class BlueToothPrinterApp extends Activity
 	protected void connect() {
 		BluetoothConnector.BluetoothSocketWrapper btsocket = BluetoothPrinters.INS.getCurrentPrinterSocket();
 		if(btsocket == null){
-			Intent BTIntent = new Intent(getApplicationContext(), BTDeviceListActivity.class);
-			this.startActivityForResult(BTIntent, BTDeviceListActivity.REQUEST_CONNECT_BT);
+			Intent BTIntent = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+			this.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
 		}
 		else{
 			print_bt(btsocket);

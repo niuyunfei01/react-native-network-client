@@ -1,7 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.AlertDialog;
-import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -14,13 +13,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.ToggleButton;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -28,7 +23,6 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
-import cn.cainiaoshicai.crm.orders.domain.PerformStat;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -55,9 +49,9 @@ public class MineActivity extends AbstractActionBarActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		this.setContentView(R.layout.listview_btd_list);
+		this.setContentView(R.layout.mine_lists);
 		listView = (ListView) findViewById(android.R.id.list);
-        listAdapter = new MineItemsAdapter(this, R.layout.listview_btd_list, R.id.text1, R.id.image1);
+        listAdapter = new MineItemsAdapter(this, R.layout.mine_lists, R.id.text1, R.id.image1);
         this.listView.setAdapter(listAdapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -65,7 +59,7 @@ public class MineActivity extends AbstractActionBarActivity {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
 				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
-					startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
+					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
 							Uri.parse("http://www.cainiaoshicai.cn/CainiaoCRM-release.apk"));

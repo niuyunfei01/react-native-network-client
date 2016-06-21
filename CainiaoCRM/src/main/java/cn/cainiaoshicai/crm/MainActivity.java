@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -42,7 +41,7 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
-import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
+import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
@@ -112,7 +111,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
 
             final String printStatusTxt;
             final int bgColorResId;
-            if (BTDeviceListActivity.isPrinterConnected()) {
+            if (SettingsPrintActivity.isPrinterConnected()) {
                 printStatusTxt = "已设自动打印(" + storeDesc + ")，打印机已就绪！";
                 bgColorResId = R.color.green;
             } else {
@@ -125,7 +124,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             printerStatus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(getApplicationContext(), BTDeviceListActivity.class);
+                    Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
                     MainActivity.this.startActivity(i);
                 }
             });

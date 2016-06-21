@@ -28,7 +28,7 @@ import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
 
-public class BTDeviceListActivity extends ListActivity {
+public class SettingsPrintActivity extends ListActivity {
 
     static public final int REQUEST_CONNECT_BT = 0x2300;
 
@@ -47,8 +47,8 @@ public class BTDeviceListActivity extends ListActivity {
 
 		this.setContentView(R.layout.settings_print);
 
-		setTitle(R.string.title_bluetooth_setting);
-        listAdapter = new BluetoothItemAdapter<>(this, R.layout.listview_btd_list, R.id.text1, R.id.image1);
+		setTitle(R.string.title_print_setting);
+        listAdapter = new BluetoothItemAdapter<>(this, R.id.printers_list, R.id.text1, R.id.image1);
         setListAdapter(listAdapter);
 
 		Switch toggleSoundNotify = (Switch) findViewById(R.id.toggleSoundNotify);

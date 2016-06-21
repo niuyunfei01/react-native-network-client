@@ -59,7 +59,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 //                return true;
 //            case R.id.menu_settings:
 //                showHelp();
-//                startActivity(new Intent(getApplicationContext(), BTDeviceListActivity.class));
+//                startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 //                return true;
             default:
                 return super.onOptionsItemSelected(item);

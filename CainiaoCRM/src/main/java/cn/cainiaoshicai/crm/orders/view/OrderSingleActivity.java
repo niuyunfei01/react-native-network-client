@@ -35,7 +35,6 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
-import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
@@ -44,7 +43,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
-import cn.cainiaoshicai.crm.ui.activity.BTDeviceListActivity;
+import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
@@ -297,8 +296,8 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     protected void connect(final int platform, final String platformOid) {
         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
         if(ds == null || ds.getSocket() == null){
-            Intent BTIntent = new Intent(getApplicationContext(), BTDeviceListActivity.class);
-            this.startActivityForResult(BTIntent, BTDeviceListActivity.REQUEST_CONNECT_BT);
+            Intent BTIntent = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+            this.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
         }
         else{
             new MyAsyncTask<Void,Order, Boolean>(){
