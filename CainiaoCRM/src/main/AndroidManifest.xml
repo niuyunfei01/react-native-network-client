@@ -80,9 +80,6 @@
         <activity android:name=".ui.activity.RemindersActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
-        <activity android:name=".ui.activity.StorePerformActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
-        </activity>
         <activity android:name=".ui.activity.StoreStorageActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>

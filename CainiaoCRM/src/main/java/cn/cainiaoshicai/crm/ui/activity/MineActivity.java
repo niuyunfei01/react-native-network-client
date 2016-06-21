@@ -27,6 +27,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
+import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.PerformStat;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -86,7 +87,9 @@ public class MineActivity extends AbstractActionBarActivity {
 							.setNegativeButton(R.string.no, null)
 							.show();
 				} else if (item.getType() == TYPE_STORE_PERF) {
-					startActivity(new Intent(getApplicationContext(), StorePerformActivity.class));
+					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+					intent.putExtra("url", String.format("%s/worker_stats_by_day.html", URLHelper.HTTP_MOBILE_STORES));
+					startActivity(intent);
 				} else if (item.getType() == TYPE_SYNC_STATUS) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
 							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + GlobalCtx.getApplication().getSpecialToken()));

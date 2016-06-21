@@ -16,15 +16,20 @@ import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
  * Created by liuzhr on 5/17/16.
  */
 public class WebViewActivity extends AbstractActionBarActivity {
+
+    public static final int FROM_MINE = 1;
+    public static final int FROM_HOME = 2;
+
     protected WebView mWebView;
     protected int contentViewRes;
+
+    protected int from;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(this.contentViewRes);
-        ActionBar ab = getSupportActionBar();
-        ab.setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
@@ -36,6 +41,13 @@ public class WebViewActivity extends AbstractActionBarActivity {
         mWebView.setWebViewClient(new MyAppWebViewClient());
 
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
+    }
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        // or call onBackPressed()
+        return true;
     }
 
     @Override

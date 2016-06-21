@@ -119,7 +119,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
 
         Button delayFaqButton = (Button) findViewById(R.id.button3);
         if(!isDelay){
-            delayFaqButton.setVisibility(View.INVISIBLE);
+            delayFaqButton.setVisibility(View.GONE);
         }else{
             delayFaqButton.setOnClickListener(new View.OnClickListener() {
                 @Override

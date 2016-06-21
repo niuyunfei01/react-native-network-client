@@ -25,7 +25,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.store_perform);
+        setContentView(R.layout.quality_case_list);
 
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
