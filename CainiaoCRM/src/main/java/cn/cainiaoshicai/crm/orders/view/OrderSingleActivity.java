@@ -196,7 +196,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
         if (workers != null && !workers.isEmpty()) {
             for(CommonConfigDao.Worker worker : workers.values()) {
-                if (!isWaitingReady || !worker.isExtShipWorker()) {
+                if (!(isWaitingReady || action == ACTION_EDIT_PACK_WORKER) || !worker.isExtShipWorker()) {
                   workerList.add(worker);
                 }
             }
