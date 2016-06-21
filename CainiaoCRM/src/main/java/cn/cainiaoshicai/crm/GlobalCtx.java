@@ -427,6 +427,7 @@ public class GlobalCtx extends Application {
         }
 
         private boolean play_double_sound(final int firstSound, final int suffixSound) {
+            if (check_disabled()) return false;
             if (soundLoaded) {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override
@@ -444,7 +445,16 @@ public class GlobalCtx extends Application {
             }
         }
 
+        private boolean check_disabled() {
+            if (SettingUtility.isDisableSoundNotify()) {
+                AppLogger.w("notify sound is disabled!");
+                return true;
+            }
+            return false;
+        }
+
         private boolean play_three_sound(final int storeSound, final int numberSound, final int suffixSound) {
+            if (check_disabled()) return false;
             if (soundLoaded) {
                 new MyAsyncTask<Void, Void, Void>(){
                     @Override
@@ -492,6 +502,7 @@ public class GlobalCtx extends Application {
         }
 
         public boolean play_sync_not_work_sound() {
+            if (check_disabled()) return false;
             if (soundLoaded) {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override
@@ -508,6 +519,7 @@ public class GlobalCtx extends Application {
         }
 
         public boolean play_serious_timeout(Set<Integer> notifyWorkers) {
+            if (check_disabled()) return false;
             if (soundLoaded) {
                 boolean shouldWarn = false;
                 if (notifyWorkers != null && !notifyWorkers.isEmpty()) {

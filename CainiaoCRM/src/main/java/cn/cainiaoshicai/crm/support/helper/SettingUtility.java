@@ -355,4 +355,12 @@ public class SettingUtility {
     public static void setLastConnectedPrinterAddress(String address) {
         SettingHelper.setEditor(getContext(), "last_printer_address", address);
     }
+
+    public static boolean isDisableSoundNotify() {
+        return SettingHelper.getSharedPreferences(getContext(), "disable_sound_notify", false);
+    }
+
+    public static void setDisableSoundNotify(boolean isChecked) {
+        SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
+    }
 }

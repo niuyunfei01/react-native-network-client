@@ -51,6 +51,15 @@ public class BTDeviceListActivity extends ListActivity {
         listAdapter = new BluetoothItemAdapter<>(this, R.layout.listview_btd_list, R.id.text1, R.id.image1);
         setListAdapter(listAdapter);
 
+		Switch toggleSoundNotify = (Switch) findViewById(R.id.toggleSoundNotify);
+		toggleSoundNotify.setChecked(SettingUtility.isDisableSoundNotify());
+		toggleSoundNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				SettingUtility.setDisableSoundNotify(isChecked);
+			}
+		});
+
 		Switch toggleHLG = (Switch) findViewById(R.id.togglePrintHLG);
 		Switch toggleYYC = (Switch) findViewById(R.id.togglePrintYYC);
 		toggleHLG.setChecked(SettingUtility.isAutoPrintHLG());
