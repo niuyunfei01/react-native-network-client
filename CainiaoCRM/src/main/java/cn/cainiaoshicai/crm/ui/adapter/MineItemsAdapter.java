@@ -13,9 +13,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
+import cn.cainiaoshicai.crm.ui.activity.StorePerformActivity;
 
 public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extends ArrayAdapter<T> {
     Activity context;
@@ -72,6 +75,15 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
 
             viewAllLate.setOnClickListener(new ToSearchBtnListener("delayed:yes"));
             viewAllSerious.setOnClickListener(new ToSearchBtnListener("delayed:serious"));
+
+            delayedOverview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(v.getContext(), GeneralWebViewActivity.class);
+                    i.putExtra("url", GlobalCtx.getInstance().getUrl("delay_analysis.main", true));
+                    v.getContext().startActivity(i);
+                }
+            });
         } else {
             if (item.getCount() >= 0) {
                 statusLabel.setText(String.valueOf(item.getCount()));

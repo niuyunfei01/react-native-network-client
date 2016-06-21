@@ -334,7 +334,14 @@ public class GlobalCtx extends Application {
     }
 
     public String getUrl(String key) {
-        return URLHelper.WEB_URL_ROOT + this.configUrls.get(key);
+        return this.getUrl(key, false);
+    }
+    public String getUrl(String key, boolean appendAcess) {
+        String s = URLHelper.WEB_URL_ROOT + this.configUrls.get(key);
+        if (appendAcess) {
+            s += "&access_token=" + this.getSpecialToken();
+        }
+        return s;
     }
 
     public static boolean isAutoPrint(int store_id) {
