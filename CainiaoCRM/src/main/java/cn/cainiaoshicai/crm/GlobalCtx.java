@@ -64,19 +64,11 @@ public class GlobalCtx extends Application {
 
     //image memory cache
     private LruCache<String, Bitmap> appBitmapCache = null;
-    /**
-     * Cached for booked user uid=>name mapping.
-     */
-    private Map<Integer, String> uidNames = new HashMap<>();
-    private User currUser;
-    private StatusService statusService;
-
     public boolean tokenExpiredDialogIsShowing = false;
     private AccountBean accountBean;
     private SoundManager soundManager;
 
     public GlobalCtx() {
-        this.statusService=new StatusService();
     }
 
 
@@ -86,41 +78,6 @@ public class GlobalCtx extends Application {
 
     public void setImageLoader(ImageLoader imageLoader) {
         this.imageLoader = imageLoader;
-    }
-
-    public String getCurrUid() {
-        return currUser != null? currUser.getId() : null;
-    }
-
-    public void addCommentUidNames(HashMap<Integer, String> commentIdNames) {
-        this.uidNames.putAll(commentIdNames);
-    }
-
-    public User getCurrUser() {
-        return currUser;
-    }
-
-    public void setCurrUser(User currUser) {
-        this.currUser = currUser;
-    }
-
-    public String getUNameById(String bookedUid) {
-        int uid = 0;
-        try {
-            uid = Integer.parseInt(bookedUid);
-        } catch (NumberFormatException e) {
-            return bookedUid;
-        }
-        String s = this.uidNames.get(uid);
-        return s != null? s : "";
-    }
-
-    public void addCommentUidNames(User currU) {
-        this.uidNames.put(Integer.parseInt(currU.getId()), currU.getName());
-    }
-
-    public StatusService getStatusService() {
-        return statusService;
     }
 
     public static GlobalCtx getInstance() {
@@ -355,7 +312,7 @@ public class GlobalCtx extends Application {
     }
 
     public CommonConfigDao.Worker getCurrentWorker() {
-        String currUid = GlobalCtx.getApplication().getCurrUid();
+        String currUid = GlobalCtx.getApplication().getCurrentAccountId();
         if (currUid != null) {
             try {
                 int iUid = Integer.parseInt(currUid);

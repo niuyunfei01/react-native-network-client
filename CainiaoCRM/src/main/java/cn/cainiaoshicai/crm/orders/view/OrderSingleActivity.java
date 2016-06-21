@@ -195,40 +195,38 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
         HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
         if (workers != null && !workers.isEmpty()) {
-            workerList.addAll(workers.values());
+            for(CommonConfigDao.Worker worker : workers.values()) {
+                if (!isWaitingReady || !worker.isExtShipWorker()) {
+                  workerList.add(worker);
+                }
+            }
         }
 
-        AccountBean accountBean = GlobalCtx.getApplication().getAccountBean();
-        int currUid = Integer.parseInt(accountBean.getUid());
-        if (workerList.isEmpty()) {
-            workerList.add(new CommonConfigDao.Worker(accountBean.getUsernick(), "", currUid));
-        }
-
+        String currUid = GlobalCtx.getInstance().getCurrentAccountId();
+        int iCurrUid = currUid != null ? Integer.parseInt(currUid) : 0;
         final int[] checkedIdx = {0};
         List<String> items = new ArrayList<>();
         for (int i = 0; i < workerList.size(); i++) {
             CommonConfigDao.Worker worker = workerList.get(i);
-
-            if (!isWaitingReady || !worker.isExtShipWorker()) {
-                items.add(worker.getNickname());
-                if (currUid == worker.getId()) {
-                    checkedIdx[0] = items.size() - 1;
-                }
+            items.add(worker.getNickname());
+            if (iCurrUid == worker.getId()) {
+                checkedIdx[0] = items.size() - 1;
             }
         }
+
         adb.setSingleChoiceItems(items.toArray(new String[items.size()]), checkedIdx[0], new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 checkedIdx[0] = which;
             }
         });
-        adb.setTitle(isWaitingReady ? "谁打包的？" : "选择快递小哥")
+        adb.setTitle((isWaitingReady || action == ACTION_EDIT_PACK_WORKER) ? "谁打包的？" : "选择快递小哥")
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         final int selectedWorker = workerList.get(checkedIdx[0]).getId();
-                        if (action == ACTION_EDIT_SHIP_WORKER ) {
+                        if (action == ACTION_EDIT_SHIP_WORKER) {
                             new EditShipWorkerTask(selectedWorker, activity).executeOnIO();
                         } else if (action == ACTION_EDIT_PACK_WORKER) {
                             new EditPackWorkerTask(selectedWorker, activity).executeOnIO();
@@ -614,6 +612,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                 ResultBean result = dao.chg_ship_worker(orderId, ship_worker_id, selectedWorker);
                 if (result.isOk()) {
                     showToast("修改配送员成功！", true);
+                    ship_worker_id = selectedWorker;
                     return true;
                 } else {
                     error = result.getDesc();
@@ -652,6 +651,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
                 ResultBean result = dao.order_chg_pack_worker(orderId, pack_worker_id, selectedWorker);
                 if (result.isOk()) {
                     showToast("修改打包员成功！", true);
+                    pack_worker_id = selectedWorker;
                     return true;
                 } else {
                     error = result.getDesc();
