@@ -37,7 +37,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_STORE_PERF = 4;
 	private static final int TYPE_STORE_STORAGE = 5;
 	private static final int TYPE_ORDER_SEARCH = 6;
-	private static final int TYPE_USER_COMMENTS = 7;
+	public static final int TYPE_USER_ITEMS = 7;
 	private static final int TYPE_QUALITY_CASE = 8;
 	public static final int TYPE_ORDER_DELAYED = 9;
 	private static final int TYPE_TOTAL_SCORE = 10;
@@ -50,8 +50,8 @@ public class MineActivity extends AbstractActionBarActivity {
 		super.onCreate(savedInstanceState);
 
 		this.setContentView(R.layout.mine_lists);
-		listView = (ListView) findViewById(android.R.id.list);
-        listAdapter = new MineItemsAdapter(this, R.layout.mine_lists, R.id.text1, R.id.image1);
+		listView = (ListView) findViewById(R.id.nav_list);
+        listAdapter = new MineItemsAdapter(this);
         this.listView.setAdapter(listAdapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -88,7 +88,7 @@ public class MineActivity extends AbstractActionBarActivity {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
 							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + GlobalCtx.getApplication().getSpecialToken()));
 					startActivity(intent);
-				} else if (item.getType() == TYPE_USER_COMMENTS) {
+				} else if (item.getType() == TYPE_USER_ITEMS) {
 					startActivity(new Intent(getApplicationContext(), UserCommentsActivity.class));
 				} else if (item.getType() == TYPE_STORE_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
@@ -154,7 +154,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.get("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("库存盘点", -1, TYPE_STORE_STORAGE, null));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("用户评价", -1, TYPE_USER_COMMENTS, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("客 户", -1, TYPE_USER_ITEMS, null));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("案例跟踪", -1, TYPE_QUALITY_CASE, null));
 

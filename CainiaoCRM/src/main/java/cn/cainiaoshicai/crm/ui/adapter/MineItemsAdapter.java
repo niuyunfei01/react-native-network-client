@@ -9,7 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -18,37 +21,60 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
+import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 
 public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extends ArrayAdapter<T> {
-    Activity context;
     int layoutId;
     int textId;
     int imageId;
 
-    public MineItemsAdapter(Activity context, int layoutId, int textId, int imageId) {
-        super(context, layoutId, new ArrayList<T>());
-
-        this.context = context;
-        this.layoutId = layoutId;
-        this.textId = textId;
-        this.imageId = imageId;
+    public MineItemsAdapter(Activity context) {
+        super(context, R.layout.mine_lists, new ArrayList<T>());
+        this.layoutId = R.layout.mine_lists;
+        this.textId = R.id.text1;
+        this.imageId = R.id.image1;
     }
 
     public View getView(int pos, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = context.getLayoutInflater();
-        View row = inflater.inflate(layoutId, null);
-        TextView label = (TextView) row.findViewById(textId);
+        LayoutInflater inflater = ((Activity)getContext()).getLayoutInflater();
+        ViewHolder holder;
+
+        if (convertView == null) {
+            convertView = inflater.inflate(layoutId, null);
+
+            holder = new ViewHolder();
+            holder.text = (TextView) convertView.findViewById(textId);
+            holder.icon = (ImageView) convertView.findViewById(this.imageId);
+            holder.statusLabel = (TextView) convertView.findViewById(R.id.text_device_status);
+
+            holder.delayedOverview = convertView.findViewById(R.id.delayed_overview);
+            holder.lastWeekRatio = (TextView) convertView.findViewById(R.id.last_week_in_time_ratio);
+            holder.toadyInTimeRatio = (TextView) convertView.findViewById(R.id.today_in_time_ratio);
+            holder.lastWeekReadyTime = (TextView) convertView.findViewById(R.id.last_week_avg_ready_time);
+            holder.todayReadyTime = (TextView) convertView.findViewById(R.id.toady_avg_ready_time);
+            holder.viewAllLate = (Button) convertView.findViewById(R.id.btn_view_all_late);
+            holder.viewAllSerious = (Button) convertView.findViewById(R.id.btn_view_all_serious);
+
+            holder.user_rst_overview = (RelativeLayout) convertView.findViewById(R.id.user_rst_overview);
+            holder.week_new_user = (TextView)convertView.findViewById(R.id.week_new_user);
+            holder.week_retent_user = (TextView)convertView.findViewById(R.id.week_retent_user);
+            holder.total_complain_todo = (TextView) convertView.findViewById(R.id.total_complain_todo);
+            holder.total_complain_done = (TextView) convertView.findViewById(R.id.total_complain_done);
+
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        TextView label = holder.text;
 
 
         T item = this.getItem(pos);
         label.setText(item.getName());
 
-        TextView statusLabel = (TextView) row.findViewById(R.id.text_device_status);
-
         if (item.getType() == MineActivity.TYPE_ORDER_DELAYED) {
-            View delayedOverview = row.findViewById(R.id.delayed_overview);
-            delayedOverview.setVisibility(View.VISIBLE);
-            statusLabel.setVisibility(View.GONE);
+            holder.delayedOverview.setVisibility(View.VISIBLE);
+            holder.statusLabel.setVisibility(View.GONE);
 
             ArrayList<Object> params = item.getParams();
             MineActivity.StatInTime statInTime = null;
@@ -56,26 +82,19 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
                 statInTime = (MineActivity.StatInTime) params.get(0);
             }
 
-            TextView lastWeekRatio = (TextView) row.findViewById(R.id.last_week_in_time_ratio);
-            TextView toadyInTimeRatio = (TextView) row.findViewById(R.id.today_in_time_ratio);
+            holder.lastWeekRatio.setText("上周准点率: " + (statInTime != null && statInTime.inTimeRatioLastWeek != null ? String.format("%.1f%%", statInTime.inTimeRatioLastWeek * 100) : "-"));
+            holder.toadyInTimeRatio.setText("今日准点率: " + (statInTime != null && statInTime.inTimeRatioToday != null ? String.format("%.1f%%",  statInTime.inTimeRatioToday * 100) : "-"));
 
-            lastWeekRatio.setText("上周准点率: " + (statInTime != null && statInTime.inTimeRatioLastWeek != null ? String.format("%.1f%%", statInTime.inTimeRatioLastWeek * 100) : "-"));
-            toadyInTimeRatio.setText("今日准点率: " + (statInTime != null && statInTime.inTimeRatioToday != null ? String.format("%.1f%%",  statInTime.inTimeRatioToday * 100) : "-"));
+            holder.lastWeekReadyTime.setText("上周25分出库率:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f%%", statInTime.avgReadyTimeLastWeek * 100) : "-"));
+            holder.todayReadyTime.setText("今日25分出库率:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f%%", statInTime.avgReadyTimeToday * 100) : "-"));
 
-            TextView lastWeekReadyTime = (TextView) row.findViewById(R.id.last_week_avg_ready_time);
-            TextView todayReadyTime = (TextView) row.findViewById(R.id.toady_avg_ready_time);
-            lastWeekReadyTime.setText("上周25分出库率:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f%%", statInTime.avgReadyTimeLastWeek * 100) : "-"));
-            todayReadyTime.setText("今日25分出库率:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f%%", statInTime.avgReadyTimeToday * 100) : "-"));
+            holder.viewAllLate.setText("延误" + ((statInTime.getTotalLate() != null && statInTime.getTotalLate() > 0) ? String.format("%s单", statInTime.getTotalLate()) : "订单"));
+            holder.viewAllSerious.setText("严重延误" + ((statInTime.getTotalSeriousLate() != null && statInTime.getTotalSeriousLate() > 0) ? String.format("%s单", statInTime.getTotalSeriousLate()) : "订单"));
 
-            Button viewAllLate = (Button) row.findViewById(R.id.btn_view_all_late);
-            Button viewAllSerious = (Button) row.findViewById(R.id.btn_view_all_serious);
-            viewAllLate.setText("延误" + ((statInTime.getTotalLate() != null && statInTime.getTotalLate() > 0) ? String.format("%s单", statInTime.getTotalLate()) : "订单"));
-            viewAllSerious.setText("严重延误" + ((statInTime.getTotalSeriousLate() != null && statInTime.getTotalSeriousLate() > 0) ? String.format("%s单", statInTime.getTotalSeriousLate()) : "订单"));
+            holder.viewAllLate.setOnClickListener(new ToSearchBtnListener("delayed:yes"));
+            holder.viewAllSerious.setOnClickListener(new ToSearchBtnListener("delayed:serious"));
 
-            viewAllLate.setOnClickListener(new ToSearchBtnListener("delayed:yes"));
-            viewAllSerious.setOnClickListener(new ToSearchBtnListener("delayed:serious"));
-
-            delayedOverview.setOnClickListener(new View.OnClickListener() {
+            holder.delayedOverview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(v.getContext(), GeneralWebViewActivity.class);
@@ -83,17 +102,23 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
                     v.getContext().startActivity(i);
                 }
             });
-        } else {
+        } else if(item.getType() == MineActivity.TYPE_USER_ITEMS){
+            holder.user_rst_overview.setVisibility(View.VISIBLE);
+            holder.user_rst_overview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.getContext().startActivity(new Intent(v.getContext(), UserCommentsActivity.class));
+                }
+            });
+        }else {
             if (item.getCount() >= 0) {
-                statusLabel.setText(String.valueOf(item.getCount()));
+                holder.statusLabel.setText(String.valueOf(item.getCount()));
             }
-
         }
 
-        ImageView icon = (ImageView) row.findViewById(imageId);
-        icon.setImageResource(R.drawable.arrow);
+        holder.icon.setImageResource(R.drawable.arrow);
 
-        return (row);
+        return (convertView);
     }
 
     static public class PerformanceItem {
@@ -137,6 +162,30 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
         public ArrayList<Object> getParams() {
             return params;
         }
+    }
+
+    static class ViewHolder {
+        TextView text;
+        ImageView icon;
+        TextView statusLabel;
+
+
+        public View delayedOverview;
+        public TextView lastWeekRatio;
+        public TextView toadyInTimeRatio;
+        public TextView lastWeekReadyTime;
+        public TextView todayReadyTime;
+        public Button viewAllLate;
+        public Button viewAllSerious;
+
+
+        public RelativeLayout user_rst_overview;
+
+
+        public TextView week_new_user;
+        public TextView week_retent_user;
+        public TextView total_complain_todo;
+        public TextView total_complain_done;
     }
 
     private static class ToSearchBtnListener implements View.OnClickListener {
