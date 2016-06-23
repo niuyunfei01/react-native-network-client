@@ -48,7 +48,7 @@ public class SettingsPrintActivity extends ListActivity {
 		this.setContentView(R.layout.settings_print);
 
 		setTitle(R.string.title_print_setting);
-        listAdapter = new BluetoothItemAdapter<>(this, R.id.printers_list, R.id.text1, R.id.image1);
+        listAdapter = new BluetoothItemAdapter<>(this, R.layout.print_list, R.id.text1, R.id.image1);
         setListAdapter(listAdapter);
 
 		Switch toggleSoundNotify = (Switch) findViewById(R.id.toggleSoundNotify);
