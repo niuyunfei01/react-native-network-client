@@ -28,7 +28,7 @@ public class Constants {
     public static final Platform PLAT_WX = new Platform("微信", 2);
     public static final Platform PLAT_MT  = new Platform("美团", 3);
     public static final Platform PLAT_ELEME  = new Platform("饿了么", 4);
-    public static final Platform PLAT_APP  = new Platform("App", 5);
+    public static final Platform PLAT_APP  = new Platform("菜鸟APP", 5);
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", -1);
 
     public static final String ERR_INVALID_GRANT = "invalid_grant";
@@ -45,7 +45,7 @@ public class Constants {
         }
 
         static public Platform find(int id) {
-            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME)) {
+            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP)) {
                 if (next.id == id) {
                     return next;
                 }
