@@ -156,8 +156,6 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("客 户", -1, TYPE_USER_ITEMS, null));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("案例跟踪", -1, TYPE_QUALITY_CASE, null));
-
 		String versionDesc = getVersionDesc();
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("打印设置", -1, TYPE_PRINT_SETTINGS, null));

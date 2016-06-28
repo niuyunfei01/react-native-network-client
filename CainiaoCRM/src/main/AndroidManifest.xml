@@ -101,6 +101,9 @@
         <activity android:name=".ui.activity.GeneralWebViewActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
+        <activity android:name=".ui.activity.UserFeedBackEditActivity" android:screenOrientation="portrait">
+            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        </activity>
 
         <activity android:name="com.example.BlueToothPrinterApp.BlueToothPrinterApp"/>
         <activity android:name=".ui.activity.SettingsPrintActivity" android:screenOrientation="portrait"/>

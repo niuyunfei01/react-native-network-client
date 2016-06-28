@@ -203,12 +203,27 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_user_feedback">用户反馈</string>
+    <string name="title_user_feedback">客诉信息</string>
     <string name="feedback_hint">输入用户反馈信息</string>
+    <string name="feedback_process_hint">客诉处理过程、结果</string>
     <string name="menu_user_feedback">用户反馈</string>
     <string name="menu_invalid">置为无效</string>
     <string name="menu_order_chg_pack">修改分拣员</string>
     <string name="menu_order_chg_ship">修改送货员</string>
     <string name="action_source_done">备货状态</string>
+    <string name="order_text">订单</string>
+    <string name="process_right_once">需立即处理</string>
+
+    <string-array name="feedback_source_array">
+        <item>400来电</item>
+        <item>微信后台</item>
+        <item>客户回访</item>
+        <item>通过员工反馈</item>
+        <item>饿了么评价</item>
+        <item>美团外卖评价</item>
+        <item>百度外卖评价</item>
+        <item>京东到家评价</item>
+        <item>员工建议</item>
+    </string-array>
 
 </resources>

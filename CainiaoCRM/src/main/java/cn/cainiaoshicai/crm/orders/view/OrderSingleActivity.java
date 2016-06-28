@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,12 +47,14 @@ import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
+import cn.cainiaoshicai.crm.ui.activity.UserFeedBackEditActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
  */
 public class OrderSingleActivity extends Activity implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
+    private static final int REQUEST_CODE_ADDFB = 1001;
     private WebView mWebView;
     private DelayFaqFragment delayFaqFragment;
     private MenuItem refreshItem;
@@ -71,6 +74,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     private static final int ACTION_NORMAL = 0;
     private static final int ACTION_EDIT_SHIP_WORKER = 1;
     private static final int ACTION_EDIT_PACK_WORKER = 2;
+    private String platformWithId;
 
 
     @Override
@@ -97,6 +101,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         this.orderId = order.getId();
         platformOid = order.getPlatform_oid();
         shipWorkerName = order.getShip_worker_name();
+        platformWithId = order.platformWithId();
         int sourceReady = order.getSource_ready();
         listType = intent.getIntExtra("list_type", 0);
         fromStatus = order.getOrderStatus();
@@ -384,11 +389,29 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_ADDFB) {
+            if (resultCode == RESULT_OK) {
+                if (data != null) {
+                    boolean added = data.getBooleanExtra("done", false);
+                    if (added) {
+                        this.refresh();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_user_feedback:
-                UserFeedbackDialogFragment dlg = new UserFeedbackDialogFragment();
-                dlg.show(getFragmentManager(), "userFeedbackDlg");
+                Intent intent = new Intent(this, UserFeedBackEditActivity.class);
+                intent.putExtra("order_id", this.orderId);
+                intent.putExtra("platformWithId", this.platformWithId);
+
+                startActivityForResult(intent, REQUEST_CODE_ADDFB);
+
                 break;
             case R.id.menu_set_invalid:
                 AlertDialog.Builder adb = new AlertDialog.Builder(this);

@@ -17,7 +17,7 @@ public class UserFeedbackDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.dialog_user_feedback, null))
+        builder.setView(inflater.inflate(R.layout.user_feedback_add, null))
                 // Add action buttons
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override

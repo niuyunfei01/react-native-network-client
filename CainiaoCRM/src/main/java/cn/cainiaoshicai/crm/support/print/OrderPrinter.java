@@ -132,8 +132,6 @@ public class OrderPrinter {
             OutputStream btos = btsocket.getOutputStream();
             OrderPrinter printer = new OrderPrinter(btos);
 
-            String platformName = Constants.Platform.find(order.getPlatform()).name;
-
 
             btos.write(new byte[]{0x1B, 0x21, 0});
             btos.write(GPrinterCommand.left);
@@ -141,8 +139,7 @@ public class OrderPrinter {
             printer.starLine().highBigText("   菜鸟食材").newLine()
                     .newLine().highBigText("  #" + order.getSimplifiedId());
 
-            boolean dayIdInvalid = TextUtil.isEmpty(order.getPlatform_dayId()) || "0".equals(order.getPlatform_dayId());
-            printer.normalText(String.format("(%s#%s)", platformName, dayIdInvalid ? order.getPlatform_oid() : order.getPlatform_dayId())).newLine();
+            printer.normalText(order.platformWithId()).newLine();
 
             printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
 
@@ -163,7 +160,7 @@ public class OrderPrinter {
             }
 
             printer.starLine()
-                    .normalText("订单编号：" + platformName + "-" + order.getPlatform_oid())
+                    .normalText("订单编号：" + Constants.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
                     .newLine()
                     .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
                     .newLine();

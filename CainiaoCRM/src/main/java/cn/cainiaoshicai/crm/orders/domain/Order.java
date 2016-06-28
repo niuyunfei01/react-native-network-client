@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.print.Constant;
 
 public class Order implements Serializable {
@@ -332,6 +333,11 @@ public class Order implements Serializable {
 
     public void setPack_operator(int pack_operator) {
         this.pack_operator = pack_operator;
+    }
+
+    public String platformWithId() {
+        boolean dayIdInvalid = TextUtil.isEmpty(this.getPlatform_dayId()) || "0".equals(this.getPlatform_dayId());
+        return String.format("(%s#%s)", Constants.Platform.find(this.getPlatform()).name, dayIdInvalid ? this.getPlatform_oid() : this.getPlatform_dayId());
     }
 
     public boolean shouldTryAutoPrint() {
