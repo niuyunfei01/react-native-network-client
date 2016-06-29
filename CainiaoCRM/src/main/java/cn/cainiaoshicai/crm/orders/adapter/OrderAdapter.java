@@ -131,7 +131,7 @@ public class OrderAdapter extends BaseAdapter {
 
             String platformName = Constants.Platform.find(order.getPlatform()).name;
             String platformDayId = order.getPlatform_dayId();
-            sourcePlatform.setText(platformName + (platformDayId != null && order.getPlatform() != Constants.PLAT_WX.id? String.format("#%s", platformDayId) : ""));
+            sourcePlatform.setText(order.platformWithId());
 
             if (order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
