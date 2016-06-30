@@ -175,6 +175,7 @@
     <string name="title_not_connected">未连接</string>
     <string name="title_bluetooth_setting">蓝牙打印设置</string>
     <string name="title_print_setting">打印设置</string>
+    <string name="title_storage_status">库存盘点</string>
 
     <string name="action_package_done">打包完成</string>
     <string name="action_start_ship">提醒出发</string>
@@ -224,6 +225,13 @@
         <item>百度外卖评价</item>
         <item>京东到家评价</item>
         <item>员工建议</item>
+    </string-array>
+
+    <string-array name="storage_categories_array">
+        <item>只看即将补货</item>
+        <item>只看缺货</item>
+        <item>只看总部备货</item>
+        <item>只看门店备货</item>
     </string-array>
 
 </resources>

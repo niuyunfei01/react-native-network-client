@@ -12,8 +12,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -32,7 +30,7 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
         super(context, R.layout.mine_lists, new ArrayList<T>());
         this.layoutId = R.layout.mine_lists;
         this.textId = R.id.text1;
-        this.imageId = R.id.image1;
+        this.imageId = R.id.storage_item_status;
     }
 
     public View getView(int pos, View convertView, ViewGroup parent) {

@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import cn.cainiaoshicai.crm.domain.Store;
+
 /**
  */
 public class Constants {
@@ -13,6 +15,9 @@ public class Constants {
     public static final int STORE_HLG = 1;
     public static final int STORE_YYC = 2;
     public static final int STORE_UNKNOWN = -1;
+
+    public static final Store ST_HLG = new Store("回龙观", STORE_HLG);
+    public static final Store ST_YYC = new Store("亚运村", STORE_YYC);
 
     public static final int MAX_EXCELL_SPENT_TIME = 50;
 

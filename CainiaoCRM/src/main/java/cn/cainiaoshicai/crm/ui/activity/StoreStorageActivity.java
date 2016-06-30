@@ -1,90 +1,258 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.view.KeyEvent;
+import android.util.Pair;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
-import cn.cainiaoshicai.crm.MainActivity;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
-import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
+import cn.cainiaoshicai.crm.dao.StorageActionDao;
+import cn.cainiaoshicai.crm.domain.StorageItem;
+import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
-/**
- */
 public class StoreStorageActivity extends AbstractActionBarActivity {
-    private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
-    private WebView mWebView;
+
+    private static final int MENU_CONTEXT_DELETE_ID = 10992;
+    private StorageItemAdapter<StorageItem> listAdapter;
+    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+
+    private static final int FILTER_ALL = 1;
+    private static final int FILTER_RISK = 2;
+    private static final int FILTER_SOLD_OUT = 3;
+
+    private int filter = FILTER_ALL;
+
+    private Store currStore;
+
+    private Button btnSoldOut;
+    private Button btnRisk;
+    private Button btnAll;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.quality_case_list);
 
-        ActionBar ab = getSupportActionBar();
-        ab.setHomeButtonEnabled(true);
+        this.setContentView(R.layout.storage_status);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
+        setTitle(R.string.title_storage_status);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        ListView lv = (ListView) findViewById(R.id.list_storage_status);
+
+        listAdapter = new StorageItemAdapter<>(this, new ArrayList<StorageItem>());
+        listAdapter.notifyDataSetChanged();
+        lv.setAdapter(listAdapter);
+        registerForContextMenu(lv);
+
+        Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
+        final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        storeArrayAdapter.addAll(Constants.ST_HLG, Constants.ST_YYC);
+        storeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        currStoreSpinner.setAdapter(storeArrayAdapter);
+        currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Store newStore = storeArrayAdapter.getItem(position);
+                if (currStore == null || currStore.getStoreId() != newStore.getStoreId()) {
+                    currStore = newStore;
+                    refreshData();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        if (currStore == null) {
+            currStore = Constants.ST_HLG;
         }
-        mWebView = (WebView) findViewById(R.id.activity_main_webview);
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
 
-        mWebView.setWebViewClient(new MyAppWebViewClient());
+//        Spinner filterCategories = (Spinner) findViewById(R.id.filter_categories);
+//        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                R.array.storage_categories_array, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        filterCategories.setAdapter(adapter);
+//        filterCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                String feedback_source = adapter.getItem(position).toString();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
 
-        mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
+        btnAll = (Button) findViewById(R.id.filter_btn_all);
+        btnRisk = (Button) findViewById(R.id.filter_btn_risk);
+        btnSoldOut = (Button) findViewById(R.id.filter_btn_sold_out);
 
-        String url = String.format("%s/store_goods/mobileapp.html", HTTP_MOBILE_STORES);
-        AppLogger.i("loading url:" + url);
-        mWebView.loadUrl(url);
+        btnAll.setOnClickListener(new FilterButtonClicked(FILTER_ALL));
+        btnRisk.setOnClickListener(new FilterButtonClicked(FILTER_RISK));
+        btnSoldOut.setOnClickListener(new FilterButtonClicked(FILTER_SOLD_OUT));
+
+        updateFilterBtnLabels(0, 0, 0);
+        refreshData();
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
+    private void updateFilterBtnLabels(int total, int totalRisk, int totalSoldOut) {
+        btnAll.setText(String.format("全部(%s)", total > 0 ? total : "-"));
+        btnRisk.setText(String.format("低于安全库存(%s)", totalRisk > 0 ? totalRisk : "-"));
+        btnSoldOut.setText(String.format("已售完(%s)", totalSoldOut > 0 ? totalSoldOut :  "-"));
+    }
+
+    private void updateAdapterData(List<StorageItem> storageItems) {
+        listAdapter.clear();
+        listAdapter.addAll(storageItems);
+        listAdapter.notifyDataSetChanged();
+    }
+
+    private void refreshData() {
+        new MyAsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    final Pair<List<StorageItem>, StorageActionDao.StoreStatusStat> result = sad.getStorageItems(currStore);
+
+                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (result.first != null) {
+                                updateAdapterData(result.first);
+                            }
+                            StorageActionDao.StoreStatusStat sec = result.second;
+                            if (sec != null) {
+                                updateFilterBtnLabels(sec.getTotal(), sec.getTotal_risk(), sec.getTotal_sold_out());
+                            }
+                        }
+                    });
+                } catch (ServiceException e) {
+                    e.printStackTrace();
+                    AppLogger.e("error to get storage items:" + currStore, e);
+                }
+                return null;
+            }
+        }.executeOnIO();
+    }
+
+    @Override
+    protected void onActivityResult(int reqCode, int resultCode, Intent intent) {
+        super.onActivityResult(reqCode, resultCode, intent);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        String title = listAdapter.getItem(info.position).getIdAndNameStr();
+        menu.setHeaderTitle(title);
+
+        menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_process:
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            case MENU_CONTEXT_DELETE_ID:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                 AppLogger.d("reset storage item pos=" + info.position);
+                final StorageItem storageItem = this.listAdapter.getItem(info.position);
+                LayoutInflater inflater = (LayoutInflater)
+                        getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
+                final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
+                et.setText(String.valueOf(storageItem.getLeft_since_last_stat()));
+                AlertDialog dlg = new AlertDialog.Builder(this)
+                        .setTitle(String.format("设置库存数:(%s)", storageItem.getName()))
+                        .setView(npView)
+                        .setPositiveButton(R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        new MyAsyncTask<Void, Void, Void>(){
+                                            @Override
+                                            protected Void doInBackground(Void... params) {
+
+                                                ResultBean rb;
+                                                final int lastStat = Integer.parseInt(et.getText().toString());
+                                                try {
+                                                    rb = sad.store_status_reset_stat_num(currStore.getStoreId(), storageItem.getProduct_id(), lastStat);
+                                                } catch (ServiceException e) {
+                                                    rb = new ResultBean(false , "访问服务器出错");
+                                                }
+
+                                                final ResultBean finalRb = rb;
+                                                StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if (finalRb.isOk()) {
+                                                            storageItem.setTotal_last_stat(lastStat);
+                                                            storageItem.setTotal_sold(0);
+                                                            storageItem.setLeft_since_last_stat(lastStat);
+                                                            listAdapter.notifyDataSetChanged();
+                                                            Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }
+                                                });
+                                                return null;
+                                            }
+                                        }.executeOnIO();
+                                    }
+                                })
+                        .setNegativeButton(R.string.cancel,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                    }
+                                })
+                        .create();
+                dlg.show();
+                et.requestFocus();
                 return true;
-            case R.id.menu_accept:
-                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
-                return true;
-//            case R.id.menu_manage:
-//                return true;
-//            case R.id.menu_settings:
-//                showHelp();
-//                startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
-//                return true;
             default:
-                return super.onOptionsItemSelected(item);
+                return super.onContextItemSelected(item);
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if(mWebView.canGoBack()) {
-            mWebView.goBack();
-        } else {
-            super.onBackPressed();
-        }
-    }
+    private class FilterButtonClicked implements View.OnClickListener {
+        private int clicked;
 
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button and if there's history
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
-            mWebView.goBack();
-            return true;
+        public FilterButtonClicked(int clicked) {
+            this.clicked = clicked;
         }
-        // If it wasn't the Back key or there's no web page history, bubble up to the default
-        // system behavior (probably exit the activity)
-        return super.onKeyDown(keyCode, event);
+
+        @Override
+        public void onClick(View v) {
+            if (filter != clicked) {
+                filter = clicked;
+                refreshData();
+            }
+        }
     }
 }

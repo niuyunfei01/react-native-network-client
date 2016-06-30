@@ -19,7 +19,6 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -48,7 +47,7 @@ public class SettingsPrintActivity extends ListActivity {
 		this.setContentView(R.layout.settings_print);
 
 		setTitle(R.string.title_print_setting);
-        listAdapter = new BluetoothItemAdapter<>(this, R.layout.print_list, R.id.text1, R.id.image1);
+        listAdapter = new BluetoothItemAdapter<>(this, R.layout.print_list, R.id.text1, R.id.storage_item_status);
         setListAdapter(listAdapter);
 
 		Switch toggleSoundNotify = (Switch) findViewById(R.id.toggleSoundNotify);
