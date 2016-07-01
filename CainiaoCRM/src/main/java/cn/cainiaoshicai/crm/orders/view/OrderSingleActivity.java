@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders.view;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
@@ -44,6 +45,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
@@ -52,7 +54,7 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
  */
-public class OrderSingleActivity extends Activity implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
+public class OrderSingleActivity extends AbstractActionBarActivity implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private static final int REQUEST_CODE_ADDFB = 1001;
     private WebView mWebView;
@@ -82,6 +84,9 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_single);
 
+        ActionBar actionBar = this.getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
@@ -105,7 +110,7 @@ public class OrderSingleActivity extends Activity implements DelayFaqFragment.No
         int sourceReady = order.getSource_ready();
         listType = intent.getIntExtra("list_type", 0);
         fromStatus = order.getOrderStatus();
-        final boolean isDelay = intent.getBooleanExtra("is_delay", false);
+        final boolean isDelay = order.getOrderStatus() == Constants.WM_ORDER_STATUS_ARRIVED && !Constants.DeliverReview.find(order.getReview_deliver()).isGood();
         printButton = (Button) findViewById(R.id.button1);
         int printTimes = order.getPrint_times();
         this.showPrintTimes(printTimes);
