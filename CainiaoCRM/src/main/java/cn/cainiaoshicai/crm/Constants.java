@@ -39,6 +39,18 @@ public class Constants {
     public static final String ERR_INVALID_GRANT = "invalid_grant";
     public static final int POSITION_EXT_SHIP = 3;
 
+    public static final Provide PROVIDE_SLEF = new Provide(1, "自采");
+    public static final Provide PROVIDE_COMMON = new Provide(0, "直供");
+
+    static public class Provide {
+        public final int value;
+        public final String name;
+
+        public Provide(int value, String name) {
+            this.value = value;
+            this.name = name;
+        }
+    }
 
     static public class Platform {
         public final String name;

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -95,11 +96,11 @@ public class StorageActionDao {
         }
     }
 
-    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter) throws ServiceException {
+    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Constants.Provide provide) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
-            String json = getJson("/list_store_storage_status/" + store.getStoreId() + "/" + filter, params);
+            String json = getJson("/list_store_storage_status/" + provide.value +  "/" + store.getStoreId() + "/" + filter, params);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
@@ -123,10 +124,10 @@ public class StorageActionDao {
                     storageItems.add(si);
                 }
             }
-            return new Pair<ArrayList<StorageItem>, StoreStatusStat>(storageItems, storagesMap.stats);
+            return new Pair<>(storageItems, storagesMap.stats);
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);
-            return new Pair<ArrayList<StorageItem>, StoreStatusStat>(storageItems, new StoreStatusStat());
+            return new Pair<>(storageItems, new StoreStatusStat());
         }
     }
 

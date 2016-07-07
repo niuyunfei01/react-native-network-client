@@ -42,6 +42,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	public static final int TYPE_ORDER_DELAYED = 9;
 	private static final int TYPE_TOTAL_SCORE = 10;
 	private static final int TYPE_SYNC_STATUS = 11;
+	private static final int TYPE_STORE_SELF_STORAGE = 12;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
@@ -92,6 +93,8 @@ public class MineActivity extends AbstractActionBarActivity {
 					startActivity(new Intent(getApplicationContext(), UserCommentsActivity.class));
 				} else if (item.getType() == TYPE_STORE_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+				}  else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
+					startActivity(new Intent(getApplicationContext(), StoreSelfStorageActivity.class));
 				} else if (item.getType() == TYPE_QUALITY_CASE) {
 					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
 				} else if (item.getType() == TYPE_ORDER_SEARCH) {
@@ -152,7 +155,8 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.get("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("供货管理", -1, TYPE_STORE_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部供货管理", -1, TYPE_STORE_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店自采管理", -1, TYPE_STORE_SELF_STORAGE, null));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("客 户", -1, TYPE_USER_ITEMS, null));
 

@@ -21,14 +21,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -43,9 +41,9 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
-public class StoreStorageActivity extends AbstractActionBarActivity {
+public class StoreSelfStorageActivity extends AbstractActionBarActivity {
 
-    private static final int MENU_CONTEXT_DELETE_ID = 10992;
+    private static final int MENU_CONTEXT_DELETE_ID = 10991;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
@@ -72,7 +70,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         if (savedInstanceState == null) {
             this.setContentView(R.layout.storage_status);
 
-            setTitle(R.string.title_storage_status);
+            setTitle(R.string.title_storage_self_provided);
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             lv = (ListView) findViewById(R.id.list_storage_status);
@@ -103,7 +101,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     } else {
-                        Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
+                        Toast.makeText(StoreSelfStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -206,13 +204,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             @Override
             protected void onPreExecute() {
                 progressFragment.setAsyncTask(this);
-                Utility.forceShowDialog(StoreStorageActivity.this, progressFragment);
+                Utility.forceShowDialog(StoreSelfStorageActivity.this, progressFragment);
             }
 
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, Constants.PROVIDE_COMMON);
+                    result = sad.getStorageItems(currStore, filter, Constants.PROVIDE_SLEF);
                     return null;
                 } catch (ServiceException e) {
                     e.printStackTrace();
@@ -228,7 +226,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 //                if (progressFragment.isVisible()) {
                     progressFragment.dismissAllowingStateLoss();
 //                }
-                StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (result.first != null) {
@@ -291,7 +289,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                                                 }
 
                                                 final ResultBean finalRb = rb;
-                                                StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                                                StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         if (finalRb.isOk()) {
@@ -299,9 +297,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                                                             storageItem.setTotal_sold(0);
                                                             storageItem.setLeft_since_last_stat(lastStat);
                                                             listAdapter.notifyDataSetChanged();
-                                                            Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(StoreSelfStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
                                                         } else {
-                                                            Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(StoreSelfStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
                                                         }
                                                     }
                                                 });
