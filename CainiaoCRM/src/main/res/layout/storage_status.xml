@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="#ffffff">
 
-    <Button android:id="@+id/filter_btn_all"
+    <Button android:id="@+id/filter_btn_on_sale"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:textSize="12sp"
@@ -15,7 +15,7 @@
 
     <Button
         android:id="@+id/filter_btn_sold_out"
-        android:layout_toEndOf="@+id/filter_btn_all"
+        android:layout_toEndOf="@+id/filter_btn_on_sale"
         android:layout_alignParentTop="true"
         android:textSize="12sp"
         android:layout_width="wrap_content"
@@ -23,6 +23,13 @@
 
     <Button android:id="@+id/filter_btn_risk"
         android:layout_toEndOf="@+id/filter_btn_sold_out"
+        android:layout_alignParentTop="true"
+        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button android:id="@+id/filter_btn_Off_sale"
+        android:layout_toEndOf="@+id/filter_btn_risk"
         android:layout_alignParentTop="true"
         android:textSize="12sp"
         android:layout_width="wrap_content"
@@ -69,7 +76,7 @@
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
             android:paddingTop="10dp"
-            android:text="盘点数"
+            android:text="库存"
             android:textSize="16sp"
             android:textColor="#000000"
             android:typeface="sans"/>
@@ -84,7 +91,7 @@
             android:paddingEnd="5dp"
             android:paddingTop="10dp"
             android:textSize="16sp"
-            android:text="已售数"
+            android:text="已售"
             android:textColor="#000000"
             android:typeface="sans"/>
 
@@ -103,5 +110,27 @@
         android:layout_height="wrap_content"
         android:background="@drawable/abc_cab_background_top_holo_light"
         android:layout_below="@+id/storage_list_title"/>
+
+    <!--<TextView android:id="@+id/paged_overview"-->
+        <!--android:layout_toStartOf="@+id/page_back"-->
+        <!--android:layout_below="@+id/list_storage_status"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
+
+    <!--<Button android:id="@+id/page_back"-->
+        <!--android:drawableEnd="@drawable/ic_action_back"-->
+        <!--android:text="上一页"-->
+        <!--android:layout_toStartOf="@+id/page_forward"-->
+        <!--android:layout_below="@+id/list_storage_status"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
+
+    <!--<Button android:id="@+id/page_forward"-->
+        <!--android:drawableEnd="@drawable/ic_action_forward"-->
+        <!--android:text="下一页"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_below="@+id/list_storage_status"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
 
 </RelativeLayout>

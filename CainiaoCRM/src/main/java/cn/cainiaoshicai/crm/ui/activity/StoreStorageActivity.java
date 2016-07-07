@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
 public class StoreStorageActivity extends AbstractActionBarActivity {
@@ -39,58 +41,59 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+    private ListView lv;
 
-    private static final int FILTER_ALL = 1;
+    private static final int FILTER_ON_SALE = 1;
     private static final int FILTER_RISK = 2;
     private static final int FILTER_SOLD_OUT = 3;
+    private static final int FILTER_OFF_SALE = 4;
 
-    private int filter = FILTER_ALL;
+    private int filter = FILTER_ON_SALE;
 
     private Store currStore;
 
     private Button btnSoldOut;
     private Button btnRisk;
-    private Button btnAll;
+    private Button btnOnSale;
+    private Button btnOffSale;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.setContentView(R.layout.storage_status);
+        if (savedInstanceState == null) {
+            this.setContentView(R.layout.storage_status);
 
-        setTitle(R.string.title_storage_status);
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            setTitle(R.string.title_storage_status);
+            this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ListView lv = (ListView) findViewById(R.id.list_storage_status);
+            lv = (ListView) findViewById(R.id.list_storage_status);
+            registerForContextMenu(lv);
+            resetListAdapter(new ArrayList<StorageItem>());
 
-        listAdapter = new StorageItemAdapter<>(this, new ArrayList<StorageItem>());
-        listAdapter.notifyDataSetChanged();
-        lv.setAdapter(listAdapter);
-        registerForContextMenu(lv);
-
-        Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
-        final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        storeArrayAdapter.addAll(Constants.ST_HLG, Constants.ST_YYC);
-        storeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        currStoreSpinner.setAdapter(storeArrayAdapter);
-        currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Store newStore = storeArrayAdapter.getItem(position);
-                if (currStore == null || currStore.getStoreId() != newStore.getStoreId()) {
-                    currStore = newStore;
-                    refreshData();
+            Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
+            final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            storeArrayAdapter.addAll(Constants.ST_HLG, Constants.ST_YYC);
+            storeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            currStoreSpinner.setAdapter(storeArrayAdapter);
+            currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Store newStore = storeArrayAdapter.getItem(position);
+                    if (currStore == null || currStore.getStoreId() != newStore.getStoreId()) {
+                        currStore = newStore;
+                        refreshData();
+                    }
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
 
-        if (currStore == null) {
-            currStore = Constants.ST_HLG;
-        }
+            if (currStore == null) {
+                currStore = Constants.ST_HLG;
+            }
 
 //        Spinner filterCategories = (Spinner) findViewById(R.id.filter_categories);
 //        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -109,54 +112,92 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 //            }
 //        });
 
-        btnAll = (Button) findViewById(R.id.filter_btn_all);
-        btnRisk = (Button) findViewById(R.id.filter_btn_risk);
-        btnSoldOut = (Button) findViewById(R.id.filter_btn_sold_out);
+            btnOnSale = (Button) findViewById(R.id.filter_btn_on_sale);
+            btnRisk = (Button) findViewById(R.id.filter_btn_risk);
+            btnSoldOut = (Button) findViewById(R.id.filter_btn_sold_out);
+            btnOffSale = (Button) findViewById(R.id.filter_btn_Off_sale);
 
-        btnAll.setOnClickListener(new FilterButtonClicked(FILTER_ALL));
-        btnRisk.setOnClickListener(new FilterButtonClicked(FILTER_RISK));
-        btnSoldOut.setOnClickListener(new FilterButtonClicked(FILTER_SOLD_OUT));
+            btnOnSale.setOnClickListener(new FilterButtonClicked(FILTER_ON_SALE));
+            btnRisk.setOnClickListener(new FilterButtonClicked(FILTER_RISK));
+            btnSoldOut.setOnClickListener(new FilterButtonClicked(FILTER_SOLD_OUT));
+            btnOffSale.setOnClickListener(new FilterButtonClicked(FILTER_OFF_SALE));
 
-        updateFilterBtnLabels(0, 0, 0);
-        refreshData();
+            updateFilterBtnLabels(0, 0, 0, 0);
+            refreshData();
+        }
     }
 
-    private void updateFilterBtnLabels(int total, int totalRisk, int totalSoldOut) {
-        btnAll.setText(String.format("全部(%s)", total > 0 ? total : "-"));
-        btnRisk.setText(String.format("低于安全库存(%s)", totalRisk > 0 ? totalRisk : "-"));
-        btnSoldOut.setText(String.format("已售完(%s)", totalSoldOut > 0 ? totalSoldOut :  "-"));
+    private void resetListAdapter(ArrayList<StorageItem> storageItems) {
+
+        lv.setAdapter(null);
+
+        listAdapter = new StorageItemAdapter<>(this, storageItems);
+        lv.setAdapter(listAdapter);
+
+//        lv.addFooterView(findViewById(R.id.paged_overview));
+
     }
 
-    private void updateAdapterData(List<StorageItem> storageItems) {
-        listAdapter.clear();
-        listAdapter.addAll(storageItems);
-        listAdapter.notifyDataSetChanged();
+    private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale) {
+        btnOnSale.setText(String.format("上架(%s)", totalOnSale > 0 ? totalOnSale : "-"));
+        btnRisk.setText(String.format("告急(%s)", totalRisk > 0 ? totalRisk : "-"));
+        btnSoldOut.setText(String.format("缺货(%s)", totalSoldOut > 0 ? totalSoldOut :  "-"));
+        btnOffSale.setText(String.format("下架(%s)", totalOffSale > 0 ? totalOffSale :  "-"));
+
+        int defColor = android.R.color.primary_text_dark;
+        btnOnSale.setTextColor(ContextCompat.getColor(this, filter != FILTER_ON_SALE ? defColor : R.color.green));
+        btnRisk.setTextColor(ContextCompat.getColor(this, filter != FILTER_RISK ? defColor : R.color.green));
+        btnSoldOut.setTextColor(ContextCompat.getColor(this, filter != FILTER_SOLD_OUT ? defColor : R.color.green));
+        btnOffSale.setTextColor(ContextCompat.getColor(this, filter != FILTER_OFF_SALE ? defColor : R.color.green));
+    }
+
+    private void updateAdapterData(ArrayList<StorageItem> storageItems) {
+        resetListAdapter(storageItems);
     }
 
     private void refreshData() {
         new MyAsyncTask<Void, Void, Void>(){
+            private ProgressFragment progressFragment = ProgressFragment.newInstance(R.string.refreshing);
+            Pair<ArrayList<StorageItem>, StorageActionDao.StoreStatusStat> result;
+
+            @Override
+            protected void onPreExecute() {
+                progressFragment.setAsyncTask(this);
+                Utility.forceShowDialog(StoreStorageActivity.this, progressFragment);
+            }
+
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    final Pair<List<StorageItem>, StorageActionDao.StoreStatusStat> result = sad.getStorageItems(currStore);
-
-                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (result.first != null) {
-                                updateAdapterData(result.first);
-                            }
-                            StorageActionDao.StoreStatusStat sec = result.second;
-                            if (sec != null) {
-                                updateFilterBtnLabels(sec.getTotal(), sec.getTotal_risk(), sec.getTotal_sold_out());
-                            }
-                        }
-                    });
+                    result = sad.getStorageItems(currStore, filter);
+                    return null;
                 } catch (ServiceException e) {
                     e.printStackTrace();
                     AppLogger.e("error to get storage items:" + currStore, e);
                 }
+
+                cancel(true);
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+//                if (progressFragment.isVisible()) {
+                    progressFragment.dismissAllowingStateLoss();
+//                }
+                StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (result.first != null) {
+                            updateAdapterData(result.first);
+                        }
+                        StorageActionDao.StoreStatusStat sec = result.second;
+                        if (sec != null) {
+                            updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
+                                    sec.getTotal_sold_out(), sec.getTotal_off_sale());
+                        }
+                    }
+                });
             }
         }.executeOnIO();
     }

@@ -27,6 +27,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.jpush.android.api.JPushInterface;
 
@@ -105,8 +106,13 @@ public class NotificationReceiver extends BroadcastReceiver {
 //					i.putExtra(SearchManager.QUERY, "ready_delayed:");
 				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
+				} else if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
+					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
+				} else if (Constants.PUSH_TYPE_BECOME_OFF_SALE.equals(notify.getType())
+						|| Constants.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
+					i = new Intent(context, StoreStorageActivity.class);
 				} else {
-					i = new Intent(context, RemindersActivity.class);
+					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 				}
 				i.putExtras(bundle);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

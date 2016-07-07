@@ -35,20 +35,29 @@ public class StorageActionDao {
 
     static public class StoreStatusStat {
 
-        private int total;
+        private int total_on_sale;
         private int total_risk;
         private int total_sold_out;
+        private int total_off_sale;
 
-        public int getTotal() {
-            return total;
+        public int getTotal_on_sale() {
+            return total_on_sale;
         }
 
-        public void setTotal(int total) {
-            this.total = total;
+        public void setTotal_on_sale(int total_on_sale) {
+            this.total_on_sale = total_on_sale;
         }
 
         public int getTotal_risk() {
             return total_risk;
+        }
+
+        public int getTotal_off_sale() {
+            return total_off_sale;
+        }
+
+        public void setTotal_off_sale(int total_off_sale) {
+            this.total_off_sale = total_off_sale;
         }
 
         public void setTotal_risk(int total_risk) {
@@ -86,11 +95,11 @@ public class StorageActionDao {
         }
     }
 
-    public Pair<List<StorageItem>, StoreStatusStat> getStorageItems(Store store) throws ServiceException {
+    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
-            String json = getJson("/list_store_storage_status/" + store.getStoreId(), params);
+            String json = getJson("/list_store_storage_status/" + store.getStoreId() + "/" + filter, params);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
@@ -101,6 +110,10 @@ public class StorageActionDao {
                     si.setTotal_last_stat(sp.getTotal_last_stat());
                     si.setTotal_sold(sp.getSold_from_last_stat());
                     si.setProduct_id(sp.getProduct_id());
+                    si.setStatus(sp.getStatus());
+                    si.setProduct_id(sp.getProduct_id());
+                    si.setSelf_provided(sp.getSelf_provided());
+                    si.setRisk_min_stat(sp.getRisk_min_stat());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {
@@ -109,10 +122,10 @@ public class StorageActionDao {
                     storageItems.add(si);
                 }
             }
-            return new Pair<List<StorageItem>, StoreStatusStat>(storageItems, storagesMap.stats);
+            return new Pair<ArrayList<StorageItem>, StoreStatusStat>(storageItems, storagesMap.stats);
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);
-            return new Pair<List<StorageItem>, StoreStatusStat>(storageItems, new StoreStatusStat());
+            return new Pair<ArrayList<StorageItem>, StoreStatusStat>(storageItems, new StoreStatusStat());
         }
     }
 

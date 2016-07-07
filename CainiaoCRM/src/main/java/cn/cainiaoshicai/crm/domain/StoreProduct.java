@@ -24,6 +24,10 @@ public class StoreProduct {
     private int total_left_in_store;
     private int left_since_last_stat;
 
+    private int risk_min_stat;
+    private int self_provided;
+    private int auto_off_sale;
+
     public int getId() {
         return id;
     }
@@ -158,5 +162,29 @@ public class StoreProduct {
 
     public void setLeft_since_last_stat(int left_since_last_stat) {
         this.left_since_last_stat = left_since_last_stat;
+    }
+
+    public int getRisk_min_stat() {
+        return risk_min_stat;
+    }
+
+    public void setRisk_min_stat(int risk_min_stat) {
+        this.risk_min_stat = risk_min_stat;
+    }
+
+    public int getSelf_provided() {
+        return self_provided;
+    }
+
+    public void setSelf_provided(int self_provided) {
+        this.self_provided = self_provided;
+    }
+
+    public int getAuto_off_sale() {
+        return auto_off_sale;
+    }
+
+    public void setAuto_off_sale(int auto_off_sale) {
+        this.auto_off_sale = auto_off_sale;
     }
 }

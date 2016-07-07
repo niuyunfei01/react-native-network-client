@@ -96,5 +96,8 @@ public class Constants {
     public static final String PUSH_TYPE_REDY_TIMEOUT = "ready_timeout";
     public static final String PUSH_TYPE_SYNC_BROKEN = "warning_no_active_sync";
     public static final String PUSH_TYPE_SERIOUS_TIMEOUT = "serious_timeout";
+    public static final String PUSH_TYPE_STORAGE_WARNING = "storage_warning";
+    public static final String PUSH_TYPE_BECOME_OFF_SALE = "store_prod_off_sale";
+    public static final String PUSH_TYPE_WM_GOOD_NOT_MAP = "prod_wm_not_map";
 
 }

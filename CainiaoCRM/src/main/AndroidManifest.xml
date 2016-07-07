@@ -17,8 +17,8 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="219"
-    android:versionName="2.1.0">
+    android:versionCode="221"
+    android:versionName="2.2.0">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
     <permission
@@ -80,7 +80,7 @@
         <activity android:name=".ui.activity.RemindersActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
-        <activity android:name=".ui.activity.StoreStorageActivity" android:screenOrientation="portrait">
+        <activity android:name=".ui.activity.StoreStorageActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
         <activity android:name=".ui.activity.MineActivity" android:screenOrientation="portrait">

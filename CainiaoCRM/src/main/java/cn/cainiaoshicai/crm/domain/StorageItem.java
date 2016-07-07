@@ -1,9 +1,18 @@
 package cn.cainiaoshicai.crm.domain;
 
+import cn.cainiaoshicai.crm.Constants;
+
 /**
  * Created by liuzhr on 6/29/16.
  */
 public class StorageItem {
+
+    public static final int STORE_SELF_PROVIDED = 1;
+    public static final int STORE_COMMON_PROVIDED = 0;
+
+    public static final int STORE_PROD_ON_SALE = 1;
+    public static final int STORE_PROD_OFF_SALE = 3;
+    public static final int STORE_PROD_SOLD_OUT = 2;
 
     private int id;
     private String name;
@@ -11,6 +20,11 @@ public class StorageItem {
     private int total_sold;
     private int left_since_last_stat;
     private int product_id;
+    private int status;
+    private int self_provided;
+    private int risk_min_stat;
+
+
 
     public int getProduct_id() {
         return product_id;
@@ -64,10 +78,11 @@ public class StorageItem {
 
     public String getIdAndNameStr() {
         String name = getName();
-        if (name.length() > 15) {
-            name = name.substring(0, 15);
+        int maxLen = 12;
+        if (name.length() > maxLen) {
+            name = name.substring(0, maxLen);
         }
-        return String.format("#%s\n%s", getId(), name);
+        return String.format("%s#%s", product_id, name);
     }
 
     public int getLeft_since_last_stat() {
@@ -76,5 +91,40 @@ public class StorageItem {
 
     public void setLeft_since_last_stat(int left_since_last_stat) {
         this.left_since_last_stat = left_since_last_stat;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getSelf_provided() {
+        return self_provided;
+    }
+
+    public void setSelf_provided(int self_provided) {
+        this.self_provided = self_provided;
+    }
+
+    public int getRisk_min_stat() {
+        return risk_min_stat;
+    }
+
+    public void setRisk_min_stat(int risk_min_stat) {
+        this.risk_min_stat = risk_min_stat;
+    }
+
+    public  String getStatusText() {
+        if (this.status == STORE_PROD_ON_SALE) {
+            return (this.getLeft_since_last_stat() >= this.risk_min_stat)? "正常" : "告急";
+        }
+        return this.status == STORE_PROD_OFF_SALE? "下架" : (this.status == STORE_PROD_SOLD_OUT? "缺货" : "不明");
+    }
+
+    public String getProvideTypeText() {
+        return (self_provided>0 ? "自采" : "直供");
     }
 }
