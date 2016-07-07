@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.ui.adapter;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,16 +9,19 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
+    private List<StorageItem> backendData = new ArrayList<>();
     Activity context;
 
     public StorageItemAdapter(Activity context, ArrayList<T> objects) {
         super(context, R.layout.storage_status_row, objects);
-
+        this.backendData.addAll(objects);
         this.context = context;
     }
 
@@ -61,6 +65,36 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         super.clear();
     }
 
+    public void filter(String text) {
+        this.clear();
+        if (!TextUtils.isEmpty(text)) {
+
+            int id = 0;
+            if (text.indexOf("#") > 0) {
+                id = Integer.parseInt(text.substring(0, text.indexOf("#")));
+            } else {
+                try {
+                    id = Integer.parseInt(text);
+                } catch (Exception e) {
+                }
+            }
+
+            for (StorageItem item : this.backendData) {
+                if (id > 0 && item.getId() == id) {
+                    ((StorageItemAdapter<StorageItem>) this).add(item);
+                    break;
+                } else {
+                    if (item.getIdAndNameStr().contains(text)) {
+                        ((StorageItemAdapter<StorageItem>) this).add(item);
+                    }
+                }
+            }
+        } else {
+            ((StorageItemAdapter<StorageItem>) this).addAll(this.backendData);
+        }
+
+        this.notifyDataSetChanged();
+    }
 
     class ViewHolder {
         TextView label;

@@ -107,6 +107,7 @@ public class StorageActionDao {
                 for(StoreProduct sp : storagesMap.getStore_products()) {
                     StorageItem si = new StorageItem();
                     si.setId(sp.getProduct_id());
+                    si.setLeft_since_last_stat(sp.getLeft_since_last_stat());
                     si.setTotal_last_stat(sp.getTotal_last_stat());
                     si.setTotal_sold(sp.getSold_from_last_stat());
                     si.setProduct_id(sp.getProduct_id());

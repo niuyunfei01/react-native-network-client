@@ -6,18 +6,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -42,6 +49,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
+    private AutoCompleteTextView ctv;
 
     private static final int FILTER_ON_SALE = 1;
     private static final int FILTER_RISK = 2;
@@ -70,6 +78,35 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             lv = (ListView) findViewById(R.id.list_storage_status);
             registerForContextMenu(lv);
             resetListAdapter(new ArrayList<StorageItem>());
+
+            ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
+
+            ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        CharSequence text = v.getText();
+                            listAdapter.filter(TextUtils.isEmpty(text) ? text.toString() : null);
+                            InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+                    return true;
+                }
+            });
+
+            ctv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Object selected = parent.getAdapter().getItem(position);
+                    if (selected instanceof StorageItem) {
+                        listAdapter.filter(String.valueOf(((StorageItem) selected).getId()));
+                        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    } else {
+                        Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
             Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
             final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
@@ -133,6 +170,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 
         listAdapter = new StorageItemAdapter<>(this, storageItems);
         lv.setAdapter(listAdapter);
+
+        if (ctv != null) {
+            ArrayAdapter<StorageItem> ctvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+            ctvAdapter.addAll(storageItems);
+            ctv.setAdapter(ctvAdapter);
+        }
 
 //        lv.addFooterView(findViewById(R.id.paged_overview));
 

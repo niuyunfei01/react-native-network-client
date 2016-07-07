@@ -127,4 +127,9 @@ public class StorageItem {
     public String getProvideTypeText() {
         return (self_provided>0 ? "自采" : "直供");
     }
+
+    @Override
+    public String toString() {
+        return getIdAndNameStr();
+    }
 }
