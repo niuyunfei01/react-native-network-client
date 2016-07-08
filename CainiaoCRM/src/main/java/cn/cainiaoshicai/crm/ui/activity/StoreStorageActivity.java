@@ -21,14 +21,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -80,16 +78,23 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             resetListAdapter(new ArrayList<StorageItem>());
 
             ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
-
+            ctv.setThreshold(1);
+            ctv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    AutoCompleteTextView view = (AutoCompleteTextView) v;
+                    if (hasFocus) {
+                        view.showDropDown();
+                    }
+                }
+            });
             ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                        CharSequence text = v.getText();
-                            listAdapter.filter(TextUtils.isEmpty(text) ? text.toString() : null);
-                            InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                    }
+                    CharSequence text = v.getText();
+                    listAdapter.filter(!TextUtils.isEmpty(text) ? text.toString() : null);
+                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     return true;
                 }
             });
@@ -254,7 +259,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        String title = listAdapter.getItem(info.position).getIdAndNameStr();
+        String title = listAdapter.getItem(info.position).getIdAndNameStr(false);
         menu.setHeaderTitle(title);
 
         menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");

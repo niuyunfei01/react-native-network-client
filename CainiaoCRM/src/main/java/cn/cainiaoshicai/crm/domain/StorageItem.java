@@ -77,10 +77,17 @@ public class StorageItem {
     }
 
     public String getIdAndNameStr() {
+        return this.getIdAndNameStr(true);
+    }
+
+    public String getIdAndNameStr(boolean limit) {
         String name = getName();
-        int maxLen = 12;
-        if (name.length() > maxLen) {
-            name = name.substring(0, maxLen);
+
+        if (limit){
+            int maxLen = 12;
+            if (name.length() > maxLen) {
+                name = name.substring(0, maxLen);
+            }
         }
         return String.format("%s#%s", product_id, name);
     }
