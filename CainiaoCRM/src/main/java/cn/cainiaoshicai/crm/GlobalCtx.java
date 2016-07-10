@@ -144,6 +144,17 @@ public class GlobalCtx extends Application {
                 try {
                     String token = GlobalCtx.getInstance().getSpecialToken();
                     if (!TextUtils.isEmpty(token)) {
+
+                        try {
+                            GlobalCtx ctx = GlobalCtx.this;
+                            String uid = ctx.getCurrentAccountId();
+                            if (!TextUtils.isEmpty(uid)) {
+                                JPushInterface.setAliasAndTags(ctx, "uid_" + uid, null);
+                            }
+                        } catch (Exception e) {
+                            AppLogger.w("error to set jpush alias");
+                        }
+
                         CommonConfigDao.Config config = new CommonConfigDao(token).get();
                         HashMap<Integer, CommonConfigDao.Worker> workers = config.getWorkers();
                         if (workers != null) {
