@@ -27,7 +27,7 @@ public class StoreProduct {
     private int risk_min_stat;
     private int self_provided;
     private int auto_off_sale;
-    private int sold_5day;
+    private int sold_7day;
     private int sold_weekend;
 
     public int getId() {
@@ -190,12 +190,12 @@ public class StoreProduct {
         this.auto_off_sale = auto_off_sale;
     }
 
-    public int getSold_5day() {
-        return sold_5day;
+    public int getSold_7day() {
+        return sold_7day;
     }
 
-    public void setSold_5day(int sold_5day) {
-        this.sold_5day = sold_5day;
+    public void setSold_7day(int sold_7day) {
+        this.sold_7day = sold_7day;
     }
 
     public int getSold_weekend() {

@@ -55,8 +55,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.riskNum.setText("安全库存: " + item.getRisk_min_stat());
 
         holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
-        holder.sold_5day.setText("1-5:"+ (item.getSold_5day()/5));
-        holder.sold_weekend.setText("末:"+ (item.getSold_weekend()/2));
+        holder.sold_5day.setText(String.format("1-5:%.1f", item.getSold_5day()/5.0));
+        holder.sold_weekend.setText(String.format("末:%.1f", item.getSold_weekend()/2.0));
 
         return (convertView);
     }

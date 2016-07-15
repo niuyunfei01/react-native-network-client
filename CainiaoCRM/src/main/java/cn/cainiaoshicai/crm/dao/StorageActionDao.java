@@ -116,7 +116,7 @@ public class StorageActionDao {
                     si.setProduct_id(sp.getProduct_id());
                     si.setSelf_provided(sp.getSelf_provided());
                     si.setRisk_min_stat(sp.getRisk_min_stat());
-                    si.setSold_5day(sp.getSold_5day());
+                    si.setSold_5day(sp.getSold_7day() - sp.getSold_weekend());
                     si.setSold_weekend(sp.getSold_weekend());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
