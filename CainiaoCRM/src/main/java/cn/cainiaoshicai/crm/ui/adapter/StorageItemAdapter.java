@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.R;
@@ -37,7 +36,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
             holder.label = (TextView) row.findViewById(R.id.product_name);
             holder.leftNumber = (TextView) row.findViewById(R.id.total_last_stat);
-            holder.totalSold = (TextView) row.findViewById(R.id.total_sold);
+            holder.sold_5day = (TextView) row.findViewById(R.id.sold_5day);
+            holder.sold_weekend = (TextView) row.findViewById(R.id.sold_weekend);
 
             holder.prodStatus = (TextView) row.findViewById(R.id.store_prod_status);
             holder.provideType = (TextView) row.findViewById(R.id.product_provide_type);
@@ -55,7 +55,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.riskNum.setText("安全库存: " + item.getRisk_min_stat());
 
         holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
-        holder.totalSold.setText(item.getTotal_sold() + "份");
+        holder.sold_5day.setText("1-5:"+ (item.getSold_5day()/5));
+        holder.sold_weekend.setText("末:"+ (item.getSold_weekend()/2));
 
         return (convertView);
     }
@@ -99,7 +100,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     class ViewHolder {
         TextView label;
         TextView leftNumber;
-        TextView totalSold;
+        TextView sold_5day;
+        TextView sold_weekend;
 
         TextView prodStatus;
         TextView provideType;

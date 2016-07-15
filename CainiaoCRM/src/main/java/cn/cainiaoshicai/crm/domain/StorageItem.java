@@ -23,7 +23,8 @@ public class StorageItem {
     private int status;
     private int self_provided;
     private int risk_min_stat;
-
+    private int sold_5day;
+    private int sold_weekend;
 
 
     public int getProduct_id() {
@@ -138,5 +139,21 @@ public class StorageItem {
     @Override
     public String toString() {
         return getIdAndNameStr();
+    }
+
+    public int getSold_5day() {
+        return sold_5day;
+    }
+
+    public void setSold_5day(int sold_5day) {
+        this.sold_5day = sold_5day;
+    }
+
+    public int getSold_weekend() {
+        return sold_weekend;
+    }
+
+    public void setSold_weekend(int sold_weekend) {
+        this.sold_weekend = sold_weekend;
     }
 }
