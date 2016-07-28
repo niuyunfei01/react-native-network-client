@@ -209,6 +209,7 @@
     <string name="feedback_process_hint">客诉处理过程、结果</string>
     <string name="menu_user_feedback">用户反馈</string>
     <string name="menu_invalid">置为无效</string>
+    <string name="menu_send_coupon">发送优惠券</string>
     <string name="menu_order_chg_pack">修改分拣员</string>
     <string name="menu_order_chg_ship">修改送货员</string>
     <string name="action_source_done">备货状态</string>

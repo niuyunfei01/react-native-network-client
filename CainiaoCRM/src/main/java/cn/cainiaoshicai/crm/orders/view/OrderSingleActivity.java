@@ -78,7 +78,6 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
     private static final int ACTION_EDIT_PACK_WORKER = 2;
     private String platformWithId;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -473,6 +472,64 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                 break;
             case R.id.menu_refresh:
                 refresh();
+                return true;
+            case R.id.menu_send_coupon:
+                AlertDialog.Builder couponsAdb = new AlertDialog.Builder(this);
+                String[] coupons = new String[]{
+                        "严重延误补偿（满79减20）", //type = 2
+                        "延误补偿(6元优惠券)" //type = 1
+                };
+                final int[] checkedIdx = new int[1];
+                couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        checkedIdx[0] = which;
+                    }
+                });
+                couponsAdb.setTitle("发放优惠券")
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    private String errorDesc = null;
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        int type = 0;
+                                        if (checkedIdx[0] == 0) {
+                                            type = 2;
+                                        } else if (checkedIdx[0] == 1) {
+                                            type = 1;
+                                        }
+
+                                        if (type > 0) {
+                                            OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            try {
+                                                ResultBean resultBean = dao.genCoupon(type, orderId);
+                                                if (!resultBean.isOk()) {
+                                                    errorDesc = "err:" + resultBean.getDesc();
+                                                }
+                                            } catch (ServiceException e) {
+                                                AppLogger.e("error:" + e.getMessage(), e);
+                                                errorDesc = "操作失败:" + e.getMessage();
+                                            }
+                                        }
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void aVoid) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                String text = TextUtils.isEmpty(errorDesc) ? "操作成功" : errorDesc;
+                                                Toast.makeText(OrderSingleActivity.this, text, Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                }.executeOnNormal();
+                            }
+                        }).setNegativeButton(R.string.cancel, null);
+                couponsAdb.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
