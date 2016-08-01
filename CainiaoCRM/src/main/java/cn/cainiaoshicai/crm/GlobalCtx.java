@@ -19,7 +19,6 @@ import android.view.Display;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,11 +27,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.domain.User;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
-import cn.cainiaoshicai.crm.orders.service.StatusService;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -313,9 +310,9 @@ public class GlobalCtx extends Application {
     }
 
     public static boolean isAutoPrint(int store_id) {
-        return store_id == Constants.STORE_UNKNOWN
-                || (SettingUtility.isAutoPrintHLG() && store_id == Constants.STORE_HLG)
-                || (SettingUtility.isAutoPrintYYC() && store_id == Constants.STORE_YYC);
+        return store_id == Cts.STORE_UNKNOWN
+                || (SettingUtility.isAutoPrintHLG() && store_id == Cts.STORE_HLG)
+                || (SettingUtility.isAutoPrintYYC() && store_id == Cts.STORE_YYC);
     }
 
     public SoundManager getSoundManager() {
@@ -337,7 +334,7 @@ public class GlobalCtx extends Application {
 
     public boolean acceptNotifyNew() {
         CommonConfigDao.Worker currentWorker = this.getCurrentWorker();
-        return currentWorker == null || currentWorker.getPosition() != Constants.POSITION_EXT_SHIP;
+        return currentWorker == null || currentWorker.getPosition() != Cts.POSITION_EXT_SHIP;
     }
 
     public boolean acceptReadyTimeoutNotify() {
@@ -452,9 +449,9 @@ public class GlobalCtx extends Application {
         }
 
         private int getStoreSound(int store_id) {
-            if (store_id == Constants.STORE_HLG) {
+            if (store_id == Cts.STORE_HLG) {
                 return storeSoundhlg;
-            } else if (store_id == Constants.STORE_YYC) {
+            } else if (store_id == Cts.STORE_YYC) {
                 return storeSoundYyc;
             } else {
                 return storeSoundUnknown;

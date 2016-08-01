@@ -1,7 +1,5 @@
 package cn.cainiaoshicai.crm.domain;
 
-import cn.cainiaoshicai.crm.Constants;
-
 /**
  * Created by liuzhr on 6/29/16.
  */

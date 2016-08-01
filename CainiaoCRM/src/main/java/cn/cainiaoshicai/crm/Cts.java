@@ -10,7 +10,7 @@ import cn.cainiaoshicai.crm.domain.Store;
 
 /**
  */
-public class Constants {
+public class Cts {
 
     public static final int STORE_HLG = 1;
     public static final int STORE_YYC = 2;
@@ -41,6 +41,13 @@ public class Constants {
 
     public static final Provide PROVIDE_SLEF = new Provide(1, "自采");
     public static final Provide PROVIDE_COMMON = new Provide(0, "直供");
+
+    public static final int  DADA_STATUS_NEVER_START = 0;
+    public static final int  DADA_STATUS_TO_ACCEPT = 1;
+    public static final int  DADA_STATUS_TO_FETCH = 2;
+    public static final int  DADA_STATUS_SHIPPING = 3;
+    public static final int  DADA_STATUS_ARRIVED = 4;
+    public static final int  DADA_STATUS_CANCEL = 5;
 
     static public class Provide {
         public final int value;

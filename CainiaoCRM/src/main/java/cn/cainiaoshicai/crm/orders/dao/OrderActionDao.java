@@ -8,9 +8,11 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
@@ -32,24 +34,24 @@ public class OrderActionDao {
         return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
     }
 
-    public ResultBean startShip(Constants.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
+    public ResultBean startShip(Cts.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", String.valueOf(ship_worker_id));
         return actionWithResult(platform, platformId, "/order_start_ship/", params);
     }
 
-    public ResultBean setArrived(Constants.Platform platform, String platform_oid) throws ServiceException {
+    public ResultBean setArrived(Cts.Platform platform, String platform_oid) throws ServiceException {
         return actionWithResult(platform, platform_oid, "/order_set_arrived", new HashMap<String, String>());
     }
 
-    public ResultBean setReady(Constants.Platform platform, String platform_oid, int workerId) throws ServiceException {
+    public ResultBean setReady(Cts.Platform platform, String platform_oid, int workerId) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", String.valueOf(workerId));
         return actionWithResult(platform, platform_oid, "/order_set_ready", params);
     }
 
     @Nullable
-    private ResultBean actionWithResult(Constants.Platform platform, String platformId, String pathSuffix,
+    private ResultBean actionWithResult(Cts.Platform platform, String platformId, String pathSuffix,
                                         HashMap<String, String> params) throws ServiceException {
         String path = pathSuffix + "/" + platform.id + "/" + platformId;
         return actionWithResult(path, params);
@@ -80,11 +82,11 @@ public class OrderActionDao {
         this.access_token = access_token;
     }
 
-    public ResultBean confirmAccepted(Constants.Platform platform, String platformOid) throws ServiceException {
+    public ResultBean confirmAccepted(Cts.Platform platform, String platformOid) throws ServiceException {
         return actionWithResult(platform, platformOid, "/order_confirm_accepted", null);
     }
 
-    public ResultBean saveDelayReason(Constants.Platform platform, String platformOid, HashMap<String, String> params) throws ServiceException {
+    public ResultBean saveDelayReason(Cts.Platform platform, String platformOid, HashMap<String, String> params) throws ServiceException {
         return actionWithResult(platform, platformOid, "/save_order_delay_reason", params);
     }
 
@@ -111,6 +113,21 @@ public class OrderActionDao {
         return null;
     }
 
+    public List<DadaCancelReason> getDadaCancelReasons(int orderId) {
+        try {
+            String json = getJson("/order_dada_cancel_reasons/" + orderId, new HashMap<String, String>());
+            AppLogger.v("action: getDadaCancelReasons " + json);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<List<DadaCancelReason>>() {}.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e(e.getMessage(), e);
+        } catch (ServiceException e) {
+            AppLogger.e("exception to get getDadaCancelReasons:" + e.getMessage(), e);
+        }
+
+        return null;
+    }
+
     public ResultBean setOrderInvalid(int orderId) throws ServiceException {
         return actionWithResult("/order_set_invalid/"+orderId, new HashMap<String, String>());
     }
@@ -131,4 +148,13 @@ public class OrderActionDao {
 //        gen_coupon($type, $bind_mobile, $wm_order_id = 0, $to_uid = 0)
         return actionWithResult("/gen_coupon_wm/" + type + "/" + orderId, new HashMap<String, String>());
     }
+
+    public ResultBean order_dada_start(int orderId) throws ServiceException {
+        return actionWithResult("/order_dada_start/" + orderId, new HashMap<String, String>());
+    }
+
+    public ResultBean order_dada_cancel(int orderId, int cancelReason, String reasonTxt) throws ServiceException {
+        return actionWithResult("/order_dada_cancel/" + orderId + "/" + cancelReason + "/" + reasonTxt , new HashMap<String, String>());
+    }
+
 }

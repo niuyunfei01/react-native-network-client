@@ -16,18 +16,14 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.Iterator;
 import java.util.Set;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.print.Constant;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
-import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.jpush.android.api.JPushInterface;
@@ -65,13 +61,13 @@ public class NotificationReceiver extends BroadcastReceiver {
 			if (notify != null) {
 
 				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
-				if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
+				if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notificationId);
 					if (GlobalCtx.getInstance().acceptNotifyNew()) {
 						soundManager.play_new_order_sound(notify.getStore_id());
 						OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
 					}
-				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
 					int totalLate = notify.getTotal_late();
 					if (totalLate > 10) {
 						totalLate = 10;
@@ -79,11 +75,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 					if (GlobalCtx.getInstance().acceptReadyTimeoutNotify()) {
 						soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
 					}
-				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
 					if (GlobalCtx.getInstance().acceptTechNotify()) {
 						soundManager.play_sync_not_work_sound();
 					}
-				} else if (Constants.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
 					soundManager.play_serious_timeout(notify.getNotify_workers());
 				}
 			}
@@ -99,18 +95,18 @@ public class NotificationReceiver extends BroadcastReceiver {
 			AppLogger.w("open notify:" + notify);
 
 			if (notify != null) {
-				if (Constants.PUSH_TYPE_NEW_COMMENT.equals(notify.getType())) {
+				if (Cts.PUSH_TYPE_NEW_COMMENT.equals(notify.getType())) {
 					i = new Intent(context, UserCommentsActivity.class);
-				} else if (Constants.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 //					i.setAction(Intent.ACTION_SEARCH);
 //					i.putExtra(SearchManager.QUERY, "ready_delayed:");
-				} else if (Constants.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
-				} else if (Constants.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
-				} else if (Constants.PUSH_TYPE_BECOME_OFF_SALE.equals(notify.getType())
-						|| Constants.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_BECOME_OFF_SALE.equals(notify.getType())
+						|| Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
 					i = new Intent(context, StoreStorageActivity.class);
 				} else {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);

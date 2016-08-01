@@ -10,12 +10,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Date;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.NewOrderReminder;
-import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
@@ -83,7 +81,7 @@ public class NewOrderReminderAdapter extends BaseAdapter {
 
             orderTime.setText(instance.getShortTime(order.getPay_time()));
 
-            String platformName = Constants.Platform.find(order.getPlatform()).name;
+            String platformName = Cts.Platform.find(order.getPlatform()).name;
             sourcePlatform.setText(platformName);
         }catch (Exception e) {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);

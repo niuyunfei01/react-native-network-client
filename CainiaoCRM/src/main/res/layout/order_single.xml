@@ -25,18 +25,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/menu_print" />
-        <Switch
+        <Button
             android:layout_marginStart="5dp"
+            android:id="@+id/button_call_dada"
             android:layout_toEndOf="@id/button1"
-            android:id="@+id/button_source_ready"
-            android:textOn="已备货"
-            android:textOff="备货中"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:text="@string/menu_call_dada" />
+        <!--<Switch-->
+            <!--android:layout_marginStart="5dp"-->
+            <!--android:layout_toEndOf="@id/button1"-->
+            <!--android:id="@+id/button_source_ready"-->
+            <!--android:textOn="已备货"-->
+            <!--android:textOff="备货中"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--/>-->
         <Button
             android:id="@+id/button2"
-            android:layout_toEndOf="@id/button_source_ready"
+            android:layout_toEndOf="@id/button_call_dada"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/action_package_done" />

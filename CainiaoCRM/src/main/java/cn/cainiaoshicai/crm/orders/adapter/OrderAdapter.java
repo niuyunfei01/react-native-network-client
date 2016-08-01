@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
@@ -129,11 +129,11 @@ public class OrderAdapter extends BaseAdapter {
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
             dayNo.setText("#" + order.getSimplifiedId());
 
-            String platformName = Constants.Platform.find(order.getPlatform()).name;
+            String platformName = Cts.Platform.find(order.getPlatform()).name;
             String platformDayId = order.getPlatform_dayId();
             sourcePlatform.setText(order.platformWithId());
 
-            if (order.getOrderStatus() != Constants.WM_ORDER_STATUS_INVALID) {
+            if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
                 ShipWorkerOnClickListener shipWorkerClicked = new ShipWorkerOnClickListener(order);
 
@@ -169,7 +169,7 @@ public class OrderAdapter extends BaseAdapter {
                     shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
                     int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) /(60 * 1000));
                     shipTimeCost.setText(String.valueOf(minutes));
-//                    int colorResource = minutes <= Constants.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
+//                    int colorResource = minutes <= Cts.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
 //                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
                 } else {
                     shipTimeCost.setVisibility(View.GONE);
@@ -184,10 +184,10 @@ public class OrderAdapter extends BaseAdapter {
             TextView inTimeView = (TextView) vi.findViewById(R.id.is_in_time);
             if (order.getExpectTime() != null ) {
                 if (order.getTime_arrived() != null) {
-                    Constants.DeliverReview reviewDeliver = Constants.DeliverReview.find(order.getReview_deliver());
+                    Cts.DeliverReview reviewDeliver = Cts.DeliverReview.find(order.getReview_deliver());
                     int colorResource = (reviewDeliver.isGood()) ? R.color.green : R.color.red;
                     inTimeView.setText(reviewDeliver.name);
-                    if (reviewDeliver.value != Constants.DELIVER_UNKNOWN.value) {
+                    if (reviewDeliver.value != Cts.DELIVER_UNKNOWN.value) {
                         inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
                         inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
                     }
@@ -195,8 +195,8 @@ public class OrderAdapter extends BaseAdapter {
                     inTimeView.setVisibility(View.GONE);
                     TextView print_times = (TextView) vi.findViewById(R.id.print_times);
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
-                    if ((order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
-                            || order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_SHIP)) {
+                    if ((order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
+                            || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP)) {
                         int leftMin = order.getReadyLeftMin();
                         if (leftMin < 10) {
                             readyDelayWarn.setBackground(ContextCompat.getDrawable(activity, R.drawable.list_text_border_red));

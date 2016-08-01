@@ -46,7 +46,7 @@ import cn.cainiaoshicai.crm.support.lib.pulltorefresh.internal.ViewCompat;
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout implements IPullToRefresh<T> {
 
     // ===========================================================
-    // Constants
+    // Cts
     // ===========================================================
 
     static final boolean DEBUG = false;

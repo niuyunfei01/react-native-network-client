@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
@@ -14,7 +14,6 @@ import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
@@ -160,7 +159,7 @@ public class OrderPrinter {
             }
 
             printer.starLine()
-                    .normalText("订单编号：" + Constants.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
+                    .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
                     .newLine()
                     .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
                     .newLine();

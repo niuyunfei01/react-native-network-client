@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,7 +27,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
@@ -115,7 +114,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 
             Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
             final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-            storeArrayAdapter.addAll(Constants.ST_HLG, Constants.ST_YYC);
+            storeArrayAdapter.addAll(Cts.ST_HLG, Cts.ST_YYC);
             storeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             currStoreSpinner.setAdapter(storeArrayAdapter);
             currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -134,7 +133,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             });
 
             if (currStore == null) {
-                currStore = Constants.ST_HLG;
+                currStore = Cts.ST_HLG;
             }
 
 //        Spinner filterCategories = (Spinner) findViewById(R.id.filter_categories);
@@ -217,7 +216,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, Constants.PROVIDE_COMMON);
+                    result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_COMMON);
                     return null;
                 } catch (ServiceException e) {
                     e.printStackTrace();

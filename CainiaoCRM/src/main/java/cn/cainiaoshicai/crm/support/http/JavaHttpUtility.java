@@ -33,7 +33,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import cn.cainiaoshicai.crm.BuildConfig;
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
@@ -193,7 +193,7 @@ public class JavaHttpUtility {
             exception.setError_code(errCode);
             exception.setOriError(err);
 
-            if (Constants.ERR_INVALID_GRANT.equals(json.optString("error")) || errCode == ErrorCode.EXPIRED_TOKEN || errCode == ErrorCode.INVALID_TOKEN) {
+            if (Cts.ERR_INVALID_GRANT.equals(json.optString("error")) || errCode == ErrorCode.EXPIRED_TOKEN || errCode == ErrorCode.INVALID_TOKEN) {
                 SettingUtility.setDefaultAccountId("");
                 Utility.showExpiredTokenDialogOrNotification();
             }

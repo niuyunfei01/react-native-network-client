@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
@@ -175,7 +175,7 @@ public class DelayFaqFragment extends DialogFragment {
                     }
                     HashMap<String, String> postData = new HashMap<>();
                     postData.put("delay_reason", reason.toString());
-                    return new OrderActionDao(token).saveDelayReason(Constants.Platform.find(platform), platformOid, postData);
+                    return new OrderActionDao(token).saveDelayReason(Cts.Platform.find(platform), platformOid, postData);
                 } catch (Exception ex) {
                     AppLogger.e("error on handle click save delay reason action: ", ex);
                     return ResultBean.exception();

@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
@@ -184,7 +183,7 @@ public class OrderListFragment extends Fragment {
 
                 for(final Order order: value.getOrders()) {
                     if (order.shouldTryAutoPrint()
-                            && order.getOrderStatus() == Constants.WM_ORDER_STATUS_TO_READY
+                            && order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
                             && GlobalCtx.isAutoPrint(order.getStore_id())) {
                        OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new OrderPrinter.PrintCallback() {
                            @Override

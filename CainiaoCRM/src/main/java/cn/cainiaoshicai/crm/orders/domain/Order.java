@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
-import cn.cainiaoshicai.crm.support.print.Constant;
 
 public class Order implements Serializable {
 
@@ -48,6 +47,8 @@ public class Order implements Serializable {
     private int paid_done;
     private boolean showReadyDelay;
     private int readyLeftMin;
+
+    private int dada_status;
 
     private int source_ready;
 
@@ -337,12 +338,20 @@ public class Order implements Serializable {
 
     public String platformWithId() {
         boolean dayIdInvalid = TextUtil.isEmpty(this.getPlatform_dayId()) || "0".equals(this.getPlatform_dayId());
-        return String.format("(%s#%s)", Constants.Platform.find(this.getPlatform()).name, dayIdInvalid ? this.getPlatform_oid() : this.getPlatform_dayId());
+        return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayIdInvalid ? this.getPlatform_oid() : this.getPlatform_dayId());
     }
 
     public boolean shouldTryAutoPrint() {
-        return (this.store_id == Constants.STORE_UNKNOWN && print_times <= 2)
+        return (this.store_id == Cts.STORE_UNKNOWN && print_times <= 2)
                 || this.print_times < 1;
+    }
+
+    public int getDada_status() {
+        return dada_status;
+    }
+
+    public void setDada_status(int dada_status) {
+        this.dada_status = dada_status;
     }
 }
 

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -96,7 +96,7 @@ public class StorageActionDao {
         }
     }
 
-    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Constants.Provide provide) throws ServiceException {
+    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Cts.Provide provide) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {

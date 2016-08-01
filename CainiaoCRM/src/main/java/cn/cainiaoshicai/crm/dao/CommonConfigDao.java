@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -115,7 +115,7 @@ public class CommonConfigDao {
         }
 
         public boolean isExtShipWorker() {
-            return this.getPosition() == Constants.POSITION_EXT_SHIP;
+            return this.getPosition() == Cts.POSITION_EXT_SHIP;
         }
     }
 
