@@ -425,23 +425,24 @@ public class OrderAdapter extends BaseAdapter {
 
         @Override
         public void onClick(View v) {
-            HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
-            if (workers != null) {
-                String mobilephone = null;
-                if (order.getShip_worker_id() == -999) {
-                    mobilephone = order.getDada_mobile();
-                } else {
+            String mobilephone = null;
+            if (order.getShip_worker_id() == -999) {
+                mobilephone = order.getDada_mobile();
+            } else {
+                HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
+                if (workers != null) {
                     CommonConfigDao.Worker worker = workers.get(order.getShip_worker_id());
                     if (worker != null) {
                         mobilephone = worker.getMobilephone();
                     }
                 }
 
-                if (mobilephone != null) {
-                    callMobilePhone(v, mobilephone);
-                }
             }
-            Toast.makeText(activity, "未找到配送员电话", Toast.LENGTH_LONG).show();
+            if (mobilephone != null) {
+                callMobilePhone(v, mobilephone);
+            } else {
+                Toast.makeText(activity, "未找到配送员电话", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
