@@ -52,7 +52,7 @@ public class Order implements Serializable {
     private Date dada_call_at;
     private int dada_distance;
     private int dada_order_id;
-    private int dada_fee;
+    private float dada_fee;
 
     private String dada_mobile;
     private int dada_dm_id;
@@ -386,11 +386,11 @@ public class Order implements Serializable {
         this.dada_order_id = dada_order_id;
     }
 
-    public int getDada_fee() {
+    public float getDada_fee() {
         return dada_fee;
     }
 
-    public void setDada_fee(int dada_fee) {
+    public void setDada_fee(float dada_fee) {
         this.dada_fee = dada_fee;
     }
 

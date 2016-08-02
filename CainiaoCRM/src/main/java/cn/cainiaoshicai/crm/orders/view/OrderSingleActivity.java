@@ -439,8 +439,13 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
             case R.id.menu_send_coupon:
                 AlertDialog.Builder couponsAdb = new AlertDialog.Builder(this);
                 String[] coupons = new String[]{
+                        "延误补偿(6元优惠券)", //type = 1
                         "严重延误补偿（满79减20）", //type = 2
-                        "延误补偿(6元优惠券)" //type = 1
+                        "品质补偿券(6元)", //type = 3
+                        "品质补偿券(10元)", //type = 4
+                        "品质补偿券(15元)", //type = 5
+                        "品质补偿券(20元)", //type = 6
+                        "品质补偿券(30元)", //type = 7
                 };
                 final int[] checkedIdx = new int[1];
                 couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], new DialogInterface.OnClickListener() {
@@ -457,13 +462,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                                     private String errorDesc = null;
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        int type = 0;
-                                        if (checkedIdx[0] == 0) {
-                                            type = 2;
-                                        } else if (checkedIdx[0] == 1) {
-                                            type = 1;
-                                        }
-
+                                        int type = checkedIdx[0] + 1;
                                         if (type > 0) {
                                             OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                                             try {

@@ -95,7 +95,7 @@ public class OrderActionDao {
     }
 
     public Order getOrder(int orderId) {
-        return _order("/order/" + orderId);
+        return _order("/order_by_id/" + orderId);
     }
 
     private Order _order(String path) {
