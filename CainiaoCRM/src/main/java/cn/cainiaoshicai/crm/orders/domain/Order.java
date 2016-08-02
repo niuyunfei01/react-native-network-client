@@ -49,6 +49,14 @@ public class Order implements Serializable {
     private int readyLeftMin;
 
     private int dada_status;
+    private Date dada_call_at;
+    private int dada_distance;
+    private int dada_order_id;
+    private int dada_fee;
+
+    private String dada_mobile;
+    private int dada_dm_id;
+    private String dada_dm_name;
 
     private int source_ready;
 
@@ -352,6 +360,62 @@ public class Order implements Serializable {
 
     public void setDada_status(int dada_status) {
         this.dada_status = dada_status;
+    }
+
+    public Date getDada_call_at() {
+        return dada_call_at;
+    }
+
+    public void setDada_call_at(Date dada_call_at) {
+        this.dada_call_at = dada_call_at;
+    }
+
+    public int getDada_distance() {
+        return dada_distance;
+    }
+
+    public void setDada_distance(int dada_distance) {
+        this.dada_distance = dada_distance;
+    }
+
+    public int getDada_order_id() {
+        return dada_order_id;
+    }
+
+    public void setDada_order_id(int dada_order_id) {
+        this.dada_order_id = dada_order_id;
+    }
+
+    public int getDada_fee() {
+        return dada_fee;
+    }
+
+    public void setDada_fee(int dada_fee) {
+        this.dada_fee = dada_fee;
+    }
+
+    public String getDada_mobile() {
+        return dada_mobile;
+    }
+
+    public void setDada_mobile(String dada_mobile) {
+        this.dada_mobile = dada_mobile;
+    }
+
+    public int getDada_dm_id() {
+        return dada_dm_id;
+    }
+
+    public void setDada_dm_id(int dada_dm_id) {
+        this.dada_dm_id = dada_dm_id;
+    }
+
+    public String getDada_dm_name() {
+        return dada_dm_name;
+    }
+
+    public void setDada_dm_name(String dada_dm_name) {
+        this.dada_dm_name = dada_dm_name;
     }
 }
 

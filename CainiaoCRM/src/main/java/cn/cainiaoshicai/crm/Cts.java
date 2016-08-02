@@ -48,6 +48,7 @@ public class Cts {
     public static final int  DADA_STATUS_SHIPPING = 3;
     public static final int  DADA_STATUS_ARRIVED = 4;
     public static final int  DADA_STATUS_CANCEL = 5;
+    public static final int  DADA_STATUS_TIMEOUT = 7;
 
     static public class Provide {
         public final int value;

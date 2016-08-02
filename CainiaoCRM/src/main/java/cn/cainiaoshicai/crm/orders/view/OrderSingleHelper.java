@@ -18,6 +18,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -201,31 +202,51 @@ public class OrderSingleHelper {
         }
 
         @Override
-        public void onClick(View v) {
-            final Activity ctx = (Activity) v.getContext();
-            AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
-            if (dadaStatus == Cts.DADA_STATUS_NEVER_START) {
-                adb.setTitle("呼叫达达")
-                        .setMessage("现在呼叫达达...")
-                        .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                new DadaCallTask(orderId, helper).executeOnNormal();
-                            }
-                        }).setNegativeButton("暂不呼叫", null);
-                adb.show();
-            } else if (dadaStatus == Cts.DADA_STATUS_TO_ACCEPT) {
-                adb.setTitle("呼叫达达")
-                        .setMessage("等待达达接单中...")
-                        .setPositiveButton("继续等待", null)
-                        .setNegativeButton("撤回呼叫", new DadaCancelClicked(false));
-                adb.show();
-            } else if (dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
-                adb.setTitle("呼叫达达")
-                        .setMessage("达达已接单。如强制取消扣1元费用，影响达达配送员...")
-                        .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
-                adb.show();
-            }
+        public void onClick(final View v) {
+
+            new MyAsyncTask<Void, Void, Void>(){
+
+                private int _dadaStatus;
+                private Order _order;
+                @Override
+                protected Void doInBackground(Void... params) {
+                    OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                    this._order = dao.getOrder(orderId);
+                    this._dadaStatus = this._order.getDada_status();
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    final Activity ctx = (Activity) v.getContext();
+                    AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
+                    if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
+                        adb.setTitle("呼叫达达")
+                                .setMessage("现在呼叫达达...")
+                                .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new DadaCallTask(orderId, helper).executeOnNormal();
+                                    }
+                                }).setNegativeButton("暂不呼叫", null);
+                        adb.show();
+                    } else if (_dadaStatus == Cts.DADA_STATUS_TO_ACCEPT) {
+                        adb.setTitle("呼叫达达")
+                                .setMessage("等待达达接单中...")
+                                .setPositiveButton("继续等待", null)
+                                .setNegativeButton("撤回呼叫", new DadaCancelClicked(false));
+                        adb.show();
+                    } else if (_dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
+                        String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
+                        String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
+                        adb.setTitle("呼叫达达")
+                                .setMessage(String.format("达达%s(%s)已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
+                                .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
+                        adb.show();
+                    }
+                }
+            }.executeOnNormal();
+
         }
 
         private class CallDadaListener implements DialogInterface.OnClickListener {
