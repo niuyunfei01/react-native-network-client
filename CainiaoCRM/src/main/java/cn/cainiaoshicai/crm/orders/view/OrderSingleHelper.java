@@ -243,6 +243,12 @@ public class OrderSingleHelper {
                                 .setMessage(String.format("达达%s(%s)已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
                                 .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
                         adb.show();
+                    } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL) {
+                        adb.setTitle("呼叫达达")
+                                .setMessage("订单已取消，重新发单？")
+                                /* order_dada_restart */
+                                .setPositiveButton("重新发单(开发中)", null).setNegativeButton("不发了", new DadaCancelClicked(true));
+                        adb.show();
                     }
                 }
             }.executeOnNormal();
