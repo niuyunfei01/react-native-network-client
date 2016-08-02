@@ -231,7 +231,7 @@ public class OrderSingleHelper {
                                 }).setNegativeButton("暂不呼叫", null);
                         adb.show();
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_ACCEPT) {
-                        adb.setTitle("呼叫达达")
+                        adb.setTitle("达达待接单")
                                 .setMessage("等待达达接单中...")
                                 .setPositiveButton("继续等待", null)
                                 .setNegativeButton("撤回呼叫", new DadaCancelClicked(false));
@@ -239,7 +239,7 @@ public class OrderSingleHelper {
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
                         String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
-                        adb.setTitle("呼叫达达")
+                        adb.setTitle("达达待取货")
                                 .setMessage(String.format("达达%s(%s)已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
                                 .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
                         adb.show();
