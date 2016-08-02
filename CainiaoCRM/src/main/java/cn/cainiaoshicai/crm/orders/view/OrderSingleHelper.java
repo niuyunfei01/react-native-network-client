@@ -222,7 +222,7 @@ public class OrderSingleHelper {
                 adb.show();
             } else if (dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
                 adb.setTitle("呼叫达达")
-                        .setMessage("达达已接单，等待上门取货")
+                        .setMessage("达达已接单。如强制取消扣1元费用，影响达达配送员...")
                         .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
                 adb.show();
             }
@@ -286,7 +286,7 @@ public class OrderSingleHelper {
                 try {
                     resultBean = dao.order_dada_start(orderId);
                     if (resultBean.isOk()) {
-                        helper.showToast("呼叫完成");
+                        helper.showToast("呼叫完成:" + resultBean.getDesc());
                         dadaStatus = Cts.DADA_STATUS_TO_ACCEPT;
                         helper.updateDadaCallLabelUI(dadaStatus, btnCallDada);
                     }else {
