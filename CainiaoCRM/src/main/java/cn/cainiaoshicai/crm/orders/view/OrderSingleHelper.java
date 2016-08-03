@@ -228,9 +228,11 @@ public class OrderSingleHelper {
 
                     helper.updateDadaCallLabelUI(_dadaStatus, btnCallDada);
 
+                    double dadaPrice = Math.max(_order.getOrderMoney() * 0.08, 6);
+
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
                         adb.setTitle("呼叫达达")
-                                .setMessage("现在呼叫达达...")
+                                .setMessage(dadaPrice > 8.0 ? "起步价约 " + dadaPrice + " 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？" : "现在呼叫达达..." )
                                 .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -264,7 +266,6 @@ public class OrderSingleHelper {
                     } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL || _dadaStatus == Cts.DADA_STATUS_TIMEOUT) {
                         adb.setTitle("呼叫达达")
                                 .setMessage("订单已"+(_dadaStatus == Cts.DADA_STATUS_TIMEOUT ? "超时":"取消")+"，重新发单？")
-                                /* order_dada_restart */
                                 .setPositiveButton("重新发单", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
