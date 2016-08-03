@@ -1,9 +1,16 @@
 package cn.cainiaoshicai.crm.orders.view;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -114,29 +121,29 @@ public class OrderSingleHelper {
 
         private int orderId;
         private OrderSingleHelper helper;
+     private int cancelCode = 1;
+     private String cancelReason = "";
 
-        public DadaCancelTask(int orderId, OrderSingleHelper helper) {
+        public DadaCancelTask(int orderId, OrderSingleHelper helper, int cancelCode, String cancelReason) {
             this.orderId = orderId;
             this.helper = helper;
+            this.cancelReason = cancelReason;
+            this.cancelCode = cancelCode;
         }
 
-        @Override
-       protected ResultBean doInBackground(Integer... params) {
-           OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
-           ResultBean resultBean;
-           try {
-               resultBean = dao.order_dada_cancel(orderId, 1, "");
-               if (resultBean.isOk()) {
-                    helper.showToast("呼叫完成");
-               }else {
-                    helper.showToast("呼叫失败:" + resultBean.getDesc());
-               }
-           } catch (ServiceException e) {
-               e.printStackTrace();
-               helper.showToast("发生错误：" + e.getMessage());
-           }
-           return null;
-       }
+     @Override
+     protected ResultBean doInBackground(Integer... params) {
+         OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+         ResultBean resultBean;
+         try {
+             resultBean = dao.order_dada_cancel(orderId, this.cancelCode, this.cancelReason);
+             helper.showToast((resultBean.isOk() ? "取消完成：" : "取消失败:") + resultBean.getDesc());
+         } catch (ServiceException e) {
+             e.printStackTrace();
+             helper.showToast("发生错误：" + e.getMessage());
+         }
+         return null;
+     }
    }
 
  public static class DadaQueryTask extends MyAsyncTask<Integer, ResultBean, ResultBean> {
@@ -156,9 +163,9 @@ public class OrderSingleHelper {
            try {
                resultBean = dao.order_dada_start(orderId);
                if (resultBean.isOk()) {
-                    helper.showToast("呼叫完成");
+                    helper.showToast("查询完成");
                }else {
-                    helper.showToast("呼叫失败:" + resultBean.getDesc());
+                    helper.showToast("查询失败:" + resultBean.getDesc());
                }
            } catch (ServiceException e) {
                e.printStackTrace();
@@ -186,15 +193,13 @@ public class OrderSingleHelper {
         public static String getDadaBtnLabel(int dada_status) {
             String label;
             switch (dada_status) {
-                case Cts.DADA_STATUS_TO_ACCEPT:
-                    label = "达达待接单";
-                    break;
-                case Cts.DADA_STATUS_NEVER_START:
-                    label = "呼叫达达";
-                    break;
-                case Cts.DADA_STATUS_SHIPPING:
-                    label = "达达已接单";
-                    break;
+                case Cts.DADA_STATUS_TO_ACCEPT: label = "达达待接单"; break;
+                case Cts.DADA_STATUS_NEVER_START: label = "呼叫达达"; break;
+                case Cts.DADA_STATUS_SHIPPING: label = "达达在途"; break;
+                case Cts.DADA_STATUS_ARRIVED: label = "达达已送达"; break;
+                case Cts.DADA_STATUS_CANCEL: label = "达达已取消"; break;
+                case Cts.DADA_STATUS_TO_FETCH: label = "达达已接单"; break;
+                case Cts.DADA_STATUS_TIMEOUT: label = "超时未接单"; break;
                 default:
                     label = String.valueOf(dada_status);
             }
@@ -220,6 +225,9 @@ public class OrderSingleHelper {
                 protected void onPostExecute(Void aVoid) {
                     final Activity ctx = (Activity) v.getContext();
                     AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
+
+                    helper.updateDadaCallLabelUI(_dadaStatus, btnCallDada);
+
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
                         adb.setTitle("呼叫达达")
                                 .setMessage("现在呼叫达达...")
@@ -231,23 +239,50 @@ public class OrderSingleHelper {
                                 }).setNegativeButton("暂不呼叫", null);
                         adb.show();
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_ACCEPT) {
+                        String msg;
+                        if (_order != null) {
+                            int minutes = (int) ((System.currentTimeMillis() - _order.getDada_call_at().getTime()) / (1000 * 60));
+                            msg = String.format("%d分前已发单(%s米%.1f元)，等待接单中...", minutes, _order.getDada_distance(), _order.getDada_fee());
+                        } else {
+                            msg = "达达已发单，等待接单";
+                        }
                         adb.setTitle("达达待接单")
-                                .setMessage("等待达达接单中...")
+                                .setMessage(msg)
                                 .setPositiveButton("继续等待", null)
                                 .setNegativeButton("撤回呼叫", new DadaCancelClicked(false));
                         adb.show();
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
-                        String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
+                        final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
                         adb.setTitle("达达待取货")
-                                .setMessage(String.format("达达%s(%s)已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
+                                .setMessage(String.format("前达达%s (%s) 已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
                                 .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
+                        if (_order != null && !TextUtils.isEmpty(_order.getDada_mobile())) {
+                            adb.setNeutralButton("呼叫配送员", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                    callIntent.setData(Uri.parse("tel:" + dada_mobile));
+                                    OrderSingleActivity ctx = helper.activity;
+                                    if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                        Toast.makeText(ctx, "没有呼叫权限", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    ctx.startActivity(callIntent);
+                                }
+                            });
+                        }
                         adb.show();
                     } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL) {
                         adb.setTitle("呼叫达达")
                                 .setMessage("订单已取消，重新发单？")
                                 /* order_dada_restart */
-                                .setPositiveButton("重新发单(开发中)", null).setNegativeButton("不发了", new DadaCancelClicked(true));
+                                .setPositiveButton("重新发单", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new DadaCallTask(orderId, helper, true).executeOnNormal();
+                                    }
+                                }).setNegativeButton(R.string.cancel, null);
                         adb.show();
                     }
                 }
@@ -255,55 +290,20 @@ public class OrderSingleHelper {
 
         }
 
-        private class CallDadaListener implements DialogInterface.OnClickListener {
-            private final Activity ctx;
-
-            public CallDadaListener(Activity ctx) {
-                this.ctx = ctx;
-            }
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                new MyAsyncTask<Void, Void, Void>() {
-                    List<DadaCancelReason> reasonList = null;
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
-                        reasonList = dao.getDadaCancelReasons(orderId);
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        if (reasonList == null) {
-                            helper.showToast("获取达达订单取消理由列表失败！");
-                        } else {
-                            AlertDialog.Builder build = new AlertDialog.Builder(ctx);
-                            String[] reasons = new String[reasonList.size()];
-                            final int[] checkedItem = new int[]{0};
-                            build.setTitle("取消达达订单")
-                                    .setSingleChoiceItems(reasons, checkedItem[0], new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            checkedItem[0] = which;
-                                        }
-                                    });
-                        }
-
-                    }
-                }.executeOnNormal();
-
-            }
-        }
-
         private class DadaCallTask extends MyAsyncTask<Integer, ResultBean, ResultBean> {
 
+            private final boolean restart;
             private int orderId;
             private OrderSingleHelper helper;
 
             public DadaCallTask(int orderId, OrderSingleHelper helper) {
+                this(orderId, helper, false);
+            }
+
+            public DadaCallTask(int orderId, OrderSingleHelper helper, boolean restart) {
                 this.orderId = orderId;
                 this.helper = helper;
+                this.restart = restart;
             }
 
             @Override
@@ -311,9 +311,9 @@ public class OrderSingleHelper {
                 OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                 ResultBean resultBean;
                 try {
-                    resultBean = dao.order_dada_start(orderId);
+                    resultBean = restart ? dao.order_dada_restart(orderId) : dao.order_dada_start(orderId);
                     if (resultBean.isOk()) {
-                        helper.showToast("呼叫完成:" + resultBean.getDesc());
+                        helper.showToast("达达已收到请求:" + resultBean.getDesc());
                         dadaStatus = Cts.DADA_STATUS_TO_ACCEPT;
                         helper.updateDadaCallLabelUI(dadaStatus, btnCallDada);
                     }else {
@@ -337,7 +337,52 @@ public class OrderSingleHelper {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                new DadaCancelTask(orderId, helper).executeOnNormal();
+                new MyAsyncTask<Void, Void, Void>() {
+                    List<DadaCancelReason> reasonList = null;
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                        reasonList = dao.getDadaCancelReasons(orderId);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        if (reasonList == null) {
+                            helper.showToast("获取达达订单取消理由列表失败！");
+                        } else {
+                            helper.updateUI(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AlertDialog.Builder build = new AlertDialog.Builder(helper.activity);
+                                    final HashMap<String, Integer> reasons = new HashMap<>(reasonList.size());
+                                    for(DadaCancelReason re : reasonList) {
+                                        reasons.put(re.getText(), re.getId());
+                                    }
+                                    final int[] checkedItem = new int[]{0};
+                                    final String[] items = reasons.keySet().toArray(new String[reasons.size()]);
+                                    build.setTitle("取消达达订单")
+                                            .setSingleChoiceItems(items, checkedItem[0], new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    checkedItem[0] = which;
+                                                }
+                                            });
+                                    build.setPositiveButton("确定取消达达", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            String reasonTxt = items[checkedItem[0]];
+                                            new DadaCancelTask(orderId, helper, reasons.get(reasonTxt), reasonTxt).executeOnNormal();
+                                        }
+                                    })
+                                        .setNegativeButton(R.string.cancel, null);
+                                    build.show();
+                                }
+                            });
+                        }
+
+                    }
+                }.executeOnNormal();
             }
         }
     }

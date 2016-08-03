@@ -172,7 +172,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         if (btnCallDada != null) {
             label = OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status);
         }
-        if (!TextUtils.isEmpty(label) && (isWaitingReady || fromStatus == Cts.WM_ORDER_STATUS_TO_SHIP)) {
+        if (!TextUtils.isEmpty(label)
+                && (isWaitingReady || fromStatus == Cts.WM_ORDER_STATUS_TO_SHIP || fromStatus == Cts.WM_ORDER_STATUS_TO_ARRIVE)) {
             btnCallDada.setVisibility(View.VISIBLE);
             btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
         } else {

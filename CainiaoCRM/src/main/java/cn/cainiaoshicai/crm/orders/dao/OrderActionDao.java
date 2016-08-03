@@ -152,6 +152,9 @@ public class OrderActionDao {
     public ResultBean order_dada_start(int orderId) throws ServiceException {
         return actionWithResult("/order_dada_start/" + orderId, new HashMap<String, String>());
     }
+    public ResultBean order_dada_restart(int orderId) throws ServiceException {
+        return actionWithResult("/order_dada_restart/" + orderId, new HashMap<String, String>());
+    }
 
     public ResultBean order_dada_cancel(int orderId, int cancelReason, String reasonTxt) throws ServiceException {
         return actionWithResult("/order_dada_cancel/" + orderId + "/" + cancelReason + "/" + reasonTxt , new HashMap<String, String>());
