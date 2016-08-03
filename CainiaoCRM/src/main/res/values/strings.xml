@@ -177,6 +177,7 @@
     <string name="title_bluetooth_setting">蓝牙打印设置</string>
     <string name="title_print_setting">打印设置</string>
     <string name="title_storage_status">供货管理</string>
+    <string name="title_order_query">订单查询</string>
 
     <string name="action_package_done">打包完成</string>
     <string name="action_start_ship">提醒出发</string>

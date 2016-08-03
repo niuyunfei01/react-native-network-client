@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,36 +14,31 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
-import cn.cainiaoshicai.crm.orders.dao.OrdersDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
-import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
-import cn.cainiaoshicai.crm.support.utils.Utility;
-import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
+import cn.cainiaoshicai.crm.ui.loader.RefreshOrderListTask;
 
 public class OrderListFragment extends Fragment {
 
 	private SwipeRefreshLayout swipeRefreshLayout;
-	private ListView listView;
-	private OrderAdapter adapter;
+    private OrderAdapter adapter;
 	private ArrayList<Order> data = new ArrayList<Order>();
 
-    private int listType;
+    private ListType listType;
     private String searchTerm;
 
-    public void setDayAndType(final MainActivity.ListType listType) {
-        this.listType = listType.getValue();
+    public void setDayAndType(final ListType listType) {
+        this.listType = listType;
         this.searchTerm = "";
         onTypeChanged();
     }
@@ -61,8 +55,8 @@ public class OrderListFragment extends Fragment {
     }
 
     private void init(View v) {
-		listView = (ListView) v.findViewById(R.id.orderListView);
-		adapter = new OrderAdapter(getActivity(), data, this.listType);
+        ListView listView = (ListView) v.findViewById(R.id.orderListView);
+		adapter = new OrderAdapter(getActivity(), data, this.listType.getValue());
 		listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -71,17 +65,16 @@ public class OrderListFragment extends Fragment {
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
                 Order item = (Order) adapter.getItem(position);
                 openOrder.putExtra("id", item.getId());
-                openOrder.putExtra("list_type", listType);
+                openOrder.putExtra("list_type", listType.getValue());
                 openOrder.putExtra("order", item);
                 try {
                     getActivity().startActivity(openOrder);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        onTypeChanged();
 
 		swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.list_order_view);
 		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -93,126 +86,68 @@ public class OrderListFragment extends Fragment {
                 }
             });
 
+        onTypeChanged();
 	}
 
     private void onTypeChanged() {
         if (adapter != null) {
-            new RefreshOrderListTask(this.listView).executeOnNormal();
+            FragmentActivity activity = (FragmentActivity) this.getActivity();
+            RefreshOrderListTask task = new RefreshOrderListTask(activity, searchTerm, listType, swipeRefreshLayout, new QueryDoneCallback());
+            task.executeOnNormal();
         }
     }
 
-    public void executeSearch(MainActivity.ListType listType, String query) {
-        this.listType = listType.getValue();
+    public void executeSearch(ListType listType, String query) {
+        this.listType = listType;
         this.searchTerm = query;
     }
 
-    private class RefreshOrderListTask
-            extends MyAsyncTask<Void,List<Order>,OrderContainer> {
-
-        private ListView listView;
-        private String error;
-        private ProgressFragment progressFragment;
-
-        public RefreshOrderListTask(ListView listView) {
-            this.listView = listView;
-
-            if (!TextUtils.isEmpty(searchTerm)) {
-               progressFragment = ProgressFragment.newInstance(R.string.searching);
-            }
-        }
-
+    private class QueryDoneCallback implements RefreshOrderListTask.OrderQueriedDone {
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        public void done(final OrderContainer value, String error) {
 
-            if (progressFragment != null) {
-                if (this.listView != null) {
-                    FragmentActivity context = (FragmentActivity) this.listView.getContext();
-                    Utility.forceShowDialog(context, progressFragment);
-                }
-                progressFragment.setAsyncTask(this);
-            }
-        }
+            final OrderListFragment orderListFragment = OrderListFragment.this;
 
-        @Override
-        protected OrderContainer doInBackground(Void... params) {
-            try {
-                String token = GlobalCtx.getInstance().getSpecialToken();
-                OrdersDao ordersDao = new OrdersDao(token, listType);
-                if (TextUtils.isEmpty(searchTerm)) {
-                    return ordersDao.get();
-                } else {
-                    return ordersDao.search(searchTerm);
-                }
-            } catch (ServiceException e) {
-//                cancel(true);
-                this.error = e.getMessage();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onCancelled(OrderContainer orderContainer) {
-            this.onCancelled();
-        }
-
-        @Override
-        protected void onCancelled() {
-            swipeRefreshLayout.setRefreshing(false);
-            if (progressFragment != null) {
-                progressFragment.dismissAllowingStateLoss();
-            }
-            Toast.makeText(getActivity(), "已取消：" + this.error, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        protected void onPostExecute(final OrderContainer value) {
-            super.onPostExecute(value);
-            swipeRefreshLayout.setRefreshing(false);
-            if (progressFragment != null) {
-                progressFragment.dismissAllowingStateLoss();
-            }
-            if (getActivity() == null) {
+            if (OrderListFragment.this.getActivity() == null) {
                 return;
             }
 
             if (value != null) {
-                data.clear();
-                data.addAll(value.getOrders());
-                getAdapter().notifyDataSetChanged();
+                orderListFragment.data.clear();
+                orderListFragment.data.addAll(value.getOrders());
+                orderListFragment.getAdapter().notifyDataSetChanged();
 
-                for(final Order order: value.getOrders()) {
+                for (final Order order : value.getOrders()) {
                     if (order.shouldTryAutoPrint()
                             && order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
                             && GlobalCtx.isAutoPrint(order.getStore_id())) {
-                       OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new OrderPrinter.PrintCallback() {
-                           @Override
-                           public void run(boolean result, String desc) {
-                               getActivity().runOnUiThread(new Runnable() {
-                                   @Override
-                                   public void run() {
-                                       order.incrPrintTimes();
-                                       getAdapter().notifyDataSetChanged();
-                                   }
-                               });
-                           }
-                       });
+                        OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new OrderPrinter.PrintCallback() {
+                            @Override
+                            public void run(boolean result, String desc) {
+                                orderListFragment.getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        order.incrPrintTimes();
+                                        orderListFragment.getAdapter().notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
 
-                final MainActivity context = (MainActivity) this.listView.getContext();
+                final MainActivity context = (MainActivity) orderListFragment.getActivity();
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        context.updateStatusCnt(value.getTotals(), searchTerm != null);
+                        context.updateStatusCnt(value.getTotals(), orderListFragment.searchTerm != null);
                     }
                 });
 
-                AppLogger.d("display data:" + data.size());
+                AppLogger.d("display data:" + orderListFragment.data.size());
             } else {
-                Toast.makeText(getActivity(), "发生错误：" + this.error, Toast.LENGTH_LONG).show();
+                Toast.makeText(orderListFragment.getActivity(), "发生错误：" + error, Toast.LENGTH_LONG).show();
             }
         }
     }
-
 }
