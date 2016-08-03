@@ -255,27 +255,15 @@ public class OrderSingleHelper {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
                         adb.setTitle("达达待取货")
-                                .setMessage(String.format("前达达%s (%s) 已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
+                                .setMessage(String.format("达达%s (%s) 已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
                                 .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
                         if (_order != null && !TextUtils.isEmpty(_order.getDada_mobile())) {
-                            adb.setNeutralButton("呼叫配送员", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                    callIntent.setData(Uri.parse("tel:" + dada_mobile));
-                                    OrderSingleActivity ctx = helper.activity;
-                                    if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                        Toast.makeText(ctx, "没有呼叫权限", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    ctx.startActivity(callIntent);
-                                }
-                            });
+                            adb.setNeutralButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile));
                         }
                         adb.show();
-                    } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL) {
+                    } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL || _dadaStatus == Cts.DADA_STATUS_TIMEOUT) {
                         adb.setTitle("呼叫达达")
-                                .setMessage("订单已取消，重新发单？")
+                                .setMessage("订单已"+(_dadaStatus == Cts.DADA_STATUS_TIMEOUT ? "超时":"取消")+"，重新发单？")
                                 /* order_dada_restart */
                                 .setPositiveButton("重新发单", new DialogInterface.OnClickListener() {
                                     @Override
@@ -283,6 +271,13 @@ public class OrderSingleHelper {
                                         new DadaCallTask(orderId, helper, true).executeOnNormal();
                                     }
                                 }).setNegativeButton(R.string.cancel, null);
+                        adb.show();
+                    } else if (_dadaStatus == Cts.DADA_STATUS_SHIPPING || _dadaStatus == Cts.DADA_STATUS_ARRIVED) {
+                        String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
+                        final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
+                        adb.setTitle("达达在途")
+                                .setMessage(String.format("达达%s (%s) " + (_dadaStatus == Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达"), dada_dm_name, dada_mobile))
+                                .setPositiveButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile)).setNegativeButton("知道了", null);
                         adb.show();
                     }
                 }
@@ -383,6 +378,26 @@ public class OrderSingleHelper {
 
                     }
                 }.executeOnNormal();
+            }
+        }
+
+        private class CallDadaPhoneClicked implements DialogInterface.OnClickListener {
+            private final String dada_mobile;
+
+            public CallDadaPhoneClicked(String dada_mobile) {
+                this.dada_mobile = dada_mobile;
+            }
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + dada_mobile));
+                OrderSingleActivity ctx = helper.activity;
+                if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(ctx, "没有呼叫权限", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ctx.startActivity(callIntent);
             }
         }
     }
