@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class DadaCancelReason implements Serializable {
 
     private int id;
-    private String text;
+    private String info;
 
     public int getId() {
         return id;
@@ -18,11 +18,11 @@ public class DadaCancelReason implements Serializable {
         this.id = id;
     }
 
-    public String getText() {
-        return text;
+    public String getInfo() {
+        return info;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setInfo(String info) {
+        this.info = info;
     }
 }

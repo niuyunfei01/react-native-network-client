@@ -3,7 +3,6 @@ package cn.cainiaoshicai.crm.orders.view;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -161,11 +160,11 @@ public class OrderSingleHelper {
            OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
            ResultBean resultBean;
            try {
-               resultBean = dao.order_dada_start(orderId);
+               resultBean = dao.orderDadaQuery(this.orderId);
                if (resultBean.isOk()) {
-                    helper.showToast("查询完成");
+                    helper.showToast("查询结果：" + resultBean.getDesc());
                }else {
-                    helper.showToast("查询失败:" + resultBean.getDesc());
+                    helper.showToast("查询结果:" + resultBean.getDesc());
                }
            } catch (ServiceException e) {
                e.printStackTrace();
@@ -232,7 +231,7 @@ public class OrderSingleHelper {
 
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
                         adb.setTitle("呼叫达达")
-                                .setMessage(dadaPrice > 8.0 ? "起步价约 " + dadaPrice + " 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？" : "现在呼叫达达..." )
+                                .setMessage(dadaPrice > 7.0 ? "起步价约 " + dadaPrice + " 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？" : "现在呼叫达达..." )
                                 .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -251,6 +250,12 @@ public class OrderSingleHelper {
                         adb.setTitle("达达待接单")
                                 .setMessage(msg)
                                 .setPositiveButton("继续等待", null)
+                                .setNeutralButton("刷新状态", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new DadaQueryTask(orderId, helper).executeOnNormal();
+                                    }
+                                })
                                 .setNegativeButton("撤回呼叫", new DadaCancelClicked(false));
                         adb.show();
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
@@ -353,25 +358,25 @@ public class OrderSingleHelper {
                                     AlertDialog.Builder build = new AlertDialog.Builder(helper.activity);
                                     final HashMap<String, Integer> reasons = new HashMap<>(reasonList.size());
                                     for(DadaCancelReason re : reasonList) {
-                                        reasons.put(re.getText(), re.getId());
+                                        reasons.put(re.getInfo(), re.getId());
                                     }
                                     final int[] checkedItem = new int[]{0};
                                     final String[] items = reasons.keySet().toArray(new String[reasons.size()]);
-                                    build.setTitle("取消达达订单")
+                                    build.setTitle("撤回达达订单")
                                             .setSingleChoiceItems(items, checkedItem[0], new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     checkedItem[0] = which;
                                                 }
                                             });
-                                    build.setPositiveButton("确定取消达达", new DialogInterface.OnClickListener() {
+                                    build.setPositiveButton("确定撤回达达", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             String reasonTxt = items[checkedItem[0]];
                                             new DadaCancelTask(orderId, helper, reasons.get(reasonTxt), reasonTxt).executeOnNormal();
                                         }
                                     })
-                                        .setNegativeButton(R.string.cancel, null);
+                                        .setNegativeButton("不撤回", null);
                                     build.show();
                                 }
                             });
