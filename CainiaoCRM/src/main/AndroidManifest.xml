@@ -17,7 +17,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="225"
+    android:versionCode="226"
     android:versionName="2.2.1">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
@@ -60,7 +60,7 @@
         android:theme="@style/Theme.Styled"
         android:name=".GlobalCtx">
 
-        <meta-data android:name="android.app.default_searchable" android:value=".MainActivity" />
+        <meta-data android:name="android.app.default_searchable" android:value=".ui.activity.OrderQueryActivity" />
 
         <activity android:name=".ui.activity.LoginActivity">
             <intent-filter>
@@ -71,10 +71,6 @@
 
         <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
         </activity>
 
         <activity android:name=".ui.activity.RemindersActivity" android:screenOrientation="portrait">
@@ -87,6 +83,10 @@
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
         <activity android:name=".ui.activity.OrderQueryActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
         <activity android:name=".ui.activity.MineActivity" android:screenOrientation="portrait">

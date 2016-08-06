@@ -63,7 +63,8 @@ public class OrdersDao {
         this.access_token = access_token;
     }
 
-    public OrderContainer search(String searchTerm) throws ServiceException {
+    public OrderContainer search(String searchTerm, int listType) throws ServiceException {
+        this.listType = listType;
         return convert(getJson(searchTerm));
     }
 }

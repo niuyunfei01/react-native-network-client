@@ -231,7 +231,7 @@ public class OrderSingleHelper {
 
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
                         adb.setTitle("呼叫达达")
-                                .setMessage(dadaPrice > 7.0 ? "起步价约 " + dadaPrice + " 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？" : "现在呼叫达达..." )
+                                .setMessage(dadaPrice > 7.0 ? String.format("起步价约 %.1f 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？", dadaPrice) : "现在呼叫达达..." )
                                 .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -263,7 +263,8 @@ public class OrderSingleHelper {
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
                         adb.setTitle("达达待取货")
                                 .setMessage(String.format("达达%s (%s) 已接单，如强制取消扣1元费用", dada_dm_name, dada_mobile))
-                                .setPositiveButton(R.string.ok, null).setNegativeButton("强行取消", new DadaCancelClicked(true));
+                                .setPositiveButton("知道了", null)
+                                .setNegativeButton("强行撤单", new DadaCancelClicked(true));
                         if (_order != null && !TextUtils.isEmpty(_order.getDada_mobile())) {
                             adb.setNeutralButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile));
                         }
@@ -271,19 +272,20 @@ public class OrderSingleHelper {
                     } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL || _dadaStatus == Cts.DADA_STATUS_TIMEOUT) {
                         adb.setTitle("呼叫达达")
                                 .setMessage("订单已"+(_dadaStatus == Cts.DADA_STATUS_TIMEOUT ? "超时":"取消")+"，重新发单？")
-                                .setPositiveButton("重新发单", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("重新发单", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         new DadaCallTask(orderId, helper, true).executeOnNormal();
                                     }
-                                }).setNegativeButton(R.string.cancel, null);
+                                }).setPositiveButton(R.string.cancel, null);
                         adb.show();
                     } else if (_dadaStatus == Cts.DADA_STATUS_SHIPPING || _dadaStatus == Cts.DADA_STATUS_ARRIVED) {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
                         adb.setTitle("达达在途")
                                 .setMessage(String.format("达达%s (%s) " + (_dadaStatus == Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达"), dada_dm_name, dada_mobile))
-                                .setPositiveButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile)).setNegativeButton("知道了", null);
+                                .setNegativeButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile))
+                                .setPositiveButton("知道了", null);
                         adb.show();
                     }
                 }

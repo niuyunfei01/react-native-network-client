@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
@@ -105,7 +106,9 @@ public class MineActivity extends AbstractActionBarActivity {
 				} else if (item.getType() == TYPE_ORDER_DELAYED) {
 					MineActivity.this.startActivity(new Intent(getApplicationContext(), InTimeStatsActivity.class));
 				} else if (item.getType() == TYPE_ORDER_LIST) {
-					MineActivity.this.startActivity(new Intent(getApplicationContext(), OrderQueryActivity.class));
+					Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
+					intent.putExtra("list_type", ListType.INVALID.getValue());
+					MineActivity.this.startActivity(intent);
 				}
 			}
 		});

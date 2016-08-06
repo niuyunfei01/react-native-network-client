@@ -67,10 +67,9 @@ public class RefreshOrderListTask
             String token = GlobalCtx.getInstance().getSpecialToken();
             OrdersDao ordersDao = new OrdersDao(token, this.listType.getValue());
             if (TextUtils.isEmpty(searchTerm)) {
-                OrderContainer oc = ordersDao.get();
-                return oc;
+                return ordersDao.get();
             } else {
-                return ordersDao.search(searchTerm);
+                return ordersDao.search(searchTerm, this.listType.getValue());
             }
         } catch (ServiceException e) {
 //                cancel(true);

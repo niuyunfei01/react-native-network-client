@@ -1,8 +1,10 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -23,7 +25,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
     private OrderAdapter adapter;
     private ArrayList<Order> data = new ArrayList<Order>();
 
-    private ListType listType = ListType.INVALID;
+    private ListType listType = ListType.NONE;
     private String searchTerm = "";
 
     @Override
@@ -67,8 +69,28 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 }
             });
 
+            // Get the intent, verify the action and get the query
+            Intent intent = getIntent();
+
+            int list_type = intent.getIntExtra("list_type", 0);
+            ListType foundType = ListType.findByType(list_type);
+            if (foundType != null) {
+                this.listType = foundType;
+            }
+
+            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                this.searchTerm = intent.getStringExtra(SearchManager.QUERY);
+                this.onTypeChanged();
+            } else {
+                String query = intent.getStringExtra("query");
+                if (!TextUtils.isEmpty(query)) {
+                    this.searchTerm = query;
+                }
+            }
+
             onTypeChanged();
         }
+
     }
 
     private void onTypeChanged() {
