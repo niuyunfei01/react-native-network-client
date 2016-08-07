@@ -24,6 +24,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -281,10 +282,10 @@ public class OrderAdapter extends BaseAdapter {
         @Override
         public void onClick(View v) {
             String mobilephone = null;
-            if (order.getShip_worker_id() == -999) {
+            if (order.getShip_worker_id() == Cts.ID_DADA_SHIP_WORKER) {
                 mobilephone = order.getDada_mobile();
             } else {
-                HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
+                SortedMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
                 if (workers != null) {
                     CommonConfigDao.Worker worker = workers.get(order.getShip_worker_id());
                     if (worker != null) {

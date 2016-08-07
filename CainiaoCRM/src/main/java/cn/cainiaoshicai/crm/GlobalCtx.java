@@ -11,15 +11,21 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.Display;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,7 +57,7 @@ public class GlobalCtx extends Application {
     private Activity currentRunningActivity = null;
     private Handler handler = new Handler();
 
-    private HashMap<Integer, CommonConfigDao.Worker> workers = new HashMap<>();
+    private SortedMap<Integer, CommonConfigDao.Worker> workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
 
@@ -153,7 +159,7 @@ public class GlobalCtx extends Application {
                         }
 
                         CommonConfigDao.Config config = new CommonConfigDao(token).get();
-                        HashMap<Integer, CommonConfigDao.Worker> workers = config.getWorkers();
+                        SortedMap<Integer, CommonConfigDao.Worker> workers = config.getWorkers();
                         if (workers != null) {
                             GlobalCtx.this.workers = workers;
                         }
@@ -172,12 +178,12 @@ public class GlobalCtx extends Application {
         }.executeOnNormal();
     }
 
-    public HashMap<Integer, CommonConfigDao.Worker> getWorkers() {
+    public SortedMap<Integer, CommonConfigDao.Worker> getWorkers() {
         if (workers == null || workers.isEmpty()) {
             initConfigs();
         }
 
-        return this.workers == null ? new HashMap<Integer, CommonConfigDao.Worker>() : this.workers;
+        return this.workers == null ? new TreeMap<Integer, CommonConfigDao.Worker>() : this.workers;
     }
 
     public String[] getDelayReasons() {

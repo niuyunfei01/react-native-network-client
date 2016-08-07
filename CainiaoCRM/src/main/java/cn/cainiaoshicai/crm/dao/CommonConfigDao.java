@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
@@ -33,7 +34,7 @@ public class CommonConfigDao {
 
         String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
 
-        AppLogger.v("get wokers:" + json);
+        AppLogger.v("get common config:" + json);
 
         Config value = null;
         try {
@@ -47,17 +48,17 @@ public class CommonConfigDao {
     }
 
     static public class Config {
-        private HashMap<Integer, Worker> workers;
+        private SortedMap<Integer, Worker> workers;
         private String[] delayReasons;
         private HashMap<String, String> configUrls;
 
-        public Config(HashMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
+        public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
             this.workers = workers;
             this.delayReasons = delayReasons;
             this.configUrls = configUrls;
         }
 
-        public HashMap<Integer, Worker> getWorkers() {
+        public SortedMap<Integer, Worker> getWorkers() {
             return workers;
         }
 

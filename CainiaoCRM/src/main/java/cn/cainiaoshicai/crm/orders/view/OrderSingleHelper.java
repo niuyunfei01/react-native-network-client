@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -52,7 +53,7 @@ public class OrderSingleHelper {
         final boolean isWaitingReady = fromStatus == Cts.WM_ORDER_STATUS_TO_READY;
         AlertDialog.Builder adb = new AlertDialog.Builder(activity);
         final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
-        HashMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
+        SortedMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
         if (workers != null && !workers.isEmpty()) {
             for(CommonConfigDao.Worker worker : workers.values()) {
                 if (!(isWaitingReady || action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) || !worker.isExtShipWorker()) {
