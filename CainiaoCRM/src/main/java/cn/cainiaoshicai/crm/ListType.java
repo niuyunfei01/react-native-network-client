@@ -4,7 +4,7 @@ package cn.cainiaoshicai.crm;
  * Created by liuzhr on 8/3/16.
  */
 public enum ListType {
-    NONE(0, "ALL"), WAITING_READY(1, "打包中"), WAITING_SENT(2, "待送"), WAITING_ARRIVE(3, "在途"), ARRIVED(4, "送达"), INVALID(5, "无效");
+        NONE(0, "全部"), WAITING_READY(1, "打包中"), WAITING_SENT(2, "待送"), WAITING_ARRIVE(3, "在途"), ARRIVED(4, "送达"), INVALID(5, "无效");
 
     private int value;
     private String name;

@@ -7,6 +7,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +33,7 @@ import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 
 /**
  */
@@ -80,7 +83,12 @@ public class OrderAdapter extends BaseAdapter {
         TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
         TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
         TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
-        TextView paidDoneTxt = (TextView)vi.findViewById(R.id.paid_done);
+        TextView paidWayTxt = (TextView)vi.findViewById(R.id.paid_done);
+        TextView labelExpectTxt = (TextView)vi.findViewById(R.id.label_expect);
+
+        GlobalCtx ctx = GlobalCtx.getApplication();
+        ColorStateList defTextColor = labelExpectTxt.getTextColors();
+        int redTextColor = ContextCompat.getColor(ctx, R.color.red);
 
 //        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
 
@@ -92,18 +100,29 @@ public class OrderAdapter extends BaseAdapter {
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
             Date expectTime = order.getExpectTime();
-            expect_time.setText(TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.mdHourMinCh(expectTime)) : order.getExpectTimeStr());
+            expect_time.setText(TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr());
 
             boolean paid_done = order.isPaidDone();
-            if (paid_done) {
-                paidDoneTxt.setVisibility(View.VISIBLE);
-                paidDoneTxt.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), R.color.green));
-//                paidDoneTxt.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), R.drawable.list_text_border_green));
+            if (!paid_done) {
+                paidWayTxt.setText("货到付款");
+                paidWayTxt.setTextColor(redTextColor);
+                paidWayTxt.setBackground(ContextCompat.getDrawable(activity, R.drawable.list_text_border_red));
             } else {
-                paidDoneTxt.setVisibility(View.GONE);
+                paidWayTxt.setText("在线支付");
+                paidWayTxt.setTextColor(defTextColor);
+                paidWayTxt.setBackground(null);
             }
 
-            orderAddr.setText(order.getAddress());
+            boolean isInvalid = order.getOrderStatus() == Cts.WM_ORDER_STATUS_INVALID;
+
+            if (isInvalid) {
+                addStrikeThrough(dayNo);
+                addStrikeThrough(labelExpectTxt);
+                addStrikeThrough(expect_time);
+                addStrikeThrough(paidWayTxt);
+            }
+
+            orderAddr.setText((isInvalid ? "[已无效]":"") + order.getAddress());
             userName.setText(order.getUserName());
             phone.setText(order.getMobile());
             phone.setOnClickListener(new View.OnClickListener() {
@@ -114,12 +133,12 @@ public class OrderAdapter extends BaseAdapter {
             });
             genderText.setText(order.getGenderText());
             orderMoney.setText(String.valueOf(order.getOrderMoney()));
-            orderTimesTxt.setText(order.getOrder_times() > 1 ? "第"+order.getOrder_times()+"次下单" : "新用户");
+            orderTimesTxt.setText(order.getOrder_times() > 1 ? "第" + order.getOrder_times() + "次" : "新用户");
 
             orderTimesTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), MainActivity.class);
+                    Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
                     intent.setAction(Intent.ACTION_SEARCH);
                     intent.putExtra(SearchManager.QUERY, order.getMobile());
                     v.getContext().startActivity(intent);
@@ -129,8 +148,6 @@ public class OrderAdapter extends BaseAdapter {
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
             dayNo.setText("#" + order.getSimplifiedId());
 
-            String platformName = Cts.Platform.find(order.getPlatform()).name;
-            String platformDayId = order.getPlatform_dayId();
             sourcePlatform.setText(order.platformWithId());
 
             if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_INVALID) {
@@ -188,13 +205,16 @@ public class OrderAdapter extends BaseAdapter {
                     int colorResource = (reviewDeliver.isGood()) ? R.color.green : R.color.red;
                     inTimeView.setText(reviewDeliver.name);
                     if (reviewDeliver.value != Cts.DELIVER_UNKNOWN.value) {
-                        inTimeView.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
-                        inTimeView.setBackground(ContextCompat.getDrawable(GlobalCtx.getApplication(), reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
+                        inTimeView.setTextColor(ContextCompat.getColor(ctx, colorResource));
+                        inTimeView.setBackground(ContextCompat.getDrawable(ctx, reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
                     }
                 } else {
                     inTimeView.setVisibility(View.GONE);
                     TextView print_times = (TextView) vi.findViewById(R.id.print_times);
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
+                    readyDelayWarn.setTextColor(defTextColor);
+                    readyDelayWarn.setBackground(null);
+
                     if ((order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
                             || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP)) {
                         int leftMin = order.getReadyLeftMin();
@@ -222,177 +242,12 @@ public class OrderAdapter extends BaseAdapter {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
         }
 
-        /*
-        long time = order.getCreatedAt().getTime();
-        Log.d(GlobalCtx.ORDERS_TAG, "created at " + order.getCreatedAt());
-        createdAtTxt.setText(DateUtils.getRelativeTimeSpanString(time, System.currentTimeMillis(), 0));
-        ((TextView) vi.findViewById(R.id.post_address)).setText(order.getAddress());
-        if (order.getAddress() != null && !"".equals(order.getAddress().trim())) {
-            (vi.findViewById(R.id.post_address_pic)).setVisibility(View.VISIBLE);
-        } else {
-            (vi.findViewById(R.id.post_address_pic)).setVisibility(View.GONE);
-        }*/
-
-//        ExpandGridView grid = (ExpandGridView) vi.findViewById(R.id.mygallery);
-//        if (order.getImages().size() > 0) {
-//            ThumbnailsLoader adapter = new ThumbnailsLoader(this.activity, null);
-//            adapter.addImageUrls(order.getImages());
-//            adapter.addFullImages(order.fullImages());
-//            ((BaseActivity) activity).getDaifanApplication().getImageLoader();
-//            grid.setAdapter(adapter);
-//            grid.setExpanded(true);
-//            grid.setVisibility(View.VISIBLE);
-//        } else {
-//            grid.setVisibility(View.GONE);
-//        }
-
-        /*
-        NetworkImageView imageV = (NetworkImageView) vi.findViewById(R.id.list_row_image);
-        if (order.hasImage()) {
-            imageV.setImageUrl(order.getImages().get(0), mImageLoader);
-            imageV.setVisibility(View.VISIBLE);
-        } else {
-            imageV.setVisibility(View.GONE);
-        }
-
-        imageV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent login = new Intent(activity.getApplicationContext(), ImagesActivity.class);
-                login.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                ArrayList<String> fullImages = order.fullImages();
-                login.putExtra("images", fullImages.toArray(new String[0]));
-                activity.startActivity(login);
-            }
-        });  */
-
-        /*
-        TextView postTotalNum = (TextView) vi.findViewById(R.id.post_total_num);
-        postTotalNum.setText(String.valueOf(order.getCount()));
-
-        final TextView postLeftNumTxt = (TextView) vi.findViewById(R.id.post_left_num);
-
-        final LinearLayout orderLayout = (LinearLayout) vi.findViewById(R.id.subOrderLayout);
-        final TextView bookedUNameTxt = (TextView) vi.findViewById(R.id.booked_uname_txts);
-        final ImageView bookedNamePic = (ImageView) vi.findViewById(R.id.book_pic);
-        final ImageButton bookBtn = (ImageButton) vi.findViewById(R.id.btnBooked);
-        reLayoutBooked(order, bookedUNameTxt, orderLayout, postLeftNumTxt, bookBtn);
-
-        final RelativeLayout commentContainers = (RelativeLayout) vi.findViewById(R.id.list_row_comments_container);
-        commentContainers.removeViews(0, commentContainers.getChildCount());
-
-        if (order.getComments().size() > 0) {
-            View pre = bookedNamePic;
-            for (Comment cm : order.getComments()) {
-                pre = appendComment(commentContainers, cm, pre);
-            }
-            commentContainers.setVisibility(View.VISIBLE);
-        }
-
-        final User currU = GlobalCtx.getInstance().getCurrUser();
-        boolean booked = (currU == null ? false : order.booked(currU.getId()));
-        if (booked) {
-            // bookBtn.setImageDrawable(R.d);
-            // TODO: 需要已经订阅的提示
-        }
-
-        bookBtn.setOnClickListener(new View.OnClickListener() {
-
-            private boolean doing = false;
-
-            @Override
-            public void onClick(View v) {
-
-                if (doing) {
-                    Log.d(GlobalCtx.ORDERS_TAG, "canceling a duplicated clicked.");
-                    return;
-                }
-
-                if (order.isInactive()) {
-                    Toast.makeText(activity, R.string.not_active_any_more, Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                if (order.outofOrder() && !order.booked(currU.getId())) {
-                    Toast.makeText(activity, R.string.out_of_order, Toast.LENGTH_LONG).show();
-                    bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_outoforder));
-                    return;
-                }
-
-                if (currU == null) {
-                    Toast.makeText(activity, R.string.login_required, Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                boolean isUndo = false;
-                if (order.booked(currU.getId())) {
-                    order.undoBook(currU);
-                    Toast.makeText(activity, R.string.book_undo_op, Toast.LENGTH_LONG).show();
-                    isUndo = true;
-                } else {
-                    order.addBooked(currU);
-                    Toast.makeText(activity, R.string.book_book_op, Toast.LENGTH_LONG).show();
-                }
-
-
-                final boolean nowBooked = order.booked(currU.getId());
-//                bookBtn.setHint(nowBooked ? R.string.bookBtn_cancel : R.string.bookBtn_book);
-                if (order.outofOrder())
-                    bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_outoforder));
-
-                reLayoutBooked(order, bookedUNameTxt, orderLayout, postLeftNumTxt, bookBtn);
-
-                new AsyncTask<Void, Void, Boolean>() {
-                    @Override
-                    protected void onPreExecute() {
-                        doing = true;
-                    }
-
-                    @Override
-                    protected Boolean doInBackground(Void... params) {
-                        PostService postService = GlobalCtx.getInstance().getOrderService();
-                        return nowBooked ?
-                                postService.book(order)
-                                : postService.undoBook(order);
-                    }
-
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        Log.i(GlobalCtx.ORDERS_TAG, "onPostExecute of book:" + result);
-                        doing = false;
-                        if (result) {
-//                            order.removeComment(currU.getId());
-                            OrderAdapter.this.notifyDataSetChanged();
-                        }
-                    }
-
-                    @Override
-                    protected void onCancelled(Boolean aBoolean) {
-                        doing = false;
-                    }
-                }.execute();
-            }
-        });
-
-        final ImageButton commentBtn = (ImageButton) vi.findViewById(R.id.btnComment);
-
-        commentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(GlobalCtx.ORDERS_TAG, "accepted commentBtn onclick event");
-
-                //if (!order.booked(GlobalCtx.getInstance().getCurrUid())) {
-//                    AlertUtil.showAlert(activity, R.string.comment_block_title, R.string.comment_block_error);
-                // Toast.makeText(activity, R.string.comment_block_error, Toast.LENGTH_LONG).show();
-                //return;
-                //}
-
-                commentComp.showForPost(order, OrderAdapter.this);
-            }
-        });
-        */
 
         return vi;
+    }
+
+    private void addStrikeThrough(TextView textView) {
+        textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
     }
 
     private void callMobilePhone(View v, String mobile) {
@@ -445,66 +300,4 @@ public class OrderAdapter extends BaseAdapter {
             }
         }
     }
-
-//    private long spentInMilliSeconds(Order order) {
-//        if (DateTimeUtils.sameDay(order.getOrderTime().getTime(), order.getExpectTime().getTime())) {
-//            return order.getTime_arrived().getTime() - order.getOrderTime().getTime();
-//        } else {
-//            Calendar cal = Calendar.getInstance();
-//        }
-//    }
-
-//    private void reLayoutBooked(Post post, TextView bookedUNameTxt, LinearLayout orderLayout, TextView postLeftNumTxt, ImageButton bookBtn) {
-//
-//        Log.d(GlobalCtx.ORDERS_TAG, "relayoutBooked" + post);
-//
-//        postLeftNumTxt.setText(String.valueOf(post.getLeft()));
-//        if (post.outofOrder()) {
-//            bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_outoforder));
-//        } else {
-//            bookBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.book_go));
-//        }
-//
-//        if (bookedUNameTxt == null) {
-//            Log.e(GlobalCtx.ORDERS_TAG, "booked name text view is null");
-//            return;
-//        }
-//
-//        if (post.getBookedUids().length > 0) {
-//            bookedUNameTxt.setText(post.getBookedUNames());
-//            orderLayout.setVisibility(View.VISIBLE);
-//        } else {
-//            bookedUNameTxt.setText("");
-//            orderLayout.setVisibility(View.GONE);
-//        }
-//    }
-//
-//    private TextView appendComment(RelativeLayout commentContainers, Comment cm, View pre) {
-//        TextView textLabel = (TextView) new TextView(activity);
-//        TextView textView = new TextView(activity);
-//        textLabel.setId(pre != null ? pre.getId() + 2 : 1);
-//        textView.setId(textLabel.getId() + 1);
-//
-//        LayoutParams p1 = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        p1.addRule(RelativeLayout.BELOW, pre != null ? pre.getId() : R.id.book_pic);
-//        p1.addRule(RelativeLayout.ALIGN_BOTTOM, textView.getId());
-//        p1.addRule(RelativeLayout.ALIGN_TOP, textView.getId());
-//
-//        textLabel.setLayoutParams(p1);
-//        textLabel.setTextColor(activity.getResources().getColor(R.color.post_anota_num_color));
-//        textLabel.setPadding(5, 2, 5, 2);
-//        textLabel.setGravity(Gravity.CENTER_VERTICAL);
-//
-//        LayoutParams p2 = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        p2.addRule(RelativeLayout.BELOW, pre != null ? pre.getId() : R.id.book_pic);
-//        p2.addRule(RelativeLayout.RIGHT_OF, textLabel.getId());
-//        textView.setLayoutParams(p2);
-//        textView.setPadding(0, 2, 0, 2);
-//
-//        textLabel.setText(GlobalCtx.getInstance().getUNameById(String.valueOf(cm.getUid())) + ": ");
-//        textView.setText(cm.getComment());
-//        commentContainers.addView(textLabel);
-//        commentContainers.addView(textView);
-//        return textLabel;
-//    }
 }

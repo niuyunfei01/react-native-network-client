@@ -35,7 +35,6 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
         if (savedInstanceState == null) {
             this.setContentView(R.layout.order_list);
 
-            setTitle(R.string.title_order_query);
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             ListView listView = (ListView) findViewById(R.id.orderListView);
@@ -72,15 +71,13 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
             // Get the intent, verify the action and get the query
             Intent intent = getIntent();
 
-            int list_type = intent.getIntExtra("list_type", 0);
-            ListType foundType = ListType.findByType(list_type);
+            ListType foundType = ListType.findByType(intent.getIntExtra("list_type", 0));
             if (foundType != null) {
                 this.listType = foundType;
             }
 
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 this.searchTerm = intent.getStringExtra(SearchManager.QUERY);
-                this.onTypeChanged();
             } else {
                 String query = intent.getStringExtra("query");
                 if (!TextUtils.isEmpty(query)) {
@@ -89,6 +86,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
             }
 
             onTypeChanged();
+            setTitle(String.format("%s订单%s", this.listType.getName(), TextUtils.isEmpty(this.searchTerm)?"" : ("中搜索：" + searchTerm)));
         }
 
     }
