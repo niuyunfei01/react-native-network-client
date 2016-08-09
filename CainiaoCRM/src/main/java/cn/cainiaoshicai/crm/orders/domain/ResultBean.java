@@ -32,6 +32,10 @@ public class ResultBean {
         return new ResultBean(false, "位置错误");
     }
 
+    public static ResultBean serviceException(String msg) {
+        return new ResultBean(false, msg);
+    }
+
     public static ResultBean networkException() {
         return new ResultBean(false, "网络异常");
     }

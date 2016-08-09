@@ -107,7 +107,13 @@
         <activity android:name=".ui.activity.GeneralWebViewActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
-        <activity android:name=".ui.activity.UserFeedBackEditActivity" android:screenOrientation="portrait">
+        <activity android:name=".ui.activity.FeedBackEditActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
+            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        </activity>
+        <activity android:name=".ui.activity.FeedbackListsActivity" android:screenOrientation="portrait">
+            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        </activity>
+        <activity android:name=".ui.activity.FeedbackViewActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
 

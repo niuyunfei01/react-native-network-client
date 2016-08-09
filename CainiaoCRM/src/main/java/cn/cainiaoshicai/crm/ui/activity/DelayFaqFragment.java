@@ -119,12 +119,7 @@ public class DelayFaqFragment extends DialogFragment {
                 })
                 .setView(editText)
                 .setPositiveButton(R.string.submit, null)
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {

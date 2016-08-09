@@ -43,7 +43,7 @@ import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
-import cn.cainiaoshicai.crm.ui.activity.UserFeedBackEditActivity;
+import cn.cainiaoshicai.crm.ui.activity.FeedBackEditActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
@@ -367,8 +367,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
 
         switch (item.getItemId()) {
             case R.id.menu_user_feedback:
-                Intent intent = new Intent(this, UserFeedBackEditActivity.class);
+                Intent intent = new Intent(this, FeedBackEditActivity.class);
                 intent.putExtra("order_id", this.orderId);
+                intent.putExtra("wm_id", this.orderId);
                 intent.putExtra("platformWithId", this.platformWithId);
 
                 startActivityForResult(intent, REQUEST_CODE_ADDFB);

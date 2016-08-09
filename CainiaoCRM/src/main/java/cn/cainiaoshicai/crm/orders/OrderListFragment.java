@@ -56,7 +56,12 @@ public class OrderListFragment extends Fragment {
 
     private void init(View v) {
         ListView listView = (ListView) v.findViewById(R.id.orderListView);
-		adapter = new OrderAdapter(getActivity(), data, this.listType.getValue());
+        ListType listType = this.listType;
+        if (listType == null) {
+            AppLogger.e("null list type!");
+            return;
+        }
+        adapter = new OrderAdapter(getActivity(), data, listType.getValue());
 		listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -65,7 +70,7 @@ public class OrderListFragment extends Fragment {
                 Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
                 Order item = (Order) adapter.getItem(position);
                 openOrder.putExtra("id", item.getId());
-                openOrder.putExtra("list_type", listType.getValue());
+                openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
                 openOrder.putExtra("order", item);
                 try {
                     getActivity().startActivity(openOrder);

@@ -92,7 +92,7 @@ public class MineActivity extends AbstractActionBarActivity {
 							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + GlobalCtx.getApplication().getSpecialToken()));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_USER_ITEMS) {
-					startActivity(new Intent(getApplicationContext(), UserCommentsActivity.class));
+					startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
 				} else if (item.getType() == TYPE_STORE_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				}  else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
