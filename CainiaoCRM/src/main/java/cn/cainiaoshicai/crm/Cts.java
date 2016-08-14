@@ -15,6 +15,7 @@ public class Cts {
     public static final int STORE_HLG = 1;
     public static final int STORE_YYC = 2;
     public static final int STORE_UNKNOWN = -1;
+    public static final int STORE_ALL = 0;
 
     public static final Store ST_HLG = new Store("回龙观", STORE_HLG);
     public static final Store ST_YYC = new Store("亚运村", STORE_YYC);

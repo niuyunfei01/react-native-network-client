@@ -121,6 +121,11 @@ public class OrderAdapter extends BaseAdapter {
                 addStrikeThrough(labelExpectTxt);
                 addStrikeThrough(expect_time);
                 addStrikeThrough(paidWayTxt);
+            } else {
+                cancelStrikeThrough(dayNo);
+                cancelStrikeThrough(labelExpectTxt);
+                cancelStrikeThrough(expect_time);
+                cancelStrikeThrough(paidWayTxt);
             }
 
             orderAddr.setText((isInvalid ? "[已无效]":"") + order.getAddress());
@@ -249,6 +254,10 @@ public class OrderAdapter extends BaseAdapter {
 
     private void addStrikeThrough(TextView textView) {
         textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    }
+
+    private void cancelStrikeThrough(TextView textView) {
+        textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
     private void callMobilePhone(View v, String mobile) {

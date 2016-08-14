@@ -22,6 +22,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -57,10 +58,10 @@ public class FeedBackEditActivity extends AbstractActionBarActivity {
 
                     String token = GlobalCtx.getInstance().getSpecialToken();
                     UserFeedbackDao dao = new UserFeedbackDao(token);
-                    Feedback fb = dao.findByOrderId(order_id);
-                    if (fb != null) {
+                    ResultObject<Feedback> fbObj = dao.findByOrderId(order_id);
+                    if (fbObj.isOk() && fbObj.getObj() != null) {
                         Intent to = new Intent(FeedBackEditActivity.this, FeedbackViewActivity.class);
-                        to.putExtra("fb", fb);
+                        to.putExtra("fb", fbObj.getObj());
                         FeedBackEditActivity.this.startActivity(to);
                     }
                     return null;

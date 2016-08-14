@@ -471,14 +471,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                     Toast.makeText(this, "该订单尚未指定过打包员，请先打包出库", Toast.LENGTH_LONG).show();
                     return false;
                 }
-                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER);
+                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER, ship_worker_id);
                 break;
             case R.id.menu_chg_ship_worker:
-                if (ship_worker_id <= 0) {
+                if (ship_worker_id <= 0 && ship_worker_id != Cts.ID_DADA_MANUAL_WORKER) {
                     Toast.makeText(this, "该订单尚未指定过配送员，请先打包出库", Toast.LENGTH_LONG).show();
                     return false;
                 }
-                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_SHIP_WORKER);
+                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_SHIP_WORKER, ship_worker_id);
                 break;
             case R.id.menu_refresh:
                 refresh();

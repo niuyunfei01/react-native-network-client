@@ -49,27 +49,43 @@ public class OrderSingleHelper {
     }
 
     public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action) {
+        this.chooseWorker(activity, orderListTypeToJump, fromStatus, action, null);
+    }
+
+    public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action, Integer defaultWorker) {
 
         final boolean isWaitingReady = fromStatus == Cts.WM_ORDER_STATUS_TO_READY;
         AlertDialog.Builder adb = new AlertDialog.Builder(activity);
         final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
         SortedMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
+        boolean is_choosing_ship = !isWaitingReady && action != OrderSingleActivity.ACTION_EDIT_PACK_WORKER;
+
         if (workers != null && !workers.isEmpty()) {
             for(CommonConfigDao.Worker worker : workers.values()) {
-                if (!(isWaitingReady || action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) || !worker.isExtShipWorker()) {
+                if (is_choosing_ship || !worker.isExtShipWorker()) {
                     workerList.add(worker);
                 }
             }
         }
 
         String currUid = GlobalCtx.getInstance().getCurrentAccountId();
-        int iCurrUid = currUid != null ? Integer.parseInt(currUid) : 0;
+
+        int defUid;
+        if (defaultWorker == null) {
+            defUid = currUid == null ? 0 : Integer.valueOf(currUid);
+            if (is_choosing_ship && action != OrderSingleActivity.ACTION_EDIT_SHIP_WORKER) {
+                defUid = Cts.ID_DADA_MANUAL_WORKER;
+            }
+        } else {
+            defUid = defaultWorker;
+        }
+
         final int[] checkedIdx = {0};
         List<String> items = new ArrayList<>();
         for (int i = 0; i < workerList.size(); i++) {
             CommonConfigDao.Worker worker = workerList.get(i);
             items.add(worker.getNickname());
-            if (iCurrUid == worker.getId()) {
+            if (defUid == worker.getId()) {
                 checkedIdx[0] = items.size() - 1;
             }
         }
@@ -80,7 +96,7 @@ public class OrderSingleHelper {
                 checkedIdx[0] = which;
             }
         });
-        adb.setTitle((isWaitingReady || action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) ? "谁打包的？" : "选择快递小哥")
+        adb.setTitle(!is_choosing_ship ? "谁打包的？" : "选择快递小哥")
                 .setPositiveButton(activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

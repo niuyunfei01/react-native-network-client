@@ -7,10 +7,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import java.util.ArrayList;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
@@ -27,17 +31,27 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
 
     private ListType listType = ListType.NONE;
     private String searchTerm = "";
+    private int selected_store = Cts.STORE_ALL;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            this.setContentView(R.layout.order_list);
+            this.setContentView(R.layout.order_query);
 
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            ListView listView = (ListView) findViewById(R.id.orderListView);
+            RadioGroup rg = (RadioGroup) findViewById(R.id.order_q_store_filter);
+            Button queryBtn = (Button) findViewById(R.id.order_query_search);
+            queryBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onTypeChanged();
+                }
+            });
+
+            ListView listView = (ListView) findViewById(R.id.order_query_list_view);
             adapter = new OrderAdapter(this, data, this.listType.getValue());
             listView.setAdapter(adapter);
 
@@ -57,8 +71,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 }
             });
 
-
-            swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.list_order_view);
+            swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.order_query_swipe);
             swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                     android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -88,7 +101,31 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
             onTypeChanged();
             setTitle(String.format("%s订单%s", this.listType.getName(), TextUtils.isEmpty(this.searchTerm)?"" : ("中搜索：" + searchTerm)));
         }
+    }
 
+    public void onStoreFilterClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.order_q_store_all:
+                if (checked)
+                    selected_store = Cts.STORE_ALL;
+                    break;
+            case R.id.order_q_store_hlg:
+                if (checked)
+                    selected_store = Cts.STORE_HLG;
+                    break;
+            case R.id.order_q_store_yyc:
+                if (checked)
+                    selected_store = Cts.STORE_YYC;
+                    break;
+            case R.id.order_q_store_unknown:
+                if (checked)
+                    selected_store = Cts.STORE_UNKNOWN;
+                    break;
+        }
     }
 
     private void onTypeChanged() {
@@ -103,7 +140,14 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                     }
                 }
             };
-            new RefreshOrderListTask(this, this.searchTerm, listType, this.swipeRefreshLayout, callback).executeOnNormal();
+
+            ListType lt = listType;
+            String term = this.searchTerm;
+            if (this.selected_store != Cts.STORE_ALL) {
+                term = "store:" + selected_store;
+                lt = ListType.NONE;
+            }
+            new RefreshOrderListTask(this, term, lt, this.swipeRefreshLayout, callback).executeOnNormal();
         }
     }
 
