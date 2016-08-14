@@ -60,6 +60,8 @@ public class Order implements Serializable {
 
     private int source_ready;
 
+    private Feedback feedback;
+
     public int getId() {
         return id;
     }
@@ -412,6 +414,15 @@ public class Order implements Serializable {
 
     public String getDada_dm_name() {
         return dada_dm_name;
+    }
+
+
+    public Feedback getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(Feedback feedback) {
+        this.feedback = feedback;
     }
 
     public void setDada_dm_name(String dada_dm_name) {

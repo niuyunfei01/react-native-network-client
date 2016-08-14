@@ -1,6 +1,8 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by liuzhr on 8/8/16.
@@ -12,6 +14,9 @@ public class Feedback implements Serializable {
     private int from_user;
     private int reported_by;
     private int source;
+    private int from_order;
+
+    private List<FeedbackLog> logs = new ArrayList<>(0);
 
     public int getId() {
         return id;
@@ -57,8 +62,28 @@ public class Feedback implements Serializable {
         return source;
     }
 
+    public void setSource(int source) {
+        this.source = source;
+    }
+
+    public List<FeedbackLog> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<FeedbackLog> logs) {
+        this.logs = logs;
+    }
+
     public String getSourceName() {
         return "百度差评";
+    }
+
+    public int getFrom_order() {
+        return from_order;
+    }
+
+    public void setFrom_order(int from_order) {
+        this.from_order = from_order;
     }
 
     public String getFromUserName() {

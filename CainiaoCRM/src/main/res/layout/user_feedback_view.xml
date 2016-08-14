@@ -18,8 +18,10 @@
         android:textSize="18sp"
         android:layout_toEndOf="@id/order_label"
         android:layout_alignParentTop="true"
+        android:background="@drawable/list_text_border_grey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/order_platform_no"
         android:layout_toEndOf="@id/order_id"
@@ -65,5 +67,58 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         />
+
+    <TextView android:id="@+id/label_curr_status"
+        android:layout_below="@id/feedback"
+        android:text="当前状态:"
+        android:layout_alignParentStart="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView android:id="@+id/curr_status"
+        android:layout_below="@id/feedback"
+        android:layout_toEndOf="@id/label_curr_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView android:id="@+id/label_processor"
+        android:layout_below="@id/feedback"
+        android:layout_toEndOf="@id/curr_status"
+        android:text="处理人:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView android:id="@+id/curr_processor"
+        android:layout_below="@id/feedback"
+        android:layout_toEndOf="@id/label_processor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ListView android:id="@+id/process_logs"
+        android:layout_below="@id/label_curr_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </ListView>
+
+    <Button android:id="@+id/add_process_log"
+        android:layout_below="@id/process_logs"
+        android:text="处理意见"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button android:id="@+id/process_forward"
+        android:layout_below="@id/process_logs"
+        android:layout_toEndOf="@+id/add_process_log"
+        android:text="转给别人"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button android:id="@+id/process_resolved"
+        android:layout_below="@id/process_logs"
+        android:layout_toEndOf="@+id/process_forward"
+        android:text="解决完毕"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

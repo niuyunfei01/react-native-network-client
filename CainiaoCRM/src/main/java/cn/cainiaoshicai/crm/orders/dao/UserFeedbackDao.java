@@ -17,6 +17,7 @@ import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultList;
+import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -90,7 +91,38 @@ public class UserFeedbackDao {
         return actionWithResult("/fb_new_by_order/" + orderId, params);
     }
 
-    public Feedback getFeedback(Integer feedbackId) {
-        return null;
+    public ResultObject<Feedback> getFeedback(int feedback_id) {
+        return _findFeedback("/fb_get/" + feedback_id);
+    }
+
+    @Nullable
+    private ResultObject<Feedback> _findFeedback(String path) {
+        try {
+            String json = getJson(path, new HashMap<String, String>());
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ResultObject<Feedback>>() {
+            }.getType());
+        } catch (Exception e) {
+            AppLogger.e("exception to get feedback:" + e.getMessage(), e);
+            return new ResultObject<Feedback>(ResultBean.exception());
+        }
+    }
+
+    public ResultBean saveFeedbackLog(int feedback_id, String log) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("log", log);
+            String json = getJson("/fb_add_log/" + feedback_id, params);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ResultBean>() {
+            }.getType());
+        } catch (Exception e) {
+            AppLogger.e("exception to get saveFeedbackLog:" + e.getMessage(), e);
+            return ResultBean.exception();
+        }
+    }
+
+    public ResultObject<Feedback> findByOrderId(int order_id) {
+        return _findFeedback("/fb_get_by_order_id/" + order_id);
     }
 }

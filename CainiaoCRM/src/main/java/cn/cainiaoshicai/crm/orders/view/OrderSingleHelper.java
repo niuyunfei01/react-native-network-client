@@ -316,7 +316,7 @@ public class OrderSingleHelper {
                 ResultBean resultBean;
                 try {
                     resultBean = restart ? dao.order_dada_restart(orderId) : dao.order_dada_start(orderId);
-                    if (resultBean.isOk()) {
+                    if (resultBean != null && resultBean.isOk()) {
                         helper.showToast("达达已收到请求:" + resultBean.getDesc());
                         dadaStatus = Cts.DADA_STATUS_TO_ACCEPT;
                         helper.updateDadaCallLabelUI(dadaStatus, btnCallDada);

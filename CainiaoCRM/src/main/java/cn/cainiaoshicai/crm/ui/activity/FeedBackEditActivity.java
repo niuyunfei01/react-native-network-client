@@ -15,9 +15,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
+
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
+import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
@@ -43,6 +46,31 @@ public class FeedBackEditActivity extends AbstractActionBarActivity {
         final TextView orderId = (TextView) findViewById(R.id.order_id);
         TextView platformWithId = (TextView) findViewById(R.id.order_platform_no);
 
+        Intent intent = getIntent();
+        final int order_id = intent.getIntExtra("order_id", 0);
+        orderId.setText(String.valueOf(order_id));
+
+        if (order_id > 0) {
+            new MyAsyncTask<Integer, Void, Feedback>() {
+                @Override
+                protected Feedback doInBackground(Integer... params) {
+
+                    String token = GlobalCtx.getInstance().getSpecialToken();
+                    UserFeedbackDao dao = new UserFeedbackDao(token);
+                    Feedback fb = dao.findByOrderId(order_id);
+                    if (fb != null) {
+                        Intent to = new Intent(FeedBackEditActivity.this, FeedbackViewActivity.class);
+                        to.putExtra("fb", fb);
+                        FeedBackEditActivity.this.startActivity(to);
+                    }
+                    return null;
+                }
+            }.executeOnNormal(order_id);
+        }
+
+        platformWithId.setText(intent.getStringExtra("platformWithId"));
+        final int wmId = intent.getIntExtra("wm_id", 0);
+
         Spinner spinner = (Spinner) findViewById(R.id.feedback_source);
         final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.feedback_source_array, android.R.layout.simple_spinner_item);
@@ -61,11 +89,6 @@ public class FeedBackEditActivity extends AbstractActionBarActivity {
         });
 
         final EditText et = (EditText)findViewById(R.id.feedback);
-
-        Intent intent = getIntent();
-        orderId.setText(String.valueOf(intent.getIntExtra("order_id", 0)));
-        platformWithId.setText(intent.getStringExtra("platformWithId"));
-        final int wmId = intent.getIntExtra("wm_id", 0);
 
         final Intent resultIntent = new Intent(getApplicationContext(), OrderSingleActivity.class);
         Button saveBtn = (Button) findViewById(R.id.save_btn);

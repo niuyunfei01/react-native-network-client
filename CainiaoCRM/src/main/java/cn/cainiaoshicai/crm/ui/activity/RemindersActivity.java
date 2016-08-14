@@ -20,9 +20,9 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,7 +66,7 @@ public class RemindersActivity extends AbstractActionBarActivity implements Acti
         ab.setDisplayShowTitleEnabled(false);
 
         // Add three tabs to the Action Bar for display
-        for(ListType type : Arrays.asList(ListType.NEW_ORDER, ListType.CUSTOMER_NOTIFY, ListType.REMINDER)) {
+        for(ListType type : Arrays.asList(ListType.COMPLAIN, ListType.CUSTOMER_NOTIFY, ListType.REMINDER)) {
             ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
         }
 
@@ -127,15 +127,19 @@ public class RemindersActivity extends AbstractActionBarActivity implements Acti
 
         FragmentManager fm = getFragmentManager();
         Integer fragmentId = fragmentMap.get(listType.getValue());
-        NewOrderFragment found = null;
+        Fragment found = null;
         if (fragmentId != null) {
-           found =(NewOrderFragment) fm.findFragmentById(fragmentId);
+           found = fm.findFragmentById(fragmentId);
         }
         if (found == null) {
-            found = new NewOrderFragment();
-            fragmentMap.put(listType.getValue(), found.getId());
+//            if (ListType.COMPLAIN.equals(listType)) {
+//                found = new FeedbackListsActivity();
+//            } else {
+                found = new NewOrderFragment();
+                fragmentMap.put(listType.getValue(), found.getId());
+                ((NewOrderFragment) found).setType(listType);
+//            }
         }
-        found.setType(listType);
         fm.beginTransaction().replace(R.id.order_list_main, found).commit();
     }
 
@@ -175,7 +179,7 @@ public class RemindersActivity extends AbstractActionBarActivity implements Acti
     }
 
     public enum ListType {
-            NEW_ORDER(1, "新订单"), CUSTOMER_NOTIFY(2, "用户催单"), REMINDER(3, "提醒");
+            COMPLAIN(1, "客户投诉"), CUSTOMER_NOTIFY(2, "用户催单"), REMINDER(3, "提醒");
 
         private int value;
         private String name;
@@ -194,7 +198,7 @@ public class RemindersActivity extends AbstractActionBarActivity implements Acti
         }
 
         static public ListType findByType(int type) {
-            if (type == 1) return NEW_ORDER;
+            if (type == 1) return COMPLAIN;
             if (type == 2) return CUSTOMER_NOTIFY;
             if (type == 3) return REMINDER;
             throw new IllegalArgumentException("incorrect argument:" + type);

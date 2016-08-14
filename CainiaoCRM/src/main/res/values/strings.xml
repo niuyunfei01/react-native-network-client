@@ -217,9 +217,13 @@
     <string name="menu_order_chg_ship">修改送货员</string>
     <string name="action_source_done">备货状态</string>
     <string name="order_text">订单</string>
+    <string name="label_status">状态</string>
     <string name="process_right_once">需立即处理</string>
     <string name="search_product_hint">输入编号或品名搜索</string>
     <string name="title_storage_self_provided">门店自采管理</string>
+    <string name="status_fixed">已解决</string>
+    <string name="status_working">未解决</string>
+    <string name="status_deleted">已作废</string>
 
     <string-array name="feedback_source_array">
         <item>400来电</item>

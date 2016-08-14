@@ -25,12 +25,14 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
@@ -41,6 +43,7 @@ import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
+import cn.cainiaoshicai.crm.ui.activity.FeedbackViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedBackEditActivity;
@@ -68,6 +71,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
     private int ship_worker_id;
     private int pack_worker_id;
     private OrderSingleHelper helper;
+    private AtomicReference<Order> order = new AtomicReference<>();
+
 
     public int getPack_worker_id() {
         return pack_worker_id;
@@ -120,7 +125,40 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         Intent intent = getIntent();
-        Order order = (Order) intent.getSerializableExtra("order");
+
+        final Order order = (Order) intent.getSerializableExtra("order");
+        final boolean is_from_new_order = "new_order".equals(intent.getStringExtra("from"));
+        listType = intent.getIntExtra("list_type", 0);
+
+        if (order == null) {
+            final int order_id = intent.getIntExtra("order_id", 0);
+            new MyAsyncTask<Integer, Void, Order>() {
+                @Override
+                protected Order doInBackground(Integer... params) {
+                    OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                    final Order o = dao.getOrder(order_id);
+                    final OrderSingleActivity act = OrderSingleActivity.this;
+                    act.order.set(order);
+                    if (o != null) {
+                        act.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                act.init_data(o, is_from_new_order);
+                            }
+                        });
+                    } else {
+                        Toast.makeText(act, "获取订单失败", Toast.LENGTH_LONG).show();
+                    }
+                    return null;
+                }
+            }.executeOnNormal(order_id);
+        } else {
+            this.order.set(order);
+            init_data(order, is_from_new_order);
+        }
+    }
+
+    private void init_data(Order order, boolean is_from_new_order) {
         ship_worker_id = order.getShip_worker_id();
         pack_worker_id = order.getPack_operator();
         platform = order.getPlatform();
@@ -132,7 +170,6 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         helper = new OrderSingleHelper(platform, platformOid, OrderSingleActivity.this, orderId);
 
         int sourceReady = order.getSource_ready();
-        listType = intent.getIntExtra("list_type", 0);
         fromStatus = order.getOrderStatus();
         final boolean isDelay = order.getOrderStatus() == Cts.WM_ORDER_STATUS_ARRIVED && !Cts.DeliverReview.find(order.getReview_deliver()).isGood();
         printButton = (Button) findViewById(R.id.button1);
@@ -175,7 +212,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
 
 
         final Button actionButton = (Button) findViewById(R.id.button2);
-        if("new_order".equals(intent.getStringExtra("from"))) {
+        if(is_from_new_order) {
             actionButton.setText("确认接单");
             actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, fromStatus, listType));
         } else {
@@ -260,7 +297,12 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
     }
 
     public void showPrintTimes(int print_times) {
-        printButton.setText(getString(R.string.menu_print) + (print_times > 0 ? String.format("(%d)", print_times) : ""));
+        String printTimesLabel = print_times > 0 ? String.format("(%d)", print_times) : "";
+        try {
+            printButton.setText(getString(R.string.menu_print) + printTimesLabel);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected void connect(final int platform, final String platformOid) {
@@ -283,6 +325,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                         return false;
                     } else {
                         this.order = order;
+                        OrderSingleActivity.this.order.set(order);
                         try {
                             OrderPrinter.printOrder(ds.getSocket(), order);
                             order.incrPrintTimes();
@@ -367,7 +410,16 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
 
         switch (item.getItemId()) {
             case R.id.menu_user_feedback:
-                Intent intent = new Intent(this, FeedBackEditActivity.class);
+
+                final Intent intent;
+
+                if (this.order.get() != null && this.order.get().getFeedback() != null) {
+                    intent = new Intent(this, FeedbackViewActivity.class);
+                    intent.putExtra("fb", this.order.get().getFeedback());
+                } else {
+                    intent = new Intent(this, FeedBackEditActivity.class);
+                }
+
                 intent.putExtra("order_id", this.orderId);
                 intent.putExtra("wm_id", this.orderId);
                 intent.putExtra("platformWithId", this.platformWithId);

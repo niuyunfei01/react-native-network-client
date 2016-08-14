@@ -171,8 +171,12 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             if (count == null) count = 0;
 
             ActionBar.Tab tab = this.getSupportActionBar().getTabAt(listType.getValue() - 1);
-            if (tab != null && (isSearch || !listType.equals(ListType.ARRIVED))) {
-                tab.setText(listType.getName() + "\n(" + count + ")");
+            if (tab != null) {
+                String tabTxt = listType.getName();
+                if (!listType.equals(ListType.ARRIVED)) {
+                    tabTxt += "(" + count + ")";
+                }
+                tab.setText(tabTxt);
             }
         }
     }
