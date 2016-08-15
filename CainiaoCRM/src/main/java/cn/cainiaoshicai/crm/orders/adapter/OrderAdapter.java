@@ -90,6 +90,7 @@ public class OrderAdapter extends BaseAdapter {
         GlobalCtx ctx = GlobalCtx.getApplication();
         ColorStateList defTextColor = labelExpectTxt.getTextColors();
         int redTextColor = ContextCompat.getColor(ctx, R.color.red);
+        int lightBlue = ContextCompat.getColor(activity, R.color.light_blue);
 
 //        NetworkImageView thumb_image = (NetworkImageView) vi.findViewById(R.id.ivItemAvatar);
 
@@ -101,7 +102,18 @@ public class OrderAdapter extends BaseAdapter {
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
             Date expectTime = order.getExpectTime();
-            expect_time.setText(TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr());
+            boolean notTimeToShip = expectTime != null && (expectTime.getTime() - System.currentTimeMillis() > 90 * 60 * 1000);
+
+            String expectTimeTxt = TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr();
+            expect_time.setText(expectTimeTxt);
+
+            if(notTimeToShip) {
+                expect_time.setBackgroundColor(ContextCompat.getColor(activity, R.color.green));
+                expect_time.setTextColor(ContextCompat.getColor(activity, R.color.white));
+            } else {
+                expect_time.setBackgroundColor(0);
+                expect_time.setTextColor(lightBlue);
+            }
 
             boolean paid_done = order.isPaidDone();
             if (!paid_done) {
