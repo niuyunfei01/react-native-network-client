@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -25,12 +26,15 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -542,6 +546,74 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                             }
                         }).setNegativeButton(R.string.cancel, null);
                 couponsAdb.show();
+                return true;
+            case R.id.menu_chg_store:
+                AlertDialog.Builder storesDlg = new AlertDialog.Builder(this);
+                Collection<Store> stores = GlobalCtx.getInstance().listStores();
+                if (stores == null || stores.isEmpty()) {
+                    helper.showToast("正在加载店铺列表，请重试...");
+                    return false;
+                }
+
+                final int[] selectedIdx = new int[1];
+                String[] storeNames = new String[stores.size()];
+                final int[] storeIds = new int[stores.size()];
+                int idx = 0;
+                for(Store store : stores) {
+                    storeNames[idx] = store.getName();
+                    storeIds[idx] = store.getId();
+
+                    if (store.getId() == this.orderRef.get().getStore_id()) {
+                        selectedIdx[0] = idx;
+                    }
+
+                    idx++;
+                }
+                storesDlg.setSingleChoiceItems(storeNames, selectedIdx[0], new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedIdx[0] = which;
+                    }
+                }).setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.submit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final Order order = orderRef.get();
+                        final int storeId = storeIds[selectedIdx[0]];
+                        if (storeId != order.getStore_id()) {
+                            new MyAsyncTask<Void, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Void... params) {
+                                    OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                    try {
+                                        ResultBean rb = dao.orderChgStore(order.getId(), storeId, order.getStore_id());
+                                        if (rb.isOk()) {
+                                            helper.showToast("修改成功！");
+                                            orderRef.get().setStore_id(storeId);
+                                            helper.updateUI(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    refresh();
+                                                }
+                                            });
+                                        } else {
+                                            helper.showToast("修改失败：" + rb.getDesc());
+                                        }
+                                    } catch (ServiceException e) {
+                                        e.printStackTrace();
+                                        helper.showToast("修改店铺错误：" + e.getMessage());
+                                    }
+                                    return null;
+                                }
+                            }.executeOnNormal();
+                        } else {
+                            helper.showToast("未修改店铺");
+                        }
+                    }
+                });
+
+                storesDlg.show();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

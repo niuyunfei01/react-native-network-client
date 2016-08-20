@@ -136,6 +136,7 @@ public class GlobalCtx extends Application {
         application = this;
 
         initConfigs();
+        listStores();
 
         this.soundManager = new SoundManager();
         this.soundManager.load(this);

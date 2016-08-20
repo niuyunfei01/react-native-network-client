@@ -225,6 +225,7 @@
     <string name="status_fixed">已解决</string>
     <string name="status_working">未解决</string>
     <string name="status_deleted">已作废</string>
+    <string name="menu_order_chg_store">修改店铺</string>
 
     <string-array name="feedback_source_array">
         <item>400来电</item>

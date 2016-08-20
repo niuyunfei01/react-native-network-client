@@ -163,4 +163,10 @@ public class OrderActionDao {
     public ResultBean orderDadaQuery(int orderId) throws ServiceException {
         return actionWithResult("/order_dada_query/" + orderId, new HashMap<String, String>());
     }
+
+    public ResultBean orderChgStore(int orderId, int storeId, int oldStoreId) throws ServiceException {
+        return actionWithResult(String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId), new HashMap<String, String>());
+    }
+
+
 }

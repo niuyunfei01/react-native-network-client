@@ -23,5 +23,6 @@
 
     <item android:id="@+id/menu_chg_pack_worker" android:title="@string/menu_order_chg_pack"/>
     <item android:id="@+id/menu_chg_ship_worker" android:title="@string/menu_order_chg_ship"/>
+    <item android:id="@+id/menu_chg_store" android:title="@string/menu_order_chg_store"/>
 
 </menu>
