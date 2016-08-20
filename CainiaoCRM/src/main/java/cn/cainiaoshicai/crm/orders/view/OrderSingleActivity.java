@@ -32,7 +32,6 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
-import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
@@ -71,7 +70,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
     private int ship_worker_id;
     private int pack_worker_id;
     private OrderSingleHelper helper;
-    private AtomicReference<Order> order = new AtomicReference<>();
+    private AtomicReference<Order> orderRef = new AtomicReference<>();
 
 
     public int getPack_worker_id() {
@@ -138,8 +137,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                     OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                     final Order o = dao.getOrder(order_id);
                     final OrderSingleActivity act = OrderSingleActivity.this;
-                    act.order.set(order);
                     if (o != null) {
+                        act.orderRef.set(o);
+                        update_dada_btn(o.getDada_status());
                         act.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -153,7 +153,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                 }
             }.executeOnNormal(order_id);
         } else {
-            this.order.set(order);
+            this.orderRef.set(order);
             init_data(order, is_from_new_order);
         }
     }
@@ -204,12 +204,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
             });
         }
 
-        int dada_status = order.getDada_status();
-        if (btnCallDada != null) {
-            btnCallDada.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status));
-            btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
-        }
-
+        update_dada_btn(order.getDada_status());
 
         final Button actionButton = (Button) findViewById(R.id.button2);
         if(is_from_new_order) {
@@ -246,6 +241,13 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken()+"&client_id="+GlobalCtx.getInstance().getCurrentAccountId();
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
+    }
+
+    private void update_dada_btn(int dada_status) {
+        if (btnCallDada != null) {
+            btnCallDada.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status));
+            btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
+        }
     }
 
     private void showSourceReady(final boolean isSourceReady, boolean isWaitingReady) {
@@ -325,7 +327,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                         return false;
                     } else {
                         this.order = order;
-                        OrderSingleActivity.this.order.set(order);
+                        OrderSingleActivity.this.orderRef.set(order);
+                        OrderSingleActivity.this.update_dada_btn(order.getDada_status());
                         try {
                             OrderPrinter.printOrder(ds.getSocket(), order);
                             order.incrPrintTimes();
@@ -413,9 +416,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
 
                 final Intent intent;
 
-                if (this.order.get() != null && this.order.get().getFeedback() != null) {
+                if (this.orderRef.get() != null && this.orderRef.get().getFeedback() != null) {
                     intent = new Intent(this, FeedbackViewActivity.class);
-                    intent.putExtra("fb", this.order.get().getFeedback());
+                    intent.putExtra("fb", this.orderRef.get().getFeedback());
                 } else {
                     intent = new Intent(this, FeedBackEditActivity.class);
                 }

@@ -17,10 +17,12 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.Display;
+import android.widget.Toast;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,11 +33,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
+import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -57,6 +61,7 @@ public class GlobalCtx extends Application {
     private Activity currentRunningActivity = null;
     private Handler handler = new Handler();
 
+    private AtomicReference<LinkedHashMap<Integer, Store>> storesRef = new AtomicReference<>(null);
     private SortedMap<Integer, CommonConfigDao.Worker> workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
@@ -138,6 +143,7 @@ public class GlobalCtx extends Application {
 
     public void initAfterLogin() {
         this.initConfigs();
+        this.listStores();
     }
 
     private void initConfigs() {
@@ -349,6 +355,38 @@ public class GlobalCtx extends Application {
 
     public boolean acceptTechNotify() {
         return this.acceptNotifyNew();
+    }
+
+    public Collection<Store> listStores() {
+        LinkedHashMap<Integer, Store> stores = storesRef.get();
+        if (stores == null || stores.isEmpty()) {
+            new MyAsyncTask<Void, Void, List<Store>>(){
+                @Override
+                protected List<Store> doInBackground(Void... params) {
+                    CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
+                    try {
+                        LinkedHashMap<Integer, Store> s = cfgDao.listStores();
+                        if (s != null) {
+                            storesRef.set(s);
+                        }
+                    } catch (ServiceException e) {
+                        AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
+                    }
+                    return null;
+                }
+            }.executeOnNormal();
+        }
+        return stores != null ? stores.values() : null;
+
+    }
+
+    public String getStoreName(int storeId) {
+        LinkedHashMap<Integer, Store> idStoreMap = this.storesRef.get();
+        if (idStoreMap != null) {
+            Store s = idStoreMap.get(storeId);
+            if (s != null) return s.getName();
+        }
+        return String.valueOf(storeId);
     }
 
     public static class SoundManager {

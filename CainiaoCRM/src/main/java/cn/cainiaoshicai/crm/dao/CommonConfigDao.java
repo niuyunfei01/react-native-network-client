@@ -5,10 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -40,6 +43,27 @@ public class CommonConfigDao {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             value = gson.fromJson(json, new TypeToken<Config>() {}.getType());
+        } catch (Exception e) {
+            AppLogger.e(e.getMessage(), e);
+        }
+
+        return value;
+    }
+
+    public LinkedHashMap<Integer, Store> listStores() throws ServiceException {
+        String url = URLHelper.API_ROOT + "/list_store.json" ;
+
+        Map<String, String> map = new HashMap<>();
+        map.put("access_token", access_token);
+
+        String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+
+        AppLogger.v("list stores:" + json);
+
+        LinkedHashMap<Integer, Store> value = null;
+        try {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            value = gson.fromJson(json, new TypeToken<LinkedHashMap<Integer, Store>>() {}.getType());
         } catch (Exception e) {
             AppLogger.e(e.getMessage(), e);
         }

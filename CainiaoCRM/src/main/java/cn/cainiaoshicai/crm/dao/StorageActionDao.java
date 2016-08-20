@@ -100,7 +100,7 @@ public class StorageActionDao {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
-            String json = getJson("/list_store_storage_status/" + provide.value +  "/" + store.getStoreId() + "/" + filter, params);
+            String json = getJson("/list_store_storage_status/" + provide.value +  "/" + store.getId() + "/" + filter, params);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());

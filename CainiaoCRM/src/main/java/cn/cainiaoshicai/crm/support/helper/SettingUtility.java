@@ -1,9 +1,14 @@
 package cn.cainiaoshicai.crm.support.helper;
 
 import android.content.Context;
+import android.text.TextUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.utils.AppConfig;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.SettingActivity;
@@ -362,5 +367,23 @@ public class SettingUtility {
 
     public static void setDisableSoundNotify(boolean isChecked) {
         SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
+    }
+
+    public static void setListenerStores(Set<Integer> currSelectedStores) {
+        SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
+    }
+
+    /**
+     * @return never null
+     */
+    public static Set<Integer> getListenerStores() {
+        HashSet<Integer> listenerStores = new HashSet<>();
+        String storesIdStr = SettingHelper.getSharedPreferences(getContext(), "listener_stores", "");
+        if (!TextUtils.isEmpty(storesIdStr)) {
+            for(String s : TextUtils.split(storesIdStr, ",")){
+                listenerStores.add(Integer.parseInt(s));
+            }
+        }
+        return listenerStores;
     }
 }

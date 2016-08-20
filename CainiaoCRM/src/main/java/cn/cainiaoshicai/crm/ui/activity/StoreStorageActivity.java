@@ -121,7 +121,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     Store newStore = storeArrayAdapter.getItem(position);
-                    if (currStore == null || currStore.getStoreId() != newStore.getStoreId()) {
+                    if (currStore == null || currStore.getId() != newStore.getId()) {
                         currStore = newStore;
                         refreshData();
                     }
@@ -289,7 +289,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                                                 ResultBean rb;
                                                 final int lastStat = Integer.parseInt(et.getText().toString());
                                                 try {
-                                                    rb = sad.store_status_reset_stat_num(currStore.getStoreId(), storageItem.getProduct_id(), lastStat);
+                                                    rb = sad.store_status_reset_stat_num(currStore.getId(), storageItem.getProduct_id(), lastStat);
                                                 } catch (ServiceException e) {
                                                     rb = new ResultBean(false , "访问服务器出错");
                                                 }

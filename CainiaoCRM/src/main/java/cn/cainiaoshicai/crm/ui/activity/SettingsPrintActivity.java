@@ -1,26 +1,36 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
@@ -46,7 +56,7 @@ public class SettingsPrintActivity extends ListActivity {
 
 		this.setContentView(R.layout.settings_print);
 
-		setTitle(R.string.title_print_setting);
+		setTitle(R.string.title_setting);
         listAdapter = new BluetoothItemAdapter<>(this, R.layout.print_list, R.id.text1, R.id.storage_item_status);
         setListAdapter(listAdapter);
 
@@ -76,6 +86,73 @@ public class SettingsPrintActivity extends ListActivity {
 			}
 		});
 
+		final TextView list_store_filter_values = (TextView) findViewById(R.id.list_store_filter_values);
+		((ImageView)findViewById(R.id.list_store_filter_arrow)).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.arrow));
+		final Set<Integer> selectedStores = SettingUtility.getListenerStores();
+		updateStoreFilterText(list_store_filter_values, selectedStores);
+
+		RelativeLayout v = (RelativeLayout) findViewById(R.id.settings_order_filter);
+		v.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				SettingsPrintActivity context = SettingsPrintActivity.this;
+
+				final Collection<Store> stores = GlobalCtx.getInstance().listStores();
+				if (stores == null) {
+					Toast.makeText(context, "暂时无法修改：(获取店铺列表错误)", Toast.LENGTH_LONG).show();
+					return;
+				}
+
+				selectedStores.clear();
+
+				boolean noListened = true;
+				Set<Integer> savedIds = SettingUtility.getListenerStores();
+				if (!savedIds.isEmpty()) {
+					selectedStores.addAll(savedIds);
+					noListened = false;
+				}
+
+				final String[] titles = new String[stores.size()];
+				final boolean[] checked = new boolean[stores.size()];
+				final int[] storeIds = new int[stores.size()];
+				int i = 0;
+				for (Store currStore : stores) {
+					titles[i] = currStore.getName();
+					checked[i] = noListened || selectedStores.contains(currStore.getId());
+					if (noListened) {
+						selectedStores.add(currStore.getId());
+					}
+					storeIds[i] = currStore.getId();
+					i++;
+				}
+
+				AlertDialog.Builder adb = new AlertDialog.Builder(context);
+				adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+						int currId = storeIds[which];
+						if (isChecked) {
+							selectedStores.add(currId);
+						} else {
+							selectedStores.remove(currId);
+						}
+					}
+				});
+
+				adb.setTitle("选中可以显示的店铺")
+						.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								SettingUtility.setListenerStores(selectedStores);
+								updateStoreFilterText(list_store_filter_values, selectedStores);
+							}
+						});
+				adb.setNegativeButton(context.getString(R.string.cancel), null);
+				adb.show();
+			}
+		});
+
 		try {
 			if (initDevicesList() != 0) {
 				this.finish();
@@ -91,6 +168,19 @@ public class SettingsPrintActivity extends ListActivity {
 		registerReceiver(mBTReceiver, btIntentFilter);
 
 		connectToLastOne();
+	}
+
+	private void updateStoreFilterText(TextView list_store_filter_values, Set<Integer> selectedStores) {
+		if (selectedStores.isEmpty()) {
+			list_store_filter_values.setText("全部店铺");
+		} else {
+			String[] storeNames = new String[selectedStores.size()];
+			int i = 0;
+			for(int storeId : selectedStores) {
+				storeNames[i++] = GlobalCtx.getInstance().getStoreName(storeId);
+			}
+			list_store_filter_values.setText(TextUtils.join(",", storeNames));
+		}
 	}
 
 	private void connectToLastOne() {
