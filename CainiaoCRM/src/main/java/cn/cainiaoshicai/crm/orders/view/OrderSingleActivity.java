@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.orders.view;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -162,7 +164,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         }
     }
 
-    private void init_data(Order order, boolean is_from_new_order) {
+    private void init_data(final Order order, boolean is_from_new_order) {
         ship_worker_id = order.getShip_worker_id();
         pack_worker_id = order.getPack_operator();
         platform = order.getPlatform();
@@ -208,7 +210,34 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
             });
         }
 
-        update_dada_btn(order.getDada_status());
+        if (order.getOrderStatus() == Cts.WM_ORDER_STATUS_ARRIVED) {
+            if (order.getShip_worker_id() == Cts.ID_DADA_MANUAL_WORKER) {
+                btnCallDada.setText("修改到达时间");
+                btnCallDada.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_ARRIVED
+                                || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER) {
+                            helper.showToast("只有手动达达订单支持修改。");
+                            return;
+                        }
+
+                        TimePickerDialog tpd = new TimePickerDialog(OrderSingleActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                System.out.println("time set:" + hourOfDay + ":" + minute);
+                            }
+                        }, 11, 43, true);
+
+                        tpd.show();
+                    }
+                });
+            } else {
+                btnCallDada.setVisibility(View.GONE);
+            }
+        } else {
+            update_dada_btn(order.getDada_status());
+        }
 
         final Button actionButton = (Button) findViewById(R.id.button2);
         if(is_from_new_order) {
