@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
@@ -221,6 +222,17 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             found = new OrderListFragment();
             fragmentMap.put(listType.getValue(), found.getId());
         }
+
+        Set<Integer> listenerStores = SettingUtility.getListenerStores();
+        if (!listenerStores.isEmpty()) {
+            String storeIdStr = "store:" + TextUtils.join(",", listenerStores);
+            if (TextUtils.isEmpty(query)) {
+                query = storeIdStr;
+            } else {
+                query += "|||" + storeIdStr;
+            }
+        }
+
         if (TextUtils.isEmpty(query)) {
             found.setDayAndType(listType);
         } else {

@@ -43,6 +43,11 @@ public class OrderListFragment extends Fragment {
         onTypeChanged();
     }
 
+    public void executeSearch(ListType listType, String query) {
+        this.listType = listType;
+        this.searchTerm = query;
+    }
+
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.order_list, container, false);
@@ -100,11 +105,6 @@ public class OrderListFragment extends Fragment {
             RefreshOrderListTask task = new RefreshOrderListTask(activity, searchTerm, listType, swipeRefreshLayout, new QueryDoneCallback());
             task.executeOnNormal();
         }
-    }
-
-    public void executeSearch(ListType listType, String query) {
-        this.listType = listType;
-        this.searchTerm = query;
     }
 
     private class QueryDoneCallback implements RefreshOrderListTask.OrderQueriedDone {

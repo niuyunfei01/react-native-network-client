@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import java.util.HashSet;
 import java.util.Set;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -370,6 +371,9 @@ public class SettingUtility {
     }
 
     public static void setListenerStores(Set<Integer> currSelectedStores) {
+        if (!currSelectedStores.isEmpty()) {
+            currSelectedStores.add(Cts.STORE_UNKNOWN);
+        }
         SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
     }
 
