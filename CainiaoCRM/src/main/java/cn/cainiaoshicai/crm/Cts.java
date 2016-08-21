@@ -32,6 +32,8 @@ public class Cts {
     public static final int WM_ORDER_STATUS_ARRIVED = 4;
     public static final int WM_ORDER_STATUS_INVALID = 5;
 
+    public static final int DADA_MAX_EDIT_ARRIVED_LIMIT = 43200 * 1000;
+
 
     public static final Platform PLAT_BD = new Platform("百度", 1);
     public static final Platform PLAT_WX = new Platform("微信", 2);

@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,5 +169,10 @@ public class OrderActionDao {
         return actionWithResult(String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId), new HashMap<String, String>());
     }
 
-
+    public ResultBean order_chg_arrived_time(int orderId, Date old_arrived, Date new_arrived) throws ServiceException {
+        int newTimeInSec = (int) (old_arrived.getTime() / 1000);
+        int oldTimeInSec = (int) (new_arrived.getTime() / 1000);
+        String path = String.format("/order_chg_arrived_time/%d/%d/%d", orderId, newTimeInSec, oldTimeInSec);
+        return actionWithResult(path, new HashMap<String, String>());
+    }
 }

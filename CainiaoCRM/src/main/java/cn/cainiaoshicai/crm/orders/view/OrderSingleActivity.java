@@ -28,6 +28,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -41,6 +42,7 @@ import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -145,7 +147,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                     final OrderSingleActivity act = OrderSingleActivity.this;
                     if (o != null) {
                         act.orderRef.set(o);
-                        update_dada_btn(o.getDada_status());
+                        update_dada_btn(o.getDada_status(), o);
                         act.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -210,34 +212,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
             });
         }
 
-        if (order.getOrderStatus() == Cts.WM_ORDER_STATUS_ARRIVED) {
-            if (order.getShip_worker_id() == Cts.ID_DADA_MANUAL_WORKER) {
-                btnCallDada.setText("修改到达时间");
-                btnCallDada.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_ARRIVED
-                                || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER) {
-                            helper.showToast("只有手动达达订单支持修改。");
-                            return;
-                        }
-
-                        TimePickerDialog tpd = new TimePickerDialog(OrderSingleActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                System.out.println("time set:" + hourOfDay + ":" + minute);
-                            }
-                        }, 11, 43, true);
-
-                        tpd.show();
-                    }
-                });
-            } else {
-                btnCallDada.setVisibility(View.GONE);
-            }
-        } else {
-            update_dada_btn(order.getDada_status());
-        }
+        update_dada_btn(order.getDada_status(), order);
 
         final Button actionButton = (Button) findViewById(R.id.button2);
         if(is_from_new_order) {
@@ -245,7 +220,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
             actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, fromStatus, listType));
         } else {
             if (fromStatus == Cts.WM_ORDER_STATUS_ARRIVED) {
-                actionButton.setVisibility(View.INVISIBLE);
+                actionButton.setVisibility(View.GONE);
             } else {
                 actionButton.setText(getActionText(fromStatus));
                 actionButton.setOnClickListener(new View.OnClickListener() {
@@ -276,10 +251,62 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         mWebView.loadUrl(url);
     }
 
-    private void update_dada_btn(int dada_status) {
+    private void update_dada_btn(int dada_status, final Order order) {
         if (btnCallDada != null) {
-            btnCallDada.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status));
-            btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
+            if (order.getOrderStatus() == Cts.WM_ORDER_STATUS_ARRIVED
+                    && order.getShip_worker_id() == Cts.ID_DADA_MANUAL_WORKER) {
+                btnCallDada.setText("修改到达时间");
+                btnCallDada.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_ARRIVED
+                                || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER
+                                || (System.currentTimeMillis() - order.getTime_arrived().getTime() > Cts.DADA_MAX_EDIT_ARRIVED_LIMIT)) {
+                            helper.showToast("只有5天内的手动达达订单支持修改。");
+                            return;
+                        }
+
+                        final Calendar cal = Calendar.getInstance();
+                        cal.setTime(order.getTime_arrived());
+
+                        TimePickerDialog tpd = new TimePickerDialog(OrderSingleActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, final int hourOfDay, final int minute) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                        cal.set(Calendar.MINUTE, minute);
+                                            ResultBean rb;
+                                        try {
+                                            String token = GlobalCtx.getInstance().getSpecialToken();
+                                            rb = new OrderActionDao(token).order_chg_arrived_time(order.getId(), order.getTime_arrived(), cal.getTime());
+                                            if (rb.isOk()) {
+                                                helper.updateUI(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        refresh();
+                                                    }
+                                                });
+                                            }
+                                        } catch (ServiceException e) {
+                                            rb = ResultBean.serviceException(e.getMessage());
+                                        }
+                                        helper.showToast(rb.isOk() ? "修改成功" : "修改失败："+ rb.getDesc());
+                                        return null;
+                                    }
+                                }.executeOnNormal();
+
+                            }
+                        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true);
+
+                        tpd.show();
+                    }
+                });
+            } else {
+                btnCallDada.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status));
+                btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
+            }
         }
     }
 
@@ -361,7 +388,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                     } else {
                         this.order = order;
                         OrderSingleActivity.this.orderRef.set(order);
-                        OrderSingleActivity.this.update_dada_btn(order.getDada_status());
+                        OrderSingleActivity.this.update_dada_btn(order.getDada_status(), order);
                         try {
                             OrderPrinter.printOrder(ds.getSocket(), order);
                             order.incrPrintTimes();
