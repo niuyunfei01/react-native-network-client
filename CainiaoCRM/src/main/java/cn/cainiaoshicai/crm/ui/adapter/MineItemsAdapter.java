@@ -114,6 +114,13 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
             }
         }
 
+        if (item.getType() != MineActivity.TYPE_USER_ITEMS) {
+            holder.total_complain_done.setVisibility(View.GONE);
+            holder.total_complain_todo.setVisibility(View.GONE);
+            holder.week_new_user.setVisibility(View.GONE);
+            holder.week_retent_user.setVisibility(View.GONE);
+        }
+
         holder.icon.setImageResource(R.drawable.arrow);
 
         return (convertView);

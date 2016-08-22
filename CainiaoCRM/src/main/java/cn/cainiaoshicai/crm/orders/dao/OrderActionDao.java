@@ -170,8 +170,8 @@ public class OrderActionDao {
     }
 
     public ResultBean order_chg_arrived_time(int orderId, Date old_arrived, Date new_arrived) throws ServiceException {
-        int newTimeInSec = (int) (old_arrived.getTime() / 1000);
-        int oldTimeInSec = (int) (new_arrived.getTime() / 1000);
+        int newTimeInSec = (int) (new_arrived.getTime() / 1000);
+        int oldTimeInSec = (int) (old_arrived.getTime() / 1000);
         String path = String.format("/order_chg_arrived_time/%d/%d/%d", orderId, newTimeInSec, oldTimeInSec);
         return actionWithResult(path, new HashMap<String, String>());
     }

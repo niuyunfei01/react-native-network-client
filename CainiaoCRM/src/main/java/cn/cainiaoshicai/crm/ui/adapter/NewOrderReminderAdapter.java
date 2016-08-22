@@ -53,14 +53,14 @@ public class NewOrderReminderAdapter extends BaseAdapter {
         if (vi == null)
             vi = inflater.inflate(R.layout.order_list_one, null);
 
-        TextView expect_time = (TextView) vi.findViewById(R.id.expect_time);
-        TextView orderAddr = (TextView) vi.findViewById(R.id.address);
+        TextView expect_time = (TextView) vi.findViewById(R.id.fb_reported_at);
+        TextView orderAddr = (TextView) vi.findViewById(R.id.fb_content);
         TextView userName = (TextView) vi.findViewById(R.id.userName);
         TextView phone = (TextView) vi.findViewById(R.id.phone_text);
         TextView genderText = (TextView) vi.findViewById(R.id.gender_text);
         TextView orderMoney = (TextView) vi.findViewById(R.id.total_money);
         TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
-        TextView dayNo = (TextView) vi.findViewById(R.id.dayNo);
+        TextView dayNo = (TextView) vi.findViewById(R.id.feedbackId);
         TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
         TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
         orderTimesTxt.setVisibility(View.GONE);

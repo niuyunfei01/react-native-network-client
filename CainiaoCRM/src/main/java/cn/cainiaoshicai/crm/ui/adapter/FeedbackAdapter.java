@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 
 /**
  * Created by liuzhr on 8/8/16.
@@ -21,26 +23,42 @@ public class FeedbackAdapter<T> extends ArrayAdapter<T> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-/*
-         * The convertView argument is essentially a "ScrapView" as described is Lucas post
-         * http://lucasr.org/2012/04/05/performance-tips-for-androids-listview/
-         * It will have a non-null value when ListView is asking you recycle the row layout.
-         * So, when convertView is not null, you should simply update its contents instead of inflating a new row layout.
-         */
+
+        ViewHolder v;
         if (convertView == null) {
             // inflate the layout
             LayoutInflater inflater = ((Activity) this.getContext()).getLayoutInflater();
-            convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            convertView = inflater.inflate(R.layout.user_feedback_one_row, parent, false);
+            v = new ViewHolder();
+            v.id = (TextView) convertView.findViewById(R.id.feedbackId);
+            v.userName = (TextView) convertView.findViewById(R.id.fb_from_user);
+            v.reportAt = (TextView) convertView.findViewById(R.id.fb_reported_at);
+            v.statusTxt = (TextView) convertView.findViewById(R.id.fb_status);
+            v.content = (TextView) convertView.findViewById(R.id.fb_content);
+
+            convertView.setTag(v);
+        } else {
+            v = (ViewHolder) convertView.getTag();
         }
 
         // object item based on the position
         Feedback fb = (Feedback) this.getItem(position);
 
-        // get the TextView and then set the text (item name) and tag (item ID) values
-        TextView textViewItem = (TextView) convertView.findViewById(android.R.id.text1);
-        textViewItem.setText(fb.getContent());
-        textViewItem.setTag(fb.getId());
+        v.id.setText("#" + fb.getId());
+        v.userName.setText(fb.getFromUserName());
+        v.reportAt.setText(DateTimeUtils.mdHourMinCh(fb.getReported_at()));
+        v.statusTxt.setText(fb.getStatusTxt());
+        v.content.setText(fb.getContent());
 
         return convertView;
+    }
+
+
+    class ViewHolder {
+        public TextView id;
+        public TextView userName;
+        public TextView reportAt;
+        public TextView statusTxt;
+        public TextView content;
     }
 }

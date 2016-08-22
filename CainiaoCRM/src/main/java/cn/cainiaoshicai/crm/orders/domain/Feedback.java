@@ -2,19 +2,41 @@ package cn.cainiaoshicai.crm.orders.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import cn.cainiaoshicai.crm.Cts;
 
 /**
  * Created by liuzhr on 8/8/16.
  */
 public class Feedback implements Serializable {
+
     private int id;
     private String content;
     private String userName;
+    private Date reported_at;
     private int from_user;
     private int reported_by;
     private int source;
     private int from_order;
+    private int status;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Date getReported_at() {
+        return reported_at;
+    }
+
+    public void setReported_at(Date reported_at) {
+        this.reported_at = reported_at;
+    }
 
     private List<FeedbackLog> logs = new ArrayList<>(0);
 
@@ -88,5 +110,14 @@ public class Feedback implements Serializable {
 
     public String getFromUserName() {
         return "流星花园张先生";
+    }
+
+    public String getStatusTxt() {
+        switch(this.status) {
+            case Cts.FB_STATUS_DOING: return Cts.FB_STATUS_DOING_T;
+            case Cts.FB_STATUS_FIXED: return Cts.FB_STATUS_FIXED_T;
+            default:
+                return Cts.FB_STATUS_UNKNOWN_T;
+        }
     }
 }

@@ -34,6 +34,11 @@ public class Cts {
 
     public static final int DADA_MAX_EDIT_ARRIVED_LIMIT = 43200 * 1000;
 
+    public static final int FB_STATUS_DOING = 0;
+    public static final int FB_STATUS_FIXED = 1;
+    public static final String FB_STATUS_DOING_T = "处理中";
+    public static final String FB_STATUS_FIXED_T = "已解决";
+    public static final String FB_STATUS_UNKNOWN_T = "未知";
 
     public static final Platform PLAT_BD = new Platform("百度", 1);
     public static final Platform PLAT_WX = new Platform("微信", 2);
