@@ -352,12 +352,30 @@
     <color name="link_pressed_background_color_light">#33B5E5</color>
     <color name="link_pressed_background_color_dark">#ff454545</color>
 
-
-
-
-
     <color name="normal_day">#ff999999</color>
     <color name="selected_day_background">#E75F49</color>
     <color name="selected_day_text">#fff2f2f2</color>
+
+
+    <color name="colorPrimary">#6C9EFC</color>
+    <color name="colorPrimaryDark">@color/colorPrimary</color>
+
+    <color name="test_red">#fc5369</color>
+    <color name="test_green">#00ce7d</color>
+    <color name="test_blue">#50a3fc</color>
+
+
+    <!--通过覆盖资源id的形式自定义美洽UI START-->
+    <color name="mq_colorPrimary">@color/colorPrimary</color>
+    <color name="mq_colorPrimaryDark">@color/colorPrimaryDark</color>
+
+    <color name="mq_activity_title_textColor">@android:color/white</color>
+    <color name="mq_activity_title_bg">@color/colorPrimary</color>
+
+    <color name="mq_chat_left_textColor">@android:color/black</color>
+    <color name="mq_chat_right_textColor">@android:color/white</color>
+
+    <color name="mq_chat_left_bubble">#E6E6EA</color>
+    <color name="mq_chat_right_bubble">@color/colorPrimary</color>
 
 </resources>

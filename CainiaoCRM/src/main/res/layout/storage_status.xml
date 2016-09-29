@@ -111,8 +111,8 @@
         android:id="@+id/list_storage_status"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/abc_cab_background_top_holo_light"
         android:layout_below="@+id/storage_list_title"/>
+        <!--android:background="@drawable/abc_cab_background_top_holo_light"-->
 
     <!--<TextView android:id="@+id/paged_overview"-->
         <!--android:layout_toStartOf="@+id/page_back"-->

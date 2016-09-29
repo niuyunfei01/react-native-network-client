@@ -28,6 +28,7 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.adapter.MineItemsAdapter;
+import cn.customer_serv.customer_servsdk.util.MQIntentBuilder;
 
 public class MineActivity extends AbstractActionBarActivity {
 
@@ -110,6 +111,9 @@ public class MineActivity extends AbstractActionBarActivity {
 					Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
 					intent.putExtra("list_type", ListType.INVALID.getValue());
 					MineActivity.this.startActivity(intent);
+				} else if (item.getType() == TYPE_USER_ITEMS) {
+					Intent intent = new MQIntentBuilder(MineActivity.this, CustomizedMQConversationActivity.class).build();
+					startActivity(intent);
 				}
 			}
 		});

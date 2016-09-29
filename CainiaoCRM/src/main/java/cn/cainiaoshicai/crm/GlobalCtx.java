@@ -45,6 +45,8 @@ import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.customer_serv.core.callback.OnInitCallback;
+import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
 
 public class GlobalCtx extends Application {
@@ -138,6 +140,10 @@ public class GlobalCtx extends Application {
         initConfigs();
         listStores();
 
+        initMeiqiaSDK();
+
+        cn.customer_serv.core.MQManager.setDebugMode(true);
+
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
     }
@@ -183,6 +189,42 @@ public class GlobalCtx extends Application {
                 return null;
             }
         }.executeOnNormal();
+    }
+
+    private void initMeiqiaSDK() {
+        cn.customer_serv.core.MQManager.setDebugMode(true);
+
+        // 替换成自己的key
+        String meiqiaKey = "a71c257c80dfe883d92a64dca323ec20";
+        cn.customer_serv.customer_servsdk.util.MQConfig.init(this, meiqiaKey, new OnInitCallback() {
+            @Override
+            public void onSuccess(String clientId) {
+                Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int code, String message) {
+                Toast.makeText(GlobalCtx.this, "int failure message = " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 可选
+        customMeiqiaSDK();
+    }
+
+    private void customMeiqiaSDK() {
+        // 配置自定义信息
+        MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
+        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha;
+//        MQConfig.ui.titleBackgroundResId = R.color.test_red;
+//        MQConfig.ui.titleTextColorResId = R.color.test_blue;
+//        MQConfig.ui.leftChatBubbleColorResId = R.color.test_green;
+//        MQConfig.ui.leftChatTextColorResId = R.color.test_red;
+//        MQConfig.ui.rightChatBubbleColorResId = R.color.test_red;
+//        MQConfig.ui.rightChatTextColorResId = R.color.test_green;
+//        MQConfig.ui.robotEvaluateTextColorResId = R.color.test_red;
+//        MQConfig.ui.robotMenuItemTextColorResId = R.color.test_blue;
+//        MQConfig.ui.robotMenuTipTextColorResId = R.color.test_blue;
     }
 
     public SortedMap<Integer, CommonConfigDao.Worker> getWorkers() {
