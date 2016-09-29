@@ -251,7 +251,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         mWebView.loadUrl(url);
     }
 
-    private void update_dada_btn(int dada_status, final Order order) {
+    private void update_dada_btn(final int dada_status, final Order order) {
         if (btnCallDada != null) {
             if (order.getOrderStatus() == Cts.WM_ORDER_STATUS_ARRIVED
                     && order.getShip_worker_id() == Cts.ID_DADA_MANUAL_WORKER) {
@@ -304,8 +304,13 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                     }
                 });
             } else {
-                btnCallDada.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status));
-                btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
+                helper.updateUI(new Runnable() {
+                    @Override
+                    public void run() {
+                    btnCallDada.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(dada_status));
+                    btnCallDada.setOnClickListener(new OrderSingleHelper.CallDadaClicked(dada_status, orderId, helper, btnCallDada));
+                    }
+                });
             }
         }
     }
