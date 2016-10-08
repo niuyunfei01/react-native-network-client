@@ -239,7 +239,7 @@ public class LongClickableLinkMovementMethod extends ScrollingMovementMethod {
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             float[] position = {event.getX(), event.getY()};
-//            int slop = ViewConfiguration.get(widget.getContext()).getScaledTouchSlop();
+//            int slop = ViewConfiguration.userTalkStatus(widget.getContext()).getScaledTouchSlop();
             int slop = 6;
             float xInstance = Math.abs(lastEvent[0] - position[0]);
             float yInstance = Math.abs(lastEvent[1] - position[1]);

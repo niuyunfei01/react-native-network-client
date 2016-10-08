@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.file.FileDownloaderHttpHelper;
 import cn.cainiaoshicai.crm.support.file.FileLocationMethod;
 import cn.cainiaoshicai.crm.support.file.FileManager;

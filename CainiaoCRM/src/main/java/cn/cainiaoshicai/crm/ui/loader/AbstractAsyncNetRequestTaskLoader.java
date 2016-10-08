@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 
 import cn.cainiaoshicai.crm.orders.domain.android.AsyncTaskLoaderResult;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 
 /**
  * User: qii

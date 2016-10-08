@@ -118,4 +118,6 @@
     <string name="mq_queue_leave_msg">请稍等，你前面还有 %1$s 个访客，你也可以选择给我们</string>
     <string name="mq_unknown_msg_tip">当前 App 暂不支持该类型消息，请升级您的 App 到最新版本</string>
     <string name="mq_inquire_gender_choice">["男","女"]</string>
+
+    <string name="unknown_error_error_code">未知错误，错误代码</string>
 </resources>

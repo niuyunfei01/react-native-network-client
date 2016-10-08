@@ -140,7 +140,7 @@ public abstract class LoadingLayout extends FrameLayout implements ILoadingLayou
             }
         }
 
-        // Try and get defined drawable from Attrs
+        // Try and userTalkStatus defined drawable from Attrs
         Drawable imageDrawable = null;
         if (attrs.hasValue(R.styleable.PullToRefresh_ptrDrawable)) {
             imageDrawable = attrs.getDrawable(R.styleable.PullToRefresh_ptrDrawable);

@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -20,11 +19,9 @@ import android.view.Display;
 import android.widget.Toast;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -33,13 +30,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.orders.dao.URLHelper;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -140,7 +138,7 @@ public class GlobalCtx extends Application {
         initConfigs();
         listStores();
 
-        initMeiqiaSDK();
+        initTalkSDK();
 
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
@@ -191,12 +189,14 @@ public class GlobalCtx extends Application {
         }.executeOnNormal();
     }
 
-    private void initMeiqiaSDK() {
+    private void initTalkSDK() {
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
         // 替换成自己的key
-        String meiqiaKey = "a71c257c80dfe883d92a64dca323ec20";
-        cn.customer_serv.customer_servsdk.util.MQConfig.init(this, meiqiaKey, new OnInitCallback() {
+        UserTalkDao userTalkDao = new UserTalkDao(this.getSpecialToken());
+
+        cn.customer_serv.customer_servsdk.util.MQConfig.init(this,
+                GlobalCtx.getInstance().getSpecialToken(), userTalkDao, new OnInitCallback() {
             @Override
             public void onSuccess(String clientId) {
                 Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
@@ -215,7 +215,9 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha;
+        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_holo_light;
+        //.abc_ic_ab_back_mtrl_am_alpha;
+
 //        MQConfig.ui.titleBackgroundResId = R.color.test_red;
 //        MQConfig.ui.titleTextColorResId = R.color.test_blue;
 //        MQConfig.ui.leftChatBubbleColorResId = R.color.test_green;

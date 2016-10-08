@@ -69,7 +69,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
                 }
             });
 
-            // Get the intent, verify the action and get the query
+            // Get the intent, verify the action and userTalkStatus the query
             Intent intent = getIntent();
 
             ListType foundType = ListType.findByType(intent.getIntExtra("list_type", 0));

@@ -35,7 +35,7 @@ import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -214,7 +214,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
                     return null;
                 } catch (ServiceException e) {
                     e.printStackTrace();
-                    AppLogger.e("error to get storage items:" + currStore, e);
+                    AppLogger.e("error to userTalkStatus storage items:" + currStore, e);
                 }
 
                 cancel(true);

@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.asyncdrawable.TimeLineBitmapDownloader;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 

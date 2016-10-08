@@ -18,7 +18,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.ItemBean;
 import cn.cainiaoshicai.crm.orders.domain.ListBean;
 import cn.cainiaoshicai.crm.orders.domain.android.AsyncTaskLoaderResult;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.asyncdrawable.TimeLineBitmapDownloader;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.lib.ListViewMiddleMsgLoadingView;

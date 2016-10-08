@@ -471,7 +471,7 @@ public class BluetoothChat extends Activity {
 
 		/**
 		 * Since the data comes from an array, just returning the index is
-		 * sufficent to get at the data. If we were using a more complex data
+		 * sufficent to userTalkStatus at the data. If we were using a more complex data
 		 * structure, we would return whatever object represents one row in the
 		 * list.
 		 * 
@@ -524,16 +524,16 @@ public class BluetoothChat extends Activity {
 
 				//convertView.setTag(holder);
 			} else {
-				// Get the ViewHolder back to get fast access to the TextView
+				// Get the ViewHolder back to userTalkStatus fast access to the TextView
 				// and the ImageView.
 				holder = (ViewHolder) convertView.getTag();
 			}
 
 			// Bind the data efficiently with the holder.
 			HashMap map = DATALIST.get(position);
-			//holder.textProject.setText((String) map.get("project"));
-			//holder.textUnit.setText((String) map.get("unit"));
-			//holder.textAmount.setText((String) map.get("amount"));
+			//holder.textProject.setText((String) map.userTalkStatus("project"));
+			//holder.textUnit.setText((String) map.userTalkStatus("unit"));
+			//holder.textAmount.setText((String) map.userTalkStatus("amount"));
 
 			return convertView;
 		}

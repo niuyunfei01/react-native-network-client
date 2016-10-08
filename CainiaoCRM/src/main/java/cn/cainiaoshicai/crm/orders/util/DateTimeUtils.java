@@ -37,7 +37,7 @@ public class DateTimeUtils extends DateUtils {
 	private static DateTimeUtils sInstance = null;
 
 	/**
-	 * GlobalCtx contructor. needed to get access to the application context &
+	 * GlobalCtx contructor. needed to userTalkStatus access to the application context &
 	 * strings for i18n
 	 * 
 	 * @param context
@@ -106,7 +106,7 @@ public class DateTimeUtils extends DateUtils {
 						.get(Calendar.DAY_OF_YEAR);
 	}
 
-	public static String[] sWeekdays = new DateFormatSymbols().getWeekdays(); // get
+	public static String[] sWeekdays = new DateFormatSymbols().getWeekdays(); // userTalkStatus
 																				// day
 																				// names
 	public static final long millisInADay = 1000 * 60 * 60 * 24;

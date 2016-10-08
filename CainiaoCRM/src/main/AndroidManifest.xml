@@ -226,7 +226,7 @@
         </receiver>
 
 
-        <!-- Required  . Enable it you can get statistics data with channel -->
+        <!-- Required  . Enable it you can userTalkStatus statistics data with channel -->
         <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
         <meta-data android:name="JPUSH_APPKEY" android:value="30073ab80a50534d39c84d3c" />
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for

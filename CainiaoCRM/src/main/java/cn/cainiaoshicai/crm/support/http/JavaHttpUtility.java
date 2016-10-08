@@ -34,9 +34,9 @@ import javax.net.ssl.X509TrustManager;
 
 import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.Cts;
-import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.file.FileDownloaderHttpHelper;
@@ -112,7 +112,7 @@ public class JavaHttpUtility {
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
         if (!TextUtils.isEmpty(proxyHost) && !TextUtils.isEmpty(proxyPort)) {
-            return new Proxy(java.net.Proxy.Type.HTTP,
+            return new Proxy(Proxy.Type.HTTP,
                     new InetSocketAddress(proxyHost, Integer.valueOf(proxyPort)));
         } else {
             return null;
@@ -290,7 +290,7 @@ public class JavaHttpUtility {
             StringBuilder urlBuilder = new StringBuilder(urlStr);
             urlBuilder.append("?").append(Utility.encodeUrl(param));
             URL url = new URL(urlBuilder.toString());
-            AppLogger.d("get request: " + url);
+            AppLogger.d("userTalkStatus request: " + url);
             Proxy proxy = getProxy();
             HttpURLConnection urlConnection;
             if (proxy != null) {

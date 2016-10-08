@@ -11,7 +11,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -52,7 +52,7 @@ public class OrderPrinter {
                 if (order != null) {
                     _print(order, true, printedCallback);
                 } else {
-                    AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                    AppLogger.e("[print]error to userTalkStatus order platform=:" + platform + ", oid=" + platformOid);
                 }
                 return null;
             }

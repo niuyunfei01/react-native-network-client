@@ -1,13 +1,13 @@
 package cn.customer_serv.core;
 
 import android.content.Context;
-import android.text.TextUtils;
-
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
 
+import cn.cainiaoshicai.crm.dao.IUserTalkDao;
+import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.customer_serv.core.bean.MQAgent;
 import cn.customer_serv.core.bean.MQEnterpriseConfig;
 import cn.customer_serv.core.bean.MQMessage;
@@ -22,6 +22,10 @@ import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.core.callback.OnMessageSendCallback;
 import cn.customer_serv.core.callback.OnProgressCallback;
 import cn.customer_serv.core.callback.SimpleCallback;
+import cn.customer_serv.customer_servsdk.util.ErrorCode;
+import cn.customer_serv.customer_servsdk.util.MQAsyncTask;
+import cn.customer_serv.customer_servsdk.util.MQUtils;
+import cn.customer_serv.customer_servsdk.util.RichText;
 
 /**
  * Created by liuzhr on 9/29/16.
@@ -36,6 +40,19 @@ public class MQManager {
     private boolean isWaitingInQueue;
     private String currentClientId;
     private static boolean debugMode;
+    private Context context;
+    private IUserTalkDao dao;
+
+    public static void init(Context context, String appKey, OnInitCallback onInitCallBack, IUserTalkDao dao) {
+        M.context = context;
+        M.dao = dao;
+        MQAgent mqAgent = new MQAgent();
+        mqAgent.setId("qingcaijun@cainiaoshicai_com");
+        mqAgent.setNickname("青菜君");
+        mqAgent.setOnLine(true);
+        mqAgent.setStatus("接待中");
+        M.currentAgent = mqAgent;
+    }
 
     public static MQManager getInstance(Context context) {
         return M;
@@ -49,8 +66,20 @@ public class MQManager {
         return debugMode;
     }
 
-    public void sendMQTextMessage(String content, OnMessageSendCallback onMQMessageSendCallback) {
-
+    public void sendMQTextMessage(final String content, final OnMessageSendCallback onMQMessageSendCallback) {
+        MQUtils.runInThread(new Runnable() {
+            @Override
+            public void run() {
+                MQManager.this.dao.talk_reply_text(currentAgent.getId(), MQManager.this.currentClientId, content);
+                MQMessage mqMsg = new MQMessage(MQMessage.TYPE_CONTENT_TEXT);
+                MQUtils.runInUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onMQMessageSendCallback.onSuccess(mqMsg, 0);
+                    }
+                });
+            }
+        });
     }
 
     public void sendMQPhotoMessage(String localPath, OnMessageSendCallback onMQMessageSendCallback) {
@@ -65,10 +94,6 @@ public class MQManager {
 
     }
 
-    public static void init(Context context, String appKey, OnInitCallback onInitCallBack) {
-
-    }
-
     public MQAgent getCurrentAgent() {
         return currentAgent;
     }
@@ -78,15 +103,55 @@ public class MQManager {
     }
 
     public void getMQMessageFromService(long lastMessageCreateOn, int length, OnGetMessageListCallback onGetMessageListCallback) {
-
+        try {
+            IUserTalkDao.UserTalk userTalk = dao.userTalkStatus(currentAgent.getId(), 0, lastMessageCreateOn, length);
+            onGetMessageListCallback.onSuccess(userTalk.getMessages());
+        } catch (ServiceException e) {
+            if (onGetMessageListCallback != null) {
+                onGetMessageListCallback.onFailure(e.getError_code(), e.getMessage());
+            }
+        }
     }
 
     public void getMQMessageFromDatabase(long lastMessageCreateOn, int length, OnGetMessageListCallback onGetMessageListCallback) {
 
     }
 
-    public void setClientOnlineWithClientId(String clientId, OnClientOnlineCallback onlineCallback) {
+    public void setClientOnlineWithClientId(final String clientId, final OnClientOnlineCallback onlineCallback) {
 
+        new MyAsyncTask<Void, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                Runnable runnable;
+                try {
+                    final IUserTalkDao.UserTalk userTalk = MQManager.this.dao.userTalkStatus(clientId, 0, Integer.MAX_VALUE, 100);
+                    runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (userTalk != null) {
+                                onlineCallback.onSuccess(MQManager.this.currentAgent, userTalk.getSessionId(), userTalk.getMessages());
+                            } else {
+                                onlineCallback.onFailure(-1, "获取会话信息失败！");
+                            }
+                        }
+                    };
+
+                } catch (final ServiceException e) {
+                    e.printStackTrace();
+                    runnable = new Runnable(){
+                        @Override
+                        public void run() {
+                            onlineCallback.onFailure(e.getError_code(), "获取回话信息失败！");
+                        }
+                    };
+                }
+
+                MQUtils.runInUIThread(runnable);
+
+                return null;
+            }
+        }.execute();
     }
 
     public void setClientOnlineWithCustomizedId(String customizedId, OnClientOnlineCallback onlineCallback) {

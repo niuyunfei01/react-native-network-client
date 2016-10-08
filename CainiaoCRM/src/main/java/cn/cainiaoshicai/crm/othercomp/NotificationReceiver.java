@@ -115,7 +115,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				context.startActivity(i);
 			} else {
-				AppLogger.e("error to get notify from bundle!");
+				AppLogger.e("error to userTalkStatus notify from bundle!");
 			}
 		} else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
 			Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));

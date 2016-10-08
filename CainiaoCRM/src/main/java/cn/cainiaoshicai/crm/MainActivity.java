@@ -99,7 +99,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
         }
 
-        // Get the intent, verify the action and get the query
+        // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
         handleIntent(ab, intent);
     }

@@ -1,10 +1,6 @@
-package cn.cainiaoshicai.crm.orders.service;
+package cn.cainiaoshicai.crm.service;
 
-import android.content.res.Resources;
 import android.text.TextUtils;
-
-import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.GlobalCtx;
 
 /**
  */
@@ -50,21 +46,14 @@ public class ServiceException extends Exception {
         } else {
 
             String name = "code" + error_code;
-            int i = GlobalCtx.getInstance().getResources()
-                    .getIdentifier(name, "string", GlobalCtx.getInstance().getPackageName());
 
-            try {
-                result = GlobalCtx.getInstance().getString(i);
-
-            } catch (Resources.NotFoundException e) {
 
                 if (!TextUtils.isEmpty(oriError)) {
                     result = oriError;
                 } else {
 
-                    result = GlobalCtx.getInstance().getString(R.string.unknown_error_error_code) + error_code;
+                    result = "UNKNOWN ERROR:" + error_code;
                 }
-            }
         }
 
         return result;

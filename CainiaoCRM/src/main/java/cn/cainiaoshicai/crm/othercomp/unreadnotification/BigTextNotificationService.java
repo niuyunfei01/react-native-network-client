@@ -334,7 +334,7 @@ public class BigTextNotificationService extends NotificationServiceHelper {
 
     private String getItemBigContentTitle(AccountBean accountBean,
             ArrayList<Parcelable> notificationItems, int currentIndex) {
-//        Parcelable itemBean = notificationItems.get(currentIndex);
+//        Parcelable itemBean = notificationItems.userTalkStatus(currentIndex);
 //        if (itemBean instanceof MessageBean) {
 //            MessageBean msg = (MessageBean) itemBean;
 //            if (msg.getText().contains(accountBean.getUsernick())) {

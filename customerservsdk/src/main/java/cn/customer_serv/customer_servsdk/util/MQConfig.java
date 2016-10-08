@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 
+import cn.cainiaoshicai.crm.dao.IUserTalkDao;
 import cn.customer_serv.core.MQManager;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.callback.MQActivityLifecycleCallback;
@@ -97,12 +98,12 @@ public final class MQConfig {
     }
 
     @Deprecated
-    public static void init(Context context, String appKey, MQImageLoader imageLoader, final OnInitCallback onInitCallBack) {
-        MQManager.init(context, appKey, onInitCallBack);
+    public static void init(Context context, String appKey, MQImageLoader imageLoader, IUserTalkDao dao, final OnInitCallback onInitCallBack) {
+        MQManager.init(context, appKey, onInitCallBack, dao);
     }
 
-    public static void init(Context context, String appKey, OnInitCallback onInitCallBack) {
-        MQManager.init(context, appKey, onInitCallBack);
+    public static void init(Context context, String appKey, IUserTalkDao dao, OnInitCallback onInitCallBack) {
+        MQManager.init(context, appKey, onInitCallBack, dao);
     }
 }
 

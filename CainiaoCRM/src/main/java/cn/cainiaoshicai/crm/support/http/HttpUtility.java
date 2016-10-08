@@ -2,7 +2,7 @@ package cn.cainiaoshicai.crm.support.http;
 
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.file.FileDownloaderHttpHelper;
 import cn.cainiaoshicai.crm.support.file.FileUploaderHttpHelper;
 

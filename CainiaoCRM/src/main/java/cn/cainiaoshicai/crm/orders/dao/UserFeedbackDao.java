@@ -8,17 +8,15 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
-import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
-import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultList;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
@@ -78,7 +76,7 @@ public class UserFeedbackDao {
         } catch (JsonSyntaxException e) {
             AppLogger.e(e.getMessage(), e);
         } catch (Exception e) {
-            AppLogger.e("exception to get getDadaCancelReasons:" + e.getMessage(), e);
+            AppLogger.e("exception to userTalkStatus getDadaCancelReasons:" + e.getMessage(), e);
         }
 
         return null;
@@ -103,7 +101,7 @@ public class UserFeedbackDao {
             return gson.fromJson(json, new TypeToken<ResultObject<Feedback>>() {
             }.getType());
         } catch (Exception e) {
-            AppLogger.e("exception to get feedback:" + e.getMessage(), e);
+            AppLogger.e("exception to userTalkStatus feedback:" + e.getMessage(), e);
             return new ResultObject<Feedback>(ResultBean.exception());
         }
     }
@@ -117,7 +115,7 @@ public class UserFeedbackDao {
             return gson.fromJson(json, new TypeToken<ResultBean>() {
             }.getType());
         } catch (Exception e) {
-            AppLogger.e("exception to get saveFeedbackLog:" + e.getMessage(), e);
+            AppLogger.e("exception to userTalkStatus saveFeedbackLog:" + e.getMessage(), e);
             return ResultBean.exception();
         }
     }

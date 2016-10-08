@@ -2,7 +2,7 @@ package cn.cainiaoshicai.crm.orders.domain.android;
 
 import android.os.Bundle;
 
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 
 /**
  * User: qii

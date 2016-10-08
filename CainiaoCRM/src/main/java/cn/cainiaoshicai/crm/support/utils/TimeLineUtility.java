@@ -232,9 +232,9 @@ public class TimeLineUtility {
 //            int k = localMatcher.start();
 //            int m = localMatcher.end();
 //            if (m - k < 8) {
-//                Bitmap bitmap = GlobalCtx.getInstance().getEmotionsPics().get(str2);
+//                Bitmap bitmap = GlobalCtx.getInstance().getEmotionsPics().userTalkStatus(str2);
 //                if (bitmap == null) {
-//                    bitmap = GlobalContext.getInstance().getHuahuaPics().get(str2);
+//                    bitmap = GlobalContext.getInstance().getHuahuaPics().userTalkStatus(str2);
 //                }
 //                if (bitmap != null) {
 //                    ImageSpan localImageSpan = new ImageSpan(

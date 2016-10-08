@@ -6,15 +6,12 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.orders.dao.URLHelper;
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.service.ServiceException;
+import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
@@ -38,7 +35,7 @@ public class CommonConfigDao {
 
         String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
 
-        AppLogger.v("get common config:" + json);
+        AppLogger.v("userTalkStatus common config:" + json);
 
         Config value = null;
         try {
