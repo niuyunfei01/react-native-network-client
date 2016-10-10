@@ -2,7 +2,6 @@ Application/build
 *.iml
 .idea
 .gradle
-CainiaoCRM/build.gradle
 gradle/wrapper/gradle-wrapper.properties
 build/
 local.properties
