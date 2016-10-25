@@ -2,15 +2,20 @@ package cn.cainiaoshicai.crm.dao;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -68,6 +73,23 @@ public class CommonConfigDao {
 
         return value;
     }
+
+    public ArrayList<Tag> getTags() throws ServiceException {
+        Map<String, String> map = new HashMap<>();
+        map.put("access_token", access_token);
+
+        try {
+            String url = URLHelper.API_ROOT + "/list_tags.json";
+            String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ArrayList<Tag>>() {
+            }.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e("[getTags] json syntax error:" + e.getMessage(), e);
+            return new ArrayList<>(0);
+        }
+    }
+
 
     static public class Config {
         private SortedMap<Integer, Worker> workers;

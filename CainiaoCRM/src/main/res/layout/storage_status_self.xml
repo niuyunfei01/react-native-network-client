@@ -6,21 +6,40 @@
     android:layout_height="wrap_content"
     android:background="#ffffff">
 
-    <Spinner android:id="@+id/spinner_curr_status"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+    <Button android:id="@+id/filter_btn_on_sale"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
+        android:textSize="12sp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
-    <Spinner android:id="@+id/filter_categories"
+    <Button
+        android:id="@+id/filter_btn_sold_out"
+        android:layout_toEndOf="@+id/filter_btn_on_sale"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/spinner_curr_store"
-        android:layout_marginTop="10dp"
+        android:textSize="12sp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
+
+    <Button android:id="@+id/filter_btn_risk"
+        android:layout_toEndOf="@+id/filter_btn_sold_out"
+        android:layout_alignParentTop="true"
+        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button android:id="@+id/filter_btn_Off_sale"
+        android:layout_toEndOf="@+id/filter_btn_risk"
+        android:layout_alignParentTop="true"
+        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--<Spinner android:id="@+id/filter_categories"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"/>-->
 
     <Spinner android:id="@+id/spinner_curr_store"
         android:focusable="true"

@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -33,34 +34,91 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
 public class StoreStorageActivity extends AbstractActionBarActivity {
 
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
+    private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
+    private static final int MENU_CONTEXT_TO_SOLD_OUT_ID = 10994;
+    private static final int MENU_CONTEXT_EDIT_REQ = 10995;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
     private AutoCompleteTextView ctv;
+    private Spinner currStoreSpinner;
+    private Spinner tagFilterSpinner;
+    private Spinner currStatusSpinner;
 
     private static final int FILTER_ON_SALE = 1;
     private static final int FILTER_RISK = 2;
     private static final int FILTER_SOLD_OUT = 3;
     private static final int FILTER_OFF_SALE = 4;
 
+
+    private static class StatusItem {
+        static final StatusItem[] STATUS = new StatusItem[]{
+                new StatusItem(FILTER_ON_SALE, "在售"),
+                new StatusItem(FILTER_RISK, " 安全库存"),
+                new StatusItem(FILTER_SOLD_OUT, " 缺货"),
+                new StatusItem(FILTER_OFF_SALE, "已下架"),
+        };
+        public final int status;
+        public final String label;
+        private int num;
+
+        StatusItem(int status, String label) {
+            this.status = status;
+            this.label = label;
+        }
+
+        public int getNum() {
+            return num;
+        }
+
+        void setNum(int num) {
+            this.num = num;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(this.label + "(%s)", num > 0 ? num :  "-");
+        }
+
+        public static StatusItem find(int filter) {
+            for (StatusItem item :
+                    STATUS) {
+                if (item.status == filter) {
+                    return item;
+                }
+            }
+
+            throw new IllegalArgumentException("illegal filter:" + filter);
+        }
+
+        static int findIdx(int filter) {
+            for (int i = 0; i < STATUS.length; i++) {
+                if (STATUS[i].status == filter) {
+                    return i;
+                }
+            }
+
+            throw new IllegalArgumentException("illegal filter:" + filter);
+        }
+    }
+
+
     private int filter = FILTER_ON_SALE;
 
     private Store currStore;
-
-    private Button btnSoldOut;
-    private Button btnRisk;
-    private Button btnOnSale;
-    private Button btnOffSale;
+    private Tag currTag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,18 +170,83 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                 }
             });
 
-            Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
-            final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-            storeArrayAdapter.addAll(Cts.ST_HLG, Cts.ST_YYC);
-            storeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            currStoreSpinner.setAdapter(storeArrayAdapter);
+            currStatusSpinner = (Spinner) findViewById(R.id.spinner_curr_status);
+            final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            statusAdapter.addAll(StatusItem.STATUS);
+            statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            currStatusSpinner.setAdapter(statusAdapter);
+            currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    StatusItem status = statusAdapter.getItem(position);
+                    if (status != null) {
+                        filter = status.status;
+                        refreshData();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+
+            tagFilterSpinner = (Spinner) findViewById(R.id.filter_categories);
+            final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags();
+            tagAdapter.addAll(allTags);
+            tagAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            tagFilterSpinner.setAdapter(tagAdapter);
+            tagFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Tag tag = tagAdapter.getItem(position);
+                    if (tag != null) {
+                        currTag = tag;
+                        refreshData();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            for(int i = 0; i < tagAdapter.getCount(); i++) {
+                Tag t = tagAdapter.getItem(i);
+                if (t != null && currTag != null && t.getId() == currTag.getId()) {
+                    tagFilterSpinner.setSelection(i);
+                    break;
+                }
+            }
+
+            if (allTags.isEmpty()) {
+                Utility.runUIActionDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tagAdapter.addAll(GlobalCtx.getInstance().listTags());
+                        tagAdapter.notifyDataSetChanged();
+                    }
+                }, 2000);
+            }
+
+            currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
+            final ArrayAdapter<Store> arrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            arrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            currStoreSpinner.setAdapter(arrAdapter);
             currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Store newStore = storeArrayAdapter.getItem(position);
-                    if (currStore == null || currStore.getId() != newStore.getId()) {
-                        currStore = newStore;
-                        refreshData();
+                    Store newStore = arrAdapter.getItem(position);
+                    if (newStore != null) {
+                        if (currStore == null || currStore.getId() != newStore.getId()) {
+                            currStore = newStore;
+                            refreshData();
+                        }
+
+                        SettingUtility.setCurrentStorageStore(newStore.getId());
                     }
                 }
 
@@ -132,36 +255,32 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                 }
             });
 
-            if (currStore == null) {
-                currStore = Cts.ST_HLG;
+            Collection<Store> stores = GlobalCtx.getInstance().listStores();
+            if (stores == null || stores.isEmpty()) {
+                Utility.toast("正在加载店铺列表，请重试...", this, null);
             }
 
-//        Spinner filterCategories = (Spinner) findViewById(R.id.filter_categories);
-//        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-//                R.array.storage_categories_array, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        filterCategories.setAdapter(adapter);
-//        filterCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String feedback_source = adapter.getItem(position).toString();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
+            if (stores != null) {
+                arrAdapter.addAll(stores);
+            }
+            if (currStore == null) {
+                if (stores != null) {
 
-            btnOnSale = (Button) findViewById(R.id.filter_btn_on_sale);
-            btnRisk = (Button) findViewById(R.id.filter_btn_risk);
-            btnSoldOut = (Button) findViewById(R.id.filter_btn_sold_out);
-            btnOffSale = (Button) findViewById(R.id.filter_btn_Off_sale);
+                    int stoId = SettingUtility.getCurrentStorageStore();
 
-            btnOnSale.setOnClickListener(new FilterButtonClicked(FILTER_ON_SALE));
-            btnRisk.setOnClickListener(new FilterButtonClicked(FILTER_RISK));
-            btnSoldOut.setOnClickListener(new FilterButtonClicked(FILTER_SOLD_OUT));
-            btnOffSale.setOnClickListener(new FilterButtonClicked(FILTER_OFF_SALE));
+                    for (Store next : stores) {
+                        if (next.getId() == stoId) {
+                            currStore = next;
+                            break;
+                        }
+                    }
+                }
+
+                if (currStore == null) {
+                    currStore = Cts.ST_HLG;
+                }
+            }
+            currStoreSpinner.setSelection(arrAdapter.getPosition(currStore));
 
             updateFilterBtnLabels(0, 0, 0, 0);
             refreshData();
@@ -174,6 +293,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 
         listAdapter = new StorageItemAdapter<>(this, storageItems);
         lv.setAdapter(listAdapter);
+        listAdapter.notifyDataSetChanged();
 
         if (ctv != null) {
             ArrayAdapter<StorageItem> ctvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -186,16 +306,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     }
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale) {
-        btnOnSale.setText(String.format("上架(%s)", totalOnSale > 0 ? totalOnSale : "-"));
-        btnRisk.setText(String.format("告急(%s)", totalRisk > 0 ? totalRisk : "-"));
-        btnSoldOut.setText(String.format("缺货(%s)", totalSoldOut > 0 ? totalSoldOut :  "-"));
-        btnOffSale.setText(String.format("下架(%s)", totalOffSale > 0 ? totalOffSale :  "-"));
+        StatusItem.find(FILTER_ON_SALE).setNum(totalOnSale);
+        StatusItem.find(FILTER_OFF_SALE).setNum(totalOffSale);
+        StatusItem.find(FILTER_RISK).setNum(totalRisk);
+        StatusItem.find(FILTER_SOLD_OUT).setNum(totalSoldOut);
 
-        int defColor = android.R.color.primary_text_dark;
-        btnOnSale.setTextColor(ContextCompat.getColor(this, filter != FILTER_ON_SALE ? defColor : R.color.green));
-        btnRisk.setTextColor(ContextCompat.getColor(this, filter != FILTER_RISK ? defColor : R.color.green));
-        btnSoldOut.setTextColor(ContextCompat.getColor(this, filter != FILTER_SOLD_OUT ? defColor : R.color.green));
-        btnOffSale.setTextColor(ContextCompat.getColor(this, filter != FILTER_OFF_SALE ? defColor : R.color.green));
+        if(this.currStatusSpinner != null) {
+            ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
+        }
     }
 
     private void updateAdapterData(ArrayList<StorageItem> storageItems) {
@@ -216,7 +334,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_COMMON);
+                    result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_COMMON, currTag);
                     return null;
                 } catch (ServiceException e) {
                     e.printStackTrace();
@@ -258,73 +376,142 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        String title = listAdapter.getItem(info.position).getIdAndNameStr(false);
-        menu.setHeaderTitle(title);
+        StorageItem item = listAdapter.getItem(info.position);
+        if (item != null) {
+            String title = item.getIdAndNameStr(false);
+            menu.setHeaderTitle(title);
 
-        menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
+            menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
+
+            if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "开始售卖");
+            } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
+            }
+
+            if (item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
+                menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, hasReqNumber() ? "编辑调货" : "加入调货");
+            }
+        }
+    }
+
+    private boolean hasReqNumber() {
+        return false;
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        AppLogger.d("reset storage item pos=" + info.position);
+        final StorageItem storageItem = this.listAdapter.getItem(info.position);
+
         switch (item.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                 AppLogger.d("reset storage item pos=" + info.position);
-                final StorageItem storageItem = this.listAdapter.getItem(info.position);
                 LayoutInflater inflater = (LayoutInflater)
                         getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
                 final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
-                et.setText(String.valueOf(storageItem.getLeft_since_last_stat()));
-                AlertDialog dlg = new AlertDialog.Builder(this)
-                        .setTitle(String.format("设置库存数:(%s)", storageItem.getName()))
-                        .setView(npView)
-                        .setPositiveButton(R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        new MyAsyncTask<Void, Void, Void>(){
-                                            @Override
-                                            protected Void doInBackground(Void... params) {
+                if (storageItem != null) {
+                    et.setText(String.valueOf(storageItem.getLeft_since_last_stat()));
+                    AlertDialog dlg = new AlertDialog.Builder(this)
+                            .setTitle(String.format("设置库存数:(%s)", storageItem.getName()))
+                            .setView(npView)
+                            .setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            new MyAsyncTask<Void, Void, Void>() {
+                                                @Override
+                                                protected Void doInBackground(Void... params) {
 
-                                                ResultBean rb;
-                                                final int lastStat = Integer.parseInt(et.getText().toString());
-                                                try {
-                                                    rb = sad.store_status_reset_stat_num(currStore.getId(), storageItem.getProduct_id(), lastStat);
-                                                } catch (ServiceException e) {
-                                                    rb = new ResultBean(false , "访问服务器出错");
-                                                }
-
-                                                final ResultBean finalRb = rb;
-                                                StoreStorageActivity.this.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        if (finalRb.isOk()) {
-                                                            storageItem.setTotal_last_stat(lastStat);
-                                                            storageItem.setTotal_sold(0);
-                                                            storageItem.setLeft_since_last_stat(lastStat);
-                                                            listAdapter.notifyDataSetChanged();
-                                                            Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
-                                                        } else {
-                                                            Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
-                                                        }
+                                                    ResultBean rb;
+                                                    final int lastStat = Integer.parseInt(et.getText().toString());
+                                                    try {
+                                                        rb = sad.store_status_reset_stat_num(currStore.getId(), storageItem.getProduct_id(), lastStat);
+                                                    } catch (ServiceException e) {
+                                                        rb = new ResultBean(false, "访问服务器出错");
                                                     }
-                                                });
-                                                return null;
-                                            }
-                                        }.executeOnIO();
-                                    }
-                                })
-                        .setNegativeButton(R.string.cancel,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                    }
-                                })
-                        .create();
-                dlg.show();
-                et.requestFocus();
+
+                                                    final ResultBean finalRb = rb;
+                                                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            if (finalRb.isOk()) {
+                                                                storageItem.setTotal_last_stat(lastStat);
+                                                                storageItem.setTotal_sold(0);
+                                                                storageItem.setLeft_since_last_stat(lastStat);
+                                                                listAdapter.notifyDataSetChanged();
+                                                                Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }
+                                                    });
+                                                    return null;
+                                                }
+                                            }.executeOnIO();
+                                        }
+                                    })
+                            .setNegativeButton(R.string.cancel,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                        }
+                                    })
+                            .create();
+                    dlg.show();
+                    et.requestFocus();
+                    return true;
+                } else {
+                    return false;
+                }
+            case MENU_CONTEXT_TO_SALE_ID:
+                action_chg_status(storageItem, StorageItem.STORE_PROD_ON_SALE, "开始售卖");
+                return true;
+            case MENU_CONTEXT_TO_SOLD_OUT_ID:
+                action_chg_status(storageItem, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖");
+                return true;
+            case MENU_CONTEXT_EDIT_REQ:
+                Utility.toast("还没有开放", StoreStorageActivity.this, null);
                 return true;
             default:
                 return super.onContextItemSelected(item);
+        }
+    }
+
+    private void action_chg_status(final StorageItem storageItem, final int destStatus, final String desc) {
+        if (storageItem != null) {
+            if (storageItem.getStatus() == destStatus) {
+                return;
+            }
+            new MyAsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    ResultBean rb;
+                    try {
+                        rb = sad.chg_item_status(currStore.getId(), storageItem.getProduct_id(), storageItem.getStatus(), destStatus);
+                    } catch (ServiceException e) {
+                        rb = new ResultBean(false, "访问服务器出错");
+                    }
+
+                    String msg;
+                    Runnable uiCallback = null;
+                    if (rb.isOk()) {
+                        msg = "已将" + storageItem.getIdAndNameStr() + "设置为" + desc + "!";
+                        uiCallback = new Runnable() {
+                            @Override
+                            public void run() {
+                                storageItem.setStatus(destStatus);
+                                listAdapter.notifyDataSetChanged();
+                            }
+                        };
+                    } else {
+                        msg = "设置失败:" + rb.getDesc();
+                    }
+                    Utility.toast(msg, StoreStorageActivity.this, uiCallback);
+                    return null;
+                }
+            }.executeOnIO();
+        } else {
+            Utility.toast("没有找到您指定的商品", this, null);
         }
     }
 

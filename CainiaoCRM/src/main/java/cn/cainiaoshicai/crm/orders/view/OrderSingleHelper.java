@@ -30,6 +30,7 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 
 /**
  * Created by liuzhr on 7/28/16.
@@ -500,10 +501,9 @@ public class OrderSingleHelper {
     }
 
     public void showToast(final String msg, final boolean refresh) {
-        activity.runOnUiThread(new Runnable() {
+        Utility.toast(msg, activity, new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
                 if (refresh) {
                     activity.refresh();
                 }

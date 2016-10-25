@@ -53,6 +53,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -82,6 +83,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.GeoBean;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.othercomp.unreadnotification.NotificationServiceHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -1007,6 +1009,18 @@ public class Utility {
         c.translate(-view.getScrollX(), -view.getScrollY());
         view.draw(c);
         return b;
+    }
+
+    public static void toast(final String msg, final Activity activity, final Runnable uiCallback) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+                if (uiCallback != null) {
+                    uiCallback.run();
+                }
+            }
+        });
     }
 }
 

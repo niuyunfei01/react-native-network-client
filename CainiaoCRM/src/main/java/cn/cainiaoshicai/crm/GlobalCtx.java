@@ -18,7 +18,14 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +40,7 @@ import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
@@ -62,6 +70,7 @@ public class GlobalCtx extends Application {
     private Handler handler = new Handler();
 
     private AtomicReference<LinkedHashMap<Integer, Store>> storesRef = new AtomicReference<>(null);
+    private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
     private SortedMap<Integer, CommonConfigDao.Worker> workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
@@ -422,7 +431,27 @@ public class GlobalCtx extends Application {
             }.executeOnNormal();
         }
         return stores != null ? stores.values() : null;
-
+    }
+    public ArrayList<Tag> listTags() {
+        ArrayList<Tag> tags = tagsRef.get();
+        if (tags == null || tags.isEmpty()) {
+            new MyAsyncTask<Void, Void, List<Store>>(){
+                @Override
+                protected List<Store> doInBackground(Void... params) {
+                    CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
+                    try {
+                        ArrayList<Tag> s = cfgDao.getTags();
+                        if (s != null) {
+                            tagsRef.set(s);
+                        }
+                    } catch (ServiceException e) {
+                        AppLogger.e("获取产品分类列表错误:" + e.getMessage(), e);
+                    }
+                    return null;
+                }
+            }.executeOnNormal();
+        }
+        return tags == null ? new ArrayList<Tag>(0) : tags;
     }
 
     public String getStoreName(int storeId) {

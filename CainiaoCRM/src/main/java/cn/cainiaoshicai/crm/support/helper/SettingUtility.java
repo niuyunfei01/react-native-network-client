@@ -390,4 +390,12 @@ public class SettingUtility {
         }
         return listenerStores;
     }
+
+    public static int getCurrentStorageStore() {
+        return SettingHelper.getSharedPreferences(getContext(), "storage_store", 0);
+    }
+
+    public static void setCurrentStorageStore(int storeId) {
+        SettingHelper.setEditor(getContext(), "storage_store", storeId);
+    }
 }

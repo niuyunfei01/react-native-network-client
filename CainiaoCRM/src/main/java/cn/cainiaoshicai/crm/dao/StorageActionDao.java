@@ -9,6 +9,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreProduct;
+import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -31,6 +34,11 @@ public class StorageActionDao {
 
     public ResultBean store_status_reset_stat_num(int storeId, int product_id, int lastStat) throws ServiceException {
         return actionWithResult(String.format("/store_status_reset_stat_num/%d/%d/%d", storeId, product_id, lastStat), null);
+    }
+
+    public ResultBean chg_item_status(int storeId, int product_id, int status, int destStatus) throws ServiceException {
+
+        return actionWithResult(String.format("/store_chg_status/%d/%d/%d/%d", storeId, product_id, status, destStatus), null);
     }
 
     static public class StoreStatusStat {
@@ -73,12 +81,12 @@ public class StorageActionDao {
         }
     }
 
-    static public class StorageStatusResults {
+    private static class StorageStatusResults {
         List<StoreProduct> store_products;
         HashMap<Integer, Product> products;
         StoreStatusStat stats;
 
-        public List<StoreProduct> getStore_products() {
+        List<StoreProduct> getStore_products() {
             return store_products;
         }
 
@@ -86,7 +94,7 @@ public class StorageActionDao {
             this.store_products = store_products;
         }
 
-        public HashMap<Integer, Product> getProducts() {
+        HashMap<Integer, Product> getProducts() {
             return products;
         }
 
@@ -95,10 +103,13 @@ public class StorageActionDao {
         }
     }
 
-    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Cts.Provide provide) throws ServiceException {
+    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Cts.Provide provide, Tag tag) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
+            if (tag != null) {
+                params.put("tag_id", String.valueOf(tag.getId()));
+            }
             String json = getJson("/list_store_storage_status/" + provide.value +  "/" + store.getId() + "/" + filter, params);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {

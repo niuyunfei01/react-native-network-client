@@ -170,8 +170,8 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部供货管理", -1, TYPE_STORE_STORAGE, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店自采管理", -1, TYPE_STORE_SELF_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部商品管理", -1, TYPE_STORE_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
 
 		String versionDesc = getVersionDesc();
 

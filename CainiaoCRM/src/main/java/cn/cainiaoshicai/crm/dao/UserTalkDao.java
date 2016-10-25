@@ -39,6 +39,11 @@ public class UserTalkDao implements IUserTalkDao {
         return convert(post(String.format("%s/%s/%d/%d/%d", method, openid, uid, latestTime, limit), params));
     }
 
+    @Override
+    public void talk_reply_text(String id, String currentClientId, String content) {
+
+    }
+
     @Nullable
     private UserTalk convert(String json) {
 

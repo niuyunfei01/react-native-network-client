@@ -71,7 +71,7 @@ public class MQManager {
             @Override
             public void run() {
                 MQManager.this.dao.talk_reply_text(currentAgent.getId(), MQManager.this.currentClientId, content);
-                MQMessage mqMsg = new MQMessage(MQMessage.TYPE_CONTENT_TEXT);
+                final MQMessage mqMsg = new MQMessage(MQMessage.TYPE_CONTENT_TEXT);
                 MQUtils.runInUIThread(new Runnable() {
                     @Override
                     public void run() {

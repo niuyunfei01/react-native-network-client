@@ -68,7 +68,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            this.setContentView(R.layout.storage_status);
+            this.setContentView(R.layout.storage_status_self);
 
             setTitle(R.string.title_storage_self_provided);
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -210,7 +210,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_SLEF);
+                    result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_SLEF, null);
                     return null;
                 } catch (ServiceException e) {
                     e.printStackTrace();
