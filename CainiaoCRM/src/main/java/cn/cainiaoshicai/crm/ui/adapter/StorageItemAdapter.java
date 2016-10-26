@@ -97,6 +97,11 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         this.notifyDataSetChanged();
     }
 
+    public void changeBackendData(ArrayList<StorageItem> storageItems) {
+        this.backendData.clear();
+        this.backendData.addAll(storageItems);
+    }
+
     class ViewHolder {
         TextView label;
         TextView leftNumber;

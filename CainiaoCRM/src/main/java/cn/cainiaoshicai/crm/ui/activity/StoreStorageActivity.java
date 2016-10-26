@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -18,7 +17,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -115,7 +113,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     }
 
 
-    private int filter = FILTER_ON_SALE;
+    private int filter = FILTER_SOLD_OUT;
 
     private Store currStore;
     private Tag currTag;
@@ -171,9 +169,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             });
 
             currStatusSpinner = (Spinner) findViewById(R.id.spinner_curr_status);
-            final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
             statusAdapter.addAll(StatusItem.STATUS);
-            statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
             currStatusSpinner.setAdapter(statusAdapter);
             currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -193,10 +191,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             currStatusSpinner.setSelection(StatusItem.findIdx(filter));
 
             tagFilterSpinner = (Spinner) findViewById(R.id.filter_categories);
-            final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
             ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags();
             tagAdapter.addAll(allTags);
-            tagAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            tagAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
             tagFilterSpinner.setAdapter(tagAdapter);
             tagFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -229,12 +227,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                         tagAdapter.addAll(GlobalCtx.getInstance().listTags());
                         tagAdapter.notifyDataSetChanged();
                     }
-                }, 2000);
+                }, 500);
             }
 
             currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
-            final ArrayAdapter<Store> arrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-            arrAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            final ArrayAdapter<Store> arrAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
+            arrAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
             currStoreSpinner.setAdapter(arrAdapter);
             currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -289,11 +287,16 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 
     private void resetListAdapter(ArrayList<StorageItem> storageItems) {
 
-        lv.setAdapter(null);
-
-        listAdapter = new StorageItemAdapter<>(this, storageItems);
-        lv.setAdapter(listAdapter);
-        listAdapter.notifyDataSetChanged();
+        if (listAdapter != null) {
+            listAdapter.changeBackendData(storageItems);
+            listAdapter.filter("");
+        } else {
+            listAdapter = new StorageItemAdapter<>(this, storageItems);
+            lv.setAdapter(listAdapter);
+        }
+//        listAdapter = new StorageItemAdapter<>(this, storageItems);
+//        lv.setAdapter(listAdapter);
+//        listAdapter.notifyDataSetChanged();
 
         if (ctv != null) {
             ArrayAdapter<StorageItem> ctvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
@@ -512,22 +515,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             }.executeOnIO();
         } else {
             Utility.toast("没有找到您指定的商品", this, null);
-        }
-    }
-
-    private class FilterButtonClicked implements View.OnClickListener {
-        private int clicked;
-
-        public FilterButtonClicked(int clicked) {
-            this.clicked = clicked;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (filter != clicked) {
-                filter = clicked;
-                refreshData();
-            }
         }
     }
 }
