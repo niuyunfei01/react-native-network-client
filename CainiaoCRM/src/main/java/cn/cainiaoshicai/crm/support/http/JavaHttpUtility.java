@@ -290,7 +290,7 @@ public class JavaHttpUtility {
             StringBuilder urlBuilder = new StringBuilder(urlStr);
             urlBuilder.append("?").append(Utility.encodeUrl(param));
             URL url = new URL(urlBuilder.toString());
-            AppLogger.d("userTalkStatus request: " + url);
+            AppLogger.d("request: " + url);
             Proxy proxy = getProxy();
             HttpURLConnection urlConnection;
             if (proxy != null) {

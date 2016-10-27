@@ -26,19 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <TextView android:id="@+id/product_provide_type"
-        android:layout_below="@id/product_name"
-        android:layout_toEndOf="@id/store_prod_status"
-        android:background="@drawable/list_text_border_green_mini"
-        android:layout_marginStart="2dp"
-        android:paddingStart="2dp"
-        android:paddingEnd="2dp"
-        android:textSize="@dimen/mini_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <TextView android:id="@+id/lowest_risk_num"
-        android:layout_toEndOf="@id/product_provide_type"
+        android:layout_toEndOf="@id/store_prod_status"
         android:layout_below="@id/product_name"
         android:background="@drawable/list_text_border_green_mini"
         android:textSize="@dimen/mini_text"
@@ -46,6 +35,18 @@
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
         android:layout_marginBottom="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView android:id="@+id/provide_total_req"
+        android:layout_below="@id/product_name"
+        android:layout_toEndOf="@id/lowest_risk_num"
+        android:background="@drawable/list_text_border_green_mini"
+        android:layout_marginStart="2dp"
+        android:visibility="gone"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:textSize="@dimen/mini_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

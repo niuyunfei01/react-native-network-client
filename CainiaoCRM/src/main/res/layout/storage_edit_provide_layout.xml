@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<TextView android:id="@+id/hint_total_req"
+    android:text="份数:"
+    android:textColor="@color/light_blue"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentStart="true"
+    android:layout_marginTop="10dp"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp" />
+
+<EditText android:id="@+id/total_req"
+    android:textColor="@color/light_blue"
+    android:layout_alignParentTop="true"
+    android:layout_toEndOf="@id/hint_total_req"
+    android:inputType="number"
+    android:layout_marginTop="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:background="@drawable/edittext_style"/>
+
+<TextView
+    android:id="@+id/hint_req_remark"
+    android:layout_below="@+id/hint_total_req"
+    android:layout_alignParentStart="true"
+    android:text="备注:"
+    android:textColor="@color/light_blue"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp" />
+
+<EditText android:id="@+id/remark"
+    android:layout_below="@id/hint_total_req"
+    android:textColor="@color/light_blue"
+    android:layout_toEndOf="@+id/hint_req_remark"
+    android:inputType="textMultiLine"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@drawable/edittext_style"/>
+
+<TextView
+    android:id="@+id/hint_req_day"
+    android:layout_below="@+id/hint_total_req"
+    android:layout_alignParentStart="true"
+    android:text="备注:"
+    android:textColor="@color/light_blue"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp" />
+
+</RelativeLayout>

@@ -9,10 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
@@ -40,7 +42,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.sold_weekend = (TextView) row.findViewById(R.id.sold_weekend);
 
             holder.prodStatus = (TextView) row.findViewById(R.id.store_prod_status);
-            holder.provideType = (TextView) row.findViewById(R.id.product_provide_type);
+            holder.req_total = (TextView) row.findViewById(R.id.provide_total_req);
             holder.riskNum = (TextView) row.findViewById(R.id.lowest_risk_num);
 
             convertView = row;
@@ -51,7 +53,14 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.label.setText(item.getIdAndNameStr());
 
         holder.prodStatus.setText(item.getStatusText());
-        holder.provideType.setText(item.getProvideTypeText());
+
+        if (item.getTotalInReq() > 0) {
+            holder.req_total.setText("调货：" + item.getTotalInReq());
+            holder.req_total.setVisibility(View.VISIBLE);
+        } else {
+            holder.req_total.setVisibility(View.GONE);
+        }
+
         holder.riskNum.setText("安全库存: " + item.getRisk_min_stat());
 
         holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
@@ -61,13 +70,15 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         return (convertView);
     }
 
-    @Override
-    public void clear() {
-        super.clear();
-    }
-
     public void filter(String text) {
         this.clear();
+
+        for(int i = 0; i < this.getCount(); i++) {
+            this.remove(this.getItem(i));
+        }
+
+        AppLogger.d("items count after clear:" + this.getCount());
+
         if (!TextUtils.isEmpty(text)) {
 
             int id = 0;
@@ -77,6 +88,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 try {
                     id = Integer.parseInt(text);
                 } catch (Exception e) {
+                    AppLogger.e("exception parse int:" + text, e);
                 }
             }
 
@@ -91,10 +103,11 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 }
             }
         } else {
+
+            AppLogger.d("add to adapter:" + Arrays.toString(this.backendData.toArray(new StorageItem[0])));
+
             ((StorageItemAdapter<StorageItem>) this).addAll(this.backendData);
         }
-
-        this.notifyDataSetChanged();
     }
 
     public void changeBackendData(ArrayList<StorageItem> storageItems) {
@@ -109,7 +122,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView sold_weekend;
 
         TextView prodStatus;
-        TextView provideType;
+        TextView req_total;
         TextView riskNum;
     }
 }

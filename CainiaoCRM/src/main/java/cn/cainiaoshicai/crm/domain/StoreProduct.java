@@ -29,6 +29,8 @@ public class StoreProduct {
     private int auto_off_sale;
     private int sold_7day;
     private int sold_weekend;
+    private int req_total;
+    private String req_mark;
 
     public int getId() {
         return id;
@@ -204,5 +206,21 @@ public class StoreProduct {
 
     public void setSold_weekend(int sold_weekend) {
         this.sold_weekend = sold_weekend;
+    }
+
+    public int getReq_total() {
+        return req_total;
+    }
+
+    public void setReq_total(int req_total) {
+        this.req_total = req_total;
+    }
+
+    public String getReq_mark() {
+        return req_mark;
+    }
+
+    public void setReq_mark(String req_mark) {
+        this.req_mark = req_mark;
     }
 }

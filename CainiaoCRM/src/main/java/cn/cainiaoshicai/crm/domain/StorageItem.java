@@ -24,6 +24,9 @@ public class StorageItem {
     private int sold_5day;
     private int sold_weekend;
 
+    private int totalInReq;
+    private String reqMark;
+
 
     public int getProduct_id() {
         return product_id;
@@ -153,5 +156,21 @@ public class StorageItem {
 
     public void setSold_weekend(int sold_weekend) {
         this.sold_weekend = sold_weekend;
+    }
+
+    public int getTotalInReq() {
+        return totalInReq;
+    }
+
+    public void setTotalInReq(int totalInReq) {
+        this.totalInReq = totalInReq;
+    }
+
+    public String getReqMark() {
+        return reqMark;
+    }
+
+    public void setReqMark(String reqMark) {
+        this.reqMark = reqMark;
     }
 }

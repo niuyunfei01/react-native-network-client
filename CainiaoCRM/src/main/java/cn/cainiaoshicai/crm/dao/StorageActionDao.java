@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreProduct;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -41,12 +43,21 @@ public class StorageActionDao {
         return actionWithResult(String.format("/store_chg_status/%d/%d/%d/%d", storeId, product_id, status, destStatus), null);
     }
 
+    public ResultEditReq store_edit_provide_req(int pid, int store_id, int total_req, String remark) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("remark", remark);
+        params.put("day", DateTimeUtils.shortYmd(new Date()));
+        return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d", pid, store_id, total_req), params);
+    }
+
+
     static public class StoreStatusStat {
 
         private int total_on_sale;
         private int total_risk;
         private int total_sold_out;
         private int total_off_sale;
+        private int total_req_cnt;
 
         public int getTotal_on_sale() {
             return total_on_sale;
@@ -79,12 +90,21 @@ public class StorageActionDao {
         public void setTotal_sold_out(int total_sold_out) {
             this.total_sold_out = total_sold_out;
         }
+
+        public void setTotal_req_cnt(int total_req_cnt) {
+            this.total_req_cnt = total_req_cnt;
+        }
+
+        public int getTotal_req_cnt() {
+            return total_req_cnt;
+        }
     }
 
     private static class StorageStatusResults {
         List<StoreProduct> store_products;
         HashMap<Integer, Product> products;
         StoreStatusStat stats;
+        private int total_req_cnt;
 
         List<StoreProduct> getStore_products() {
             return store_products;
@@ -92,6 +112,14 @@ public class StorageActionDao {
 
         public void setStore_products(List<StoreProduct> store_products) {
             this.store_products = store_products;
+        }
+
+        public int getTotal_req_cnt() {
+            return total_req_cnt;
+        }
+
+        public void setTotal_req_cnt(int total_req_cnt) {
+            this.total_req_cnt = total_req_cnt;
         }
 
         HashMap<Integer, Product> getProducts() {
@@ -103,6 +131,23 @@ public class StorageActionDao {
         }
     }
 
+    public static class ResultEditReq extends ResultBean {
+
+        private int total_req_cnt;
+
+        public ResultEditReq(boolean b, String desc) {
+            super(b, desc);
+        }
+
+        public int getTotal_req_cnt() {
+            return total_req_cnt;
+        }
+
+        public void setTotal_req_cnt(int total_req_cnt) {
+            this.total_req_cnt = total_req_cnt;
+        }
+    }
+
     public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Cts.Provide provide, Tag tag) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
@@ -110,12 +155,12 @@ public class StorageActionDao {
             if (tag != null) {
                 params.put("tag_id", String.valueOf(tag.getId()));
             }
-            String json = getJson("/list_store_storage_status/" + provide.value +  "/" + store.getId() + "/" + filter, params);
+            String json = getJson("/list_store_storage_status/" + provide.value + "/" + store.getId() + "/" + filter, params);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
             if (storagesMap.getStore_products() != null) {
-                for(StoreProduct sp : storagesMap.getStore_products()) {
+                for (StoreProduct sp : storagesMap.getStore_products()) {
                     StorageItem si = new StorageItem();
                     si.setId(sp.getProduct_id());
                     si.setLeft_since_last_stat(sp.getLeft_since_last_stat());
@@ -128,6 +173,8 @@ public class StorageActionDao {
                     si.setRisk_min_stat(sp.getRisk_min_stat());
                     si.setSold_5day(sp.getSold_7day() - sp.getSold_weekend());
                     si.setSold_weekend(sp.getSold_weekend());
+                    si.setTotalInReq(sp.getReq_total());
+                    si.setReqMark(sp.getReq_mark());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {
@@ -136,7 +183,12 @@ public class StorageActionDao {
                     storageItems.add(si);
                 }
             }
-            return new Pair<>(storageItems, storagesMap.stats);
+            StoreStatusStat stats = storagesMap.stats;
+            if (stats != null) {
+                stats.setTotal_req_cnt(storagesMap.getTotal_req_cnt());
+            }
+            Pair<ArrayList<StorageItem>, StoreStatusStat> result = new Pair<>(storageItems, stats);
+            return result;
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);
             return new Pair<>(storageItems, new StoreStatusStat());
@@ -149,7 +201,9 @@ public class StorageActionDao {
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
         map.putAll(params);
-        return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+        String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+        AppLogger.v("action" + pathSuffix + ":" + json);
+        return json;
     }
 
     @Nullable
@@ -169,6 +223,24 @@ public class StorageActionDao {
         } catch (JsonSyntaxException e) {
             AppLogger.e(e.getMessage(), e);
             return ResultBean.readingFailed();
+        }
+    }
+
+    @Nullable
+    private ResultEditReq actionEditReq(String path, HashMap<String, String> params) throws ServiceException {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        String json = getJson(path, params);
+
+        try {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ResultEditReq>() {
+            }.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e(e.getMessage(), e);
+            ResultBean bean = ResultBean.readingFailed();
+            return new ResultEditReq(bean.isOk(), bean.getDesc());
         }
     }
 
