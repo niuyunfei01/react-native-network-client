@@ -21,6 +21,7 @@ public class Feedback implements Serializable {
     private int source;
     private int from_order;
     private int status;
+    private String fromUserName;
 
     public int getStatus() {
         return status;
@@ -109,7 +110,11 @@ public class Feedback implements Serializable {
     }
 
     public String getFromUserName() {
-        return "流星花园张先生";
+        return this.fromUserName;
+    }
+
+    public void setFromUserName(String fromUserName) {
+        this.fromUserName = fromUserName;
     }
 
     public String getStatusTxt() {
