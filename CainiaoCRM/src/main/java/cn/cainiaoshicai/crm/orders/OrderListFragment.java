@@ -25,6 +25,7 @@ import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.loader.RefreshOrderListTask;
 
@@ -126,7 +127,7 @@ public class OrderListFragment extends Fragment {
                     if (order.shouldTryAutoPrint()
                             && order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
                             && GlobalCtx.isAutoPrint(order.getStore_id())) {
-                        OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new OrderPrinter.PrintCallback() {
+                        OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new BasePrinter.PrintCallback() {
                             @Override
                             public void run(boolean result, String desc) {
                                 orderListFragment.getActivity().runOnUiThread(new Runnable() {

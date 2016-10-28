@@ -146,6 +146,7 @@ public class GlobalCtx extends Application {
 
         initConfigs();
         listStores();
+        listTags();
 
         initTalkSDK();
 
@@ -158,6 +159,7 @@ public class GlobalCtx extends Application {
     public void initAfterLogin() {
         this.initConfigs();
         this.listStores();
+        this.listTags();
     }
 
     private void initConfigs() {

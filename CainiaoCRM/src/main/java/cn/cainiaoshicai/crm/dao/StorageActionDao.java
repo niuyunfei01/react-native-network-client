@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,11 +19,13 @@ import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Product;
+import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreProduct;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -48,6 +51,31 @@ public class StorageActionDao {
         params.put("remark", remark);
         params.put("day", DateTimeUtils.shortYmd(new Date()));
         return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d", pid, store_id, total_req), params);
+    }
+
+    public ResultObject store_provide_req(Integer storeId) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        String json = getJson("/store_curr_provide_req/" + storeId, params);
+
+        try {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ResultObject<ProvideReq>>() {
+            }.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e(e.getMessage(), e);
+            ResultBean bean = ResultBean.readingFailed();
+            return new ResultObject(bean.isOk(), bean.getDesc());
+        }
+    }
+
+    public ResultBean store_status_provide_req(int req_id, int fromStatus, int toStatus) {
+        try {
+            String path = MessageFormat.format("/store_status_provide_req/{0}/{1}/{2}", req_id, fromStatus, toStatus);
+            return actionWithResult(path, new HashMap<String, String>());
+        } catch (ServiceException e) {
+            AppLogger.e("store_status_provide_req req_id="+ req_id + ", fromStatus=" + fromStatus + ", " + toStatus, e);
+            return ResultBean.readingFailed();
+        }
     }
 
 

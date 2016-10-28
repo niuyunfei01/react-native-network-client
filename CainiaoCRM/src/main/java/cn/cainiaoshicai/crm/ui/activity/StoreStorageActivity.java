@@ -57,11 +57,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     private Spinner tagFilterSpinner;
     private Spinner currStatusSpinner;
     private Button btnReqList;
+    private LayoutInflater inflater;
 
     private static final int FILTER_ON_SALE = 1;
     private static final int FILTER_RISK = 2;
     private static final int FILTER_SOLD_OUT = 3;
     private static final int FILTER_OFF_SALE = 4;
+    private int total_in_req;
 
 
     private static class StatusItem {
@@ -125,21 +127,37 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        inflater = (LayoutInflater)
+                getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         if (savedInstanceState == null) {
             this.setContentView(R.layout.storage_status);
+
 
             setTitle(R.string.title_storage_status);
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             lv = (ListView) findViewById(R.id.list_storage_status);
             registerForContextMenu(lv);
-            resetListAdapter(new ArrayList<StorageItem>());
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    StorageItem item = listAdapter.getItem(position);
+                    if (item != null) {
+                        AlertDialog dlg = createEditProvideDlg(item, inflater);
+                        dlg.show();
+                    }
+                }
+            });
 
             this.btnReqList = (Button) findViewById(R.id.btn_req_list);
             this.btnReqList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utility.toast("还没有放开...", StoreStorageActivity.this, null);
+                    Intent intent = new Intent(StoreStorageActivity.this, StorageProvideActivity.class);
+                    intent.putExtra("store_id", currStore.getId());
+                    startActivity(intent);
                 }
             });
 
@@ -238,7 +256,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                         tagAdapter.addAll(GlobalCtx.getInstance().listTags());
                         tagAdapter.notifyDataSetChanged();
                     }
-                }, 500);
+                }, 50);
             }
 
             currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
@@ -335,6 +353,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     }
 
     private void updateReqListBtn(int total_in_req) {
+        this.total_in_req = total_in_req;
         if (this.btnReqList != null) {
             this.btnReqList.setText("订货单\n(" + total_in_req + ")");
         }
@@ -427,9 +446,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         AppLogger.d("reset storage item pos=" + info.position);
         final StorageItem storageItem = this.listAdapter.getItem(info.position);
 
-        LayoutInflater inflater = (LayoutInflater)
-                getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         switch (item.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
                 View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
@@ -506,7 +522,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
         final EditText remark = (EditText) npView.findViewById(R.id.remark);
 
-        totalReqTxt.setText(String.valueOf(item.getTotalInReq()));
+        int totalInReq = item.getTotalInReq();
+        totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : item.getRisk_min_stat()));
         remark.setText(item.getReqMark());
         AlertDialog dlg = new AlertDialog.Builder(this)
                 .setTitle(String.format("编辑备货:(%s)", item.getName()))

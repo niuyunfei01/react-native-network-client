@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OrderSingleActivity"
+    android:layout_gravity="center_vertical"
+    tools:ignore="MergeRootFrame">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <WebView
+            android:id="@+id/activity_main_webview"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/list_item_bg"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/btn_provide_print"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_print" />
+        <Button
+            android:layout_marginStart="5dp"
+            android:id="@+id/btn_provide_edit"
+            android:layout_toEndOf="@id/btn_provide_print"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_provide_edit" />
+
+        <Button
+            android:id="@+id/btn_provide_lock"
+            android:layout_toEndOf="@id/btn_provide_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_provide_lock" />
+
+        <Button
+            android:id="@+id/btn_provide_ship"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/btn_provide_lock"
+            android:visibility="gone"
+            android:text="@string/menu_provide_ship" />
+
+        <Button
+            android:id="@+id/btn_provide_accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/btn_provide_ship"
+            android:visibility="gone"
+            android:text="@string/menu_provide_accept" />
+
+    </RelativeLayout>
+</RelativeLayout>
