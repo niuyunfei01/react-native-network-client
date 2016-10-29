@@ -231,6 +231,9 @@
     <string name="menu_provide_locked">已截单</string>
     <string name="menu_provide_ship">订单发货</string>
     <string name="menu_provide_accept">订单收货</string>
+    <string name="store_on_sale_now">库里有货或临时可采购，立即开卖</string>
+    <string name="store_on_sale_after_off_work">下班后恢复上架</string>
+    <string name="store_on_sale_after_provided">等总部到货后再上架</string>
 
     <string-array name="feedback_source_array">
         <item>400来电</item>

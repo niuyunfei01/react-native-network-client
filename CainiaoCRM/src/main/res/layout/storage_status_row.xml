@@ -38,9 +38,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <TextView android:id="@+id/re_on_sale_desc"
+        android:layout_toEndOf="@id/lowest_risk_num"
+        android:layout_below="@id/product_name"
+        android:background="@drawable/list_text_border_green_mini"
+        android:textSize="@dimen/tiny_text"
+        android:layout_marginStart="2dp"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:visibility="gone"
+        android:layout_marginBottom="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <TextView android:id="@+id/provide_total_req"
         android:layout_below="@id/product_name"
-        android:layout_toEndOf="@id/lowest_risk_num"
+        android:layout_toEndOf="@id/re_on_sale_desc"
         android:background="@drawable/list_text_border_green_mini"
         android:layout_marginStart="2dp"
         android:visibility="gone"

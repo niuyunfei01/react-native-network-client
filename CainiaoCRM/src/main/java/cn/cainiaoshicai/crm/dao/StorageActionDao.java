@@ -70,7 +70,7 @@ public class StorageActionDao {
 
     public ResultBean store_status_provide_req(int req_id, int fromStatus, int toStatus) {
         try {
-            String path = MessageFormat.format("/store_status_provide_req/{0}/{1}/{2}", req_id, fromStatus, toStatus);
+            String path = String.format("/store_status_provide_req/%d/%d/%d", req_id, fromStatus, toStatus);
             return actionWithResult(path, new HashMap<String, String>());
         } catch (ServiceException e) {
             AppLogger.e("store_status_provide_req req_id="+ req_id + ", fromStatus=" + fromStatus + ", " + toStatus, e);
@@ -78,6 +78,15 @@ public class StorageActionDao {
         }
     }
 
+    public ResultBean chg_item_when_on_sale_again(int storeId, int product_id, int option) {
+        try {
+            String path = String.format("/chg_item_when_on_sale_again/%d/%d/%d", storeId, product_id, option);
+            return actionWithResult(path, new HashMap<String, String>());
+        } catch (ServiceException e) {
+            AppLogger.e("chg_item_when_on_sale_again req_id="+ storeId + ", fromStatus=" + product_id + ", " + option, e);
+            return ResultBean.readingFailed();
+        }
+    }
 
     static public class StoreStatusStat {
 
@@ -203,6 +212,7 @@ public class StorageActionDao {
                     si.setSold_weekend(sp.getSold_weekend());
                     si.setTotalInReq(sp.getReq_total());
                     si.setReqMark(sp.getReq_mark());
+                    si.setWhen_sale_again(sp.getRe_on_sale_time());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {

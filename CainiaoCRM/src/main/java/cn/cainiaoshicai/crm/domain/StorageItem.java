@@ -12,6 +12,9 @@ public class StorageItem {
     public static final int STORE_PROD_OFF_SALE = 3;
     public static final int STORE_PROD_SOLD_OUT = 2;
 
+    public static final int RE_ONSALE_OFF_WORK = 1;
+    public static final int RE_ONSALE_PROVIDED = 2;
+
     private int id;
     private String name;
     private int total_last_stat;
@@ -27,6 +30,7 @@ public class StorageItem {
     private int totalInReq;
     private String reqMark;
 
+    private int when_sale_again;
 
     public int getProduct_id() {
         return product_id;
@@ -44,6 +48,14 @@ public class StorageItem {
         this.name = name;
         this.total_last_stat = total_last_stat;
         this.total_sold = total_sold;
+    }
+
+    public int getWhen_sale_again() {
+        return when_sale_again;
+    }
+
+    public void setWhen_sale_again(int when_sale_again) {
+        this.when_sale_again = when_sale_again;
     }
 
     public int getId() {
@@ -172,5 +184,14 @@ public class StorageItem {
 
     public void setReqMark(String reqMark) {
         this.reqMark = reqMark;
+    }
+
+    public static String getDesc(int when_sale_again) {
+        if (when_sale_again == RE_ONSALE_OFF_WORK) {
+            return "下班后";
+        } else if (when_sale_again == RE_ONSALE_PROVIDED) {
+            return "来货后";
+        }
+        return "未设置";
     }
 }

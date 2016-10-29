@@ -27,6 +27,7 @@
 
     <dimen name="small_text">16sp</dimen>
     <dimen name="mini_text">14sp</dimen>
+    <dimen name="tiny_text">12sp</dimen>
 
     <!-- Semantic definitions -->
 

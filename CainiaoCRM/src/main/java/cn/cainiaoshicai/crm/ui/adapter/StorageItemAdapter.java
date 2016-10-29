@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.ui.adapter;
 
 import android.app.Activity;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.prodStatus = (TextView) row.findViewById(R.id.store_prod_status);
             holder.req_total = (TextView) row.findViewById(R.id.provide_total_req);
             holder.riskNum = (TextView) row.findViewById(R.id.lowest_risk_num);
+            holder.reOnSale = (TextView) row.findViewById(R.id.re_on_sale_desc);
 
             convertView = row;
             convertView.setTag(holder);
@@ -66,6 +68,21 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
         holder.sold_5day.setText(String.format("1-5:%.1f", item.getSold_5day()/5.0));
         holder.sold_weekend.setText(String.format("末:%.1f", item.getSold_weekend()/2.0));
+
+        if(item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT){
+            holder.reOnSale.setVisibility(View.VISIBLE);
+
+            int bg;
+            if (item.getWhen_sale_again() > 0) {
+                bg = R.drawable.list_text_border_green_mini;
+            } else {
+                bg = R.drawable.list_text_border_red_mini;
+            }
+            holder.reOnSale.setBackground(ContextCompat.getDrawable(this.getContext(), bg));
+            holder.reOnSale.setText("再上架：" + StorageItem.getDesc(item.getWhen_sale_again()));
+        } else {
+            holder.reOnSale.setVisibility(View.GONE);
+        }
 
         return (convertView);
     }
@@ -115,7 +132,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         this.backendData.addAll(storageItems);
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         TextView label;
         TextView leftNumber;
         TextView sold_5day;
@@ -124,5 +141,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView prodStatus;
         TextView req_total;
         TextView riskNum;
+
+        TextView reOnSale;
     }
 }

@@ -23,6 +23,7 @@ public class StoreProduct {
     private int store_gap;
     private int total_left_in_store;
     private int left_since_last_stat;
+    private int re_on_sale_time;
 
     private int risk_min_stat;
     private int self_provided;
@@ -218,6 +219,14 @@ public class StoreProduct {
 
     public String getReq_mark() {
         return req_mark;
+    }
+
+    public int getRe_on_sale_time() {
+        return re_on_sale_time;
+    }
+
+    public void setRe_on_sale_time(int re_on_sale_time) {
+        this.re_on_sale_time = re_on_sale_time;
     }
 
     public void setReq_mark(String req_mark) {
