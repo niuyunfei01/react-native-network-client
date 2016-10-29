@@ -383,14 +383,22 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                 @Override
                 protected Boolean doInBackground(Void... params) {
                     String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
-                    Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                    final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
                     if (order == null) {
                         this.error = getApplication().getString(R.string.error_get_order);
                         return false;
                     } else {
                         this.order = order;
                         OrderSingleActivity.this.orderRef.set(order);
-                        OrderSingleActivity.this.update_dada_btn(order.getDada_status(), order);
+
+                        OrderSingleActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                OrderSingleActivity.this.update_dada_btn(order.getDada_status(), order);
+                            }
+
+                        });
+
                         try {
                             OrderPrinter.printOrder(ds.getSocket(), order);
                             order.incrPrintTimes();
