@@ -234,6 +234,7 @@
     <string name="store_on_sale_now">库里有货或临时可采购，立即开卖</string>
     <string name="store_on_sale_after_off_work">下班后恢复上架</string>
     <string name="store_on_sale_after_provided">等总部到货后再上架</string>
+    <string name="store_on_sale_manual">回头手工上架</string>
 
     <string-array name="feedback_source_array">
         <item>400来电</item>

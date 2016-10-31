@@ -12,8 +12,9 @@ public class StorageItem {
     public static final int STORE_PROD_OFF_SALE = 3;
     public static final int STORE_PROD_SOLD_OUT = 2;
 
-    public static final int RE_ONSALE_OFF_WORK = 1;
-    public static final int RE_ONSALE_PROVIDED = 2;
+    public static final int RE_ON_SALE_OFF_WORK = 1;
+    public static final int RE_ON_SALE_PROVIDED = 2;
+    public static final int RE_ON_SALE_MANUAL = 3;
 
     private int id;
     private String name;
@@ -187,10 +188,12 @@ public class StorageItem {
     }
 
     public static String getDesc(int when_sale_again) {
-        if (when_sale_again == RE_ONSALE_OFF_WORK) {
+        if (when_sale_again == RE_ON_SALE_OFF_WORK) {
             return "下班后";
-        } else if (when_sale_again == RE_ONSALE_PROVIDED) {
+        } else if (when_sale_again == RE_ON_SALE_PROVIDED) {
             return "来货后";
+        } else if (when_sale_again == RE_ON_SALE_MANUAL) {
+            return "手动";
         }
         return "未设置";
     }

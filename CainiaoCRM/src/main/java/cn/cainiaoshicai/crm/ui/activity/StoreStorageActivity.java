@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -25,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -52,7 +52,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
     private AutoCompleteTextView ctv;
-    private Spinner currStoreSpinner;
     private Spinner tagFilterSpinner;
     private Spinner currStatusSpinner;
     private Button btnReqList;
@@ -63,7 +62,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     private static final int FILTER_SOLD_OUT = 3;
     private static final int FILTER_OFF_SALE = 4;
     private int total_in_req;
-
 
     private static class StatusItem {
         static final StatusItem[] STATUS = new StatusItem[]{
@@ -116,7 +114,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         }
     }
 
-
     private int filter = FILTER_SOLD_OUT;
 
     private Store currStore;
@@ -143,7 +140,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     StorageItem item = listAdapter.getItem(position);
-                    if (item != null) {
+                    if (item != null && item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
                         AlertDialog dlg = createEditProvideDlg(item, inflater);
                         dlg.show();
                     }
@@ -258,14 +255,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                 }, 50);
             }
 
-            currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
-            final ArrayAdapter<Store> arrAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
-            arrAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
-            currStoreSpinner.setAdapter(arrAdapter);
-            currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            StoreStorageHelper.initStoreSpinner(this, this.currStore, new StoreChangeCallback() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Store newStore = arrAdapter.getItem(position);
+                public void changed(Store newStore) {
                     if (newStore != null) {
                         if (currStore == null || currStore.getId() != newStore.getId()) {
                             currStore = newStore;
@@ -275,41 +267,15 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                         SettingUtility.setCurrentStorageStore(newStore.getId());
                     }
                 }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
             });
-
-            Collection<Store> stores = GlobalCtx.getInstance().listStores();
-            if (stores == null || stores.isEmpty()) {
-                Utility.toast("正在加载店铺列表，请重试...", this, null);
-            }
-
-            if (stores != null) {
-                arrAdapter.addAll(stores);
-            }
-            if (currStore == null) {
-                if (stores != null) {
-
-                    int storeId = SettingUtility.getCurrentStorageStore();
-                    for (Store next : stores) {
-                        if (next.getId() == storeId) {
-                            currStore = next;
-                            break;
-                        }
-                    }
-                }
-
-                if (currStore == null) {
-                    currStore = Cts.ST_HLG;
-                }
-            }
-            currStoreSpinner.setSelection(arrAdapter.getPosition(currStore));
 
             updateFilterBtnLabels(0, 0, 0, 0, 0);
             refreshData();
         }
+    }
+
+    interface StoreChangeCallback {
+        void changed(Store newStore);
     }
 
     private void resetListAdapter(ArrayList<StorageItem> storageItems) {
@@ -497,13 +463,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                     return false;
                 }
             case MENU_CONTEXT_TO_SALE_ID:
-                createSetOnSaleDlg(storageItem).show();
+                StoreStorageHelper.createSetOnSaleDlg(this, storageItem, this.currStore, notifyDataSetChanged()).show();
                 return true;
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
-                action_chg_status(storageItem, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
+                StoreStorageHelper.action_chg_status(this, currStore, storageItem, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
                     @Override
                     public void run() {
-                        createSetOnSaleDlg(storageItem).show();
+                        listAdapter.notifyDataSetChanged();
+                        StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, storageItem, currStore, notifyDataSetChanged()).show();
                     }
                 });
                 return true;
@@ -516,43 +483,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         }
     }
 
-    private AlertDialog createSetOnSaleDlg(final StorageItem item) {
-
-        final int checked[] = new int[1];
-        checked[0] = 0;
-        final String[] items = {
-                getString(R.string.store_on_sale_now),
-                getString(R.string.store_on_sale_after_off_work),
-                getString(R.string.store_on_sale_after_provided)
+    @NonNull
+    private Runnable notifyDataSetChanged() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.notifyDataSetChanged();
+            }
         };
-
-        return new AlertDialog.Builder(this)
-                .setTitle("选择重新恢复售卖的时间")
-                .setSingleChoiceItems(items, checked[0], new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        checked[0] = which;
-                    }
-                })
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String selected = items[checked[0]];
-                        final int option;
-                        if (selected.equals(getString(R.string.store_on_sale_now))) {
-                            action_chg_status(item, StorageItem.STORE_PROD_ON_SALE, "现在开始售卖, 请注意设置库存");
-                            return;
-                        } else if (selected.equals(getString(R.string.store_on_sale_after_off_work))) {
-                            option = StorageItem.RE_ONSALE_OFF_WORK;
-                        } else if (selected.equals(getString(R.string.store_on_sale_after_provided))) {
-                            option = StorageItem.RE_ONSALE_PROVIDED;
-                        } else {
-                            throw new IllegalStateException("impossible selection:" + selected);
-                        }
-                        action_set_on_sale_again(item, option, selected);
-                    }
-                }).setNegativeButton(R.string.cancel, null)
-                .create();
     }
 
     private AlertDialog createEditProvideDlg(final StorageItem item, LayoutInflater inflater) {
@@ -613,73 +551,4 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         return dlg;
     }
 
-    private void action_set_on_sale_again(final StorageItem item, final int option, final String optionLabel) {
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ResultBean rb = sad.chg_item_when_on_sale_again(currStore.getId(), item.getProduct_id(), option);
-                String msg;
-                Runnable uiCallback = null;
-                if (rb.isOk()) {
-                    msg = "已将" + item.getIdAndNameStr() + "设置为" + optionLabel + "!";
-                    uiCallback = new Runnable() {
-                        @Override
-                        public void run() {
-                            item.setWhen_sale_again(option);
-                            listAdapter.notifyDataSetChanged();
-                        }
-                    };
-                } else {
-                    msg = "设置失败:" + rb.getDesc();
-                }
-                Utility.toast(msg, StoreStorageActivity.this, uiCallback);
-                return null;
-            }
-        }.executeOnIO();
-    }
-
-    private void action_chg_status(final StorageItem item, final int destStatus, final String desc) {
-        this.action_chg_status(item, destStatus, desc, null);
-    }
-
-    private void action_chg_status(final StorageItem item, final int destStatus, final String desc, final Runnable clb) {
-        if (item != null) {
-            if (item.getStatus() == destStatus) {
-                return;
-            }
-            new MyAsyncTask<Void, Void, Void>() {
-                @Override protected Void doInBackground(Void... params) {
-                    ResultBean rb;
-                    try {
-                        rb = sad.chg_item_status(currStore.getId(), item.getProduct_id(), item.getStatus(), destStatus);
-                    } catch (ServiceException e) {
-                        rb = new ResultBean(false, "访问服务器出错");
-                    }
-
-                    String msg;
-                    Runnable uiCallback = null;
-                    if (rb.isOk()) {
-                        msg = "已将" + item.getIdAndNameStr() + "设置为" + desc + "!";
-                        uiCallback = new Runnable() {
-                            @Override
-                            public void run() {
-                                item.setStatus(destStatus);
-                                listAdapter.notifyDataSetChanged();
-
-                                if (clb != null) {
-                                    clb.run();
-                                }
-                            }
-                        };
-                    } else {
-                        msg = "设置失败:" + rb.getDesc();
-                    }
-                    Utility.toast(msg, StoreStorageActivity.this, uiCallback);
-                    return null;
-                }
-            }.executeOnIO();
-        } else {
-            Utility.toast("没有找到您指定的商品", this, null);
-        }
-    }
 }

@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,7 +21,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,11 +41,15 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
 public class StoreSelfStorageActivity extends AbstractActionBarActivity {
 
-    private static final int MENU_CONTEXT_DELETE_ID = 10991;
+    private static final int MENU_CONTEXT_DELETE_ID = 10992;
+    private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
+    private static final int MENU_CONTEXT_TO_SOLD_OUT_ID = 10994;
+
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
     private AutoCompleteTextView ctv;
+    private Runnable listAdapterChanged;
 
     private static final int FILTER_ON_SALE = 1;
     private static final int FILTER_RISK = 2;
@@ -104,46 +106,15 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
                 }
             });
 
-            Spinner currStoreSpinner = (Spinner) findViewById(R.id.spinner_curr_store);
-            final ArrayAdapter<Store> storeArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-            storeArrayAdapter.addAll(Cts.ST_HLG, Cts.ST_YYC);
-            storeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            currStoreSpinner.setAdapter(storeArrayAdapter);
-            currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            StoreStorageHelper.initStoreSpinner(this, currStore, new StoreStorageActivity.StoreChangeCallback() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Store newStore = storeArrayAdapter.getItem(position);
+                public void changed(Store newStore) {
                     if (currStore == null || currStore.getId() != newStore.getId()) {
                         currStore = newStore;
                         refreshData();
                     }
                 }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
             });
-
-            if (currStore == null) {
-                currStore = Cts.ST_HLG;
-            }
-
-//        Spinner filterCategories = (Spinner) findViewById(R.id.filter_categories);
-//        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-//                R.array.storage_categories_array, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        filterCategories.setAdapter(adapter);
-//        filterCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String feedback_source = adapter.getItem(position).toString();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
 
             btnOnSale = (Button) findViewById(R.id.filter_btn_on_sale);
             btnRisk = (Button) findViewById(R.id.filter_btn_risk);
@@ -248,73 +219,102 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        String title = listAdapter.getItem(info.position).getIdAndNameStr();
-        menu.setHeaderTitle(title);
+        StorageItem item = listAdapter.getItem(info.position);
+        if (item != null) {
+            String title = item.getIdAndNameStr();
+            menu.setHeaderTitle(title);
 
-        menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
+            menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
+            if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "设置何时重新上架");
+            } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
+            }
+        }
+
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+    public boolean onContextItemSelected(MenuItem mi) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
+        AppLogger.d("reset storage menu item pos=" + info.position);
+        final StorageItem item = this.listAdapter.getItem(info.position);
+        switch (mi.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                 AppLogger.d("reset storage item pos=" + info.position);
-                final StorageItem storageItem = this.listAdapter.getItem(info.position);
-                LayoutInflater inflater = (LayoutInflater)
-                        getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
-                final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
-                et.setText(String.valueOf(storageItem.getLeft_since_last_stat()));
-                AlertDialog dlg = new AlertDialog.Builder(this)
-                        .setTitle(String.format("设置库存数:(%s)", storageItem.getName()))
-                        .setView(npView)
-                        .setPositiveButton(R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        new MyAsyncTask<Void, Void, Void>(){
-                                            @Override
-                                            protected Void doInBackground(Void... params) {
+                if (item != null) {
+                    LayoutInflater inflater = (LayoutInflater)
+                            getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
+                    final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
+                    et.setText(String.valueOf(item.getLeft_since_last_stat()));
+                    AlertDialog dlg = new AlertDialog.Builder(this)
+                            .setTitle(String.format("设置库存数:(%s)", item.getName()))
+                            .setView(npView)
+                            .setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            new MyAsyncTask<Void, Void, Void>() {
+                                                @Override
+                                                protected Void doInBackground(Void... params) {
 
-                                                ResultBean rb;
-                                                final int lastStat = Integer.parseInt(et.getText().toString());
-                                                try {
-                                                    rb = sad.store_status_reset_stat_num(currStore.getId(), storageItem.getProduct_id(), lastStat);
-                                                } catch (ServiceException e) {
-                                                    rb = new ResultBean(false , "访问服务器出错");
-                                                }
-
-                                                final ResultBean finalRb = rb;
-                                                StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        if (finalRb.isOk()) {
-                                                            storageItem.setTotal_last_stat(lastStat);
-                                                            storageItem.setTotal_sold(0);
-                                                            storageItem.setLeft_since_last_stat(lastStat);
-                                                            listAdapter.notifyDataSetChanged();
-                                                            Toast.makeText(StoreSelfStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
-                                                        } else {
-                                                            Toast.makeText(StoreSelfStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
-                                                        }
+                                                    ResultBean rb;
+                                                    final int lastStat = Integer.parseInt(et.getText().toString());
+                                                    try {
+                                                        rb = sad.store_status_reset_stat_num(currStore.getId(), item.getProduct_id(), lastStat);
+                                                    } catch (ServiceException e) {
+                                                        rb = new ResultBean(false, "访问服务器出错");
                                                     }
-                                                });
-                                                return null;
-                                            }
-                                        }.executeOnIO();
-                                    }
-                                })
-                        .setNegativeButton(R.string.cancel,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                    }
-                                })
-                        .create();
-                dlg.show();
-                et.requestFocus();
+
+                                                    final ResultBean finalRb = rb;
+                                                    StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            if (finalRb.isOk()) {
+                                                                item.setTotal_last_stat(lastStat);
+                                                                item.setTotal_sold(0);
+                                                                item.setLeft_since_last_stat(lastStat);
+                                                                listAdapter.notifyDataSetChanged();
+                                                                Toast.makeText(StoreSelfStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                Toast.makeText(StoreSelfStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }
+                                                    });
+                                                    return null;
+                                                }
+                                            }.executeOnIO();
+                                        }
+                                    })
+                            .setNegativeButton(R.string.cancel,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                        }
+                                    })
+                            .create();
+                    dlg.show();
+                    et.requestFocus();
+                }
+                return true;
+            case MENU_CONTEXT_TO_SALE_ID:
+                listAdapterChanged = new Runnable() {
+                    @Override
+                    public void run() {
+                        listAdapter.notifyDataSetChanged();
+                    }
+                };
+                StoreStorageHelper.createSetOnSaleDlg(this, item, this.currStore, listAdapterChanged, true).show();
+                return true;
+            case MENU_CONTEXT_TO_SOLD_OUT_ID:
+                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
+                    @Override
+                    public void run() {
+                        listAdapter.notifyDataSetChanged();
+                        StoreStorageHelper.createSetOnSaleDlg(StoreSelfStorageActivity.this, item, currStore, listAdapterChanged, true).show();
+                    }
+                });
                 return true;
             default:
-                return super.onContextItemSelected(item);
+                return super.onContextItemSelected(mi);
         }
     }
 
