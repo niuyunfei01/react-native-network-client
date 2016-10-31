@@ -48,6 +48,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_STORE_SELF_STORAGE = 12;
 	private static final int TYPE_ORDER_LIST = 13;
 	public static final int TYPE_USER_COMPLAINS = 14;
+	private static final int TYPE_PROVIDE_LIST = 15;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
@@ -89,6 +90,10 @@ public class MineActivity extends AbstractActionBarActivity {
 				} else if (item.getType() == TYPE_STORE_PERF) {
 					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
 					intent.putExtra("url", String.format("%s/worker_stats_by_day.html", URLHelper.HTTP_MOBILE_STORES));
+					startActivity(intent);
+				} else if (item.getType() == TYPE_PROVIDE_LIST) {
+					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+					intent.putExtra("url", String.format("%s/provide_req_all.html", URLHelper.HTTP_MOBILE_STORES));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_SYNC_STATUS) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
@@ -170,13 +175,14 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部商品管理", -1, TYPE_STORE_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部供货管理", -1, TYPE_STORE_STORAGE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
 
 		String versionDesc = getVersionDesc();
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设   置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("同步监控", -1, TYPE_SYNC_STATUS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));

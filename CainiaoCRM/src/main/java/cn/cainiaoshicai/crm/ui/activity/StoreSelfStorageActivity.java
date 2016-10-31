@@ -82,12 +82,10 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
             ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                        CharSequence text = v.getText();
-                            listAdapter.filter(TextUtils.isEmpty(text) ? text.toString() : null);
-                            InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                    }
+                    CharSequence text = v.getText();
+                    listAdapter.filter(!TextUtils.isEmpty(text) ? text.toString() : null);
+                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     return true;
                 }
             });
@@ -174,8 +172,6 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
             ctvAdapter.addAll(storageItems);
             ctv.setAdapter(ctvAdapter);
         }
-
-//        lv.addFooterView(findViewById(R.id.paged_overview));
 
     }
 
@@ -325,7 +321,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
     private class FilterButtonClicked implements View.OnClickListener {
         private int clicked;
 
-        public FilterButtonClicked(int clicked) {
+        FilterButtonClicked(int clicked) {
             this.clicked = clicked;
         }
 

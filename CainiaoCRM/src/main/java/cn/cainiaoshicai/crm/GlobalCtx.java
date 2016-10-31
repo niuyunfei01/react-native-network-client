@@ -474,8 +474,12 @@ public class GlobalCtx extends Application {
         private int storeSoundUnknown;
         private int storeSoundhlg;
         private int storeSoundYyc;
+        private int storeSoundWj;
         private int seriousTimeoutSound;
         private int syncNotWorkSound;
+        private int storageEleStatus;
+        private int storageSoldout;
+        private int customerNewMsgSound;
         private int[] numberSound = new int[10];
         private volatile boolean soundLoaded = false;
 
@@ -489,8 +493,12 @@ public class GlobalCtx extends Application {
             storeSoundUnknown = soundPool.load(ctx, R.raw.store_unknown, 1);
             storeSoundYyc = soundPool.load(ctx, R.raw.store_yyc, 1);
             storeSoundhlg = soundPool.load(ctx, R.raw.store_hlg, 1);
+            storeSoundWj = soundPool.load(ctx, R.raw.store_wj, 1);
+            storageEleStatus = soundPool.load(ctx, R.raw.storage_ele_status, 1);
+            storageSoldout = soundPool.load(ctx, R.raw.storage_no_good, 1);
             seriousTimeoutSound = soundPool.load(ctx, R.raw.serious_timeout, 1);
             syncNotWorkSound = soundPool.load(ctx, R.raw.sync_not_work, 1);
+            customerNewMsgSound = soundPool.load(ctx, R.raw.customer_new_message, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -582,17 +590,29 @@ public class GlobalCtx extends Application {
             return this.play_double_sound(getStoreSound(store_id), newOrderSound);
         }
 
+        public boolean play_item_sold_out_sound(int store_id) {
+            return this.play_double_sound(getStoreSound(store_id), storageSoldout);
+        }
+
+        public boolean play_ele_status_changed(int store_id) {
+            return this.play_double_sound(getStoreSound(store_id), storageEleStatus);
+        }
+
         public boolean play_will_ready_timeout(int store_id, int totalLate) {
             return this.play_three_sound(getStoreSound(store_id), numberSound[totalLate - 1], readyDelayWarnSound);
         }
 
         public boolean play_sync_not_work_sound() {
             if (check_disabled()) return false;
+            return play_single_sound(this.syncNotWorkSound);
+        }
+
+        private boolean play_single_sound(final int sound) {
             if (soundLoaded) {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        soundPool.play(syncNotWorkSound, 1.0f, 1.0f, 1, 0, 1.0f);
+                        soundPool.play(sound, 1.0f, 1.0f, 1, 0, 1.0f);
                         return null;
                     }
                 }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
@@ -633,6 +653,12 @@ public class GlobalCtx extends Application {
             } else {
                 AppLogger.e("error: no sound!");
                 return false;
+            }
+        }
+
+        public void play_customer_new_msg() {
+            if (check_disabled()) {
+                this.play_single_sound(this.customerNewMsgSound);
             }
         }
     }

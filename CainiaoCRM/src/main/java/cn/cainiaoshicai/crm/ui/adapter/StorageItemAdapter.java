@@ -56,18 +56,12 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.prodStatus.setText(item.getStatusText());
 
-        if (item.getTotalInReq() > 0) {
+        if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
             holder.req_total.setText("调货：" + item.getTotalInReq());
             holder.req_total.setVisibility(View.VISIBLE);
         } else {
             holder.req_total.setVisibility(View.GONE);
         }
-
-        holder.riskNum.setText("安全库存: " + item.getRisk_min_stat());
-
-        holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
-        holder.sold_5day.setText(String.format("1-5:%.1f", item.getSold_5day()/5.0));
-        holder.sold_weekend.setText(String.format("末:%.1f", item.getSold_weekend()/2.0));
 
         if(item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT){
             holder.reOnSale.setVisibility(View.VISIBLE);
@@ -83,6 +77,13 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         } else {
             holder.reOnSale.setVisibility(View.GONE);
         }
+
+        holder.riskNum.setText("安全库存: " + item.getRisk_min_stat());
+
+        holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
+        holder.sold_5day.setText(String.format("1-5:%.1f", item.getSold_5day()/5.0));
+        holder.sold_weekend.setText(String.format("末:%.1f", item.getSold_weekend()/2.0));
+
 
         return (convertView);
     }

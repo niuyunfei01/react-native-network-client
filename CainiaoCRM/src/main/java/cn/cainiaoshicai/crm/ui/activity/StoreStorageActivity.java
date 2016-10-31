@@ -292,10 +292,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             if (currStore == null) {
                 if (stores != null) {
 
-                    int stoId = SettingUtility.getCurrentStorageStore();
-
+                    int storeId = SettingUtility.getCurrentStorageStore();
                     for (Store next : stores) {
-                        if (next.getId() == stoId) {
+                        if (next.getId() == storeId) {
                             currStore = next;
                             break;
                         }
