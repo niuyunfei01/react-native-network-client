@@ -3,10 +3,13 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.Collection;
 
@@ -197,5 +200,61 @@ public class StoreStorageHelper {
         } else {
             Utility.toast("没有找到您指定的商品", context, null);
         }
+    }
+
+    public static AlertDialog createEditLeftNum(final Activity activity, final StorageItem item,
+                                                LayoutInflater inflater, final Runnable succCallback) {
+        View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
+        final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
+        et.setText(String.valueOf(item.getLeft_since_last_stat()));
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(String.format("设置库存数:(%s)", item.getName()))
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+
+                                        ResultBean rb;
+                                        final int lastStat = Integer.parseInt(et.getText().toString());
+                                        try {
+                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            rb = sad.store_status_reset_stat_num(item.getStore_id(), item.getProduct_id(), lastStat);
+                                        } catch (ServiceException e) {
+                                            rb = new ResultBean(false, "访问服务器出错");
+                                        }
+
+                                        final ResultBean finalRb = rb;
+                                        activity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (finalRb.isOk()) {
+                                                    item.setTotal_last_stat(lastStat);
+                                                    item.setTotal_sold(0);
+                                                    item.setLeft_since_last_stat(lastStat);
+                                                    if (succCallback != null) {
+                                                        succCallback.run();
+                                                    }
+                                                    Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+                                        return null;
+                                    }
+                                }.executeOnIO();
+                            }
+                        })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        })
+                .create();
+        et.requestFocus();
+        return dlg;
     }
 }

@@ -167,14 +167,36 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         this.btn_provide_ship.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                async_set_status(ProvideReq.STATUS_SHIPPED, ProvideReq.STATUS_LOCKED);
+                AlertDialog dlg = new AlertDialog.Builder(StorageProvideActivity.this)
+                        .setTitle("通知门店：订货单已发出")
+                        .setMessage("请认真核对货品，保证件数；注意装车，保温；开车注意安全！")
+                        .setPositiveButton(R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        async_set_status(ProvideReq.STATUS_SHIPPED, ProvideReq.STATUS_LOCKED);
+                                    }
+                                })
+                        .setNegativeButton(R.string.cancel, null)
+                        .create();
+                dlg.show();
             }
         });
 
         this.btn_provide_accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                async_set_status(ProvideReq.STATUS_CONFIRMED, ProvideReq.STATUS_SHIPPED);
+                AlertDialog dlg = new AlertDialog.Builder(StorageProvideActivity.this)
+                        .setTitle("确认收货")
+                        .setMessage("请认真核对货品，检查品质；可以收货后，分类入库，并将缺货商品设为销售状态！")
+                        .setPositiveButton(R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        async_set_status(ProvideReq.STATUS_CONFIRMED, ProvideReq.STATUS_SHIPPED);
+                                    }
+                                })
+                        .setNegativeButton(R.string.cancel, null)
+                        .create();
+                dlg.show();
             }
         });
         this.btn_provide_lock.setOnClickListener(new View.OnClickListener() {
@@ -185,12 +207,12 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                 }
 
                 if (curr_req != null && curr_req.getTotal_req() == 0){
-                    Util.showToast(StorageProvideActivity.this, "调货单为空，还不能截单");
+                    Util.showToast(StorageProvideActivity.this, "调货单为空，还不能提交");
                     return;
                 }
                 AlertDialog dlg = new AlertDialog.Builder(StorageProvideActivity.this)
-                        .setTitle("截单")
-                        .setMessage("确定截单吗？截单以后不能再修改，默认明早发货")
+                        .setTitle("提交订货单")
+                        .setMessage("确定提交吗？提交以后不能再修改，默认明早发货")
                         .setPositiveButton(R.string.ok,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {

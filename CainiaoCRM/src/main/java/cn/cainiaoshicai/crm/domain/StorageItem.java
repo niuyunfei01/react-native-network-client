@@ -27,6 +27,7 @@ public class StorageItem {
     private int risk_min_stat;
     private int sold_5day;
     private int sold_weekend;
+    private int store_id;
 
     private int totalInReq;
     private String reqMark;
@@ -196,5 +197,13 @@ public class StorageItem {
             return "手动";
         }
         return "未设置";
+    }
+
+    public int getStore_id() {
+        return store_id;
+    }
+
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
     }
 }

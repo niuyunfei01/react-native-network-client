@@ -14,6 +14,7 @@ public class Cts {
 
     public static final int STORE_HLG = 1;
     public static final int STORE_YYC = 2;
+    public static final int STORE_WJ = 3;
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 

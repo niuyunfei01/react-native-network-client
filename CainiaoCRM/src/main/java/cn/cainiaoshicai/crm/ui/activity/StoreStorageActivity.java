@@ -42,7 +42,7 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
-public class StoreStorageActivity extends AbstractActionBarActivity {
+public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged {
 
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
     private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
@@ -66,7 +66,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
     private static class StatusItem {
         static final StatusItem[] STATUS = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
-                new StatusItem(FILTER_RISK, " 安全库存"),
+                new StatusItem(FILTER_RISK, " 待订货"),
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
         };
@@ -386,8 +386,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             String title = item.getIdAndNameStr(false);
             menu.setHeaderTitle(title);
 
-            menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
-
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "设置何时重新上架");
             } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
@@ -395,7 +393,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
             }
 
             if (item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
-                menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑调货" : "加入调货");
+                menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
             }
         }
     }
@@ -408,56 +406,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
 
         switch (item.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
-                View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
-                final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
                 if (storageItem != null) {
-                    et.setText(String.valueOf(storageItem.getLeft_since_last_stat()));
-                    AlertDialog dlg = new AlertDialog.Builder(this)
-                            .setTitle(String.format("设置库存数:(%s)", storageItem.getName()))
-                            .setView(npView)
-                            .setPositiveButton(R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                            new MyAsyncTask<Void, Void, Void>() {
-                                                @Override
-                                                protected Void doInBackground(Void... params) {
-
-                                                    ResultBean rb;
-                                                    final int lastStat = Integer.parseInt(et.getText().toString());
-                                                    try {
-                                                        rb = sad.store_status_reset_stat_num(currStore.getId(), storageItem.getProduct_id(), lastStat);
-                                                    } catch (ServiceException e) {
-                                                        rb = new ResultBean(false, "访问服务器出错");
-                                                    }
-
-                                                    final ResultBean finalRb = rb;
-                                                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            if (finalRb.isOk()) {
-                                                                storageItem.setTotal_last_stat(lastStat);
-                                                                storageItem.setTotal_sold(0);
-                                                                storageItem.setLeft_since_last_stat(lastStat);
-                                                                listAdapter.notifyDataSetChanged();
-                                                                Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
-                                                            } else {
-                                                                Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
-                                                            }
-                                                        }
-                                                    });
-                                                    return null;
-                                                }
-                                            }.executeOnIO();
-                                        }
-                                    })
-                            .setNegativeButton(R.string.cancel,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                        }
-                                    })
-                            .create();
+                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum(this, storageItem, inflater, notifyDataSetChanged());
                     dlg.show();
-                    et.requestFocus();
                     return true;
                 } else {
                     return false;
@@ -469,7 +420,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                 StoreStorageHelper.action_chg_status(this, currStore, storageItem, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
                     @Override
                     public void run() {
-                        listAdapter.notifyDataSetChanged();
+                        listAdapterRefresh();
                         StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, storageItem, currStore, notifyDataSetChanged()).show();
                     }
                 });
@@ -483,12 +434,17 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         }
     }
 
+    private void listAdapterRefresh() {
+        listAdapter.notifyDataSetChanged();
+        listAdapter.filter("");
+    }
+
     @NonNull
-    private Runnable notifyDataSetChanged() {
+    public Runnable notifyDataSetChanged() {
         return new Runnable() {
             @Override
             public void run() {
-                listAdapter.notifyDataSetChanged();
+                 listAdapterRefresh();
             }
         };
     }
@@ -499,10 +455,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
         final EditText remark = (EditText) npView.findViewById(R.id.remark);
 
         int totalInReq = item.getTotalInReq();
-        totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : item.getRisk_min_stat()));
+        int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
+        totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
         remark.setText(item.getReqMark());
         AlertDialog dlg = new AlertDialog.Builder(this)
-                .setTitle(String.format("编辑备货:(%s)", item.getName()))
+                .setTitle(String.format("订货:(%s)", item.getName()))
                 .setView(npView)
                 .setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
@@ -528,7 +485,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity {
                                                     item.setTotalInReq(total_req_no);
                                                     item.setReqMark(remarkTxt);
                                                     updateReqListBtn(total_req_cnt);
-                                                    listAdapter.notifyDataSetChanged();
+                                                    listAdapterRefresh();
                                                     Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
                                                 } else {
                                                     Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();

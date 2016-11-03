@@ -55,6 +55,8 @@ import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
 
+import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
+
 public class GlobalCtx extends Application {
 
 
@@ -380,7 +382,7 @@ public class GlobalCtx extends Application {
     public static boolean isAutoPrint(int store_id) {
         return store_id == Cts.STORE_UNKNOWN
                 || (SettingUtility.isAutoPrintHLG() && store_id == Cts.STORE_HLG)
-                || (SettingUtility.isAutoPrintYYC() && store_id == Cts.STORE_YYC);
+                || (SettingUtility.isAutoPrintYYC() && store_id == STORE_YYC);
     }
 
     public SoundManager getSoundManager() {
@@ -579,8 +581,10 @@ public class GlobalCtx extends Application {
         private int getStoreSound(int store_id) {
             if (store_id == Cts.STORE_HLG) {
                 return storeSoundhlg;
-            } else if (store_id == Cts.STORE_YYC) {
+            } else if (store_id == STORE_YYC) {
                 return storeSoundYyc;
+            } else if (store_id == Cts.STORE_WJ){
+              return storeSoundWj;
             } else {
                 return storeSoundUnknown;
             }
@@ -603,8 +607,7 @@ public class GlobalCtx extends Application {
         }
 
         public boolean play_sync_not_work_sound() {
-            if (check_disabled()) return false;
-            return play_single_sound(this.syncNotWorkSound);
+            return !check_disabled() && play_single_sound(this.syncNotWorkSound);
         }
 
         private boolean play_single_sound(final int sound) {

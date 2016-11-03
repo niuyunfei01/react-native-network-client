@@ -114,6 +114,10 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
             }
         }
 
+        if (item.getType() != MineActivity.TYPE_ORDER_DELAYED) {
+            holder.delayedOverview.setVisibility(View.GONE);
+        }
+
         if (item.getType() != MineActivity.TYPE_USER_ITEMS) {
             holder.total_complain_done.setVisibility(View.GONE);
             holder.total_complain_todo.setVisibility(View.GONE);

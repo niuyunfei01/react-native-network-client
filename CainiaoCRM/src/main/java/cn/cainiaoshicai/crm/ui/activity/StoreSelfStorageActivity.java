@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -39,7 +40,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 
-public class StoreSelfStorageActivity extends AbstractActionBarActivity {
+public class StoreSelfStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged {
 
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
     private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
@@ -223,8 +224,6 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
         if (item != null) {
             String title = item.getIdAndNameStr();
             menu.setHeaderTitle(title);
-
-            menu.add(Menu.NONE, MENU_CONTEXT_DELETE_ID, Menu.NONE, "设置库存");
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "设置何时重新上架");
             } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
@@ -232,6 +231,17 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity {
             }
         }
 
+    }
+
+
+    @NonNull
+    public Runnable notifyDataSetChanged() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.notifyDataSetChanged();
+            }
+        };
     }
 
     @Override

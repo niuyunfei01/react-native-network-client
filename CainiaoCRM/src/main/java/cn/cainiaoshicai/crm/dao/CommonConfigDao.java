@@ -120,6 +120,7 @@ public class CommonConfigDao {
         private String mobilephone;
         private int id;
         private int position;
+        private int[] pos_list;
 
         public Worker(String nickname, String mobilephone, int userId) {
             this.nickname = nickname;
@@ -161,6 +162,14 @@ public class CommonConfigDao {
 
         public boolean isExtShipWorker() {
             return this.getPosition() == Cts.POSITION_EXT_SHIP;
+        }
+
+        public int[] getPos_list() {
+            return pos_list;
+        }
+
+        public void setPos_list(int[] pos_list) {
+            this.pos_list = pos_list;
         }
     }
 

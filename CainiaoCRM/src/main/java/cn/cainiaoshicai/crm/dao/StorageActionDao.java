@@ -213,6 +213,7 @@ public class StorageActionDao {
                     si.setTotalInReq(sp.getReq_total());
                     si.setReqMark(sp.getReq_mark());
                     si.setWhen_sale_again(sp.getRe_on_sale_time());
+                    si.setStore_id(sp.getStore_id());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {

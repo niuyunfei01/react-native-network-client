@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.ui.adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import java.util.List;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
@@ -30,11 +33,11 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     public View getView(int pos, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
+        final LayoutInflater inflater = context.getLayoutInflater();
         if (convertView != null) {
             holder = (ViewHolder) convertView.getTag();
         } else {
             holder = new ViewHolder();
-            LayoutInflater inflater = context.getLayoutInflater();
             View row = inflater.inflate(R.layout.storage_status_row, null);
 
             holder.label = (TextView) row.findViewById(R.id.product_name);
@@ -51,13 +54,13 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             convertView.setTag(holder);
         }
 
-        StorageItem item = this.getItem(pos);
+        final StorageItem item = this.getItem(pos);
         holder.label.setText(item.getIdAndNameStr());
 
         holder.prodStatus.setText(item.getStatusText());
 
         if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
-            holder.req_total.setText("调货：" + item.getTotalInReq());
+            holder.req_total.setText("订货:" + item.getTotalInReq());
             holder.req_total.setVisibility(View.VISIBLE);
         } else {
             holder.req_total.setVisibility(View.GONE);
@@ -78,12 +81,20 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.reOnSale.setVisibility(View.GONE);
         }
 
-        holder.riskNum.setText("安全库存: " + item.getRisk_min_stat());
+        holder.riskNum.setText("最低库存: " + item.getRisk_min_stat());
 
         holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
-        holder.sold_5day.setText(String.format("1-5:%.1f", item.getSold_5day()/5.0));
-        holder.sold_weekend.setText(String.format("末:%.1f", item.getSold_weekend()/2.0));
+        holder.leftNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                dlg.show();
+            }
+        });
 
+        holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day()/5.0));
+        holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
 
         return (convertView);
     }

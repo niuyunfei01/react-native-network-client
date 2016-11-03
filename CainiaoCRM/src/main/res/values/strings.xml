@@ -227,8 +227,8 @@
     <string name="status_deleted">已作废</string>
     <string name="menu_order_chg_store">修改店铺</string>
     <string name="menu_provide_edit">订货</string>
-    <string name="menu_provide_lock">截单</string>
-    <string name="menu_provide_locked">已截单</string>
+    <string name="menu_provide_lock">提交</string>
+    <string name="menu_provide_locked">已提交</string>
     <string name="menu_provide_ship">订单发货</string>
     <string name="menu_provide_accept">订单收货</string>
     <string name="store_on_sale_now">库里有货或临时可采购，立即开卖</string>

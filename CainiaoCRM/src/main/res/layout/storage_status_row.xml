@@ -30,7 +30,7 @@
         android:layout_toEndOf="@id/store_prod_status"
         android:layout_below="@id/product_name"
         android:background="@drawable/list_text_border_green_mini"
-        android:textSize="@dimen/mini_text"
+        android:textSize="@dimen/tiny_text"
         android:layout_marginStart="2dp"
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
@@ -59,7 +59,7 @@
         android:visibility="gone"
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
-        android:textSize="@dimen/mini_text"
+        android:textSize="@dimen/tiny_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -85,7 +85,7 @@
         android:paddingTop="10dp"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:textSize="16sp"
+        android:textSize="@dimen/tiny_text"
         android:textColor="#000000"
         android:typeface="sans"/>
 
@@ -99,7 +99,7 @@
         android:paddingBottom="5dp"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:textSize="16sp"
+        android:textSize="@dimen/tiny_text"
         android:textColor="#000000"
         android:typeface="sans"/>
 
