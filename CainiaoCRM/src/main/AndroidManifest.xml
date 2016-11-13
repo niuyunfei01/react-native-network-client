@@ -17,7 +17,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="232"
+    android:versionCode="235"
     android:versionName="2.2.1">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
@@ -115,6 +115,8 @@
         </activity>
         <activity android:name=".ui.activity.FeedbackViewActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        </activity>
+        <activity android:name=".ui.activity.FeedbackWebViewActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
         </activity>
         <activity android:name=".ui.activity.StorageProvideActivity" android:screenOrientation="portrait"
             android:parentActivityName=".ui.activity.StoreStorageActivity">

@@ -4,16 +4,24 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
+import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -21,6 +29,8 @@ import cn.cainiaoshicai.crm.orders.domain.ResultList;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.ui.adapter.FeedbackAdapter;
+import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
+import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper.StoreChangeCallback;
 
 public class FeedbackListsActivity extends AbstractActionBarActivity {
 
@@ -30,34 +40,56 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
 
     private ListType listType = ListType.NONE;
     private String searchTerm = "";
+    private Store currStore = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
+
+
         if (savedInstanceState == null) {
-            this.setContentView(R.layout.order_list);
+            this.setContentView(R.layout.user_feedback_list_all);
 
-            this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar bar = this.getSupportActionBar();
+            bar.setDisplayShowHomeEnabled(false);
+            bar.setDisplayUseLogoEnabled(false);
+            bar.setDisplayHomeAsUpEnabled(false);
 
-            ListView listView = (ListView) findViewById(R.id.orderListView);
+            bar.setCustomView(R.layout.user_feedback_list_title);
+
+            Spinner currStoreSpinner = (Spinner) bar.getCustomView().findViewById(R.id.spinner_curr_store);
+            StoreSpinnerHelper.initStoreSpinner(this, null, new StoreChangeCallback(){
+                @Override
+                public void changed(Store newStore) {
+                }
+
+            },  true, currStoreSpinner);
+
+            bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
+                    | ActionBar.DISPLAY_SHOW_HOME);
+
+            ListView listView = (ListView) findViewById(R.id.user_feedback_list);
             adapter = new FeedbackAdapter<>(this, android.R.layout.activity_list_item);
             listView.setAdapter(adapter);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent openFeedback = new Intent(FeedbackListsActivity.this, FeedbackViewActivity.class);
                     Feedback item = adapter.getItem(position);
-                    openFeedback.putExtra("fb", item);
-                    try {
-                        FeedbackListsActivity.this.startActivity(openFeedback);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (item != null) {
+                        Intent openFeedback = new Intent(FeedbackListsActivity.this, FeedbackWebViewActivity.class);
+                        openFeedback.putExtra("fb", item);
+                        openFeedback.putExtra("fb_id", item.getId());
+                        try {
+                            FeedbackListsActivity.this.startActivity(openFeedback);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
-
 
             swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.list_order_view);
             swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -89,7 +121,35 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
             onTypeChanged();
             setTitle(String.format("%s客诉%s", this.listType.getName(), TextUtils.isEmpty(this.searchTerm)?"" : ("中搜索：" + searchTerm)));
         }
+    }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_process:
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                return true;
+            case R.id.menu_accept:
+                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
+                return true;
+            case R.id.menu_search:
+                this.onSearchRequested();
+                return true;
+            case R.id.menu_mine:
+                startActivity(new Intent(getApplicationContext(), MineActivity.class));
+                return true;
+            case R.id.menu_user_feedback:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void onTypeChanged() {

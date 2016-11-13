@@ -15,52 +15,40 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
         <TextView
-            android:textSize="24sp"
-            android:textColor="@color/light_blue"
             android:ellipsize="middle"
             android:id="@+id/feedbackId"
-            android:paddingStart="5.0dip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="2.0dip"
             android:layout_alignParentStart="true"
-            android:text="#13"
-            android:singleLine="true"
             android:layout_marginBottom="5dip"/>
         <TextView
             android:id="@+id/fb_from_user"
             android:textColor="#555555"
             android:ellipsize="middle"
-            android:paddingLeft="3.0dip"
+            android:paddingStart="3.0dip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="1.0dip"
             android:layout_toEndOf="@+id/feedbackId"
             android:layout_centerVertical="true"
             android:text="张先生"/>
 
-        <TextView
-            android:textColor="@color/light_blue"
-                android:ellipsize="middle"
-                android:id="@+id/fb_reported_at"
-                android:paddingLeft="1.0dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2.0dip"
-                android:text="立即"
-                android:layout_toEndOf="@+id/fb_from_user"
-                android:layout_centerVertical="true"
-                android:singleLine="true"/>
+        <TextView android:id="@+id/fb_current_assigned"
+            android:layout_toStartOf="@+id/fb_status"
+            android:text="张蕾"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/fb_status"
-            android:layout_marginEnd="10dip"
+            android:layout_marginStart="10dip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:text="处理中"/>
+
     </RelativeLayout>
 
     <TextView
@@ -72,5 +60,26 @@
             android:layout_marginTop="8dp"
             android:text="总是漏掉东西，忍无可忍了"
             android:textSize="16.0sp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/fb_reported_by"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/fb_reported_at"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2.0dip"
+            android:layout_toEndOf="@+id/fb_reported_by"
+            android:ellipsize="middle"
+            android:textColor="@color/light_blue" />
+
+    </RelativeLayout>
 
 </LinearLayout>

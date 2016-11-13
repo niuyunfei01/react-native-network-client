@@ -161,7 +161,7 @@ public class Utility {
      */
     public static Bundle parseUrl(String url) {
         // hack to prevent MalformedURLException
-        url = url.replace("weiboconnect", "http");
+        url = url.replace("crm_connect:", "http");
         try {
             URL u = new URL(url);
             Bundle b = decodeUrl(u.getQuery());

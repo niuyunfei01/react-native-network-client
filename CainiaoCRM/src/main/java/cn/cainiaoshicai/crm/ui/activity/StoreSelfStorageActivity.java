@@ -39,6 +39,7 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
+import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 public class StoreSelfStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged {
 
@@ -107,7 +108,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
                 }
             });
 
-            StoreStorageHelper.initStoreSpinner(this, currStore, new StoreStorageActivity.StoreChangeCallback() {
+            StoreSpinnerHelper.initStoreSpinner(this, currStore, new StoreSpinnerHelper.StoreChangeCallback() {
                 @Override
                 public void changed(Store newStore) {
                     if (currStore == null || currStore.getId() != newStore.getId()) {

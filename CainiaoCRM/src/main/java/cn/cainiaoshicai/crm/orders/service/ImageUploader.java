@@ -36,7 +36,7 @@ public class ImageUploader {
 //
 //            // Send it
 //            httpPost.setEntity(multipartContent);
-//            HttpResponse response = httpClient.execute(httpPost, httpContext);
+//            HttpResponse response = httpClient.onPageFinished(httpPost, httpContext);
 //            StatusLine statusLine = response.getStatusLine();
 //
 //            if (statusLine.getStatusCode() == 200) {

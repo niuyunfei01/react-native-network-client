@@ -169,6 +169,9 @@ public class RemindersActivity extends AbstractActionBarActivity implements Acti
             case R.id.menu_search:
                 this.onSearchRequested();
                 return true;
+            case R.id.menu_user_feedback:
+                startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -11,11 +11,19 @@
         android:title="@string/menu_manage_order"
         android:icon="@drawable/ic_action_view_as_list"
         support:showAsAction="ifRoom"/>
+
+      <item
+        android:id="@+id/menu_user_feedback"
+        android:title="@string/menu_user_feedback"
+        android:icon="@drawable/mq_ic_emoji_normal"
+        support:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/menu_mine"
         android:title="@string/menu_mine"
         android:icon="@drawable/ic_action_settings"
         support:showAsAction="ifRoom"/>
+
     <item android:id="@+id/menu_search"
         android:title="@string/action_search"
         android:icon="@drawable/ic_action_search"

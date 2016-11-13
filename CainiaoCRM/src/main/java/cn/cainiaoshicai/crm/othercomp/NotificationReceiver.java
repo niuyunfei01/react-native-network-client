@@ -86,7 +86,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 					soundManager.play_serious_timeout(notify.getNotify_workers());
 				} else if (Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
 					int store_id = notify.getStore_id();
-					if (store_id > 0) {
+					if (store_id > 0 && "sold_out".equals(notify.getSound())) {
 						soundManager.play_item_sold_out_sound(store_id);
 					}
 				} else if (Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
@@ -98,7 +98,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 					if (params != null && "eleme".equals(params.get("notify_sound"))) {
 						String storeIdS = params.get("store_id");
 						if (storeIdS != null && Integer.parseInt(storeIdS) > 0)
-						soundManager.play_ele_status_changed(Integer.parseInt(storeIdS));
+							soundManager.play_ele_status_changed(Integer.parseInt(storeIdS));
 					}
 				} else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
 					soundManager.play_customer_new_msg();
@@ -132,7 +132,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 					Class targetClazz = notify.isStorage_provided_self() ?
 							StoreSelfStorageActivity.class :
-								StoreStorageActivity.class;
+							StoreStorageActivity.class;
 					i = new Intent(context, targetClazz);
 
 				} else {
@@ -233,6 +233,7 @@ class Notify {
 	private Set<Integer> notify_workers;
 
 	private boolean storage_provided_self;
+	private String sound;
 
 	public String getType() {
 		return type;
@@ -298,5 +299,13 @@ class Notify {
 
 	public void setStorage_provided_self(boolean storage_provided_self) {
 		this.storage_provided_self = storage_provided_self;
+	}
+
+	public String getSound() {
+		return sound;
+	}
+
+	public void setSound(String sound) {
+		this.sound = sound;
 	}
 }

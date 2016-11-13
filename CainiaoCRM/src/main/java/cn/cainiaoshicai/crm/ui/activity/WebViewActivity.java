@@ -1,16 +1,24 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 
 /**
  * Created by liuzhr on 5/17/16.
@@ -22,6 +30,7 @@ public class WebViewActivity extends AbstractActionBarActivity {
 
     protected WebView mWebView;
     protected int contentViewRes;
+    private MenuItem refreshItem;
 
     protected int from;
 
@@ -38,9 +47,101 @@ public class WebViewActivity extends AbstractActionBarActivity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
-        mWebView.setWebViewClient(new MyAppWebViewClient());
+        MyAppWebViewClient client = new MyAppWebViewClient();
+        client.setCallback(new MyAppWebViewClient.PageCallback() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (!url.equals("about:blank")) {
+                    completeRefresh();
+                }
+            }
 
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                Toast.makeText(WebViewActivity.this, "发生错误" + error, Toast.LENGTH_LONG).show();
+                AppLogger.e("web view error:" + error);
+            }
+
+            public void handleRedirectUrl(WebView view, String url) {
+                Bundle values = Utility.parseUrl(url);
+                String error = values.getString("error");
+                String error_code = values.getString("error_code");
+
+                Intent intent = new Intent();
+                intent.putExtras(values);
+
+                if (error == null && error_code == null) {
+
+                    String access_token = values.getString("access_token");
+                    String expires_time = values.getString("expires_in");
+                    WebViewActivity.this.setResult(RESULT_OK, intent);
+        //            new OAuthTask(this).onPageFinished(access_token, expires_time);
+                } else {
+                    Toast.makeText(WebViewActivity.this, getString(R.string.you_cancel_login),
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                if (Utility.isWeiboAccountDomainLink(url)) {
+//                    String result = Utility.getDomainFromWeiboAccountLink(url);
+//                    Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+//                    intent.putExtra("domain", result);
+//                    getActivity().startActivity(intent);
+//                    getActivity().finish();
+//                    return true;
+//                } else if (Utility.isWeiboMid(url)) {
+//                    String mid = Utility.getMidFromUrl(url);
+//                    RedirectLinkToWeiboIdTask task = new RedirectLinkToWeiboIdTask(
+//                            BrowserWebFragment.this, url, mid);
+//                    task.executeOnExecutor(MyAsyncTask.THREAD_POOL_EXECUTOR);
+//                    return true;
+//                } else {
+//                    view.loadUrl(url);
+//                    return true;
+//                }
+
+
+
+                if (url != null) {
+                    if (url.indexOf("/stores/provide_list.html") > 0) {
+                        Intent intent = new Intent(WebViewActivity.this, StorageProvideActivity.class);
+                        intent.putExtra("req_id", Integer.parseInt(Utility.parseUrl(url).getString("req_id")));
+                        startActivity(intent);
+                        return true;
+                    } else if (url.indexOf("/stores/view_order") > 0) {
+                        Intent intent = new Intent(WebViewActivity.this, OrderSingleActivity.class);
+                        String wm_id = Utility.parseUrl(url).getString("wm_id");
+                        if (wm_id != null) {
+                            intent.putExtra("order_id", Integer.parseInt(wm_id));
+                        }
+                        startActivity(intent);
+                        return true;
+                    }
+                }
+
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        mWebView.setWebViewClient(client);
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
+    }
+
+    private void completeRefresh() {
+        if (refreshItem.getActionView() != null) {
+            refreshItem.getActionView().clearAnimation();
+            refreshItem.setActionView(null);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.webview_menu, menu);
+        refreshItem = menu.findItem(R.id.menu_refresh);
+        return true;
     }
 
     @Override

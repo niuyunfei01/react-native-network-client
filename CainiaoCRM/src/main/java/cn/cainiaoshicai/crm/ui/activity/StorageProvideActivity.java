@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -62,6 +64,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
 
         Intent intent = getIntent();
         int store_id = intent.getIntExtra("store_id", 0);
+        int req_id = intent.getIntExtra("req_id", 0);
 
         android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
@@ -78,17 +81,38 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         webSettings.setJavaScriptEnabled(true);
 
         MyAppWebViewClient client = new MyAppWebViewClient();
-        client.setFinishCallback(new MyAppWebViewClient.PageCallback() {
+        client.setCallback(new MyAppWebViewClient.PageCallback() {
             @Override
-            public void execute(WebView view, String url) {
+            public void onPageFinished(WebView view, String url) {
                 StorageProvideActivity.this.completeRefresh();
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+
+            }
+
+            @Override
+            public void handleRedirectUrl(WebView view, String url) {
+
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null && url.indexOf("/stores/provide_req_all.html") > 0) {
+                    Intent intent = new Intent(StorageProvideActivity.this, GeneralWebViewActivity.class);
+                    intent.putExtra("url", url);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
             }
         });
 
         mWebView.setWebViewClient(client);
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
-        this.init_data(store_id);
+        this.init_data(store_id, req_id);
     }
 
     private void updateBtnStatus() {
@@ -123,7 +147,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                 case ProvideReq.STATUS_SHIPPED:
                     this.btn_provide_accept.setVisibility(View.VISIBLE);
                     this.btn_provide_ship.setVisibility(View.VISIBLE);
-                    this.btn_provide_ship.setText("已出发");
+                    this.btn_provide_ship.setText("配送在途");
 
                     this.btn_provide_edit.setVisibility(View.GONE);
                     this.btn_provide_lock.setVisibility(View.GONE);
@@ -133,8 +157,9 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         }
     }
 
-    private void init_data(int store_id) {
-        url = String.format("%s/provide_list/%s.html", URLHelper.HTTP_MOBILE_STORES, store_id) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken()+"&client_id="+GlobalCtx.getInstance().getCurrentAccountId();
+    private void init_data(int store_id, int req_id) {
+        update_loading_url(store_id, req_id);
+
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
         new MyAsyncTask<Integer, Void, Void>() {
@@ -142,7 +167,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
             @Override
             protected Void doInBackground(Integer... params) {
                 try {
-                    ResultObject ro = sad.store_provide_req(params[0]);
+                    ResultObject ro = sad.store_provide_req(params[0], params[1]);
                     if (ro.isOk()) {
                         final ProvideReq req = (ProvideReq) ro.getObj();
                         if (req != null) {
@@ -151,7 +176,13 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                             StorageProvideActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    StorageProvideActivity.this.updateBtnStatus();
+                                    StorageProvideActivity act = StorageProvideActivity.this;
+                                    act.updateBtnStatus();
+                                    android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
+                                    if (actionBar != null) {
+                                        String storeName = GlobalCtx.getApplication().getStoreName(req.getStore_id());
+                                        actionBar.setTitle(storeName + "订货单");
+                                    }
                                 }
                             });
                         }
@@ -161,12 +192,17 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                 }
                 return null;
             }
-        }.executeOnIO(store_id);
+        }.executeOnIO(store_id, req_id);
 
 
         this.btn_provide_ship.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (curr_req.getStatus() != ProvideReq.STATUS_LOCKED)  {
+                    return;
+                }
+
                 AlertDialog dlg = new AlertDialog.Builder(StorageProvideActivity.this)
                         .setTitle("通知门店：订货单已发出")
                         .setMessage("请认真核对货品，保证件数；注意装车，保温；开车注意安全！")
@@ -185,9 +221,16 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         this.btn_provide_accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (curr_req != null && curr_req.getStatus() != ProvideReq.STATUS_SHIPPED) {
+                    return;
+                }
+
                 AlertDialog dlg = new AlertDialog.Builder(StorageProvideActivity.this)
                         .setTitle("确认收货")
-                        .setMessage("请认真核对货品，检查品质；可以收货后，分类入库，并将缺货商品设为销售状态！")
+                        .setMessage("请认真核对货品，检查品质；品质、数量不符合可以拒收！\n" +
+                                "确认收货后，库存将自动增加；\n" +
+                                "设定总部来货后上架的商品将自动上架销售。")
                         .setPositiveButton(R.string.ok,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -199,6 +242,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                 dlg.show();
             }
         });
+
         this.btn_provide_lock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -240,6 +284,16 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
             }
         });
 
+    }
+
+    private void update_loading_url(int store_id, int req_id) {
+        String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
+        String gotoUrl = String.format("%s/provide_list/%s.html", URLHelper.HTTP_MOBILE_STORES, store_id)
+                + "?access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;
+        if (req_id > 0) {
+            gotoUrl += "&req_id=" + req_id;
+        }
+        url = gotoUrl;
     }
 
     private void async_set_status(final int toStatus, final int fromStatus) {
@@ -291,6 +345,10 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         iv.startAnimation(rotation);
 
         refreshItem.setActionView(iv);
+
+        if (curr_req != null) {
+            update_loading_url(curr_req.getStore_id(), curr_req.getId());
+        }
         this.mWebView.loadUrl(this.url);
     }
 

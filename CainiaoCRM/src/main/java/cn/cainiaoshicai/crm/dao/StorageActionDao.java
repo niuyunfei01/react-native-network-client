@@ -53,9 +53,9 @@ public class StorageActionDao {
         return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d", pid, store_id, total_req), params);
     }
 
-    public ResultObject store_provide_req(Integer storeId) throws ServiceException {
+    public ResultObject store_provide_req(Integer storeId, int reqId) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
-        String json = getJson("/store_curr_provide_req/" + storeId, params);
+        String json = getJson("/store_curr_provide_req/" + storeId +"/" + reqId, params);
 
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();

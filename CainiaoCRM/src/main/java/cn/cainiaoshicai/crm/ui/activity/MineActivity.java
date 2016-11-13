@@ -69,7 +69,7 @@ public class MineActivity extends AbstractActionBarActivity {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
-							Uri.parse("http://www.cainiaoshicai.cn/CainiaoCRM-release.apk"));
+							Uri.parse("http://www.cainiaoshicai.cn/cc.apk"));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_VERSION_LOGOUT) {
 					new AlertDialog.Builder(MineActivity.this)
@@ -170,21 +170,20 @@ public class MineActivity extends AbstractActionBarActivity {
 		statInTime.setTotalSeriousLate(Integer.parseInt(performStat.get("totalSeriousLate")));
 		inTimeParams.add(statInTime);
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("客户投诉", -1, TYPE_USER_COMPLAINS, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
-
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部供货管理", -1, TYPE_STORE_STORAGE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
+
 
 		String versionDesc = getVersionDesc();
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设   置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("同步监控", -1, TYPE_SYNC_STATUS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("同步监控", -1, TYPE_SYNC_STATUS, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));
 	}
 
@@ -225,6 +224,9 @@ public class MineActivity extends AbstractActionBarActivity {
 				this.onSearchRequested();
 				return true;
 			case R.id.menu_mine:
+				return true;
+			case R.id.menu_user_feedback:
+				startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

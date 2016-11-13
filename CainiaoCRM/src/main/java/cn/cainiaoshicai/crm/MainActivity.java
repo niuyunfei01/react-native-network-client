@@ -42,6 +42,7 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
+import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
@@ -273,6 +274,9 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 return true;
             case R.id.menu_mine:
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
+                return true;
+            case R.id.menu_user_feedback:
+                startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

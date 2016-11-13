@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -117,10 +119,25 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         webSettings.setJavaScriptEnabled(true);
 
         MyAppWebViewClient client = new MyAppWebViewClient();
-        client.setFinishCallback(new MyAppWebViewClient.PageCallback() {
+        client.setCallback(new MyAppWebViewClient.PageCallback() {
             @Override
-            public void execute(WebView view, String url) {
+            public void onPageFinished(WebView view, String url) {
                 OrderSingleActivity.this.completeRefresh();
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+
+            }
+
+            @Override
+            public void handleRedirectUrl(WebView view, String url) {
+
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
             }
         });
 
@@ -243,7 +260,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
             }
         }
 
-        url = String.format("%s/single_order/android/%s/%s.html", HTTP_MOBILE_STORES, platform, platformOid) + "?access_token=" + GlobalCtx.getInstance().getSpecialToken()+"&client_id="+GlobalCtx.getInstance().getCurrentAccountId();
+        String token = GlobalCtx.getInstance().getSpecialToken();
+        String clientId = GlobalCtx.getInstance().getCurrentAccountId();
+        url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", HTTP_MOBILE_STORES, token, order.getId(), clientId);
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }

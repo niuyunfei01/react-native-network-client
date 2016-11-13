@@ -41,6 +41,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
+import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged {
 
@@ -255,7 +256,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }, 50);
             }
 
-            StoreStorageHelper.initStoreSpinner(this, this.currStore, new StoreChangeCallback() {
+            StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
                 @Override
                 public void changed(Store newStore) {
                     if (newStore != null) {
@@ -272,10 +273,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             updateFilterBtnLabels(0, 0, 0, 0, 0);
             refreshData();
         }
-    }
-
-    interface StoreChangeCallback {
-        void changed(Store newStore);
     }
 
     private void resetListAdapter(ArrayList<StorageItem> storageItems) {

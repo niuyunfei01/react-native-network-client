@@ -24,58 +24,13 @@ import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
+import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 /**
  * Created by liuzhr on 10/31/16.
  */
 
 public class StoreStorageHelper {
-
-    public static void initStoreSpinner(Activity activity, Store currStore,
-                                        final StoreStorageActivity.StoreChangeCallback storeChgCallback) {
-        Spinner currStoreSpinner = (Spinner) activity.findViewById(R.id.spinner_curr_store);
-        final ArrayAdapter<Store> arrAdapter = new ArrayAdapter<>(activity, R.layout.spinner_item_small);
-        arrAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
-        currStoreSpinner.setAdapter(arrAdapter);
-        currStoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Store newStore = arrAdapter.getItem(position);
-                storeChgCallback.changed(newStore);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        Collection<Store> stores = GlobalCtx.getInstance().listStores();
-        if (stores == null || stores.isEmpty()) {
-            Utility.toast("正在加载店铺列表，请重试...", activity, null);
-        }
-
-        if (stores != null) {
-            arrAdapter.addAll(stores);
-        }
-        if (currStore == null) {
-            if (stores != null) {
-
-                int storeId = SettingUtility.getCurrentStorageStore();
-                for (Store next : stores) {
-                    if (next.getId() == storeId) {
-                        currStore = next;
-                        break;
-                    }
-                }
-            }
-
-            if (currStore == null) {
-                currStore = Cts.ST_HLG;
-            }
-        }
-        currStoreSpinner.setSelection(arrAdapter.getPosition(currStore));
-        storeChgCallback.changed(currStore);
-    }
 
     static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Store currStore, final Runnable setOkCallback) {
         return createSetOnSaleDlg(activity, item, currStore, setOkCallback, false);
@@ -257,4 +212,5 @@ public class StoreStorageHelper {
         et.requestFocus();
         return dlg;
     }
+
 }
