@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +62,7 @@ public class StoreSpinnerHelper {
         }
         Collection<Store> listStores = GlobalCtx.getInstance().listStores();
         if (listStores == null || listStores.isEmpty()) {
-            Utility.toast("正在加载店铺列表，请重试...", activity, null);
+            Utility.toast("正在加载店铺列表，请重试...", activity, null, Toast.LENGTH_LONG);
         } else {
             stores.addAll(listStores);
         }

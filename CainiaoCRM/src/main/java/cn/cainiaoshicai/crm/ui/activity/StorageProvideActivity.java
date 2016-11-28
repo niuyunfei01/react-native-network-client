@@ -19,6 +19,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -99,13 +100,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url != null && url.indexOf("/stores/provide_req_all.html") > 0) {
-                    Intent intent = new Intent(StorageProvideActivity.this, GeneralWebViewActivity.class);
-                    intent.putExtra("url", url);
-                    startActivity(intent);
-                    return true;
-                }
-                return false;
+                return Utility.handleUrlJump(StorageProvideActivity.this, view, url);
             }
         });
 
@@ -317,7 +312,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                 }
             }.executeOnIO();
         } else {
-            Utility.toast("操作失败", StorageProvideActivity.this, null);
+            Utility.toast("操作失败", StorageProvideActivity.this, null, Toast.LENGTH_LONG);
         }
     }
 
@@ -361,10 +356,30 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.menu_refresh:
                 this.refresh();
+                break;
+            case R.id.menu_trash:
+                if (curr_req == null) {
+                    Util.showToast(this, "数据状态不正确");
+                } else if (curr_req.getStatus() != ProvideReq.STATUS_CREATED
+                            && curr_req.getStatus() != ProvideReq.STATUS_LOCKED) {
+                    Util.showToast(StorageProvideActivity.this, "订单已发货/收货，不能作废");
+                } else {
+                    AlertDialog dlg = new AlertDialog.Builder(StorageProvideActivity.this)
+                            .setTitle("作废订货单")
+                            .setMessage("确定作废订货单吗，作废以后不能恢复！")
+                            .setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            async_set_status(curr_req.getStatus(), ProvideReq.STATUS_TRASHED);
+                                        }
+                                    })
+                            .setNegativeButton(R.string.cancel, null)
+                            .create();
+                    dlg.show();
+                }
                 break;
             default:
         }

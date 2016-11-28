@@ -89,10 +89,16 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
 import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.customer_serv.customer_servsdk.util.Utils;
 
 public class Utility {
+
+    private static final String CRM_PREFIX = "crm://";
+    private static final String STORES_STORAGE_COMMON = "/stores/storage_common/";
 
     private Utility() {
         // Forbidden being instantiated.
@@ -1012,15 +1018,60 @@ public class Utility {
     }
 
     public static void toast(final String msg, final Activity activity, final Runnable uiCallback) {
+        toast(msg, activity, uiCallback, Toast.LENGTH_LONG);
+    }
+
+    public static void toast(final String msg, final Activity activity, final Runnable uiCallback, final int toastLength) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, msg, toastLength).show();
                 if (uiCallback != null) {
                     uiCallback.run();
                 }
             }
         });
+    }
+
+
+    public static boolean handleUrlJump(Context ctx, WebView view, String url) {
+        if (url != null) {
+            if (url.indexOf("/stores/provide_list.html") > 0) {
+                Intent intent = new Intent(ctx, StorageProvideActivity.class);
+                intent.putExtra("req_id", Integer.parseInt(Utility.parseUrl(url).getString("req_id")));
+                ctx.startActivity(intent);
+                return true;
+            } else if (url.indexOf("/stores/view_order") > 0) {
+                Intent intent = new Intent(ctx, OrderSingleActivity.class);
+                String wm_id = Utility.parseUrl(url).getString("wm_id");
+                if (wm_id != null) {
+                    intent.putExtra("order_id", Integer.parseInt(wm_id));
+                }
+                ctx.startActivity(intent);
+                return true;
+            } else if(url.indexOf("/stores/provide_req_all.html") > 0) {
+                Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
+                intent.putExtra("url", url);
+                ctx.startActivity(intent);
+                return true;
+            } else if (url.indexOf(STORES_STORAGE_COMMON) > 0) {
+                int start = url.indexOf(STORES_STORAGE_COMMON) + STORES_STORAGE_COMMON.length();
+                String[] args = url.substring(start).split("/");
+                int store_id = args.length > 1 ? Integer.parseInt(args[0]) : 0;
+                int req_id = args.length > 2 ? Integer.parseInt(args[1]) : 0;
+                int prod_id = args.length > 3 ? Integer.parseInt(args[2]) : 0;
+
+                Intent ssa = new Intent(ctx, StoreStorageActivity.class);
+                ssa.putExtra("store_id", store_id);
+                ssa.putExtra("req_id", req_id);
+                ssa.putExtra("prod_id", prod_id);
+                ssa.putExtra("search", String.valueOf(prod_id));
+                ctx.startActivity(ssa);
+            }
+        }
+
+//        view.loadUrl(url);
+        return false;
     }
 }
 

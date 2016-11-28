@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_marginStart="20sp"
+        android:layout_marginEnd="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="库存大于0后将自动开始售卖"
+        android:textColor="@color/red"
+        />
+    <EditText android:id="@+id/number_edit_txt"
+    android:textColor="@color/light_blue"
+        android:layout_marginStart="20sp"
+        android:layout_marginEnd="20sp"
+    android:text="0"
+    android:inputType="number"
+    android:layout_width="100sp"
+    android:layout_height="wrap_content" />
+</LinearLayout>

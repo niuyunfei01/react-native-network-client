@@ -2,16 +2,12 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.util.Collection;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -22,9 +18,7 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
-import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
-import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 /**
  * Created by liuzhr on 10/31/16.
@@ -32,26 +26,20 @@ import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 public class StoreStorageHelper {
 
-    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Store currStore, final Runnable setOkCallback) {
-        return createSetOnSaleDlg(activity, item, currStore, setOkCallback, false);
+    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Runnable setOkCallback) {
+        return createSetOnSaleDlg(activity, item, setOkCallback, false);
     }
 
-    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Store currStore, final Runnable setOkCallback, boolean selfProvided) {
+    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Runnable setOkCallback, boolean selfProvided) {
 
         final int checked[] = new int[1];
         checked[0] = 0;
 
-        final String[] items = new String[selfProvided ? 3 : 4];
-        items[0] = activity.getString(R.string.store_on_sale_now);
-        items[1] = activity.getString(R.string.store_on_sale_after_off_work);
-        items[2] = activity.getString(R.string.store_on_sale_manual);
-
-        if (items.length >= 4) {
-            items[3] = activity.getString(R.string.store_on_sale_after_provided);
-        }
+        final String[] items = new String[]{activity.getString(R.string.store_on_sale_after_off_work),
+                activity.getString(R.string.store_on_sale_after_have_storage)};
 
         return new AlertDialog.Builder(activity)
-                .setTitle("选择重新恢复售卖的时间")
+                .setTitle("选择恢复售卖的时间")
                 .setSingleChoiceItems(items, checked[0], new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -63,32 +51,27 @@ public class StoreStorageHelper {
                     public void onClick(DialogInterface dialog, int which) {
                         String selected = items[checked[0]];
                         final int option;
-                        if (selected.equals(activity.getString(R.string.store_on_sale_now))) {
-                            action_chg_status(activity, currStore, item, StorageItem.STORE_PROD_ON_SALE, "现在开始售卖, 请注意设置库存");
-                            return;
-                        } else if (selected.equals(activity.getString(R.string.store_on_sale_after_off_work))) {
+                        if (selected.equals(activity.getString(R.string.store_on_sale_after_off_work))) {
                             option = StorageItem.RE_ON_SALE_OFF_WORK;
-                        } else if (selected.equals(activity.getString(R.string.store_on_sale_after_provided))) {
+                        } else if (selected.equals(activity.getString(R.string.store_on_sale_after_have_storage))) {
                             option = StorageItem.RE_ON_SALE_PROVIDED;
-                        } else if (selected.equals(activity.getString(R.string.store_on_sale_manual))) {
-                            option = StorageItem.RE_ON_SALE_MANUAL;
-                        } else {
+                        }  else {
                             throw new IllegalStateException("impossible selection:" + selected);
                         }
-                        action_set_on_sale_again(activity, currStore, item, option, selected, setOkCallback);
+                        action_set_on_sale_again(activity, item, option, selected, setOkCallback);
                     }
                 }).setNegativeButton(R.string.cancel, null)
                 .create();
     }
 
 
-    private static void action_set_on_sale_again(final Activity context, final Store currStore,
+    private static void action_set_on_sale_again(final Activity context,
                                                  final StorageItem item, final int option, final String optionLabel, final Runnable setOkCallback) {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 StorageActionDao sad = new StorageActionDao(GlobalCtx.getApplication().getSpecialToken());
-                ResultBean rb = sad.chg_item_when_on_sale_again(currStore.getId(), item.getProduct_id(), option);
+                ResultBean rb = sad.chg_item_when_on_sale_again(item.getId(), option);
                 String msg;
                 Runnable uiCallback = null;
                 if (rb.isOk()) {
@@ -105,7 +88,7 @@ public class StoreStorageHelper {
                 } else {
                     msg = "设置失败:" + rb.getDesc();
                 }
-                Utility.toast(msg, context, uiCallback);
+                Utility.toast(msg, context, uiCallback, Toast.LENGTH_SHORT);
                 return null;
             }
         }.executeOnIO();
@@ -148,18 +131,18 @@ public class StoreStorageHelper {
                     } else {
                         msg = "设置失败:" + rb.getDesc();
                     }
-                    Utility.toast(msg, context, uiCallback);
+                    Utility.toast(msg, context, uiCallback, Toast.LENGTH_LONG);
                     return null;
                 }
             }.executeOnIO();
         } else {
-            Utility.toast("没有找到您指定的商品", context, null);
+            Utility.toast("没有找到您指定的商品", context, null, Toast.LENGTH_LONG);
         }
     }
 
     public static AlertDialog createEditLeftNum(final Activity activity, final StorageItem item,
                                                 LayoutInflater inflater, final Runnable succCallback) {
-        View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
+        View npView = inflater.inflate(R.layout.number_edit_left_number_layout, null);
         final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
         et.setText(String.valueOf(item.getLeft_since_last_stat()));
         AlertDialog dlg = new AlertDialog.Builder(activity)
@@ -168,31 +151,67 @@ public class StoreStorageHelper {
                 .setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                final int lastStat = Integer.parseInt(et.getText().toString());
                                 new MyAsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
+                                        new PostLeftNum(lastStat, item, activity, succCallback).invoke();
+                                        return null;
+                                    }
+                                }.execute();
+                            }
+                        })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        })
+                .create();
+        et.requestFocus();
+        return dlg;
+    }
 
-                                        ResultBean rb;
-                                        final int lastStat = Integer.parseInt(et.getText().toString());
+    static AlertDialog createEditProvideDlg(final StoreStorageActivity activity, final StorageItem item) {
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
+        final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
+        final EditText remark = (EditText) npView.findViewById(R.id.remark);
+
+        int totalInReq = item.getTotalInReq();
+        int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
+        totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
+        remark.setText(item.getReqMark());
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(String.format("订货:(%s)", item.getName()))
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        StorageActionDao.ResultEditReq rb;
+                                        final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
+                                        final String remarkTxt = remark.getText().toString();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
-                                            rb = sad.store_status_reset_stat_num(item.getStore_id(), item.getProduct_id(), lastStat);
+                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
                                         } catch (ServiceException e) {
-                                            rb = new ResultBean(false, "访问服务器出错");
+                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
                                         }
+                                        final int total_req_cnt = rb.isOk() ? rb.getTotal_req_cnt() : -1;
 
                                         final ResultBean finalRb = rb;
                                         activity.runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 if (finalRb.isOk()) {
-                                                    item.setTotal_last_stat(lastStat);
-                                                    item.setTotal_sold(0);
-                                                    item.setLeft_since_last_stat(lastStat);
-                                                    if (succCallback != null) {
-                                                        succCallback.run();
-                                                    }
+                                                    item.setTotalInReq(total_req_no);
+                                                    item.setReqMark(remarkTxt);
+                                                    activity.updateReqListBtn(total_req_cnt);
+                                                    activity.listAdapterRefresh();
                                                     Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
+                                                    activity.refreshData();
                                                 } else {
                                                     Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
                                                 }
@@ -209,8 +228,55 @@ public class StoreStorageHelper {
                             }
                         })
                 .create();
-        et.requestFocus();
+        dlg.show();
+        totalReqTxt.requestFocus();
         return dlg;
     }
 
+    private static class PostLeftNum {
+        private final int lastStat;
+        private final StorageItem item;
+        private final Activity activity;
+        private final Runnable succCallback;
+
+        PostLeftNum(int lastStat, StorageItem item, Activity activity, Runnable succCallback) {
+            this.lastStat = lastStat;
+            this.item = item;
+            this.activity = activity;
+            this.succCallback = succCallback;
+        }
+
+        void invoke() {
+            ResultBean rb;
+            try {
+                StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+                rb = sad.store_status_reset_stat_num(item.getStore_id(), item.getProduct_id(), lastStat);
+            } catch (ServiceException e) {
+                rb = new ResultBean(false, "访问服务器出错");
+            }
+
+            final ResultBean finalRb = rb;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (finalRb.isOk()) {
+                        item.setTotal_last_stat(lastStat);
+                        item.setTotal_sold(0);
+                        item.setLeft_since_last_stat(lastStat);
+                        if (succCallback != null) {
+                            succCallback.run();
+                        }
+                        Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
+                        if (lastStat == 0 && item.getSelf_provided() == Cts.PROVIDE_COMMON.value) {
+                            createEditProvideDlg((StoreStorageActivity) activity, item).show();
+                        } else {
+                            ((RefreshStorageData)activity).refreshData();
+                        }
+                    } else {
+                        Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+    }
 }

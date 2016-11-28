@@ -2,10 +2,10 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -34,7 +33,6 @@ import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -43,12 +41,13 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
-public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged {
+public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged, RefreshStorageData {
 
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
     private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
     private static final int MENU_CONTEXT_TO_SOLD_OUT_ID = 10994;
     private static final int MENU_CONTEXT_EDIT_REQ = 10995;
+    private static final int MENU_CONTEXT_TO_AUTO_ON_ID = 10996;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
@@ -56,18 +55,22 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private Spinner tagFilterSpinner;
     private Spinner currStatusSpinner;
     private Button btnReqList;
+    private Button btnEmptyList;
     private LayoutInflater inflater;
 
-    private static final int FILTER_ON_SALE = 1;
-    private static final int FILTER_RISK = 2;
-    private static final int FILTER_SOLD_OUT = 3;
-    private static final int FILTER_OFF_SALE = 4;
+    public static final int FILTER_ON_SALE = 1;
+    public static final int FILTER_RISK = 2;
+    public static final int FILTER_SOLD_OUT = 3;
+    public static final int FILTER_OFF_SALE = 4;
+    public static final int FILTER_SOLD_EMPTY = 5;
+
     private int total_in_req;
 
     private static class StatusItem {
         static final StatusItem[] STATUS = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
                 new StatusItem(FILTER_RISK, " 待订货"),
+                new StatusItem(FILTER_SOLD_EMPTY, " 零库存"),
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
         };
@@ -116,6 +119,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private int filter = FILTER_SOLD_OUT;
+    private String searchTerm = "";
 
     private Store currStore;
     private Tag currTag;
@@ -130,6 +134,15 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         if (savedInstanceState == null) {
             this.setContentView(R.layout.storage_status);
 
+            this.filter = this.getIntent().getIntExtra("filter", filter);
+            int storeId = this.getIntent().getIntExtra("store_id", -1);
+            this.searchTerm = this.getIntent().getStringExtra("search");
+            if (storeId > 0) {
+                Store store = GlobalCtx.getInstance().findStore(storeId);
+                if (store != null) {
+                    this.currStore = store;
+                }
+            }
 
             setTitle(R.string.title_storage_status);
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -142,7 +155,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     StorageItem item = listAdapter.getItem(position);
                     if (item != null && item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
-                        AlertDialog dlg = createEditProvideDlg(item, inflater);
+                        AlertDialog dlg = StoreStorageHelper.createEditProvideDlg(StoreStorageActivity.this, item);
                         dlg.show();
                     }
                 }
@@ -155,6 +168,19 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     Intent intent = new Intent(StoreStorageActivity.this, StorageProvideActivity.class);
                     intent.putExtra("store_id", currStore.getId());
                     startActivity(intent);
+                }
+            });
+
+            this.btnEmptyList = (Button) findViewById(R.id.btn_empty_list);
+            this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    filter = StatusItem.find(FILTER_SOLD_EMPTY).status;
+                    currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+                    Tag tag = new Tag();
+                    tag.setId(0);
+                    currTag = tag;
+                    refreshData();
                 }
             });
 
@@ -173,7 +199,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     CharSequence text = v.getText();
-                    listAdapter.filter(!TextUtils.isEmpty(text) ? text.toString() : null);
+                    String term = !TextUtils.isEmpty(text) ? text.toString() : null;
+                    StoreStorageActivity.this.searchTerm = term != null ? term : "";
+                    listAdapter.filter(term);
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     return true;
@@ -256,6 +284,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }, 50);
             }
 
+
+            ActionBar bar = getSupportActionBar();
+            bar.setCustomView(R.layout.store_list_in_title);
+
+            Spinner currStoreSpinner = (Spinner) bar.getCustomView().findViewById(R.id.spinner_curr_store);
             StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
                 @Override
                 public void changed(Store newStore) {
@@ -268,9 +301,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                         SettingUtility.setCurrentStorageStore(newStore.getId());
                     }
                 }
-            });
+            }, false, currStoreSpinner);
 
-            updateFilterBtnLabels(0, 0, 0, 0, 0);
+            bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
+                    | ActionBar.DISPLAY_SHOW_HOME);
+
+
+            updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
             refreshData();
         }
     }
@@ -285,10 +322,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         if (listAdapter != null) {
             listAdapter.changeBackendData(storageItems);
-            listAdapter.filter("");
+            listAdapter.filter(this.searchTerm);
         } else {
             listAdapter = new StorageItemAdapter<>(this, storageItems);
             lv.setAdapter(listAdapter);
+            listAdapter.filter(this.searchTerm);
             listAdapter.notifyDataSetChanged();
         }
 
@@ -300,23 +338,31 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     }
 
-    private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale, int total_in_req) {
+    private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale, int total_in_req, int totalSoldEmpty) {
         StatusItem.find(FILTER_ON_SALE).setNum(totalOnSale);
         StatusItem.find(FILTER_OFF_SALE).setNum(totalOffSale);
         StatusItem.find(FILTER_RISK).setNum(totalRisk);
         StatusItem.find(FILTER_SOLD_OUT).setNum(totalSoldOut);
+        StatusItem.find(FILTER_SOLD_EMPTY).setNum(totalSoldEmpty);
 
         if(this.currStatusSpinner != null) {
             ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
         }
 
         updateReqListBtn(total_in_req);
+        updateEmptyListBtn(totalSoldEmpty);
     }
 
-    private void updateReqListBtn(int total_in_req) {
+    void updateReqListBtn(int total_in_req) {
         this.total_in_req = total_in_req;
         if (this.btnReqList != null) {
             this.btnReqList.setText("订货单\n(" + total_in_req + ")");
+        }
+    }
+
+    void updateEmptyListBtn(int total) {
+        if (this.btnEmptyList != null) {
+            this.btnEmptyList.setText("零库存\n(" +  total + ")");
         }
     }
 
@@ -324,7 +370,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         resetListAdapter(storageItems);
     }
 
-    private void refreshData() {
+    public void refreshData() {
         new MyAsyncTask<Void, Void, Void>(){
             private ProgressFragment progressFragment = ProgressFragment.newInstance(R.string.refreshing);
             Pair<ArrayList<StorageItem>, StorageActionDao.StoreStatusStat> result;
@@ -361,7 +407,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                         StorageActionDao.StoreStatusStat sec = result.second;
                         if (sec != null) {
                             updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
-                                    sec.getTotal_sold_out(), sec.getTotal_off_sale(), sec.getTotal_req_cnt());
+                                    sec.getTotal_sold_out(), sec.getTotal_off_sale(),
+                                    sec.getTotal_req_cnt(), sec.getTotal_sold_empty());
                         }
                     }
                 });
@@ -384,7 +431,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             menu.setHeaderTitle(title);
 
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
-                menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "设置何时重新上架");
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_AUTO_ON_ID, Menu.NONE, "设置自动上架");
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "恢复售卖");
             } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
             }
@@ -396,44 +444,61 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    public boolean onContextItemSelected(MenuItem mi) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
         AppLogger.d("reset storage item pos=" + info.position);
-        final StorageItem storageItem = this.listAdapter.getItem(info.position);
+        final StorageItem item = this.listAdapter.getItem(info.position);
+        Runnable changed = new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.notifyDataSetChanged();
+            }
+        };
 
-        switch (item.getItemId()) {
+        switch (mi.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
-                if (storageItem != null) {
-                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum(this, storageItem, inflater, notifyDataSetChanged());
+                if (item != null) {
+                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum(this, item, inflater, notifyDataSetChanged());
                     dlg.show();
                     return true;
                 } else {
                     return false;
                 }
             case MENU_CONTEXT_TO_SALE_ID:
-                StoreStorageHelper.createSetOnSaleDlg(this, storageItem, this.currStore, notifyDataSetChanged()).show();
+                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "恢复售卖", changed);
                 return true;
+            case MENU_CONTEXT_TO_AUTO_ON_ID:
+                StoreStorageHelper.createSetOnSaleDlg(this, item, changed, true).show();
+                return true;
+
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
-                StoreStorageHelper.action_chg_status(this, currStore, storageItem, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
-                    @Override
-                    public void run() {
-                        listAdapterRefresh();
-                        StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, storageItem, currStore, notifyDataSetChanged()).show();
-                    }
-                });
+                StoreStorageHelper.action_chg_status(StoreStorageActivity.this, currStore, item,
+                        StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
+                            @Override
+                            public void run() {
+                                StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, item, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        listAdapterRefresh();
+                                        refreshData();
+                                    }
+                                }).show();
+                            }
+                        });
+
                 return true;
             case MENU_CONTEXT_EDIT_REQ:
-                AlertDialog dlg = createEditProvideDlg(storageItem, inflater);
+                AlertDialog dlg = StoreStorageHelper.createEditProvideDlg(this, item);
                 dlg.show();
                 return true;
             default:
-                return super.onContextItemSelected(item);
+                return super.onContextItemSelected(mi);
         }
     }
 
-    private void listAdapterRefresh() {
+    void listAdapterRefresh() {
         listAdapter.notifyDataSetChanged();
-        listAdapter.filter("");
+        listAdapter.filter(this.searchTerm);
     }
 
     @NonNull
@@ -444,65 +509,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                  listAdapterRefresh();
             }
         };
-    }
-
-    private AlertDialog createEditProvideDlg(final StorageItem item, LayoutInflater inflater) {
-        View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
-        final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
-        final EditText remark = (EditText) npView.findViewById(R.id.remark);
-
-        int totalInReq = item.getTotalInReq();
-        int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
-        totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
-        remark.setText(item.getReqMark());
-        AlertDialog dlg = new AlertDialog.Builder(this)
-                .setTitle(String.format("订货:(%s)", item.getName()))
-                .setView(npView)
-                .setPositiveButton(R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new MyAsyncTask<Void, Void, Void>() {
-                                    @Override
-                                    protected Void doInBackground(Void... params) {
-                                        StorageActionDao.ResultEditReq rb;
-                                        final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
-                                        final String remarkTxt = remark.getText().toString();
-                                        try {
-                                            rb = sad.store_edit_provide_req(item.getProduct_id(), currStore.getId(), total_req_no, remarkTxt);
-                                        } catch (ServiceException e) {
-                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
-                                        }
-                                        final int total_req_cnt = rb.isOk() ? rb.getTotal_req_cnt() : -1;
-
-                                        final ResultBean finalRb = rb;
-                                        StoreStorageActivity.this.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (finalRb.isOk()) {
-                                                    item.setTotalInReq(total_req_no);
-                                                    item.setReqMark(remarkTxt);
-                                                    updateReqListBtn(total_req_cnt);
-                                                    listAdapterRefresh();
-                                                    Toast.makeText(StoreStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    Toast.makeText(StoreStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
-                                                }
-                                            }
-                                        });
-                                        return null;
-                                    }
-                                }.executeOnIO();
-                            }
-                        })
-                .setNegativeButton(R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
-                .create();
-        dlg.show();
-        totalReqTxt.requestFocus();
-        return dlg;
     }
 
 }

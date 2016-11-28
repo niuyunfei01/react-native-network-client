@@ -86,8 +86,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 					soundManager.play_serious_timeout(notify.getNotify_workers());
 				} else if (Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
 					int store_id = notify.getStore_id();
-					if (store_id > 0 && "sold_out".equals(notify.getSound())) {
-						soundManager.play_item_sold_out_sound(store_id);
+					if (store_id > 0) {
+                        if ("sold_out".equals(notify.getSound())) {
+                            soundManager.play_item_sold_out_sound(store_id);
+                        } else if ("check_storage".equals(notify.getSound())) {
+                            soundManager.play_storage_check(store_id);
+                        }
 					}
 				} else if (Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
 					String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
@@ -141,6 +145,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 				if (notify.getStore_id() > 0) {
 					i.putExtra("store_id", notify.getStore_id());
+					if ("sold_out".equals(notify.getSound())) {
+						i.putExtra("filter", StoreStorageActivity.FILTER_SOLD_OUT);
+					} else if ("check_storage".equals(notify.getSound())) {
+						i.putExtra("filter", StoreStorageActivity.FILTER_SOLD_EMPTY);
+					}
 				}
 
 				i.putExtras(bundle);
@@ -230,6 +239,7 @@ class Notify {
 	private String platform_oid;
 	private int store_id;
 	private int total_late;
+	private int filter;
 	private Set<Integer> notify_workers;
 
 	private boolean storage_provided_self;
@@ -271,6 +281,14 @@ class Notify {
 
 	public int getStore_id() {
 		return store_id;
+	}
+
+	public int getFilter() {
+		return filter;
+	}
+
+	public void setFilter(int filter) {
+		this.filter = filter;
 	}
 
 	public void setStore_id(int store_id) {

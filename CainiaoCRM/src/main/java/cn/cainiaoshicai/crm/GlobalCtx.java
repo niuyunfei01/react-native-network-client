@@ -299,7 +299,8 @@ public class GlobalCtx extends Application {
     }
 
     public String getCurrentAccountId() {
-        return getAccountBean().getUid();
+        AccountBean bean = getAccountBean();
+        return bean != null ? bean.getUid() : null;
     }
 
     public String getCurrentAccountName() {
@@ -436,6 +437,8 @@ public class GlobalCtx extends Application {
         }
         return stores != null ? stores.values() : null;
     }
+
+
     public ArrayList<Tag> listTags() {
         ArrayList<Tag> tags = tagsRef.get();
         if (tags == null || tags.isEmpty()) {
@@ -467,6 +470,11 @@ public class GlobalCtx extends Application {
         return String.valueOf(storeId);
     }
 
+    public Store findStore(int storeId) {
+        LinkedHashMap<Integer, Store> idStoreMap = this.storesRef.get();
+        return (idStoreMap != null) ?  idStoreMap.get(storeId) : null;
+    }
+
     public static class SoundManager {
         private static final int STORE_SOUND_LEN = 1700;
         private static final int NUMBER_SOUND_LENGTH = 1000;
@@ -481,6 +489,7 @@ public class GlobalCtx extends Application {
         private int syncNotWorkSound;
         private int storageEleStatus;
         private int storageSoldout;
+        private int storageCheckStorage;
         private int customerNewMsgSound;
         private int[] numberSound = new int[10];
         private volatile boolean soundLoaded = false;
@@ -501,6 +510,7 @@ public class GlobalCtx extends Application {
             seriousTimeoutSound = soundPool.load(ctx, R.raw.serious_timeout, 1);
             syncNotWorkSound = soundPool.load(ctx, R.raw.sync_not_work, 1);
             customerNewMsgSound = soundPool.load(ctx, R.raw.customer_new_message, 1);
+            storageCheckStorage = soundPool.load(ctx, R.raw.check_storage, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -600,6 +610,10 @@ public class GlobalCtx extends Application {
 
         public boolean play_ele_status_changed(int store_id) {
             return this.play_double_sound(getStoreSound(store_id), storageEleStatus);
+        }
+
+        public boolean play_storage_check(int store_id) {
+            return this.play_double_sound(getStoreSound(store_id), storageCheckStorage);
         }
 
         public boolean play_will_ready_timeout(int store_id, int totalLate) {

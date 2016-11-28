@@ -37,8 +37,10 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -50,6 +52,7 @@ import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
 import cn.cainiaoshicai.crm.ui.activity.FeedbackViewActivity;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedBackEditActivity;
@@ -503,20 +506,38 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         switch (item.getItemId()) {
             case R.id.menu_user_feedback:
 
-                final Intent intent;
-
+                Intent gog = new Intent(this, GeneralWebViewActivity.class);
+                String token = GlobalCtx.getApplication().getSpecialToken();
+                final String vm_path;
+                Feedback fb = null;
                 if (this.orderRef.get() != null && this.orderRef.get().getFeedback() != null) {
-                    intent = new Intent(this, FeedbackViewActivity.class);
-                    intent.putExtra("fb", this.orderRef.get().getFeedback());
+                    fb = this.orderRef.get().getFeedback();
+                }
+                if (fb != null) {
+                    vm_path = "#!/feedback/view/" + fb.getId();
                 } else {
-                    intent = new Intent(this, FeedBackEditActivity.class);
+                    vm_path = "#!/feedback/order/" + this.orderId;
                 }
 
-                intent.putExtra("order_id", this.orderId);
-                intent.putExtra("wm_id", this.orderId);
-                intent.putExtra("platformWithId", this.platformWithId);
-
-                startActivityForResult(intent, REQUEST_CODE_ADDFB);
+                String url = URLHelper.WEB_URL_ROOT + "/vm?access_token=" + token + vm_path;
+                gog.putExtra("url", url);
+                startActivity(gog);
+//
+//                final Intent intent;
+//
+//                if (this.orderRef.get() != null && this.orderRef.get().getFeedback() != null) {
+//                    intent = new Intent(this, FeedbackViewActivity.class);
+//                    intent.putExtra("fb", this.orderRef.get().getFeedback());
+//                } else {
+//                    intent = new Intent(this, FeedBackEditActivity.class);
+//                }
+//
+//
+//                intent.putExtra("order_id", this.orderId);
+//                intent.putExtra("wm_id", this.orderId);
+//                intent.putExtra("platformWithId", this.platformWithId);
+//
+//                startActivityForResult(intent, REQUEST_CODE_ADDFB);
 
                 break;
             case R.id.menu_set_invalid:
@@ -750,7 +771,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         private int listType;
         private int workerId;
 
-        public OrderActionOp(int oid, String platformOid, Activity v, int listType) {
+        OrderActionOp(int oid, String platformOid, Activity v, int listType) {
             this.oid = oid;
             this.platformOid = platformOid;
             activity = v;

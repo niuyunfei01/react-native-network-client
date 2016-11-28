@@ -508,7 +508,7 @@ public class OrderSingleHelper {
                     activity.refresh();
                 }
             }
-        });
+        }, Toast.LENGTH_LONG);
     }
 
 }

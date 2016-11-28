@@ -17,7 +17,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="235"
+    android:versionCode="237"
     android:versionName="2.2.1">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
@@ -104,10 +104,11 @@
         <activity android:name=".ui.activity.QualityCaseActivity" android:screenOrientation="portrait">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
-        <activity android:name=".ui.activity.GeneralWebViewActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity android:name=".ui.activity.GeneralWebViewActivity" android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar">
         </activity>
-        <activity android:name=".ui.activity.FeedBackEditActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
+        <activity android:name=".ui.activity.FeedBackEditActivity" android:screenOrientation="portrait"
+            android:parentActivityName=".ui.activity.FeedbackListsActivity">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
         <activity android:name=".ui.activity.FeedbackListsActivity" android:screenOrientation="portrait">

@@ -11,6 +11,7 @@ public class ProvideReq {
     public static final int STATUS_SHIPPED = 2;
 //    public static final int STATUS_ARRIVED = 3;
     public static final int STATUS_CONFIRMED = 4;
+    public static final int STATUS_TRASHED = 5;
 
     private int id;
     private int store_id;
@@ -48,4 +49,5 @@ public class ProvideReq {
     public void setTotal_req(int total_req) {
         this.total_req = total_req;
     }
+
 }

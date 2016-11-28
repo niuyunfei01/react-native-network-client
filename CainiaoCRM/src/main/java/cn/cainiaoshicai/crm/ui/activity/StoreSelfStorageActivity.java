@@ -2,7 +2,6 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +31,6 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -41,11 +38,12 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
-public class StoreSelfStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged {
+public class StoreSelfStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged, RefreshStorageData {
 
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
     private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
     private static final int MENU_CONTEXT_TO_SOLD_OUT_ID = 10994;
+    private static final int MENU_CONTEXT_TO_AUTO_ON_ID = 10995;
 
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
@@ -66,10 +64,14 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
     private Button btnRisk;
     private Button btnOnSale;
     private Button btnOffSale;
+    private LayoutInflater inflater;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        inflater = (LayoutInflater)
+                getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (savedInstanceState == null) {
             this.setContentView(R.layout.storage_status_self);
@@ -165,7 +167,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
         resetListAdapter(storageItems);
     }
 
-    private void refreshData() {
+    public void refreshData() {
         new MyAsyncTask<Void, Void, Void>(){
             private ProgressFragment progressFragment = ProgressFragment.newInstance(R.string.refreshing);
             Pair<ArrayList<StorageItem>, StorageActionDao.StoreStatusStat> result;
@@ -226,7 +228,8 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
             String title = item.getIdAndNameStr();
             menu.setHeaderTitle(title);
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
-                menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "设置何时重新上架");
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_AUTO_ON_ID, Menu.NONE, "设置自动上架");
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "恢复售卖");
             } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
             }
@@ -249,78 +252,37 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
     public boolean onContextItemSelected(MenuItem mi) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
         AppLogger.d("reset storage menu item pos=" + info.position);
+        listAdapterChanged = new Runnable() {
+            @Override
+            public void run() {
+                listAdapter.notifyDataSetChanged();
+            }
+        };
         final StorageItem item = this.listAdapter.getItem(info.position);
         switch (mi.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
                 if (item != null) {
-                    LayoutInflater inflater = (LayoutInflater)
-                            getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    View npView = inflater.inflate(R.layout.number_edit_dialog_layout, null);
-                    final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
-                    et.setText(String.valueOf(item.getLeft_since_last_stat()));
-                    AlertDialog dlg = new AlertDialog.Builder(this)
-                            .setTitle(String.format("设置库存数:(%s)", item.getName()))
-                            .setView(npView)
-                            .setPositiveButton(R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                            new MyAsyncTask<Void, Void, Void>() {
-                                                @Override
-                                                protected Void doInBackground(Void... params) {
-
-                                                    ResultBean rb;
-                                                    final int lastStat = Integer.parseInt(et.getText().toString());
-                                                    try {
-                                                        rb = sad.store_status_reset_stat_num(currStore.getId(), item.getProduct_id(), lastStat);
-                                                    } catch (ServiceException e) {
-                                                        rb = new ResultBean(false, "访问服务器出错");
-                                                    }
-
-                                                    final ResultBean finalRb = rb;
-                                                    StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            if (finalRb.isOk()) {
-                                                                item.setTotal_last_stat(lastStat);
-                                                                item.setTotal_sold(0);
-                                                                item.setLeft_since_last_stat(lastStat);
-                                                                listAdapter.notifyDataSetChanged();
-                                                                Toast.makeText(StoreSelfStorageActivity.this, "已保存", Toast.LENGTH_SHORT).show();
-                                                            } else {
-                                                                Toast.makeText(StoreSelfStorageActivity.this, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
-                                                            }
-                                                        }
-                                                    });
-                                                    return null;
-                                                }
-                                            }.executeOnIO();
-                                        }
-                                    })
-                            .setNegativeButton(R.string.cancel,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                        }
-                                    })
-                            .create();
+                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum(this, item, inflater, notifyDataSetChanged());
                     dlg.show();
-                    et.requestFocus();
                 }
                 return true;
             case MENU_CONTEXT_TO_SALE_ID:
-                listAdapterChanged = new Runnable() {
+                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "暂停售卖", new Runnable() {
                     @Override
                     public void run() {
                         listAdapter.notifyDataSetChanged();
                     }
-                };
-                StoreStorageHelper.createSetOnSaleDlg(this, item, this.currStore, listAdapterChanged, true).show();
+                });
+                return true;
+            case MENU_CONTEXT_TO_AUTO_ON_ID:
+                StoreStorageHelper.createSetOnSaleDlg(this, item, listAdapterChanged, true).show();
                 return true;
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
                 StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
                     @Override
                     public void run() {
                         listAdapter.notifyDataSetChanged();
-                        StoreStorageHelper.createSetOnSaleDlg(StoreSelfStorageActivity.this, item, currStore, listAdapterChanged, true).show();
+                        StoreStorageHelper.createSetOnSaleDlg(StoreSelfStorageActivity.this, item, listAdapterChanged, true).show();
                     }
                 });
                 return true;

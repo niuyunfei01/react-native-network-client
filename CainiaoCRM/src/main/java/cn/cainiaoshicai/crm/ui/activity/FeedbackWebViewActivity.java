@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -30,7 +31,7 @@ public class FeedbackWebViewActivity extends WebViewActivity {
             String token = GlobalCtx.getInstance().getSpecialToken();
             this.mWebView.loadUrl(URLHelper.WEB_URL_ROOT + "/vm?access_token=" + token + "#!/feedback/" + fbId, crmHeader);
         } else {
-            Utility.toast("参数错误：没有 fb_id", this, null);
+            Utility.toast("参数错误：没有 fb_id", this, null, Toast.LENGTH_LONG);
         }
     }
 }

@@ -47,7 +47,6 @@
         <item name="progressBarStyle">@style/Widget.Styled.ProgressBar.Horizontal</item>
     </style>
 
-
     <!--
         For the following styles, the attributes are available in the android namespace which
         means that we can set them here for all platforms (v7 through to the latest).

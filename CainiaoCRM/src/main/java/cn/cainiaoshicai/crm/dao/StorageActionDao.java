@@ -78,12 +78,12 @@ public class StorageActionDao {
         }
     }
 
-    public ResultBean chg_item_when_on_sale_again(int storeId, int product_id, int option) {
+    public ResultBean chg_item_when_on_sale_again(int id, int option) {
         try {
-            String path = String.format("/chg_item_when_on_sale_again/%d/%d/%d", storeId, product_id, option);
+            String path = String.format("/chg_item_when_on_sale/%d/%d", id, option);
             return actionWithResult(path, new HashMap<String, String>());
         } catch (ServiceException e) {
-            AppLogger.e("chg_item_when_on_sale_again req_id="+ storeId + ", fromStatus=" + product_id + ", " + option, e);
+            AppLogger.e("chg_item_when_on_sale_again store_product_id="+ id + ", option=" + option, e);
             return ResultBean.readingFailed();
         }
     }
@@ -95,6 +95,7 @@ public class StorageActionDao {
         private int total_sold_out;
         private int total_off_sale;
         private int total_req_cnt;
+        private int total_sold_empty;
 
         public int getTotal_on_sale() {
             return total_on_sale;
@@ -134,6 +135,14 @@ public class StorageActionDao {
 
         public int getTotal_req_cnt() {
             return total_req_cnt;
+        }
+
+        public int getTotal_sold_empty() {
+            return total_sold_empty;
+        }
+
+        public void setTotal_sold_empty(int total_sold_empty) {
+            this.total_sold_empty = total_sold_empty;
         }
     }
 

@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/refresh"
         support:showAsAction="ifRoom|collapseActionView" />
+    <item
+        android:id="@+id/menu_trash"
+        android:icon="@drawable/ic_action_delete"
+        android:title="@string/trash"
+        support:showAsAction="ifRoom|collapseActionView" />
 </menu>
