@@ -101,7 +101,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Object selected = parent.getAdapter().getItem(position);
                     if (selected instanceof StorageItem) {
-                        listAdapter.filter(String.valueOf(((StorageItem) selected).getId()));
+                        listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
                         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     } else {
@@ -225,7 +225,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         StorageItem item = listAdapter.getItem(info.position);
         if (item != null) {
-            String title = item.getIdAndNameStr();
+            String title = item.pidAndNameStr();
             menu.setHeaderTitle(title);
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_AUTO_ON_ID, Menu.NONE, "设置自动上架");

@@ -75,7 +75,7 @@ public class StoreStorageHelper {
                 String msg;
                 Runnable uiCallback = null;
                 if (rb.isOk()) {
-                    msg = "已将" + item.getIdAndNameStr() + "设置为" + optionLabel + "!";
+                    msg = "已将" + item.pidAndNameStr() + "设置为" + optionLabel + "!";
                     uiCallback = new Runnable() {
                         @Override
                         public void run() {
@@ -118,7 +118,7 @@ public class StoreStorageHelper {
                     String msg;
                     Runnable uiCallback = null;
                     if (rb.isOk()) {
-                        msg = "已将" + item.getIdAndNameStr() + "设置为" + desc + "!";
+                        msg = "已将" + item.pidAndNameStr() + "设置为" + desc + "!";
                         uiCallback = new Runnable() {
                             @Override
                             public void run() {

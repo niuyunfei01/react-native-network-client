@@ -70,7 +70,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         static final StatusItem[] STATUS = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
                 new StatusItem(FILTER_RISK, " 待订货"),
-                new StatusItem(FILTER_SOLD_EMPTY, " 零库存"),
+                new StatusItem(FILTER_SOLD_EMPTY, " 零库待订"),
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
         };
@@ -177,6 +177,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 public void onClick(View v) {
                     filter = StatusItem.find(FILTER_SOLD_EMPTY).status;
                     currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+                    searchTerm = "";
                     Tag tag = new Tag();
                     tag.setId(0);
                     currTag = tag;
@@ -213,7 +214,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Object selected = parent.getAdapter().getItem(position);
                     if (selected instanceof StorageItem) {
-                        listAdapter.filter(String.valueOf(((StorageItem) selected).getId()));
+                        listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
                         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     } else {
@@ -427,7 +428,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         StorageItem item = listAdapter.getItem(info.position);
         if (item != null) {
-            String title = item.getIdAndNameStr(false);
+            String title = item.pidAndNameStr(false);
             menu.setHeaderTitle(title);
 
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {

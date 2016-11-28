@@ -92,11 +92,11 @@ public class StorageItem {
         this.total_sold = total_sold;
     }
 
-    public String getIdAndNameStr() {
-        return this.getIdAndNameStr(true);
+    public String pidAndNameStr() {
+        return this.pidAndNameStr(true);
     }
 
-    public String getIdAndNameStr(boolean limit) {
+    public String pidAndNameStr(boolean limit) {
         String name = getName();
 
         if (limit){
@@ -153,7 +153,7 @@ public class StorageItem {
 
     @Override
     public String toString() {
-        return getIdAndNameStr();
+        return pidAndNameStr();
     }
 
     public int getSold_5day() {

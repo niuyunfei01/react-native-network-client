@@ -55,7 +55,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         }
 
         final StorageItem item = this.getItem(pos);
-        holder.label.setText(item.getIdAndNameStr());
+        holder.label.setText(item.pidAndNameStr());
 
         holder.prodStatus.setText(item.getStatusText());
 
@@ -122,11 +122,11 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             }
 
             for (StorageItem item : this.backendData) {
-                if (id > 0 && item.getId() == id) {
+                if (id > 0 && item.getProduct_id() == id) {
                     ((StorageItemAdapter<StorageItem>) this).add(item);
                     break;
                 } else {
-                    if (item.getIdAndNameStr().contains(text)) {
+                    if (item.pidAndNameStr().contains(text)) {
                         ((StorageItemAdapter<StorageItem>) this).add(item);
                     }
                 }
