@@ -33,6 +33,7 @@ public class StorageItem {
     private String reqMark;
 
     private int when_sale_again;
+    private String tag_code;
 
     public int getProduct_id() {
         return product_id;
@@ -205,5 +206,13 @@ public class StorageItem {
 
     public void setStore_id(int store_id) {
         this.store_id = store_id;
+    }
+
+    public String getTag_code() {
+        return tag_code;
+    }
+
+    public void setTag_code(String tag_code) {
+        this.tag_code = tag_code;
     }
 }

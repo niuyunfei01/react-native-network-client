@@ -227,6 +227,7 @@ public class StorageActionDao {
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {
                         si.setName(pd.getName());
+                        si.setTag_code(pd.getTag_code());
                     }
                     storageItems.add(si);
                 }

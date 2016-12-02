@@ -16,6 +16,7 @@ public class Product {
     private String listimg;
     private int published;
     private String promote_name;
+    private String tag_code;
 
     public int getId() {
         return id;
@@ -95,6 +96,14 @@ public class Product {
 
     public void setPromote_name(String promote_name) {
         this.promote_name = promote_name;
+    }
+
+    public String getTag_code() {
+        return tag_code;
+    }
+
+    public void setTag_code(String tag_code) {
+        this.tag_code = tag_code;
     }
 
     //

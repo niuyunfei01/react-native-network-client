@@ -373,7 +373,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                             .setPositiveButton(R.string.ok,
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            async_set_status(curr_req.getStatus(), ProvideReq.STATUS_TRASHED);
+                                            async_set_status(ProvideReq.STATUS_TRASHED, curr_req.getStatus());
                                         }
                                     })
                             .setNegativeButton(R.string.cancel, null)

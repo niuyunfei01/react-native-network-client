@@ -126,7 +126,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                     ((StorageItemAdapter<StorageItem>) this).add(item);
                     break;
                 } else {
-                    if (item.pidAndNameStr().contains(text)) {
+                    if (text.equals(item.getTag_code()) || item.pidAndNameStr().contains(text)) {
                         ((StorageItemAdapter<StorageItem>) this).add(item);
                     }
                 }

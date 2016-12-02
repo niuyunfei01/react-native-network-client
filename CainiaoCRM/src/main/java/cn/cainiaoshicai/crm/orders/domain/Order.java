@@ -51,7 +51,7 @@ public class Order implements Serializable {
     private int dada_status;
     private Date dada_call_at;
     private int dada_distance;
-    private int dada_order_id;
+    private String dada_order_id;
     private float dada_fee;
 
     private String dada_mobile;
@@ -380,11 +380,11 @@ public class Order implements Serializable {
         this.dada_distance = dada_distance;
     }
 
-    public int getDada_order_id() {
+    public String getDada_order_id() {
         return dada_order_id;
     }
 
-    public void setDada_order_id(int dada_order_id) {
+    public void setDada_order_id(String dada_order_id) {
         this.dada_order_id = dada_order_id;
     }
 
