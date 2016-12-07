@@ -382,8 +382,7 @@ public class GlobalCtx extends Application {
 
     public static boolean isAutoPrint(int store_id) {
         return store_id == Cts.STORE_UNKNOWN
-                || (SettingUtility.isAutoPrintHLG() && store_id == Cts.STORE_HLG)
-                || (SettingUtility.isAutoPrintYYC() && store_id == STORE_YYC);
+                || (SettingUtility.isAutoPrint(store_id));
     }
 
     public SoundManager getSoundManager() {
@@ -473,6 +472,17 @@ public class GlobalCtx extends Application {
     public Store findStore(int storeId) {
         LinkedHashMap<Integer, Store> idStoreMap = this.storesRef.get();
         return (idStoreMap != null) ?  idStoreMap.get(storeId) : null;
+    }
+
+    public String getStoreNames(ArrayList<Integer> store_id_list) {
+        if (!store_id_list.isEmpty()) {
+            String[] names = new String[store_id_list.size()];
+            for(int i = 0; i < store_id_list.size(); i++) {
+                names[i] = this.getStoreName(store_id_list.get(i));
+            }
+            return TextUtils.join(",", names);
+        }
+        return "";
     }
 
     public static class SoundManager {

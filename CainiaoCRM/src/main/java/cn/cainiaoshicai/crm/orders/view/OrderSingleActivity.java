@@ -334,18 +334,18 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
         }
     }
 
-    private void showSourceReady(final boolean isSourceReady, boolean isWaitingReady) {
-        this.sourceReadyButton.setTextOn("已备货");
-        this.sourceReadyButton.setTextOff("备货中");
-        this.sourceReadyButton.setChecked(isSourceReady);
-        if (!isWaitingReady) {
-            this.sourceReadyButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    SettingUtility.setAutoPrintHLG(isChecked);
-                }
-            });
-        }
-    }
+//    private void showSourceReady(final boolean isSourceReady, boolean isWaitingReady) {
+//        this.sourceReadyButton.setTextOn("已备货");
+//        this.sourceReadyButton.setTextOff("备货中");
+//        this.sourceReadyButton.setChecked(isSourceReady);
+//        if (!isWaitingReady) {
+//            this.sourceReadyButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    SettingUtility.setAutoPrintHLG(isChecked);
+//                }
+//            });
+//        }
+//    }
 
     @Override
     protected void onPause() {

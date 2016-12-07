@@ -1067,6 +1067,7 @@ public class Utility {
                 ssa.putExtra("prod_id", prod_id);
                 ssa.putExtra("search", String.valueOf(prod_id));
                 ctx.startActivity(ssa);
+                return true;
             }
         }
 

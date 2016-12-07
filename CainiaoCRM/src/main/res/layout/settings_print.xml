@@ -24,41 +24,11 @@
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/label_sound_notify" />
 
-    <TextView android:id="@+id/label_auto_print_hlg"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_below="@id/label_sound_notify"
-        android:layout_marginStart="10dp"
-        android:text="自动打印回龙观" />
-
-    <Switch android:id="@+id/togglePrintHLG"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_below="@id/toggleSoundNotify"
-        android:layout_marginEnd="10dp"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/label_auto_print_hlg" />
-
-    <TextView android:text="自动打印亚运村"
-        android:id="@+id/label_auto_print_yyc"
-        android:layout_below="@+id/label_auto_print_hlg"
-        android:layout_width="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_height="30dp"/>
-
-    <Switch android:id="@+id/togglePrintYYC"
-        android:layout_below="@+id/togglePrintHLG"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/label_auto_print_yyc"
-        android:layout_width="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_height="30dp" />
-
     <RelativeLayout
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:id="@+id/settings_order_filter"
-        android:layout_below="@+id/togglePrintYYC"
+        android:layout_below="@+id/toggleSoundNotify"
         android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -78,6 +48,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"/>
+
+        <TextView android:text="自动打印"
+            android:id="@+id/label_auto_print"
+            android:layout_below="@+id/label_list_store_filter"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_height="30dp"/>
+
+        <Switch android:id="@+id/toggleAutoPrint"
+            android:layout_below="@+id/label_list_store_filter"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/label_auto_print"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_height="30dp" />
+
     </RelativeLayout>
 
     <ListView

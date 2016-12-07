@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
@@ -107,17 +109,16 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
 
     private void resetPrinterStatusBar(boolean show) {
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
-        if (show && (SettingUtility.isAutoPrintYYC() || SettingUtility.isAutoPrintHLG())) {
-            String storeDesc = SettingUtility.isAutoPrintHLG() ? "回龙观店" : "";
-            storeDesc += SettingUtility.isAutoPrintYYC() ? (("".equals(storeDesc) ? "" : ", ") + "亚运村店") : "";
-
+        ArrayList<Integer> autoPrintStores = SettingUtility.getAutoPrintStores();
+        if (show && !autoPrintStores.isEmpty()) {
             final String printStatusTxt;
             final int bgColorResId;
+            String autoPrintNames = GlobalCtx.getApplication().getStoreNames(autoPrintStores);
             if (SettingsPrintActivity.isPrinterConnected()) {
-                printStatusTxt = "已设自动打印(" + storeDesc + ")，打印机已就绪！";
+                printStatusTxt = "已设自动打印(" + autoPrintNames + ")，打印机已就绪！";
                 bgColorResId = R.color.green;
             } else {
-                printStatusTxt = "已设自动打印(" + storeDesc + ")，点此连接打印机！";
+                printStatusTxt = "已设自动打印(" + autoPrintNames + ")，点此连接打印机！";
                 bgColorResId = R.color.red;
             }
             printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));

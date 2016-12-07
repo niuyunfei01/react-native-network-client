@@ -2,7 +2,6 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,6 +34,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
 
 public class SettingsPrintActivity extends ListActivity {
@@ -69,22 +69,23 @@ public class SettingsPrintActivity extends ListActivity {
 			}
 		});
 
-		Switch toggleHLG = (Switch) findViewById(R.id.togglePrintHLG);
-		Switch toggleYYC = (Switch) findViewById(R.id.togglePrintYYC);
-		toggleHLG.setChecked(SettingUtility.isAutoPrintHLG());
-		toggleYYC.setChecked(SettingUtility.isAutoPrintYYC());
-
-		toggleHLG.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				SettingUtility.setAutoPrintHLG(isChecked);
-			}
-		});
-		toggleYYC.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		final Switch toggleAutoPrint = (Switch) findViewById(R.id.toggleAutoPrint);
+		toggleAutoPrint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				SettingUtility.setAutoPrintYYC(isChecked);
+				if (isChecked && SettingUtility.getListenerStores().isEmpty()) {
+					Utility.toast("您必须先指定【待处理订单显示店铺】", SettingsPrintActivity.this, new Runnable() {
+						@Override
+						public void run() {
+							toggleAutoPrint.setChecked(false);
+						}
+					});
+				} else {
+					SettingUtility.setAutoPrint(isChecked);
+				}
 			}
 		});
+		toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
 
 		final TextView list_store_filter_values = (TextView) findViewById(R.id.list_store_filter_values);
 		((ImageView)findViewById(R.id.list_store_filter_arrow)).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.arrow));
@@ -158,7 +159,6 @@ public class SettingsPrintActivity extends ListActivity {
 				this.finish();
 				return;
 			}
-
 		} catch (Exception ex) {
 			this.finish();
 			return;

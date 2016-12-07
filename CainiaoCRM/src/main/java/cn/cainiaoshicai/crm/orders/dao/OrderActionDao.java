@@ -39,7 +39,7 @@ public class OrderActionDao {
     public ResultBean startShip(Cts.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", String.valueOf(ship_worker_id));
-        return actionWithResult(platform, platformId, "/order_start_ship/", params);
+        return actionWithResult(platform, platformId, "/order_start_ship", params);
     }
 
     public ResultBean setArrived(Cts.Platform platform, String platform_oid) throws ServiceException {

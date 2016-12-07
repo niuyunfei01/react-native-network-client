@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.support.helper;
 import android.content.Context;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -319,20 +320,22 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), BLACK_MAGIC, true);
     }
 
-    public static boolean isAutoPrintHLG() {
-        return SettingHelper.getSharedPreferences(getContext(), "auto_print_hlg", false);
+    public static ArrayList<Integer> getAutoPrintStores() {
+        Boolean auto_print = SettingHelper.getSharedPreferences(getContext(), "auto_print", false);
+        return (auto_print ? new ArrayList<>(getListenerStores()) : new ArrayList<Integer>());
     }
 
-    public static void setAutoPrintHLG(boolean value) {
-        SettingHelper.setEditor(getContext(), "auto_print_hlg", value);
+    public static boolean isAutoPrint(int store_id) {
+        Boolean auto_print = SettingHelper.getSharedPreferences(getContext(), "auto_print", false);
+        return auto_print && getListenerStores().contains(store_id);
     }
 
-    public static void setAutoPrintYYC(boolean value) {
-        SettingHelper.setEditor(getContext(), "auto_print_yyc", value);
+    public static Boolean getAutoPrintSetting() {
+        return SettingHelper.getSharedPreferences(getContext(), "auto_print", false);
     }
 
-    public static boolean isAutoPrintYYC() {
-        return SettingHelper.getSharedPreferences(getContext(), "auto_print_yyc", false);
+    public static void setAutoPrint(boolean value) {
+        SettingHelper.setEditor(getContext(), "auto_print", value);
     }
 
     public static boolean isFollowingOrFanListFirstShow() {

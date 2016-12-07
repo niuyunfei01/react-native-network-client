@@ -11,7 +11,7 @@
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/togglePrintYYC"
+        android:layout_below="@+id/toggleAutoPrint"
         android:layout_marginTop="30dp"
         android:layout_alignEnd="@+id/storage_item_status"/>
     <TextView
