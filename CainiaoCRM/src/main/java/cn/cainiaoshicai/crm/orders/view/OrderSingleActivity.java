@@ -22,7 +22,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TimePicker;
@@ -37,6 +37,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
@@ -46,16 +47,14 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
-import cn.cainiaoshicai.crm.ui.activity.FeedbackViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
-import cn.cainiaoshicai.crm.ui.activity.FeedBackEditActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
@@ -653,6 +652,10 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                         }).setNegativeButton(R.string.cancel, null);
                 couponsAdb.show();
                 return true;
+            case R.id.menu_kf_coupon:
+                Order o = orderRef.get();
+                createKfCouponDlg(this, o.getUserName(), o.getUserId(), o.getId()).show();
+                return true;
             case R.id.menu_chg_store:
                 AlertDialog.Builder storesDlg = new AlertDialog.Builder(this);
                 Collection<Store> stores = GlobalCtx.getInstance().listStores();
@@ -725,6 +728,65 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private static AlertDialog createKfCouponDlg(final OrderSingleActivity activity, String userName, final int uid, final int orderId) {
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View npView = inflater.inflate(R.layout.user_kf_coupon_dlg, null);
+        final EditText leastTxt = (EditText) npView.findViewById(R.id.kf_coupon_least_amount);
+        final EditText reduceTxt = (EditText) npView.findViewById(R.id.kf_coupon_reduce_amount);
+        final EditText msgTxt = (EditText) npView.findViewById(R.id.kf_msg_to_user);
+        msgTxt.setText("");
+        reduceTxt.setText("0.0");
+        leastTxt.setText("0.0");
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle("发放自定义优惠券给：" + userName)
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        ResultBean rb;
+                                        final Float least = Float.valueOf(leastTxt.getText().toString());
+                                        final Float reduce = Float.valueOf(reduceTxt.getText().toString());
+                                        final String remarkTxt = msgTxt.getText().toString();
+
+                                        if (least < 0 || reduce <= 1 || TextUtils.isEmpty(remarkTxt) || reduce > 100) {
+                                            Utility.toast("满减金额不能小于1元大于100元，满减门槛不能为负数，给用户的留言不能为空！", activity, null);
+                                            return null;
+                                        }
+                                        try {
+                                            OrderActionDao sad = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            rb = sad.coupon_by_kf(uid, orderId, remarkTxt, (int)(reduce * 100), (int)(least * 100));
+                                        } catch (ServiceException e) {
+                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                        }
+                                        final ResultBean finalRb = rb;
+                                        activity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (finalRb.isOk()) {
+                                                    Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+                                        return null;
+                                    }
+                                }.executeOnIO();
+                            }
+                        })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        })
+                .create();
+        dlg.show();
+        return dlg;
     }
 
     @Override

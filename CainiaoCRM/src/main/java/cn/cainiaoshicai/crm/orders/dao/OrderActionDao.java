@@ -151,6 +151,14 @@ public class OrderActionDao {
         return actionWithResult("/gen_coupon_wm/" + type + "/" + orderId, new HashMap<String, String>());
     }
 
+    public ResultBean coupon_by_kf(int to_uid, int orderId, String message, int reduce, int least) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("kf_message", message);
+        params.put("reduce_price", String.valueOf(reduce));
+        params.put("least_price", String.valueOf(least));
+        return actionWithResult("/coupon_by_kf/" + to_uid + "/" + orderId, params);
+    }
+
     public ResultBean order_dada_start(int orderId) throws ServiceException {
         return actionWithResult("/order_dada_start/" + orderId, new HashMap<String, String>());
     }
