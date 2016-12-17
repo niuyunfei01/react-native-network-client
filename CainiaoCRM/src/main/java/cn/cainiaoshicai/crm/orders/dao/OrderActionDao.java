@@ -184,4 +184,10 @@ public class OrderActionDao {
         String path = String.format("/order_chg_arrived_time/%d/%d/%d", orderId, newTimeInSec, oldTimeInSec);
         return actionWithResult(path, new HashMap<String, String>());
     }
+
+    public ResultBean save_remark(int orderId, String remarkTxt) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("store_remark", remarkTxt);
+        return actionWithResult("/order_edit_store_remark/" + orderId, params);
+    }
 }

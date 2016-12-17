@@ -59,7 +59,8 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
 
 /**
  */
-public class OrderSingleActivity extends AbstractActionBarActivity implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
+public class OrderSingleActivity extends AbstractActionBarActivity
+        implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
     private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private static final int REQUEST_CODE_ADDFB = 1001;
     private WebView mWebView;
@@ -656,6 +657,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                 Order o = orderRef.get();
                 createKfCouponDlg(this, o.getUserName(), o.getUser_id(), o.getId()).show();
                 return true;
+            case R.id.menu_store_remark:
+                createStoreRemarkDlg(this, orderRef.get().getStore_remark(), orderRef.get().getId()).show();
+                return true;
             case R.id.menu_chg_store:
                 AlertDialog.Builder storesDlg = new AlertDialog.Builder(this);
                 Collection<Store> stores = GlobalCtx.getInstance().listStores();
@@ -784,6 +788,53 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                             public void onClick(DialogInterface dialog, int whichButton) {
                             }
                         })
+                .create();
+        dlg.show();
+        return dlg;
+    }
+
+    private static AlertDialog createStoreRemarkDlg(final OrderSingleActivity activity, String initValue, final int orderId) {
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View npView = inflater.inflate(R.layout.order_single_remark_dlg, null);
+        final EditText msgTxt = (EditText) npView.findViewById(R.id.order_remark_msg);
+        msgTxt.setText(initValue);
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(null)
+                .setView(npView)
+                .setPositiveButton(R.string.order_save_remark,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        final String remarkTxt = msgTxt.getText().toString();
+
+                                        if (TextUtils.isEmpty(remarkTxt)) {
+                                            Utility.toast("备注信息不能为空!", activity, null);
+                                            return null;
+                                        }
+
+                                        ResultBean rb;
+                                        try {
+                                            OrderActionDao sad = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            rb = sad.save_remark(orderId, remarkTxt);
+                                        } catch (ServiceException e) {
+                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                        }
+                                        final ResultBean finalRb = rb;
+                                        activity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                String msg = finalRb.isOk() ? "已保存" : "保存失败：" + finalRb.getDesc();
+                                                Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                        return null;
+                                    }
+                                }.executeOnIO();
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null)
                 .create();
         dlg.show();
         return dlg;

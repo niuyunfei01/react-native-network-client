@@ -29,6 +29,7 @@ public class Order implements Serializable {
     private int platform;
     private String platform_oid;
     private String platform_dayId;
+    private String store_remark;
 
     private Date time_start_ship;
     private Date time_ready;
@@ -416,6 +417,13 @@ public class Order implements Serializable {
         return dada_dm_name;
     }
 
+    public String getStore_remark() {
+        return store_remark;
+    }
+
+    public void setStore_remark(String store_remark) {
+        this.store_remark = store_remark;
+    }
 
     public Feedback getFeedback() {
         return feedback;

@@ -61,7 +61,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                     Intent openOrder = new Intent(OrderQueryActivity.this, OrderSingleActivity.class);
                     Order item = (Order) adapter.getItem(position);
                     openOrder.putExtra("id", item.getId());
-                    openOrder.putExtra("list_type", listType);
+                    openOrder.putExtra("list_type", listType.getValue());
                     openOrder.putExtra("order", item);
                     try {
                         OrderQueryActivity.this.startActivity(openOrder);
