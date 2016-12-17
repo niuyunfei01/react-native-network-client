@@ -239,6 +239,7 @@
     <string name="store_on_sale_manual">回头手工上架</string>
     <string name="menu_order_store_remark">增加备注</string>
     <string name="order_save_remark">增加备注</string>
+    <string name="menu_order_refund">订单退款</string>
 
     <string-array name="feedback_source_array">
         <item>400来电</item>
