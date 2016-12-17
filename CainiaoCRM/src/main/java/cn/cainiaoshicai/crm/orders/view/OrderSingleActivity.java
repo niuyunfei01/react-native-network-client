@@ -654,7 +654,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity implements De
                 return true;
             case R.id.menu_kf_coupon:
                 Order o = orderRef.get();
-                createKfCouponDlg(this, o.getUserName(), o.getUserId(), o.getId()).show();
+                createKfCouponDlg(this, o.getUserName(), o.getUser_id(), o.getId()).show();
                 return true;
             case R.id.menu_chg_store:
                 AlertDialog.Builder storesDlg = new AlertDialog.Builder(this);

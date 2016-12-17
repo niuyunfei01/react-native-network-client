@@ -11,7 +11,7 @@ import cn.cainiaoshicai.crm.orders.util.TextUtil;
 public class Order implements Serializable {
 
     private int id;
-    private int userId;
+    private int user_id;
     private String area;
     private int gender;
     private Date receivedTime;
@@ -78,12 +78,12 @@ public class Order implements Serializable {
         this.dayId = dayId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
     public String getUserName() {
