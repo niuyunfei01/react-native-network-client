@@ -35,15 +35,14 @@
     android:text="退款原因:"
     android:textColor="@color/light_blue"
     android:layout_alignParentStart="true"
-    android:layout_below="@id/label_least_amount"
+    android:layout_below="@id/label_refund_amount"
     android:layout_marginTop="10dp"
     android:layout_width="wrap_content"
     android:layout_height="36dp" />
 
 <EditText android:id="@+id/order_refund_cause"
     android:textColor="@color/light_blue"
-    android:layout_toEndOf="@id/label_reduce_amount"
-    android:layout_below="@id/label_least_amount"
+    android:layout_toEndOf="@id/label_refund_reason"
     android:inputType="number"
     android:layout_marginTop="10dp"
     android:layout_width="match_parent"
@@ -51,14 +50,8 @@
     android:background="@drawable/edittext_style"/>
 
  <TextView
-     android:layout_below="@id/order_refund_cause"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:text="退款方式"/>
-
- <TextView
-    android:id="@+id/label_kf_msg"
-    android:layout_below="@+id/order_refund_cause"
+    android:id="@+id/label_refund_detail"
+    android:layout_below="@id/label_refund_reason"
     android:layout_alignParentStart="true"
     android:text="金额明细:"
     android:textColor="@color/light_blue"
@@ -66,12 +59,18 @@
     android:layout_height="36dp" />
 
 <EditText android:id="@+id/order_refund_detail"
-    android:layout_below="@id/label_reduce_amount"
+    android:layout_below="@id/label_refund_reason"
     android:textColor="@color/light_blue"
-    android:layout_toEndOf="@+id/label_kf_msg"
+    android:layout_toEndOf="@+id/label_refund_detail"
     android:inputType="textMultiLine"
     android:layout_width="match_parent"
     android:layout_height="72dp"
     android:background="@drawable/edittext_style"/>
+
+ <TextView android:id="@+id/label_order_refund"
+     android:layout_below="@id/label_refund_detail"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="退款方式"/>
 
 </RelativeLayout>
