@@ -91,6 +91,7 @@ import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
 import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.PrePackageCheckActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.customer_serv.customer_servsdk.util.Utils;
@@ -1066,6 +1067,10 @@ public class Utility {
                 ssa.putExtra("req_id", req_id);
                 ssa.putExtra("prod_id", prod_id);
                 ssa.putExtra("search", String.valueOf(prod_id));
+                ctx.startActivity(ssa);
+                return true;
+            } else if (url.indexOf("/stores/provide_prepare") > 0) {
+                Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);
                 ctx.startActivity(ssa);
                 return true;
             }

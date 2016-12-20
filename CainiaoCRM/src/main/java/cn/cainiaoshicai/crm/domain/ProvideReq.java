@@ -17,6 +17,7 @@ public class ProvideReq {
     private int store_id;
     private int status;
     private int total_req;
+    private String day;
 
     public int getId() {
         return id;
@@ -50,4 +51,11 @@ public class ProvideReq {
         this.total_req = total_req;
     }
 
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
 }

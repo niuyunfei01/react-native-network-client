@@ -19,6 +19,7 @@ import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Product;
+import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -85,6 +86,27 @@ public class StorageActionDao {
         } catch (ServiceException e) {
             AppLogger.e("chg_item_when_on_sale_again store_product_id="+ id + ", option=" + option, e);
             return ResultBean.readingFailed();
+        }
+    }
+
+    public ResultObject store_provide_estimate(int store_id, String day) {
+        try {
+            String path = String.format("/provide_estimate/%d/%s", store_id, day);
+            HashMap<String, String> params = new HashMap<>();
+            String json = getJson(path, params);
+
+            try {
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+                return gson.fromJson(json, new TypeToken<ResultObject<ProductEstimate>>() {
+                }.getType());
+            } catch (JsonSyntaxException e) {
+                AppLogger.e(e.getMessage(), e);
+                ResultBean bean = ResultBean.readingFailed();
+                return new ResultObject(bean.isOk(), bean.getDesc());
+            }
+        } catch (ServiceException e) {
+            AppLogger.e("provide_estimate store_id="+ store_id + ", day=" + day, e);
+            return ResultObject.readingFailed();
         }
     }
 

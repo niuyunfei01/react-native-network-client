@@ -7,6 +7,7 @@ import java.io.OutputStream;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -15,6 +16,8 @@ import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+
+import static android.R.attr.order;
 
 /**
  * Created by liuzhr on 10/27/16.
@@ -50,6 +53,82 @@ public class OrderPrinter {
                 return null;
             }
         }.executeOnNormal();
+    }
+
+    public static void printEstimate(BluetoothConnector.BluetoothSocketWrapper btsocket, ProductEstimate estimate) throws IOException {
+        try {
+            OutputStream btos = btsocket.getOutputStream();
+            BasePrinter printer = new BasePrinter(btos);
+
+            btos.write(new byte[]{0x1B, 0x21, 0});
+            btos.write(GPrinterCommand.left);
+
+            printer.starLine().highBigText("   估货单").newLine()
+                    .newLine().highBigText("  #" + estimate.getDay());
+
+            printer.normalText(GlobalCtx.getApplication().getStoreName(estimate.getStore_id()) ).newLine();
+
+//            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
+//
+//            printer.starLine()
+//                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
+//                    .newLine()
+//                    .highText(TextUtil.replaceWhiteStr(order.getAddress()))
+//                    .newLine();
+//
+//            String expectedStr = order.getExpectTimeStr();
+//            if (expectedStr == null) {
+//                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+//            }
+//            printer.starLine().highText("期望送达：" + expectedStr).newLine();
+//            if (!TextUtils.isEmpty(order.getRemark())) {
+//                printer.highText("用户备注：" + order.getRemark())
+//                        .newLine();
+//            }
+//
+//            printer.starLine()
+//                    .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
+//                    .newLine()
+//                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+//                    .newLine();
+
+            printer.starLine().highText(String.format("品名%22s", "份数")).newLine().splitLine();
+
+            int total = 0;
+            for (ProductEstimate.Item item :  estimate.getLists()) {
+                String name = item.getName();
+                for (int idx = 0; idx < name.length(); ) {
+
+                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
+                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                    if (isEnd) {
+                        String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                        text = String.format(format, text, "x" + item.getTo_ready());
+                    }
+                    printer.highText(text).newLine();
+                    if (isEnd) {
+                        printer.spaceLine();
+                    }
+
+                    idx += MAX_TITLE_PART;
+                }
+                total += item.getTo_ready();
+            }
+
+            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
+
+            printer.starLine().normalText("当天的菜，必须包好进入冷库和货架！").newLine();
+
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(GPrinterCommand.walkPaper((byte) 4));
+            btos.flush();
+        } catch (Exception e) {
+            AppLogger.e("error in printing estimate lists", e);
+            throw e;
+        }
     }
 
     public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {

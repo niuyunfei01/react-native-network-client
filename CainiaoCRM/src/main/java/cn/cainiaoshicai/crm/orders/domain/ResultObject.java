@@ -21,4 +21,8 @@ public class ResultObject<T> extends ResultBean {
     public void setObj(T obj) {
         this.obj = obj;
     }
+
+    public static ResultObject readingFailed() {
+        return new ResultObject(false, "数据读取异常");
+    }
 }
