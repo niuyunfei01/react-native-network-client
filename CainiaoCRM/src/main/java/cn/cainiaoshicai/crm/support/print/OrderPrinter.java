@@ -152,8 +152,11 @@ public class OrderPrinter {
             printer.starLine()
                     .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
                             .newLine()
-                            .highText(TextUtil.replaceWhiteStr(order.getAddress()))
-                            .newLine();
+                            .highText(TextUtil.replaceWhiteStr(order.getAddress()));
+            if (!TextUtils.isEmpty(order.getDirection())) {
+                printer.highText("[" + order.getDirection() + "]");
+            }
+            printer.newLine();
 
             String expectedStr = order.getExpectTimeStr();
             if (expectedStr == null) {

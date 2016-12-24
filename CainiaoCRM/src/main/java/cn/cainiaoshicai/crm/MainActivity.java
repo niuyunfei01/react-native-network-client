@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -45,6 +47,7 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
@@ -108,22 +111,38 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
     }
 
     private void resetPrinterStatusBar(boolean show) {
+        final ArrayList<Integer> autoPrintStores = SettingUtility.getAutoPrintStores();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
-        ArrayList<Integer> autoPrintStores = SettingUtility.getAutoPrintStores();
-        if (show && !autoPrintStores.isEmpty()) {
-            final String printStatusTxt;
+        RelativeLayout opBar = (RelativeLayout) this.findViewById(R.id.op_bar);
+        this.findViewById(R.id.head_orders_schedule).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+                String storeStr = TextUtils.join(",", autoPrintStores);
+                String token = GlobalCtx.getApplication().getSpecialToken();
+                intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token, URLHelper.HTTP_MOBILE_STORES, storeStr));
+                startActivity(intent);
+            }
+        });
+        if (show) {
+            opBar.setVisibility(View.VISIBLE);
             final int bgColorResId;
-            String autoPrintNames = GlobalCtx.getApplication().getStoreNames(autoPrintStores);
-            if (SettingsPrintActivity.isPrinterConnected()) {
-                printStatusTxt = "已设自动打印(" + autoPrintNames + ")，打印机已就绪！";
-                bgColorResId = R.color.green;
+            if (!autoPrintStores.isEmpty()) {
+                final String printStatusTxt;
+                String autoPrintNames = GlobalCtx.getApplication().getStoreNames(autoPrintStores);
+                if (SettingsPrintActivity.isPrinterConnected()) {
+                    printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
+                    bgColorResId = R.color.green;
+                } else {
+                    printStatusTxt = "自动打印(" + autoPrintNames + ")，未连接！";
+                    bgColorResId = R.color.red;
+                }
+                printerStatus.setText(printStatusTxt);
             } else {
-                printStatusTxt = "已设自动打印(" + autoPrintNames + ")，点此连接打印机！";
-                bgColorResId = R.color.red;
+                printerStatus.setText("自动打印：关闭");
+                bgColorResId = R.color.gray;
             }
             printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
-            printerStatus.setText(printStatusTxt);
-            printerStatus.setVisibility(View.VISIBLE);
             printerStatus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -132,7 +151,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 }
             });
         } else {
-            printerStatus.setVisibility(View.GONE);
+            opBar.setVisibility(View.GONE);
         }
     }
 
