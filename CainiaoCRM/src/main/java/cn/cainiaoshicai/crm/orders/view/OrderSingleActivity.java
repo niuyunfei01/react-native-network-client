@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -598,7 +600,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 return true;
             case R.id.menu_send_coupon:
                 AlertDialog.Builder couponsAdb = new AlertDialog.Builder(this);
-                String[] coupons = new String[]{
+                final String[] coupons = new String[]{
                         "延误补偿(6元优惠券)", //type = 1
                         "严重延误补偿（满79减20）", //type = 2
                         "品质补偿券(6元)", //type = 3
@@ -606,6 +608,10 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                         "品质补偿券(15元)", //type = 5
                         "品质补偿券(20元)", //type = 6
                         "品质补偿券(30元)", //type = 7
+                        "品质补偿券(30元)", //type = 7
+                        "品质补偿券(30元)", //type = 7
+                        "活动有奖菜票(防冻玻璃水)[28591]", //type = 28591
+                        "活动有奖菜票(香油)[28590]", //type = 28590
                 };
                 final int[] checkedIdx = new int[1];
                 couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], new DialogInterface.OnClickListener() {
@@ -622,7 +628,17 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                     private String errorDesc = null;
                                     @Override
                                     protected Void doInBackground(Void... params) {
+
                                         int type = checkedIdx[0] + 1;
+                                        Pattern pattern = Pattern.compile(".*\\[(\\d+)\\]$");
+                                        Matcher matcher = pattern.matcher(coupons[checkedIdx[0]]);
+                                        if(matcher.find()) {
+                                            int typeInt = Integer.parseInt(matcher.group(1));
+                                            if (typeInt > coupons.length) {
+                                                type = typeInt;
+                                            }
+                                        }
+
                                         if (type > 0) {
                                             OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                                             try {

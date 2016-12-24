@@ -68,6 +68,8 @@ public class OrderPrinter {
 
             printer.normalText(GlobalCtx.getApplication().getStoreName(estimate.getStore_id()) ).newLine();
 
+            printer.normalText("负责人：___________").newLine();
+
 //            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
 //
 //            printer.starLine()
