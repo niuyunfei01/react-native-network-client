@@ -267,7 +267,7 @@ public class StorageActionDao {
     }
 
     private String getJson(String pathSuffix, HashMap<String, String> params) throws ServiceException {
-        String url = URLHelper.API_ROOT + pathSuffix + ".json" ;
+        String url = URLHelper.API_ROOT() + pathSuffix + ".json" ;
 
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);

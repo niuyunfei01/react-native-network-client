@@ -33,7 +33,7 @@ public class CommonConfigDao {
     }
 
     public Config get() throws ServiceException {
-        String url = URLHelper.API_ROOT + "/common_config.json" ;
+        String url = URLHelper.API_ROOT() + "/common_config.json" ;
 
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
@@ -54,7 +54,7 @@ public class CommonConfigDao {
     }
 
     public LinkedHashMap<Integer, Store> listStores() throws ServiceException {
-        String url = URLHelper.API_ROOT + "/list_store.json" ;
+        String url = URLHelper.API_ROOT() + "/list_store.json" ;
 
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
@@ -79,7 +79,7 @@ public class CommonConfigDao {
         map.put("access_token", access_token);
 
         try {
-            String url = URLHelper.API_ROOT + "/list_tags.json";
+            String url = URLHelper.API_ROOT() + "/list_tags.json";
             String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             return gson.fromJson(json, new TypeToken<ArrayList<Tag>>() {

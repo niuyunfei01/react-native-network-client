@@ -23,7 +23,7 @@ import cn.cainiaoshicai.crm.support.http.HttpUtility;
 public class OrdersDao {
 
     private String getJson(String searchTerm) throws ServiceException {
-        String url = URLHelper.API_ROOT + "/orders.json" ;
+        String url = URLHelper.API_ROOT() + "/orders.json" ;
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("access_token", access_token);

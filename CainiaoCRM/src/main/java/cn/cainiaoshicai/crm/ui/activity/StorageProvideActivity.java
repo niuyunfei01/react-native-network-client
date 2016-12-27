@@ -283,7 +283,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
 
     private void update_loading_url(int store_id, int req_id) {
         String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
-        String gotoUrl = String.format("%s/provide_list/%s.html", URLHelper.HTTP_MOBILE_STORES, store_id)
+        String gotoUrl = String.format("%s/provide_list/%s.html", URLHelper.getStoresPrefix(), store_id)
                 + "?access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;
         if (req_id > 0) {
             gotoUrl += "&req_id=" + req_id;

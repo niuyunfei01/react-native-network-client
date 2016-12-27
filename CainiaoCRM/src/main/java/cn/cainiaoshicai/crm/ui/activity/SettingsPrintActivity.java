@@ -31,6 +31,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
@@ -66,6 +67,15 @@ public class SettingsPrintActivity extends ListActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				SettingUtility.setDisableSoundNotify(isChecked);
+			}
+		});
+
+		final Switch toggleUsePreview = (Switch) findViewById(R.id.toggleUsePreview);
+		toggleUsePreview.setChecked(SettingHelper.usePreviewHost());
+		toggleUsePreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				SettingHelper.setUserPreviewHost(isChecked);
 			}
 		});
 

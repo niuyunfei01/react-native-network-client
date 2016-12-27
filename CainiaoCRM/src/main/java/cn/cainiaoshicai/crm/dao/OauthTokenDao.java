@@ -18,7 +18,7 @@ import cn.cainiaoshicai.crm.support.http.HttpUtility;
 public class OauthTokenDao {
 
     private String getJson(String username, String password) throws ServiceException {
-        String url = URLHelper.OAUTH2_TOKEN;
+        String url = URLHelper.OAUTH2_TOKEN();
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("grant_type", "password");

@@ -120,7 +120,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
                 String storeStr = TextUtils.join(",", autoPrintStores);
                 String token = GlobalCtx.getApplication().getSpecialToken();
-                intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token, URLHelper.HTTP_MOBILE_STORES, storeStr));
+                intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token, URLHelper.getStoresPrefix(), storeStr));
                 startActivity(intent);
             }
         });

@@ -63,7 +63,6 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
  */
 public class OrderSingleActivity extends AbstractActionBarActivity
         implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
-    private static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
     private static final int REQUEST_CODE_ADDFB = 1001;
     private WebView mWebView;
     private DelayFaqFragment delayFaqFragment;
@@ -267,7 +266,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
         String token = GlobalCtx.getInstance().getSpecialToken();
         String clientId = GlobalCtx.getInstance().getCurrentAccountId();
-        url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", HTTP_MOBILE_STORES, token, order.getId(), clientId);
+        url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", URLHelper.getStoresPrefix(), token, order.getId(), clientId);
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }

@@ -8,7 +8,9 @@ import android.preference.PreferenceManager;
  * User: qii
  * Date: 12-11-28
  */
-class SettingHelper {
+public class SettingHelper {
+
+    private static boolean USE_PREVIEW_HOST = false;
     private static SharedPreferences.Editor editor = null;
     private static SharedPreferences sharedPreferences = null;
 
@@ -63,5 +65,13 @@ class SettingHelper {
 
     public static void setEditor(Context paramContext, String paramString1, String paramString2) {
         getEditorObject(paramContext).putString(paramString1, paramString2).commit();
+    }
+
+    public static void setUserPreviewHost(boolean isChecked) {
+        SettingHelper.USE_PREVIEW_HOST = isChecked;
+    }
+
+    public static boolean usePreviewHost() {
+        return USE_PREVIEW_HOST;
     }
 }

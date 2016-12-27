@@ -89,11 +89,11 @@ public class MineActivity extends AbstractActionBarActivity {
 							.show();
 				} else if (item.getType() == TYPE_STORE_PERF) {
 					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-					intent.putExtra("url", String.format("%s/worker_stats_by_day.html", URLHelper.HTTP_MOBILE_STORES));
+					intent.putExtra("url", String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix()));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_PROVIDE_LIST) {
 					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-					intent.putExtra("url", String.format("%s/provide_req_all.html", URLHelper.HTTP_MOBILE_STORES));
+					intent.putExtra("url", String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_SYNC_STATUS) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,

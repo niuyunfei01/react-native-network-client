@@ -22,7 +22,7 @@ import cn.cainiaoshicai.crm.support.http.HttpUtility;
 public class NewOrderDao {
 
     private String getJson() throws ServiceException {
-        String url = URLHelper.API_ROOT + "/orders_new.json" ;
+        String url = URLHelper.API_ROOT() + "/orders_new.json" ;
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("access_token", access_token);
@@ -53,7 +53,7 @@ public class NewOrderDao {
 
     public PerformStat getStat() {
         try {
-            String url = URLHelper.API_ROOT + "/perm_stats.json" ;
+            String url = URLHelper.API_ROOT() + "/perm_stats.json" ;
 
             Map<String, String> map = new HashMap<String, String>();
             map.put("access_token", access_token);
@@ -69,7 +69,7 @@ public class NewOrderDao {
 
     public HashMap<String, String> getStatMap() {
         try {
-            String url = URLHelper.API_ROOT + "/perm_stats.json" ;
+            String url = URLHelper.API_ROOT() + "/perm_stats.json" ;
 
             Map<String, String> map = new HashMap<String, String>();
             map.put("access_token", access_token);

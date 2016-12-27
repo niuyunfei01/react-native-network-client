@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.dao;
 
 import cn.customer_serv.customer_servsdk.util.Utils;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 
 /**
  * User: qii
@@ -8,15 +9,22 @@ import cn.customer_serv.customer_servsdk.util.Utils;
  */
 public class URLHelper {
 
-    public static final String HTTP_MOBILE_STORES = "http://www.cainiaoshicai.cn/stores";
-    public static final String WEB_URL_ROOT = "http://www.cainiaoshicai.cn";
-    public static final String API_ROOT = "http://www.cainiaoshicai.cn/api";
-    public static final String OAUTH2_TOKEN = "http://www.cainiaoshicai.cn/oauth/token";
-    public static final String USER_INFO = API_ROOT +  "/user_info";
+    public static String getHost() {
+        return (SettingHelper.usePreviewHost() ? "preview" : "www")  + ".cainiaoshicai.cn";
+    }
+
+    public static final String WEB_URL_ROOT = "http://" + getHost();
+    public static String API_ROOT() {
+        return "http://" + getHost() + "/api";
+    }
+
+    public static final String OAUTH2_TOKEN() {
+        return "http://" + getHost() + "/oauth/token";
+    }
+
+    public static final String USER_INFO = API_ROOT() + "/user_info";
 
     private static final String URL_SINA_WEIBO = "https://api.weibo.com/2/";
-
-
 
     //login
     public static final String UID = URL_SINA_WEIBO + "account/get_uid.json";
@@ -157,4 +165,8 @@ public class URLHelper {
     //edit my profile
     public static final String MYPROFILE_EDIT = URL_SINA_WEIBO + "account/profile/basic_update.json";
     public static final String AVATAR_UPLOAD = URL_SINA_WEIBO + "account/avatar/upload.json";
+
+    public static String getStoresPrefix() {
+        return"http://" + getHost() + "/stores";
+    }
 }

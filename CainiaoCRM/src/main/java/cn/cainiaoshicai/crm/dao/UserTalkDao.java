@@ -22,7 +22,7 @@ import cn.cainiaoshicai.crm.support.http.HttpUtility;
 public class UserTalkDao implements IUserTalkDao {
 
     private String post(String method, Map<String, String> params) throws ServiceException {
-        String url = URLHelper.API_ROOT + "/" + method + ".json";
+        String url = URLHelper.API_ROOT() + "/" + method + ".json";
         params.put("access_token", access_token);
         return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, params);
     }
