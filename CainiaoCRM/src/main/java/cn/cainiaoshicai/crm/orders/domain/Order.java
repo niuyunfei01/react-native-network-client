@@ -350,7 +350,11 @@ public class Order implements Serializable {
 
     public String platformWithId() {
         boolean dayIdInvalid = TextUtil.isEmpty(this.getPlatform_dayId()) || "0".equals(this.getPlatform_dayId());
-        return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayIdInvalid ? this.getPlatform_oid() : this.getPlatform_dayId());
+        String dayNo = dayIdInvalid ? this.getPlatform_oid() : this.getPlatform_dayId();
+        if (this.getPlatform() == Cts.PLAT_JDDJ.id) {
+            dayNo = "";
+        }
+        return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayNo);
     }
 
     public boolean shouldTryAutoPrint() {

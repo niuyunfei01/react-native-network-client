@@ -24,8 +24,7 @@
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/label_sound_notify" />
 
-
-    <TextView android:text="使用预发布环境"
+    <TextView android:text="使用预发布(工程师使用)"
         android:id="@+id/label_use_preview"
         android:layout_below="@+id/label_sound_notify"
         android:layout_width="wrap_content"
