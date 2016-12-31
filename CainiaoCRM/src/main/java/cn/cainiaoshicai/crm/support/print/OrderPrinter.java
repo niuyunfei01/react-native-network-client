@@ -179,23 +179,25 @@ public class OrderPrinter {
             int total = 0;
             for (CartItem item : order.getItems()) {
                 String name = item.getProduct_name();
-                for (int idx = 0; idx < name.length(); ) {
+                if (item.getPrice() >= 0) {
+                    for (int idx = 0; idx < name.length(); ) {
 
-                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+                        String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
 
-                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
-                    if (isEnd) {
-                        String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
-                        text = String.format(format, text, "x" + item.getNum());
+                        boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                        if (isEnd) {
+                            String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                            text = String.format(format, text, "x" + item.getNum());
+                        }
+                        printer.highText(text).newLine();
+                        if (isEnd) {
+                            printer.spaceLine();
+                        }
+
+                        idx += MAX_TITLE_PART;
                     }
-                    printer.highText(text).newLine();
-                    if (isEnd) {
-                        printer.spaceLine();
-                    }
-
-                    idx += MAX_TITLE_PART;
+                    total += item.getNum();
                 }
-                total += item.getNum();
             }
 
             printer.highText(String.format("合计 %27s", "x" + total)).newLine();
