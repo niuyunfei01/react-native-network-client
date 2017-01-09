@@ -1037,7 +1037,11 @@ public class Utility {
 
     public static boolean handleUrlJump(Context ctx, WebView view, String url) {
         if (url != null) {
-            if (url.indexOf("/stores/provide_list.html") > 0) {
+            if (url.startsWith("tel:")) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                ctx.startActivity(intent);
+                return true;
+            } else if (url.indexOf("/stores/provide_list.html") > 0) {
                 Intent intent = new Intent(ctx, StorageProvideActivity.class);
                 intent.putExtra("req_id", Integer.parseInt(Utility.parseUrl(url).getString("req_id")));
                 ctx.startActivity(intent);

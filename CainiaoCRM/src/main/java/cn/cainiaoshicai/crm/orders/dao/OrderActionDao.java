@@ -190,4 +190,9 @@ public class OrderActionDao {
         params.put("store_remark", remarkTxt);
         return actionWithResult("/order_edit_store_remark/" + orderId, params);
     }
+
+    public ResultBean order_waiting_list(int orderId) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        return actionWithResult("/order_waiting_list/" + orderId, params);
+    }
 }

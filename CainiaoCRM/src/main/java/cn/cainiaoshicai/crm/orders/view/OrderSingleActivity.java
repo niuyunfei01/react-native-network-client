@@ -141,7 +141,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return false;
+                return Utility.handleUrlJump(OrderSingleActivity.this, view, url);
             }
         });
 
@@ -674,6 +674,27 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 return true;
             case R.id.menu_store_remark:
                 createStoreRemarkDlg(this, orderRef.get().getStore_remark(), orderRef.get().getId()).show();
+                return true;
+            case R.id.menu_order_refund:
+                return true;
+            case R.id.menu_order_waiting_list:
+                new MyAsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                        try {
+                            ResultBean rb = dao.order_waiting_list( orderRef.get().getId());
+                            if (rb.isOk()) {
+                                helper.showToast("加入成功！");
+                            } else {
+                                helper.showToast("加入失败：" + rb.getDesc());
+                            }
+                        } catch (ServiceException e) {
+                            helper.showToast("加入失败：" + e.getMessage());
+                        }
+                        return null;
+                    }
+                }.executeOnNormal();
                 return true;
             case R.id.menu_chg_store:
                 AlertDialog.Builder storesDlg = new AlertDialog.Builder(this);

@@ -124,6 +124,15 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 startActivity(intent);
             }
         });
+        this.findViewById(R.id.head_orders_waiting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+                String token = GlobalCtx.getApplication().getSpecialToken();
+                intent.putExtra("url", String.format("%s/quick_task_list.html?access_token="+ token, URLHelper.getStoresPrefix()));
+                startActivity(intent);
+            }
+        });
         if (show) {
             opBar.setVisibility(View.VISIBLE);
             final int bgColorResId;

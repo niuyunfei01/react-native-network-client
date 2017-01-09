@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.orders.view;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,8 +11,10 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -23,6 +26,8 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.dao.StorageActionDao;
+import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -31,6 +36,7 @@ import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 
 /**
  * Created by liuzhr on 7/28/16.
@@ -133,6 +139,71 @@ public class OrderSingleHelper {
         });
     }
 
+
+    /**
+     * 退款/加钱
+     * @param activity
+     * @param item
+     * @return
+     */
+    static AlertDialog createRefundDialog(final StoreStorageActivity activity, final StorageItem item) {
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
+        final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
+        final EditText remark = (EditText) npView.findViewById(R.id.remark);
+        int totalInReq = item.getTotalInReq();
+        int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
+        totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
+        remark.setText(item.getReqMark());
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(String.format("订货:(%s)", item.getName()))
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        StorageActionDao.ResultEditReq rb;
+                                        final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
+                                        final String remarkTxt = remark.getText().toString();
+                                        try {
+                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
+                                        } catch (ServiceException e) {
+                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                        }
+                                        final int total_req_cnt = rb.isOk() ? rb.getTotal_req_cnt() : -1;
+
+                                        final ResultBean finalRb = rb;
+                                        activity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (finalRb.isOk()) {
+                                                    item.setTotalInReq(total_req_no);
+                                                    item.setReqMark(remarkTxt);
+                                                    Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
+                                                    activity.refreshData();
+                                                } else {
+                                                    Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+                                        return null;
+                                    }
+                                }.executeOnIO();
+                            }
+                        })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        })
+                .create();
+        dlg.show();
+        totalReqTxt.requestFocus();
+        return dlg;
+    }
 
  public static class DadaCancelTask extends MyAsyncTask<Integer, ResultBean, ResultBean> {
 
@@ -253,7 +324,7 @@ public class OrderSingleHelper {
                                 .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        new DadaCallTask(orderId, helper).executeOnNormal();
+                                        callDada(_order, ctx);
                                     }
                                 }).setNegativeButton("暂不呼叫", null);
                         adb.show();
@@ -293,7 +364,7 @@ public class OrderSingleHelper {
                                 .setNegativeButton("重新发单", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        new DadaCallTask(orderId, helper, true).executeOnNormal();
+                                        callDada(_order, ctx, true);
                                     }
                                 }).setPositiveButton(R.string.cancel, null);
                         adb.show();
@@ -309,6 +380,25 @@ public class OrderSingleHelper {
                 }
             }.executeOnNormal();
 
+        }
+
+        private void callDada(Order _order, Context ctx, final boolean restart) {
+            if (_order.getPlatform() == Cts.PLAT_JDDJ.id) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
+                adb.setMessage("这是京东到家订单！确定要使用达达发单吗？")
+                        .setPositiveButton("确定呼叫", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new DadaCallTask(orderId, helper, restart).executeOnNormal();
+                            }
+                        }).setNegativeButton("取消", null);
+            } else {
+                new DadaCallTask(orderId, helper, restart).executeOnNormal();
+            }
+        }
+
+        private void callDada(Order _order, Context ctx) {
+            this.callDada(_order, ctx, false);
         }
 
         private class DadaCallTask extends MyAsyncTask<Integer, ResultBean, ResultBean> {
