@@ -138,7 +138,13 @@ public class OrderAdapter extends BaseAdapter {
                 cancelStrikeThrough(paidWayTxt);
             }
 
-            orderAddr.setText((isInvalid ? "[已无效]":"") + order.getAddress());
+            final String direction;
+            if ("未知".equals(order.getDirection())) {
+                direction = "";
+            } else {
+                direction = " [ " + order.getDirection() + " ]";
+            }
+            orderAddr.setText((isInvalid ? "[已无效]" : "") + order.getAddress() + direction);
             userName.setText(order.getUserName());
             phone.setText(order.getMobile());
             phone.setOnClickListener(new View.OnClickListener() {
