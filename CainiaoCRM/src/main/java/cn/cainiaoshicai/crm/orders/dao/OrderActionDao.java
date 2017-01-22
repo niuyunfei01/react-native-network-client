@@ -167,7 +167,9 @@ public class OrderActionDao {
     }
 
     public ResultBean order_dada_cancel(int orderId, int cancelReason, String reasonTxt) throws ServiceException {
-        return actionWithResult("/order_dada_cancel/" + orderId + "/" + cancelReason + "/" + reasonTxt , new HashMap<String, String>());
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cancel_reason", reasonTxt);
+        return actionWithResult("/order_dada_cancel/" + orderId + "/" + cancelReason , params);
     }
 
     public ResultBean orderDadaQuery(int orderId) throws ServiceException {

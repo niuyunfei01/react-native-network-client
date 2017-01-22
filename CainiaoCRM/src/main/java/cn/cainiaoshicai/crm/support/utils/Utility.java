@@ -1041,42 +1041,48 @@ public class Utility {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 ctx.startActivity(intent);
                 return true;
-            } else if (url.indexOf("/stores/provide_list.html") > 0) {
-                Intent intent = new Intent(ctx, StorageProvideActivity.class);
-                intent.putExtra("req_id", Integer.parseInt(Utility.parseUrl(url).getString("req_id")));
-                ctx.startActivity(intent);
-                return true;
-            } else if (url.indexOf("/stores/view_order") > 0) {
-                Intent intent = new Intent(ctx, OrderSingleActivity.class);
-                String wm_id = Utility.parseUrl(url).getString("wm_id");
-                if (wm_id != null) {
-                    intent.putExtra("order_id", Integer.parseInt(wm_id));
-                }
-                ctx.startActivity(intent);
-                return true;
-            } else if(url.indexOf("/stores/provide_req_all.html") > 0) {
-                Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
-                intent.putExtra("url", url);
-                ctx.startActivity(intent);
-                return true;
-            } else if (url.indexOf(STORES_STORAGE_COMMON) > 0) {
-                int start = url.indexOf(STORES_STORAGE_COMMON) + STORES_STORAGE_COMMON.length();
-                String[] args = url.substring(start).split("/");
-                int store_id = args.length > 1 ? Integer.parseInt(args[0]) : 0;
-                int req_id = args.length > 2 ? Integer.parseInt(args[1]) : 0;
-                int prod_id = args.length > 3 ? Integer.parseInt(args[2]) : 0;
+            } else if (url.startsWith("https:")) {
+                if (url.indexOf("/stores/provide_list.html") > 0) {
+                    Intent intent = new Intent(ctx, StorageProvideActivity.class);
+                    intent.putExtra("req_id", Integer.parseInt(Utility.parseUrl(url).getString("req_id")));
+                    ctx.startActivity(intent);
+                    return true;
+                } else if (url.indexOf("/stores/view_order") > 0) {
+                    Intent intent = new Intent(ctx, OrderSingleActivity.class);
+                    String wm_id = Utility.parseUrl(url).getString("wm_id");
+                    if (wm_id != null) {
+                        intent.putExtra("order_id", Integer.parseInt(wm_id));
+                    }
+                    ctx.startActivity(intent);
+                    return true;
+                } else if(url.indexOf("/stores/provide_req_all.html") > 0) {
+                    Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
+                    intent.putExtra("url", url);
+                    ctx.startActivity(intent);
+                    return true;
+                } else if (url.indexOf(STORES_STORAGE_COMMON) > 0) {
+                    int start = url.indexOf(STORES_STORAGE_COMMON) + STORES_STORAGE_COMMON.length();
+                    String[] args = url.substring(start).split("/");
+                    int store_id = args.length > 1 ? Integer.parseInt(args[0]) : 0;
+                    int req_id = args.length > 2 ? Integer.parseInt(args[1]) : 0;
+                    int prod_id = args.length > 3 ? Integer.parseInt(args[2]) : 0;
 
-                Intent ssa = new Intent(ctx, StoreStorageActivity.class);
-                ssa.putExtra("store_id", store_id);
-                ssa.putExtra("req_id", req_id);
-                ssa.putExtra("prod_id", prod_id);
-                ssa.putExtra("search", String.valueOf(prod_id));
-                ctx.startActivity(ssa);
-                return true;
-            } else if (url.indexOf("/stores/provide_prepare") > 0) {
-                Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);
-                ctx.startActivity(ssa);
-                return true;
+                    Intent ssa = new Intent(ctx, StoreStorageActivity.class);
+                    ssa.putExtra("store_id", store_id);
+                    ssa.putExtra("req_id", req_id);
+                    ssa.putExtra("prod_id", prod_id);
+                    ssa.putExtra("search", String.valueOf(prod_id));
+                    ctx.startActivity(ssa);
+                    return true;
+                } else if (url.indexOf("/stores/provide_prepare") > 0) {
+                    Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);
+                    ctx.startActivity(ssa);
+                    return true;
+                } else if (url.indexOf("/stores/m_buy_waiting_list") > 0) {
+                    Intent ssa = new Intent(ctx, GeneralWebViewActivity.class);
+                    ctx.startActivity(ssa);
+                    return true;
+                }
             }
         }
 

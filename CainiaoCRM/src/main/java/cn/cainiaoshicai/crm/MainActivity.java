@@ -45,6 +45,7 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
@@ -118,7 +119,15 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-                String storeStr = TextUtils.join(",", autoPrintStores);
+
+                Set<Integer> listenerStores =  SettingUtility.getListenerStores();
+                listenerStores.remove(Cts.STORE_UNKNOWN);
+                if (listenerStores.size() > 1 || listenerStores.isEmpty()) {
+                    Utility.toast("排单/采购系统只支持一个店铺的订单，请修改设置！", MainActivity.this, null);
+                    return;
+                }
+
+                String storeStr = TextUtils.join(",", listenerStores);
                 String token = GlobalCtx.getApplication().getSpecialToken();
                 intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token, URLHelper.getStoresPrefix(), storeStr));
                 startActivity(intent);

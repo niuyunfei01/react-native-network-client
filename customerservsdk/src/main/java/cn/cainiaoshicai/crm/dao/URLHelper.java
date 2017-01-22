@@ -13,13 +13,13 @@ public class URLHelper {
         return (SettingHelper.usePreviewHost() ? "preview" : "www")  + ".cainiaoshicai.cn";
     }
 
-    public static final String WEB_URL_ROOT = "http://" + getHost();
+    public static final String WEB_URL_ROOT = "https://" + getHost();
     public static String API_ROOT() {
-        return "http://" + getHost() + "/api";
+        return "https://" + getHost() + "/api";
     }
 
     public static final String OAUTH2_TOKEN() {
-        return "http://" + getHost() + "/oauth/token";
+        return "https://" + getHost() + "/oauth/token";
     }
 
     public static final String USER_INFO = API_ROOT() + "/user_info";
@@ -167,6 +167,6 @@ public class URLHelper {
     public static final String AVATAR_UPLOAD = URL_SINA_WEIBO + "account/avatar/upload.json";
 
     public static String getStoresPrefix() {
-        return"http://" + getHost() + "/stores";
+        return"https://" + getHost() + "/stores";
     }
 }

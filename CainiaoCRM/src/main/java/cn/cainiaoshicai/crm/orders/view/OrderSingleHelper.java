@@ -428,7 +428,7 @@ public class OrderSingleHelper {
                         dadaStatus = Cts.DADA_STATUS_TO_ACCEPT;
                         helper.updateDadaCallLabelUI(dadaStatus, btnCallDada);
                     }else {
-                        helper.showToast("呼叫失败:" + resultBean.getDesc());
+                        helper.showToast("呼叫失败:" + (resultBean != null ? resultBean.getDesc() : "未知"));
                     }
                 } catch (ServiceException e) {
                     e.printStackTrace();
