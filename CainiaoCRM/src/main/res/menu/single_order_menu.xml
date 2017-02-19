@@ -33,6 +33,4 @@
 
     <item android:id="@+id/menu_order_waiting_list" android:title="@string/menu_to_waiting_list"/>
 
-
-
 </menu>

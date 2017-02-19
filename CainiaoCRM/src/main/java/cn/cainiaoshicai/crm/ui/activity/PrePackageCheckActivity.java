@@ -171,7 +171,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
     }
 
     public void refresh() {
-        this.mWebView.loadUrl("about:blank");
+//        this.mWebView.loadUrl("about:blank");
         LayoutInflater inflater = (LayoutInflater) getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);

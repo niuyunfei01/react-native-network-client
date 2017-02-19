@@ -89,11 +89,15 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
 import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
+import cn.cainiaoshicai.crm.ui.activity.CustomizedMQConversationActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.PrePackageCheckActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.customer_serv.customer_servsdk.activity.MQConversationActivity;
+import cn.customer_serv.customer_servsdk.util.MQIntentBuilder;
 import cn.customer_serv.customer_servsdk.util.Utils;
 
 public class Utility {
@@ -1058,6 +1062,24 @@ public class Utility {
                 } else if(url.indexOf("/stores/provide_req_all.html") > 0) {
                     Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
                     intent.putExtra("url", url);
+                    ctx.startActivity(intent);
+                    return true;
+                } else if (url.indexOf("/market_tools/users.html") > 0) {
+                    Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
+                    intent.putExtra("url", url);
+                    ctx.startActivity(intent);
+                    return true;
+                } else if (url.indexOf("/market_tools/user_data.html") > 0) {
+                    String uid = Utility.parseUrl(url).getString("uid");
+                    Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
+                    intent.putExtra("url", url);
+                    ctx.startActivity(intent);
+                    return true;
+                }  else if (url.indexOf("/market_tools/user_talk") > 0) {
+                    String uid = Utility.parseUrl(url).getString("uid");
+                    Intent intent = new MQIntentBuilder(ctx, CustomizedMQConversationActivity.class).build();
+                    intent.putExtra("uid", uid);
+                    intent.putExtra(MQConversationActivity.CLIENT_ID, "oqtD1jpuI1-U8wQWQ09LPegHIVeU");
                     ctx.startActivity(intent);
                     return true;
                 } else if (url.indexOf(STORES_STORAGE_COMMON) > 0) {

@@ -31,6 +31,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +50,7 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -230,6 +232,29 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             });
         }
 
+        Button gotoBuyBtn = (Button)findViewById(R.id.btn_go_buy);
+        gotoBuyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+
+                Set<Integer> listenerStores =  SettingUtility.getListenerStores();
+                listenerStores.remove(Cts.STORE_UNKNOWN);
+                if (listenerStores.size() > 1 || listenerStores.isEmpty()) {
+                    Utility.toast("排单/采购系统只支持一个店铺的订单，请修改设置！", OrderSingleActivity.this, null);
+                    return;
+                } else if (order.getStore_id() == Cts.STORE_UNKNOWN){
+                    Utility.toast("请先修改订单所属门店", OrderSingleActivity.this, null);
+                    return;
+                }
+
+                String token = GlobalCtx.getApplication().getSpecialToken();
+                intent.putExtra("url", String.format("%s/orders_go_to_buy/%s.html?access_token=%s",
+                        URLHelper.getStoresPrefix(), order.getId(), token));
+                startActivity(intent);
+            }
+        });
+
         update_dada_btn(order.getDada_status(), order);
 
         final Button actionButton = (Button) findViewById(R.id.button2);
@@ -364,7 +389,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
     }
 
     public void refresh() {
-        this.mWebView.loadUrl("about:blank");
+//        this.mWebView.loadUrl("about:blank");
         LayoutInflater inflater = (LayoutInflater) getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
@@ -609,8 +634,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                         "品质补偿券(30元)", //type = 7
                         "品质补偿券(30元)", //type = 7
                         "品质补偿券(30元)", //type = 7
-                        "活动有奖菜票(防冻玻璃水)[28591]", //type = 28591
-                        "活动有奖菜票(香油)[28590]", //type = 28590
+                        "员工50券[29190]",
+                        "员工100券[29189]",
                 };
                 final int[] checkedIdx = new int[1];
                 couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], new DialogInterface.OnClickListener() {

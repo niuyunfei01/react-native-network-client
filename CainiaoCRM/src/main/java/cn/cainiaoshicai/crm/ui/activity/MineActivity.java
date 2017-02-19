@@ -118,8 +118,8 @@ public class MineActivity extends AbstractActionBarActivity {
 					intent.putExtra("list_type", ListType.INVALID.getValue());
 					MineActivity.this.startActivity(intent);
 				} else if (item.getType() == TYPE_USER_ITEMS) {
-					Intent intent = new MQIntentBuilder(MineActivity.this, CustomizedMQConversationActivity.class).build();
-					intent.putExtra(MQConversationActivity.CLIENT_ID, "oqtD1jpuI1-U8wQWQ09LPegHIVeU");
+					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+					intent.putExtra("url", String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT));
 					startActivity(intent);
 				}
 			}
