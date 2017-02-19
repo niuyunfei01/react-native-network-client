@@ -49,6 +49,8 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_ORDER_LIST = 13;
 	public static final int TYPE_USER_COMPLAINS = 14;
 	private static final int TYPE_PROVIDE_LIST = 15;
+	private static final int TYPE_COMMENT_WM = 16;
+	private static final int TYPE_COMMENT_SELF = 17;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
@@ -88,13 +90,9 @@ public class MineActivity extends AbstractActionBarActivity {
 							.setNegativeButton(R.string.no, null)
 							.show();
 				} else if (item.getType() == TYPE_STORE_PERF) {
-					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-					intent.putExtra("url", String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix()));
-					startActivity(intent);
+					gotoWeb(String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix()));
 				} else if (item.getType() == TYPE_PROVIDE_LIST) {
-					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-					intent.putExtra("url", String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()));
-					startActivity(intent);
+					gotoWeb(String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()));
 				} else if (item.getType() == TYPE_SYNC_STATUS) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
 							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + GlobalCtx.getApplication().getSpecialToken()));
@@ -118,10 +116,18 @@ public class MineActivity extends AbstractActionBarActivity {
 					intent.putExtra("list_type", ListType.INVALID.getValue());
 					MineActivity.this.startActivity(intent);
 				} else if (item.getType() == TYPE_USER_ITEMS) {
-					Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-					intent.putExtra("url", String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT));
-					startActivity(intent);
+					gotoWeb(String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT));
+				} else if (item.getType() == TYPE_COMMENT_SELF) {
+					gotoWeb(String.format("%s/stores/show_evaluations.html", URLHelper.WEB_URL_ROOT));
+				} else if (item.getType() == TYPE_COMMENT_WM) {
+					gotoWeb(String.format("%s/stores/show_waimai_evaluations.html", URLHelper.WEB_URL_ROOT));
 				}
+			}
+
+			private void gotoWeb(String url) {
+				Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+				intent.putExtra("url", url);
+				startActivity(intent);
 			}
 		});
 		new MyAsyncTask<Void,HashMap<String, String>, HashMap<String, String>>() {
@@ -174,6 +180,9 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("外卖评价", -1, TYPE_COMMENT_WM, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
 
 
 		String versionDesc = getVersionDesc();
@@ -181,8 +190,6 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设   置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("同步监控", -1, TYPE_SYNC_STATUS, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("本月积分 %s", performStat.get("totalMonthScore") == null ? "" : performStat.get("totalMonthScore")), -1, TYPE_TOTAL_SCORE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));
 	}

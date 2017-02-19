@@ -26,6 +26,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreSelfStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
@@ -121,7 +122,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 			if (notify != null) {
 				if (Cts.PUSH_TYPE_NEW_COMMENT.equals(notify.getType())) {
-					i = new Intent(context, UserCommentsActivity.class);
+					if (TextUtils.isEmpty(notify.getUrl())) {
+						i = new Intent(context, UserCommentsActivity.class);
+					} else {
+						i = new Intent(context, GeneralWebViewActivity.class);
+						i.putExtra("url", notify.getUrl());
+					}
 				} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 //					i.setAction(Intent.ACTION_SEARCH);
@@ -240,6 +246,7 @@ class Notify {
 	private int store_id;
 	private int total_late;
 	private int filter;
+	private String url;
 	private Set<Integer> notify_workers;
 
 	private boolean storage_provided_self;
@@ -325,5 +332,13 @@ class Notify {
 
 	public void setSound(String sound) {
 		this.sound = sound;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }
