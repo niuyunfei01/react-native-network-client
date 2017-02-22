@@ -80,7 +80,9 @@ import javax.microedition.khronos.opengles.GL11;
 
 import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.GeoBean;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
@@ -93,6 +95,7 @@ import cn.cainiaoshicai.crm.ui.activity.CustomizedMQConversationActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
+import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.PrePackageCheckActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
@@ -1080,6 +1083,26 @@ public class Utility {
                     Intent intent = new MQIntentBuilder(ctx, CustomizedMQConversationActivity.class).build();
                     intent.putExtra("uid", uid);
                     intent.putExtra(MQConversationActivity.CLIENT_ID, "oqtD1jpuI1-U8wQWQ09LPegHIVeU");
+                    ctx.startActivity(intent);
+                    return true;
+                }  else if (url.indexOf("/stores/crm_add_token") > 0) {
+                    Bundle bundle = Utility.parseUrl(url);
+                    String path = bundle.getString("path");
+                    String vmPath = bundle.getString("vm_path");
+                    String specialToken = GlobalCtx.getApplication().getSpecialToken();
+                    view.loadUrl(String.format("%s%s&access_token=%s%s", URLHelper.WEB_URL_ROOT, path, specialToken, vmPath));
+                    return true;
+                } else if (url.indexOf("/stores/search_wm_orders") > 0) {
+                    Intent intent = new Intent(ctx, OrderQueryActivity.class);
+                    Bundle bundle = Utility.parseUrl(url);
+                    String term = bundle.getString("search");
+                    String status = bundle.getString("status");
+                    if (!TextUtils.isEmpty(term)) {
+                        intent.putExtra("query", term);
+                    }
+                    if (!TextUtils.isEmpty(status)) {
+                        intent.putExtra("status", term);
+                    }
                     ctx.startActivity(intent);
                     return true;
                 } else if (url.indexOf(STORES_STORAGE_COMMON) > 0) {
