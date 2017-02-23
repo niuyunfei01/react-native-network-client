@@ -37,6 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.dao.URLHelper;
@@ -51,6 +52,8 @@ import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
+import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -76,6 +79,9 @@ public class GlobalCtx extends Application {
     private SortedMap<Integer, CommonConfigDao.Worker> workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
+
+    private SortedMap<Integer, CommonConfigDao.Worker> storeWorkers = new TreeMap<>();
+    private long storeWorkersTs = 0;
 
     private DisplayMetrics displayMetrics = null;
 
@@ -248,6 +254,26 @@ public class GlobalCtx extends Application {
         }
 
         return this.workers == null ? new TreeMap<Integer, CommonConfigDao.Worker>() : this.workers;
+    }
+
+    public SortedMap<Integer, CommonConfigDao.Worker> getStoreWorkers(final int posType, final int storeId) {
+
+        if (System.currentTimeMillis() - storeWorkersTs > 2 * 60 * 1000) {
+            new MyAsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        GlobalCtx.this.storeWorkers = new StaffDao(GlobalCtx.this.getSpecialToken()).getStoreTodayWorkers(storeId);
+                        GlobalCtx.this.storeWorkersTs = System.currentTimeMillis();
+                    } catch (ServiceException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.executeOnNormal();
+        }
+
+        return storeWorkers.isEmpty() ? getWorkers() : storeWorkers;
     }
 
     public String[] getDelayReasons() {
@@ -483,6 +509,13 @@ public class GlobalCtx extends Application {
             return TextUtils.join(",", names);
         }
         return "";
+    }
+
+    public void toTaskListActivity() {
+        Intent intent = new Intent(getApplicationContext(), RemindersActivity.class);
+        String token = GlobalCtx.getApplication().getSpecialToken();
+        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token="+ token, URLHelper.getStoresPrefix()));
+        startActivity(intent);
     }
 
     public static class SoundManager {

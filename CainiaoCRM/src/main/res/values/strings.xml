@@ -206,6 +206,7 @@
     <string name="action_search">搜索</string>
     <string name="searching">搜索中</string>
     <string name="running">等待中</string>
+    <string name="signing">打卡中</string>
     <string name="saving">正在保存</string>
 
     <!-- TODO: Remove or change this placeholder text -->

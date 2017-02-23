@@ -35,7 +35,7 @@
             android:layout_toStartOf="@+id/head_orders_schedule"
             android:textColor="@color/white"
             android:background="@color/purple"
-            android:text="待跟进"
+            android:text="打卡"
             android:gravity="center"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"

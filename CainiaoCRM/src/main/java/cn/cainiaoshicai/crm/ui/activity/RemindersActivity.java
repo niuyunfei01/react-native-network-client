@@ -18,14 +18,21 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
@@ -36,52 +43,90 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
+import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 
-public class RemindersActivity extends AbstractActionBarActivity implements ActionBar.TabListener {
+public class RemindersActivity extends AbstractActionBarActivity {
 
-    private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
+    private final int contentViewRes;
+    private WebView mWebView;
 
-    public static Intent newIntent() {
-        return new Intent(GlobalCtx.getInstance(), RemindersActivity.class);
-    }
-
-    public static Intent newIntent(AccountBean accountBean) {
-        Intent intent = newIntent();
-        intent.putExtra(BundleArgsConstants.ACCOUNT_EXTRA, accountBean);
-        return intent;
+    public RemindersActivity() {
+        AppLogger.v("start reminds web view activity");
+        this.contentViewRes = R.layout.quality_case_list;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(this.contentViewRes);
 
-        setContentView(R.layout.order_list_main);
-
-        // Set the Action Bar to use tabs for navigation
-        ActionBar ab = getSupportActionBar();
-        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        ab.setDisplayHomeAsUpEnabled(false);
-        ab.setDisplayShowHomeEnabled(false);
-        ab.setDisplayShowTitleEnabled(false);
-
-        // Add three tabs to the Action Bar for display
-        for(ListType type : Arrays.asList(ListType.COMPLAIN, ListType.CUSTOMER_NOTIFY, ListType.REMINDER)) {
-            ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
         }
 
-        GlobalCtx.clearNewOrderNotifies(this);
+        mWebView = (WebView) findViewById(R.id.activity_main_webview);
+        WebSettings webSettings = mWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
 
-        Intent intent = this.getIntent();
-        if (intent != null) {
-            int list_type = intent.getIntExtra("list_type", 0);
-            if (list_type > 0) {
-                ActionBar.Tab tabAt = ab.getTabAt(list_type - 1);
-                if (tabAt != null) {
-                    ab.selectTab(tabAt);
+        MyAppWebViewClient client = new MyAppWebViewClient();
+        client.setCallback(new MyAppWebViewClient.PageCallback() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (!url.equals("about:blank")) {
+                    completeRefresh();
                 }
             }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                Toast.makeText(RemindersActivity.this, "发生错误" + error, Toast.LENGTH_LONG).show();
+                AppLogger.e("web view error:" + error);
+            }
+
+            public void handleRedirectUrl(WebView view, String url) {
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return Utility.handleUrlJump(RemindersActivity.this, view, url);
+            }
+
+        });
+        mWebView.setWebViewClient(client);
+        mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
+
+        String url = this.getIntent().getStringExtra("url");
+        AppLogger.i("loading url:" + url);
+        mWebView.loadUrl(url);
+    }
+
+    private void completeRefresh() {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mWebView.canGoBack()) {
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // Check if the key event was the Back button and if there's history
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
+            mWebView.goBack();
+            return true;
+        }
+        // If it wasn't the Back key or there's no web page history, bubble up to the default
+        // system behavior (probably exit the activity)
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -92,67 +137,10 @@ public class RemindersActivity extends AbstractActionBarActivity implements Acti
         return super.onCreateOptionsMenu(menu);
     }
 
-    // Implemented from ActionBar.TabListener
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Log.d(GlobalCtx.ORDERS_TAG, String.valueOf(tab.getText()));
-
-        int position = tab.getPosition();
-
-        onListChanged(getListTypeByTab(position));
-    }
-
-    public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
-        for (Map.Entry<Integer, Integer> en : totalByStatus.entrySet()) {
-            Integer status = en.getKey();
-            ActionBar.Tab tabAt = this.getSupportActionBar().getTabAt(status - 1);
-            ListType type = ListType.findByType(status);
-            if (tabAt != null && type != null) {
-                tabAt.setText(type.getName() + "(" + en.getValue() + ")");
-            }
-        }
-    }
-
 
     @NonNull
     private ListType getListTypeByTab(int position) {
         return RemindersActivity.ListType.findByType(position + 1);
-    }
-
-    private void onListChanged(ListType listType) {
-
-        if (listType == null) {
-            listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
-        }
-
-        FragmentManager fm = getFragmentManager();
-        Integer fragmentId = fragmentMap.get(listType.getValue());
-        Fragment found = null;
-        if (fragmentId != null) {
-           found = fm.findFragmentById(fragmentId);
-        }
-        if (found == null) {
-//            if (ListType.COMPLAIN.equals(listType)) {
-//                found = new FeedbackListsActivity();
-//            } else {
-                found = new NewOrderFragment();
-                fragmentMap.put(listType.getValue(), found.getId());
-                ((NewOrderFragment) found).setType(listType);
-//            }
-        }
-        fm.beginTransaction().replace(R.id.order_list_main, found).commit();
-    }
-
-    // Implemented from ActionBar.TabListener
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // This is called when a previously selected tab is unselected.
-    }
-
-    // Implemented from ActionBar.TabListener
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // This is called when a previously selected tab is selected again.
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

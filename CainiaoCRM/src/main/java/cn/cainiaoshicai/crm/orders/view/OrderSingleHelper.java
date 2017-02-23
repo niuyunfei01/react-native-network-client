@@ -32,6 +32,7 @@ import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -47,25 +48,35 @@ public class OrderSingleHelper {
     private String platformOid;
     private OrderSingleActivity activity;
     private int orderId;
+    private final int store_id;
 
-    public OrderSingleHelper(int platform, String platformOid, OrderSingleActivity activity, int orderId) {
+    public OrderSingleHelper(int platform, String platformOid, OrderSingleActivity activity, int orderId, int store_id) {
         this.platform = platform;
         this.platformOid = platformOid;
         this.activity = activity;
         this.orderId = orderId;
+        this.store_id = store_id;
     }
 
     public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action) {
         this.chooseWorker(activity, orderListTypeToJump, fromStatus, action, null);
     }
 
-    public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action, Integer defaultWorker) {
+    public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action, List<Integer> defaultWorker) {
 
         final boolean isWaitingReady = fromStatus == Cts.WM_ORDER_STATUS_TO_READY;
         AlertDialog.Builder adb = new AlertDialog.Builder(activity);
         final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
-        SortedMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getApplication().getWorkers();
         boolean is_choosing_ship = !isWaitingReady && action != OrderSingleActivity.ACTION_EDIT_PACK_WORKER;
+
+        int posType = isWaitingReady ? Cts.POSITION_PACK :  Cts.POSITION_ALL;
+        final SortedMap<Integer, CommonConfigDao.Worker> workers;
+        GlobalCtx app = GlobalCtx.getApplication();
+        if (isWaitingReady) {
+           workers = app.getStoreWorkers(posType, store_id);
+        } else {
+            workers = app.getWorkers();
+        }
 
         if (workers != null && !workers.isEmpty()) {
             for(CommonConfigDao.Worker worker : workers.values()) {
@@ -77,45 +88,66 @@ public class OrderSingleHelper {
 
         String currUid = GlobalCtx.getInstance().getCurrentAccountId();
 
-        int defUid;
         if (defaultWorker == null) {
-            defUid = currUid == null ? 0 : Integer.valueOf(currUid);
+            defaultWorker = new ArrayList<>();
             if (is_choosing_ship && action != OrderSingleActivity.ACTION_EDIT_SHIP_WORKER) {
-                defUid = Cts.ID_DADA_MANUAL_WORKER;
+                defaultWorker.add(Cts.ID_DADA_MANUAL_WORKER);
+            } else {
+                defaultWorker.add(currUid == null ? 0 : Integer.valueOf(currUid));
             }
-        } else {
-            defUid = defaultWorker;
         }
 
-        final int[] checkedIdx = {0};
+        final boolean checked[] = new boolean[workerList.size()];
+        int checkedIdx = 0;
         List<String> items = new ArrayList<>();
         for (int i = 0; i < workerList.size(); i++) {
             CommonConfigDao.Worker worker = workerList.get(i);
             items.add(worker.getNickname());
-            if (defUid == worker.getId()) {
-                checkedIdx[0] = items.size() - 1;
+            if (defaultWorker.contains(worker.getId())) {
+                checked[i] = true;
+                checkedIdx = i;
             }
         }
 
-        adb.setSingleChoiceItems(items.toArray(new String[items.size()]), checkedIdx[0], new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                checkedIdx[0] = which;
-            }
-        });
+        String[] workerNames = items.toArray(new String[items.size()]);
+        if (is_choosing_ship) {
+            adb.setSingleChoiceItems(workerNames, checkedIdx, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    checked[which] = true;
+                }
+            });
+        } else {
+            adb.setMultiChoiceItems(workerNames, checked, new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    checked[which] = isChecked;
+                }
+            });
+        }
+
         adb.setTitle(!is_choosing_ship ? "谁打包的？" : "选择快递小哥")
                 .setPositiveButton(activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ArrayList<Integer> selected = new ArrayList<Integer>();
+                        for(int i = 0 ; i < checked.length; i++) {
+                            if (checked[i]) selected.add(workerList.get(i).getId());
+                        }
 
-                        final int selectedWorker = workerList.get(checkedIdx[0]).getId();
+                        if (selected.isEmpty()) {
+                            AlertUtil.showAlert(OrderSingleHelper.this.activity, "错误提示", "请至少操作人员");
+                            return;
+                        }
+
                         if (action == OrderSingleActivity.ACTION_EDIT_SHIP_WORKER) {
-                            new EditShipWorkerTask(selectedWorker).executeOnIO();
+                            new EditShipWorkerTask(selected).executeOnIO();
                         } else if (action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) {
-                            new EditPackWorkerTask(selectedWorker).executeOnIO();
+                            new EditPackWorkerTask(selected).executeOnIO();
                         } else {
-                            OrderSingleActivity.OrderActionOp orderActionOp = new OrderSingleActivity.OrderActionOp(platform, platformOid, activity, orderListTypeToJump);
-                            orderActionOp.setWorkerId(selectedWorker);
+                            OrderSingleActivity.OrderActionOp orderActionOp = new OrderSingleActivity.OrderActionOp(platform,
+                                    platformOid, activity, orderListTypeToJump);
+                            orderActionOp.setWorkerId(selected);
                             orderActionOp.executeOnNormal(fromStatus);
                         }
                     }
@@ -379,7 +411,6 @@ public class OrderSingleHelper {
                     }
                 }
             }.executeOnNormal();
-
         }
 
         private void callDada(Order _order, Context ctx, final boolean restart) {
@@ -520,9 +551,9 @@ public class OrderSingleHelper {
 
 
     private class EditShipWorkerTask extends MyAsyncTask<Integer, Void, Boolean> {
-        private final int selectedWorker;
+        private final List<Integer> selectedWorker;
 
-        public EditShipWorkerTask(int selectedWorker) {
+        EditShipWorkerTask(List<Integer> selectedWorker) {
             this.selectedWorker = selectedWorker;
         }
 
@@ -534,7 +565,7 @@ public class OrderSingleHelper {
                 ResultBean result = dao.chg_ship_worker(orderId, activity.getShip_worker_id(), selectedWorker);
                 if (result.isOk()) {
                     showToast("修改配送员成功！", true);
-                    activity.setShip_worker_id(selectedWorker);
+                    activity.setShip_worker_id(selectedWorker.get(0));
                     return true;
                 } else {
                     error = result.getDesc();
@@ -557,9 +588,9 @@ public class OrderSingleHelper {
     }
 
     private class EditPackWorkerTask extends MyAsyncTask<Integer, Void, Boolean> {
-        private final int selectedWorker;
+        private final List<Integer> selectedWorker;
 
-        public EditPackWorkerTask(int selectedWorker) {
+        public EditPackWorkerTask(List<Integer> selectedWorker) {
             this.selectedWorker = selectedWorker;
         }
 
@@ -571,7 +602,7 @@ public class OrderSingleHelper {
                 ResultBean result = dao.order_chg_pack_worker(orderId, activity.getPack_worker_id(), selectedWorker);
                 if (result.isOk()) {
                     showToast("修改打包员成功！", true);
-                    activity.setPack_worker_id(selectedWorker);
+                    activity.setPack_worker_id(selectedWorker.get(0));
                     return true;
                 } else {
                     error = result.getDesc();

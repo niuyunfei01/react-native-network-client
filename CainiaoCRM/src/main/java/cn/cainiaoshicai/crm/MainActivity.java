@@ -16,11 +16,24 @@
 
 package cn.cainiaoshicai.crm;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.SearchManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -36,19 +49,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
+import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.ResultObject;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.orders.util.Util;
+import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.LocationHelper;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
+import cn.cainiaoshicai.crm.ui.activity.FeedBackEditActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
+import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
@@ -64,6 +91,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
 
     private Date day = new Date();
     private AccountBean accountBean;
+    private LocationHelper locationHelper;
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.getInstance(), MainActivity.class);
@@ -109,6 +137,11 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
         handleIntent(ab, intent);
+
+        if (locationHelper == null) {
+            locationHelper = new LocationHelper(this);
+            locationHelper.initLocation();
+        }
     }
 
     private void resetPrinterStatusBar(boolean show) {
@@ -133,13 +166,160 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 startActivity(intent);
             }
         });
-        this.findViewById(R.id.head_orders_waiting).setOnClickListener(new View.OnClickListener() {
+
+        final TextView signingText = (TextView) this.findViewById(R.id.head_orders_waiting);
+        final String labelDaka = "打卡";
+        final String labelWorking = "工作中";
+        final String labelOffwork = "已下班";
+
+        signingText.setText(SettingUtility.getSignInStore() > 0 ? labelWorking : labelDaka);
+
+         signingText.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("HardwareIds")
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-                String token = GlobalCtx.getApplication().getSpecialToken();
-                intent.putExtra("url", String.format("%s/quick_task_list.html?access_token="+ token, URLHelper.getStoresPrefix()));
-                startActivity(intent);
+                final Integer signInStore = SettingUtility.getSignInStore();
+                if (locationHelper != null) {
+                    final HashMap<String, String> envInfos = extraEnvInfo();
+                    if (labelDaka.equals(signingText.getText()) || labelOffwork.equals(signingText.getText())) {
+                        final HashSet<Integer> selectedStores = new HashSet<>();
+                        if (signInStore > 0) {
+                            selectedStores.add(signInStore);
+                        }
+                        Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", selectedStores,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (selectedStores.isEmpty()) {
+                                            AlertUtil.showAlert(MainActivity.this, "错误提醒", "您需选择一个工作门店");
+                                        } else if (selectedStores.size() > 1) {
+                                            AlertUtil.showAlert(MainActivity.this, "错误提醒", "您只应选择一个门店");
+                                        } else {
+                                            final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                            Utility.forceShowDialog(MainActivity.this, pf);
+                                            final Integer signInStoreId = selectedStores.iterator().next();
+
+                                            new MyAsyncTask<Void, Void, Void>() {
+                                                private ResultObject<HashMap<String, String>> resultBean;
+
+                                                @Override
+                                                protected Void doInBackground(Void... params) {
+                                                    StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                                    try {
+                                                        resultBean = fbDao.sign_in(signInStoreId, envInfos);
+                                                    } catch (ServiceException e) {
+                                                        resultBean = new ResultObject<>(ResultBean.serviceException("服务异常:" + e.getMessage()));
+                                                    }
+                                                    return null;
+                                                }
+
+                                                @Override
+                                                protected void onPostExecute(Void aVoid) {
+                                                    pf.dismissAllowingStateLoss();
+                                                    if (resultBean.isOk()) {
+                                                        HashMap obj = resultBean.getObj();
+                                                        String signInDesc = "";
+
+                                                        Integer signInTs = 0;
+                                                        if (obj != null && obj.containsKey("time")) {
+                                                            try {
+                                                                signInTs = Integer.valueOf((String) obj.get("time"));
+                                                            }catch (Exception e) {
+                                                                //
+                                                            }
+                                                            if (signInTs > 0) {
+                                                                signInDesc = "打卡时间：" + DateTimeUtils.hourMin(new Date(signInTs * 1000));
+                                                            }
+                                                        }
+
+                                                        SettingUtility.setSignIn(signInStoreId, signInTs);
+
+                                                        final String okTips = "打卡成功，今日值班店长："
+                                                                + (obj != null ? obj.get("working_mgr") : "未安排")
+                                                                + signInDesc;
+
+                                                        MainActivity.this.runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
+                                                                signingText.setText(labelWorking);
+                                                            }
+                                                        });
+                                                    } else {
+                                                        Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
+                                                    }
+                                                }
+                                            }.executeOnNormal();
+                                        }
+                                    }
+                                });
+                    } else if (labelWorking.equals(signingText.getText())) {
+
+                        if (signInStore > 0) {
+
+                            AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                            final String[] titles = new String[]{
+                                    "已完成订货",
+                                    "已完成报损",
+                                    "下架产品已重新上架",
+                                    "门店卫生已清理",
+                                    "已向值班店长报告完毕",
+                            };
+                            final boolean[] checked = new boolean[]{true, true, true, true, true};
+                            adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+
+                                }
+                            });
+
+                            adb.setTitle("检查下班各项工作是否已完成？")
+                                    .setPositiveButton("现在下班", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                            Utility.forceShowDialog(MainActivity.this, pf);
+                                            new MyAsyncTask<Void, Void, Void>() {
+                                                private ResultObject<HashMap<String, String>> resultBean;
+
+                                                @Override
+                                                protected Void doInBackground(Void... params) {
+                                                    StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                                    try {
+                                                        resultBean = fbDao.sign_off(signInStore, envInfos);
+                                                    } catch (ServiceException e) {
+                                                        resultBean = new ResultObject<>(ResultBean.serviceException("系统异常:" + e.getMessage()));
+                                                    }
+                                                    return null;
+                                                }
+
+                                                @Override
+                                                protected void onPostExecute(Void aVoid) {
+                                                    pf.dismissAllowingStateLoss();
+                                                    if (resultBean.isOk()) {
+                                                        MainActivity.this.runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Utility.toast("打卡完成，下班愉快！", MainActivity.this);
+                                                                signingText.setText(labelOffwork);
+                                                            }
+                                                        });
+                                                    } else {
+                                                        Utility.toast("打卡失败:" + resultBean.getDesc(), MainActivity.this);
+                                                    }
+                                                }
+                                            }.executeOnNormal();
+                                        }
+                                    });
+                            adb.setNegativeButton("取消", null);
+                            adb.show();
+                        } else {
+                            signingText.setText(labelDaka);
+                        }
+                    }
+                } else {
+                    AlertUtil.showAlert(MainActivity.this, "错误提示", "无法检测位置信息");
+                }
             }
         });
         if (show) {
@@ -171,6 +351,45 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         } else {
             opBar.setVisibility(View.GONE);
         }
+    }
+
+    @NonNull
+    public HashMap<String, String> extraEnvInfo() {
+        final HashMap<String, String> envInfos = new HashMap<>();
+        Location location = locationHelper.getLastBestLocation();
+        if (location != null) {
+            AppLogger.e("location: Lat: " + location.getLatitude() + " Lng: \"\n" + location.getLongitude());
+            envInfos.put("loc_lat", String.valueOf(location.getLatitude()));
+            envInfos.put("loc_lng", String.valueOf(location.getLongitude()));
+        } else {
+            AlertUtil.showAlert(MainActivity.this, "签到失败", "无法获得当前的地理位置，开启位置权限后重试！");
+        }
+
+        WifiManager mWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (!mWifi.isWifiEnabled()) {
+            mWifi.setWifiEnabled(true);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        WifiInfo wifiInfo = mWifi.getConnectionInfo();
+        if (wifiInfo != null) {
+
+            envInfos.put("wifi_name", wifiInfo.getSSID());
+            envInfos.put("device_mac", wifiInfo.getMacAddress());
+            envInfos.put("wifi_mac", wifiInfo.getBSSID());
+
+            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：" + wifiInfo.getBSSID());
+            //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
+            sb.append("\n\n获取SSID 是否被隐藏：" + wifiInfo.getHiddenSSID());
+            sb.append("\n\n获取IP 地址：" + wifiInfo.getIpAddress());
+            sb.append("\n\n获取连接的速度：" + wifiInfo.getLinkSpeed());
+            sb.append("\n\n获取Mac 地址（手机本身网卡的MAC地址）：" + wifiInfo.getMacAddress());
+            sb.append("\n\n获取802.11n 网络的信号：" + wifiInfo.getRssi());
+            sb.append("\n\n获取SSID（所连接的WIFI的网络名称）：" + wifiInfo.getSSID());
+            sb.append("\n\n获取具体客户端状态的信息：" + wifiInfo.getSupplicantState());
+        }
+        AppLogger.e("wifi info:" + sb.toString());
+        return envInfos;
     }
 
     private void handleIntent(ActionBar ab, Intent intent) {
@@ -305,7 +524,8 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 onDayAndTypeChanged(null, null);
                 return true;
             case R.id.menu_accept:
-                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
+//                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
+                GlobalCtx.getApplication().toTaskListActivity();
                 return true;
             case R.id.menu_search:
                 this.onSearchRequested();

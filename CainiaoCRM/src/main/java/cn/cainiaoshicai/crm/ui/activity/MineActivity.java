@@ -225,7 +225,7 @@ public class MineActivity extends AbstractActionBarActivity {
 				startActivity(new Intent(getApplicationContext(), MainActivity.class));
 				return true;
 			case R.id.menu_accept:
-				startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
+				GlobalCtx.getApplication().toTaskListActivity();
 				return true;
 			case R.id.menu_search:
 				this.onSearchRequested();

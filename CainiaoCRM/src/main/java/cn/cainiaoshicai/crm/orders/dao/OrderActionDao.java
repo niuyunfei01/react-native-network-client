@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.orders.dao;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,9 +47,9 @@ public class OrderActionDao {
         return actionWithResult(platform, platform_oid, "/order_set_arrived", new HashMap<String, String>());
     }
 
-    public ResultBean setReady(Cts.Platform platform, String platform_oid, int workerId) throws ServiceException {
+    public ResultBean setReady(Cts.Platform platform, String platform_oid, List<Integer> workerIds) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
-        params.put("worker_id", String.valueOf(workerId));
+        params.put("worker_id", TextUtils.join(",", workerIds));
         return actionWithResult(platform, platform_oid, "/order_set_ready", params);
     }
 
@@ -138,11 +139,11 @@ public class OrderActionDao {
         return actionWithResult("/order_log_print/"+orderId, new HashMap<String, String>());
     }
 
-    public ResultBean chg_ship_worker(int orderId, int oldWorker, int newWorker) throws ServiceException {
-        return actionWithResult("/order_chg_ship_worker/" + orderId + "/" + oldWorker + "/" + newWorker, new HashMap<String, String>());
+    public ResultBean chg_ship_worker(int orderId, int oldWorker, List<Integer> newWorker) throws ServiceException {
+        return actionWithResult("/order_chg_ship_worker/" + orderId + "/" + oldWorker + "/" + TextUtils.join(",", newWorker), new HashMap<String, String>());
     }
 
-    public ResultBean order_chg_pack_worker(int orderId, int oldWorker, int newWorker) throws ServiceException {
+    public ResultBean order_chg_pack_worker(int orderId, int oldWorker, List<Integer> newWorker) throws ServiceException {
         return actionWithResult("/order_chg_pack_worker/" + orderId + "/" + oldWorker + "/" + newWorker, new HashMap<String, String>());
     }
 

@@ -51,7 +51,11 @@ public class Cts {
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", -1);
 
     public static final String ERR_INVALID_GRANT = "invalid_grant";
+
+    public static final int POSITION_ALL = 0;
     public static final int POSITION_EXT_SHIP = 3;
+    public static final int POSITION_PACK = 4;
+    public static final int POSITION_STORE_DAY_MGR = 5;
 
     public static final Provide PROVIDE_SLEF = new Provide(1, "自采");
     public static final Provide PROVIDE_COMMON = new Provide(0, "直供");

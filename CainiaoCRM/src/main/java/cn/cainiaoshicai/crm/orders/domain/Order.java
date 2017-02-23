@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +45,8 @@ public class Order implements Serializable {
     private List<CartItem> items = new ArrayList<>();
     private String ship_worker_name;
     private int ship_worker_id;
-    private int 	pack_operator;
+    private int pack_operator;
+    private String pack_workers;
     private int order_times;
     private int paid_done;
     private boolean showReadyDelay;
@@ -63,6 +66,7 @@ public class Order implements Serializable {
 
     private Feedback feedback;
     private String direction;
+    private int additional_to_pay;
 
     public int getId() {
         return id;
@@ -448,6 +452,31 @@ public class Order implements Serializable {
 
     public void setDirection(String direction) {
         this.direction = direction;
+    }
+
+    public String getPack_workers() {
+        return pack_workers;
+    }
+
+    public void setPack_workers(String pack_workers) {
+        this.pack_workers = pack_workers;
+    }
+
+    public int getAdditional_to_pay() {
+        return additional_to_pay;
+    }
+
+    public void setAdditional_to_pay(int additional_to_pay) {
+        this.additional_to_pay = additional_to_pay;
+    }
+
+    public List<Integer> getPackWorkers() {
+        ArrayList<Integer> workers = new ArrayList<>();
+        String[] w = TextUtils.split(",", this.pack_workers);
+        for(String sId : w) {
+            workers.add(Integer.parseInt(sId));
+        }
+        return workers;
     }
 }
 

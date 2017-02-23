@@ -29,9 +29,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,6 +100,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
     public int getShip_worker_id() {
         return ship_worker_id;
+    }
+
+    public List<Integer> getShip_worker_ids() {
+        ArrayList<Integer> lists = new ArrayList<>();
+        if (ship_worker_id > 0) {
+            lists.add(ship_worker_id);
+        }
+        return lists;
     }
 
     public void setShip_worker_id(int ship_worker_id) {
@@ -195,7 +207,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         shipWorkerName = order.getShip_worker_name();
         platformWithId = order.platformWithId();
 
-        helper = new OrderSingleHelper(platform, platformOid, OrderSingleActivity.this, orderId);
+        helper = new OrderSingleHelper(platform, platformOid, OrderSingleActivity.this, orderId, order.getStore_id());
 
         int sourceReady = order.getSource_ready();
         fromStatus = order.getOrderStatus();
@@ -610,14 +622,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     Toast.makeText(this, "该订单尚未指定过打包员，请先打包出库", Toast.LENGTH_LONG).show();
                     return false;
                 }
-                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER, ship_worker_id);
+                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER, this.orderRef.get().getPackWorkers());
                 break;
             case R.id.menu_chg_ship_worker:
                 if (ship_worker_id <= 0 && ship_worker_id != Cts.ID_DADA_MANUAL_WORKER) {
                     Toast.makeText(this, "该订单尚未指定过配送员，请先打包出库", Toast.LENGTH_LONG).show();
                     return false;
                 }
-                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_SHIP_WORKER, ship_worker_id);
+                helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_SHIP_WORKER, Arrays.asList(ship_worker_id));
                 break;
             case R.id.menu_refresh:
                 refresh();
@@ -943,7 +955,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         final String platformOid;
         private Activity activity;
         private int listType;
-        private int workerId;
+        private List<Integer> workerId;
 
         OrderActionOp(int oid, String platformOid, Activity v, int listType) {
             this.oid = oid;
@@ -960,7 +972,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             try {
                 switch (fromStatus) {
                     case Cts.WM_ORDER_STATUS_TO_SHIP:
-                        oc = new OrderActionDao(token).startShip(Cts.Platform.find(oid), platformOid, workerId);
+                        oc = new OrderActionDao(token).startShip(Cts.Platform.find(oid), platformOid, workerId.get(0));
                         break;
                     case Cts.WM_ORDER_STATUS_TO_ARRIVE:
                         oc = new OrderActionDao(token).setArrived(Cts.Platform.find(oid), platformOid);
@@ -992,7 +1004,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             });
         }
 
-        public void setWorkerId(int workerId) {
+        void setWorkerId(List<Integer> workerId) {
             this.workerId = workerId;
         }
     }
@@ -1003,7 +1015,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         private final int status;
         private final int listType;
 
-        public AccpetOrderButtonClicked(int platform, String platformOid, int status, int listType) {
+        AccpetOrderButtonClicked(int platform, String platformOid, int status, int listType) {
             this.platform = platform;
             this.platformOid = platformOid;
             this.status = status;

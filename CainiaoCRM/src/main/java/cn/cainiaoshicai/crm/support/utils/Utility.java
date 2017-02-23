@@ -70,6 +70,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,12 +84,14 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.GeoBean;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.othercomp.unreadnotification.NotificationServiceHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
 import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
 import cn.cainiaoshicai.crm.ui.activity.CustomizedMQConversationActivity;
@@ -97,6 +100,7 @@ import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.PrePackageCheckActivity;
+import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.customer_serv.customer_servsdk.activity.MQConversationActivity;
@@ -697,6 +701,47 @@ public class Utility {
         }
     }
 
+    public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
+                                         final Set<Integer> selectedStores, DialogInterface.OnClickListener okCallback) {
+        final Collection<Store> stores = GlobalCtx.getInstance().listStores();
+        if (stores == null) {
+            Toast.makeText(context, "暂时无法修改：(获取店铺列表错误)", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        final String[] titles = new String[stores.size()];
+        final boolean[] checked = new boolean[stores.size()];
+        final int[] storeIds = new int[stores.size()];
+        int i = 0;
+        for (Store currStore : stores) {
+            titles[i] = currStore.getName();
+            checked[i] = selectedStores.contains(currStore.getId());
+            if (checked[i]) {
+                selectedStores.add(currStore.getId());
+            }
+            storeIds[i] = currStore.getId();
+            i++;
+        }
+
+        AlertDialog.Builder adb = new AlertDialog.Builder(context);
+        adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                int currId = storeIds[which];
+                if (isChecked) {
+                    selectedStores.add(currId);
+                } else {
+                    selectedStores.remove(currId);
+                }
+            }
+        });
+
+        adb.setTitle(title)
+                .setPositiveButton(okLabel, okCallback);
+        adb.setNegativeButton(cancelLabel, null);
+        adb.show();
+    }
+
     //the position within the adapter's data set, will plus header view count
     public static void setListViewAdapterPosition(final ListView listView,
             final int adapterItemPosition, final int top, final Runnable runnable) {
@@ -1023,6 +1068,10 @@ public class Utility {
         c.translate(-view.getScrollX(), -view.getScrollY());
         view.draw(c);
         return b;
+    }
+
+    public static void toast(final String msg, final Activity activity) {
+        toast(msg, activity, null, Toast.LENGTH_LONG);
     }
 
     public static void toast(final String msg, final Activity activity, final Runnable uiCallback) {

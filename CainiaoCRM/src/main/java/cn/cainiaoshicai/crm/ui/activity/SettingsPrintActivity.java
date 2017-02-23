@@ -99,68 +99,37 @@ public class SettingsPrintActivity extends ListActivity {
 
 		final TextView list_store_filter_values = (TextView) findViewById(R.id.list_store_filter_values);
 		((ImageView)findViewById(R.id.list_store_filter_arrow)).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.arrow));
+
+
 		final Set<Integer> selectedStores = SettingUtility.getListenerStores();
 		updateStoreFilterText(list_store_filter_values, selectedStores);
 
 		RelativeLayout v = (RelativeLayout) findViewById(R.id.settings_order_filter);
+
+
+		selectedStores.clear();
+
+		Set<Integer> savedIds = SettingUtility.getListenerStores();
+		if (!savedIds.isEmpty()) {
+			selectedStores.addAll(savedIds);
+		}
+
 		v.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 
 				SettingsPrintActivity context = SettingsPrintActivity.this;
+				String title = "选中可以显示的店铺";
+				String okLabel = context.getString(R.string.ok);
+				String cancelLabel = context.getString(R.string.cancel);
 
-				final Collection<Store> stores = GlobalCtx.getInstance().listStores();
-				if (stores == null) {
-					Toast.makeText(context, "暂时无法修改：(获取店铺列表错误)", Toast.LENGTH_LONG).show();
-					return;
-				}
-
-				selectedStores.clear();
-
-				boolean noListened = true;
-				Set<Integer> savedIds = SettingUtility.getListenerStores();
-				if (!savedIds.isEmpty()) {
-					selectedStores.addAll(savedIds);
-					noListened = false;
-				}
-
-				final String[] titles = new String[stores.size()];
-				final boolean[] checked = new boolean[stores.size()];
-				final int[] storeIds = new int[stores.size()];
-				int i = 0;
-				for (Store currStore : stores) {
-					titles[i] = currStore.getName();
-					checked[i] = noListened || selectedStores.contains(currStore.getId());
-					if (noListened) {
-						selectedStores.add(currStore.getId());
-					}
-					storeIds[i] = currStore.getId();
-					i++;
-				}
-
-				AlertDialog.Builder adb = new AlertDialog.Builder(context);
-				adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+				Utility.showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-						int currId = storeIds[which];
-						if (isChecked) {
-							selectedStores.add(currId);
-						} else {
-							selectedStores.remove(currId);
-						}
+					public void onClick(DialogInterface dialog, int which) {
+						SettingUtility.setListenerStores(selectedStores);
+						updateStoreFilterText(list_store_filter_values, selectedStores);
 					}
 				});
-
-				adb.setTitle("选中可以显示的店铺")
-						.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								SettingUtility.setListenerStores(selectedStores);
-								updateStoreFilterText(list_store_filter_values, selectedStores);
-							}
-						});
-				adb.setNegativeButton(context.getString(R.string.cancel), null);
-				adb.show();
 			}
 		});
 
