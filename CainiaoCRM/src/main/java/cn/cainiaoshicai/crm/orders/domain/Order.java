@@ -472,7 +472,7 @@ public class Order implements Serializable {
 
     public List<Integer> getPackWorkers() {
         ArrayList<Integer> workers = new ArrayList<>();
-        String[] w = TextUtils.split(",", this.pack_workers);
+        String[] w = TextUtils.split(this.pack_workers, ",");
         for(String sId : w) {
             workers.add(Integer.parseInt(sId));
         }

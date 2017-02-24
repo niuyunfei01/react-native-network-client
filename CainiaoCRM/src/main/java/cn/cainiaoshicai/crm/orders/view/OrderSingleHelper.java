@@ -62,7 +62,8 @@ public class OrderSingleHelper {
         this.chooseWorker(activity, orderListTypeToJump, fromStatus, action, null);
     }
 
-    public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus, final int action, List<Integer> defaultWorker) {
+    public void chooseWorker(final Activity activity, final int orderListTypeToJump, final int fromStatus,
+                             final int action, List<Integer> defaultWorker) {
 
         final boolean isWaitingReady = fromStatus == Cts.WM_ORDER_STATUS_TO_READY;
         AlertDialog.Builder adb = new AlertDialog.Builder(activity);
@@ -74,7 +75,10 @@ public class OrderSingleHelper {
         GlobalCtx app = GlobalCtx.getApplication();
         if (isWaitingReady) {
            workers = app.getStoreWorkers(posType, store_id);
+        } else if (is_choosing_ship) {
+           workers = app.getShipWorkers();
         } else {
+            //Editing possible be past workers, so show full
             workers = app.getWorkers();
         }
 

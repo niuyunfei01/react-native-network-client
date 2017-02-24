@@ -40,7 +40,7 @@ public class CommonConfigDao {
 
         String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
 
-        AppLogger.v("userTalkStatus common config:" + json);
+        AppLogger.v("common config:" + json);
 
         Config value = null;
         try {
@@ -93,6 +93,7 @@ public class CommonConfigDao {
 
     static public class Config {
         private SortedMap<Integer, Worker> workers;
+        private SortedMap<Integer, Worker> ship_workers;
         private String[] delayReasons;
         private HashMap<String, String> configUrls;
 
@@ -100,6 +101,14 @@ public class CommonConfigDao {
             this.workers = workers;
             this.delayReasons = delayReasons;
             this.configUrls = configUrls;
+        }
+
+        public SortedMap<Integer, Worker> getShip_workers() {
+            return ship_workers;
+        }
+
+        public void setShip_workers(SortedMap<Integer, Worker> ship_workers) {
+            this.ship_workers = ship_workers;
         }
 
         public SortedMap<Integer, Worker> getWorkers() {

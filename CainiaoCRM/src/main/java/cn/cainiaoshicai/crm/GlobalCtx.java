@@ -78,6 +78,7 @@ public class GlobalCtx extends Application {
     private AtomicReference<LinkedHashMap<Integer, Store>> storesRef = new AtomicReference<>(null);
     private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
     private SortedMap<Integer, CommonConfigDao.Worker> workers = new TreeMap<>();
+    private SortedMap<Integer, CommonConfigDao.Worker> ship_workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
 
@@ -190,9 +191,13 @@ public class GlobalCtx extends Application {
                         }
 
                         CommonConfigDao.Config config = new CommonConfigDao(token).get();
+
                         SortedMap<Integer, CommonConfigDao.Worker> workers = config.getWorkers();
                         if (workers != null) {
                             GlobalCtx.this.workers = workers;
+                        }
+                        if (config.getShip_workers() != null) {
+                            GlobalCtx.this.ship_workers = config.getShip_workers();
                         }
                         GlobalCtx.this.delayReasons.set(config.getDelayReasons());
                         GlobalCtx.this.configUrls.clear();
@@ -255,6 +260,14 @@ public class GlobalCtx extends Application {
         }
 
         return this.workers == null ? new TreeMap<Integer, CommonConfigDao.Worker>() : this.workers;
+    }
+
+    public SortedMap<Integer, CommonConfigDao.Worker> getShipWorkers() {
+        if (ship_workers == null || ship_workers.isEmpty()) {
+            initConfigs();
+        }
+
+        return this.ship_workers == null ? new TreeMap<Integer, CommonConfigDao.Worker>() : this.ship_workers;
     }
 
     public SortedMap<Integer, CommonConfigDao.Worker> getStoreWorkers(final int posType, final int storeId) {
