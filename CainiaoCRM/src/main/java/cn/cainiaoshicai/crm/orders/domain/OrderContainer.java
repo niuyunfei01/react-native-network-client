@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 public class OrderContainer {
 
+    private int total_task_mine = 0;
+
     private ArrayList<Order> orders;
     private HashMap<Integer, Integer> totals;
 
@@ -22,6 +24,14 @@ public class OrderContainer {
 
     public void setTotals(HashMap<Integer, Integer> totals) {
         this.totals = totals;
+    }
+
+    public int getTotal_task_mine() {
+        return total_task_mine;
+    }
+
+    public void setTotal_task_mine(int total_task_mine) {
+        this.total_task_mine = total_task_mine;
     }
 
     @Override

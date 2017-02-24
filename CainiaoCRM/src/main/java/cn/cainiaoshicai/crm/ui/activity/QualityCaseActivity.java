@@ -41,7 +41,7 @@ public class QualityCaseActivity  extends WebViewActivity   {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 return true;
             case R.id.menu_accept:
-                GlobalCtx.getApplication().toTaskListActivity();
+                GlobalCtx.getApplication().toTaskListActivity(this);
                 return true;
 //            case R.id.menu_manage:
 //                return true;

@@ -17,25 +17,20 @@
 package cn.cainiaoshicai.crm;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -56,14 +51,11 @@ import java.util.Set;
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
-import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
-import cn.cainiaoshicai.crm.orders.util.TextUtil;
-import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.LocationHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -72,14 +64,13 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
-import cn.cainiaoshicai.crm.ui.activity.FeedBackEditActivity;
+import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
+import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
-import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
-import cn.cainiaoshicai.crm.ui.activity.MineActivity;
-import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
+import cn.cainiaoshicai.crm.ui.helper.MyMenuItemStuffListener;
 
 public class MainActivity extends AbstractActionBarActivity implements ActionBar.TabListener {
 
@@ -92,6 +83,8 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
     private Date day = new Date();
     private AccountBean accountBean;
     private LocationHelper locationHelper;
+    private TextView notifCount;
+    private int mNotifCount = 1;
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.getInstance(), MainActivity.class);
@@ -297,6 +290,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                                 protected void onPostExecute(Void aVoid) {
                                                     pf.dismissAllowingStateLoss();
                                                     if (resultBean.isOk()) {
+                                                        SettingUtility.setSignIn(0, 0);
                                                         MainActivity.this.runOnUiThread(new Runnable() {
                                                             @Override
                                                             public void run() {
@@ -525,7 +519,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 return true;
             case R.id.menu_accept:
 //                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
-                GlobalCtx.getApplication().toTaskListActivity();
+                GlobalCtx.getApplication().toTaskListActivity(this);
                 return true;
             case R.id.menu_search:
                 this.onSearchRequested();
@@ -544,7 +538,48 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_accept);
+        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+
+        View count = item.getActionView();
+        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
+        notifCount.setText(String.valueOf(mNotifCount));
+
+        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+            @Override
+            public void callback(int count) {
+                mNotifCount = count;
+                updateHotCount(mNotifCount);
+            }
+        });
+
+        new MyMenuItemStuffListener(count, "查看任务") {
+            @Override
+            public void onClick(View v) {
+                GlobalCtx.getApplication().toTaskListActivity(MainActivity.this);
+            }
+        };
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    // call the updating code on the main thread,
+// so we can call this asynchronously
+    public void updateHotCount(final int new_hot_number) {
+        mNotifCount = new_hot_number;
+        if (notifCount == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (new_hot_number == 0)
+                    notifCount.setVisibility(View.INVISIBLE);
+                else {
+                    notifCount.setVisibility(View.VISIBLE);
+                    notifCount.setText(Integer.toString(new_hot_number));
+                }
+            }
+        });
     }
 
     private void startPicker() {

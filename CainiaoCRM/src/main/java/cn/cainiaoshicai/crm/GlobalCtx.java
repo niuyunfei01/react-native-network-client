@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -511,11 +512,46 @@ public class GlobalCtx extends Application {
         return "";
     }
 
-    public void toTaskListActivity() {
-        Intent intent = new Intent(getApplicationContext(), RemindersActivity.class);
+    public void toTaskListActivity(Activity ctx) {
+        Intent intent = new Intent(ctx, RemindersActivity.class);
         String token = GlobalCtx.getApplication().getSpecialToken();
         intent.putExtra("url", String.format("%s/quick_task_list.html?access_token="+ token, URLHelper.getStoresPrefix()));
-        startActivity(intent);
+        ctx.startActivity(intent);
+    }
+
+    public void setTaskCount(int taskCount) {
+        this.taskCount = taskCount;
+        this.taskUpdateTs = System.currentTimeMillis();
+    }
+
+
+    public interface TaskCountUpdated {
+        void callback(int count);
+    }
+    private volatile int taskCount = 0;
+    private long taskUpdateTs;
+    public void getTaskCount(Activity act, final TaskCountUpdated uiAction) {
+        act.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                uiAction.callback(taskCount);
+            }
+        });
+
+        if (System.currentTimeMillis() - taskUpdateTs > 2 * 60 * 1000) {
+            new MyAsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        taskCount = new StaffDao(GlobalCtx.this.getSpecialToken()).getTaskCount();
+                    } catch (ServiceException e) {
+                        e.printStackTrace();
+                    }
+                    GlobalCtx.this.taskUpdateTs = System.currentTimeMillis();
+                    return null;
+                }
+            }.executeOnNormal();
+        }
     }
 
     public static class SoundManager {

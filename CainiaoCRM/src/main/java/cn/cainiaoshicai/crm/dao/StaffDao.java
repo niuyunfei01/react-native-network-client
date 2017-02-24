@@ -97,4 +97,22 @@ public class StaffDao {
         }
         return rtn;
     }
+
+    public int getTaskCount() throws ServiceException {
+        String json = post("total_mine_task");
+        ResultObject<HashMap<String, Integer>> value = null;
+        try {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            value = gson.fromJson(json, new TypeToken<ResultObject<HashMap<String, Integer>>>() {}.getType());
+        } catch (Exception e) {
+            Log.e("crm", e.getMessage(), e);
+
+            if (e instanceof JsonSyntaxException) {
+                Log.e("crm", "json:" + json);
+            }
+        }
+
+        boolean invalid = value == null || value.getObj() == null || value.getObj().get("total_mine_task") == null;
+        return invalid ? 0 : value.getObj().get("total_mine_task");
+    }
 }

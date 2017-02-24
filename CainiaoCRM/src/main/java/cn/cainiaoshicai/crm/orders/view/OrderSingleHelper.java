@@ -115,6 +115,11 @@ public class OrderSingleHelper {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     checked[which] = true;
+                    for(int i = 0; i < checked.length; i++) {
+                        if (i != which) {
+                            checked[i] = false;
+                        }
+                    }
                 }
             });
         } else {

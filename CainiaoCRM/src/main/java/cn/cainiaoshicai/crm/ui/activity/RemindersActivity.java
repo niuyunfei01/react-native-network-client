@@ -23,15 +23,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -48,11 +51,14 @@ import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
+import cn.cainiaoshicai.crm.ui.helper.MyMenuItemStuffListener;
 
 public class RemindersActivity extends AbstractActionBarActivity {
 
     private final int contentViewRes;
     private WebView mWebView;
+    private TextView notifCount;
+    private int mNotifCount = 1;
 
     public RemindersActivity() {
         AppLogger.v("start reminds web view activity");
@@ -133,6 +139,25 @@ public class RemindersActivity extends AbstractActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate menu from menu resource (res/menu/print)
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem item = menu.findItem(R.id.menu_accept);
+        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+
+        View count = item.getActionView();
+        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
+        notifCount.setText(String.valueOf(mNotifCount));
+        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+            @Override
+            public void callback(int count) {
+                mNotifCount = count;
+                updateHotCount(mNotifCount);
+            }
+        });
+        new MyMenuItemStuffListener(count, "查看任务") {
+            @Override
+            public void onClick(View v) {
+                GlobalCtx.getApplication().toTaskListActivity(RemindersActivity.this);
+            }
+        };
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -163,6 +188,24 @@ public class RemindersActivity extends AbstractActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    // call the updating code on the main thread,
+// so we can call this asynchronously
+    public void updateHotCount(final int new_hot_number) {
+        mNotifCount = new_hot_number;
+        if (notifCount == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (new_hot_number == 0)
+                    notifCount.setVisibility(View.INVISIBLE);
+                else {
+                    notifCount.setVisibility(View.VISIBLE);
+                    notifCount.setText(Integer.toString(new_hot_number));
+                }
+            }
+        });
     }
 
     @Override

@@ -202,9 +202,14 @@ public class OrderPrinter {
 
             printer.highText(String.format("合计 %27s", "x" + total)).newLine();
 
-            printer.starLine().highText(String.format("实付金额：%22.2f", order.getOrderMoney())).newLine();
+            if (order.getAdditional_to_pay() > 0) {
+                printer.starLine(). normalText(String.format("客户追加应付：%22.2f", order.getAdditional_to_pay()/100)).newLine();
+            }
 
-            printer.starLine().normalText("我们承诺坏一赔二，请您放心买菜。").newLine().normalText("客服电话：400-018-6069");
+            double totalMoney = (order.getOrderMoney() * 100 + order.getAdditional_to_pay()) / 100;
+            printer.starLine().highText(String.format("%s：%22.2f", (order.isPaidDone() ? "实付金额" : "客户合计待付"), totalMoney)).newLine();
+
+            printer.starLine().normalText("生鲜娇嫩，请您妥善储存。售后问题请").newLine().normalText("致电客服：400-018-6069");
 
             btos.write(0x0D);
             btos.write(0x0D);

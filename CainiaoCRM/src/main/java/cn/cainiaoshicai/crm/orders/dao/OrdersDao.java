@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -57,7 +58,7 @@ public class OrdersDao {
     }
 
     public OrderContainer get() throws ServiceException {
-        return convert(getJson(""));
+        return  convert(getJson(""));
     }
 
     @Nullable
@@ -68,6 +69,10 @@ public class OrdersDao {
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             value = gson.fromJson(json, new TypeToken<OrderContainer>() {}.getType());
+
+            if (value != null) {
+                GlobalCtx.getApplication().setTaskCount(value.getTotal_task_mine());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             AppLogger.e(e.getMessage(), e);
