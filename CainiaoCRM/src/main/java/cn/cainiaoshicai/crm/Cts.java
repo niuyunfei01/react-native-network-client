@@ -68,6 +68,32 @@ public class Cts {
     public static final int  DADA_STATUS_CANCEL = 5;
     public static final int  DADA_STATUS_TIMEOUT = 7;
 
+    public static final int  SIGN_ACTION_NONE = 0;
+    public static final int  SIGN_ACTION_IN = 1;
+    public static final int  SIGN_ACTION_OFF = 2;
+    public static final int  SIGN_ACTION_VACATION = 3;
+
+    public static final String labelSignIn = "打卡";
+    public static final String labelWorking = "工作中";
+    public static final String labelOffwork = "已下班";
+    public static final String labelVocation = "请假";
+
+    public static String getSignInLabel(int sign_status) {
+        final String label;
+        if (sign_status == Cts.SIGN_ACTION_IN) {
+            label = labelWorking;
+        } else if (sign_status == Cts.SIGN_ACTION_OFF) {
+            label = labelOffwork;
+        } else if (sign_status == Cts.SIGN_ACTION_VACATION) {
+            label = labelVocation;
+        } else if (sign_status == Cts.SIGN_ACTION_NONE) {
+            label = labelSignIn;
+        } else {
+            label = "未知";
+        }
+        return label;
+    }
+
     static public class Provide {
         public final int value;
         public final String name;

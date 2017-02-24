@@ -161,158 +161,125 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         });
 
         final TextView signingText = (TextView) this.findViewById(R.id.head_orders_waiting);
-        final String labelDaka = "打卡";
-        final String labelWorking = "工作中";
-        final String labelOffwork = "已下班";
+        signingText.setText(Cts.getSignInLabel(SettingUtility.getSignInStatus()));
 
-        signingText.setText(SettingUtility.getSignInStore() > 0 ? labelWorking : labelDaka);
-
-         signingText.setOnClickListener(new View.OnClickListener() {
+        signingText.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("HardwareIds")
             @Override
             public void onClick(View v) {
+                if (locationHelper == null) {
+                    AlertUtil.showAlert(MainActivity.this, "错误提示", "暂时无法检测您的位置，请打开GPS");
+                    return;
+                }
                 final Integer signInStore = SettingUtility.getSignInStore();
-                if (locationHelper != null) {
-                    final HashMap<String, String> envInfos = extraEnvInfo();
-                    if (labelDaka.equals(signingText.getText()) || labelOffwork.equals(signingText.getText())) {
-                        final HashSet<Integer> selectedStores = new HashSet<>();
-                        if (signInStore > 0) {
-                            selectedStores.add(signInStore);
-                        }
-                        Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", selectedStores,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (selectedStores.isEmpty()) {
-                                            AlertUtil.showAlert(MainActivity.this, "错误提醒", "您需选择一个工作门店");
-                                        } else if (selectedStores.size() > 1) {
-                                            AlertUtil.showAlert(MainActivity.this, "错误提醒", "您只应选择一个门店");
-                                        } else {
-                                            final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                                            Utility.forceShowDialog(MainActivity.this, pf);
-                                            final Integer signInStoreId = selectedStores.iterator().next();
+                final Integer signInStatus = SettingUtility.getSignInStatus();
+                final HashMap<String, String> envInfos = extraEnvInfo();
+                if (signInStatus == Cts.SIGN_ACTION_IN) {
 
-                                            new MyAsyncTask<Void, Void, Void>() {
-                                                private ResultObject<HashMap<String, String>> resultBean;
+                    final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                    Utility.forceShowDialog(MainActivity.this, pf);
 
-                                                @Override
-                                                protected Void doInBackground(Void... params) {
-                                                    StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
-                                                    try {
-                                                        resultBean = fbDao.sign_in(signInStoreId, envInfos);
-                                                    } catch (ServiceException e) {
-                                                        resultBean = new ResultObject<>(ResultBean.serviceException("服务异常:" + e.getMessage()));
-                                                    }
-                                                    return null;
-                                                }
+                    new MyAsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            pf.dismissAllowingStateLoss();
 
-                                                @Override
-                                                protected void onPostExecute(Void aVoid) {
-                                                    pf.dismissAllowingStateLoss();
-                                                    if (resultBean.isOk()) {
-                                                        HashMap obj = resultBean.getObj();
-                                                        String signInDesc = "";
-
-                                                        Integer signInTs = 0;
-                                                        if (obj != null && obj.containsKey("time")) {
-                                                            try {
-                                                                signInTs = Integer.valueOf((String) obj.get("time"));
-                                                            }catch (Exception e) {
-                                                                //
-                                                            }
-                                                            if (signInTs > 0) {
-                                                                signInDesc = "打卡时间：" + DateTimeUtils.hourMin(new Date(signInTs * 1000));
-                                                            }
-                                                        }
-
-                                                        SettingUtility.setSignIn(signInStoreId, signInTs);
-
-                                                        final String okTips = "打卡成功，今日值班店长："
-                                                                + (obj != null ? obj.get("working_mgr") : "未安排")
-                                                                + signInDesc;
-
-                                                        MainActivity.this.runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
-                                                                signingText.setText(labelWorking);
-                                                            }
-                                                        });
-                                                    } else {
-                                                        Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
-                                                    }
-                                                }
-                                            }.executeOnNormal();
-                                        }
-                                    }
-                                });
-                    } else if (labelWorking.equals(signingText.getText())) {
-
-                        if (signInStore > 0) {
-
-                            AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
-                            final String[] titles = new String[]{
-                                    "已完成订货",
-                                    "已完成报损",
-                                    "下架产品已重新上架",
-                                    "门店卫生已清理",
-                                    "已向值班店长报告完毕",
-                            };
-                            final boolean[] checked = new boolean[]{true, true, true, true, true};
-                            adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
-                                }
-                            });
-
-                            adb.setTitle("检查下班各项工作是否已完成？")
-                                    .setPositiveButton("现在下班", new DialogInterface.OnClickListener() {
+                            String err = "";
+                            try {
+                                StaffDao staffDao = new StaffDao(GlobalCtx.getApplication().getSpecialToken());
+                                final ResultObject<HashMap<String, String>> msg = staffDao.getWorkingStatus();
+                                if (msg.isOk()) {
+                                    MainActivity.this.runOnUiThread(new Runnable() {
                                         @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                                            Utility.forceShowDialog(MainActivity.this, pf);
-                                            new MyAsyncTask<Void, Void, Void>() {
-                                                private ResultObject<HashMap<String, String>> resultBean;
-
-                                                @Override
-                                                protected Void doInBackground(Void... params) {
-                                                    StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
-                                                    try {
-                                                        resultBean = fbDao.sign_off(signInStore, envInfos);
-                                                    } catch (ServiceException e) {
-                                                        resultBean = new ResultObject<>(ResultBean.serviceException("系统异常:" + e.getMessage()));
-                                                    }
-                                                    return null;
-                                                }
-
-                                                @Override
-                                                protected void onPostExecute(Void aVoid) {
-                                                    pf.dismissAllowingStateLoss();
-                                                    if (resultBean.isOk()) {
-                                                        SettingUtility.setSignIn(0, 0);
-                                                        MainActivity.this.runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                Utility.toast("打卡完成，下班愉快！", MainActivity.this);
-                                                                signingText.setText(labelOffwork);
-                                                            }
-                                                        });
-                                                    } else {
-                                                        Utility.toast("打卡失败:" + resultBean.getDesc(), MainActivity.this);
-                                                    }
-                                                }
-                                            }.executeOnNormal();
+                                        public void run() {
+                                            AlertUtil.showAlert(MainActivity.this, R.string.working_status,
+                                                    msg.getDesc(), "知道了", null, "查看详情", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            String token = GlobalCtx.getInstance().getSpecialToken();
+                                                            GeneralWebViewActivity.gotoWeb(MainActivity.this,
+                                                                    URLHelper.getStoresPrefix() + "/working_status.html?access_token=" + token);
+                                                        }
+                                                    }, "现在下班",
+                                                    new SignOffOnClickListener(signInStore, envInfos, signingText));
                                         }
                                     });
-                            adb.setNegativeButton("取消", null);
-                            adb.show();
-                        } else {
-                            signingText.setText(labelDaka);
+                                } else {
+                                    err = "获取工作状态失败:"+msg.getDesc();
+                                }
+                            } catch (ServiceException e) {
+                                err = "异常:" + e.getMessage();
+                            }
+
+                            if (!TextUtils.isEmpty(err)) {
+                                AlertUtil.showAlert(MainActivity.this, "发生错误", err);
+                            }
+
+                            return null;
                         }
-                    }
+                    }.executeOnNormal();
+
                 } else {
-                    AlertUtil.showAlert(MainActivity.this, "错误提示", "无法检测位置信息");
+                    final HashSet<Integer> selectedStores = new HashSet<>();
+                    if (signInStore > 0) {
+                        selectedStores.add(signInStore);
+                    }
+                    Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", selectedStores,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (selectedStores.size() != 1) {
+                                        AlertUtil.showAlert(MainActivity.this, "错误提醒", "选择一个工作门店");
+                                    } else {
+                                        final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                        Utility.forceShowDialog(MainActivity.this, pf);
+                                        final Integer signInStoreId = selectedStores.iterator().next();
+
+                                        new MyAsyncTask<Void, Void, Void>() {
+                                            private ResultObject<HashMap<String, String>> resultBean;
+
+                                            @Override
+                                            protected Void doInBackground(Void... params) {
+                                                StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                                try {
+                                                    resultBean = fbDao.sign_in(signInStoreId, envInfos);
+                                                } catch (ServiceException e) {
+                                                    resultBean = new ResultObject<>(ResultBean.serviceException("服务异常:" + e.getMessage()));
+                                                }
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void onPostExecute(Void aVoid) {
+                                                pf.dismissAllowingStateLoss();
+                                                if (resultBean.isOk()) {
+                                                    final HashMap<String, String> obj = resultBean.getObj();
+
+                                                    final String okTips = "打卡成功，今日值班店长："
+                                                            + (obj != null ? obj.get("working_mgr") : "未安排")
+                                                            + resultBean.getDesc();
+
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
+                                                            updateSignInStatus(obj, signingText);
+                                                        }
+                                                    });
+                                                } else {
+                                                    Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            updateSignInStatus(resultBean.getObj(), signingText);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }.executeOnNormal();
+                                    }
+                                }
+                            });
                 }
             }
         });
@@ -344,6 +311,16 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             });
         } else {
             opBar.setVisibility(View.GONE);
+        }
+    }
+
+    public void updateSignInStatus(HashMap<String, String> obj, TextView signingText) {
+        if (obj != null
+                && (obj.containsKey("sign_store") && obj.containsKey("sign_status"))) {
+            int sign_store = Integer.valueOf(obj.get("sign_store"));
+            int sign_status = Integer.valueOf(obj.get("sign_status"));
+            SettingUtility.setSignIn(sign_store, sign_status);
+            signingText.setText(Cts.getSignInLabel(sign_status));
         }
     }
 
@@ -607,4 +584,89 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         super.onDestroy();
     }
 
+    private class SignOffOnClickListener implements DialogInterface.OnClickListener {
+        private final Integer signInStore;
+        private final HashMap<String, String> envInfos;
+        private final TextView signingText;
+
+        public SignOffOnClickListener(Integer signInStore, HashMap<String, String> envInfos, TextView signingText) {
+            this.signInStore = signInStore;
+            this.envInfos = envInfos;
+            this.signingText = signingText;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+            final String[] titles = new String[]{
+                    "已完成订货",
+                    "已完成报损",
+                    "下架产品已重新上架",
+                    "门店卫生已清理",
+                    "已向值班店长报告各项工作下班",
+            };
+            final boolean[] checked = new boolean[titles.length];
+            adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    checked[which] = isChecked;
+                }
+            });
+
+            adb.setTitle("检查下班各项工作是否已完成？")
+                    .setPositiveButton("现在下班", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            for (boolean aChecked : checked) {
+                                if (!aChecked) {
+                                    AlertUtil.showAlert(MainActivity.this, "", "店内各项工作完成方可打卡下班");
+                                    return;
+                                }
+                            }
+
+                            final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                            Utility.forceShowDialog(MainActivity.this, pf);
+                            new MyAsyncTask<Void, Void, Void>() {
+                                private ResultObject<HashMap<String, String>> resultBean;
+
+                                @Override
+                                protected Void doInBackground(Void... params) {
+                                    StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                    try {
+                                        resultBean = fbDao.sign_off(signInStore, envInfos);
+                                    } catch (ServiceException e) {
+                                        resultBean = new ResultObject<>(ResultBean.serviceException("系统异常:" + e.getMessage()));
+                                    }
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(Void aVoid) {
+                                    pf.dismissAllowingStateLoss();
+                                    if (resultBean.isOk()) {
+                                        MainActivity.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                AlertUtil.showAlert(MainActivity.this, "下班提示", resultBean.getDesc());
+                                                updateSignInStatus(resultBean.getObj(), signingText);
+                                            }
+                                        });
+                                    } else {
+                                        Utility.toast("打卡失败:" + resultBean.getDesc(), MainActivity.this);
+                                        MainActivity.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                updateSignInStatus(resultBean.getObj(), signingText);
+                                            }
+                                        });
+                                    }
+                                }
+                            }.executeOnNormal();
+                        }
+                    });
+            adb.setNegativeButton("取消", null);
+            adb.show();
+        }
+    }
 }

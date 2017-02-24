@@ -110,4 +110,10 @@ public class GeneralWebViewActivity extends Activity {
         // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
     }
+
+    public static void gotoWeb(Activity ctx, String url) {
+        Intent intent = new Intent(ctx, GeneralWebViewActivity.class);
+        intent.putExtra("url", url);
+        ctx.startActivity(intent);
+    }
 }

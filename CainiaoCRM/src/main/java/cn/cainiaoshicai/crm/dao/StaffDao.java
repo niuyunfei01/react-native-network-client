@@ -115,4 +115,8 @@ public class StaffDao {
         boolean invalid = value == null || value.getObj() == null || value.getObj().get("total_mine_task") == null;
         return invalid ? 0 : value.getObj().get("total_mine_task");
     }
+
+    public ResultObject<HashMap<String, String>> getWorkingStatus() throws ServiceException {
+        return convert(post("working_status", new HashMap<String, String>()));
+    }
 }

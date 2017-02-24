@@ -125,9 +125,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			}
 
 			private void gotoWeb(String url) {
-				Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
-				intent.putExtra("url", url);
-				startActivity(intent);
+				GeneralWebViewActivity.gotoWeb(MineActivity.this, url);
 			}
 		});
 		new MyAsyncTask<Void,HashMap<String, String>, HashMap<String, String>>() {

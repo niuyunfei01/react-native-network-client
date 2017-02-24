@@ -404,10 +404,13 @@ public class SettingUtility {
 
     public static void setSignIn(Integer signInStoreId, Integer signInTs) {
         SettingHelper.setEditor(getContext(), "sign_in_store", signInStoreId);
-        SettingHelper.setEditor(getContext(), "sign_in_store_ts", signInTs);
+        SettingHelper.setEditor(getContext(), "sign_in_status", signInTs);
     }
 
     public static Integer getSignInStore() {
         return SettingHelper.getSharedPreferences(getContext(), "sign_in_store", 0);
+    }
+    public static Integer getSignInStatus() {
+        return SettingHelper.getSharedPreferences(getContext(), "sign_in_status", 0);
     }
 }
