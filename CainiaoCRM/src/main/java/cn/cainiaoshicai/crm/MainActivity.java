@@ -193,14 +193,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                         @Override
                                         public void run() {
                                             AlertUtil.showAlert(MainActivity.this, R.string.working_status,
-                                                    msg.getDesc(), "知道了", null, "查看详情", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            String token = GlobalCtx.getInstance().getSpecialToken();
-                                                            GeneralWebViewActivity.gotoWeb(MainActivity.this,
-                                                                    URLHelper.getStoresPrefix() + "/working_status.html?access_token=" + token);
-                                                        }
-                                                    }, "现在下班",
+                                                    msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(), "现在下班",
                                                     new SignOffOnClickListener(signInStore, envInfos, signingText));
                                         }
                                     });
@@ -279,7 +272,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                         }.executeOnNormal();
                                     }
                                 }
-                            });
+                            }, "查看考勤表", new StaffDetailsClickListener());
                 }
             }
         });
@@ -667,6 +660,15 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                     });
             adb.setNegativeButton("取消", null);
             adb.show();
+        }
+    }
+
+    private class StaffDetailsClickListener implements DialogInterface.OnClickListener {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            String token = GlobalCtx.getInstance().getSpecialToken();
+            GeneralWebViewActivity.gotoWeb(MainActivity.this,
+                    URLHelper.getStoresPrefix() + "/working_status.html?access_token=" + token);
         }
     }
 }

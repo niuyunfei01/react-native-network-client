@@ -703,6 +703,12 @@ public class Utility {
 
     public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
                                          final Set<Integer> selectedStores, DialogInterface.OnClickListener okCallback) {
+        showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, okCallback, null, null);
+    }
+    
+    public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
+                                         final Set<Integer> selectedStores, DialogInterface.OnClickListener okCallback,
+                                         String neutralLabel, DialogInterface.OnClickListener neutralCallback) {
         final Collection<Store> stores = GlobalCtx.getInstance().listStores();
         if (stores == null) {
             Toast.makeText(context, "暂时无法修改：(获取店铺列表错误)", Toast.LENGTH_LONG).show();
@@ -738,6 +744,10 @@ public class Utility {
 
         adb.setTitle(title)
                 .setPositiveButton(okLabel, okCallback);
+
+        if (neutralLabel != null) {
+            adb.setNeutralButton(neutralLabel, neutralCallback);
+        }
         adb.setNegativeButton(cancelLabel, null);
         adb.show();
     }
