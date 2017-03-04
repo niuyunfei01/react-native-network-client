@@ -24,6 +24,7 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
@@ -107,6 +108,8 @@ public class NotificationReceiver extends BroadcastReceiver {
 					}
 				} else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
 					soundManager.play_customer_new_msg();
+				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
+					soundManager.play_order_cancelled();
 				}
 			}
 
@@ -145,6 +148,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 							StoreStorageActivity.class;
 					i = new Intent(context, targetClazz);
 
+				}  else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
+					i = new Intent(context, OrderSingleActivity.class);
+					i.putExtra("order_id", notify.getOrder_id());
 				} else {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 				}
@@ -246,6 +252,7 @@ class Notify {
 	private int store_id;
 	private int total_late;
 	private int filter;
+	private int order_id;
 	private String url;
 	private Set<Integer> notify_workers;
 
@@ -340,5 +347,13 @@ class Notify {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public int getOrder_id() {
+		return order_id;
+	}
+
+	public void setOrder_id(int order_id) {
+		this.order_id = order_id;
 	}
 }

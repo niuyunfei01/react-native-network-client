@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,14 +18,8 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +46,6 @@ import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -582,6 +574,7 @@ public class GlobalCtx extends Application {
         private int storageEleStatus;
         private int storageSoldout;
         private int storageCheckStorage;
+        private int orderCancel;
         private int customerNewMsgSound;
         private int[] numberSound = new int[10];
         private volatile boolean soundLoaded = false;
@@ -603,6 +596,8 @@ public class GlobalCtx extends Application {
             syncNotWorkSound = soundPool.load(ctx, R.raw.sync_not_work, 1);
             customerNewMsgSound = soundPool.load(ctx, R.raw.customer_new_message, 1);
             storageCheckStorage = soundPool.load(ctx, R.raw.check_storage, 1);
+
+            orderCancel = soundPool.load(ctx, R.raw.check_storage, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -766,6 +761,12 @@ public class GlobalCtx extends Application {
         }
 
         public void play_customer_new_msg() {
+            if (check_disabled()) {
+                this.play_single_sound(this.customerNewMsgSound);
+            }
+        }
+
+        public void play_order_cancelled() {
             if (check_disabled()) {
                 this.play_single_sound(this.customerNewMsgSound);
             }

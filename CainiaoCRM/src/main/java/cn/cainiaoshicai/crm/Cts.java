@@ -164,6 +164,7 @@ public class Cts {
     public static final String PUSH_TYPE_BECOME_OFF_SALE = "store_prod_off_sale";
     public static final String PUSH_TYPE_WM_GOOD_NOT_MAP = "prod_wm_not_map";
     public static final String PUSH_TYPE_EXT_WARNING = "ext_store_warning";
+    public static final String PUSH_TYPE_ORDER_CANCELLED = "order_cancelled";
 
     public static final String PUSH_TYPE_USER_TALK = "talk";
 }

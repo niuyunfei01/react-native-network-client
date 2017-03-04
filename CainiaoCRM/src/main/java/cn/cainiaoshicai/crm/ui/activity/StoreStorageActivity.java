@@ -48,6 +48,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_TO_SOLD_OUT_ID = 10994;
     private static final int MENU_CONTEXT_EDIT_REQ = 10995;
     private static final int MENU_CONTEXT_TO_AUTO_ON_ID = 10996;
+    private static final int MENU_CONTEXT_TO_LOSS = 10997;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
@@ -441,6 +442,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             if (item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
             }
+
+            menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
         }
     }
 
@@ -491,6 +494,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             case MENU_CONTEXT_EDIT_REQ:
                 AlertDialog dlg = StoreStorageHelper.createEditProvideDlg(this, item);
                 dlg.show();
+                return true;
+            case MENU_CONTEXT_TO_LOSS:
+                if (item != null) {
+                    int itemId = item.getId();
+                    GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, "/stores/prod_loss/" + itemId);
+                }
                 return true;
             default:
                 return super.onContextItemSelected(mi);

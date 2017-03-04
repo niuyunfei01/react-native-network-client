@@ -44,6 +44,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
     private static final int MENU_CONTEXT_TO_SALE_ID = 10993;
     private static final int MENU_CONTEXT_TO_SOLD_OUT_ID = 10994;
     private static final int MENU_CONTEXT_TO_AUTO_ON_ID = 10995;
+    private static final int MENU_CONTEXT_TO_LOSS = 10997;
 
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
@@ -233,8 +234,9 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
             } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
             }
-        }
 
+            menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
+        }
     }
 
 
@@ -277,6 +279,14 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
             case MENU_CONTEXT_TO_AUTO_ON_ID:
                 StoreStorageHelper.createSetOnSaleDlg(this, item, listAdapterChanged, true).show();
                 return true;
+
+            case MENU_CONTEXT_TO_LOSS:
+                if (item != null) {
+                    int itemId = item.getId();
+                    GeneralWebViewActivity.gotoWeb(StoreSelfStorageActivity.this, "/stores/prod_loss/" + itemId);
+                }
+                return true;
+
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
                 StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
                     @Override
