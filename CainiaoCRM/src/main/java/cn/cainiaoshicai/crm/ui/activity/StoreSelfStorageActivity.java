@@ -29,6 +29,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -283,7 +284,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
             case MENU_CONTEXT_TO_LOSS:
                 if (item != null) {
                     int itemId = item.getId();
-                    GeneralWebViewActivity.gotoWeb(StoreSelfStorageActivity.this, "/stores/prod_loss/" + itemId);
+                    GeneralWebViewActivity.gotoWeb(StoreSelfStorageActivity.this, URLHelper.WEB_URL_ROOT + "/stores/prod_loss/" + itemId);
                 }
                 return true;
 

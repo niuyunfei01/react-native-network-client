@@ -67,6 +67,7 @@ public class Order implements Serializable {
     private Feedback feedback;
     private String direction;
     private int additional_to_pay;
+    private String ship_worker_mobile;
 
     public int getId() {
         return id;
@@ -477,6 +478,14 @@ public class Order implements Serializable {
             workers.add(Integer.parseInt(sId));
         }
         return workers;
+    }
+
+    public String getShip_worker_mobile() {
+        return ship_worker_mobile;
+    }
+
+    public void setShip_worker_mobile(String ship_worker_mobile) {
+        this.ship_worker_mobile = ship_worker_mobile;
     }
 }
 

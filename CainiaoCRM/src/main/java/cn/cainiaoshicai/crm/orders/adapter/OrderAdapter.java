@@ -311,6 +311,8 @@ public class OrderAdapter extends BaseAdapter {
             String mobilephone = null;
             if (order.getShip_worker_id() == Cts.ID_DADA_SHIP_WORKER) {
                 mobilephone = order.getDada_mobile();
+            } else if (!TextUtils.isEmpty(order.getShip_worker_mobile())) {
+                mobilephone = order.getShip_worker_mobile();
             } else {
                 SortedMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
                 if (workers != null) {
