@@ -96,6 +96,7 @@ public class CommonConfigDao {
         private SortedMap<Integer, Worker> ship_workers;
         private String[] delayReasons;
         private HashMap<String, String> configUrls;
+        private String[] coupons;
 
         public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
             this.workers = workers;
@@ -121,6 +122,14 @@ public class CommonConfigDao {
 
         public HashMap<String, String> getConfigUrls() {
             return configUrls;
+        }
+
+        public String[] getCoupons() {
+            return coupons;
+        }
+
+        public void setCoupons(String[] coupons) {
+            this.coupons = coupons;
         }
     }
 

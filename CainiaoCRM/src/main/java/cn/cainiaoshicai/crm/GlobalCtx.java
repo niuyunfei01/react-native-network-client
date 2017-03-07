@@ -86,6 +86,7 @@ public class GlobalCtx extends Application {
     public boolean tokenExpiredDialogIsShowing = false;
     private AccountBean accountBean;
     private SoundManager soundManager;
+    private String[] coupons;
 
     public GlobalCtx() {
     }
@@ -197,6 +198,8 @@ public class GlobalCtx extends Application {
                         if (configUrls != null) {
                             GlobalCtx.this.configUrls.putAll(configUrls);
                         }
+
+                        GlobalCtx.this.coupons = config.getCoupons();
                     }
                 } catch (Exception e) {
                     AppLogger.w("error to init config:" + e.getMessage(), e);
@@ -529,6 +532,26 @@ public class GlobalCtx extends Application {
         this.taskUpdateTs = System.currentTimeMillis();
     }
 
+    public String[] getCoupons() {
+        String[] must = {
+                "延误补偿(6元优惠券)", //type = 1
+                "严重延误补偿（满79减20）", //type = 2
+                "品质补偿券(6元)", //type = 3
+                "品质补偿券(10元)", //type = 4
+                "品质补偿券(15元)", //type = 5
+                "品质补偿券(20元)", //type = 6
+                "品质补偿券(30元)", //type = 7
+        };
+
+        if (this.coupons != null) {
+            String[] _coupons = new String[this.coupons.length + must.length];
+            System.arraycopy(must, 0, _coupons, 0, must.length);
+            System.arraycopy(this.coupons, 0, _coupons, must.length, this.coupons.length);
+            return _coupons;
+        } else {
+            return must;
+        }
+    }
 
     public interface TaskCountUpdated {
         void callback(int count);

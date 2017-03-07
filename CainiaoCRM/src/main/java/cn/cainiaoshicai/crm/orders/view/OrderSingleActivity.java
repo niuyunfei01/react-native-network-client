@@ -636,19 +636,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 return true;
             case R.id.menu_send_coupon:
                 AlertDialog.Builder couponsAdb = new AlertDialog.Builder(this);
-                final String[] coupons = new String[]{
-                        "延误补偿(6元优惠券)", //type = 1
-                        "严重延误补偿（满79减20）", //type = 2
-                        "品质补偿券(6元)", //type = 3
-                        "品质补偿券(10元)", //type = 4
-                        "品质补偿券(15元)", //type = 5
-                        "品质补偿券(20元)", //type = 6
-                        "品质补偿券(30元)", //type = 7
-                        "品质补偿券(30元)", //type = 7
-                        "品质补偿券(30元)", //type = 7
-                        "员工50券[29190]",
-                        "员工100券[29189]",
-                };
+                final String[] coupons = GlobalCtx.getApplication().getCoupons();
                 final int[] checkedIdx = new int[1];
                 couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], new DialogInterface.OnClickListener() {
                     @Override
