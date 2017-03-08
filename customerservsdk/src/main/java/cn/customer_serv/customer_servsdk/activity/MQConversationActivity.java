@@ -44,7 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.customer_serv.core.callback.OnClientPositionInQueueCallback;
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.callback.LeaveMessageCallback;
 import cn.customer_serv.customer_servsdk.callback.OnClientOnlineCallback;
 import cn.customer_serv.customer_servsdk.callback.OnEvaluateRobotAnswerCallback;

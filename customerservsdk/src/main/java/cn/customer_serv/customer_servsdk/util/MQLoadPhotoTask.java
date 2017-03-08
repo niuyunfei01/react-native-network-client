@@ -8,7 +8,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.model.ImageFolderModel;
 
 import java.io.File;

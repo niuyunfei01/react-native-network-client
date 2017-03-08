@@ -12,6 +12,13 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+        }
+    }
 }
 
 dependencies {

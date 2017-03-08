@@ -11,7 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.domain.UserTalkBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
@@ -59,7 +59,7 @@ public class UserTalkDao implements IUserTalkDao {
             }
         }
 
-        return value != null ? value.talk : null;
+        return value != null ? value.getTalk() : null;
     }
 
     private String access_token;
@@ -68,12 +68,4 @@ public class UserTalkDao implements IUserTalkDao {
         this.access_token = access_token;
     }
 
-    class UserTalkBean extends ResultBean {
-
-        private UserTalk talk;
-
-        public UserTalkBean(boolean b, String desc) {
-            super(b, desc);
-        }
-    }
 }

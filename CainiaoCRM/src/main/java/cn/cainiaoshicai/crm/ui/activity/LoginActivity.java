@@ -17,6 +17,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.OauthTokenDao;
+import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.orders.dao.OAuthDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -182,7 +183,7 @@ public class LoginActivity extends AbstractActionBarActivity {
             String password = params[1];
 
             try {
-                OauthTokenDao.LoginResult loginResult = new OauthTokenDao().login(userName, password);
+                LoginResult loginResult = new OauthTokenDao().login(userName, password);
                 if (loginResult != null && loginResult.loginOk()) {
                     String token = loginResult.getAccess_token();
                     long expiresInSeconds = loginResult.getExpires_in();

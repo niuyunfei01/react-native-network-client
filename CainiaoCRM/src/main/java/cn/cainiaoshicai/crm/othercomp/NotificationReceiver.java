@@ -108,7 +108,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 					}
 				} else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
 					soundManager.play_customer_new_msg();
-				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
+				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
+						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
+					//TODO: play_sound_delayed
 					soundManager.play_order_cancelled();
 				}
 			}
@@ -148,7 +150,8 @@ public class NotificationReceiver extends BroadcastReceiver {
 							StoreStorageActivity.class;
 					i = new Intent(context, targetClazz);
 
-				}  else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
+				}  else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
+						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
 					i = new Intent(context, OrderSingleActivity.class);
 					i.putExtra("order_id", notify.getOrder_id());
 				} else {

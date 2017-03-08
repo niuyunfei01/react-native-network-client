@@ -16,29 +16,30 @@ repositories {
 }
 
 dependencies {
-    compile "com.android.support:support-v4:23.1.0"
-    compile "com.android.support:gridlayout-v7:23.1.0"
-    compile "com.android.support:cardview-v7:23.1.0"
+    compile 'com.android.support:support-v4:23.1.0'
+    compile 'com.android.support:gridlayout-v7:23.1.0'
+    compile 'com.android.support:cardview-v7:23.1.0'
     compile 'com.android.support:recyclerview-v7:23.1.0'
     compile 'com.android.support:appcompat-v7:18.0.+'
-
     compile 'in.srain.cube:ultra-ptr:1.0.11'
-
-    compile fileTree(dir: 'libs', include: '*.jar', exclude: ['*-javadoc.jar', '*-sources.jar'])
-
-    compile project(':customerservsdk')
-
+    compile fileTree(include: '*.jar', exclude: ['*-javadoc.jar', '*-sources.jar'], dir: 'libs')
+    //    compile project(':customerservsdk')
     // -------------------- 以下三个库是必须依赖的 ----------------------------
-//    compile 'cn.customer_serv:customer_servsdk:3.3.1@aar'
+    //    compile 'cn.customer_serv:customer_servsdk:3.3.1@aar'
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.squareup.okhttp3:okhttp:3.3.1'
     // -------------------- 以上三个库是必须依赖的 ----------------------------
-
     // 目前支持常见的 4 种图片加载库，必须在下面四个图片加载库中选择一个添加依赖
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-//    compile 'com.github.bumptech.glide:glide:3.7.0'
-//    compile 'com.squareup.picasso:picasso:2.5.2'
-//    compile 'org.xutils:xutils:3.3.36'
+    //    compile 'com.github.bumptech.glide:glide:3.7.0'
+    //    compile 'com.squareup.picasso:picasso:2.5.2'
+    //    compile 'org.xutils:xutils:3.3.36'
+    //    provided 'com.android.support:support-v4:23.1.1'
+    provided 'com.squareup.okhttp3:okhttp:3.3.1'
+    provided 'com.github.bumptech.glide:glide:3.7.0'
+    provided 'com.squareup.picasso:picasso:2.5.2'
+    provided 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    compile 'org.xutils:xutils:3.3.36'
 }
 
 // The sample build uses multiple directories to
@@ -98,8 +99,11 @@ android {
             keyAlias "androiddebugkey"
             keyPassword "android"
         }
-
         release {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('debug.keystore')
+            storePassword 'android'
             if (System.getenv("KEYSTORE") != null) {
                 storeFile file(System.getenv("KEYSTORE"))
                 storePassword System.getenv("KEYSTORE_PASSWORD")
@@ -111,15 +115,21 @@ android {
 
     buildTypes {
         debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
+
             applicationIdSuffix ""
             versionNameSuffix "-debug"
             resValue "string", "applicationId", "cn.cainiaoshicai.crm" + getApplicationIdSuffix()
-            resValue "string", "weiciyuanOfficalWeiboName",
+            resValue "string", "cainiaoshicai_com",
                     "cn.cainiaoshicai.crm" + getApplicationIdSuffix() + ".mention://@Cainiao-CRM"
             debuggable true
             signingConfig signingConfigs.debug
         }
         release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
+
             resValue "string", "applicationId", "cn.cainiaoshicai.crm"
             resValue "string", "Cainiaoshicai.cn",
                     "cn.cainiaoshicai.crm" + ".mention://@Cainiao-CRM"

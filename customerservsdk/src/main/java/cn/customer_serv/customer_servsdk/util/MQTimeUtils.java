@@ -2,7 +2,7 @@ package cn.customer_serv.customer_servsdk.util;
 
 import android.content.Context;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.model.BaseMessage;
 
 import java.text.SimpleDateFormat;

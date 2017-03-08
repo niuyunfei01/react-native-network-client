@@ -40,7 +40,7 @@ import android.widget.Toast;
 
 import cn.customer_serv.core.bean.MQAgent;
 import cn.customer_serv.core.bean.MQMessage;
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.model.Agent;
 import cn.customer_serv.customer_servsdk.model.BaseMessage;
 import cn.customer_serv.customer_servsdk.model.FileMessage;

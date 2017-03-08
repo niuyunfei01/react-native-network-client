@@ -6,14 +6,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -89,108 +87,6 @@ public class CommonConfigDao {
             return new ArrayList<>(0);
         }
     }
-
-
-    static public class Config {
-        private SortedMap<Integer, Worker> workers;
-        private SortedMap<Integer, Worker> ship_workers;
-        private String[] delayReasons;
-        private HashMap<String, String> configUrls;
-        private String[] coupons;
-
-        public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
-            this.workers = workers;
-            this.delayReasons = delayReasons;
-            this.configUrls = configUrls;
-        }
-
-        public SortedMap<Integer, Worker> getShip_workers() {
-            return ship_workers;
-        }
-
-        public void setShip_workers(SortedMap<Integer, Worker> ship_workers) {
-            this.ship_workers = ship_workers;
-        }
-
-        public SortedMap<Integer, Worker> getWorkers() {
-            return workers;
-        }
-
-        public String[] getDelayReasons() {
-            return delayReasons;
-        }
-
-        public HashMap<String, String> getConfigUrls() {
-            return configUrls;
-        }
-
-        public String[] getCoupons() {
-            return coupons;
-        }
-
-        public void setCoupons(String[] coupons) {
-            this.coupons = coupons;
-        }
-    }
-
-    static public class Worker {
-        private String nickname;
-        private String mobilephone;
-        private int id;
-        private int position;
-        private int[] pos_list;
-
-        public Worker(String nickname, String mobilephone, int userId) {
-            this.nickname = nickname;
-            this.mobilephone = mobilephone;
-            this.id = userId;
-        }
-
-        public String getNickname() {
-            return nickname;
-        }
-
-        public void setNickname(String nickname) {
-            this.nickname = nickname;
-        }
-
-        public String getMobilephone() {
-            return mobilephone;
-        }
-
-        public void setMobilephone(String mobilephone) {
-            this.mobilephone = mobilephone;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public int getPosition() {
-            return position;
-        }
-
-        public void setPosition(int position) {
-            this.position = position;
-        }
-
-        public boolean isExtShipWorker() {
-            return this.getPosition() == Cts.POSITION_EXT_SHIP;
-        }
-
-        public int[] getPos_list() {
-            return pos_list;
-        }
-
-        public void setPos_list(int[] pos_list) {
-            this.pos_list = pos_list;
-        }
-    }
-
 
 
 }

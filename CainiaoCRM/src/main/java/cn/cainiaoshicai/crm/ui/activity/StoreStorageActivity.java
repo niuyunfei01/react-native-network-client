@@ -33,6 +33,7 @@ import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -376,7 +377,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public void refreshData() {
         new MyAsyncTask<Void, Void, Void>(){
             private ProgressFragment progressFragment = ProgressFragment.newInstance(R.string.refreshing);
-            Pair<ArrayList<StorageItem>, StorageActionDao.StoreStatusStat> result;
+            Pair<ArrayList<StorageItem>, StoreStatusStat> result;
 
             @Override
             protected void onPreExecute() {
@@ -407,7 +408,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     @Override
                     public void run() {
                         updateAdapterData(result.first);
-                        StorageActionDao.StoreStatusStat sec = result.second;
+                        StoreStatusStat sec = result.second;
                         if (sec != null) {
                             updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
                                     sec.getTotal_sold_out(), sec.getTotal_off_sale(),

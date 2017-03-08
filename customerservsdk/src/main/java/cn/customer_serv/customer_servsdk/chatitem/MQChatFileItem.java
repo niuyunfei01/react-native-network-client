@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.callback.OnDownloadFileCallback;
 import cn.customer_serv.customer_servsdk.model.FileMessage;
 import cn.customer_serv.customer_servsdk.util.ErrorCode;

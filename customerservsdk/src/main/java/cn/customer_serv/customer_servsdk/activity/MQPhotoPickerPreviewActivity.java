@@ -16,7 +16,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.imageloader.MQImage;
 import cn.customer_serv.customer_servsdk.util.MQBrowserPhotoViewAttacher;
 import cn.customer_serv.customer_servsdk.util.MQUtils;

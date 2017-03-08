@@ -25,9 +25,10 @@ import java.util.SortedMap;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
+import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
+import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -67,11 +68,11 @@ public class OrderSingleHelper {
 
         final boolean isWaitingReady = fromStatus == Cts.WM_ORDER_STATUS_TO_READY;
         AlertDialog.Builder adb = new AlertDialog.Builder(activity);
-        final ArrayList<CommonConfigDao.Worker> workerList = new ArrayList<>();
+        final ArrayList<Worker> workerList = new ArrayList<>();
         boolean is_choosing_ship = !isWaitingReady && action != OrderSingleActivity.ACTION_EDIT_PACK_WORKER;
 
         int posType = isWaitingReady ? Cts.POSITION_PACK :  Cts.POSITION_ALL;
-        final SortedMap<Integer, CommonConfigDao.Worker> workers;
+        final SortedMap<Integer, Worker> workers;
         GlobalCtx app = GlobalCtx.getApplication();
         if (isWaitingReady) {
            workers = app.getStoreWorkers(posType, store_id);
@@ -83,7 +84,7 @@ public class OrderSingleHelper {
         }
 
         if (workers != null && !workers.isEmpty()) {
-            for(CommonConfigDao.Worker worker : workers.values()) {
+            for(Worker worker : workers.values()) {
                 if (is_choosing_ship || !worker.isExtShipWorker()) {
                     workerList.add(worker);
                 }
@@ -105,7 +106,7 @@ public class OrderSingleHelper {
         int checkedIdx = 0;
         List<String> items = new ArrayList<>();
         for (int i = 0; i < workerList.size(); i++) {
-            CommonConfigDao.Worker worker = workerList.get(i);
+            Worker worker = workerList.get(i);
             items.add(worker.getNickname());
             if (defaultWorker.contains(worker.getId())) {
                 checked[i] = true;
@@ -205,14 +206,14 @@ public class OrderSingleHelper {
                                 new MyAsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        StorageActionDao.ResultEditReq rb;
+                                        ResultEditReq rb;
                                         final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
                                         final String remarkTxt = remark.getText().toString();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
                                             rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
                                         } catch (ServiceException e) {
-                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                            rb = new ResultEditReq(false, "访问服务器出错");
                                         }
                                         final int total_req_cnt = rb.isOk() ? rb.getTotal_req_cnt() : -1;
 

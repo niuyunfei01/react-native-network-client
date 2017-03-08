@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.activity.MQPhotoPreviewActivity;
 import cn.customer_serv.customer_servsdk.imageloader.MQImage;
 import cn.customer_serv.customer_servsdk.model.RobotMessage;

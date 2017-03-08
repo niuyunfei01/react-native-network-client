@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.activity.MQWebViewActivity;
 import cn.customer_serv.customer_servsdk.imageloader.MQImage;
 import cn.customer_serv.customer_servsdk.imageloader.MQImageLoader;

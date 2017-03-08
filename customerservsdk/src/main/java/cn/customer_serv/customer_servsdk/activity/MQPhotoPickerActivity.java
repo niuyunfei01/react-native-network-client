@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.imageloader.MQImage;
 import cn.customer_serv.customer_servsdk.model.ImageFolderModel;
 import cn.customer_serv.customer_servsdk.pw.MQPhotoFolderPw;

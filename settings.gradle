@@ -1,1 +1,2 @@
-include ':customerservsdk', 'CainiaoCRM'
+//include ':customerservsdk', 'CainiaoCRM'
+include 'CainiaoCRM'

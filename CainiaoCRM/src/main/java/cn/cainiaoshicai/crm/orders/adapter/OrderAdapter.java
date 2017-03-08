@@ -28,7 +28,7 @@ import java.util.SortedMap;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.dao.CommonConfigDao;
+import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -314,9 +314,9 @@ public class OrderAdapter extends BaseAdapter {
             } else if (!TextUtils.isEmpty(order.getShip_worker_mobile())) {
                 mobilephone = order.getShip_worker_mobile();
             } else {
-                SortedMap<Integer, CommonConfigDao.Worker> workers = GlobalCtx.getInstance().getWorkers();
+                SortedMap<Integer, Worker> workers = GlobalCtx.getInstance().getWorkers();
                 if (workers != null) {
-                    CommonConfigDao.Worker worker = workers.get(order.getShip_worker_id());
+                    Worker worker = workers.get(order.getShip_worker_id());
                     if (worker != null) {
                         mobilephone = worker.getMobilephone();
                     }

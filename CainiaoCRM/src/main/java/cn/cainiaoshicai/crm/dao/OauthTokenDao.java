@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -64,39 +65,4 @@ public class OauthTokenDao {
     public OauthTokenDao() {
     }
 
-    public static class LoginResult {
-        private String error;
-        private String access_token;
-        private int expires_in;
-        private String refresh_token;
-        private String error_description;
-
-        public String getError() {
-            return error;
-        }
-
-        public String getAccess_token() {
-            return access_token;
-        }
-
-        public int getExpires_in() {
-            return expires_in;
-        }
-
-        public String getRefresh_token() {
-            return refresh_token;
-        }
-
-        public String getError_description() {
-            return error_description;
-        }
-
-        public boolean shouldRetry() {
-            return "invalid_grant".equals(error);
-        }
-
-        public boolean loginOk(){
-            return "".equals(error) || null == error;
-        }
-    }
 }

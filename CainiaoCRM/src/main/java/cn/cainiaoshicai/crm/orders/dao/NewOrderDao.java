@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.orders.domain.NewOrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.NewOrderReminder;
 import cn.cainiaoshicai.crm.orders.domain.PerformStat;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -83,15 +84,4 @@ public class NewOrderDao {
         }
     }
 
-    static public class NewOrderContainer {
-        private List<NewOrderReminder> orders;
-
-        public List<NewOrderReminder> getOrders() {
-            return orders;
-        }
-
-        public void setOrders(List<NewOrderReminder> orders) {
-            this.orders = orders;
-        }
-    }
 }

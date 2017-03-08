@@ -13,6 +13,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
+import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -190,14 +191,14 @@ public class StoreStorageHelper {
                                 new MyAsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        StorageActionDao.ResultEditReq rb;
+                                        ResultEditReq rb;
                                         final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
                                         final String remarkTxt = remark.getText().toString();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
                                             rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
                                         } catch (ServiceException e) {
-                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                            rb = new ResultEditReq(false, "访问服务器出错");
                                         }
                                         final int total_req_cnt = rb.isOk() ? rb.getTotal_req_cnt() : -1;
 

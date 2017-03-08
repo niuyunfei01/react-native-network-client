@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,8 +43,8 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
@@ -826,7 +825,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                             OrderActionDao sad = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                                             rb = sad.coupon_by_kf(uid, orderId, remarkTxt, (int)(reduce * 100), (int)(least * 100));
                                         } catch (ServiceException e) {
-                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                            rb = new ResultEditReq(false, "访问服务器出错");
                                         }
                                         final ResultBean finalRb = rb;
                                         activity.runOnUiThread(new Runnable() {
@@ -880,7 +879,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                             OrderActionDao sad = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                                             rb = sad.save_remark(orderId, remarkTxt);
                                         } catch (ServiceException e) {
-                                            rb = new StorageActionDao.ResultEditReq(false, "访问服务器出错");
+                                            rb = new ResultEditReq(false, "访问服务器出错");
                                         }
                                         final ResultBean finalRb = rb;
                                         activity.runOnUiThread(new Runnable() {

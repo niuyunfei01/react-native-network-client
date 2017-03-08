@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import cn.customer_serv.customer_servsdk.R;
+import cn.cainiaoshicai.crm.R;
 import cn.customer_serv.customer_servsdk.util.MQAudioPlayerManager;
 import cn.customer_serv.customer_servsdk.util.MQAudioRecorderManager;
 import cn.customer_serv.customer_servsdk.util.MQUtils;

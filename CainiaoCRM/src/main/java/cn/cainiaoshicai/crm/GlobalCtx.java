@@ -33,9 +33,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
+import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Tag;
+import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
@@ -69,12 +71,12 @@ public class GlobalCtx extends Application {
 
     private AtomicReference<LinkedHashMap<Integer, Store>> storesRef = new AtomicReference<>(null);
     private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
-    private SortedMap<Integer, CommonConfigDao.Worker> workers = new TreeMap<>();
-    private SortedMap<Integer, CommonConfigDao.Worker> ship_workers = new TreeMap<>();
+    private SortedMap<Integer, Worker> workers = new TreeMap<>();
+    private SortedMap<Integer, Worker> ship_workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
 
-    private SortedMap<Integer, CommonConfigDao.Worker> storeWorkers = new TreeMap<>();
+    private SortedMap<Integer, Worker> storeWorkers = new TreeMap<>();
     private long storeWorkersTs = 0;
 
     private DisplayMetrics displayMetrics = null;
@@ -183,9 +185,9 @@ public class GlobalCtx extends Application {
                             AppLogger.w("error to set jpush alias");
                         }
 
-                        CommonConfigDao.Config config = new CommonConfigDao(token).get();
+                        Config config = new CommonConfigDao(token).get();
 
-                        SortedMap<Integer, CommonConfigDao.Worker> workers = config.getWorkers();
+                        SortedMap<Integer, Worker> workers = config.getWorkers();
                         if (workers != null) {
                             GlobalCtx.this.workers = workers;
                         }
@@ -249,23 +251,23 @@ public class GlobalCtx extends Application {
 //        MQConfig.ui.robotMenuTipTextColorResId = R.color.test_blue;
     }
 
-    public SortedMap<Integer, CommonConfigDao.Worker> getWorkers() {
+    public SortedMap<Integer, Worker> getWorkers() {
         if (workers == null || workers.isEmpty()) {
             initConfigs();
         }
 
-        return this.workers == null ? new TreeMap<Integer, CommonConfigDao.Worker>() : this.workers;
+        return this.workers == null ? new TreeMap<Integer, Worker>() : this.workers;
     }
 
-    public SortedMap<Integer, CommonConfigDao.Worker> getShipWorkers() {
+    public SortedMap<Integer, Worker> getShipWorkers() {
         if (ship_workers == null || ship_workers.isEmpty()) {
             initConfigs();
         }
 
-        return this.ship_workers == null ? new TreeMap<Integer, CommonConfigDao.Worker>() : this.ship_workers;
+        return this.ship_workers == null ? new TreeMap<Integer, Worker>() : this.ship_workers;
     }
 
-    public SortedMap<Integer, CommonConfigDao.Worker> getStoreWorkers(final int posType, final int storeId) {
+    public SortedMap<Integer, Worker> getStoreWorkers(final int posType, final int storeId) {
 
         if (System.currentTimeMillis() - storeWorkersTs > 2 * 60 * 1000) {
             new MyAsyncTask<Void, Void, Void>() {
@@ -424,7 +426,7 @@ public class GlobalCtx extends Application {
         return soundManager;
     }
 
-    public CommonConfigDao.Worker getCurrentWorker() {
+    public Worker getCurrentWorker() {
         String currUid = GlobalCtx.getApplication().getCurrentAccountId();
         if (currUid != null) {
             try {
@@ -438,7 +440,7 @@ public class GlobalCtx extends Application {
     }
 
     public boolean acceptNotifyNew() {
-        CommonConfigDao.Worker currentWorker = this.getCurrentWorker();
+        Worker currentWorker = this.getCurrentWorker();
         return currentWorker == null || currentWorker.getPosition() != Cts.POSITION_EXT_SHIP;
     }
 

@@ -8,22 +8,21 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProvideReq;
+import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
+import cn.cainiaoshicai.crm.domain.StorageStatusResults;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreProduct;
+import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
@@ -107,112 +106,6 @@ public class StorageActionDao {
         } catch (ServiceException e) {
             AppLogger.e("provide_estimate store_id="+ store_id + ", day=" + day, e);
             return ResultObject.readingFailed();
-        }
-    }
-
-    static public class StoreStatusStat {
-
-        private int total_on_sale;
-        private int total_risk;
-        private int total_sold_out;
-        private int total_off_sale;
-        private int total_req_cnt;
-        private int total_sold_empty;
-
-        public int getTotal_on_sale() {
-            return total_on_sale;
-        }
-
-        public void setTotal_on_sale(int total_on_sale) {
-            this.total_on_sale = total_on_sale;
-        }
-
-        public int getTotal_risk() {
-            return total_risk;
-        }
-
-        public int getTotal_off_sale() {
-            return total_off_sale;
-        }
-
-        public void setTotal_off_sale(int total_off_sale) {
-            this.total_off_sale = total_off_sale;
-        }
-
-        public void setTotal_risk(int total_risk) {
-            this.total_risk = total_risk;
-        }
-
-        public int getTotal_sold_out() {
-            return total_sold_out;
-        }
-
-        public void setTotal_sold_out(int total_sold_out) {
-            this.total_sold_out = total_sold_out;
-        }
-
-        public void setTotal_req_cnt(int total_req_cnt) {
-            this.total_req_cnt = total_req_cnt;
-        }
-
-        public int getTotal_req_cnt() {
-            return total_req_cnt;
-        }
-
-        public int getTotal_sold_empty() {
-            return total_sold_empty;
-        }
-
-        public void setTotal_sold_empty(int total_sold_empty) {
-            this.total_sold_empty = total_sold_empty;
-        }
-    }
-
-    private static class StorageStatusResults {
-        List<StoreProduct> store_products;
-        HashMap<Integer, Product> products;
-        StoreStatusStat stats;
-        private int total_req_cnt;
-
-        List<StoreProduct> getStore_products() {
-            return store_products;
-        }
-
-        public void setStore_products(List<StoreProduct> store_products) {
-            this.store_products = store_products;
-        }
-
-        public int getTotal_req_cnt() {
-            return total_req_cnt;
-        }
-
-        public void setTotal_req_cnt(int total_req_cnt) {
-            this.total_req_cnt = total_req_cnt;
-        }
-
-        HashMap<Integer, Product> getProducts() {
-            return products;
-        }
-
-        public void setProducts(HashMap<Integer, Product> products) {
-            this.products = products;
-        }
-    }
-
-    public static class ResultEditReq extends ResultBean {
-
-        private int total_req_cnt;
-
-        public ResultEditReq(boolean b, String desc) {
-            super(b, desc);
-        }
-
-        public int getTotal_req_cnt() {
-            return total_req_cnt;
-        }
-
-        public void setTotal_req_cnt(int total_req_cnt) {
-            this.total_req_cnt = total_req_cnt;
         }
     }
 

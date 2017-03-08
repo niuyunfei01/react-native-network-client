@@ -8,17 +8,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.service.ServiceException;
-import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 
@@ -64,12 +61,12 @@ public class StaffDao {
     }
 
     @Nullable
-    private ResultObject<HashMap<Integer, CommonConfigDao.Worker>> convertWorkers(String json) {
+    private ResultObject<HashMap<Integer, Worker>> convertWorkers(String json) {
 
-        ResultObject<HashMap<Integer, CommonConfigDao.Worker>> value = null;
+        ResultObject<HashMap<Integer, Worker>> value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<ResultObject<HashMap<Integer, CommonConfigDao.Worker>>>() {}.getType());
+            value = gson.fromJson(json, new TypeToken<ResultObject<HashMap<Integer, Worker>>>() {}.getType());
         } catch (Exception e) {
             Log.e("crm", e.getMessage(), e);
 
@@ -87,11 +84,11 @@ public class StaffDao {
         this.access_token = access_token;
     }
 
-    public SortedMap<Integer,CommonConfigDao.Worker> getStoreTodayWorkers(int storeId) throws ServiceException {
-        ResultObject<HashMap<Integer, CommonConfigDao.Worker>> workers = convertWorkers(post("store_day_workers/" + storeId));
-        TreeMap<Integer, CommonConfigDao.Worker> rtn = new TreeMap<>();
+    public SortedMap<Integer,Worker> getStoreTodayWorkers(int storeId) throws ServiceException {
+        ResultObject<HashMap<Integer, Worker>> workers = convertWorkers(post("store_day_workers/" + storeId));
+        TreeMap<Integer, Worker> rtn = new TreeMap<>();
         if (workers != null && workers.isOk() && workers.getObj() != null) {
-            for(CommonConfigDao.Worker worker : workers.getObj().values()) {
+            for(Worker worker : workers.getObj().values()) {
                 rtn.put(worker.getId(), worker);
             }
         }
