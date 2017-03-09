@@ -108,10 +108,14 @@ public class NotificationReceiver extends BroadcastReceiver {
 					}
 				} else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
 					soundManager.play_customer_new_msg();
-				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
-						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
-					//TODO: play_sound_delayed
+				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
 					soundManager.play_order_cancelled();
+				} else if (Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
+					soundManager.play_remind_deliver();
+				} else if (Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())) {
+					soundManager.play_order_ask_cancel();
+				} else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
+					soundManager.play_dada_manual_timeout();
 				}
 			}
 
@@ -151,7 +155,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 					i = new Intent(context, targetClazz);
 
 				}  else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
-						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
+						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())
+						|| Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())
+						|| Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
 					i = new Intent(context, OrderSingleActivity.class);
 					i.putExtra("order_id", notify.getOrder_id());
 				} else {

@@ -160,12 +160,14 @@ public class Cts {
     public static final String PUSH_TYPE_REDY_TIMEOUT = "ready_timeout";
     public static final String PUSH_TYPE_SYNC_BROKEN = "warning_no_active_sync";
     public static final String PUSH_TYPE_SERIOUS_TIMEOUT = "serious_timeout";
+    public static final String PUSH_TYPE_MANUAL_DADA_TIMEOUT = "manual_dada_timeout";
     public static final String PUSH_TYPE_STORAGE_WARNING = "storage_warning";
     public static final String PUSH_TYPE_BECOME_OFF_SALE = "store_prod_off_sale";
     public static final String PUSH_TYPE_WM_GOOD_NOT_MAP = "prod_wm_not_map";
     public static final String PUSH_TYPE_EXT_WARNING = "ext_store_warning";
     public static final String PUSH_TYPE_ORDER_CANCELLED = "order_cancelled";
     public static final String PUSH_TYPE_REMIND_DELIVER = "remind_deliver";
+    public static final String PUSH_TYPE_ASK_CANCEL = "ask_cancel";
 
     public static final String PUSH_TYPE_USER_TALK = "talk";
 }

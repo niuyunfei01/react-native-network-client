@@ -75,6 +75,7 @@
 
 -keep class cn.cainiaoshicai.crm.orders.domain.** { *; }
 -keep class cn.cainiaoshicai.crm.domain.** { *; }
+-keep class cn.cainiaoshicai.crm.othercomp.Notify { *; }
 
 
 -dontwarn android.support.v4.**

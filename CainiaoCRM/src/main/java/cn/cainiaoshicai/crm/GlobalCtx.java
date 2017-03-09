@@ -599,10 +599,13 @@ public class GlobalCtx extends Application {
         private int storageEleStatus;
         private int storageSoldout;
         private int storageCheckStorage;
-        private int orderCancel;
+        private int orderCancelled;
         private int customerNewMsgSound;
         private int[] numberSound = new int[10];
         private volatile boolean soundLoaded = false;
+        private int customerRemindDeliverSound;
+        private int customerAskCancelSound;
+        private int dadaManualTimeoutSound;
 
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
@@ -621,8 +624,10 @@ public class GlobalCtx extends Application {
             syncNotWorkSound = soundPool.load(ctx, R.raw.sync_not_work, 1);
             customerNewMsgSound = soundPool.load(ctx, R.raw.customer_new_message, 1);
             storageCheckStorage = soundPool.load(ctx, R.raw.check_storage, 1);
-
-            orderCancel = soundPool.load(ctx, R.raw.check_storage, 1);
+            orderCancelled = soundPool.load(ctx, R.raw.order_cancelled, 1);
+            customerRemindDeliverSound = soundPool.load(ctx, R.raw.user_ask_speedup, 1);
+            customerAskCancelSound = soundPool.load(ctx, R.raw.user_ask_cancel, 1);
+            dadaManualTimeoutSound = soundPool.load(ctx, R.raw.manual_dada_timeout, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -793,7 +798,25 @@ public class GlobalCtx extends Application {
 
         public void play_order_cancelled() {
             if (check_disabled()) {
-                this.play_single_sound(this.customerNewMsgSound);
+                this.play_single_sound(this.orderCancelled);
+            }
+        }
+
+        public void play_remind_deliver() {
+            if (check_disabled()) {
+                this.play_single_sound(this.customerRemindDeliverSound);
+            }
+        }
+
+        public void play_order_ask_cancel() {
+            if (check_disabled()) {
+                this.play_single_sound(this.customerAskCancelSound);
+            }
+        }
+
+        public void play_dada_manual_timeout() {
+            if (check_disabled()) {
+                this.play_single_sound(this.dadaManualTimeoutSound);
             }
         }
     }
