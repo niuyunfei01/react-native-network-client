@@ -168,6 +168,7 @@ public class Cts {
     public static final String PUSH_TYPE_ORDER_CANCELLED = "order_cancelled";
     public static final String PUSH_TYPE_REMIND_DELIVER = "remind_deliver";
     public static final String PUSH_TYPE_ASK_CANCEL = "ask_cancel";
+    public static final String PUSH_TYPE_TODO_COMPLAIN = "task_complain";
 
     public static final String PUSH_TYPE_USER_TALK = "talk";
 }

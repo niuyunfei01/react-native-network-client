@@ -606,6 +606,7 @@ public class GlobalCtx extends Application {
         private int customerRemindDeliverSound;
         private int customerAskCancelSound;
         private int dadaManualTimeoutSound;
+        private int todo_complain_sound;
 
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
@@ -628,6 +629,7 @@ public class GlobalCtx extends Application {
             customerRemindDeliverSound = soundPool.load(ctx, R.raw.user_ask_speedup, 1);
             customerAskCancelSound = soundPool.load(ctx, R.raw.user_ask_cancel, 1);
             dadaManualTimeoutSound = soundPool.load(ctx, R.raw.manual_dada_timeout, 1);
+            todo_complain_sound = soundPool.load(ctx, R.raw.todo_complain, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -817,6 +819,12 @@ public class GlobalCtx extends Application {
         public void play_dada_manual_timeout() {
             if (check_disabled()) {
                 this.play_single_sound(this.dadaManualTimeoutSound);
+            }
+        }
+
+        public void play_todo_complain() {
+            if (check_disabled()) {
+                this.play_single_sound(this.todo_complain_sound);
             }
         }
     }
