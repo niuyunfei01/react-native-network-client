@@ -245,6 +245,9 @@
     <string name="menu_to_waiting_list">稍后处理</string>
     <string name="working_status">工作进度</string>
 
+    <string name="app_id">58b571b2</string>
+    <string name="tts_toast_format" formatted="false">缓冲进度为%d%%，播放进度为%d%%</string>
+
     <string-array name="feedback_source_array">
         <item>400来电</item>
         <item>微信后台</item>

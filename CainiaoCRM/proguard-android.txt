@@ -218,3 +218,7 @@
 -dontwarn com.alipay.android.app.**
 -keep class org.json.alipay{*;}
 -dontwarn org.json.alipay.**
+
+
+-keep class com.iflytek.speech.**{*;}
+-dontwarn com.iflytek.speech.**

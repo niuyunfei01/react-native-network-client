@@ -118,6 +118,8 @@ public class NotificationReceiver extends BroadcastReceiver {
 					soundManager.play_dada_manual_timeout();
 				} else if (Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
 					soundManager.play_todo_complain();
+				} else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
+					soundManager.play_by_xunfei("哈哈，你们错了吗！");
 				}
 			}
 
