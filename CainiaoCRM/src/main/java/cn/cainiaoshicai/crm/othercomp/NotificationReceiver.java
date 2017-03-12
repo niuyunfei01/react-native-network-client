@@ -66,6 +66,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 			if (notify != null) {
 
 				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
+
+				if (TextUtils.isEmpty(notify.getSpeak_word())) {
+					soundManager.play_by_xunfei(notify.getSpeak_word());
+				}
+
 				if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notificationId);
 					if (GlobalCtx.getInstance().acceptNotifyNew()) {
@@ -119,7 +124,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 				} else if (Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
 					soundManager.play_todo_complain();
 				} else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
-					soundManager.play_by_xunfei("哈哈，你们错了吗！");
 				}
 			}
 
@@ -268,6 +272,7 @@ class Notify {
 	private int filter;
 	private int order_id;
 	private String url;
+	private String speak_word;
 	private Set<Integer> notify_workers;
 
 	private boolean storage_provided_self;
@@ -369,5 +374,13 @@ class Notify {
 
 	public void setOrder_id(int order_id) {
 		this.order_id = order_id;
+	}
+
+	public String getSpeak_word() {
+		return speak_word;
+	}
+
+	public void setSpeak_word(String speak_word) {
+		this.speak_word = speak_word;
 	}
 }
