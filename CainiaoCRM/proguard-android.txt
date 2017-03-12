@@ -219,6 +219,9 @@
 -keep class org.json.alipay{*;}
 -dontwarn org.json.alipay.**
 
-
--keep class com.iflytek.speech.**{*;}
--dontwarn com.iflytek.speech.**
+-dontwarn com.iflytek.**
+-keepattributes Signature
+-libraryjars libs/armeabi/libmsc.so
+-libraryjars libs/armeabi-v7a/libmsc.so
+-libraryjars libs/arm64-v8a/libmsc.so
+-keep class com.iflytek.**{*;}

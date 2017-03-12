@@ -75,7 +75,7 @@ public class GlobalCtx extends Application {
     public static final int INT_SUCESS_API = 1;
 
     public static final CopyOnWriteArrayList<Integer> newOrderNotifies = new CopyOnWriteArrayList<>();
-;
+    ;
     private static GlobalCtx application;
 
     private Activity activity = null;
@@ -103,7 +103,7 @@ public class GlobalCtx extends Application {
     private SoundManager soundManager;
     private String[] coupons;
 
-    private SpeechSynthesizer mTts;
+    //private SpeechSynthesizer mTts;
 
     public GlobalCtx() {
     }
@@ -148,6 +148,7 @@ public class GlobalCtx extends Application {
 
     //Should set at startup
     private static AtomicReference<FileCache> fileCache = new AtomicReference<FileCache>();
+
     public static FileCache getFileCache() {
         if (fileCache.get() == null) {
             fileCache.compareAndSet(null, new FileCache(GlobalCtx.getApplication()));
@@ -162,17 +163,15 @@ public class GlobalCtx extends Application {
 
         MultiDex.install(this);
 
-        SpeechUtility.createUtility(GlobalCtx.this, "appid=" + getString(R.string.app_id));
         // 初始化合成对象
-        mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
-
-//        mInstaller = new  ApkInstaller(TtsDemo.this);
-
-
+        SpeechUtility.createUtility(getApplicationContext(), "appid=" + getString(R.string.app_id));
+        AudioUtils.getInstance().init(getApplicationContext());
+        //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
+        //mInstaller = new  ApkInstaller(TtsDemo.this);
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
-        JPushInterface.setDebugMode(BuildConfig.DEBUG); 	// 设置开启日志,发布时请关闭日志
-        JPushInterface.init(this);     		// 初始化 JPush
+        JPushInterface.setDebugMode(BuildConfig.DEBUG);    // 设置开启日志,发布时请关闭日志
+        JPushInterface.init(this);            // 初始化 JPush
         application = this;
 
         initConfigs();
@@ -185,25 +184,9 @@ public class GlobalCtx extends Application {
 
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
+        //this.soundManager.play_by_xunfei("你好，我是讯飞！");
     }
 
-
-    /**
-     * 初始化监听。
-     */
-    private InitListener mTtsInitListener = new InitListener() {
-        @Override
-        public void onInit(int code) {
-            Log.d("xunfei", "InitListener init() code = " + code);
-            if (code != ErrorCode.SUCCESS) {
-                System.out.println("初始化失败,错误码："+code);
-            } else {
-                // 初始化成功，之后可以调用startSpeaking方法
-                // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
-                // 正确的做法是将onCreate中的startSpeaking调用移至这里
-            }
-        }
-    };
 
     public void initAfterLogin() {
         this.initConfigs();
@@ -263,16 +246,16 @@ public class GlobalCtx extends Application {
 
         cn.customer_serv.customer_servsdk.util.MQConfig.init(this,
                 GlobalCtx.getInstance().getSpecialToken(), userTalkDao, new OnInitCallback() {
-            @Override
-            public void onSuccess(String clientId) {
-                Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onSuccess(String clientId) {
+                        Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onFailure(int code, String message) {
-                Toast.makeText(GlobalCtx.this, "int failure message = " + message, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(int code, String message) {
+                        Toast.makeText(GlobalCtx.this, "int failure message = " + message, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         // 可选
         customMeiqiaSDK();
@@ -430,7 +413,7 @@ public class GlobalCtx extends Application {
     }
 
     public static void clearNewOrderNotifies(Context context) {
-        for(Object notifyId : GlobalCtx.newOrderNotifies.toArray()) {
+        for (Object notifyId : GlobalCtx.newOrderNotifies.toArray()) {
             JPushInterface.clearNotificationById(context, (Integer) notifyId);
         }
     }
@@ -453,6 +436,7 @@ public class GlobalCtx extends Application {
     public String getUrl(String key) {
         return this.getUrl(key, false);
     }
+
     public String getUrl(String key, boolean appendAcess) {
         String s = URLHelper.WEB_URL_ROOT + this.configUrls.get(key);
         if (appendAcess) {
@@ -476,7 +460,7 @@ public class GlobalCtx extends Application {
             try {
                 int iUid = Integer.parseInt(currUid);
                 return this.workers.get(iUid);
-            }catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 AppLogger.e("error to parse currUid:" + currUid, e);
             }
         }
@@ -499,7 +483,7 @@ public class GlobalCtx extends Application {
     public Collection<Store> listStores() {
         LinkedHashMap<Integer, Store> stores = storesRef.get();
         if (stores == null || stores.isEmpty()) {
-            new MyAsyncTask<Void, Void, List<Store>>(){
+            new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
                     CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
@@ -522,7 +506,7 @@ public class GlobalCtx extends Application {
     public ArrayList<Tag> listTags() {
         ArrayList<Tag> tags = tagsRef.get();
         if (tags == null || tags.isEmpty()) {
-            new MyAsyncTask<Void, Void, List<Store>>(){
+            new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
                     CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
@@ -552,13 +536,13 @@ public class GlobalCtx extends Application {
 
     public Store findStore(int storeId) {
         LinkedHashMap<Integer, Store> idStoreMap = this.storesRef.get();
-        return (idStoreMap != null) ?  idStoreMap.get(storeId) : null;
+        return (idStoreMap != null) ? idStoreMap.get(storeId) : null;
     }
 
     public String getStoreNames(ArrayList<Integer> store_id_list) {
         if (!store_id_list.isEmpty()) {
             String[] names = new String[store_id_list.size()];
-            for(int i = 0; i < store_id_list.size(); i++) {
+            for (int i = 0; i < store_id_list.size(); i++) {
                 names[i] = this.getStoreName(store_id_list.get(i));
             }
             return TextUtils.join(",", names);
@@ -569,7 +553,7 @@ public class GlobalCtx extends Application {
     public void toTaskListActivity(Activity ctx) {
         Intent intent = new Intent(ctx, RemindersActivity.class);
         String token = GlobalCtx.getApplication().getSpecialToken();
-        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token="+ token, URLHelper.getStoresPrefix()));
+        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
         ctx.startActivity(intent);
     }
 
@@ -602,8 +586,10 @@ public class GlobalCtx extends Application {
     public interface TaskCountUpdated {
         void callback(int count);
     }
+
     private volatile int taskCount = 0;
     private long taskUpdateTs;
+
     public void getTaskCount(Activity act, final TaskCountUpdated uiAction) {
         act.runOnUiThread(new Runnable() {
             @Override
@@ -689,7 +675,7 @@ public class GlobalCtx extends Application {
 
             soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
                 @Override
-                public void onLoadComplete(SoundPool soundPool	, int sampleId, int status) {
+                public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
                     soundLoaded = true;
                 }
             });
@@ -725,7 +711,7 @@ public class GlobalCtx extends Application {
         private boolean play_three_sound(final int storeSound, final int numberSound, final int suffixSound) {
             if (check_disabled()) return false;
             if (soundLoaded) {
-                new MyAsyncTask<Void, Void, Void>(){
+                new MyAsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
                         soundPool.play(storeSound, 100.0f, 100.0f, 1, 0, 1.0f);
@@ -736,7 +722,8 @@ public class GlobalCtx extends Application {
                         pause(4000);
                         return null;
                     }
-                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);;
+                }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
+                ;
                 return true;
             } else {
                 AppLogger.e("no sound");
@@ -757,8 +744,8 @@ public class GlobalCtx extends Application {
                 return storeSoundhlg;
             } else if (store_id == STORE_YYC) {
                 return storeSoundYyc;
-            } else if (store_id == Cts.STORE_WJ){
-              return storeSoundWj;
+            } else if (store_id == Cts.STORE_WJ) {
+                return storeSoundWj;
             } else {
                 return storeSoundUnknown;
             }
@@ -829,7 +816,7 @@ public class GlobalCtx extends Application {
                     return true;
                 } else {
                     AppLogger.e("error: not notify worker_id");
-                    return  false;
+                    return false;
                 }
             } else {
                 AppLogger.e("error: no sound!");
@@ -874,125 +861,8 @@ public class GlobalCtx extends Application {
         }
 
         public void play_by_xunfei(String s) {
-
-            if (GlobalCtx.this.mTts != null) {
-
-                //这是后台朗读，实例化一个SynthesizerPlayer
-                //设置语音朗读者，可以根据需要设置男女朗读，具体请看api文档和官方论坛
-                SpeechSynthesizer player = GlobalCtx.this.mTts;
-
-                // 设置参数
-                setParam();
-                int code = mTts.startSpeaking(s, mTtsListener);
-
-//            player.setVoiceName("vivixiaoyan");//在此设置语音播报的人选例如：vivixiaoyan、vivixiaomei、vivixiaoqi
-//            player.playText(s, "ent=vivi21,bft=5",null);
-            }
+            AudioUtils.getInstance().speakText(s);
         }
-    }
-
-
-    // 缓冲进度
-    private int mPercentForBuffering = 0;
-    // 播放进度
-    private int mPercentForPlaying = 0;
-
-
-    /**
-     * 合成回调监听。
-     */
-    private SynthesizerListener mTtsListener = new SynthesizerListener() {
-
-        @Override
-        public void onSpeakBegin() {
-            showTip("开始播放");
-        }
-
-        private void showTip(String msg) {
-
-        }
-
-        @Override
-        public void onSpeakPaused() {
-            showTip("暂停播放");
-        }
-
-        @Override
-        public void onSpeakResumed() {
-            showTip("继续播放");
-        }
-
-        @Override
-        public void onBufferProgress(int percent, int beginPos, int endPos,
-                                     String info) {
-            // 合成进度
-            mPercentForBuffering = percent;
-            showTip(String.format(getString(R.string.tts_toast_format),
-                    mPercentForBuffering, mPercentForPlaying));
-        }
-
-        @Override
-        public void onSpeakProgress(int percent, int beginPos, int endPos) {
-            // 播放进度
-            mPercentForPlaying = percent;
-            showTip(String.format(getString(R.string.tts_toast_format),
-                    mPercentForBuffering, mPercentForPlaying));
-        }
-
-        @Override
-        public void onCompleted(SpeechError error) {
-            if (error == null) {
-                showTip("播放完成");
-            } else if (error != null) {
-                showTip(error.getPlainDescription(true));
-            }
-        }
-
-        @Override
-        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
-            // 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
-            // 若使用本地能力，会话id为null
-            //	if (SpeechEvent.EVENT_SESSION_ID == eventType) {
-            //		String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
-            //		Log.d(TAG, "session id =" + sid);
-            //	}
-        }
-    };
-
-    private void setParam() {
-
-        String mEngineType = SpeechConstant.TYPE_CLOUD;
-        // 清空参数
-        mTts.setParameter(SpeechConstant.PARAMS, null);
-        // 根据合成引擎设置相应参数
-        if(mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
-            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
-            // 设置在线合成发音人
-            mTts.setParameter(SpeechConstant.VOICE_NAME, "vivixiaoyan");
-            //设置合成语速
-//            mTts.setParameter(SpeechConstant.SPEED, mSharedPreferences.getString("speed_preference", "50"));
-//            //设置合成音调
-//            mTts.setParameter(SpeechConstant.PITCH, mSharedPreferences.getString("pitch_preference", "50"));
-//            //设置合成音量
-//            mTts.setParameter(SpeechConstant.VOLUME, mSharedPreferences.getString("volume_preference", "50"));
-        }else {
-            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
-            // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
-            mTts.setParameter(SpeechConstant.VOICE_NAME, "");
-            /**
-             * TODO 本地合成不设置语速、音调、音量，默认使用语记设置
-             * 开发者如需自定义参数，请参考在线合成参数设置
-             */
-        }
-        //设置播放器音频流类型
-//        mTts.setParameter(SpeechConstant.STREAM_TYPE, mSharedPreferences.getString("stream_preference", "3"));
-        // 设置播放合成音频打断音乐播放，默认为true
-        mTts.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
-
-        // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
-        // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
-        mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
-        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory()+"/msc/tts.wav");
     }
 }
 
