@@ -9,6 +9,7 @@ import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechEvent;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 
@@ -100,6 +101,7 @@ public class AudioUtils {
             }
 
             private void showTip(String msg) {
+                Log.d("xf", msg);
             }
 
             @Override
@@ -142,10 +144,10 @@ public class AudioUtils {
             public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
                 // 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
                 // 若使用本地能力，会话id为null
-                //	if (SpeechEvent.EVENT_SESSION_ID == eventType) {
-                //		String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
-                //		Log.d(TAG, "session id =" + sid);
-                //	}
+                if (SpeechEvent.EVENT_SESSION_ID == eventType) {
+                    String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
+                    Log.d("xf", "session id =" + sid);
+                }
             }
         });
     }

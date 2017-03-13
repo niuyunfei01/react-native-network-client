@@ -67,7 +67,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
 
-				if (TextUtils.isEmpty(notify.getSpeak_word())) {
+				if (!TextUtils.isEmpty(notify.getSpeak_word())) {
 					soundManager.play_by_xunfei(notify.getSpeak_word());
 				}
 
@@ -121,8 +121,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 					soundManager.play_order_ask_cancel();
 				} else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
 					soundManager.play_dada_manual_timeout();
-				} else if (Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
-					soundManager.play_todo_complain();
 				} else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
 				}
 			}
