@@ -86,6 +86,16 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
             registerForContextMenu(lv);
             resetListAdapter(new ArrayList<StorageItem>());
 
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    StorageItem item = listAdapter.getItem(position);
+                    if (item != null) {
+                        GeneralWebViewActivity.gotoWeb(StoreSelfStorageActivity.this, URLHelper.getStoresPrefix() + "/store_product/" + item.getId());
+                    }
+                }
+            });
+
             ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
 
             ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {

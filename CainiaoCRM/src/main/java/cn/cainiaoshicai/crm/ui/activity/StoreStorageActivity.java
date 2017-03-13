@@ -157,9 +157,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     StorageItem item = listAdapter.getItem(position);
-                    if (item != null && item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
-                        AlertDialog dlg = StoreStorageHelper.createEditProvideDlg(StoreStorageActivity.this, item);
-                        dlg.show();
+                    if (item != null) {
+                        if (item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
+                            AlertDialog dlg = StoreStorageHelper.createEditProvideDlg(StoreStorageActivity.this, item);
+                            dlg.show();
+                        } else {
+                            String url = URLHelper.getStoresPrefix() + "/store_product/" + item.getId();
+                            GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, url);
+                        }
                     }
                 }
             });

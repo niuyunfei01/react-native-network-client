@@ -13,6 +13,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -228,6 +229,12 @@ public class StoreStorageHelper {
                             public void onClick(DialogInterface dialog, int whichButton) {
                             }
                         })
+                .setNeutralButton("商品页", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        GeneralWebViewActivity.gotoWeb(activity, URLHelper.getStoresPrefix() + "/store_product/" + item.getId());
+                    }
+                })
                 .create();
         dlg.show();
         totalReqTxt.requestFocus();
