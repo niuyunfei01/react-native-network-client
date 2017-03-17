@@ -293,6 +293,45 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                             adb.setNegativeButton(getString(R.string.cancel), null);
                             adb.show();
                         } else {
+
+                            Order o1 = OrderSingleActivity.this.orderRef.get();
+                            if (o1 == null) {
+                                o1 = order;
+                            }
+
+                            if (fromStatus == Cts.WM_ORDER_STATUS_TO_SHIP) {
+                                if (o1.getDada_status() != Cts.DADA_STATUS_NEVER_START
+                                        && o1.getDada_status() != Cts.DADA_STATUS_CANCEL
+                                        && o1.getDada_status() != Cts.DADA_STATUS_TIMEOUT) {
+
+                                    AlertDialog.Builder confirmAdb = new AlertDialog.Builder(v.getContext());
+                                    confirmAdb.setMessage("自动发单正在进行中，要手动来跟踪设置订单状态吗？");
+                                    confirmAdb.setPositiveButton("手动出发", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                                        }
+                                    });
+
+                                    return;
+                                }
+
+                            } else if (fromStatus == Cts.WM_ORDER_STATUS_TO_READY) {
+
+                                if (!TextUtils.isEmpty(o1.getRemark())) {
+                                    AlertDialog.Builder confirmAdb = new AlertDialog.Builder(v.getContext());
+                                    confirmAdb.setMessage("用户有备注，请检查是否已处理好？");
+                                    confirmAdb.setPositiveButton("已检查", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                                        }
+                                    });
+
+                                    return;
+                                }
+                            }
+
                             helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
                         }
                     }
@@ -316,9 +355,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     @Override
                     public void onClick(View v) {
                         if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_ARRIVED
-                                || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER
-                                || (System.currentTimeMillis() - order.getTime_arrived().getTime() > Cts.DADA_MAX_EDIT_ARRIVED_LIMIT)) {
-                            helper.showToast("只有5天内的手动达达订单支持修改。");
+                                || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER) {
+                            helper.showToast("只有已送达的手动达达订单支持修改。");
                             return;
                         }
 
@@ -624,8 +662,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER, this.orderRef.get().getPackWorkers());
                 break;
             case R.id.menu_chg_ship_worker:
-                if (ship_worker_id <= 0 && ship_worker_id != Cts.ID_DADA_MANUAL_WORKER) {
-                    Toast.makeText(this, "该订单尚未指定过配送员，请先打包出库", Toast.LENGTH_LONG).show();
+                if (ship_worker_id <= 0) {
+                    Toast.makeText(this, "该订单暂无配送员信息，请先打包出库", Toast.LENGTH_LONG).show();
                     return false;
                 }
                 helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_SHIP_WORKER, Arrays.asList(ship_worker_id));

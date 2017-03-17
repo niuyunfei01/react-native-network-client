@@ -34,8 +34,6 @@ public class Cts {
     public static final int WM_ORDER_STATUS_ARRIVED = 4;
     public static final int WM_ORDER_STATUS_INVALID = 5;
 
-    public static final int DADA_MAX_EDIT_ARRIVED_LIMIT = 43200 * 1000;
-
     public static final int FB_STATUS_DOING = 0;
     public static final int FB_STATUS_FIXED = 1;
     public static final String FB_STATUS_DOING_T = "处理中";
@@ -168,6 +166,7 @@ public class Cts {
     public static final String PUSH_TYPE_ORDER_CANCELLED = "order_cancelled";
     public static final String PUSH_TYPE_REMIND_DELIVER = "remind_deliver";
     public static final String PUSH_TYPE_ASK_CANCEL = "ask_cancel";
+    public static final String PUSH_TYPE_ORDER_UPDATE = "order_update";
     public static final String PUSH_TYPE_TODO_COMPLAIN = "task_complain";
     public static final String PUSH_TYPE_SYS_ERROR = "system_error";
 
