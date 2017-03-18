@@ -114,6 +114,8 @@
     <string name="app_key">尾巴</string>
     <string name="login_failed">授权失败：</string>
 
+    <string name="confirm_msg_manual_dada_auto">自动发单正在进行中，确定要人工设置出发吗？</string>
+
     <!--Tip Dialog-->
     <string name="tip_dialog_title">提示</string>
     <string name="tip_dialog_content">

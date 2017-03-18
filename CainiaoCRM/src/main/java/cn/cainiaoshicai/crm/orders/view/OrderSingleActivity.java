@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,10 +47,12 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -304,30 +307,27 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                         && o1.getDada_status() != Cts.DADA_STATUS_CANCEL
                                         && o1.getDada_status() != Cts.DADA_STATUS_TIMEOUT) {
 
-                                    AlertDialog.Builder confirmAdb = new AlertDialog.Builder(v.getContext());
-                                    confirmAdb.setMessage("自动发单正在进行中，要手动来跟踪设置订单状态吗？");
-                                    confirmAdb.setPositiveButton("手动出发", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
-                                        }
-                                    });
-
+                                    AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, R.string.confirm_msg_manual_dada_auto,
+                                            "手动出发", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                                                }
+                                            }, "暂不", null);
                                     return;
                                 }
 
                             } else if (fromStatus == Cts.WM_ORDER_STATUS_TO_READY) {
 
                                 if (!TextUtils.isEmpty(o1.getRemark())) {
-                                    AlertDialog.Builder confirmAdb = new AlertDialog.Builder(v.getContext());
-                                    confirmAdb.setMessage("用户有备注，请检查是否已处理好？");
-                                    confirmAdb.setPositiveButton("已检查", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
-                                        }
-                                    });
-
+                                    final String warnTip = "有备注：\n[备注：" + o1.getRemark() + "]";
+                                    AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, warnTip,
+                                            "确认无误", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                                                }
+                                            }, "取消", null);
                                     return;
                                 }
                             }
@@ -344,6 +344,10 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", URLHelper.getStoresPrefix(), token, order.getId(), clientId);
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
+
+        //pre loading
+        GlobalCtx app = GlobalCtx.getApplication();
+        app.getStoreWorkers(Cts.POSITION_PACK, order.getStore_id());
     }
 
     private void update_dada_btn(final int dada_status, final Order order) {

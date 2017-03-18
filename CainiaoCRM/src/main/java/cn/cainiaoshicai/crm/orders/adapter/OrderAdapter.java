@@ -173,6 +173,15 @@ public class OrderAdapter extends BaseAdapter {
             dayNo.setText("#" + order.getSimplifiedId());
 
             sourcePlatform.setText(order.platformWithId());
+            sourcePlatform.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
+                    intent.setAction(Intent.ACTION_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
+                    v.getContext().startActivity(intent);
+                }
+            });
 
             if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);

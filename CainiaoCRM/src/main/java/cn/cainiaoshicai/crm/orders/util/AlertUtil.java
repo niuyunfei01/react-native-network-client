@@ -93,6 +93,31 @@ public final class AlertUtil {
      * Show Alert Dialog with tow buttons.
      * @param context
      * @param titleId
+     * @param message 消息
+     * @param positiveButtontxt
+     * @param positiveListener
+     * @param negativeButtontxt
+     * @param negativeListener
+     */
+    public static void showAlert(Context context, int titleId, String message,
+            CharSequence positiveButtontxt, DialogInterface.OnClickListener positiveListener,
+            CharSequence negativeButtontxt, DialogInterface.OnClickListener negativeListener) {
+        Dialog dlg = new AlertDialog.Builder(context)
+            .setIconAttribute(android.R.attr.alertDialogIcon)
+            .setTitle(titleId)
+            .setPositiveButton(positiveButtontxt, positiveListener)
+            .setNegativeButton(negativeButtontxt, negativeListener)
+            .setMessage(message)
+            .setCancelable(false)
+            .create();
+
+        dlg.show();
+    }
+
+    /**
+     * Show Alert Dialog with tow buttons.
+     * @param context
+     * @param titleId
      * @param messageId
      * @param positiveButtontxt
      * @param positiveListener
