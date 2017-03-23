@@ -209,7 +209,7 @@ public class OrderPrinter {
             double totalMoney = (order.getOrderMoney() * 100 + order.getAdditional_to_pay()) / 100;
             printer.starLine().highText(String.format("%s：%22.2f", (order.isPaidDone() ? "实付金额" : "客户合计待付"), totalMoney)).newLine();
 
-            printer.starLine().normalText("生鲜娇嫩，请您妥善储存。售后问题请").newLine().normalText("致电客服：400-018-6069");
+            printer.starLine().normalText("生鲜娇嫩，请您妥善储存。售后问题").newLine().normalText("请致电客服：400-018-6069");
 
             btos.write(0x0D);
             btos.write(0x0D);

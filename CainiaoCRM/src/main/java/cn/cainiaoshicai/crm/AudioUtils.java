@@ -93,7 +93,7 @@ public class AudioUtils {
 
     }
 
-    public void speakText(String content) {
+    public boolean speakText(String content) {
         int code = mySynthesizer.startSpeaking(content, new SynthesizerListener() {
             @Override
             public void onSpeakBegin() {
@@ -150,5 +150,7 @@ public class AudioUtils {
                 }
             }
         });
+
+        return true;
     }
 }

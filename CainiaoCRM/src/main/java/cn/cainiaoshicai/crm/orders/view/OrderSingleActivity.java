@@ -666,7 +666,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 helper.chooseWorker(this, this.listType, fromStatus, ACTION_EDIT_PACK_WORKER, this.orderRef.get().getPackWorkers());
                 break;
             case R.id.menu_chg_ship_worker:
-                if (ship_worker_id <= 0) {
+                if (ship_worker_id == 0) {
                     Toast.makeText(this, "该订单暂无配送员信息，请先打包出库", Toast.LENGTH_LONG).show();
                     return false;
                 }

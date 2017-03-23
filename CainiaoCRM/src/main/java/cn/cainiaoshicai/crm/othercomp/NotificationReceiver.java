@@ -24,6 +24,7 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
@@ -75,8 +76,14 @@ public class NotificationReceiver extends BroadcastReceiver {
 				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
 
 				if (!TextUtils.isEmpty(notify.getSpeak_word())) {
-					soundManager.play_by_xunfei(notify.getSpeak_word());
+					int repeatTimes = Math.min(Math.max(notify.getSpeak_times(), 1), 3);
+					for (int x = 0; x < repeatTimes; x++) {
+						String repeatPrefix = x > 0 ? ("重复" + x + "次：") : "";
+						soundManager.play_by_xunfei(repeatPrefix + notify.getSpeak_word());
+					}
 				} else {
+
+					//仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
 
 					if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 						GlobalCtx.newOrderNotifies.add(notificationId);
@@ -167,14 +174,17 @@ public class NotificationReceiver extends BroadcastReceiver {
 							StoreStorageActivity.class;
 					i = new Intent(context, targetClazz);
 
-				}  else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
+				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
 						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())
 						|| Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())
 						|| Cts.PUSH_TYPE_ORDER_UPDATE.equals(notify.getType())
 						|| Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())
-						|| Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
+						) {
 					i = new Intent(context, OrderSingleActivity.class);
 					i.putExtra("order_id", notify.getOrder_id());
+				} else if (Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
+					i = new Intent(context, GeneralWebViewActivity.class);
+					i.putExtra("url", URLHelper.getHost() + "/market_tools/user_feedback.html?fb_id=" + notify.getFb_id());
 				} else {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 				}
@@ -279,10 +289,12 @@ class Notify {
 	private int order_id;
 	private String url;
 	private String speak_word;
+	private int speak_times = 1;
 	private Set<Integer> notify_workers;
 
 	private boolean storage_provided_self;
 	private String sound;
+	private String fb_id;
 
 	public String getType() {
 		return type;
@@ -386,7 +398,23 @@ class Notify {
 		return speak_word;
 	}
 
+	public int getSpeak_times() {
+		return speak_times;
+	}
+
+	public void setSpeak_times(int speak_times) {
+		this.speak_times = speak_times;
+	}
+
 	public void setSpeak_word(String speak_word) {
 		this.speak_word = speak_word;
+	}
+
+	public String getFb_id() {
+		return fb_id;
+	}
+
+	public void setFb_id(String fb_id) {
+		this.fb_id = fb_id;
 	}
 }

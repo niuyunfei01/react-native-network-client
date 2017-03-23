@@ -824,44 +824,28 @@ public class GlobalCtx extends Application {
             }
         }
 
-        public void play_customer_new_msg() {
-            if (check_disabled()) {
-                this.play_single_sound(this.customerNewMsgSound);
-            }
+        public boolean play_customer_new_msg() {
+            return !check_disabled() && this.play_single_sound(this.customerNewMsgSound);
         }
 
-        public void play_order_cancelled() {
-            if (check_disabled()) {
-                this.play_single_sound(this.orderCancelled);
-            }
+        public boolean play_order_cancelled() {
+            return  (!check_disabled() && this.play_single_sound(this.orderCancelled));
         }
 
-        public void play_remind_deliver() {
-            if (check_disabled()) {
-                this.play_single_sound(this.customerRemindDeliverSound);
-            }
+        public boolean play_remind_deliver() {
+            return !check_disabled() && this.play_single_sound(this.customerRemindDeliverSound);
         }
 
-        public void play_order_ask_cancel() {
-            if (check_disabled()) {
-                this.play_single_sound(this.customerAskCancelSound);
-            }
+        public boolean play_order_ask_cancel() {
+            return !check_disabled() && this.play_single_sound(this.customerAskCancelSound);
         }
 
-        public void play_dada_manual_timeout() {
-            if (check_disabled()) {
-                this.play_single_sound(this.dadaManualTimeoutSound);
-            }
+        public boolean play_dada_manual_timeout() {
+            return !check_disabled() && this.play_single_sound(this.dadaManualTimeoutSound);
         }
 
-        public void play_todo_complain() {
-            if (check_disabled()) {
-                this.play_single_sound(this.todo_complain_sound);
-            }
-        }
-
-        public void play_by_xunfei(String s) {
-            AudioUtils.getInstance().speakText(s);
+        public boolean play_by_xunfei(String s) {
+            return !check_disabled() && AudioUtils.getInstance().speakText(s);
         }
     }
 }
