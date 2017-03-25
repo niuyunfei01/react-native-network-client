@@ -14,6 +14,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
+import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -89,4 +90,20 @@ public class CommonConfigDao {
     }
 
 
+    public ResultObject<HashMap<String, String>> configItem(String key) throws ServiceException {
+        Map<String, String> map = new HashMap<>();
+        map.put("access_token", access_token);
+        map.put("key", key);
+
+        try {
+            String url = URLHelper.API_ROOT() + "/config_item.json";
+            String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ResultObject<HashMap<String, String>>>() {
+            }.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e("[config_item] json syntax error:" + e.getMessage(), e);
+            return ResultObject.readingFailed();
+        }
+    }
 }

@@ -120,6 +120,11 @@ public class StorageActionDao {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
+
+            if (!storagesMap.isSuccess()) {
+                throw new ServiceException(storagesMap.getErrorAlert());
+            }
+
             if (storagesMap.getStore_products() != null) {
                 for (StoreProduct sp : storagesMap.getStore_products()) {
                     StorageItem si = new StorageItem();

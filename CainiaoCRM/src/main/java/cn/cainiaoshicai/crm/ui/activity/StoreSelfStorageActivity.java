@@ -33,6 +33,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -196,9 +197,15 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
                 try {
                     result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_SLEF, null);
                     return null;
-                } catch (ServiceException e) {
-                    e.printStackTrace();
-                    AppLogger.e("error to userTalkStatus storage items:" + currStore, e);
+                } catch (final ServiceException e) {
+                    AppLogger.e("error to getStorageItems storage items:" + currStore, e);
+                    StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertUtil.showAlert(StoreSelfStorageActivity.this, "错误提示", e.getError());
+                            cancel(true);
+                        }
+                    });
                 }
 
                 cancel(true);
@@ -207,22 +214,25 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
 
             @Override
             protected void onPostExecute(Void aVoid) {
+
+                if (result != null) {
 //                if (progressFragment.isVisible()) {
                     progressFragment.dismissAllowingStateLoss();
 //                }
-                StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (result.first != null) {
-                            updateAdapterData(result.first);
+                    StoreSelfStorageActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (result.first != null) {
+                                updateAdapterData(result.first);
+                            }
+                            StoreStatusStat sec = result.second;
+                            if (sec != null) {
+                                updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
+                                        sec.getTotal_sold_out(), sec.getTotal_off_sale());
+                            }
                         }
-                        StoreStatusStat sec = result.second;
-                        if (sec != null) {
-                            updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
-                                    sec.getTotal_sold_out(), sec.getTotal_off_sale());
-                        }
-                    }
-                });
+                    });
+                }
             }
         }.executeOnIO();
     }

@@ -33,7 +33,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -348,6 +351,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         //pre loading
         GlobalCtx app = GlobalCtx.getApplication();
         app.getStoreWorkers(Cts.POSITION_PACK, order.getStore_id());
+        app.listLaterTypes();
     }
 
     private void update_dada_btn(final int dada_status, final Order order) {
@@ -744,23 +748,67 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             case R.id.menu_order_refund:
                 return true;
             case R.id.menu_order_waiting_list:
-                new MyAsyncTask<Void, Void, Void>() {
+
+                final GlobalCtx app = GlobalCtx.getInstance();
+                final HashMap<String, String> laterTypes = app.listLaterTypes();
+
+                AlertDialog.Builder taskTypeDlg = new AlertDialog.Builder(this);
+                taskTypeDlg.setTitle("任务类型");
+                final String[] titles = laterTypes.values().toArray(new String[0]);
+                final String[] checkedType = new String[]{""};
+                taskTypeDlg.setSingleChoiceItems(titles, 0, new DialogInterface.OnClickListener() {
                     @Override
-                    protected Void doInBackground(Void... params) {
-                        OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
-                        try {
-                            ResultBean rb = dao.order_waiting_list( orderRef.get().getId());
-                            if (rb.isOk()) {
-                                helper.showToast("加入成功！");
-                            } else {
-                                helper.showToast("加入失败：" + rb.getDesc());
+                    public void onClick(DialogInterface dialog, int which) {
+                        for(Map.Entry<String, String> en : laterTypes.entrySet()) {
+                            if (titles[which].equals(en.getValue())) {
+                                checkedType[0] = en.getKey();
                             }
-                        } catch (ServiceException e) {
-                            helper.showToast("加入失败：" + e.getMessage());
                         }
-                        return null;
                     }
-                }.executeOnNormal();
+                });
+
+                taskTypeDlg.setNegativeButton("取消", null)
+                        .setPositiveButton("提交", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+
+                                        String tips = "";
+                                        String taskType = checkedType[0];
+                                        if (!TextUtils.isEmpty(taskType)) {
+                                            OrderActionDao dao = new OrderActionDao(app.getSpecialToken());
+                                            try {
+                                                ResultBean rb = dao.order_waiting_list(orderRef.get().getId(), taskType);
+                                                if (rb.isOk()) {
+                                                    helper.showToast("加入成功！");
+                                                } else {
+                                                    tips = ("加入失败：" + rb.getDesc());
+                                                }
+                                            } catch (ServiceException e) {
+                                                tips = "加入失败：" + e.getMessage();
+                                            }
+                                        } else {
+                                            tips = "您没有选择任务类型";
+                                        }
+
+                                        if (!TextUtils.isEmpty(tips)) {
+                                            final String errTips = tips;
+                                            Utility.runUIActionDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AlertUtil.showAlert(OrderSingleActivity.this, "错误提示", errTips);
+                                                }
+                                            }, 10);
+                                        }
+
+                                        return null;
+                                    }
+                                }.executeOnNormal();
+                            }
+                        }).show();
+
                 return true;
             case R.id.menu_chg_store:
                 AlertDialog.Builder storesDlg = new AlertDialog.Builder(this);

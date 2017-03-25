@@ -194,8 +194,9 @@ public class OrderActionDao {
         return actionWithResult("/order_edit_store_remark/" + orderId, params);
     }
 
-    public ResultBean order_waiting_list(int orderId) throws ServiceException {
+    public ResultBean order_waiting_list(int orderId, String taskType) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
+        params.put("task_type", taskType);
         return actionWithResult("/order_waiting_list/" + orderId, params);
     }
 }

@@ -5,14 +5,11 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
@@ -32,6 +29,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
@@ -43,6 +42,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
@@ -58,14 +58,9 @@ import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
 
 import com.google.common.cache.CacheBuilder;
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.Setting;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechSynthesizer;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.iflytek.cloud.SpeechUtility;
-import com.iflytek.cloud.SynthesizerListener;
 
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
@@ -103,10 +98,40 @@ public class GlobalCtx extends Application {
     private AccountBean accountBean;
     private SoundManager soundManager;
     private String[] coupons;
+    private final LoadingCache<String, HashMap<String, String>> timedCache;
 
     //private SpeechSynthesizer mTts;
 
     public GlobalCtx() {
+        timedCache = CacheBuilder.newBuilder()
+                .concurrencyLevel(4)
+                .weakKeys()
+                .maximumSize(10000)
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .build(new CacheLoader<String, HashMap<String, String>>() {
+                            public HashMap<String, String> load(final String key) {
+
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        try {
+                                            CommonConfigDao dao = new CommonConfigDao(GlobalCtx.this.getSpecialToken());
+                                            ResultObject<HashMap<String, String>> config = dao.configItem(key);
+                                            if (config.isOk()) {
+                                                timedCache.put(key, config.getObj());
+                                            } else {
+                                                AppLogger.e("error:" + config.getDesc());
+                                            }
+                                        } catch (ServiceException e) {
+                                            e.printStackTrace();
+                                        }
+                                        return null;
+                                    }
+                                }.executeOnNormal();
+
+                                return new HashMap<>();
+                            }
+                        });
     }
 
 
@@ -287,18 +312,13 @@ public class GlobalCtx extends Application {
         return this.workers == null ? new TreeMap<Integer, Worker>() : this.workers;
     }
 
-    public void listLaterTypes() {
-//        LoadingCache<Key, Graph> graphs = CacheBuilder.newBuilder()
-//                .concurrencyLevel(4)
-//                .weakKeys()
-//                .maximumSize(10000)
-//                .expireAfterWrite(10, TimeUnit.MINUTES)
-//                .build(
-//                        new CacheLoader<Key, Graph>() {
-//                            public Graph load(Key key) throws AnyException {
-//                                return createExpensiveGraph(key);
-//                            }
-//                        });
+    public HashMap<String, String> listLaterTypes() {
+        try {
+            return this.timedCache.get("late_task_types");
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return new HashMap<>();
     }
 
     public SortedMap<Integer, Worker> getShipWorkers() {

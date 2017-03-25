@@ -7,10 +7,29 @@ import java.util.List;
  * Created by liuzhr on 3/8/17.
  */
 public class StorageStatusResults {
+    private boolean success = false;
+    private String errorAlert;
+
     List<StoreProduct> store_products;
     HashMap<Integer, Product> products;
     public StoreStatusStat stats;
     private int total_req_cnt;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getErrorAlert() {
+        return errorAlert;
+    }
+
+    public void setErrorAlert(String errorAlert) {
+        this.errorAlert = errorAlert;
+    }
 
     public List<StoreProduct> getStore_products() {
         return store_products;

@@ -35,6 +35,7 @@ import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -395,9 +396,16 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 try {
                     result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_COMMON, currTag);
                     return null;
-                } catch (ServiceException e) {
+                } catch (final ServiceException e) {
                     e.printStackTrace();
                     AppLogger.e("error to refresh storage items:" + currStore, e);
+                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertUtil.showAlert(StoreStorageActivity.this, "错误提示", e.getError());
+                            cancel(true);
+                        }
+                    });
                 }
 
                 cancel(true);
@@ -406,21 +414,23 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                if (result != null) {
 //                if (progressFragment.isVisible()) {
                     progressFragment.dismissAllowingStateLoss();
 //                }
-                StoreStorageActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateAdapterData(result.first);
-                        StoreStatusStat sec = result.second;
-                        if (sec != null) {
-                            updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
-                                    sec.getTotal_sold_out(), sec.getTotal_off_sale(),
-                                    sec.getTotal_req_cnt(), sec.getTotal_sold_empty());
+                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateAdapterData(result.first);
+                            StoreStatusStat sec = result.second;
+                            if (sec != null) {
+                                updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
+                                        sec.getTotal_sold_out(), sec.getTotal_off_sale(),
+                                        sec.getTotal_req_cnt(), sec.getTotal_sold_empty());
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }.executeOnIO();
     }
