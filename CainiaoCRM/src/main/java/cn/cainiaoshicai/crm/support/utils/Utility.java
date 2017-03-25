@@ -1183,8 +1183,7 @@ public class Utility {
                     ctx.startActivity(ssa);
                     return true;
                 } else if (url.indexOf("/stores/m_buy_waiting_list") > 0) {
-                    Intent ssa = new Intent(ctx, GeneralWebViewActivity.class);
-                    ctx.startActivity(ssa);
+                    GeneralWebViewActivity.gotoWeb((Activity) ctx, url);
                     return true;
                 }
             }

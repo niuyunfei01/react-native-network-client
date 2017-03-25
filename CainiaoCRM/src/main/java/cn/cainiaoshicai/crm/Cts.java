@@ -19,7 +19,6 @@ public class Cts {
     public static final int STORE_ALL = 0;
 
     public static final Store ST_HLG = new Store("回龙观", STORE_HLG);
-    public static final Store ST_YYC = new Store("亚运村", STORE_YYC);
     public static final Store ST_ALL = new Store("全部",  STORE_ALL);
 
     public static final int ID_DADA_SHIP_WORKER = -999;

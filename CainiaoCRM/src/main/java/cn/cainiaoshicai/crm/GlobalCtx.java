@@ -57,6 +57,7 @@ import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
 
+import com.google.common.cache.CacheBuilder;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.Setting;
@@ -284,6 +285,20 @@ public class GlobalCtx extends Application {
         }
 
         return this.workers == null ? new TreeMap<Integer, Worker>() : this.workers;
+    }
+
+    public void listLaterTypes() {
+//        LoadingCache<Key, Graph> graphs = CacheBuilder.newBuilder()
+//                .concurrencyLevel(4)
+//                .weakKeys()
+//                .maximumSize(10000)
+//                .expireAfterWrite(10, TimeUnit.MINUTES)
+//                .build(
+//                        new CacheLoader<Key, Graph>() {
+//                            public Graph load(Key key) throws AnyException {
+//                                return createExpensiveGraph(key);
+//                            }
+//                        });
     }
 
     public SortedMap<Integer, Worker> getShipWorkers() {
