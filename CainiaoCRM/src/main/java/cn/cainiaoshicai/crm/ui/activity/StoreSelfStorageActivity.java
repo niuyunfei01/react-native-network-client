@@ -291,7 +291,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
                 }
                 return true;
             case MENU_CONTEXT_TO_SALE_ID:
-                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "暂停售卖", new Runnable() {
+                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "开始售卖", new Runnable() {
                     @Override
                     public void run() {
                         listAdapter.notifyDataSetChanged();
@@ -310,7 +310,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
                 return true;
 
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
-                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_SOLD_OUT, "暂停售卖", new Runnable() {
+                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_SOLD_OUT, "停售", new Runnable() {
                     @Override
                     public void run() {
                         listAdapter.notifyDataSetChanged();
