@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -586,10 +587,15 @@ public class GlobalCtx extends Application {
     }
 
     public void toTaskListActivity(Activity ctx) {
+        ctx.startActivity(toTaskListIntent(ctx));
+    }
+
+    @NonNull
+    public Intent toTaskListIntent(Context ctx) {
         Intent intent = new Intent(ctx, RemindersActivity.class);
         String token = GlobalCtx.getApplication().getSpecialToken();
         intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
-        ctx.startActivity(intent);
+        return intent;
     }
 
     public void setTaskCount(int taskCount) {

@@ -11,7 +11,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
         android:orientation="vertical">
 
         <Space
@@ -68,5 +68,14 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="@dimen/weight_1_when_tablet" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="语音技术由科大讯飞提供"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            />
     </LinearLayout>
 </ScrollView>

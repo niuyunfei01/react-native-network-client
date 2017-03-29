@@ -168,6 +168,7 @@ public class Cts {
     public static final String PUSH_TYPE_ORDER_UPDATE = "order_update";
     public static final String PUSH_TYPE_TODO_COMPLAIN = "task_complain";
     public static final String PUSH_TYPE_SYS_ERROR = "system_error";
+    public static final String  PUSH_TYPE_TASK_REMIND = "task_remind";
 
     public static final String PUSH_TYPE_USER_TALK = "talk";
 }
