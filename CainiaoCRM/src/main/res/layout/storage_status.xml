@@ -13,16 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <Spinner android:id="@+id/filter_categories"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/spinner_curr_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
     <Button android:id="@+id/btn_empty_list"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/btn_req_list"
-        android:text="零库存\n(0)"
+        android:text="零库存(0)"
         android:textSize="@dimen/mini_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -30,18 +24,30 @@
     <Button android:id="@+id/btn_req_list"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:text="订货单\n(0)"
+        android:text="订货单(0)"
         android:textSize="@dimen/mini_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_below="@+id/spinner_curr_status">
+
+    <ListView
+        android:id="@+id/list_category"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="4" />
+
     <RelativeLayout
-        android:layout_below="@+id/spinner_curr_status"
+        android:layout_weight="1"
         android:id="@+id/storage_list_title"
         android:layout_marginTop="5dp"
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:background="@color/darkolivegreen"
+        android:layout_gravity="top"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content">
         <AutoCompleteTextView
             android:id="@+id/title_product_name"
@@ -53,6 +59,7 @@
             android:padding="10dp"
             android:textSize="16sp"
             android:textColor="#000000"
+            android:background="@color/darkolivegreen"
             android:typeface="sans"/>
 
         <TextView
@@ -67,6 +74,7 @@
             android:text="库存"
             android:textSize="16sp"
             android:textColor="#000000"
+            android:background="@color/darkolivegreen"
             android:typeface="sans"/>
 
         <TextView
@@ -81,6 +89,7 @@
             android:textSize="16sp"
             android:text="已售"
             android:textColor="#000000"
+            android:background="@color/darkolivegreen"
             android:typeface="sans"/>
 
         <ImageView
@@ -90,35 +99,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"/>
+
+        <ListView
+            android:id="@+id/list_storage_status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_total_last_stat"/>
+
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/list_storage_status"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/storage_list_title"/>
-        <!--android:background="@drawable/abc_cab_background_top_holo_light"-->
-
-    <!--<TextView android:id="@+id/paged_overview"-->
-        <!--android:layout_toStartOf="@+id/page_back"-->
-        <!--android:layout_below="@+id/list_storage_status"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
-
-    <!--<Button android:id="@+id/page_back"-->
-        <!--android:drawableEnd="@drawable/ic_action_back"-->
-        <!--android:text="上一页"-->
-        <!--android:layout_toStartOf="@+id/page_forward"-->
-        <!--android:layout_below="@+id/list_storage_status"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
-
-    <!--<Button android:id="@+id/page_forward"-->
-        <!--android:drawableEnd="@drawable/ic_action_forward"-->
-        <!--android:text="下一页"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:layout_below="@+id/list_storage_status"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
+    </LinearLayout>
 
 </RelativeLayout>

@@ -33,6 +33,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
+import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -134,6 +135,19 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
                 }
             });
 
+            ListView categoryLv = (ListView) findViewById(R.id.list_category);
+            final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
+            ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags();
+            tagAdapter.addAll(allTags);
+            tagAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
+            categoryLv.setAdapter(tagAdapter);
+            categoryLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                }
+            });
+
             btnOnSale = (Button) findViewById(R.id.filter_btn_on_sale);
             btnRisk = (Button) findViewById(R.id.filter_btn_risk);
             btnSoldOut = (Button) findViewById(R.id.filter_btn_sold_out);
@@ -195,7 +209,7 @@ public class StoreSelfStorageActivity extends AbstractActionBarActivity implemen
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, Cts.PROVIDE_SLEF, null);
+                    result = sad.getStorageItems(currStore, filter, null);
                     return null;
                 } catch (final ServiceException e) {
                     AppLogger.e("error to getStorageItems storage items:" + currStore, e);

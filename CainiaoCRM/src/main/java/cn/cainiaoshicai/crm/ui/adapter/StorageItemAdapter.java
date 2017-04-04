@@ -49,15 +49,23 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.req_total = (TextView) row.findViewById(R.id.provide_total_req);
             holder.riskNum = (TextView) row.findViewById(R.id.lowest_risk_num);
             holder.reOnSale = (TextView) row.findViewById(R.id.re_on_sale_desc);
+            holder.salePrice = (TextView) row.findViewById(R.id.sale_price);
 
             convertView = row;
             convertView.setTag(holder);
         }
 
         final StorageItem item = this.getItem(pos);
-        holder.label.setText(item.pidAndNameStr());
+        holder.label.setText(item.nameAndPidStr());
 
         holder.prodStatus.setText(item.getStatusText());
+        if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
+            holder.prodStatus.setBackground(ContextCompat.getDrawable(this.context, R.drawable.list_text_border_red_mini));
+        } else {
+            holder.prodStatus.setBackground(null);
+        }
+
+        holder.salePrice.setText(item.getPricePrecision());
 
         if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
             holder.req_total.setText("订货:" + item.getTotalInReq());
@@ -155,5 +163,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView riskNum;
 
         TextView reOnSale;
+        public TextView salePrice;
     }
 }

@@ -15,6 +15,7 @@ public class StorageItem {
     public static final int RE_ON_SALE_OFF_WORK = 1;
     public static final int RE_ON_SALE_PROVIDED = 2;
     public static final int RE_ON_SALE_MANUAL = 3;
+    public static final int RE_ON_SALE_NONE = 4; //长期下架
 
     private int id;
     private String name;
@@ -34,6 +35,7 @@ public class StorageItem {
 
     private int when_sale_again;
     private String tag_code;
+    private int price;
 
     public int getProduct_id() {
         return product_id;
@@ -107,6 +109,11 @@ public class StorageItem {
             }
         }
         return String.format("%s#%s", product_id, name);
+    }
+
+    public String nameAndPidStr() {
+        String name = getName();
+        return String.format("%s#%s", name, product_id);
     }
 
     public int getLeft_since_last_stat() {
@@ -196,6 +203,8 @@ public class StorageItem {
             return "来货后";
         } else if (when_sale_again == RE_ON_SALE_MANUAL) {
             return "手动";
+        } else if (when_sale_again == RE_ON_SALE_NONE) {
+            return "-";
         }
         return "未设置";
     }
@@ -214,5 +223,13 @@ public class StorageItem {
 
     public void setTag_code(String tag_code) {
         this.tag_code = tag_code;
+    }
+
+    public String getPricePrecision() {
+        return String.format("￥%.2f", (double)this.price/100);
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

@@ -172,6 +172,27 @@ public final class AlertUtil {
      * Show Alert Dialog with positive button.
      * @param context
      * @param titleId
+     * @param message
+     * @param positiveButtontxt
+     * @param positiveListener
+     */
+    public static void showAlert(Context context, int titleId, String message,
+            CharSequence positiveButtontxt, DialogInterface.OnClickListener positiveListener) {
+        Dialog dlg = new AlertDialog.Builder(context)
+            .setIconAttribute(android.R.attr.alertDialogIcon)
+            .setTitle(titleId)
+            .setPositiveButton(positiveButtontxt, positiveListener)
+            .setMessage(message)
+            .setCancelable(false)
+            .create();
+        
+        dlg.show();
+    }
+
+    /**
+     * Show Alert Dialog with positive button.
+     * @param context
+     * @param titleId
      * @param messageId
      * @param positiveButtontxt
      * @param positiveListener
@@ -185,7 +206,7 @@ public final class AlertUtil {
             .setMessage(messageId)
             .setCancelable(false)
             .create();
-        
+
         dlg.show();
     }
 }

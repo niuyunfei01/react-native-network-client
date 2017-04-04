@@ -115,6 +115,7 @@
     <string name="login_failed">授权失败：</string>
 
     <string name="confirm_msg_manual_dada_auto">自动发单正在进行中，确定要人工设置出发吗？</string>
+    <string name="alert_msg_storage_empty_cannot_sold">不能售卖库存为0的商品，请盘点并修改库存数</string>
 
     <!--Tip Dialog-->
     <string name="tip_dialog_title">提示</string>
@@ -238,8 +239,9 @@
     <string name="menu_provide_ship">订单发货</string>
     <string name="menu_provide_accept">订单收货</string>
     <string name="store_on_sale_now">库里有货或临时可采购，立即开卖</string>
-    <string name="store_on_sale_after_off_work">下班后开卖</string>
-    <string name="store_on_sale_after_have_storage">有货后开卖</string>
+    <string name="store_on_sale_after_off_work">暂停售卖，下班后自动开售</string>
+    <string name="store_on_sale_after_have_storage">暂停售卖，来货后自动开售</string>
+    <string name="store_on_sale_none">长期下架(限店长操作)</string>
     <string name="store_on_sale_manual">回头手工上架</string>
     <string name="menu_order_store_remark">增加备注</string>
     <string name="order_save_remark">增加备注</string>

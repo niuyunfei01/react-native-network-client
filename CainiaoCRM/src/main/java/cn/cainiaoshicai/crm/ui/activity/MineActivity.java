@@ -28,8 +28,6 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.adapter.MineItemsAdapter;
-import cn.customer_serv.customer_servsdk.activity.MQConversationActivity;
-import cn.customer_serv.customer_servsdk.util.MQIntentBuilder;
 
 public class MineActivity extends AbstractActionBarActivity {
 
@@ -38,7 +36,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_VERSION_UPDATE = 2;
 	private static final int TYPE_VERSION_LOGOUT = 3;
 	private static final int TYPE_STORE_PERF = 4;
-	private static final int TYPE_STORE_STORAGE = 5;
+	private static final int TYPE_PROD_MANAGEMENT = 5;
 	private static final int TYPE_ORDER_SEARCH = 6;
 	public static final int TYPE_USER_ITEMS = 7;
 	private static final int TYPE_QUALITY_CASE = 8;
@@ -99,10 +97,10 @@ public class MineActivity extends AbstractActionBarActivity {
 					startActivity(intent);
 				} else if (item.getType() == TYPE_USER_COMPLAINS) {
 					startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
-				} else if (item.getType() == TYPE_STORE_STORAGE) {
-					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+//				} else if (item.getType() == TYPE_STORE_STORAGE) {
+//					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				}  else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
-					startActivity(new Intent(getApplicationContext(), StoreSelfStorageActivity.class));
+					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				} else if (item.getType() == TYPE_QUALITY_CASE) {
 					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
 				} else if (item.getType() == TYPE_ORDER_SEARCH) {
@@ -174,7 +172,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		statInTime.setTotalSeriousLate(Integer.parseInt(performStat.get("totalSeriousLate")));
 		inTimeParams.add(statInTime);
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("总部供货管理", -1, TYPE_STORE_STORAGE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));

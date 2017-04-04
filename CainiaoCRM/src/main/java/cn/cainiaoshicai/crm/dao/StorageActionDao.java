@@ -109,14 +109,15 @@ public class StorageActionDao {
         }
     }
 
-    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter, Cts.Provide provide, Tag tag) throws ServiceException {
+    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter,
+                                                                         Tag tag) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
             if (tag != null) {
                 params.put("tag_id", String.valueOf(tag.getId()));
             }
-            String json = getJson("/list_store_storage_status/" + provide.value + "/" + store.getId() + "/" + filter, params);
+            String json = getJson("/list_store_storage_status/0/" + store.getId() + "/" + filter, params);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
@@ -135,6 +136,7 @@ public class StorageActionDao {
                     si.setProduct_id(sp.getProduct_id());
                     si.setStatus(sp.getStatus());
                     si.setProduct_id(sp.getProduct_id());
+                    si.setPrice(sp.getPrice());
                     si.setSelf_provided(sp.getSelf_provided());
                     si.setRisk_min_stat(sp.getRisk_min_stat());
                     si.setSold_5day(sp.getSold_7day() - sp.getSold_weekend());

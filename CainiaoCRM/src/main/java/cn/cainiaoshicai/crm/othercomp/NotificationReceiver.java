@@ -29,7 +29,6 @@ import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
-import cn.cainiaoshicai.crm.ui.activity.StoreSelfStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.jpush.android.api.JPushInterface;
@@ -169,10 +168,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 						|| Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())
 						|| Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
 
-					Class targetClazz = notify.isStorage_provided_self() ?
-							StoreSelfStorageActivity.class :
-							StoreStorageActivity.class;
-					i = new Intent(context, targetClazz);
+					i = new Intent(context, StoreStorageActivity.class);
 
 				} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())
 						|| Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())

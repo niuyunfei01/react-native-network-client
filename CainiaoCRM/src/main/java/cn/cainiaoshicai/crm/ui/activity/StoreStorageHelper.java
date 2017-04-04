@@ -18,6 +18,7 @@ import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -37,8 +38,11 @@ public class StoreStorageHelper {
         final int checked[] = new int[1];
         checked[0] = 0;
 
-        final String[] items = new String[]{activity.getString(R.string.store_on_sale_after_off_work),
-                activity.getString(R.string.store_on_sale_after_have_storage)};
+        final String[] items = new String[]{
+                activity.getString(R.string.store_on_sale_after_off_work),
+                activity.getString(R.string.store_on_sale_after_have_storage),
+                activity.getString(R.string.store_on_sale_none)
+        };
 
         return new AlertDialog.Builder(activity)
                 .setTitle("选择恢复售卖的时间")
@@ -57,7 +61,9 @@ public class StoreStorageHelper {
                             option = StorageItem.RE_ON_SALE_OFF_WORK;
                         } else if (selected.equals(activity.getString(R.string.store_on_sale_after_have_storage))) {
                             option = StorageItem.RE_ON_SALE_PROVIDED;
-                        }  else {
+                        } else if (selected.equals(activity.getString(R.string.store_on_sale_none))) {
+                            option = StorageItem.RE_ON_SALE_NONE;
+                        } else {
                             throw new IllegalStateException("impossible selection:" + selected);
                         }
                         action_set_on_sale_again(activity, item, option, selected, setOkCallback);
@@ -68,13 +74,14 @@ public class StoreStorageHelper {
 
 
     private static void action_set_on_sale_again(final Activity context,
-                                                 final StorageItem item, final int option, final String optionLabel, final Runnable setOkCallback) {
+                                                 final StorageItem item, final int option,
+                                                 final String optionLabel, final Runnable setOkCallback) {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 StorageActionDao sad = new StorageActionDao(GlobalCtx.getApplication().getSpecialToken());
                 ResultBean rb = sad.chg_item_when_on_sale_again(item.getId(), option);
-                String msg;
+                final String msg;
                 Runnable uiCallback = null;
                 if (rb.isOk()) {
                     msg = "已将" + item.pidAndNameStr() + "设置为" + optionLabel + "!";
@@ -82,6 +89,9 @@ public class StoreStorageHelper {
                         @Override
                         public void run() {
                             item.setWhen_sale_again(option);
+                            if (option == StorageItem.RE_ON_SALE_NONE) {
+                                item.setStatus(StorageItem.STORE_PROD_OFF_SALE);
+                            }
                             if (setOkCallback != null) {
                                 setOkCallback.run();
                             }
@@ -90,15 +100,25 @@ public class StoreStorageHelper {
                 } else {
                     msg = "设置失败:" + rb.getDesc();
                 }
-                Utility.toast(msg, context, uiCallback, Toast.LENGTH_SHORT);
+
+                final Runnable finalUiCallback = uiCallback;
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertUtil.showAlert(context, R.string.tip_dialog_title, msg, "知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (finalUiCallback != null) {
+                                    finalUiCallback.run();
+                                }
+                            }
+                        });
+                    }
+                });
+
                 return null;
             }
         }.executeOnIO();
-    }
-
-    private static void action_chg_status(final Activity context, final Store currStore,
-                                          final StorageItem item, final int destStatus, final String desc) {
-        action_chg_status(context, currStore, item, destStatus, desc, null);
     }
 
     static void action_chg_status(final Activity context, final Store currStore,
@@ -107,6 +127,12 @@ public class StoreStorageHelper {
             if (item.getStatus() == destStatus) {
                 return;
             }
+
+            if (item.getLeft_since_last_stat() <= 1 ) {
+                AlertUtil.showAlert(context, R.string.tip_dialog_title, R.string.alert_msg_storage_empty_cannot_sold);
+                return;
+            }
+
             new MyAsyncTask<Void, Void, Void>() {
                 @Override protected Void doInBackground(Void... params) {
                     ResultBean rb;
@@ -117,8 +143,8 @@ public class StoreStorageHelper {
                         rb = new ResultBean(false, "访问服务器出错");
                     }
 
-                    String msg;
-                    Runnable uiCallback = null;
+                    final String msg;
+                    final Runnable uiCallback;
                     if (rb.isOk()) {
                         msg = "已将" + item.pidAndNameStr() + "设置为" + desc + "!";
                         uiCallback = new Runnable() {
@@ -132,8 +158,23 @@ public class StoreStorageHelper {
                         };
                     } else {
                         msg = "设置失败:" + rb.getDesc();
+                        uiCallback = null;
                     }
-                    Utility.toast(msg, context, uiCallback, Toast.LENGTH_LONG);
+
+                    Utility.runUIActionDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertUtil.showAlert(context, R.string.tip_dialog_title, msg, "知道了", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (uiCallback != null) {
+                                        uiCallback.run();
+                                    }
+                                }
+                            });
+                        }
+                    }, 10);
+
                     return null;
                 }
             }.executeOnIO();
