@@ -97,8 +97,8 @@ public class MineActivity extends AbstractActionBarActivity {
 					startActivity(intent);
 				} else if (item.getType() == TYPE_USER_COMPLAINS) {
 					startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
-//				} else if (item.getType() == TYPE_STORE_STORAGE) {
-//					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+				} else if (item.getType() == TYPE_PROD_MANAGEMENT) {
+					gotoWeb(String.format("%s/products.html", URLHelper.getStoresPrefix()));
 				}  else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				} else if (item.getType() == TYPE_QUALITY_CASE) {
@@ -171,6 +171,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		statInTime.setTotalLate(Integer.parseInt(performStat.get("totalLate")));
 		statInTime.setTotalSeriousLate(Integer.parseInt(performStat.get("totalSeriousLate")));
 		inTimeParams.add(statInTime);
+
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));

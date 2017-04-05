@@ -1185,6 +1185,9 @@ public class Utility {
                 } else if (url.indexOf("/stores/m_buy_waiting_list") > 0) {
                     GeneralWebViewActivity.gotoWeb((Activity) ctx, url);
                     return true;
+                } else if (url.indexOf("/stores/store_product/") > 0) {
+                    GeneralWebViewActivity.gotoWeb((Activity) ctx, url);
+                    return true;
                 }
             }
         }
