@@ -1181,7 +1181,7 @@ public class Utility {
                     return true;
                 } else if (url.indexOf("/stores/provide_prepare") > 0) {
                     Bundle urlParams = Utility.parseUrl(url);
-                    String old_store_id = urlParams.getString("store_id_old");
+                    String old_store_id = urlParams.getString("old_store_id");
                     String store_id = urlParams.getString("store_id");
                     if (old_store_id != null && old_store_id.equals(store_id)) {
                         view.loadUrl(append_token(url, specialToken));

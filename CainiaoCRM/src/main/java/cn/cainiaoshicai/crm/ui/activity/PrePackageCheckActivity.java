@@ -178,8 +178,8 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
 
     private void update_loading_url(int store_id, String day) {
         String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
-        this.url = String.format("%s/provide_prepare/%s.html", URLHelper.getStoresPrefix(), store_id, day)
-                + "?access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;
+        this.url = String.format("%s/provide_prepare/%s.html", URLHelper.getStoresPrefix(), store_id)
+                + "?day="+day+"&access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;
     }
 
     @Override
