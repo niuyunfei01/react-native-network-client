@@ -27,6 +27,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.MineItemsAdapter;
 
 public class MineActivity extends AbstractActionBarActivity {
@@ -65,6 +66,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
 				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
+				String token = GlobalCtx.getApplication().getSpecialToken();
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
@@ -88,18 +90,18 @@ public class MineActivity extends AbstractActionBarActivity {
 							.setNegativeButton(R.string.no, null)
 							.show();
 				} else if (item.getType() == TYPE_STORE_PERF) {
-					gotoWeb(String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix()));
+					gotoWeb(Utility.append_token(String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix()), token));
 				} else if (item.getType() == TYPE_PROVIDE_LIST) {
-					gotoWeb(String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()));
+					gotoWeb(Utility.append_token(String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()), token));
 				} else if (item.getType() == TYPE_SYNC_STATUS) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
-							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + GlobalCtx.getApplication().getSpecialToken()));
+							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + token));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_USER_COMPLAINS) {
 					startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
 				} else if (item.getType() == TYPE_PROD_MANAGEMENT) {
-					gotoWeb(String.format("%s/products.html", URLHelper.getStoresPrefix()));
-				}  else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
+					gotoWeb(Utility.append_token(String.format("%s/products.html", URLHelper.getStoresPrefix()), token));
+				} else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
 					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				} else if (item.getType() == TYPE_QUALITY_CASE) {
 					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
@@ -114,7 +116,7 @@ public class MineActivity extends AbstractActionBarActivity {
 					intent.putExtra("list_type", ListType.INVALID.getValue());
 					MineActivity.this.startActivity(intent);
 				} else if (item.getType() == TYPE_USER_ITEMS) {
-					gotoWeb(String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT));
+					gotoWeb(Utility.append_token(String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT), token));
 				} else if (item.getType() == TYPE_COMMENT_SELF) {
 					gotoWeb(String.format("%s/stores/show_evaluations.html", URLHelper.WEB_URL_ROOT));
 				} else if (item.getType() == TYPE_COMMENT_WM) {
@@ -126,6 +128,7 @@ public class MineActivity extends AbstractActionBarActivity {
 				GeneralWebViewActivity.gotoWeb(MineActivity.this, url);
 			}
 		});
+
 		new MyAsyncTask<Void,HashMap<String, String>, HashMap<String, String>>() {
 
 			@Override

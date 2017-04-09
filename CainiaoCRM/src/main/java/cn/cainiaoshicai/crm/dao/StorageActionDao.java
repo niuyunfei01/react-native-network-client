@@ -8,6 +8,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,7 +93,13 @@ public class StorageActionDao {
 
     public ResultObject store_provide_estimate(int store_id, String day) {
         try {
-            String path = String.format("/provide_estimate/%d/%s", store_id, day);
+            String path;
+            try {
+                path = String.format("/provide_estimate/%d/%s", store_id, URLEncoder.encode(day, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                return new ResultObject(false, "unsupported-encoding");
+            }
+
             HashMap<String, String> params = new HashMap<>();
             String json = getJson(path, params);
 
@@ -158,8 +167,7 @@ public class StorageActionDao {
             if (stats != null) {
                 stats.setTotal_req_cnt(storagesMap.getTotal_req_cnt());
             }
-            Pair<ArrayList<StorageItem>, StoreStatusStat> result = new Pair<>(storageItems, stats);
-            return result;
+            return new Pair<>(storageItems, stats);
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);
             return new Pair<>(storageItems, new StoreStatusStat());

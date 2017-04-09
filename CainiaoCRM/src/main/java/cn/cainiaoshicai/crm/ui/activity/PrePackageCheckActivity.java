@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
@@ -53,7 +54,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
     private MenuItem refreshItem;
     private String url;
 
-    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+    private StorageActionDao sad = null;
 
     private Button btn_provide_print;
     private ProductEstimate productEstimate;
@@ -63,11 +64,34 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pre_package_estimate);
 
+        if (sad == null) {
+            String token = GlobalCtx.getInstance().getSpecialToken();
+            if (token != null) {
+               this.sad = new StorageActionDao(token);
+            }
+        }
+
         Intent intent = getIntent();
-        int store_id = intent.getIntExtra("store_id", SettingUtility.getCurrentStorageStore());
-        String day = intent.getStringExtra("day");
-        if (TextUtils.isEmpty(day)) {
-            day = "tomorrow";
+        String url = intent.getStringExtra("url");
+
+        final int store_id;
+        String day = "tomorrow";;
+        if (!TextUtils.isEmpty(url)) {
+            Bundle urlParams = Utility.parseUrl(url);
+            if (urlParams.containsKey("store_id")) {
+                store_id = Integer.valueOf(urlParams.getString("store_id"));
+            } else {
+                store_id = SettingUtility.getCurrentStorageStore();
+            }
+            if (urlParams.containsKey("day")) {
+                day = urlParams.getString("day");
+            }
+        } else {
+            store_id = intent.getIntExtra("store_id", SettingUtility.getCurrentStorageStore());
+            String dayExtra = intent.getStringExtra("day");
+            if (!TextUtils.isEmpty(dayExtra)) {
+                day = dayExtra;
+            }
         }
 
         android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
@@ -118,36 +142,38 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
 
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
-        new MyAsyncTask<Integer, Void, Void>() {
+        if (sad != null) {
+            new MyAsyncTask<Integer, Void, Void>() {
 
-            @Override
-            protected Void doInBackground(Integer... params) {
-                try {
-                    ResultObject ro = sad.store_provide_estimate(store_id, day);
-                    if (ro.isOk()) {
-                        final ProductEstimate req = (ProductEstimate) ro.getObj();
-                        if (req != null) {
-                            productEstimate = req;
-                            PrePackageCheckActivity.this.productEstimate = req;
-                            PrePackageCheckActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    PrePackageCheckActivity act = PrePackageCheckActivity.this;
-                                    android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
-                                    if (actionBar != null) {
-                                        String storeName = GlobalCtx.getApplication().getStoreName(req.getStore_id());
-                                        actionBar.setTitle(storeName + "备货估算表");
+                @Override
+                protected Void doInBackground(Integer... params) {
+                    try {
+                        ResultObject ro = sad.store_provide_estimate(store_id, day);
+                        if (ro.isOk()) {
+                            final ProductEstimate req = (ProductEstimate) ro.getObj();
+                            if (req != null) {
+                                productEstimate = req;
+                                PrePackageCheckActivity.this.productEstimate = req;
+                                PrePackageCheckActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        PrePackageCheckActivity act = PrePackageCheckActivity.this;
+                                        android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
+                                        if (actionBar != null) {
+                                            String storeName = GlobalCtx.getApplication().getStoreName(req.getStore_id());
+                                            actionBar.setTitle(storeName + "备货估算表");
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    return null;
                 }
-                return null;
-            }
-        }.executeOnIO();
+            }.executeOnIO();
+        }
     }
 
     private void update_loading_url(int store_id, String day) {

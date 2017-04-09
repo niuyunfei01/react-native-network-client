@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
@@ -1102,6 +1103,7 @@ public class Utility {
 
 
     public static boolean handleUrlJump(Context ctx, WebView view, String url) {
+        String specialToken = GlobalCtx.getApplication().getSpecialToken();
         if (url != null) {
             if (url.startsWith("tel:")) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -1148,7 +1150,6 @@ public class Utility {
                     Bundle bundle = Utility.parseUrl(url);
                     String path = bundle.getString("path");
                     String vmPath = bundle.getString("vm_path");
-                    String specialToken = GlobalCtx.getApplication().getSpecialToken();
                     view.loadUrl(String.format("%s%s&access_token=%s%s", URLHelper.WEB_URL_ROOT, path, specialToken, vmPath));
                     return true;
                 } else if (url.indexOf("/stores/search_wm_orders") > 0) {
@@ -1179,10 +1180,20 @@ public class Utility {
                     ctx.startActivity(ssa);
                     return true;
                 } else if (url.indexOf("/stores/provide_prepare") > 0) {
-                    Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);
-                    ctx.startActivity(ssa);
-                    return true;
-                } else if (url.indexOf("/stores/m_buy_waiting_list") > 0) {
+                    Bundle urlParams = Utility.parseUrl(url);
+                    String old_store_id = urlParams.getString("store_id_old");
+                    String store_id = urlParams.getString("store_id");
+                    if (old_store_id != null && old_store_id.equals(store_id)) {
+                        view.loadUrl(append_token(url, specialToken));
+                    } else {
+                        Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);
+                        ssa.putExtra("url", url);
+                        ctx.startActivity(ssa);
+                        return true;
+                    }
+                } else if (url.indexOf("/stores/m_buy_waiting_list") > 0
+                        || url.indexOf("/stores/store_product") > 0
+                        || url.indexOf("/stores/view_product") > 0) {
                     GeneralWebViewActivity.gotoWeb((Activity) ctx, url);
                     return true;
                 } else if (url.indexOf("/stores/store_product/") > 0) {
@@ -1194,6 +1205,11 @@ public class Utility {
 
 //        view.loadUrl(url);
         return false;
+    }
+
+    @NonNull
+    public static String append_token(String url, String specialToken) {
+        return url + (url.indexOf("?") > 0 ? "&" : "?") + "access_token=" + specialToken;
     }
 }
 
