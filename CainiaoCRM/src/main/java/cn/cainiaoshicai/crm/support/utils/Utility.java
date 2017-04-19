@@ -1112,7 +1112,10 @@ public class Utility {
             } else if (url.startsWith("https:")) {
                 if (url.indexOf("/stores/provide_list.html") > 0) {
                     Intent intent = new Intent(ctx, StorageProvideActivity.class);
-                    intent.putExtra("req_id", Integer.parseInt(Utility.parseUrl(url).getString("req_id")));
+                    Bundle params = Utility.parseUrl(url);
+                    intent.putExtra("req_id", Integer.parseInt(params.getString("req_id")));
+                    String supplierIdStr = params.getString("supplier_id");
+                    intent.putExtra("supplier_id", supplierIdStr == null ? 0 : Integer.parseInt(supplierIdStr));
                     ctx.startActivity(intent);
                     return true;
                 } else if (url.indexOf("/stores/view_order") > 0) {

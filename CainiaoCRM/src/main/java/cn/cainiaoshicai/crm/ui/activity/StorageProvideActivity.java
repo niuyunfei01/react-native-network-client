@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,15 +27,21 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.ProductEstimate;
+import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ProvideReq;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
 import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
 /**
@@ -51,6 +59,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
     private Button btn_provide_ship;
     private Button btn_provide_accept;
     private ProvideReq curr_req;
+    private int supplierId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +75,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         Intent intent = getIntent();
         int store_id = intent.getIntExtra("store_id", 0);
         int req_id = intent.getIntExtra("req_id", 0);
+        supplierId = intent.getIntExtra("supplier_id", 0);
 
         android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
@@ -275,10 +285,71 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         this.btn_provide_print.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Util.showToast(StorageProvideActivity.this, "正在开发中...");
+                final ProvideReq curr_req = StorageProvideActivity.this.curr_req;
+                if (curr_req == null) {
+
+                    AlertUtil.showAlert(StorageProvideActivity.this, "错误", "不能取得当前打印数据，请关闭重试");
+                    return;
+                }
+
+                final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+                if(ds == null || ds.getSocket() == null){
+                    Intent BTIntent = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+                    StorageProvideActivity.this.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
+                }
+                else{
+                    new MyAsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            ResultObject ro = sad.provide_list_to_print(curr_req.getId(), supplierId);
+                            if (ro.isOk()) {
+                                final ProductProvideList printList = (ProductProvideList) ro.getObj();
+                                if (printList != null) {
+                                    print(ds, printList);
+                                    return null;
+                                }
+                            }
+
+                            AlertUtil.showAlert(StorageProvideActivity.this, "错误", "获取数据失败：" + ro.getDesc());
+                            return null;
+                        }
+
+                    }.executeOnNormal();
+                }
             }
         });
+    }
 
+    private void print(final BluetoothPrinters.DeviceStatus ds, final ProductProvideList printList) {
+        new MyAsyncTask<Void, Order, Boolean>() {
+            private String error;
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    OrderPrinter.printProvideList(ds.getSocket(), printList);
+                    return true;
+                } catch (Exception e) {
+                    AppLogger.e("error IOException:" + e.getMessage(), e);
+                    this.error = "打印错误:" + e.getMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(final Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!aBoolean) {
+                            String msg = "操作：" + (TextUtils.isEmpty(error) ? "成功" : "失败");
+                            Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }.executeOnNormal();
     }
 
     private void update_loading_url(int store_id, int req_id) {

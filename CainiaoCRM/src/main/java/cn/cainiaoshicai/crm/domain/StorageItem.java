@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.domain;
 
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
+
 /**
  * Created by liuzhr on 6/29/16.
  */
@@ -102,7 +104,11 @@ public class StorageItem {
     public String pidAndNameStr(boolean limit) {
         String name = getName();
 
-        if (limit){
+        if (name == null) {
+            AppLogger.e("name is null" + this);
+        }
+
+        if (name != null && limit){
             int maxLen = 12;
             if (name.length() > maxLen) {
                 name = name.substring(0, maxLen);

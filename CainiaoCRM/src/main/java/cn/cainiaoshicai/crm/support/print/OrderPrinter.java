@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
+import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -70,30 +71,6 @@ public class OrderPrinter {
 
             printer.normalText("负责人：___________").newLine();
 
-//            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
-//
-//            printer.starLine()
-//                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
-//                    .newLine()
-//                    .highText(TextUtil.replaceWhiteStr(order.getAddress()))
-//                    .newLine();
-//
-//            String expectedStr = order.getExpectTimeStr();
-//            if (expectedStr == null) {
-//                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
-//            }
-//            printer.starLine().highText("期望送达：" + expectedStr).newLine();
-//            if (!TextUtils.isEmpty(order.getRemark())) {
-//                printer.highText("用户备注：" + order.getRemark())
-//                        .newLine();
-//            }
-//
-//            printer.starLine()
-//                    .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
-//                    .newLine()
-//                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
-//                    .newLine();
-
             printer.starLine().highText(String.format("品名%22s", "份数")).newLine().splitLine();
 
             int total = 0;
@@ -129,6 +106,65 @@ public class OrderPrinter {
             btos.flush();
         } catch (Exception e) {
             AppLogger.e("error in printing estimate lists", e);
+            throw e;
+        }
+    }
+
+    public static void printProvideList(BluetoothConnector.BluetoothSocketWrapper btsocket, ProductProvideList list) throws IOException {
+        try {
+            OutputStream btos = btsocket.getOutputStream();
+            BasePrinter printer = new BasePrinter(btos);
+
+            btos.write(new byte[]{0x1B, 0x21, 0});
+            btos.write(GPrinterCommand.left);
+
+            printer.starLine().highBigText("  订货单#" + list.getOrderId()).newLine();
+
+            printer.normalText("送达时间:" + list.getExpectTimeStr()).newLine();
+            printer.normalText("送达地点:" + list.getExpectToAddr()).newLine();
+
+            printer.normalText("订货员姓名:" + list.getOrderByName()).newLine();
+            printer.normalText("订货员电话:" + list.getOrderByPhone()).newLine();
+
+            printer.normalText("供应商姓名:" + list.getProvideName()).newLine();
+            printer.normalText("供应商电话:" + list.getProvidePhone()).newLine();
+
+
+            printer.starLine().highText(String.format("品名%22s", "数量")).newLine().splitLine();
+
+            int total = 0;
+            for (ProductProvideList.Item item :  list.getItems()) {
+                String name = item.getName();
+                for (int idx = 0; idx < name.length(); ) {
+
+                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
+                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                    if (isEnd) {
+                        String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                        text = String.format(format, text, "x" + item.getQuantity());
+                    }
+                    printer.highText(text).newLine();
+                    if (isEnd) {
+                        printer.spaceLine();
+                    }
+
+                    idx += MAX_TITLE_PART;
+                }
+                total ++;
+            }
+
+            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
+
+            printer.starLine().normalText("当天的菜，必须包好进入冷库和货架！").newLine();
+
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(GPrinterCommand.walkPaper((byte) 4));
+            btos.flush();
+        } catch (Exception e) {
+            AppLogger.e("error in printing list lists", e);
             throw e;
         }
     }

@@ -64,6 +64,7 @@ public class Cts {
     public static final int  DADA_STATUS_ARRIVED = 4;
     public static final int  DADA_STATUS_CANCEL = 5;
     public static final int  DADA_STATUS_TIMEOUT = 7;
+    public static final int  DADA_STATUS_ABNORMAL = 8;
 
     public static final int  SIGN_ACTION_NONE = 0;
     public static final int  SIGN_ACTION_IN = 1;

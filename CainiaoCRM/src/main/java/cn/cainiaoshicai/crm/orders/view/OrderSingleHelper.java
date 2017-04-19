@@ -329,6 +329,7 @@ public class OrderSingleHelper {
                 case Cts.DADA_STATUS_ARRIVED: label = "达达已送达"; break;
                 case Cts.DADA_STATUS_CANCEL: label = "达达已取消"; break;
                 case Cts.DADA_STATUS_TO_FETCH: label = "达达已接单"; break;
+                case Cts.DADA_STATUS_ABNORMAL: label = "配送异常"; break;
                 case Cts.DADA_STATUS_TIMEOUT: label = "超时未接单"; break;
                 default:
                     label = String.valueOf(dada_status);
@@ -361,8 +362,9 @@ public class OrderSingleHelper {
                     double dadaPrice = Math.max(_order.getOrderMoney() * 0.08, 6);
 
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
+                        String dadaMsg = dadaPrice > 7.0 ? String.format("起步价约 %.1f 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？", dadaPrice) : "现在呼叫达达...";
                         adb.setTitle("呼叫达达")
-                                .setMessage(dadaPrice > 7.0 ? String.format("起步价约 %.1f 元，每公里加1元，三公里以上每公里加2元，没有别的办法了吗？", dadaPrice) : "现在呼叫达达..." )
+                                .setMessage(dadaMsg)
                                 .setPositiveButton("呼叫达达", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {

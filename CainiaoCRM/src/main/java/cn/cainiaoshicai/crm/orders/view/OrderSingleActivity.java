@@ -755,7 +755,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 AlertDialog.Builder taskTypeDlg = new AlertDialog.Builder(this);
                 taskTypeDlg.setTitle("任务类型");
                 final String[] titles = laterTypes.values().toArray(new String[0]);
-                final String[] checkedType = new String[]{""};
+                String initKey = laterTypes.isEmpty() ? "" : laterTypes.keySet().iterator().next();
+                final String[] checkedType = new String[]{initKey};
                 taskTypeDlg.setSingleChoiceItems(titles, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -1073,10 +1074,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功" : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(GlobalCtx.getInstance(), MainActivity.class);
-                    intent.putExtra("list_type", listType);
-                    activity.startActivity(intent);
+                    if (oc.isOk()) {
+                        Toast.makeText(GlobalCtx.getInstance(),  "操作成功", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(GlobalCtx.getInstance(), MainActivity.class);
+                        intent.putExtra("list_type", listType);
+                        activity.startActivity(intent);
+                    } else {
+                        AlertUtil.showAlert(activity, "操作提示", "操作失败：" + oc.getDesc());
+                    }
                 }
             });
         }

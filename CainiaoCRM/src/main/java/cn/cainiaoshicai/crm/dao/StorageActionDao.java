@@ -19,6 +19,7 @@ import java.util.Map;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
+import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
@@ -88,6 +89,28 @@ public class StorageActionDao {
         } catch (ServiceException e) {
             AppLogger.e("chg_item_when_on_sale_again store_product_id="+ id + ", option=" + option, e);
             return ResultBean.readingFailed();
+        }
+    }
+
+    public ResultObject provide_list_to_print(int provideReqId, int supplierId) {
+        try {
+            String path = String.format("/provide_list_print/%d/%d", provideReqId, supplierId);
+
+            HashMap<String, String> params = new HashMap<>();
+            String json = getJson(path, params);
+
+            try {
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+                return gson.fromJson(json, new TypeToken<ResultObject<ProductProvideList>>() {
+                }.getType());
+            } catch (JsonSyntaxException e) {
+                AppLogger.e(e.getMessage(), e);
+                ResultBean bean = ResultBean.readingFailed();
+                return new ResultObject(bean.isOk(), bean.getDesc());
+            }
+        } catch (ServiceException e) {
+            AppLogger.e("provide_list_to_print provideReqId="+ provideReqId + ", supplierId=" + supplierId, e);
+            return ResultObject.readingFailed();
         }
     }
 
