@@ -364,7 +364,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     public void onClick(View v) {
                         if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_ARRIVED
                                 || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER) {
-                            helper.showToast("只有已送达的手动达达订单支持修改。");
+                            helper.showError("只有已送达的手动达达订单支持修改。");
                             return;
                         }
 
@@ -394,7 +394,11 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                         } catch (ServiceException e) {
                                             rb = ResultBean.serviceException(e.getMessage());
                                         }
-                                        helper.showToast(rb.isOk() ? "修改成功" : "修改失败："+ rb.getDesc());
+                                        if (rb.isOk()) {
+                                            helper.showToast("修改成功");
+                                        } else {
+                                            helper.showError("修改失败：" + rb.getDesc());
+                                        }
                                         return null;
                                     }
                                 }.executeOnNormal();
@@ -861,17 +865,17 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                                 }
                                             });
                                         } else {
-                                            helper.showToast("修改失败：" + rb.getDesc());
+                                            helper.showError("修改失败：" + rb.getDesc());
                                         }
                                     } catch (ServiceException e) {
                                         e.printStackTrace();
-                                        helper.showToast("修改店铺错误：" + e.getMessage());
+                                        helper.showError("修改店铺错误：" + e.getMessage());
                                     }
                                     return null;
                                 }
                             }.executeOnNormal();
                         } else {
-                            helper.showToast("未修改店铺");
+                            helper.showError("未修改店铺");
                         }
                     }
                 });

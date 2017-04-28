@@ -267,10 +267,11 @@ public class OrderSingleHelper {
          ResultBean resultBean;
          try {
              resultBean = dao.order_dada_cancel(orderId, this.cancelCode, this.cancelReason);
-             helper.showToast((resultBean.isOk() ? "取消完成：" : "取消失败:") + resultBean.getDesc());
+             if (resultBean.isOk()) { helper.showToast("取消完成：" + resultBean.getDesc()); }
+             else { helper.showError("取消失败:" + resultBean.getDesc()); }
          } catch (ServiceException e) {
              e.printStackTrace();
-             helper.showToast("发生错误：" + e.getMessage());
+             helper.showError("发生错误：" + e.getMessage());
          }
          return null;
      }
@@ -295,11 +296,11 @@ public class OrderSingleHelper {
                if (resultBean.isOk()) {
                     helper.showToast("查询结果：" + resultBean.getDesc());
                }else {
-                    helper.showToast("查询结果:" + resultBean.getDesc());
+                    helper.showError("查询失败:" + resultBean.getDesc());
                }
            } catch (ServiceException e) {
                e.printStackTrace();
-               helper.showToast("发生错误：" + e.getMessage());
+               helper.showError("发生错误：" + e.getMessage());
            }
            return null;
        }
@@ -471,11 +472,11 @@ public class OrderSingleHelper {
                         dadaStatus = Cts.DADA_STATUS_TO_ACCEPT;
                         helper.updateDadaCallLabelUI(dadaStatus, btnCallDada);
                     }else {
-                        helper.showToast("呼叫失败:" + (resultBean != null ? resultBean.getDesc() : "未知"));
+                        helper.showError("呼叫失败:" + (resultBean != null ? resultBean.getDesc() : "未知"));
                     }
                 } catch (ServiceException e) {
                     e.printStackTrace();
-                    helper.showToast("发生错误：" + e.getMessage());
+                    helper.showError("发生错误：" + e.getMessage());
                 }
                 return null;
             }
@@ -503,7 +504,7 @@ public class OrderSingleHelper {
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         if (reasonList == null) {
-                            helper.showToast("获取达达订单取消理由列表失败！");
+                            helper.showError("获取达达订单取消理由列表失败！");
                         } else {
                             helper.updateUI(new Runnable() {
                                 @Override
@@ -624,9 +625,14 @@ public class OrderSingleHelper {
                 AppLogger.e("error to edit ship worker:", e);
             }
 
-            showToast("修改打包员失败:" + error);
+            showError(error);
+
             return Boolean.FALSE;
         }
+    }
+
+    public void showError(final String error) {
+        AlertUtil.showAlert(activity, "错误提示", error);
     }
 
     public void showToast(final String msg) {
