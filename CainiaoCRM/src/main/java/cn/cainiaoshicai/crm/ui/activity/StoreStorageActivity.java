@@ -318,7 +318,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
 
             updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
-            refreshData();
         }
     }
 

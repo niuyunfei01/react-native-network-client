@@ -53,6 +53,7 @@ import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -420,11 +421,21 @@ public class GlobalCtx extends Application {
     }
 
     public String getSpecialToken() {
+        return getSpecialToken(true);
+    }
+
+    public String getSpecialToken(boolean required) {
+        String token;
         if (getAccountBean() != null) {
-            return getAccountBean().getAccess_token();
+            token = getAccountBean().getAccess_token();
         } else {
-            return "";
+            token = "";
         }
+
+        if (required && TextUtils.isEmpty(token)) {
+            Utility.showExpiredTokenDialogOrNotification();
+        }
+        return token;
     }
 
     public DisplayMetrics getDisplayMetrics() {
