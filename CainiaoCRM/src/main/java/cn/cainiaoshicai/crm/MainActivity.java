@@ -110,7 +110,10 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             accountBean = GlobalCtx.getInstance().getAccountBean();
         }
 
-//        GlobalCtx.getInstance().setGroup(null);
+        if (accountBean == null) {
+            Utility.showExpiredTokenDialogOrNotification();
+            return;
+        }
         GlobalCtx.getInstance().setAccountBean(accountBean);
         SettingUtility.setDefaultAccountId(accountBean.getUid());
 

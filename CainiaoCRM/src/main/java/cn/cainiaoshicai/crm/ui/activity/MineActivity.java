@@ -83,6 +83,7 @@ public class MineActivity extends AbstractActionBarActivity {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									SettingUtility.setDefaultAccountId("");
+									GlobalCtx.getApplication().setAccountBean(null);
 									startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 								}
 

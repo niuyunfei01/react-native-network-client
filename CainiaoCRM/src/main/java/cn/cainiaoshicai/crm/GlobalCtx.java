@@ -371,20 +371,11 @@ public class GlobalCtx extends Application {
         this.accountBean = accountBean;
     }
 
-    public void updateUserInfo(final UserBean userBean) {
-        this.accountBean.setInfo(userBean);
-    }
-
     public AccountBean getAccountBean() {
         if (accountBean == null) {
             String id = SettingUtility.getDefaultAccountId();
             if (!TextUtils.isEmpty(id)) {
                 accountBean = AccountDBTask.getAccount(id);
-            } else {
-                List<AccountBean> accountList = AccountDBTask.getAccountList();
-                if (accountList != null && accountList.size() > 0) {
-                    accountBean = accountList.get(0);
-                }
             }
         }
 
