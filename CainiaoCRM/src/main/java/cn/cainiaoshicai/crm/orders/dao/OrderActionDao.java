@@ -61,6 +61,12 @@ public class OrderActionDao {
     }
 
     @Nullable
+    private ResultBean actionWithResult(String path) throws ServiceException {
+
+        return  actionWithResult(path, new HashMap<String, String>());
+
+    }
+
     private ResultBean actionWithResult(String path, HashMap<String, String> params) throws ServiceException {
         if (params == null) {
             params = new HashMap<>();
@@ -144,7 +150,7 @@ public class OrderActionDao {
     }
 
     public ResultBean order_chg_pack_worker(int orderId, int oldWorker, List<Integer> newWorker) throws ServiceException {
-        return actionWithResult("/order_chg_pack_worker/" + orderId + "/" + oldWorker + "/" + newWorker, new HashMap<String, String>());
+        return actionWithResult("/order_chg_pack_worker/" + orderId + "/" + oldWorker + "/" + TextUtils.join(",", newWorker), new HashMap<String, String>());
     }
 
     public ResultBean genCoupon(int type, int orderId) throws ServiceException {

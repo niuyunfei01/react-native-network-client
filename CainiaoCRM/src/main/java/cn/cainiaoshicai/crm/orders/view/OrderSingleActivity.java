@@ -34,11 +34,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +48,6 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -364,7 +361,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     public void onClick(View v) {
                         if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_ARRIVED
                                 || order.getShip_worker_id() != Cts.ID_DADA_MANUAL_WORKER) {
-                            helper.showError("只有已送达的手动达达订单支持修改。");
+                            helper.showErrorInUI("只有已送达的手动达达订单支持修改。");
                             return;
                         }
 
@@ -397,7 +394,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                         if (rb.isOk()) {
                                             helper.showToast("修改成功");
                                         } else {
-                                            helper.showError("修改失败：" + rb.getDesc());
+                                            helper.showErrorInUI("修改失败：" + rb.getDesc());
                                         }
                                         return null;
                                     }
@@ -865,17 +862,17 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                                 }
                                             });
                                         } else {
-                                            helper.showError("修改失败：" + rb.getDesc());
+                                            helper.showErrorInUI("修改失败：" + rb.getDesc());
                                         }
                                     } catch (ServiceException e) {
                                         e.printStackTrace();
-                                        helper.showError("修改店铺错误：" + e.getMessage());
+                                        helper.showErrorInUI("修改店铺错误：" + e.getMessage());
                                     }
                                     return null;
                                 }
                             }.executeOnNormal();
                         } else {
-                            helper.showError("未修改店铺");
+                            helper.showErrorInUI("未修改店铺");
                         }
                     }
                 });

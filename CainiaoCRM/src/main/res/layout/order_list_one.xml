@@ -250,13 +250,15 @@
                 android:visibility="gone"
                 android:text="未打印"/>
 
-            <TextView android:id="@+id/source_ready"
+            <TextView
+                android:id="@+id/ship_schedule"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/list_text_border_grey"
                 android:visibility="gone"
-                android:text="备货中"
+                android:text=""
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
-
 
     </LinearLayout>

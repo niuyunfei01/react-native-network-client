@@ -31,6 +31,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleHelper;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 
@@ -84,6 +85,9 @@ public class OrderAdapter extends BaseAdapter {
         TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
         TextView paidWayTxt = (TextView)vi.findViewById(R.id.fb_status);
         TextView labelExpectTxt = (TextView)vi.findViewById(R.id.fb_from_user);
+
+        TextView ship_schedule = (TextView)vi.findViewById(R.id.ship_schedule);
+        ship_schedule.setVisibility(View.GONE);
 
         GlobalCtx ctx = GlobalCtx.getApplication();
         ColorStateList defTextColor = labelExpectTxt.getTextColors();
@@ -242,7 +246,7 @@ public class OrderAdapter extends BaseAdapter {
                         inTimeView.setBackground(ContextCompat.getDrawable(ctx, reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
                     }
                 } else {
-                    inTimeView.setVisibility(View.GONE);
+
                     TextView print_times = (TextView) vi.findViewById(R.id.print_times);
                     TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
                     readyDelayWarn.setTextColor(defTextColor);
@@ -258,14 +262,25 @@ public class OrderAdapter extends BaseAdapter {
 //                        else if (leftMin < 30) {
 //                            readyDelayWarn.setBackground(ContextCompat.getDrawable(activity, R.drawable.list_text_border_green));
 //                        }
-                        readyDelayWarn.setText(leftMin > 0 ? leftMin + "分后出库延误" : "已延误" + Math.abs(leftMin) + "分钟");
+                        String delayHints = leftMin > 0 ? leftMin + "分后出库延误" : "已延误" + Math.abs(leftMin) + "分钟";
+
+                        readyDelayWarn.setText(delayHints);
                         readyDelayWarn.setVisibility(View.VISIBLE);
+
+                        if (order.getPlatform() != Cts.PLAT_JDDJ.id) {
+                            ship_schedule.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(order.getDada_status()));
+                            ship_schedule.setVisibility(View.VISIBLE);
+                        }
+
                         print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
                         print_times.setVisibility(View.VISIBLE);
                     } else {
                         readyDelayWarn.setVisibility(View.GONE);
                         print_times.setVisibility(View.GONE);
                     }
+
+                    inTimeView.setVisibility(View.GONE);
+
                 }
             } else {
                 inTimeView.setText("");
@@ -274,7 +289,6 @@ public class OrderAdapter extends BaseAdapter {
          }catch (Exception e) {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
         }
-
 
         return vi;
     }

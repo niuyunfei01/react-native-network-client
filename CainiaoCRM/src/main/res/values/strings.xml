@@ -19,7 +19,7 @@
     <string name="menu_location">Location</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_print">打印</string>
-    <string name="menu_call_dada">呼叫达达</string>
+    <string name="menu_call_dada">自动发单</string>
     <string name="delay_faq_btn">延误原因</string>
     <string name="btn_go_buy">采购</string>
     <string name="main_description">This is a basic Activity showing an Action Bar which has been
