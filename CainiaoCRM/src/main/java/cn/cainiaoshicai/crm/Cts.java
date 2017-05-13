@@ -21,7 +21,7 @@ public class Cts {
     public static final Store ST_HLG = new Store("回龙观", STORE_HLG);
     public static final Store ST_ALL = new Store("全部",  STORE_ALL);
 
-    public static final int ID_DADA_SHIP_WORKER = -999;
+    public static final int ID_AUTO_SHIP_WORKER = -999;
     public static final int ID_DADA_MANUAL_WORKER = -998;
 
     public static final int MAX_EXCELL_SPENT_TIME = 50;

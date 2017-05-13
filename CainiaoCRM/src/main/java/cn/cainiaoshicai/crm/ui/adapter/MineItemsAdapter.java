@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
@@ -51,6 +52,7 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
             holder.lastWeekReadyTime = (TextView) convertView.findViewById(R.id.last_week_avg_ready_time);
             holder.todayReadyTime = (TextView) convertView.findViewById(R.id.toady_avg_ready_time);
             holder.viewAllLate = (Button) convertView.findViewById(R.id.btn_view_all_late);
+            holder.viewManLate = (Button) convertView.findViewById(R.id.btn_view_man_late);
             holder.viewAllSerious = (Button) convertView.findViewById(R.id.btn_view_all_serious);
 
             holder.user_rst_overview = (RelativeLayout) convertView.findViewById(R.id.user_rst_overview);
@@ -86,11 +88,12 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
             holder.lastWeekReadyTime.setText("上周25分出库率:" + (statInTime != null && statInTime.avgReadyTimeLastWeek != null ? String.format("%.1f%%", statInTime.avgReadyTimeLastWeek * 100) : "-"));
             holder.todayReadyTime.setText("今日25分出库率:" + (statInTime != null && statInTime.avgReadyTimeToday != null ? String.format("%.1f%%", statInTime.avgReadyTimeToday * 100) : "-"));
 
-            holder.viewAllLate.setText("延误" + ((statInTime.getTotalLate() != null && statInTime.getTotalLate() > 0) ? String.format("%s单", statInTime.getTotalLate()) : "订单"));
-            holder.viewAllSerious.setText("严重延误" + ((statInTime.getTotalSeriousLate() != null && statInTime.getTotalSeriousLate() > 0) ? String.format("%s单", statInTime.getTotalSeriousLate()) : "订单"));
+            holder.viewAllLate.setText("延误" + ((statInTime.getTotalLate() != null && statInTime.getTotalLate() > 0) ? String.format("%s", statInTime.getTotalLate()) : "0"));
+            holder.viewAllSerious.setText("严重" + ((statInTime.getTotalSeriousLate() != null && statInTime.getTotalSeriousLate() > 0) ? String.format("%s", statInTime.getTotalSeriousLate()) : "0"));
 
             holder.viewAllLate.setOnClickListener(new ToSearchBtnListener("delayed:yes"));
             holder.viewAllSerious.setOnClickListener(new ToSearchBtnListener("delayed:serious"));
+            holder.viewManLate.setOnClickListener(new ToSearchBtnListener("delayed:yes|||ship:" + Cts.ID_DADA_MANUAL_WORKER));
 
             holder.delayedOverview.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -186,6 +189,7 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
         public TextView todayReadyTime;
         public Button viewAllLate;
         public Button viewAllSerious;
+        public Button viewManLate;
 
 
         public RelativeLayout user_rst_overview;

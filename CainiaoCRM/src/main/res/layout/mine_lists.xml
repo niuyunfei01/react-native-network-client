@@ -83,6 +83,10 @@
                 android:layout_width="wrap_content"
                 android:text="延误订单"
                 android:layout_height="wrap_content" />
+            <Button android:id="@+id/btn_view_man_late"
+                android:layout_width="wrap_content"
+                android:text="手动延误"
+                android:layout_height="wrap_content" />
             <Button
                 android:id="@+id/btn_view_all_serious"
                 android:text="严重延误订单"

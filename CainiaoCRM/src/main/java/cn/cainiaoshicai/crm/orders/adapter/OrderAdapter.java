@@ -332,7 +332,7 @@ public class OrderAdapter extends BaseAdapter {
         @Override
         public void onClick(View v) {
             String mobilephone = null;
-            if (order.getShip_worker_id() == Cts.ID_DADA_SHIP_WORKER) {
+            if (order.getShip_worker_id() == Cts.ID_AUTO_SHIP_WORKER) {
                 mobilephone = order.getDada_mobile();
             } else if (!TextUtils.isEmpty(order.getShip_worker_mobile())) {
                 mobilephone = order.getShip_worker_mobile();
