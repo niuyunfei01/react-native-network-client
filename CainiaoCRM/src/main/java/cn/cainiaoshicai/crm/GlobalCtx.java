@@ -662,11 +662,8 @@ public class GlobalCtx extends Application {
                         HashMap<Integer, ShipOptions> mm = new HashMap<>();
                         for(ShipOptions so : options.getObj()) {
                             mm.put(so.getStore_id(), so);
-                            AppLogger.i("updateShipOptions store_id:" + so.getStore_id() + ", so=" + so);
                         }
-                        AppLogger.i("updateShipOptions set reference:" + mm.keySet());
                         shipOptions.set(mm);
-                        AppLogger.i("updateShipOptions after reference:" + shipOptions.get());
                     }
                 } catch (ServiceException e) {
                     e.printStackTrace();

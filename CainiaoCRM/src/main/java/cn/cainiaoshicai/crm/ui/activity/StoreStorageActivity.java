@@ -331,7 +331,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             this.searchTerm = ctv.getText().toString();
         }
 
-        AppLogger.d("resetListAdapter:" + storageItems.toString());
+        AppLogger.d("resetListAdapter:" + storageItems.size());
 
         if (listAdapter != null) {
             listAdapter.changeBackendData(storageItems);
@@ -429,9 +429,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             @Override
             protected void onPostExecute(Void aVoid) {
                 if (result != null) {
-//                if (progressFragment.isVisible()) {
                     progressFragment.dismissAllowingStateLoss();
-//                }
                     StoreStorageActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

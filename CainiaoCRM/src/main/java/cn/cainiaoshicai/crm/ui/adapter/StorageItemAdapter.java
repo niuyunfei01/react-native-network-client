@@ -140,9 +140,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 }
             }
         } else {
-
-            AppLogger.d("add to adapter:" + Arrays.toString(this.backendData.toArray(new StorageItem[0])));
-
             ((StorageItemAdapter<StorageItem>) this).addAll(this.backendData);
         }
     }
