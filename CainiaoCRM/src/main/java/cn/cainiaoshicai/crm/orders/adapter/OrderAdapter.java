@@ -3,8 +3,10 @@ package cn.cainiaoshicai.crm.orders.adapter;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -28,10 +30,15 @@ import java.util.SortedMap;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Worker;
+import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleHelper;
+import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 
@@ -268,8 +275,9 @@ public class OrderAdapter extends BaseAdapter {
                         readyDelayWarn.setVisibility(View.VISIBLE);
 
                         if (order.getPlatform() != Cts.PLAT_JDDJ.id) {
-                            ship_schedule.setText(OrderSingleHelper.CallDadaClicked.getDadaBtnLabel(order.getDada_status()));
+                            ship_schedule.setText(order.getShip_sch_desc());
                             ship_schedule.setVisibility(View.VISIBLE);
+                            ship_schedule.setOnClickListener(new ScheClickedListener(order.getShip_sch(), order.getId(), order.getStore_id()));
                         }
 
                         print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
@@ -351,6 +359,81 @@ public class OrderAdapter extends BaseAdapter {
             } else {
                 Toast.makeText(activity, "未找到配送员电话", Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    private class ScheClickedListener implements View.OnClickListener {
+
+        private final String initOption;
+        private final long orderId;
+        private int storeId;
+
+        private ScheClickedListener(String initOption, long orderId, int storeId) {
+            this.initOption = initOption;
+            this.orderId = orderId;
+            this.storeId = storeId;
+        }
+
+        @Override
+        public void onClick(final View v) {
+
+            final ShipOptions options = GlobalCtx.getInstance().getShipOptions(storeId);
+            if (options == null || options.getValues() == null || options.getNames() == null) {
+                AlertUtil.showAlert(activity, "错误提示", "该订单所在店铺暂无自动排单功能");
+                return;
+            }
+
+            final String[] selectedOption = new String[]{initOption};
+            final int checkedIdx = options.getValues().indexOf(initOption);
+            String[] names = options.getNames().toArray(new String[options.getNames().size()]);
+
+            AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+            adb.setTitle("修改排单");
+            adb.setSingleChoiceItems(names, checkedIdx, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    selectedOption[0] = options.getValues().get(which);
+                }
+            });
+
+            adb.setPositiveButton("保存", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
+                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                        new MyAsyncTask<Void, Void, Void>(){
+
+                            ResultBean rb;
+
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    rb = oad.order_edit_group(orderId, selectedOption[0], initOption);
+                                } catch (ServiceException e) {
+                                    e.printStackTrace();
+                                    rb = ResultBean.serviceException(e.getMessage());
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                if (rb != null) {
+                                    if (!rb.isOk()) {
+                                        AlertUtil.showAlert(activity, "排单失败", rb.getDesc());
+                                    } else {
+                                        Toast.makeText(activity, "排单成功", Toast.LENGTH_LONG).show();
+                                        ((TextView)v).setText(rb.getDesc());
+                                    }
+                                }
+                            }
+                        }.execute();
+                    }
+                }
+            });
+            adb.setNegativeButton("取消", null);
+            adb.show();
         }
     }
 }

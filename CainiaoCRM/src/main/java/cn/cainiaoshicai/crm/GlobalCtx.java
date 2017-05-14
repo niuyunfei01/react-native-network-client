@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -38,13 +39,13 @@ import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
+import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
-import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -202,11 +203,9 @@ public class GlobalCtx extends Application {
         JPushInterface.init(this);            // 初始化 JPush
         application = this;
 
-        initConfigs();
-        listStores();
-        listTags();
-
         initTalkSDK();
+
+        updateAfterGap(5 * 60 * 1000);
 
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
@@ -215,11 +214,22 @@ public class GlobalCtx extends Application {
         //this.soundManager.play_by_xunfei("你好，我是讯飞！");
     }
 
+    public void updateAfterGap(final int fiveMin) {
+        updateCfgInterval();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateAfterGap(fiveMin);
+            }
+        }, fiveMin);
+    }
 
-    public void initAfterLogin() {
+
+    public void updateCfgInterval() {
         this.initConfigs();
         this.listStores();
         this.listTags();
+        this.updateShipOptions();
     }
 
     private void initConfigs() {
@@ -626,10 +636,52 @@ public class GlobalCtx extends Application {
         }
     }
 
+    public ShipOptions getShipOptions(final int storeId) {
+        Map<Integer, ShipOptions> p = shipOptions.get();
+        ShipOptions ret;
+        if (p == null) {
+            updateShipOptions();
+            ret = null;
+        } else {
+            ret = p.get(storeId);
+        }
+
+        AppLogger.d("get_ship_options: store_id=" + storeId + ", ret=" + ret);
+        return ret;
+    }
+
+    private void updateShipOptions() {
+        AppLogger.i("updateShipOptions");
+        new MyAsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                CommonConfigDao oad = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
+                try {
+                    ResultObject<ArrayList<ShipOptions>> options = oad.shipOptions();
+                    if (options.isOk() && options.getObj() != null) {
+                        HashMap<Integer, ShipOptions> mm = new HashMap<>();
+                        for(ShipOptions so : options.getObj()) {
+                            mm.put(so.getStore_id(), so);
+                            AppLogger.i("updateShipOptions store_id:" + so.getStore_id() + ", so=" + so);
+                        }
+                        AppLogger.i("updateShipOptions set reference:" + mm.keySet());
+                        shipOptions.set(mm);
+                        AppLogger.i("updateShipOptions after reference:" + shipOptions.get());
+                    }
+                } catch (ServiceException e) {
+                    e.printStackTrace();
+                    AppLogger.e("updateShipOptions ServiceException:" + e.getMessage());
+                }
+                return null;
+            }
+        }.execute();
+    }
+
     public interface TaskCountUpdated {
         void callback(int count);
     }
 
+    private volatile AtomicReference<Map<Integer, ShipOptions>> shipOptions = new AtomicReference<>();
     private volatile int taskCount = 0;
     private long taskUpdateTs;
 

@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Config;
+import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultObject;
@@ -89,6 +89,21 @@ public class CommonConfigDao {
         }
     }
 
+
+    public ResultObject<ArrayList<ShipOptions>> shipOptions() throws ServiceException {
+        Map<String, String> map = new HashMap<>();
+        map.put("access_token", access_token);
+        try {
+            String url = URLHelper.API_ROOT() + "/ship_options.json";
+            String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            return gson.fromJson(json, new TypeToken<ResultObject<ArrayList<ShipOptions>>>() {
+            }.getType());
+        } catch (JsonSyntaxException e) {
+            AppLogger.e("[shipOptions] json syntax error:" + e.getMessage(), e);
+            return new ResultObject<>(false, "数据错误");
+        }
+    }
 
     public ResultObject<HashMap<String, String>> configItem(String key) throws ServiceException {
         Map<String, String> map = new HashMap<>();

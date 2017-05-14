@@ -205,4 +205,10 @@ public class OrderActionDao {
         params.put("task_type", taskType);
         return actionWithResult("/order_waiting_list/" + orderId, params);
     }
+
+    public ResultBean order_edit_group(long orderId, String shipSch, String currentSch) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("current", currentSch);
+        return actionWithResult("/order_edit_group/" + orderId + "/" + shipSch, params);
+    }
 }

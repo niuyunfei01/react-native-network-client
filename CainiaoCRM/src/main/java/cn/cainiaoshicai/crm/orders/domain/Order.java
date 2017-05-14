@@ -62,6 +62,8 @@ public class Order implements Serializable {
     private int dada_dm_id;
     private String dada_dm_name;
     private String auto_plat = "达达自动";
+    private String ship_sch;
+    private String ship_sch_desc;
 
     private int source_ready;
 
@@ -495,6 +497,22 @@ public class Order implements Serializable {
 
     public void setAuto_plat(String auto_plat) {
         this.auto_plat = auto_plat;
+    }
+
+    public String getShip_sch() {
+        return ship_sch;
+    }
+
+    public void setShip_sch(String ship_sch) {
+        this.ship_sch = ship_sch;
+    }
+
+    public String getShip_sch_desc() {
+        return ship_sch_desc;
+    }
+
+    public void setShip_sch_desc(String ship_sch_desc) {
+        this.ship_sch_desc = ship_sch_desc;
     }
 }
 

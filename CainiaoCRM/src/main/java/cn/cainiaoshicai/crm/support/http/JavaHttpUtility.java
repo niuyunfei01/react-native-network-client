@@ -281,6 +281,7 @@ public class JavaHttpUtility {
     }
 
     public String doGet(String urlStr, Map<String, String> param) throws ServiceException {
+        long start = System.currentTimeMillis();
         GlobalCtx globalContext = GlobalCtx.getInstance();
         String errorStr = globalContext.getString(R.string.timeout);
         globalContext = null;
@@ -309,7 +310,9 @@ public class JavaHttpUtility {
 
             urlConnection.connect();
 
-            return handleResponse(urlConnection);
+            String res = handleResponse(urlConnection);
+            AppLogger.d("time "+ ((System.currentTimeMillis() - start)) +", response:" + res);
+            return res;
         } catch (IOException e) {
             e.printStackTrace();
             throw new ServiceException(errorStr, e);

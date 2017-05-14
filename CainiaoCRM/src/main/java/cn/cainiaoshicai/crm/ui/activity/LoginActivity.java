@@ -197,7 +197,7 @@ public class LoginActivity extends AbstractActionBarActivity {
                     if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
                         SettingUtility.setDefaultAccountId(account.getUid());
                     }
-                    GlobalCtx.getApplication().initAfterLogin();
+                    GlobalCtx.getApplication().updateCfgInterval();
                     return dbResult;
                 } else {
                     AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()) );
