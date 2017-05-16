@@ -239,7 +239,7 @@ public class OrderPrinter {
             printer.highText(String.format("合计 %27s", "x" + total)).newLine();
 
             if (order.getAdditional_to_pay() > 0) {
-                printer.starLine(). normalText(String.format("客户追加应付：%22.2f", order.getAdditional_to_pay()/100)).newLine();
+                printer.starLine(). normalText(String.format("客户追加应付：%14.2f", (order.getAdditional_to_pay()/100.0))).newLine();
             }
 
             double totalMoney = (order.getOrderMoney() * 100 + order.getAdditional_to_pay()) / 100;
