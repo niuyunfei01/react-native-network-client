@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.orders.dao;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,20 +9,25 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 
 /**
  */
 public class OrdersDao {
+
+    private long[] storeIds;
 
     public static void main(String[] args) {
         String json = "{\"orders\":[" +
@@ -43,28 +49,50 @@ public class OrdersDao {
                 "\"params\":{\"status\":1}," +
                 "\"totals\":[\"1\",\"1\",\"1\",\"1\",\"594\",\"18\"]}";
 
-        new OrdersDao("", 1).convert(json);
+        new OrdersDao("").convert(json);
     }
 
-    private String getJson(String searchTerm) throws ServiceException {
+    private String getJson(HashMap<String, String> params) throws ServiceException {
         String url = URLHelper.API_ROOT() + "/orders.json" ;
+        return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, params);
+    }
 
-        Map<String, String> map = new HashMap<String, String>();
+    public OrderContainer get(int listType, long[] storeIds) throws ServiceException {
+        return this.get(listType, storeIds, true);
+    }
+
+    public OrderContainer get(int listType, long[] storeIds, boolean useCache) throws ServiceException {
+        this.listType = listType;
+        this.storeIds = storeIds;
+
+        boolean hasStores = this.storeIds != null && this.storeIds.length > 0;
+        String cacheKey = null;
+        if (useCache && hasStores) {
+            Arrays.sort(storeIds);
+            cacheKey = this.listType + "_" + TextUtil.join(",", storeIds);
+            OrderContainer value = SettingUtility.getSR(cacheKey, new TypeToken<OrderContainer>(){}.getType());
+            if (value != null) {
+                return value;
+            }
+        }
+
+        HashMap<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
         map.put("status", String.valueOf(this.listType));
-        map.put("search", searchTerm);
 
-        return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
-    }
+        if (hasStores) {
+            map.put("search", "store:" + TextUtil.join(",", this.storeIds));
+        }
 
-    public OrderContainer get() throws ServiceException {
-        return  convert(getJson(""));
+        OrderContainer oc = convert(getJson(map));
+        if (useCache && hasStores && oc != null && listType != ListType.ARRIVED.getValue()) {
+            SettingUtility.putOrderContainerCache(cacheKey, oc);
+        }
+        return oc;
     }
 
     @Nullable
     private OrderContainer convert(String json) {
-//        AppLogger.v("userTalkStatus orders:" + json);
-
         OrderContainer value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -74,7 +102,6 @@ public class OrdersDao {
                 GlobalCtx.getApplication().setTaskCount(value.getTotal_task_mine());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             AppLogger.e(e.getMessage(), e);
 
             if (e instanceof JsonSyntaxException) {
@@ -88,13 +115,30 @@ public class OrdersDao {
     private String access_token;
     private int listType;
 
-    public OrdersDao(String access_token, int listType) {
-        this.listType = listType;
+    public OrdersDao(String access_token) {
         this.access_token = access_token;
     }
 
-    public OrderContainer search(String searchTerm, int listType) throws ServiceException {
+    public OrderContainer search(String searchTerm, int listType, long[] storeIds) throws ServiceException {
         this.listType = listType;
-        return convert(getJson(searchTerm));
+        this.storeIds = storeIds;
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("access_token", access_token);
+        map.put("status", String.valueOf(this.listType));
+
+        if (storeIds != null && storeIds.length > 0 ) {
+            if (!TextUtils.isEmpty(searchTerm)) {
+                searchTerm += "|||store:" + TextUtil.join(",", storeIds);
+            } else {
+                searchTerm = TextUtil.join(",", storeIds);
+            }
+        }
+
+        if (!TextUtils.isEmpty(searchTerm)) {
+            map.put("search", searchTerm);
+        }
+
+        return convert(getJson(map));
     }
 }

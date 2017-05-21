@@ -14,9 +14,7 @@ public class Order implements Serializable {
 
     private int id;
     private int user_id;
-    private String area;
     private int gender;
-    private Date receivedTime;
 
     private String dayId;
     private String userName;
@@ -49,7 +47,6 @@ public class Order implements Serializable {
     private String pack_workers;
     private int order_times;
     private int paid_done;
-    private boolean showReadyDelay;
     private int readyLeftMin;
 
     private int dada_status;
@@ -112,14 +109,6 @@ public class Order implements Serializable {
         this.address = address;
     }
 
-    public String getArea() {
-        return area;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
-
     public String getMobile() {
         return mobile;
     }
@@ -136,14 +125,6 @@ public class Order implements Serializable {
         this.expectTime = expectTime;
     }
 
-    public Date getReceivedTime() {
-        return receivedTime;
-    }
-
-    public void setReceivedTime(Date receivedTime) {
-        this.receivedTime = receivedTime;
-    }
-
     public String getGenderText() {
         return this.gender == 1 ? "先生" : "女士";
     }
@@ -154,14 +135,6 @@ public class Order implements Serializable {
 
     public double getOrderMoney() {
         return orderMoney;
-    }
-
-    public int getGender() {
-        return gender;
-    }
-
-    public void setGender(int gender) {
-        this.gender = gender;
     }
 
     public Date getOrderTime() {
@@ -190,14 +163,6 @@ public class Order implements Serializable {
 
     public void setTime_start_ship(Date time_start_ship) {
         this.time_start_ship = time_start_ship;
-    }
-
-    public Date getTime_ready() {
-        return time_ready;
-    }
-
-    public void setTime_ready(Date time_ready) {
-        this.time_ready = time_ready;
     }
 
     public Date getTime_arrived() {
@@ -268,10 +233,6 @@ public class Order implements Serializable {
         this.order_times = order_times;
     }
 
-    public int isPaid_done() {
-        return paid_done;
-    }
-
     public void setPaid_done(int paid_done) {
         this.paid_done = paid_done;
     }
@@ -290,14 +251,6 @@ public class Order implements Serializable {
 
     public int getPaid_done() {
         return paid_done;
-    }
-
-    public boolean isShowReadyDelay() {
-        return showReadyDelay;
-    }
-
-    public void setShowReadyDelay(boolean showReadyDelay) {
-        this.showReadyDelay = showReadyDelay;
     }
 
     public int getReadyLeftMin() {
@@ -513,6 +466,65 @@ public class Order implements Serializable {
 
     public void setShip_sch_desc(String ship_sch_desc) {
         this.ship_sch_desc = ship_sch_desc;
+    }
+
+    public void copy(Order updatedO) {
+        this.id = updatedO.id;
+        user_id = updatedO.user_id;
+        gender = updatedO.gender;
+
+        dayId = updatedO.dayId;
+        userName = updatedO.userName;
+        address = updatedO.address;
+        mobile = updatedO.mobile;
+        orderMoney = updatedO.orderMoney;
+        expectTime = updatedO.expectTime;
+        expectTimeStr = updatedO.expectTimeStr;
+        orderTime = updatedO.orderTime;
+        remark = updatedO.remark;
+        orderStatus = updatedO.orderStatus;
+        platform = updatedO.platform;
+        platform_oid = updatedO.platform_oid;
+        platform_dayId = updatedO.platform_dayId;
+        store_remark = updatedO.store_remark;
+
+        time_start_ship = updatedO.time_start_ship;
+        time_ready = updatedO.time_ready;
+        time_arrived = updatedO.time_arrived;
+        review_deliver = updatedO.review_deliver;
+
+        print_times = updatedO.print_times;
+
+        store_id = updatedO.store_id;
+
+        items = updatedO.items;
+        ship_worker_name = updatedO.ship_worker_name;
+        ship_worker_id = updatedO.ship_worker_id;
+        pack_operator = updatedO.pack_operator;
+        pack_workers = updatedO.pack_workers;
+        order_times = updatedO.order_times;
+        paid_done = updatedO.paid_done;
+        readyLeftMin = updatedO.readyLeftMin;
+
+        dada_status = updatedO.dada_status;
+        dada_call_at = updatedO.dada_call_at;
+        dada_distance = updatedO.dada_distance;
+        dada_order_id = updatedO.dada_order_id;
+        dada_fee = updatedO.dada_fee;
+
+        dada_mobile = updatedO.dada_mobile;
+        dada_dm_id = updatedO.dada_dm_id;
+        dada_dm_name = updatedO.dada_dm_name;
+        auto_plat = updatedO.auto_plat;
+        ship_sch = updatedO.ship_sch;
+        ship_sch_desc = updatedO.ship_sch_desc;
+
+        source_ready = updatedO.source_ready;
+
+        feedback = updatedO.feedback;
+        direction = updatedO.direction;
+        additional_to_pay = updatedO.additional_to_pay;
+        ship_worker_mobile = updatedO.ship_worker_mobile;
     }
 }
 

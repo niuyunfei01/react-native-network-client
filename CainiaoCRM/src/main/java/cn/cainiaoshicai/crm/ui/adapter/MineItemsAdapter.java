@@ -20,6 +20,7 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
+import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 
 public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extends ArrayAdapter<T> {
@@ -211,7 +212,7 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(v.getContext(), MainActivity.class);
+            Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
             intent.putExtra(SearchManager.QUERY, searchQuery);
             v.getContext().startActivity(intent);

@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
@@ -35,6 +37,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
@@ -45,10 +48,12 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -102,6 +107,8 @@ public class GlobalCtx extends Application {
     private SoundManager soundManager;
     private String[] coupons;
     private final LoadingCache<String, HashMap<String, String>> timedCache;
+    private String agent;
+    public CRMService dao;
 
     //private SpeechSynthesizer mTts;
 
@@ -119,7 +126,7 @@ public class GlobalCtx extends Application {
                                     protected Void doInBackground(Void... params) {
                                         try {
                                             CommonConfigDao dao = new CommonConfigDao(GlobalCtx.this.getSpecialToken());
-                                            ResultObject<HashMap<String, String>> config = dao.configItem(key);
+                                            ResultBean<HashMap<String, String>> config = dao.configItem(key);
                                             if (config.isOk()) {
                                                 timedCache.put(key, config.getObj());
                                             } else {
@@ -163,18 +170,6 @@ public class GlobalCtx extends Application {
         }
     }
 
-    public static boolean isIntentAvailable(Context context, final Intent intent) {
-        final PackageManager packageManager = context.getPackageManager();
-        List<ResolveInfo> list =
-                packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        return list.size() > 0;
-    }
-
-    public static boolean isSucc(int code) {
-        return code == INT_SUCESS_API;
-    }
-
-
     //Should set at startup
     private static AtomicReference<FileCache> fileCache = new AtomicReference<FileCache>();
 
@@ -192,16 +187,27 @@ public class GlobalCtx extends Application {
 
         MultiDex.install(this);
 
-        // 初始化合成对象
-        SpeechUtility.createUtility(getApplicationContext(), "appid=" + getString(R.string.app_id));
-        AudioUtils.getInstance().init(getApplicationContext());
-        //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
-        //mInstaller = new  ApkInstaller(TtsDemo.this);
+        new MyAsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params) {
+                // 初始化合成对象
+                SpeechUtility.createUtility(getApplicationContext(), "appid=" + getString(R.string.app_id));
+                AudioUtils.getInstance().init(getApplicationContext());
+                //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
+                //mInstaller = new  ApkInstaller(TtsDemo.this);
+                return null;
+            }
+        }.execute();
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
         JPushInterface.setDebugMode(BuildConfig.DEBUG);    // 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);            // 初始化 JPush
         application = this;
+
+        @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
+        dao = DaoHelper.factory(agent);
 
         initTalkSDK();
 
@@ -302,7 +308,8 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_holo_light;
+//        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_holo_light;
+
         //.abc_ic_ab_back_mtrl_am_alpha;
 
 //        MQConfig.ui.titleBackgroundResId = R.color.test_red;
@@ -313,7 +320,7 @@ public class GlobalCtx extends Application {
 //        MQConfig.ui.rightChatTextColorResId = R.color.test_green;
 //        MQConfig.ui.robotEvaluateTextColorResId = R.color.test_red;
 //        MQConfig.ui.robotMenuItemTextColorResId = R.color.test_blue;
-//        MQConfig.ui.robotMenuTipTextColorResId = R.color.test_blue;
+//        MQConfig.ui.robotMenAuTipTextColorResId = R.color.test_blue;
     }
 
     public SortedMap<Integer, Worker> getWorkers() {
@@ -657,7 +664,7 @@ public class GlobalCtx extends Application {
             protected Void doInBackground(Void... params) {
                 CommonConfigDao oad = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
                 try {
-                    ResultObject<ArrayList<ShipOptions>> options = oad.shipOptions();
+                    ResultBean<ArrayList<ShipOptions>> options = oad.shipOptions();
                     if (options.isOk() && options.getObj() != null) {
                         HashMap<Integer, ShipOptions> mm = new HashMap<>();
                         for(ShipOptions so : options.getObj()) {
@@ -672,6 +679,10 @@ public class GlobalCtx extends Application {
                 return null;
             }
         }.execute();
+    }
+
+    public AccountBean getWorkerStatus() {
+        return null;
     }
 
     public interface TaskCountUpdated {

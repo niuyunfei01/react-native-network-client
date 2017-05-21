@@ -9,14 +9,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
@@ -29,7 +27,6 @@ import cn.cainiaoshicai.crm.domain.StoreProduct;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -57,18 +54,18 @@ public class StorageActionDao {
         return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d", pid, store_id, total_req), params);
     }
 
-    public ResultObject store_provide_req(Integer storeId, int reqId) throws ServiceException {
+    public ResultBean store_provide_req(Integer storeId, int reqId) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         String json = getJson("/store_curr_provide_req/" + storeId +"/" + reqId, params);
 
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            return gson.fromJson(json, new TypeToken<ResultObject<ProvideReq>>() {
+            return gson.fromJson(json, new TypeToken<ResultBean<ProvideReq>>() {
             }.getType());
         } catch (JsonSyntaxException e) {
             AppLogger.e(e.getMessage(), e);
             ResultBean bean = ResultBean.readingFailed();
-            return new ResultObject(bean.isOk(), bean.getDesc());
+            return new ResultBean(bean.isOk(), bean.getDesc());
         }
     }
 
@@ -92,7 +89,7 @@ public class StorageActionDao {
         }
     }
 
-    public ResultObject provide_list_to_print(int provideReqId, int supplierId) {
+    public <T> ResultBean<T> provide_list_to_print(int provideReqId, int supplierId) {
         try {
             String path = String.format("/provide_list_print/%d/%d", provideReqId, supplierId);
 
@@ -101,26 +98,26 @@ public class StorageActionDao {
 
             try {
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-                return gson.fromJson(json, new TypeToken<ResultObject<ProductProvideList>>() {
+                return gson.fromJson(json, new TypeToken<ResultBean<ProductProvideList>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
                 AppLogger.e(e.getMessage(), e);
                 ResultBean bean = ResultBean.readingFailed();
-                return new ResultObject(bean.isOk(), bean.getDesc());
+                return new ResultBean<T>(bean.isOk(), bean.getDesc());
             }
         } catch (ServiceException e) {
             AppLogger.e("provide_list_to_print provideReqId="+ provideReqId + ", supplierId=" + supplierId, e);
-            return ResultObject.readingFailed();
+            return ResultBean.readingFailed();
         }
     }
 
-    public ResultObject store_provide_estimate(int store_id, String day) {
+    public ResultBean store_provide_estimate(int store_id, String day) {
         try {
             String path;
             try {
                 path = String.format("/provide_estimate/%d/%s", store_id, URLEncoder.encode(day, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                return new ResultObject(false, "unsupported-encoding");
+                return new ResultBean(false, "unsupported-encoding");
             }
 
             HashMap<String, String> params = new HashMap<>();
@@ -128,16 +125,16 @@ public class StorageActionDao {
 
             try {
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-                return gson.fromJson(json, new TypeToken<ResultObject<ProductEstimate>>() {
+                return gson.fromJson(json, new TypeToken<ResultBean<ProductEstimate>>() {
                 }.getType());
             } catch (JsonSyntaxException e) {
                 AppLogger.e(e.getMessage(), e);
                 ResultBean bean = ResultBean.readingFailed();
-                return new ResultObject(bean.isOk(), bean.getDesc());
+                return new ResultBean(bean.isOk(), bean.getDesc());
             }
         } catch (ServiceException e) {
             AppLogger.e("provide_estimate store_id="+ store_id + ", day=" + day, e);
-            return ResultObject.readingFailed();
+            return ResultBean.readingFailed();
         }
     }
 

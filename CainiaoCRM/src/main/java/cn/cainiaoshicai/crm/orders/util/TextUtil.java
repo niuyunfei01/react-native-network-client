@@ -58,6 +58,22 @@ public class TextUtil {
         return cs == null || cs.length() == 0;
     }
 
+    public static String join(String delimiter, long[] storeIds) {
+        if (storeIds == null) {
+            return "";
+        }
+
+        StringBuilder s = new StringBuilder();
+        for(long val : storeIds) {
+            s.append(val).append(delimiter);
+        }
+
+        if (storeIds.length > 0) {
+            s.deleteCharAt(s.length() - 1);
+        }
+        return s.toString();
+    }
+
 //	/**
 //	 * 将text中@某人的字体加亮，匹配的表情文字以表情显示
 //	 * @return

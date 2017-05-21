@@ -14,7 +14,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import cn.cainiaoshicai.crm.domain.Worker;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
@@ -34,21 +34,21 @@ public class StaffDao {
         return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, params);
     }
 
-    public ResultObject<HashMap<String, String>> sign_in(int storeId, HashMap<String, String> extraParams) throws ServiceException {
+    public ResultBean<HashMap<String, String>> sign_in(int storeId, HashMap<String, String> extraParams) throws ServiceException {
         return convert(post("sign_in/" + storeId, extraParams));
     }
 
-    public ResultObject<HashMap<String, String>> sign_off(int storeId, HashMap<String, String> extraParams) throws ServiceException {
+    public ResultBean<HashMap<String, String>> sign_off(int storeId, HashMap<String, String> extraParams) throws ServiceException {
         return convert(post("sign_off/" + storeId, extraParams));
     }
 
     @Nullable
-    private ResultObject<HashMap<String, String>> convert(String json) {
+    private ResultBean<HashMap<String, String>> convert(String json) {
 
-        ResultObject<HashMap<String, String>> value = null;
+        ResultBean<HashMap<String, String>> value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<ResultObject<HashMap<String, String>>>() {}.getType());
+            value = gson.fromJson(json, new TypeToken<ResultBean<HashMap<String, String>>>() {}.getType());
         } catch (Exception e) {
             Log.e("crm", e.getMessage(), e);
 
@@ -61,12 +61,12 @@ public class StaffDao {
     }
 
     @Nullable
-    private ResultObject<HashMap<Integer, Worker>> convertWorkers(String json) {
+    private ResultBean<HashMap<Integer, Worker>> convertWorkers(String json) {
 
-        ResultObject<HashMap<Integer, Worker>> value = null;
+        ResultBean<HashMap<Integer, Worker>> value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<ResultObject<HashMap<Integer, Worker>>>() {}.getType());
+            value = gson.fromJson(json, new TypeToken<ResultBean<HashMap<Integer, Worker>>>() {}.getType());
         } catch (Exception e) {
             Log.e("crm", e.getMessage(), e);
 
@@ -85,7 +85,7 @@ public class StaffDao {
     }
 
     public SortedMap<Integer,Worker> getStoreTodayWorkers(int storeId) throws ServiceException {
-        ResultObject<HashMap<Integer, Worker>> workers = convertWorkers(post("store_day_workers/" + storeId));
+        ResultBean<HashMap<Integer, Worker>> workers = convertWorkers(post("store_day_workers/" + storeId));
         TreeMap<Integer, Worker> rtn = new TreeMap<>();
         if (workers != null && workers.isOk() && workers.getObj() != null) {
             for(Worker worker : workers.getObj().values()) {
@@ -97,10 +97,10 @@ public class StaffDao {
 
     public int getTaskCount() throws ServiceException {
         String json = post("total_mine_task");
-        ResultObject<HashMap<String, Integer>> value = null;
+        ResultBean<HashMap<String, Integer>> value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<ResultObject<HashMap<String, Integer>>>() {}.getType());
+            value = gson.fromJson(json, new TypeToken<ResultBean<HashMap<String, Integer>>>() {}.getType());
         } catch (Exception e) {
             Log.e("crm", e.getMessage(), e);
 
@@ -113,7 +113,7 @@ public class StaffDao {
         return invalid ? 0 : value.getObj().get("total_mine_task");
     }
 
-    public ResultObject<HashMap<String, String>> getWorkingStatus() throws ServiceException {
+    public ResultBean<HashMap<String, String>> getWorkingStatus() throws ServiceException {
         return convert(post("working_status", new HashMap<String, String>()));
     }
 }

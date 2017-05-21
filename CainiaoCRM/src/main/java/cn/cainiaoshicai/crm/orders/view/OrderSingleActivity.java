@@ -209,7 +209,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         shipWorkerName = order.getShip_worker_name();
         platformWithId = order.platformWithId();
 
-        helper = new OrderSingleHelper(platform, platformOid, OrderSingleActivity.this, orderId, order.getStore_id());
+        helper = new OrderSingleHelper(OrderSingleActivity.this, orderId, order.getStore_id());
 
         int sourceReady = order.getSource_ready();
         fromStatus = order.getOrderStatus();
@@ -290,7 +290,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                 .setPositiveButton("发送", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        new OrderActionOp(platform, platformOid, (Activity)v.getContext(), listType).executeOnNormal(fromStatus);
+                                        new OrderActionOp(orderId, (Activity)v.getContext(), listType).executeOnNormal(fromStatus);
                                     }
                                 });
                             adb.setNegativeButton(getString(R.string.cancel), null);
@@ -606,25 +606,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 String url = URLHelper.WEB_URL_ROOT + "/vm?access_token=" + token + vm_path;
                 gog.putExtra("url", url);
                 startActivity(gog);
-//
-//                final Intent intent;
-//
-//                if (this.orderRef.get() != null && this.orderRef.get().getFeedback() != null) {
-//                    intent = new Intent(this, FeedbackViewActivity.class);
-//                    intent.putExtra("fb", this.orderRef.get().getFeedback());
-//                } else {
-//                    intent = new Intent(this, FeedBackEditActivity.class);
-//                }
-//
-//
-//                intent.putExtra("order_id", this.orderId);
-//                intent.putExtra("wm_id", this.orderId);
-//                intent.putExtra("platformWithId", this.platformWithId);
-//
-//                startActivityForResult(intent, REQUEST_CODE_ADDFB);
-
                 break;
             case R.id.menu_set_invalid:
+
                 AlertDialog.Builder adb = new AlertDialog.Builder(this);
                 adb.setTitle("置为无效")
                         .setMessage("确定设置此订单为无效订单吗？此操作不可撤销！")
@@ -637,7 +621,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                     protected Void doInBackground(Void... params) {
                                         OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                                         try {
-                                            ResultBean resultBean = dao.setOrderInvalid(orderId);
+                                            ResultBean resultBean = dao.setOrderInvalid(orderId, fromStatus);
                                             if(!resultBean.isOk()) {
                                                 errorDesc = "err:" + resultBean.getDesc();
                                             }
@@ -851,7 +835,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                 protected Void doInBackground(Void... params) {
                                     OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                                     try {
-                                        ResultBean rb = dao.orderChgStore(order.getId(), storeId, order.getStore_id());
+                                        ResultBean rb = dao.orderChgStore(order.getId(), storeId, order.getStore_id(), order.getOrderStatus());
                                         if (rb.isOk()) {
                                             helper.showToast("修改成功！");
                                             orderRef.get().setStore_id(storeId);
@@ -1030,16 +1014,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity
     }
 
     static public class OrderActionOp extends MyAsyncTask<Integer, ResultBean, ResultBean> {
-        final int oid;
-        final String platformOid;
+        final long orderId;
         private Activity activity;
         private int listType;
         private List<Integer> workerId;
 
-        OrderActionOp(int oid, String platformOid, Activity v, int listType) {
-            this.oid = oid;
-            this.platformOid = platformOid;
+        OrderActionOp(long orderId, Activity v, int listType) {
             activity = v;
+            this.orderId = orderId;
             this.listType = listType;
         }
 
@@ -1051,13 +1033,13 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             try {
                 switch (fromStatus) {
                     case Cts.WM_ORDER_STATUS_TO_SHIP:
-                        oc = new OrderActionDao(token).startShip(Cts.Platform.find(oid), platformOid, workerId.get(0));
+                        oc = new OrderActionDao(token).startShip(orderId, workerId.get(0));
                         break;
                     case Cts.WM_ORDER_STATUS_TO_ARRIVE:
-                        oc = new OrderActionDao(token).setArrived(Cts.Platform.find(oid), platformOid);
+                        oc = new OrderActionDao(token).setArrived(orderId);
                         break;
                     case Cts.WM_ORDER_STATUS_TO_READY:
-                        oc = new OrderActionDao(token).setReady(Cts.Platform.find(oid), platformOid, workerId);
+                        oc = new OrderActionDao(token).setReady(orderId, workerId);
                         break;
                     default:
                         throw new ServiceException("incorrect status:" + fromStatus);

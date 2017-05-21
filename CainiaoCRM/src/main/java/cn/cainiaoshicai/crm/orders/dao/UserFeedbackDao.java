@@ -15,7 +15,6 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultList;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -89,20 +88,20 @@ public class UserFeedbackDao {
         return actionWithResult("/fb_new_by_order/" + orderId, params);
     }
 
-    public ResultObject<Feedback> getFeedback(int feedback_id) {
+    public ResultBean<Feedback> getFeedback(int feedback_id) {
         return _findFeedback("/fb_get/" + feedback_id);
     }
 
     @Nullable
-    private ResultObject<Feedback> _findFeedback(String path) {
+    private ResultBean<Feedback> _findFeedback(String path) {
         try {
             String json = getJson(path, new HashMap<String, String>());
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            return gson.fromJson(json, new TypeToken<ResultObject<Feedback>>() {
+            return gson.fromJson(json, new TypeToken<ResultBean<Feedback>>() {
             }.getType());
         } catch (Exception e) {
             AppLogger.e("exception to userTalkStatus feedback:" + e.getMessage(), e);
-            return new ResultObject<Feedback>(ResultBean.exception());
+            return ResultBean.exception();
         }
     }
 
@@ -120,7 +119,7 @@ public class UserFeedbackDao {
         }
     }
 
-    public ResultObject<Feedback> findByOrderId(int order_id) {
+    public ResultBean<Feedback> findByOrderId(int order_id) {
         return _findFeedback("/fb_get_by_order_id/" + order_id);
     }
 }

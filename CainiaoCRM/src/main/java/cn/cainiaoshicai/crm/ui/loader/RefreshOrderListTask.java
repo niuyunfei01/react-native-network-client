@@ -24,6 +24,8 @@ import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 public class RefreshOrderListTask
         extends MyAsyncTask<Void, List<Order>, OrderContainer> {
 
+    private final long[] storeIds;
+
     public interface OrderQueriedDone {
         void done(OrderContainer value, String error);
     }
@@ -35,16 +37,30 @@ public class RefreshOrderListTask
     private final ListType listType;
     private SwipeRefreshLayout swipeRefreshLayout;
     private OrderQueriedDone doneCallback;
+    private final boolean byPassCache;
+
+    public RefreshOrderListTask(FragmentActivity activity, long[] storeIds,
+                                ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
+        this(activity, "", listType, swipeRefreshLayout, doneCallback, storeIds, byPassCache);
+    }
 
     public RefreshOrderListTask(FragmentActivity activity, String searchTerm,
-                                ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback) {
+                                ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
+        this(activity, searchTerm, listType, swipeRefreshLayout, doneCallback, null, byPassCache);
+    }
+
+    private RefreshOrderListTask(FragmentActivity activity, String searchTerm,
+                                 ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, long[] storeIds,
+                                 boolean byPassCache) {
         this.activity = activity;
         this.searchTerm = searchTerm;
+        this.storeIds = storeIds;
         this.listType = listType;
         this.swipeRefreshLayout = swipeRefreshLayout;
 
         this.doneCallback = doneCallback;
-        if (!TextUtils.isEmpty(this.searchTerm)) {
+        this.byPassCache = byPassCache;
+        if (this.byPassCache) {
             progressFragment = ProgressFragment.newInstance(R.string.searching);
         }
     }
@@ -52,7 +68,6 @@ public class RefreshOrderListTask
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-
         if (progressFragment != null) {
             if (this.activity != null) {
                 Utility.forceShowDialog(this.activity, progressFragment);
@@ -65,11 +80,11 @@ public class RefreshOrderListTask
     protected OrderContainer doInBackground(Void... params) {
         try {
             String token = GlobalCtx.getInstance().getSpecialToken();
-            OrdersDao ordersDao = new OrdersDao(token, this.listType.getValue());
+            OrdersDao ordersDao = new OrdersDao(token);
             if (TextUtils.isEmpty(searchTerm)) {
-                return ordersDao.get();
+                return ordersDao.get(this.listType.getValue(), storeIds);
             } else {
-                return ordersDao.search(searchTerm, this.listType.getValue());
+                return ordersDao.search(searchTerm, this.listType.getValue(), storeIds);
             }
         } catch (ServiceException e) {
 //                cancel(true);

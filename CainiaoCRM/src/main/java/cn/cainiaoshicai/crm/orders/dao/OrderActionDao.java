@@ -8,25 +8,33 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.DadaCancelReason;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
+
+import static cn.cainiaoshicai.crm.ListType.ARRIVED;
+import static cn.cainiaoshicai.crm.ListType.WAITING_ARRIVE;
+import static cn.cainiaoshicai.crm.ListType.WAITING_READY;
+import static cn.cainiaoshicai.crm.ListType.WAITING_SENT;
 
 /**
  * Date: 13-2-14
  */
-public class OrderActionDao {
+public class OrderActionDao<T extends Order> {
 
     private String getJson(String pathSuffix, HashMap<String, String> params) throws ServiceException {
         String url = URLHelper.API_ROOT() + pathSuffix + ".json" ;
@@ -37,20 +45,23 @@ public class OrderActionDao {
         return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
     }
 
-    public ResultBean startShip(Cts.Platform platform, String platformId, int ship_worker_id) throws ServiceException {
+    public ResultBean<T> startShip(long orderId, int ship_worker_id) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", String.valueOf(ship_worker_id));
-        return actionWithResult(platform, platformId, "/order_start_ship", params);
+        return invalidListRequired(actionWithResult("/order_start_ship_by_id/" + orderId, params), orderId,
+                new ListType[]{WAITING_SENT, WAITING_ARRIVE});
     }
 
-    public ResultBean setArrived(Cts.Platform platform, String platform_oid) throws ServiceException {
-        return actionWithResult(platform, platform_oid, "/order_set_arrived", new HashMap<String, String>());
+    public ResultBean<T> setArrived(long orderId) throws ServiceException {
+        return invalidListRequired(actionWithResult("/order_set_arrived_by_id/" + orderId), orderId,
+                new ListType[]{WAITING_ARRIVE, ARRIVED});
     }
 
-    public ResultBean setReady(Cts.Platform platform, String platform_oid, List<Integer> workerIds) throws ServiceException {
+    public ResultBean<T> setReady(long orderId, List<Integer> workerIds) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", TextUtils.join(",", workerIds));
-        return actionWithResult(platform, platform_oid, "/order_set_ready", params);
+        return invalidListRequired(actionWithResult("/order_set_ready_by_id/" + orderId, params), orderId,
+                new ListType[]{WAITING_READY, WAITING_SENT});
     }
 
     @Nullable
@@ -61,13 +72,11 @@ public class OrderActionDao {
     }
 
     @Nullable
-    private ResultBean actionWithResult(String path) throws ServiceException {
-
-        return  actionWithResult(path, new HashMap<String, String>());
-
+    private ResultBean<T> actionWithResult(String path) throws ServiceException {
+        return actionWithResult(path, new HashMap<String, String>());
     }
 
-    private ResultBean actionWithResult(String path, HashMap<String, String> params) throws ServiceException {
+    private ResultBean<T> actionWithResult(String path, HashMap<String, String> params) throws ServiceException {
         if (params == null) {
             params = new HashMap<>();
         }
@@ -78,8 +87,8 @@ public class OrderActionDao {
 
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            return gson.fromJson(json, new TypeToken<ResultBean>() {
-            }.getType());
+            Type type2 = new TypeToken<ResultBean<Order>>(){}.getType();
+            return gson.fromJson(json, type2);
         } catch (JsonSyntaxException e) {
             AppLogger.e(e.getMessage(), e);
             return ResultBean.readingFailed();
@@ -137,8 +146,25 @@ public class OrderActionDao {
         return null;
     }
 
-    public ResultBean setOrderInvalid(int orderId) throws ServiceException {
-        return actionWithResult("/order_set_invalid/"+orderId, new HashMap<String, String>());
+    public ResultBean setOrderInvalid(int orderId, int currStatus) throws ServiceException {
+        return invalidListRequired(actionWithResult("/order_set_invalid/"+orderId), orderId,
+                new ListType[]{ListType.findByType(currStatus), ListType.INVALID});
+    }
+
+    private ResultBean<T> invalidListRequired(ResultBean<T> resultBean, long orderId, ListType[] affected) {
+        if (resultBean.isOk()) {
+            SettingUtility.removeSR("");
+        }
+
+        return resultBean;
+    }
+
+    private ResultBean<T> wrapUpdateOrder(ResultBean<T> resultBean, long orderId) {
+        if (resultBean.isOk() && resultBean.getObj() != null) {
+            SettingUtility.updateOCCache(orderId, resultBean.getObj());
+        }
+
+        return resultBean;
     }
 
     public ResultBean logOrderPrinted(int orderId) throws ServiceException {
@@ -146,16 +172,16 @@ public class OrderActionDao {
     }
 
     public ResultBean chg_ship_worker(int orderId, int oldWorker, List<Integer> newWorker) throws ServiceException {
-        return actionWithResult("/order_chg_ship_worker/" + orderId + "/" + oldWorker + "/" + TextUtils.join(",", newWorker), new HashMap<String, String>());
+        return actionWithResult("/order_chg_ship_worker/" + orderId + "/" + oldWorker + "/" + TextUtils.join(",", newWorker));
     }
 
     public ResultBean order_chg_pack_worker(int orderId, int oldWorker, List<Integer> newWorker) throws ServiceException {
-        return actionWithResult("/order_chg_pack_worker/" + orderId + "/" + oldWorker + "/" + TextUtils.join(",", newWorker), new HashMap<String, String>());
+        return actionWithResult("/order_chg_pack_worker/" + orderId + "/" + oldWorker + "/" + TextUtils.join(",", newWorker));
     }
 
     public ResultBean genCoupon(int type, int orderId) throws ServiceException {
 //        gen_coupon($type, $bind_mobile, $wm_order_id = 0, $to_uid = 0)
-        return actionWithResult("/gen_coupon_wm/" + type + "/" + orderId, new HashMap<String, String>());
+        return actionWithResult("/gen_coupon_wm/" + type + "/" + orderId);
     }
 
     public ResultBean coupon_by_kf(int to_uid, int orderId, String message, int reduce, int least) throws ServiceException {
@@ -167,10 +193,10 @@ public class OrderActionDao {
     }
 
     public ResultBean order_dada_start(int orderId) throws ServiceException {
-        return actionWithResult("/order_dada_start/" + orderId, new HashMap<String, String>());
+        return wrapUpdateOrder(actionWithResult("/order_dada_start/" + orderId), orderId);
     }
     public ResultBean order_dada_restart(int orderId) throws ServiceException {
-        return actionWithResult("/order_dada_restart/" + orderId, new HashMap<String, String>());
+        return actionWithResult("/order_dada_restart/" + orderId);
     }
 
     public ResultBean order_dada_cancel(int orderId, int cancelReason, String reasonTxt) throws ServiceException {
@@ -180,18 +206,19 @@ public class OrderActionDao {
     }
 
     public ResultBean orderDadaQuery(int orderId) throws ServiceException {
-        return actionWithResult("/order_dada_query/" + orderId, new HashMap<String, String>());
+        return actionWithResult("/order_dada_query/" + orderId);
     }
 
-    public ResultBean orderChgStore(int orderId, int storeId, int oldStoreId) throws ServiceException {
-        return actionWithResult(String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId), new HashMap<String, String>());
+    public ResultBean orderChgStore(int orderId, int storeId, int oldStoreId, int status) throws ServiceException {
+        String path = String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId);
+        return invalidListRequired(actionWithResult(path), orderId, new ListType[]{ListType.findByType(status)});
     }
 
     public ResultBean order_chg_arrived_time(int orderId, Date old_arrived, Date new_arrived) throws ServiceException {
         int newTimeInSec = (int) (new_arrived.getTime() / 1000);
         int oldTimeInSec = (int) (old_arrived.getTime() / 1000);
         String path = String.format("/order_chg_arrived_time/%d/%d/%d", orderId, newTimeInSec, oldTimeInSec);
-        return actionWithResult(path, new HashMap<String, String>());
+        return actionWithResult(path);
     }
 
     public ResultBean save_remark(int orderId, String remarkTxt) throws ServiceException {
@@ -209,6 +236,6 @@ public class OrderActionDao {
     public ResultBean order_edit_group(long orderId, String shipSch, String currentSch) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("current", currentSch);
-        return actionWithResult("/order_edit_group/" + orderId + "/" + shipSch, params);
+        return wrapUpdateOrder(actionWithResult("/order_edit_group/" + orderId + "/" + shipSch, params), orderId);
     }
 }

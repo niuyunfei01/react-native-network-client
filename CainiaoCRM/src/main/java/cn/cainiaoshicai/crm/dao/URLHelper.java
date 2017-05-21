@@ -9,6 +9,8 @@ import cn.customer_serv.customer_servsdk.util.Utils;
  */
 public class URLHelper {
 
+    public static final String PROTO = "https://";
+
     public static String getHost() {
         return (SettingHelper.usePreviewHost() ? "preview" : "www")  + ".cainiaoshicai.cn";
     }

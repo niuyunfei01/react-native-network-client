@@ -3,14 +3,23 @@ package cn.cainiaoshicai.crm.support.helper;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.AppConfig;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.SettingActivity;
@@ -58,21 +67,6 @@ public class SettingUtility {
         String value = SettingHelper
                 .getSharedPreferences(getContext(), SettingActivity.FONT_SIZE, "15");
         return Integer.valueOf(value);
-    }
-
-    public static int getAppTheme() {
-        String value = SettingHelper.getSharedPreferences(getContext(), SettingActivity.THEME, "1");
-
-        switch (Integer.valueOf(value)) {
-            case 1:
-                return R.style.AppTheme_Light;
-
-            case 2:
-                return R.style.AppTheme_Dark;
-
-            default:
-                return R.style.AppTheme_Light;
-        }
     }
 
     public static void switchToAnotherTheme() {
@@ -338,11 +332,107 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "auto_print", value);
     }
 
-    public static boolean isFollowingOrFanListFirstShow() {
-        boolean result = SettingHelper
-                .getSharedPreferences(getContext(), "is_following_or_fan_list_first_show", true);
-        SettingHelper.setEditor(getContext(), "is_following_or_fan_list_first_show", false);
-        return result;
+    static class OrderEntry {
+        public Set<String> cacheEntry;
+
+        public OrderEntry(Set<String> cacheEntry) {
+            this.cacheEntry = cacheEntry;
+        }
+    }
+
+    public interface CacheUpdateCallback {
+        void update(Order o);
+    }
+
+    /**
+     * invalidate the order container cache
+     * @param orderId order id
+     * @param updatedO callback to update a order's content. If none, remove the whole list in cache
+     */
+    public static void updateOCCache(long orderId, Order updatedO) {
+        String logKey = "ca_idx_o_" + orderId;
+        HashSet<String> lists = getSR(logKey, new TypeToken<HashSet<String>>(){}.getType());
+        if (lists == null) return;
+
+        for(String listId : lists) {
+            OrderContainer oc = getSR(listId, new TypeToken<OrderContainer>(){}.getType());
+            if (oc != null) {
+                boolean updated = false;
+                for(Order o : oc.getOrders()) {
+                    if (o.getId() == orderId) {
+                        o.copy(updatedO);
+                        updated = true;
+                    }
+                }
+                if (updated) {
+                    putSR(listId, oc, false);
+                }
+            }
+        }
+    }
+
+    public static void putOrderContainerCache(String key, OrderContainer value) {
+        putSR(key, value);
+        ArrayList<Order> orders = value.getOrders();
+        for(Order o : orders) {
+            int oid = o.getId();
+            String logKey = "ca_idx_o_" + oid;
+
+            HashSet<String> log = getSR(logKey, new TypeToken<HashSet<String>>(){}.getType());
+            if (log == null) {
+                log = new HashSet<>();
+            }
+            log.add(key);
+            putSR(logKey, log);
+        }
+    }
+
+    public static <T> void removeSR(String key) {
+        SettingHelper.removeEditor(getContext(), "ca_" + key);
+        SettingHelper.removeEditor(getContext(), "ca_tl_" + key);
+    }
+
+    public static <T> void putSR(String key, T value) {
+        putSR(key, value, true);
+    }
+
+    public static <T> void putSR(String key, T value, boolean firstCache) {
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String json = gson.toJson(value, new TypeToken<T>(){}.getType());
+        AppLogger.d("putSR: key=" + key + ",json:" + json);
+        SettingHelper.setEditor(getContext(), "ca_" + key, json);
+        if (firstCache) {
+            SettingHelper.setEditor(getContext(), "ca_tl_" + key, System.currentTimeMillis());
+        }
+    }
+
+    public static <T> T getSR(String key, Type type) {
+
+        long ts = SettingHelper.getSharedPreferences(getContext(), "ca_tl_" + key, System.currentTimeMillis());
+        if (System.currentTimeMillis() - ts > 30 * 1000) {
+            return null;
+        }
+
+        String json = SettingHelper.getSharedPreferences(getContext(), "ca_" + key, "");
+        if (TextUtil.isEmpty(json)) {
+            return null;
+        }
+
+        T value;
+        try {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            value = gson.fromJson(json, type);
+
+            AppLogger.d("key=" + key + ", type=" + type + ", value:" + value);
+
+            return value;
+        } catch (Exception e) {
+            AppLogger.e(e.getMessage(), e);
+            if (e instanceof JsonSyntaxException) {
+                AppLogger.e("cache deserialize fail:" + json);
+            }
+            return null;
+        }
     }
 
     public static boolean isClickToTopTipFirstShow() {

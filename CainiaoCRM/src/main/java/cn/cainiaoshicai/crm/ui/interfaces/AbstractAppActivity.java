@@ -15,8 +15,6 @@ import java.nio.charset.Charset;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.service.ServiceException;
-import cn.cainiaoshicai.crm.support.asyncdrawable.TimeLineBitmapDownloader;
-import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 
 /**
  * User: Jiang Qi
@@ -24,16 +22,10 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
  */
 public class AbstractAppActivity extends FragmentActivity {
 
-    protected int theme = 0;
-
     @Override
     protected void onResume() {
         super.onResume();
         GlobalCtx.getInstance().setCurrentRunningActivity(this);
-
-        if (theme != SettingUtility.getAppTheme()) {
-            reload();
-        }
     }
 
     @Override
@@ -47,17 +39,10 @@ public class AbstractAppActivity extends FragmentActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("theme", theme);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            theme = SettingUtility.getAppTheme();
-        } else {
-            theme = savedInstanceState.getInt("theme");
-        }
-        setTheme(theme);
         super.onCreate(savedInstanceState);
         forceShowActionBarOverflowMenu();
         initNFC();
@@ -103,21 +88,6 @@ public class AbstractAppActivity extends FragmentActivity {
         NdefRecord mimeRecord = new NdefRecord(
                 NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
         return mimeRecord;
-    }
-
-    private void reload() {
-        Intent intent = getIntent();
-        overridePendingTransition(0, 0);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        finish();
-
-        overridePendingTransition(0, 0);
-        startActivity(intent);
-        TimeLineBitmapDownloader.refreshThemePictureBackground();
-    }
-
-    public TimeLineBitmapDownloader getBitmapDownloader() {
-        return TimeLineBitmapDownloader.getInstance();
     }
 
     protected void dealWithException(ServiceException e) {

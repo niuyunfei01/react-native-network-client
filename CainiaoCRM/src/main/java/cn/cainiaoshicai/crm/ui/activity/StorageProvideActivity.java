@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,12 +26,10 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
@@ -172,7 +169,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
             @Override
             protected Void doInBackground(Integer... params) {
                 try {
-                    ResultObject ro = sad.store_provide_req(params[0], params[1]);
+                    ResultBean ro = sad.store_provide_req(params[0], params[1]);
                     if (ro.isOk()) {
                         final ProvideReq req = (ProvideReq) ro.getObj();
                         if (req != null) {
@@ -301,9 +298,9 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                     new MyAsyncTask<Void, Void, Void>() {
                         @Override
                         protected Void doInBackground(Void... params) {
-                            ResultObject ro = sad.provide_list_to_print(curr_req.getId(), supplierId);
+                            ResultBean<ProductProvideList> ro = sad.provide_list_to_print(curr_req.getId(), supplierId);
                             if (ro.isOk()) {
-                                final ProductProvideList printList = (ProductProvideList) ro.getObj();
+                                final ProductProvideList printList = ro.getObj();
                                 if (printList != null) {
                                     print(ds, printList);
                                     return null;

@@ -147,7 +147,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 term = "store:" + selected_store;
                 lt = ListType.NONE;
             }
-            new RefreshOrderListTask(this, term, lt, this.swipeRefreshLayout, callback).executeOnNormal();
+            new RefreshOrderListTask(this, term, lt, this.swipeRefreshLayout, callback, true).executeOnNormal();
         }
     }
 

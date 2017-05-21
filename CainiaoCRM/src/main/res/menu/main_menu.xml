@@ -6,28 +6,27 @@
         android:title="@string/menu_reminders"
         android:icon="@drawable/ic_bell"
         android:actionLayout="@layout/feed_update_count"
-        support:showAsAction="ifRoom"/>
+        support:showAsAction="always"/>
     <item
         android:id="@+id/menu_process"
         android:title="@string/menu_manage_order"
-        android:icon="@drawable/ic_action_view_as_list"
-        support:showAsAction="ifRoom"/>
+        android:icon="@drawable/ic_list_black_24dp"
+        support:showAsAction="always"/>
 
       <item
         android:id="@+id/menu_user_feedback"
         android:title="@string/menu_user_feedback"
         android:icon="@drawable/mq_ic_emoji_normal"
-        support:showAsAction="ifRoom"/>
+        support:showAsAction="always"/>
 
     <item
         android:id="@+id/menu_mine"
         android:title="@string/menu_mine"
         android:icon="@drawable/ic_action_settings"
-        support:showAsAction="ifRoom"/>
+        support:showAsAction="always"/>
 
     <item android:id="@+id/menu_search"
         android:title="@string/action_search"
-        android:icon="@drawable/ic_action_search"
-        support:showAsAction="ifRoom|collapseActionView" />
-
+        android:icon="@drawable/ic_search_black_24dp"
+        support:showAsAction="always" />
 </menu>

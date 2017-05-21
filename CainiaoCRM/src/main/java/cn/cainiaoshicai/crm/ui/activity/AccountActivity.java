@@ -90,7 +90,6 @@ public class AccountActivity extends AbstractAppActivity
         listView.setOnItemClickListener(new AccountListItemClickListener());
         listView.setAdapter(listAdapter);
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(new AccountMultiChoiceModeListener());
         getLoaderManager().initLoader(LOADER_ID, null, this);
 
         if (SettingUtility.firstStart()) {
@@ -130,7 +129,6 @@ public class AccountActivity extends AbstractAppActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.actionbar_menu_accountactivity, menu);
         return true;
     }
 
@@ -162,17 +160,6 @@ public class AccountActivity extends AbstractAppActivity
                                 startActivityForResult(intent, ADD_ACCOUNT_REQUEST_CODE);
                             }
                         }).show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add_account:
-                showAddAccountDialog();
-
-                break;
-        }
-        return true;
     }
 
     @Override
@@ -264,53 +251,13 @@ public class AccountActivity extends AbstractAppActivity
         }
     }
 
-    private class AccountMultiChoiceModeListener implements AbsListView.MultiChoiceModeListener {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.contextual_menu_accountactivity, menu);
-            mode.setTitle(getString(R.string.account_management));
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_remove_account:
-                    remove();
-                    mode.finish();
-                    return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
-
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-                boolean checked) {
-            listAdapter.notifyDataSetChanged();
-        }
-    }
-
     private class AccountAdapter extends BaseAdapter {
         private int checkedBG;
         private int defaultBG;
 
         public AccountAdapter() {
             defaultBG = getResources().getColor(R.color.transparent);
-            checkedBG = ThemeUtility
-                    .getColor(AccountActivity.this, R.attr.listview_checked_color);
         }
-
         @Override
         public int getCount() {
             return accountList.size();
@@ -357,11 +304,6 @@ public class AccountActivity extends AbstractAppActivity
                 holder.name.setText(accountList.get(i).getInfo().getScreen_name());
             } else {
                 holder.name.setText(accountList.get(i).getUsernick());
-            }
-
-            if (!TextUtils.isEmpty(accountList.get(i).getAvatar_url())) {
-                getBitmapDownloader()
-                        .downloadAvatar(holder.avatar, accountList.get(i).getInfo(), false);
             }
 
             holder.tokenInvalid.setVisibility(!Utility.isTokenValid(accountList.get(i)) ? View.VISIBLE : View.GONE);

@@ -34,7 +34,6 @@ import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
@@ -148,7 +147,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
                 @Override
                 protected Void doInBackground(Integer... params) {
                     try {
-                        ResultObject ro = sad.store_provide_estimate(store_id, day);
+                        ResultBean ro = sad.store_provide_estimate(store_id, day);
                         if (ro.isOk()) {
                             final ProductEstimate req = (ProductEstimate) ro.getObj();
                             if (req != null) {

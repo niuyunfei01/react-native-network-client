@@ -31,6 +31,6 @@
 
     <item android:id="@+id/menu_order_refund" android:title="@string/menu_order_refund"/>
 
-    <item android:id="@+id/menu_order_waiting_list" android:title="@string/menu_to_waiting_list"/>
+    <item android:icon="@drawable/ic_watch_later_black_24dp" android:id="@+id/menu_order_waiting_list" android:title="@string/menu_to_waiting_list"/>
 
 </menu>

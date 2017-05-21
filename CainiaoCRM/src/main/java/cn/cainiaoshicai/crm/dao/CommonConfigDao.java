@@ -14,7 +14,7 @@ import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
@@ -90,22 +90,22 @@ public class CommonConfigDao {
     }
 
 
-    public ResultObject<ArrayList<ShipOptions>> shipOptions() throws ServiceException {
+    public ResultBean<ArrayList<ShipOptions>> shipOptions() throws ServiceException {
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
         try {
             String url = URLHelper.API_ROOT() + "/ship_options.json";
             String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            return gson.fromJson(json, new TypeToken<ResultObject<ArrayList<ShipOptions>>>() {
+            return gson.fromJson(json, new TypeToken<ResultBean<ArrayList<ShipOptions>>>() {
             }.getType());
         } catch (JsonSyntaxException e) {
             AppLogger.e("[shipOptions] json syntax error:" + e.getMessage(), e);
-            return new ResultObject<>(false, "数据错误");
+            return new ResultBean<>(false, "数据错误");
         }
     }
 
-    public ResultObject<HashMap<String, String>> configItem(String key) throws ServiceException {
+    public ResultBean<HashMap<String, String>> configItem(String key) throws ServiceException {
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
         map.put("key", key);
@@ -114,11 +114,11 @@ public class CommonConfigDao {
             String url = URLHelper.API_ROOT() + "/config_item.json";
             String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            return gson.fromJson(json, new TypeToken<ResultObject<HashMap<String, String>>>() {
+            return gson.fromJson(json, new TypeToken<ResultBean<HashMap<String, String>>>() {
             }.getType());
         } catch (JsonSyntaxException e) {
             AppLogger.e("[config_item] json syntax error:" + e.getMessage(), e);
-            return ResultObject.readingFailed();
+            return ResultBean.readingFailed();
         }
     }
 }

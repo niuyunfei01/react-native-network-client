@@ -19,7 +19,6 @@ import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.FeedbackLog;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 
@@ -63,7 +62,7 @@ public class FeedbackViewActivity extends AbstractActionBarActivity {
                 protected Feedback doInBackground(Integer... params) {
                     String token = GlobalCtx.getInstance().getSpecialToken();
                     UserFeedbackDao dao = new UserFeedbackDao(token);
-                    ResultObject<Feedback> fbx = dao.getFeedback(params[0]);
+                    ResultBean<Feedback> fbx = dao.getFeedback(params[0]);
                     if (fbx.isOk()) {
                         if (fbx.getObj() != null) {
                             final List<FeedbackLog> logs = fbx.getObj().getLogs();

@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- Copyright 2013 The Android Open Source Project
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="256"
+    android:versionCode="257"
     android:versionName="2.2.1">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
@@ -69,8 +53,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity android:name=".MainActivity" android:screenOrientation="portrait" android:launchMode="singleTop"
+            android:theme="@style/Theme.Styled.NoActionBar">
         </activity>
 
         <activity android:name=".ui.activity.RemindersActivity" android:screenOrientation="portrait">
@@ -154,7 +138,6 @@
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
-            android:theme="@style/MyDialogStyle"
             android:exported="false">
         </activity>
 

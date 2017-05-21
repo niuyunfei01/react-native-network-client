@@ -45,15 +45,11 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
  */
 public class OrderSingleHelper {
 
-    private int platform;
-    private String platformOid;
     private OrderSingleActivity activity;
     private int orderId;
     private final int store_id;
 
-    public OrderSingleHelper(int platform, String platformOid, OrderSingleActivity activity, int orderId, int store_id) {
-        this.platform = platform;
-        this.platformOid = platformOid;
+    public OrderSingleHelper(OrderSingleActivity activity, int orderId, int store_id) {
         this.activity = activity;
         this.orderId = orderId;
         this.store_id = store_id;
@@ -155,8 +151,8 @@ public class OrderSingleHelper {
                         } else if (action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) {
                             new EditPackWorkerTask(selected).executeOnIO();
                         } else {
-                            OrderSingleActivity.OrderActionOp orderActionOp = new OrderSingleActivity.OrderActionOp(platform,
-                                    platformOid, activity, orderListTypeToJump);
+                            OrderSingleActivity.OrderActionOp orderActionOp = new OrderSingleActivity.OrderActionOp(orderId,
+                                    activity, orderListTypeToJump);
                             orderActionOp.setWorkerId(selected);
                             orderActionOp.executeOnNormal(fromStatus);
                         }

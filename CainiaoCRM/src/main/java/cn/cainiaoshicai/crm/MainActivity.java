@@ -18,8 +18,6 @@ package cn.cainiaoshicai.crm;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,18 +25,22 @@ import android.location.Location;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.BottomBarTab;
+import com.roughike.bottombar.OnTabSelectListener;
+import com.roughike.bottombar.TabSelectionInterceptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,9 +55,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultObject;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
-import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.LocationHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -64,27 +64,31 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
-import cn.cainiaoshicai.crm.ui.activity.DatepickerActivity;
 import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
-import cn.cainiaoshicai.crm.ui.helper.MyMenuItemStuffListener;
+import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 
-public class MainActivity extends AbstractActionBarActivity implements ActionBar.TabListener {
+public class MainActivity extends AbstractActionBarActivity {
 
     private static final List<ListType> TAB_LIST_TYPES = Arrays.asList(ListType.WAITING_READY,
             ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
-    private HashMap<Integer, Integer> fragmentMap = new HashMap<>();
     public static final int REQUEST_DAY = 1;
     public static final int REQUEST_INFO = 1;
+
+    public static String POSITION = "tab_position";
 
     private Date day = new Date();
     private AccountBean accountBean;
     private LocationHelper locationHelper;
     private TextView notifCount;
     private int mNotifCount = 1;
+    private BottomBarTab remindIconView;
+    private ViewPager ordersViewPager;
+    private TabLayout tabLayout;
+    private BottomBar bottomBar;
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.getInstance(), MainActivity.class);
@@ -94,6 +98,18 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         Intent intent = newIntent();
         intent.putExtra(BundleArgsConstants.ACCOUNT_EXTRA, accountBean);
         return intent;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt(POSITION, tabLayout.getSelectedTabPosition());
     }
 
     @Override
@@ -119,20 +135,36 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
 
         setContentView(R.layout.order_list_main);
 
-        // Set the Action Bar to use tabs for navigation
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(false);
-        ab.setDisplayShowHomeEnabled(false);
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
+        final OrdersPagerAdapter adapter = new OrdersPagerAdapter(getSupportFragmentManager(),
+                MainActivity.this);
+        ordersViewPager.setAdapter(adapter);
+        ordersViewPager.setOffscreenPageLimit(adapter.getCount());
+        ordersViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        for(ListType type : TAB_LIST_TYPES) {
-            ab.addTab(ab.newTab().setText(type.getName()).setTabListener(this));
-        }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                OrderListFragment frag = (OrderListFragment) adapter.getItem(position);
+                frag.refresh();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        tabLayout = (TabLayout) findViewById(R.id.order_list_main);
+        tabLayout.setupWithViewPager(ordersViewPager);
 
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
-        handleIntent(ab, intent);
+        handleIntent(intent);
 
         if (locationHelper == null) {
             locationHelper = new LocationHelper(this);
@@ -140,10 +172,10 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         }
     }
 
-    private void resetPrinterStatusBar(boolean show) {
+    private void resetPrinterStatusBar() {
+
         final ArrayList<Integer> autoPrintStores = SettingUtility.getAutoPrintStores();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
-        RelativeLayout opBar = (RelativeLayout) this.findViewById(R.id.op_bar);
         this.findViewById(R.id.head_orders_schedule).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,6 +194,10 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 startActivity(intent);
             }
         });
+
+        final TextView shipStatusText = (TextView) this.findViewById(R.id.head_ship_status);
+        AccountBean workStatus = GlobalCtx.getApplication().getWorkerStatus();
+        shipStatusText.setText(Cts.getShipStatusLabel(workStatus));
 
         final TextView signingText = (TextView) this.findViewById(R.id.head_orders_waiting);
         signingText.setText(Cts.getSignInLabel(SettingUtility.getSignInStatus()));
@@ -190,7 +226,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                             String err = "";
                             try {
                                 StaffDao staffDao = new StaffDao(GlobalCtx.getApplication().getSpecialToken());
-                                final ResultObject<HashMap<String, String>> msg = staffDao.getWorkingStatus();
+                                final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
                                 if (msg.isOk()) {
                                     MainActivity.this.runOnUiThread(new Runnable() {
                                         @Override
@@ -201,7 +237,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                         }
                                     });
                                 } else {
-                                    err = "获取工作状态失败:"+msg.getDesc();
+                                    err = "获取工作状态失败:" + msg.getDesc();
                                 }
                             } catch (ServiceException e) {
                                 err = "异常:" + e.getMessage();
@@ -232,7 +268,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                         final Integer signInStoreId = selectedStores.iterator().next();
 
                                         new MyAsyncTask<Void, Void, Void>() {
-                                            private ResultObject<HashMap<String, String>> resultBean;
+                                            private ResultBean<HashMap<String, String>> resultBean;
 
                                             @Override
                                             protected Void doInBackground(Void... params) {
@@ -240,7 +276,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                                 try {
                                                     resultBean = fbDao.sign_in(signInStoreId, envInfos);
                                                 } catch (ServiceException e) {
-                                                    resultBean = new ResultObject<>(ResultBean.serviceException("服务异常:" + e.getMessage()));
+                                                    resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
                                                 }
                                                 return null;
                                             }
@@ -279,35 +315,93 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 }
             }
         });
-        if (show) {
-            opBar.setVisibility(View.VISIBLE);
-            final int bgColorResId;
-            if (!autoPrintStores.isEmpty()) {
-                final String printStatusTxt;
-                String autoPrintNames = GlobalCtx.getApplication().getStoreNames(autoPrintStores);
-                if (SettingsPrintActivity.isPrinterConnected()) {
-                    printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
-                    bgColorResId = R.color.green;
-                } else {
-                    printStatusTxt = "自动打印(" + autoPrintNames + ")，未连接！";
-                    bgColorResId = R.color.red;
-                }
-                printerStatus.setText(printStatusTxt);
+        final int bgColorResId;
+        if (!autoPrintStores.isEmpty()) {
+            final String printStatusTxt;
+            String autoPrintNames = GlobalCtx.getApplication().getStoreNames(autoPrintStores);
+            if (SettingsPrintActivity.isPrinterConnected()) {
+                printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
+                bgColorResId = R.color.green;
             } else {
-                printerStatus.setText("自动打印：关闭");
-                bgColorResId = R.color.gray;
+                printStatusTxt = "自动打印(" + autoPrintNames + ")，未连接！";
+                bgColorResId = R.color.red;
             }
-            printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
-            printerStatus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
-                    MainActivity.this.startActivity(i);
-                }
-            });
+            printerStatus.setText(printStatusTxt);
         } else {
-            opBar.setVisibility(View.GONE);
+            printerStatus.setText("自动打印：关闭");
+            bgColorResId = R.color.gray;
         }
+        printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
+        printerStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+                MainActivity.this.startActivity(i);
+            }
+        });
+
+        bottomBar = (BottomBar) findViewById(R.id.toolbar_bottom);
+        bottomBar.setDefaultTab(R.id.menu_process);
+        bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
+            @Override
+            public boolean shouldInterceptTabSelection(@IdRes int oldTabId, @IdRes int newTabId) {
+//                if (newTabId == R.id.tab_pro_feature && !userHasProVersion()) {
+//                    startProVersionPurchaseFlow();
+//                    return true;
+//                }
+
+                return false;
+            }
+        });
+
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                onMenuClick(tabId);
+                //TODO: 更新orders 表格的数据, store_order updated
+                ordersViewPager.getAdapter().notifyDataSetChanged();
+                requestUpdateBadges();
+            }
+        });
+
+        if (bottomBar.getCurrentTabId() != R.id.menu_process) {
+            bottomBar.selectTabWithId(R.id.menu_process);
+        }
+
+        remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
+
+/**
+        MenuItem item = menu.findItem(R.id.menu_accept);
+        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+
+        View count = item.getActionView();
+        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
+        notifCount.setText(String.valueOf(mNotifCount));
+
+        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+            @Override
+            public void callback(int count) {
+                mNotifCount = count;
+                updateHotCount(mNotifCount);
+            }
+        });
+
+        new MyMenuItemStuffListener(count, "查看任务") {
+            @Override
+            public void onClick(View v) {
+                GlobalCtx.getApplication().toTaskListActivity(MainActivity.this);
+            }
+        }; */
+    }
+
+    private void requestUpdateBadges() {
+        GlobalCtx.getApplication().getTaskCount(MainActivity.this, new GlobalCtx.TaskCountUpdated() {
+            @Override
+            public void callback(int count) {
+                mNotifCount = count;
+                updateHotCount(mNotifCount);
+            }
+        });
     }
 
     public void updateSignInStatus(HashMap<String, String> obj, TextView signingText) {
@@ -332,7 +426,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
             AlertUtil.showAlert(MainActivity.this, "签到失败", "无法获得当前的地理位置，开启位置权限后重试！");
         }
 
-        WifiManager mWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager mWifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!mWifi.isWifiEnabled()) {
             mWifi.setWifiEnabled(true);
         }
@@ -359,63 +453,37 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         return envInfos;
     }
 
-    private void handleIntent(ActionBar ab, Intent intent) {
-        int list_type = intent.getIntExtra("list_type", 0);
+    private void handleIntent(Intent intent) {
 
+        ListType list_type;
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            list_type = ListType.ARRIVED.getValue();
-        }
-
-        if (list_type > 0) {
-            ActionBar.Tab tabAt = ab.getTabAt(list_type - 1);
-            if (tabAt != null) {
-                ab.selectTab(tabAt);
-            }
-        }
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            this.onDayAndTypeChanged(null, query);
+            list_type = ListType.ARRIVED;
         } else {
-            this.resetPrinterStatusBar(true);
+            list_type = ListType.findByType(intent.getIntExtra("list_type", 0));
         }
+
+        this.ordersViewPager.setCurrentItem(list_type == null ? 0 : list_type.getValue());
+        this.resetPrinterStatusBar();
     }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Log.d(GlobalCtx.ORDERS_TAG, String.valueOf(tab.getText()));
-
-        int position = tab.getPosition();
-        ListType listType = getListTypeByTab(position);
-
-        onDayAndTypeChanged(listType, null);
-    }
-
-    public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus, boolean isSearch) {
+    public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
+        OrdersPagerAdapter adapter = (OrdersPagerAdapter) this.ordersViewPager.getAdapter();
         for(ListType listType : TAB_LIST_TYPES) {
             Integer count = totalByStatus.get(listType.getValue());
             if (count == null) count = 0;
-
-            ActionBar.Tab tab = this.getSupportActionBar().getTabAt(listType.getValue() - 1);
-            if (tab != null) {
-                String tabTxt = listType.getName();
-                if (!listType.equals(ListType.ARRIVED)) {
-                    tabTxt += "(" + count + ")";
-                }
-                tab.setText(tabTxt);
-            }
+            adapter.setCount(listType, count);
         }
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        this.resetPrinterStatusBar(ListType.WAITING_READY.equals(getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition())));
+        this.resetPrinterStatusBar();
     }
 
     @NonNull
-    private ListType getListTypeByTab(int position) {
+    public static ListType getListTypeByTab(int position) {
         ListType listType = ListType.NONE;
         if (position == 0) {
             listType = ListType.WAITING_READY;
@@ -429,66 +497,22 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         return listType;
     }
 
-    private void onDayAndTypeChanged(ListType listType, String query) {
-
-        if (listType == null) {
-            listType = getListTypeByTab(this.getSupportActionBar().getSelectedTab().getPosition());
-        }
-
-        this.resetPrinterStatusBar(ListType.WAITING_READY.equals(listType));
-
-        FragmentManager fm = getFragmentManager();
-        Integer fragmentId = fragmentMap.get(listType.getValue());
-        OrderListFragment found = null;
-        if (fragmentId != null) {
-           found =(OrderListFragment) fm.findFragmentById(fragmentId);
-        }
-        if (found == null) {
-            found = new OrderListFragment();
-            fragmentMap.put(listType.getValue(), found.getId());
-        }
-
-        Set<Integer> listenerStores = SettingUtility.getListenerStores();
-        if (!listenerStores.isEmpty()) {
-            String storeIdStr = "store:" + TextUtils.join(",", listenerStores);
-            if (TextUtils.isEmpty(query)) {
-                query = storeIdStr;
-            } else {
-                query += "|||" + storeIdStr;
-            }
-        }
-
-        if (TextUtils.isEmpty(query)) {
-            found.setDayAndType(listType);
-        } else {
-            found.executeSearch(listType, query);
-        }
-        fm.beginTransaction().replace(R.id.order_list_main, found).commit();
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        handleIntent(this.getSupportActionBar(), intent);
-    }
-
-    // Implemented from ActionBar.TabListener
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // This is called when a previously selected tab is unselected.
-    }
-
-    // Implemented from ActionBar.TabListener
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // This is called when a previously selected tab is selected again.
+        handleIntent(intent);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
+
+        int itemId = item.getItemId();
+
+        return onMenuClick(itemId) || super.onOptionsItemSelected(item);
+    }
+
+    public boolean onMenuClick(int itemId) {
+        switch (itemId) {
             case R.id.menu_process:
-                onDayAndTypeChanged(null, null);
                 return true;
             case R.id.menu_accept:
 //                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
@@ -504,37 +528,9 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                 startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
                 return true;
             default:
-                return super.onOptionsItemSelected(item);
         }
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-
-        MenuItem item = menu.findItem(R.id.menu_accept);
-        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
-
-        View count = item.getActionView();
-        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
-        notifCount.setText(String.valueOf(mNotifCount));
-
-        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
-            @Override
-            public void callback(int count) {
-                mNotifCount = count;
-                updateHotCount(mNotifCount);
-            }
-        });
-
-        new MyMenuItemStuffListener(count, "查看任务") {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.getApplication().toTaskListActivity(MainActivity.this);
-            }
-        };
-
-        return super.onCreateOptionsMenu(menu);
+        return false;
     }
 
     // call the updating code on the main thread,
@@ -555,21 +551,11 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
         });
     }
 
-    private void startPicker() {
-        Intent pickerIntent = new Intent(getApplicationContext(), DatepickerActivity.class);
-        pickerIntent.putExtra("daytime", this.day);
-        startActivityForResult(pickerIntent, REQUEST_DAY);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_DAY) {
             if (resultCode == RESULT_OK) {
                 if (data != null) {
-                    Date day = (Date)data.getSerializableExtra("daytime");
-                    if (day != null) {
-                        onDayAndTypeChanged(null, null);
-                    }
                 }
             }
         }
@@ -624,7 +610,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                             final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
                             Utility.forceShowDialog(MainActivity.this, pf);
                             new MyAsyncTask<Void, Void, Void>() {
-                                private ResultObject<HashMap<String, String>> resultBean;
+                                private ResultBean<HashMap<String, String>> resultBean;
 
                                 @Override
                                 protected Void doInBackground(Void... params) {
@@ -632,7 +618,7 @@ public class MainActivity extends AbstractActionBarActivity implements ActionBar
                                     try {
                                         resultBean = fbDao.sign_off(signInStore, envInfos);
                                     } catch (ServiceException e) {
-                                        resultBean = new ResultObject<>(ResultBean.serviceException("系统异常:" + e.getMessage()));
+                                        resultBean = ResultBean.serviceException("系统异常:" + e.getMessage());
                                     }
                                     return null;
                                 }

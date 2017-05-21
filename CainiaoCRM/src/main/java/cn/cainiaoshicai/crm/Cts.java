@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 
 /**
  */
@@ -90,6 +91,11 @@ public class Cts {
             label = "未知";
         }
         return label;
+    }
+
+    public static String getShipStatusLabel(AccountBean accountBean) {
+
+        return "不接单";
     }
 
     static public class Provide {

@@ -22,15 +22,11 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ItemBean;
 import cn.cainiaoshicai.crm.orders.domain.MessageBean;
 import cn.cainiaoshicai.crm.orders.domain.MessageListBean;
-import cn.cainiaoshicai.crm.support.asyncdrawable.TaskCache;
 import cn.cainiaoshicai.crm.support.database.NotificationDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.file.FileLocationMethod;
 import cn.cainiaoshicai.crm.support.file.FileManager;
-import cn.cainiaoshicai.crm.support.imageutility.ImageUtility;
 import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
-import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
-import cn.cainiaoshicai.crm.support.utils.TimeLineUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
 /**
@@ -244,14 +240,6 @@ public class BigTextNotificationService extends NotificationServiceHelper {
 
         String avatar = ((ItemBean) itemBean).getUser().getCover_image();
         String avatarPath = FileManager.getFilePathFromUrl(avatar, FileLocationMethod.avatar_large);
-        if (ImageUtility.isThisBitmapCanRead(avatarPath) && TaskCache
-                .isThisUrlTaskFinished(avatar)) {
-            Bitmap bitmap = BitmapFactory.decodeFile(avatarPath, new BitmapFactory.Options());
-            if (bitmap != null) {
-                builder.setLargeIcon(bitmap);
-            }
-        }
-
         if (count > 1) {
 
             String actionName;
@@ -373,6 +361,6 @@ public class BigTextNotificationService extends NotificationServiceHelper {
 
     private CharSequence getItemBigText(ArrayList<Parcelable> notificationItems, int currentIndex) {
         ItemBean itemBean = (ItemBean) notificationItems.get(currentIndex);
-        return TimeLineUtility.convertNormalStringToSpannableString(itemBean.getText());
+        return itemBean.getText();
     }
 }
