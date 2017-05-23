@@ -52,6 +52,10 @@ public class TopExceptionHandler implements Thread.UncaughtExceptionHandler {
 // ...
         }
 
+        if (e != null) {
+            e.printStackTrace();
+        }
+
         defaultUEH.uncaughtException(t, e);
     }
 }

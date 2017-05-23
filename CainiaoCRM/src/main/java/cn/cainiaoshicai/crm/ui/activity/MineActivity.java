@@ -99,7 +99,7 @@ public class MineActivity extends AbstractActionBarActivity {
 							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + token));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_USER_COMPLAINS) {
-					startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
+					GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
 				} else if (item.getType() == TYPE_PROD_MANAGEMENT) {
 					gotoWeb(Utility.append_token(String.format("%s/products.html", URLHelper.getStoresPrefix()), token));
 				} else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
@@ -240,7 +240,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			case R.id.menu_mine:
 				return true;
 			case R.id.menu_user_feedback:
-				startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
+				GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

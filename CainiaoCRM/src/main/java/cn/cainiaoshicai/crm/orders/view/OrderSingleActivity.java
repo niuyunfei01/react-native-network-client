@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -142,7 +143,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         client.setCallback(new MyAppWebViewClient.PageCallback() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                OrderSingleActivity.this.completeRefresh();
+                OrderSingleActivity.this.completeRefresh(url, view);
+                AppLogger.i("url:" + url);
             }
 
             @Override
@@ -443,23 +445,27 @@ public class OrderSingleActivity extends AbstractActionBarActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.mWebView.clearCache(true);
+        this.mWebView.clearCache(false);
     }
 
     public void refresh() {
-//        this.mWebView.loadUrl("about:blank");
+        /*
         LayoutInflater inflater = (LayoutInflater) getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
 
         Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh);
         iv.startAnimation(rotation);
-
         refreshItem.setActionView(iv);
+        */
+        this.mWebView.loadUrl("about:blank");
         this.mWebView.loadUrl(this.url);
+
+        AppLogger.d("loading url: " + this.url);
+
     }
 
-    private void completeRefresh() {
+    private void completeRefresh(String url, WebView wv) {
         if (refreshItem.getActionView() != null) {
             refreshItem.getActionView().clearAnimation();
             refreshItem.setActionView(null);
@@ -566,7 +572,6 @@ public class OrderSingleActivity extends AbstractActionBarActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.single_order_menu, menu);
         refreshItem = menu.findItem(R.id.menu_refresh);
-        refresh();
         return true;
     }
 

@@ -105,7 +105,7 @@ public class StorageItem {
         String name = getName();
 
         if (name == null) {
-            AppLogger.e("name is null" + this);
+            AppLogger.e("name is null, pid=" + this.getProduct_id() + ", store_id=" + this.getStore_id());
         }
 
         if (name != null && limit){

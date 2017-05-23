@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -150,6 +151,26 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
             }
 
+            if (this.currStore == null) {
+                storeId = SettingUtility.getCurrentStorageStore();
+                Collection<Store> listStores = GlobalCtx.getInstance().listStores();
+                if (listStores == null || listStores.isEmpty()) {
+                    Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
+                } else {
+                    for (Store next : listStores) {
+                        if (next.getId() == storeId) {
+                            currStore = next;
+                            break;
+                        }
+                    }
+                }
+
+                if (currStore == null) {
+                    currStore = Cts.ST_UNKNOWN;
+                }
+            }
+
+
             setTitle(R.string.title_storage_status);
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -187,6 +208,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     Tag tag = new Tag();
                     tag.setId(0);
                     currTag = tag;
+                    AppLogger.d("start refresh data:");
                     refreshData();
                 }
             });
@@ -240,6 +262,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     StatusItem status = statusAdapter.getItem(position);
                     if (status != null) {
                         filter = status.status;
+                        AppLogger.d("start refresh data:");
                         refreshData();
                     }
                 }
@@ -262,6 +285,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     Tag tag = tagAdapter.getItem(position);
                     if (tag != null) {
                         currTag = tag;
+                        AppLogger.d("start refresh data:");
                         refreshData();
                         view.setBackgroundColor(getResources().getColor(R.color.white));
 
@@ -305,6 +329,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     if (newStore != null) {
                         if (currStore == null || currStore.getId() != newStore.getId()) {
                             currStore = newStore;
+                            AppLogger.d("start refresh data:");
                             refreshData();
                         }
 
@@ -411,7 +436,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     result = sad.getStorageItems(currStore, filter, currTag);
                     return null;
                 } catch (final ServiceException e) {
-                    e.printStackTrace();
                     AppLogger.e("error to refresh storage items:" + currStore, e);
                     StoreStorageActivity.this.runOnUiThread(new Runnable() {
                         @Override

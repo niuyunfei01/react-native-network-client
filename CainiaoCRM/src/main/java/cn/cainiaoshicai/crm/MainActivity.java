@@ -525,7 +525,8 @@ public class MainActivity extends AbstractActionBarActivity {
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
             case R.id.menu_user_feedback:
-                startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
+//                startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
+                GlobalCtx.getApplication().toFeedbackActivity(MainActivity.this);
                 return true;
             default:
         }

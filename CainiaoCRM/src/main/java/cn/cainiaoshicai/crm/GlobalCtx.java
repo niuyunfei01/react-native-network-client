@@ -60,6 +60,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
+import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -607,6 +608,14 @@ public class GlobalCtx extends Application {
 
     public void toTaskListActivity(Activity ctx) {
         ctx.startActivity(toTaskListIntent(ctx));
+    }
+
+    public void toFeedbackActivity(Activity ctx) {
+        Intent gog = new Intent(ctx, GeneralWebViewActivity.class);
+        String url = String.format("%s/vm/index.html?time=%d&access_token=%s#!/home", URLHelper.WEB_URL_ROOT,
+                System.currentTimeMillis(), this.getSpecialToken());
+        gog.putExtra("url", url);
+        ctx.startActivity(gog);
     }
 
     @NonNull

@@ -41,6 +41,11 @@ public class StoreSpinnerHelper {
 
     private static void init(Activity activity, Store currStore, final StoreChangeCallback storeChgCallback,
                              boolean supportAll, Spinner currStoreSpinner) {
+
+        if (currStore == null) {
+            throw new IllegalArgumentException("currStore cannot be null");
+        }
+
         final ArrayAdapter<Store> arrAdapter = new ArrayAdapter<>(activity, R.layout.spinner_item_small);
         arrAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
         currStoreSpinner.setAdapter(arrAdapter);
@@ -68,22 +73,7 @@ public class StoreSpinnerHelper {
         }
 
         arrAdapter.addAll(stores);
-        if (currStore == null) {
-
-            int storeId = SettingUtility.getCurrentStorageStore();
-            for (Store next : stores) {
-                if (next.getId() == storeId) {
-                    currStore = next;
-                    break;
-                }
-            }
-
-            if (currStore == null) {
-                currStore = supportAll ? Cts.ST_ALL : Cts.ST_HLG;
-            }
-        }
         currStoreSpinner.setSelection(arrAdapter.getPosition(currStore));
-        storeChgCallback.changed(currStore);
     }
 
     public interface StoreChangeCallback {

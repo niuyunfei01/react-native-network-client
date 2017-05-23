@@ -183,7 +183,7 @@ public class RemindersActivity extends AbstractActionBarActivity {
                 this.onSearchRequested();
                 return true;
             case R.id.menu_user_feedback:
-                startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
+                GlobalCtx.getApplication().toFeedbackActivity(RemindersActivity.this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

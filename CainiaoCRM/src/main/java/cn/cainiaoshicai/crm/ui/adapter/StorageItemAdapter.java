@@ -142,6 +142,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         } else {
             ((StorageItemAdapter<StorageItem>) this).addAll(this.backendData);
         }
+
+        AppLogger.d("filter done:" + this.backendData.size());
     }
 
     public void changeBackendData(ArrayList<StorageItem> storageItems) {

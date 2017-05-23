@@ -19,7 +19,7 @@ public class Cts {
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 
-    public static final Store ST_HLG = new Store("回龙观", STORE_HLG);
+    public static final Store ST_UNKNOWN = new Store("未知店",  STORE_UNKNOWN);
     public static final Store ST_ALL = new Store("全部",  STORE_ALL);
 
     public static final int ID_AUTO_SHIP_WORKER = -999;
