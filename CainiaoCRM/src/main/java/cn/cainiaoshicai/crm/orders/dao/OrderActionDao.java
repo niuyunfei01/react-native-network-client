@@ -152,8 +152,11 @@ public class OrderActionDao<T extends Order> {
     }
 
     private ResultBean<T> invalidListRequired(ResultBean<T> resultBean, long orderId, ListType[] affected) {
-        if (resultBean.isOk()) {
-            SettingUtility.removeSR("");
+        if (resultBean.isOk() && affected != null && affected.length > 0) {
+            for(ListType type : affected) {
+                String key = SettingUtility.key_order_list(type.getValue(), SettingUtility.listenStoreIds());
+                SettingUtility.removeSR(key);
+            }
         }
 
         return resultBean;

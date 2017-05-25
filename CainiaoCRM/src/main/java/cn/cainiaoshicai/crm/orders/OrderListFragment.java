@@ -2,7 +2,6 @@ package cn.cainiaoshicai.crm.orders;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,7 +14,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -112,21 +110,6 @@ public class OrderListFragment extends Fragment {
         refresh();
 	}
 
-    @NonNull
-    private long[] listenStoreIds() {
-
-        Set<Integer> listenerStores = SettingUtility.getListenerStores();
-        if (!listenerStores.isEmpty()) {
-            long[] storeIds = new long[listenerStores.size()];
-            int i = 0;
-            for(long storeId : listenerStores) {
-                storeIds[i++] = storeId;
-            }
-            return storeIds;
-        }
-        return new long[0];
-    }
-
     public void refresh() {
         this.refresh(false);
     }
@@ -135,7 +118,7 @@ public class OrderListFragment extends Fragment {
         AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter);
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
-            RefreshOrderListTask task = new RefreshOrderListTask(activity, listenStoreIds(), listType,
+            RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,
                     swipeRefreshLayout, new QueryDoneCallback(this), byPassCache);
             task.executeOnNormal();
         }

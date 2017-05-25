@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.support.helper;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -10,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -330,6 +332,29 @@ public class SettingUtility {
 
     public static void setAutoPrint(boolean value) {
         SettingHelper.setEditor(getContext(), "auto_print", value);
+    }
+
+    @NonNull
+    public static long[] listenStoreIds() {
+
+        Set<Integer> listenerStores = getListenerStores();
+        if (!listenerStores.isEmpty()) {
+            long[] storeIds = new long[listenerStores.size()];
+            int i = 0;
+            for(long storeId : listenerStores) {
+                storeIds[i++] = storeId;
+            }
+            return storeIds;
+        }
+        return new long[0];
+    }
+
+    @NonNull
+    public static String key_order_list(int listType, long[] storeIds) {
+        String cacheKey;
+        Arrays.sort(storeIds);
+        cacheKey = listType + "_" + TextUtil.join(",", storeIds);
+        return cacheKey;
     }
 
     static class OrderEntry {

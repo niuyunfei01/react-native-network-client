@@ -462,7 +462,9 @@ public class MainActivity extends AbstractActionBarActivity {
             list_type = ListType.findByType(intent.getIntExtra("list_type", 0));
         }
 
-        this.ordersViewPager.setCurrentItem(list_type == null ? 0 : list_type.getValue());
+        if (list_type.getValue() > 0) {
+            this.ordersViewPager.setCurrentItem(list_type.getValue() - 1);
+        }
         this.resetPrinterStatusBar();
     }
 

@@ -9,7 +9,6 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -68,8 +67,7 @@ public class OrdersDao {
         boolean hasStores = this.storeIds != null && this.storeIds.length > 0;
         String cacheKey = null;
         if (useCache && hasStores) {
-            Arrays.sort(storeIds);
-            cacheKey = this.listType + "_" + TextUtil.join(",", storeIds);
+            cacheKey = SettingUtility.key_order_list(listType, storeIds);
             OrderContainer value = SettingUtility.getSR(cacheKey, new TypeToken<OrderContainer>(){}.getType());
             if (value != null) {
                 return value;

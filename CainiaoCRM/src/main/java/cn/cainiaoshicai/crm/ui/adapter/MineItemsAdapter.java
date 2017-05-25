@@ -18,6 +18,8 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
@@ -92,9 +94,16 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
             holder.viewAllLate.setText("延误" + ((statInTime.getTotalLate() != null && statInTime.getTotalLate() > 0) ? String.format("%s", statInTime.getTotalLate()) : "0"));
             holder.viewAllSerious.setText("严重" + ((statInTime.getTotalSeriousLate() != null && statInTime.getTotalSeriousLate() > 0) ? String.format("%s", statInTime.getTotalSeriousLate()) : "0"));
 
-            holder.viewAllLate.setOnClickListener(new ToSearchBtnListener("delayed:yes"));
-            holder.viewAllSerious.setOnClickListener(new ToSearchBtnListener("delayed:serious"));
-            holder.viewManLate.setOnClickListener(new ToSearchBtnListener("delayed:yes|||ship:" + Cts.ID_DADA_MANUAL_WORKER));
+            long[] listenStoreIds = SettingUtility.listenStoreIds();
+
+            String storeCond = listenStoreIds.length > 0 ? "|||store:" + TextUtil.join(",", listenStoreIds) : "";
+            String delayYesCond = "delayed:yes" + storeCond;
+            String delaySeriousCond = "delayed:serious" + storeCond;
+            String manLate = "delayed:yes|||ship:" + Cts.ID_DADA_MANUAL_WORKER + storeCond;
+
+            holder.viewAllLate.setOnClickListener(new ToSearchBtnListener(delayYesCond));
+            holder.viewAllSerious.setOnClickListener(new ToSearchBtnListener(delaySeriousCond));
+            holder.viewManLate.setOnClickListener(new ToSearchBtnListener(manLate));
 
             holder.delayedOverview.setOnClickListener(new View.OnClickListener() {
                 @Override
