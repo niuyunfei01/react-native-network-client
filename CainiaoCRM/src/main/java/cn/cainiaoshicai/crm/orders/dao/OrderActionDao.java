@@ -48,19 +48,19 @@ public class OrderActionDao<T extends Order> {
     public ResultBean<T> startShip(long orderId, int ship_worker_id) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", String.valueOf(ship_worker_id));
-        return invalidListRequired(actionWithResult("/order_start_ship_by_id/" + orderId, params), orderId,
+        return invalidListRequired(actionWithResult("/order_start_ship_by_id/" + orderId, params),
                 new ListType[]{WAITING_SENT, WAITING_ARRIVE});
     }
 
     public ResultBean<T> setArrived(long orderId) throws ServiceException {
-        return invalidListRequired(actionWithResult("/order_set_arrived_by_id/" + orderId), orderId,
+        return invalidListRequired(actionWithResult("/order_set_arrived_by_id/" + orderId),
                 new ListType[]{WAITING_ARRIVE, ARRIVED});
     }
 
     public ResultBean<T> setReady(long orderId, List<Integer> workerIds) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("worker_id", TextUtils.join(",", workerIds));
-        return invalidListRequired(actionWithResult("/order_set_ready_by_id/" + orderId, params), orderId,
+        return invalidListRequired(actionWithResult("/order_set_ready_by_id/" + orderId, params),
                 new ListType[]{WAITING_READY, WAITING_SENT});
     }
 
@@ -147,15 +147,14 @@ public class OrderActionDao<T extends Order> {
     }
 
     public ResultBean setOrderInvalid(int orderId, int currStatus) throws ServiceException {
-        return invalidListRequired(actionWithResult("/order_set_invalid/"+orderId), orderId,
+        return invalidListRequired(actionWithResult("/order_set_invalid/"+orderId),
                 new ListType[]{ListType.findByType(currStatus), ListType.INVALID});
     }
 
-    private ResultBean<T> invalidListRequired(ResultBean<T> resultBean, long orderId, ListType[] affected) {
+    private ResultBean<T> invalidListRequired(ResultBean<T> resultBean, ListType[] affected) {
         if (resultBean.isOk() && affected != null && affected.length > 0) {
             for(ListType type : affected) {
-                String key = SettingUtility.key_order_list(type.getValue(), SettingUtility.listenStoreIds());
-                SettingUtility.removeSR(key);
+                SettingUtility.removeOrderContainerCache(type);
             }
         }
 
@@ -214,7 +213,7 @@ public class OrderActionDao<T extends Order> {
 
     public ResultBean orderChgStore(int orderId, int storeId, int oldStoreId, int status) throws ServiceException {
         String path = String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId);
-        return invalidListRequired(actionWithResult(path), orderId, new ListType[]{ListType.findByType(status)});
+        return invalidListRequired(actionWithResult(path), new ListType[]{ListType.findByType(status)});
     }
 
     public ResultBean order_chg_arrived_time(int orderId, Date old_arrived, Date new_arrived) throws ServiceException {

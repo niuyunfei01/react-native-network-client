@@ -24,9 +24,11 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
@@ -83,12 +85,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 				} else {
 
 					//仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
-
 					if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 						GlobalCtx.newOrderNotifies.add(notificationId);
 						if (GlobalCtx.getInstance().acceptNotifyNew()) {
 							soundManager.play_new_order_sound(notify.getStore_id());
 						}
+						SettingUtility.removeOrderContainerCache(ListType.WAITING_READY);
 					} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
 						int totalLate = notify.getTotal_late();
 						if (totalLate > 10) {

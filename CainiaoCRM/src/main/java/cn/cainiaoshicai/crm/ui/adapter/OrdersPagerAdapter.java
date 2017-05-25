@@ -43,7 +43,8 @@ public class OrdersPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return tabTitles[position] + "(" + counts[position] + ")";
+        String numbers = position == 3 ? "" : "(" + counts[position] + ")";
+        return tabTitles[position] + numbers;
     }
 
     public OrdersPagerAdapter(FragmentManager fm, MainActivity context) {

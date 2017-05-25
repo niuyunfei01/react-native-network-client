@@ -18,6 +18,7 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -367,6 +368,10 @@ public class SettingUtility {
 
     public interface CacheUpdateCallback {
         void update(Order o);
+    }
+
+    public static void removeOrderContainerCache(ListType type) {
+        removeSR(key_order_list(type.getValue(), listenStoreIds()));
     }
 
     /**
