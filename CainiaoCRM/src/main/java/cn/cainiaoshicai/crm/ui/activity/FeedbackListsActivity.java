@@ -1,23 +1,13 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
@@ -28,12 +18,8 @@ import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
 import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultList;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
-import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.FeedbackAdapter;
-import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
-import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper.StoreChangeCallback;
 
 public class FeedbackListsActivity extends AbstractActionBarActivity {
 
@@ -152,7 +138,8 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
             case R.id.menu_mine:
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
-            case R.id.menu_user_feedback:
+            case R.id.menu_store_maint:
+                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

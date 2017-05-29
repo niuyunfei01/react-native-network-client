@@ -29,7 +29,6 @@ import android.os.PersistableBundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -64,11 +63,11 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
-import cn.cainiaoshicai.crm.ui.activity.FeedbackListsActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 
 public class MainActivity extends AbstractActionBarActivity {
@@ -526,9 +525,8 @@ public class MainActivity extends AbstractActionBarActivity {
             case R.id.menu_mine:
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
-            case R.id.menu_user_feedback:
-//                startActivity(new Intent(getApplicationContext(), FeedbackListsActivity.class));
-                GlobalCtx.getApplication().toFeedbackActivity(MainActivity.this);
+            case R.id.menu_store_maint:
+                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
                 return true;
             default:
         }

@@ -51,6 +51,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_COMMENT_WM = 16;
 	private static final int TYPE_COMMENT_SELF = 17;
 	private static final int TYPE_PROJECT_MANAGEMENT = 18;
+	private static final int TYPE_TEAM_PERF = 19;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
@@ -127,6 +128,8 @@ public class MineActivity extends AbstractActionBarActivity {
 					Intent intent = new Intent(MineActivity.this, TowerActivity.class);
 					intent.putExtra("url", "https://tower.im/members/3f63c10bea974c03b05d1ab6a3f60965?me=1");
 					MineActivity.this.startActivity(intent);
+				} else if (item.getType() == TYPE_TEAM_PERF) {
+					GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
 				}
 			}
 
@@ -190,13 +193,13 @@ public class MineActivity extends AbstractActionBarActivity {
 		inTimeParams.add(statInTime);
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("外卖评价", -1, TYPE_COMMENT_WM, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("反馈和业绩", -1,  TYPE_TEAM_PERF, null));
 		String accountId = GlobalCtx.getApplication().getCurrentAccountId();
 		if ("811485".equals(accountId)) {
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
@@ -204,6 +207,7 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		String versionDesc = getVersionDesc();
 
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设  置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
@@ -250,8 +254,8 @@ public class MineActivity extends AbstractActionBarActivity {
 				return true;
 			case R.id.menu_mine:
 				return true;
-			case R.id.menu_user_feedback:
-				GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
+			case R.id.menu_store_maint:
+				startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

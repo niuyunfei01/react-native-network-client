@@ -13,9 +13,9 @@
         />
 
     <tab
-        id="@+id/menu_user_feedback"
-        title="@string/menu_user_feedback"
-        icon="@drawable/mq_ic_emoji_normal"
+        id="@+id/menu_store_maint"
+        title="@string/menu_good_maint"
+        icon="@drawable/ic_widgets_black_24dp"
         />
 
     <tab

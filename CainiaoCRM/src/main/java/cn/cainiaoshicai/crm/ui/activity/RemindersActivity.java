@@ -16,16 +16,11 @@
 
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,15 +36,9 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
 import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.helper.MyMenuItemStuffListener;
 
@@ -182,8 +171,8 @@ public class RemindersActivity extends AbstractActionBarActivity {
             case R.id.menu_search:
                 this.onSearchRequested();
                 return true;
-            case R.id.menu_user_feedback:
-                GlobalCtx.getApplication().toFeedbackActivity(RemindersActivity.this);
+            case R.id.menu_store_maint:
+                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -14,9 +14,9 @@
         support:showAsAction="always"/>
 
       <item
-        android:id="@+id/menu_user_feedback"
-        android:title="@string/menu_user_feedback"
-        android:icon="@drawable/mq_ic_emoji_normal"
+        android:id="@+id/menu_store_maint"
+        android:title="@string/menu_good_maint"
+        android:icon="@drawable/ic_widgets_black_24dp"
         support:showAsAction="always"/>
 
     <item
