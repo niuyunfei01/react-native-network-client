@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.webkit.WebResourceError;
@@ -26,7 +27,7 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 /**
  * Created by liuzhr on 5/20/16.
  */
-public class GeneralWebViewActivity extends Activity {
+public class GeneralWebViewActivity extends AppCompatActivity {
 
     private final int contentViewRes;
     private WebView mWebView;

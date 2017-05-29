@@ -71,7 +71,6 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
 
         TextView label = holder.text;
 
-
         T item = this.getItem(pos);
         label.setText(item.getName());
 

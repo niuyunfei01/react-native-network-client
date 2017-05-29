@@ -92,7 +92,11 @@
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
         <activity android:name=".ui.activity.GeneralWebViewActivity" android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar">
+            android:theme="@style/Theme.Styled.NoActionBar">
+        </activity>
+        <activity android:name=".ui.activity.TowerActivity" android:parentActivityName=".ui.activity.MineActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Styled">
         </activity>
         <activity android:name=".ui.activity.FeedBackEditActivity" android:screenOrientation="portrait"
             android:parentActivityName=".ui.activity.FeedbackListsActivity">
