@@ -38,6 +38,7 @@ public class StorageItem {
     private int when_sale_again;
     private String tag_code;
     private int price;
+    private String thumbPicUrl;
 
     public int getProduct_id() {
         return product_id;
@@ -234,8 +235,27 @@ public class StorageItem {
     public String getPricePrecision() {
         return String.format("￥%.2f", (double)this.price/100);
     }
+    public String getPricePrecisionNoSymbol() {
+        return String.format("%.2f", (double)this.price/100);
+    }
+
+    public int getPrice() {
+        return price;
+    }
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public String getThumbPicUrl() {
+        return thumbPicUrl;
+    }
+
+    public void setThumbPicUrl(String thumbPicUrl) {
+        this.thumbPicUrl = thumbPicUrl;
+    }
+
+    public String leftNumberStr() {
+        return "库存 " + this.getLeft_since_last_stat();
     }
 }

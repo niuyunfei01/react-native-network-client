@@ -9,7 +9,7 @@ public class Product {
     private int id;
     private String name;
     private Date created;
-    private String coverImg;
+    private String coverimg;
     private float price;
     private int comment_nums;
     private float original_price;
@@ -42,12 +42,12 @@ public class Product {
         this.created = created;
     }
 
-    public String getCoverImg() {
-        return coverImg;
+    public String getCoverimg() {
+        return coverimg;
     }
 
-    public void setCoverImg(String coverImg) {
-        this.coverImg = coverImg;
+    public void setCoverimg(String coverimg) {
+        this.coverimg = coverimg;
     }
 
     public float getPrice() {

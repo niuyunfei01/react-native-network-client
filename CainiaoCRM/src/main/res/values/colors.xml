@@ -367,4 +367,7 @@
     <color name="logo_blue">#1b82d2</color>
     <color name="logo_white">#ffffff</color>
 
+    <color name="editable_text_blue">#87CEEB</color>
+    <color name="editable_border_blue">#87CEEB</color>
+
 </resources>

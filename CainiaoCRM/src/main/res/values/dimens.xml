@@ -58,4 +58,7 @@
     <dimen name="card_content_horizontal_margin_with_8dp_padding">8dp</dimen>
     <dimen name="card_content_horizontal_margin_with_12dp_padding">4dp</dimen>
 
+    <dimen name="list_good_image_size">60dp</dimen>
+    <dimen name="list_good_sold_margin_top">4dp</dimen>
+
 </resources>

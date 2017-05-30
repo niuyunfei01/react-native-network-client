@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.Cts;
@@ -22,6 +23,9 @@ import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.utils.Utility;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by liuzhr on 10/31/16.
@@ -214,6 +218,57 @@ public class StoreStorageHelper {
         return dlg;
     }
 
+
+    public static AlertDialog createEditPrice(final Activity activity, final StorageItem item,
+                                                LayoutInflater inflater, final Runnable succCallback) {
+        View npView = inflater.inflate(R.layout.number_edit_price, null);
+
+        final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
+        et.setText(String.valueOf(item.getPricePrecisionNoSymbol()));
+        ((TextView)npView.findViewById(R.id.number_now_price)).setText("现价：" + item.getPricePrecision());
+
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(String.format("修改价格:(%s)", item.getName()))
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                final int newCents = (int) (100 * Double.parseDouble(et.getText().toString()));
+                                if (newCents < 1) {
+                                    AlertUtil.error(activity, "价格不能低于1分钱");
+                                    return;
+                                }
+
+                                Call<ResultBean> rb = GlobalCtx.getApplication().dao.store_chg_price(item.getStore_id(),
+                                        item.getProduct_id(), newCents, item.getPrice());
+                                rb.enqueue(new Callback<ResultBean>() {
+                                    @Override
+                                    public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
+                                        ResultBean body = response.body();
+                                        if (body.isOk()) {
+                                            item.setPrice(newCents);
+                                            if (succCallback != null) {
+                                                succCallback.run();
+                                            }
+                                            Toast.makeText(activity, "价格已修改为" + item.getPricePrecision(), Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            AlertUtil.showAlert(activity, "错误提示", "保存失败：" + body.getDesc());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResultBean> call, Throwable t) {
+                                        AlertUtil.showAlert(activity, "错误提示", "无法连接服务器");
+                                    }
+                                });
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        et.requestFocus();
+        return dlg;
+    }
+
     static AlertDialog createEditProvideDlg(final StoreStorageActivity activity, final StorageItem item) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
@@ -252,11 +307,11 @@ public class StoreStorageHelper {
                                                     item.setTotalInReq(total_req_no);
                                                     item.setReqMark(remarkTxt);
                                                     activity.updateReqListBtn(total_req_cnt);
-                                                    activity.listAdapterRefresh();
+//                                                    activity.listAdapterRefresh();
                                                     Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
-                                                    activity.refreshData();
+//                                                    activity.refreshData();
                                                 } else {
-                                                    Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
+                                                    AlertUtil.error(activity, "保存失败：" + finalRb.getDesc());
                                                 }
                                             }
                                         });
@@ -265,11 +320,7 @@ public class StoreStorageHelper {
                                 }.executeOnIO();
                             }
                         })
-                .setNegativeButton(R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
+                .setNegativeButton(R.string.cancel, null)
                 .setNeutralButton("商品页", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

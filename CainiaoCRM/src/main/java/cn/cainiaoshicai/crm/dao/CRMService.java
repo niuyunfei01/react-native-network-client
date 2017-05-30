@@ -49,6 +49,10 @@ public interface CRMService {
     @POST("/api/orders")
     Call<OrderContainer> orders(@Query("status") int listType);
 
+    @POST("/api/store_chg_price/{store_id}/{product_id}/{newCents}/{oldCents}")
+    Call<ResultBean> store_chg_price(@Path("store_id") int store_id, @Path("product_id") int product_id,
+                               @Path("newCents") int newCents, @Path("oldCents") int nowPrice);
+
     class UploadRes {
         private FileBean file;
 

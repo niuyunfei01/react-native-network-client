@@ -8,7 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +53,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.riskNum = (TextView) row.findViewById(R.id.lowest_risk_num);
             holder.reOnSale = (TextView) row.findViewById(R.id.re_on_sale_desc);
             holder.salePrice = (TextView) row.findViewById(R.id.sale_price);
-
+            holder.goodIcon = (ImageView) row.findViewById(R.id.good_icon);
             convertView = row;
             convertView.setTag(holder);
         }
@@ -66,6 +69,14 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         }
 
         holder.salePrice.setText(item.getPricePrecision());
+        holder.salePrice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                AlertDialog dlg = StoreStorageHelper.createEditPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                dlg.show();
+            }
+        });
 
         if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
             holder.req_total.setText("订货:" + item.getTotalInReq());
@@ -91,7 +102,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.riskNum.setText("最低库存: " + item.getRisk_min_stat());
 
-        holder.leftNumber.setText(item.getLeft_since_last_stat() + "份");
+        holder.leftNumber.setText(item.leftNumberStr());
         holder.leftNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,6 +114,16 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day()/5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
+
+        // Trigger the download of the URL asynchronously into the image view.
+        Picasso.with(context)
+                .load(item.getThumbPicUrl())
+                .placeholder(R.drawable.placeholder)
+//                .error(R.drawable.error)
+                .resizeDimen(R.dimen.list_good_image_size, R.dimen.list_good_image_size)
+                .centerInside()
+                .tag(context)
+                .into(holder.goodIcon);
 
         return (convertView);
     }
@@ -163,5 +184,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         TextView reOnSale;
         public TextView salePrice;
+        public ImageView goodIcon;
     }
 }

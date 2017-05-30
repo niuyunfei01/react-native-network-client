@@ -179,6 +179,7 @@ public class StorageActionDao {
                     if (pd != null) {
                         si.setName(pd.getName());
                         si.setTag_code(pd.getTag_code());
+                        si.setThumbPicUrl(to_full_path(pd.getCoverimg()));
                     }
                     storageItems.add(si);
                 }
@@ -191,6 +192,14 @@ public class StorageActionDao {
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);
             return new Pair<>(storageItems, new StoreStatusStat());
+        }
+    }
+
+    private String to_full_path(String coverImg) {
+        if (coverImg != null && coverImg.startsWith("//")) {
+            return "https:" + coverImg;
+        } else {
+            return coverImg;
         }
     }
 

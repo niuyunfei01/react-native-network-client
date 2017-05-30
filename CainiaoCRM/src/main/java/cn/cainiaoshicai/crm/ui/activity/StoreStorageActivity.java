@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -44,6 +45,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
+import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged, RefreshStorageData {
@@ -54,6 +56,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_EDIT_REQ = 10995;
     private static final int MENU_CONTEXT_TO_AUTO_ON_ID = 10996;
     private static final int MENU_CONTEXT_TO_LOSS = 10997;
+    private static final int MENU_CONTEXT_VIEW_DETAIL = 10998;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
     private ListView lv;
@@ -138,83 +141,80 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         inflater = (LayoutInflater)
                 getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if (savedInstanceState == null) {
             this.setContentView(R.layout.storage_status);
 
-            this.filter = this.getIntent().getIntExtra("filter", filter);
-            int storeId = this.getIntent().getIntExtra("store_id", -1);
-            this.searchTerm = this.getIntent().getStringExtra("search");
-            if (storeId > 0) {
-                Store store = GlobalCtx.getInstance().findStore(storeId);
-                if (store != null) {
-                    this.currStore = store;
+        this.filter = this.getIntent().getIntExtra("filter", filter);
+        int storeId = this.getIntent().getIntExtra("store_id", -1);
+        this.searchTerm = this.getIntent().getStringExtra("search");
+        initCurrStore(storeId);
+
+        ActionBar bar = getSupportActionBar();
+        if (bar == null) {
+            AlertUtil.error(this, "系统错误: no title bar!");
+            return;
+        }
+
+        bar.setCustomView(R.layout.store_list_in_title);
+        View titleBar = bar.getCustomView();
+        bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
+                | ActionBar.DISPLAY_SHOW_HOME);
+        setTitle(R.string.title_storage_status);
+        Toolbar parent = (Toolbar) titleBar.getParent();
+        parent.setContentInsetsAbsolute(0, 0);
+
+        Spinner currStoreSpinner = (Spinner) titleBar.findViewById(R.id.spinner_curr_store);
+        StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
+            @Override
+            public void changed(Store newStore) {
+                if (newStore != null) {
+                    if (currStore == null || currStore.getId() != newStore.getId()) {
+                        currStore = newStore;
+                        AppLogger.d("start refresh data:");
+                        refreshData();
+                    }
+
+                    SettingUtility.setCurrentStorageStore(newStore.getId());
                 }
             }
+        }, false, currStoreSpinner);
 
-            if (this.currStore == null) {
-                storeId = SettingUtility.getCurrentStorageStore();
-                Collection<Store> listStores = GlobalCtx.getInstance().listStores();
-                if (listStores == null || listStores.isEmpty()) {
-                    Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
-                } else {
-                    for (Store next : listStores) {
-                        if (next.getId() == storeId) {
-                            currStore = next;
-                            break;
-                        }
-                    }
-                }
+        lv = (ListView) findViewById(R.id.list_storage_status);
+        registerForContextMenu(lv);
 
-                if (currStore == null) {
-                    currStore = Cts.ST_UNKNOWN;
-                }
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.showContextMenu();
             }
+        });
 
+        this.btnReqList = (Button) titleBar.findViewById(R.id.btn_req_list);
+        this.btnReqList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StoreStorageActivity.this, StorageProvideActivity.class);
+                intent.putExtra("store_id", currStore.getId());
+                startActivity(intent);
+            }
+        });
 
-            setTitle(R.string.title_storage_status);
-            this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.btnEmptyList = (Button) titleBar.findViewById(R.id.btn_empty_list);
+        this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filter = StatusItem.find(FILTER_SOLD_EMPTY).status;
+                currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+                searchTerm = "";
+                Tag tag = new Tag();
+                tag.setId(0);
+                currTag = tag;
+                AppLogger.d("start refresh data:");
+                refreshData();
+            }
+        });
 
-            lv = (ListView) findViewById(R.id.list_storage_status);
-            registerForContextMenu(lv);
-
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    StorageItem item = listAdapter.getItem(position);
-                    if (item != null) {
-                        String url = URLHelper.getStoresPrefix() + "/store_product/" + item.getId();
-                        GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, url);
-                    }
-                }
-            });
-
-            this.btnReqList = (Button) findViewById(R.id.btn_req_list);
-            this.btnReqList.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(StoreStorageActivity.this, StorageProvideActivity.class);
-                    intent.putExtra("store_id", currStore.getId());
-                    startActivity(intent);
-                }
-            });
-
-            this.btnEmptyList = (Button) findViewById(R.id.btn_empty_list);
-            this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    filter = StatusItem.find(FILTER_SOLD_EMPTY).status;
-                    currStatusSpinner.setSelection(StatusItem.findIdx(filter));
-                    searchTerm = "";
-                    Tag tag = new Tag();
-                    tag.setId(0);
-                    currTag = tag;
-                    AppLogger.d("start refresh data:");
-                    refreshData();
-                }
-            });
-
-            ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
-            ctv.setThreshold(1);
+        ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
+        ctv.setThreshold(1);
 //            ctv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 //                @Override
 //                public void onFocusChange(View v, boolean hasFocus) {
@@ -224,125 +224,128 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 //                    }
 //                }
 //            });
-            ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    CharSequence text = v.getText();
-                    String term = !TextUtils.isEmpty(text) ? text.toString() : null;
-                    StoreStorageActivity.this.searchTerm = term != null ? term : "";
-                    listAdapter.filter(term);
+        ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                CharSequence text = v.getText();
+                String term = !TextUtils.isEmpty(text) ? text.toString() : null;
+                StoreStorageActivity.this.searchTerm = term != null ? term : "";
+                listAdapter.filter(term);
+                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                return true;
+            }
+        });
+
+        ctv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object selected = parent.getAdapter().getItem(position);
+                if (selected instanceof StorageItem) {
+                    listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                    return true;
+                } else {
+                    Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
                 }
-            });
+            }
+        });
 
-            ctv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Object selected = parent.getAdapter().getItem(position);
-                    if (selected instanceof StorageItem) {
-                        listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
-                        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                    } else {
-                        Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-
-            currStatusSpinner = (Spinner) findViewById(R.id.spinner_curr_status);
-            final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
-            statusAdapter.addAll(StatusItem.STATUS);
-            statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
-            currStatusSpinner.setAdapter(statusAdapter);
-            currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    StatusItem status = statusAdapter.getItem(position);
-                    if (status != null) {
-                        filter = status.status;
-                        AppLogger.d("start refresh data:");
-                        refreshData();
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-            currStatusSpinner.setSelection(StatusItem.findIdx(filter));
-
-            final ListView categoryLv = (ListView) findViewById(R.id.list_category);
-            final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
-            ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags();
-            tagAdapter.addAll(allTags);
-            categoryLv.setAdapter(tagAdapter);
-            categoryLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Tag tag = tagAdapter.getItem(position);
-                    if (tag != null) {
-                        currTag = tag;
-                        AppLogger.d("start refresh data:");
-                        refreshData();
-                        view.setBackgroundColor(getResources().getColor(R.color.white));
-
-                        int lastPos = StoreStorageActivity.this.lastCategoryPos;
-                        StoreStorageActivity.this.lastCategoryPos = position;
-
-                        View lastView = getViewByPosition(lastPos, categoryLv);
-                        lastView.setBackgroundColor(ContextCompat.getColor(StoreStorageActivity.this, R.color.lightgray));
-                    }
-
-
-                }
-            });
-
-            for(int i = 0; i < tagAdapter.getCount(); i++) {
-                Tag t = tagAdapter.getItem(i);
-                if (t != null && currTag != null && t.getId() == currTag.getId()) {
-                    tagFilterSpinner.setSelection(i);
-                    break;
+        currStatusSpinner = (Spinner) titleBar.findViewById(R.id.spinner_curr_status);
+        final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
+        statusAdapter.addAll(StatusItem.STATUS);
+        statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
+        currStatusSpinner.setAdapter(statusAdapter);
+        currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                StatusItem status = statusAdapter.getItem(position);
+                if (status != null) {
+                    filter = status.status;
+                    AppLogger.d("start refresh data:");
+                    refreshData();
                 }
             }
 
-            if (allTags.isEmpty()) {
-                Utility.runUIActionDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        tagAdapter.addAll(GlobalCtx.getInstance().listTags());
-                        tagAdapter.notifyDataSetChanged();
-                    }
-                }, 50);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
+        });
+        currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+
+        final ListView categoryLv = (ListView) findViewById(R.id.list_category);
+        final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
+        ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags();
+        tagAdapter.addAll(allTags);
+        categoryLv.setAdapter(tagAdapter);
+        categoryLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Tag tag = tagAdapter.getItem(position);
+                if (tag != null) {
+                    currTag = tag;
+                    AppLogger.d("start refresh data:");
+                    refreshData();
+                    view.setBackgroundColor(getResources().getColor(R.color.white));
+
+                    int lastPos = StoreStorageActivity.this.lastCategoryPos;
+                    StoreStorageActivity.this.lastCategoryPos = position;
+
+                    View lastView = getViewByPosition(lastPos, categoryLv);
+                    lastView.setBackgroundColor(ContextCompat.getColor(StoreStorageActivity.this, R.color.lightgray));
+                }
 
 
-            ActionBar bar = getSupportActionBar();
-            bar.setCustomView(R.layout.store_list_in_title);
+            }
+        });
 
-            Spinner currStoreSpinner = (Spinner) bar.getCustomView().findViewById(R.id.spinner_curr_store);
-            StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
+        for(int i = 0; i < tagAdapter.getCount(); i++) {
+            Tag t = tagAdapter.getItem(i);
+            if (t != null && currTag != null && t.getId() == currTag.getId()) {
+                tagFilterSpinner.setSelection(i);
+                break;
+            }
+        }
+
+        if (allTags.isEmpty()) {
+            Utility.runUIActionDelayed(new Runnable() {
                 @Override
-                public void changed(Store newStore) {
-                    if (newStore != null) {
-                        if (currStore == null || currStore.getId() != newStore.getId()) {
-                            currStore = newStore;
-                            AppLogger.d("start refresh data:");
-                            refreshData();
-                        }
+                public void run() {
+                    tagAdapter.addAll(GlobalCtx.getInstance().listTags());
+                    tagAdapter.notifyDataSetChanged();
+                }
+            }, 50);
+        }
 
-                        SettingUtility.setCurrentStorageStore(newStore.getId());
+        updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+    }
+
+    public void initCurrStore(int storeId) {
+        if (storeId > 0) {
+            Store store = GlobalCtx.getInstance().findStore(storeId);
+            if (store != null) {
+                this.currStore = store;
+            }
+        }
+
+        if (this.currStore == null) {
+            storeId = SettingUtility.getCurrentStorageStore();
+            Collection<Store> listStores = GlobalCtx.getInstance().listStores();
+            if (listStores == null || listStores.isEmpty()) {
+                Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
+            } else {
+                for (Store next : listStores) {
+                    if (next.getId() == storeId) {
+                        currStore = next;
+                        break;
                     }
                 }
-            }, false, currStoreSpinner);
+            }
 
-            bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-                    | ActionBar.DISPLAY_SHOW_HOME);
-
-
-            updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+            if (currStore == null) {
+                currStore = Cts.ST_UNKNOWN;
+            }
         }
     }
 
@@ -364,6 +367,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         } else {
             listAdapter = new StorageItemAdapter<>(this, storageItems);
             lv.setAdapter(listAdapter);
+            lv.setOnScrollListener(new PicassoScrollListener(StoreStorageActivity.this));
             listAdapter.filter(this.searchTerm);
             listAdapter.notifyDataSetChanged();
         }
@@ -405,7 +409,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     void updateReqListBtn(int total_in_req) {
         this.total_in_req = total_in_req;
         if (this.btnReqList != null) {
-            this.btnReqList.setText("订货单(" + total_in_req + ")");
+            this.btnReqList.setText("订货(" + total_in_req + ")");
         }
     }
 
@@ -499,6 +503,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
 
             menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
+            menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
         }
     }
 
@@ -559,6 +564,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item != null) {
                     int itemId = item.getId();
                     GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, URLHelper.WEB_URL_ROOT + "/stores/prod_loss/" + itemId);
+                }
+                return true;
+            case MENU_CONTEXT_VIEW_DETAIL:
+                if (item != null) {
+                    String url = URLHelper.getStoresPrefix() + "/store_product/" + item.getId();
+                    GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, url);
                 }
                 return true;
             default:
