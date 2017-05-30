@@ -53,13 +53,22 @@ public final class AlertUtil {
      * @param message Message
      */
     public static void error(Context context, String message) {
+        error(context, message, null);
+    }
+
+    /**
+     * Show Alert Dialog with String text.
+     * @param context Activity context.
+     * @param message Message
+     */
+    public static void error(Context context, String message, DialogInterface.OnClickListener listener) {
         Dialog dlg = new AlertDialog.Builder(context)
             .setIconAttribute(android.R.attr.alertDialogIcon)
             .setTitle("错误提示")
-            .setPositiveButton(android.R.string.ok, null)
+            .setPositiveButton(android.R.string.ok, listener)
             .setMessage(message)
             .create();
-        
+
         dlg.show();
     }
 

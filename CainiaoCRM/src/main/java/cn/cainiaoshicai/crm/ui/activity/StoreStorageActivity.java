@@ -48,6 +48,10 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
+
 public class StoreStorageActivity extends AbstractActionBarActivity implements StoreStorageChanged, RefreshStorageData {
 
     private static final int MENU_CONTEXT_DELETE_ID = 10992;
@@ -75,6 +79,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_SOLD_EMPTY = 5;
 
     private int total_in_req;
+    private StoreStatusStat stats;
 
     private static class StatusItem {
         static final StatusItem[] STATUS = new StatusItem[]{
@@ -391,11 +396,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
     }
 
-    private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale, int total_in_req, int totalSoldEmpty) {
-        StatusItem.find(FILTER_ON_SALE).setNum(totalOnSale);
-        StatusItem.find(FILTER_OFF_SALE).setNum(totalOffSale);
+    private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
+                                       int total_in_req, int totalSoldEmpty) {
+        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale);
         StatusItem.find(FILTER_RISK).setNum(totalRisk);
-        StatusItem.find(FILTER_SOLD_OUT).setNum(totalSoldOut);
         StatusItem.find(FILTER_SOLD_EMPTY).setNum(totalSoldEmpty);
 
         if(this.currStatusSpinner != null) {
@@ -404,6 +408,15 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         updateReqListBtn(total_in_req);
         updateEmptyListBtn(totalSoldEmpty);
+    }
+
+    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale) {
+        StatusItem.find(FILTER_ON_SALE).setNum(totalOnSale);
+        StatusItem.find(FILTER_OFF_SALE).setNum(totalOffSale);
+        StatusItem.find(FILTER_SOLD_OUT).setNum(totalSoldOut);
+        if(this.currStatusSpinner != null) {
+            ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
+        }
     }
 
     void updateReqListBtn(int total_in_req) {
@@ -464,6 +477,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             updateAdapterData(result.first);
                             StoreStatusStat sec = result.second;
                             if (sec != null) {
+                                StoreStorageActivity.this.stats = sec;
                                 updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
                                         sec.getTotal_sold_out(), sec.getTotal_off_sale(),
                                         sec.getTotal_req_cnt(), sec.getTotal_sold_empty());
@@ -492,13 +506,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_AUTO_ON_ID, Menu.NONE, "设置自动上架");
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "恢复售卖");
-            } else if (item.getStatus() == StorageItem.STORE_PROD_OFF_SALE) {
+            } else if (item.getStatus() == STORE_PROD_OFF_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SALE_ID, Menu.NONE, "上架(限店长)");
             } else if (item.getStatus() == StorageItem.STORE_PROD_ON_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
             }
 
-            if (item.getStatus() != StorageItem.STORE_PROD_OFF_SALE) {
+            if (item.getStatus() != STORE_PROD_OFF_SALE) {
                 menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
             }
 
@@ -507,17 +521,65 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
     }
 
+    class ItemStatusUpdated {
+        private Runnable additional;
+        private final StoreStorageActivity activity;
+
+        ItemStatusUpdated(StoreStorageActivity activity) {
+            this.activity = activity;
+        }
+
+        void updated(int fromStatus, int destStatus) {
+            StoreStatusStat st = activity.stats;
+            if (st != null && fromStatus != destStatus) {
+                switch (fromStatus) {
+                    case STORE_PROD_OFF_SALE:
+                        st.setTotal_off_sale(st.getTotal_off_sale() - 1);
+                        break;
+                    case STORE_PROD_ON_SALE:
+                        st.setTotal_on_sale(st.getTotal_on_sale() - 1);
+                        break;
+                    case STORE_PROD_SOLD_OUT:
+                        st.setTotal_sold_out(st.getTotal_sold_out() - 1);
+                        break;
+
+                }
+                switch (destStatus) {
+                    case STORE_PROD_OFF_SALE:
+                        st.setTotal_off_sale(st.getTotal_off_sale() + 1);
+                        break;
+                    case STORE_PROD_ON_SALE:
+                        st.setTotal_on_sale(st.getTotal_on_sale() + 1);
+                        break;
+                    case STORE_PROD_SOLD_OUT:
+                        st.setTotal_sold_out(st.getTotal_sold_out() + 1);
+                        break;
+                }
+                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale());
+            }
+            if (additional != null) {
+                additional.run();
+            }
+        }
+
+        void setAdditional(Runnable additional) {
+            this.additional = additional;
+        }
+    }
+
     @Override
     public boolean onContextItemSelected(MenuItem mi) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
         AppLogger.d("reset storage item pos=" + info.position);
         final StorageItem item = this.listAdapter.getItem(info.position);
-        Runnable changed = new Runnable() {
+
+        ItemStatusUpdated changed = new ItemStatusUpdated(this);
+        changed.setAdditional(new Runnable() {
             @Override
             public void run() {
                 listAdapter.notifyDataSetChanged();
             }
-        };
+        });
 
         switch (mi.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
@@ -530,31 +592,30 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
             case MENU_CONTEXT_TO_SALE_ID:
                 Runnable after;
-                if (item != null && item.getStatus() == StorageItem.STORE_PROD_OFF_SALE) {
-                    after = new Runnable() {
+                if (item != null && item.getStatus() == STORE_PROD_OFF_SALE) {
+                    changed.setAdditional(new Runnable() {
                         @Override
                         public void run() {
                             listAdapterRefresh();
                             refreshData();
                         }
-                    };
-                } else {
-                    after = changed;
+                    });
                 }
-                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "恢复售卖", after);
+                StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "恢复售卖", changed);
                 return true;
             case MENU_CONTEXT_TO_AUTO_ON_ID:
                 StoreStorageHelper.createSetOnSaleDlg(this, item, changed, true).show();
                 return true;
 
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
-                StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, item, new Runnable() {
+                changed.setAdditional(new Runnable() {
                     @Override
                     public void run() {
                         listAdapterRefresh();
                         refreshData();
                     }
-                }).show();
+                });
+                StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, item, changed).show();
                 return true;
             case MENU_CONTEXT_EDIT_REQ:
                 AlertDialog dlg = StoreStorageHelper.createEditProvideDlg(this, item);

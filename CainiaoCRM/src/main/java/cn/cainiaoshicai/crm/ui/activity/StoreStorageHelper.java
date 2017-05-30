@@ -27,17 +27,22 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
+import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
+
 /**
  * Created by liuzhr on 10/31/16.
  */
 
 public class StoreStorageHelper {
 
-    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Runnable setOkCallback) {
+    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item,
+                                          final StoreStorageActivity.ItemStatusUpdated setOkCallback) {
         return createSetOnSaleDlg(activity, item, setOkCallback, false);
     }
 
-    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item, final Runnable setOkCallback, boolean selfProvided) {
+    static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item,
+                                          final StoreStorageActivity.ItemStatusUpdated setOkCallback, boolean selfProvided) {
 
         final int checked[] = new int[1];
         checked[0] = 0;
@@ -78,8 +83,8 @@ public class StoreStorageHelper {
 
 
     private static void action_set_on_sale_again(final Activity context,
-                                                 final StorageItem item, final int option,
-                                                 final String optionLabel, final Runnable setOkCallback) {
+                                                 final StorageItem item, final int option, final String optionLabel,
+                                                 final StoreStorageActivity.ItemStatusUpdated setOkCallback) {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -87,17 +92,19 @@ public class StoreStorageHelper {
                 ResultBean rb = sad.chg_item_when_on_sale_again(item.getId(), option);
                 final String msg;
                 Runnable uiCallback = null;
-                if (rb.isOk()) {
+                final boolean ok = rb.isOk();
+                if (ok) {
                     msg = "已将" + item.pidAndNameStr() + "设置为" + optionLabel + "!";
                     uiCallback = new Runnable() {
                         @Override
                         public void run() {
+                            int before = item.getStatus();
                             item.setWhen_sale_again(option);
                             if (option == StorageItem.RE_ON_SALE_NONE) {
-                                item.setStatus(StorageItem.STORE_PROD_OFF_SALE);
+                                item.setStatus(STORE_PROD_OFF_SALE);
                             }
                             if (setOkCallback != null) {
-                                setOkCallback.run();
+                                setOkCallback.updated(before, item.getStatus());
                             }
                         }
                     };
@@ -109,14 +116,11 @@ public class StoreStorageHelper {
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        AlertUtil.showAlert(context, R.string.tip_dialog_title, msg, "知道了", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (finalUiCallback != null) {
-                                    finalUiCallback.run();
-                                }
-                            }
-                        });
+                        if (ok) {
+                            Utility.toast(msg, context, finalUiCallback);
+                        } else {
+                            AlertUtil.error(context, msg);
+                        }
                     }
                 });
 
@@ -126,7 +130,8 @@ public class StoreStorageHelper {
     }
 
     static void action_chg_status(final Activity context, final Store currStore,
-                                  final StorageItem item, final int destStatus, final String desc, final Runnable clb) {
+                                  final StorageItem item, final int destStatus, final String desc,
+                                  final StoreStorageActivity.ItemStatusUpdated clb) {
         if (item != null) {
             if (item.getStatus() == destStatus) {
                 return;
@@ -149,14 +154,17 @@ public class StoreStorageHelper {
 
                     final String msg;
                     final Runnable uiCallback;
-                    if (rb.isOk()) {
+                    final boolean ok = rb.isOk();
+                    if (ok) {
                         msg = "已将" + item.pidAndNameStr() + "设置为" + desc + "!";
                         uiCallback = new Runnable() {
                             @Override
                             public void run() {
+                                int before = item.getStatus();
+
                                 item.setStatus(destStatus);
                                 if (clb != null) {
-                                    clb.run();
+                                    clb.updated(before, destStatus);
                                 }
                             }
                         };
@@ -168,14 +176,11 @@ public class StoreStorageHelper {
                     Utility.runUIActionDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            AlertUtil.showAlert(context, R.string.tip_dialog_title, msg, "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (uiCallback != null) {
-                                        uiCallback.run();
-                                    }
-                                }
-                            });
+                            if (ok) {
+                                Utility.toast(msg, context, uiCallback);
+                            } else {
+                                AlertUtil.error(context,  msg);
+                            }
                         }
                     }, 10);
 
@@ -208,11 +213,7 @@ public class StoreStorageHelper {
                                 }.execute();
                             }
                         })
-                .setNegativeButton(R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
+                .setNegativeButton(R.string.cancel, null)
                 .create();
         et.requestFocus();
         return dlg;
@@ -307,7 +308,7 @@ public class StoreStorageHelper {
                                                     item.setTotalInReq(total_req_no);
                                                     item.setReqMark(remarkTxt);
                                                     activity.updateReqListBtn(total_req_cnt);
-//                                                    activity.listAdapterRefresh();
+                                                    activity.listAdapterRefresh();
                                                     Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
 //                                                    activity.refreshData();
                                                 } else {

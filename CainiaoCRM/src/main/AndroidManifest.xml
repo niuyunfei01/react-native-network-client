@@ -66,9 +66,6 @@
         <activity android:name=".ui.activity.PrePackageCheckActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
         </activity>
-        <activity android:name=".ui.activity.StoreSelfStorageActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
-        </activity>
         <activity android:name=".ui.activity.OrderQueryActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
