@@ -116,14 +116,17 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
 
         // Trigger the download of the URL asynchronously into the image view.
-        Picasso.with(context)
-                .load(item.getThumbPicUrl())
-                .placeholder(R.drawable.placeholder)
+        String thumbPicUrl = item.getThumbPicUrl();
+        if (!TextUtils.isEmpty(thumbPicUrl)) {
+            Picasso.with(context)
+                    .load(thumbPicUrl)
+                    .placeholder(R.drawable.placeholder)
 //                .error(R.drawable.error)
-                .resizeDimen(R.dimen.list_good_image_size, R.dimen.list_good_image_size)
-                .centerInside()
-                .tag(context)
-                .into(holder.goodIcon);
+                    .resizeDimen(R.dimen.list_good_image_size, R.dimen.list_good_image_size)
+                    .centerInside()
+                    .tag(context)
+                    .into(holder.goodIcon);
+        }
 
         return (convertView);
     }
