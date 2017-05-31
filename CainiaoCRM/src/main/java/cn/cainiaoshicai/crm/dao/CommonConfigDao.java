@@ -52,7 +52,7 @@ public class CommonConfigDao {
         return value;
     }
 
-    public LinkedHashMap<Integer, Store> listStores() throws ServiceException {
+    public LinkedHashMap<Long, Store> listStores() throws ServiceException {
         String url = URLHelper.API_ROOT() + "/list_store.json" ;
 
         Map<String, String> map = new HashMap<>();
@@ -62,10 +62,10 @@ public class CommonConfigDao {
 
         AppLogger.v("list stores:" + json);
 
-        LinkedHashMap<Integer, Store> value = null;
+        LinkedHashMap<Long, Store> value = null;
         try {
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<LinkedHashMap<Integer, Store>>() {}.getType());
+            value = gson.fromJson(json, new TypeToken<LinkedHashMap<Long, Store>>() {}.getType());
         } catch (Exception e) {
             AppLogger.e(e.getMessage(), e);
         }

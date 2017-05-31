@@ -717,29 +717,25 @@ public class Utility {
         }
 
         final String[] titles = new String[stores.size()];
-        final boolean[] checked = new boolean[stores.size()];
         final int[] storeIds = new int[stores.size()];
+        int selected = 0;
         int i = 0;
         for (Store currStore : stores) {
             titles[i] = currStore.getName();
-            checked[i] = selectedStores.contains(currStore.getId());
-            if (checked[i]) {
-                selectedStores.add(currStore.getId());
+            if (selectedStores.contains(currStore.getId())) {
+                selected = i;
             }
             storeIds[i] = currStore.getId();
             i++;
         }
 
         AlertDialog.Builder adb = new AlertDialog.Builder(context);
-        adb.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+        adb.setSingleChoiceItems(titles, selected, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+            public void onClick(DialogInterface dialog, int which) {
                 int currId = storeIds[which];
-                if (isChecked) {
-                    selectedStores.add(currId);
-                } else {
-                    selectedStores.remove(currId);
-                }
+                selectedStores.clear();
+                selectedStores.add(currId);
             }
         });
 

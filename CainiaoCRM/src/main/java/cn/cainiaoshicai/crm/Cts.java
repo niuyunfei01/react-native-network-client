@@ -1,17 +1,16 @@
 package cn.cainiaoshicai.crm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 
 /**
  */
 public class Cts {
+
+    public static final int SHIP_ACCEPT_OFF = 1;
+    public static final int SHIP_ACCEPT_ON = 2;
 
     public static final int STORE_HLG = 1;
     public static final int STORE_YYC = 2;
@@ -77,6 +76,9 @@ public class Cts {
     public static final String labelOffwork = "已下班";
     public static final String labelVocation = "请假";
 
+    public static final String LABEL_SHIP_ACCEPT_ON = "接单中";
+    public static final String LABEL_SHIP_ACCEPT_OFF = "不接单";
+
     public static String getSignInLabel(int sign_status) {
         final String label;
         if (sign_status == Cts.SIGN_ACTION_IN) {
@@ -93,9 +95,9 @@ public class Cts {
         return label;
     }
 
-    public static String getShipStatusLabel(AccountBean accountBean) {
-
-        return "不接单";
+    public static String getShipStatusLabel(ShipAcceptStatus status) {
+        return status != null && status.getStatus() == Cts.SHIP_ACCEPT_ON
+                ? Cts.LABEL_SHIP_ACCEPT_ON : Cts.LABEL_SHIP_ACCEPT_OFF;
     }
 
     static public class Provide {

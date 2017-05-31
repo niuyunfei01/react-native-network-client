@@ -6,14 +6,13 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -42,6 +41,7 @@ import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.dao.URLHelper;
@@ -87,7 +87,7 @@ public class GlobalCtx extends Application {
     private Activity currentRunningActivity = null;
     private Handler handler = new Handler();
 
-    private AtomicReference<LinkedHashMap<Integer, Store>> storesRef = new AtomicReference<>(null);
+    private AtomicReference<LinkedHashMap<Long, Store>> storesRef = new AtomicReference<>(null);
     private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
     private SortedMap<Integer, Worker> workers = new TreeMap<>();
     private SortedMap<Integer, Worker> ship_workers = new TreeMap<>();
@@ -537,14 +537,14 @@ public class GlobalCtx extends Application {
     }
 
     public Collection<Store> listStores() {
-        LinkedHashMap<Integer, Store> stores = storesRef.get();
+        LinkedHashMap<Long, Store> stores = storesRef.get();
         if (stores == null || stores.isEmpty()) {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
                     CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
                     try {
-                        LinkedHashMap<Integer, Store> s = cfgDao.listStores();
+                        LinkedHashMap<Long, Store> s = cfgDao.listStores();
                         if (s != null) {
                             storesRef.set(s);
                         }
@@ -582,16 +582,13 @@ public class GlobalCtx extends Application {
     }
 
     public String getStoreName(int storeId) {
-        LinkedHashMap<Integer, Store> idStoreMap = this.storesRef.get();
-        if (idStoreMap != null) {
-            Store s = idStoreMap.get(storeId);
-            if (s != null) return s.getName();
-        }
+        Store s = findStore(storeId);
+        if (s != null) return s.getName();
         return String.valueOf(storeId);
     }
 
-    public Store findStore(int storeId) {
-        LinkedHashMap<Integer, Store> idStoreMap = this.storesRef.get();
+    public Store findStore(long storeId) {
+        LinkedHashMap<Long, Store> idStoreMap = this.storesRef.get();
         return (idStoreMap != null) ? idStoreMap.get(storeId) : null;
     }
 
@@ -690,8 +687,8 @@ public class GlobalCtx extends Application {
         }.execute();
     }
 
-    public AccountBean getWorkerStatus() {
-        return null;
+    public ShipAcceptStatus getWorkerStatus(long storeId) {
+        return this.getAccountBean().shipAcceptStatus(storeId);
     }
 
     public interface TaskCountUpdated {

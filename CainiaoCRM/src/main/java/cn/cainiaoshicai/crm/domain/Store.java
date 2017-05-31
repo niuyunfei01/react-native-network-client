@@ -10,6 +10,7 @@ public class Store {
     private String tel;
     private float location_long;
     private float location_lat;
+    private boolean shipCapable;
 
     public Store() {
     }
@@ -38,5 +39,13 @@ public class Store {
     @Override
     public String toString() {
         return name;
+    }
+
+    public boolean isShipCapable() {
+        return shipCapable;
+    }
+
+    public void setShipCapable(boolean shipCapable) {
+        this.shipCapable = shipCapable;
     }
 }

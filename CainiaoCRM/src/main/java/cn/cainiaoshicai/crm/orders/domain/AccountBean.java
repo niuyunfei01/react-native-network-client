@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.support.utils.ObjectToStringUtility;
 
 /**
@@ -14,6 +15,7 @@ public class AccountBean implements Parcelable {
     private long expires_time;
     private UserBean info;
     private int navigationPosition;
+    private ShipAcceptStatus shipAcceptStatus;
 
     public String getUid() {
         return (info != null ? info.getId() : "");
@@ -105,5 +107,13 @@ public class AccountBean implements Parcelable {
 
     public CharSequence getAvatar_url() {
         return this.getInfo().getCover_image();
+    }
+
+    public ShipAcceptStatus shipAcceptStatus(long storeId) {
+        return this.shipAcceptStatus != null && this.shipAcceptStatus.getStoreId() == storeId ? this.shipAcceptStatus : null;
+    }
+
+    public void setShipAcceptStatus(ShipAcceptStatus status) {
+        this.shipAcceptStatus = status;
     }
 }

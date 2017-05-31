@@ -17,6 +17,7 @@
 package cn.cainiaoshicai.crm;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,6 +52,8 @@ import java.util.Set;
 
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -69,6 +72,9 @@ import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AbstractActionBarActivity {
 
@@ -134,6 +140,8 @@ public class MainActivity extends AbstractActionBarActivity {
 
         setContentView(R.layout.order_list_main);
 
+        tellSelectStore("请选择工作门店");
+
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
         final OrdersPagerAdapter adapter = new OrdersPagerAdapter(getSupportFragmentManager(),
@@ -171,10 +179,35 @@ public class MainActivity extends AbstractActionBarActivity {
         }
     }
 
+    private void tellSelectStore(String title) {
+        final Set<Integer> currStores = SettingUtility.getListenerStores();
+        currStores.remove(Cts.STORE_UNKNOWN);
+        final Activity context = MainActivity.this;
+        if (currStores.size() > 1 || currStores.isEmpty()) {
+            AlertUtil.error(MainActivity.this, title, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String title = "切换门店";
+                    String okLabel = context.getString(R.string.ok);
+                    String cancelLabel = context.getString(R.string.cancel);
+
+                    Utility.showStoreSelector(context, title, okLabel, cancelLabel, currStores, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SettingUtility.setListenerStores(currStores);
+                            resetPrinterStatusBar();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
     private void resetPrinterStatusBar() {
 
         final ArrayList<Integer> autoPrintStores = SettingUtility.getAutoPrintStores();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
+        final GlobalCtx app = GlobalCtx.getApplication();
         this.findViewById(R.id.head_orders_schedule).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,21 +216,101 @@ public class MainActivity extends AbstractActionBarActivity {
                 Set<Integer> listenerStores =  SettingUtility.getListenerStores();
                 listenerStores.remove(Cts.STORE_UNKNOWN);
                 if (listenerStores.size() > 1 || listenerStores.isEmpty()) {
-                    Utility.toast("排单/采购系统只支持一个店铺的订单，请修改设置！", MainActivity.this, null);
+                    tellSelectStore("排单/采购系统只支持一个店铺的订单，请修改设置！");
                     return;
                 }
 
                 String storeStr = TextUtils.join(",", listenerStores);
-                String token = GlobalCtx.getApplication().getSpecialToken();
-                intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token, URLHelper.getStoresPrefix(), storeStr));
+                String token = app.getSpecialToken();
+                intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token,
+                        URLHelper.getStoresPrefix(), storeStr));
                 startActivity(intent);
             }
         });
 
-        final TextView shipStatusText = (TextView) this.findViewById(R.id.head_ship_status);
-        AccountBean workStatus = GlobalCtx.getApplication().getWorkerStatus();
-        shipStatusText.setText(Cts.getShipStatusLabel(workStatus));
+        initShipAccept(app);
+        initSignButton(app);
 
+        final int bgColorResId;
+        if (!autoPrintStores.isEmpty()) {
+            final String printStatusTxt;
+            String autoPrintNames = app.getStoreNames(autoPrintStores);
+            if (SettingsPrintActivity.isPrinterConnected()) {
+                printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
+                bgColorResId = R.color.green;
+            } else {
+                printStatusTxt = "自动打印(" + autoPrintNames + ")，未连接！";
+                bgColorResId = R.color.red;
+            }
+            printerStatus.setText(printStatusTxt);
+        } else {
+            printerStatus.setText("自动打印：关闭");
+            bgColorResId = R.color.gray;
+        }
+        printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
+        printerStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+                MainActivity.this.startActivity(i);
+            }
+        });
+
+        bottomBar = (BottomBar) findViewById(R.id.toolbar_bottom);
+        bottomBar.setDefaultTab(R.id.menu_process);
+        bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
+            @Override
+            public boolean shouldInterceptTabSelection(@IdRes int oldTabId, @IdRes int newTabId) {
+//                if (newTabId == R.id.tab_pro_feature && !userHasProVersion()) {
+//                    startProVersionPurchaseFlow();
+//                    return true;
+//                }
+
+                return false;
+            }
+        });
+
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                onMenuClick(tabId);
+                //TODO: 更新orders 表格的数据, store_order updated
+                ordersViewPager.getAdapter().notifyDataSetChanged();
+                requestUpdateBadges();
+            }
+        });
+
+        if (bottomBar.getCurrentTabId() != R.id.menu_process) {
+            bottomBar.selectTabWithId(R.id.menu_process);
+        }
+
+        remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
+
+/**
+        MenuItem item = menu.findItem(R.id.menu_accept);
+        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+
+        View count = item.getActionView();
+        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
+        notifCount.setText(String.valueOf(mNotifCount));
+
+        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+            @Override
+            public void callback(int count) {
+                mNotifCount = count;
+                updateHotCount(mNotifCount);
+            }
+        });
+
+        new MyMenuItemStuffListener(count, "查看任务") {
+            @Override
+            public void onClick(View v) {
+                GlobalCtx.getApplication().toTaskListActivity(MainActivity.this);
+            }
+        }; */
+    }
+
+    private void initSignButton(final GlobalCtx app) {
         final TextView signingText = (TextView) this.findViewById(R.id.head_orders_waiting);
         signingText.setText(Cts.getSignInLabel(SettingUtility.getSignInStatus()));
 
@@ -224,7 +337,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                             String err = "";
                             try {
-                                StaffDao staffDao = new StaffDao(GlobalCtx.getApplication().getSpecialToken());
+                                StaffDao staffDao = new StaffDao(app.getSpecialToken());
                                 final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
                                 if (msg.isOk()) {
                                     MainActivity.this.runOnUiThread(new Runnable() {
@@ -314,83 +427,97 @@ public class MainActivity extends AbstractActionBarActivity {
                 }
             }
         });
-        final int bgColorResId;
-        if (!autoPrintStores.isEmpty()) {
-            final String printStatusTxt;
-            String autoPrintNames = GlobalCtx.getApplication().getStoreNames(autoPrintStores);
-            if (SettingsPrintActivity.isPrinterConnected()) {
-                printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
-                bgColorResId = R.color.green;
+    }
+
+    private void initShipAccept(final GlobalCtx app) {
+        final TextView shipStatusText = (TextView) this.findViewById(R.id.head_ship_status);
+        shipStatusText.setVisibility(View.GONE);
+
+        long store_id = SettingUtility.getListenerStore();
+        if (store_id > 0) {
+            final Store store = app.findStore(store_id);
+            if (!store.isShipCapable()) {
+                return;
+            }
+
+            final ShipAcceptStatus workStatus = app.getWorkerStatus(store_id);
+            if (workStatus != null) {
+                shipStatusText.setText(Cts.getShipStatusLabel(workStatus));
+                int colorId = workStatus.getStatus() == Cts.SHIP_ACCEPT_ON ? R.color.orange : R.color.dimgray;
+                shipStatusText.setBackgroundColor(ContextCompat.getColor(this, colorId));
+                shipStatusText.setVisibility(View.VISIBLE);
             } else {
-                printStatusTxt = "自动打印(" + autoPrintNames + ")，未连接！";
-                bgColorResId = R.color.red;
+                app.dao.shippingAcceptStatus(store_id).enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
+                    @Override
+                    public void onResponse(Call<ResultBean<ShipAcceptStatus>> call, Response<ResultBean<ShipAcceptStatus>> response) {
+                        ResultBean<ShipAcceptStatus> body = response.body();
+                        if (body.isOk()) {
+                            app.getAccountBean().setShipAcceptStatus(body.getObj());
+                            initShipAccept(app);
+                        } else {
+                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());;
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                        AppLogger.e("error to shippingAcceptStatus:", t);
+                    }
+                });
+                return;
             }
-            printerStatus.setText(printStatusTxt);
-        } else {
-            printerStatus.setText("自动打印：关闭");
-            bgColorResId = R.color.gray;
+
+            shipStatusText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    final long storeId = SettingUtility.getListenerStore();
+                    if (storeId <= 0) {
+                        tellSelectStore("请先选择工作门店");
+                        return;
+                    }
+
+                    final int shipAcceptStatus = workStatus.getStatus();
+                    final String labelBtn = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "开始接单" : "停止接单";
+                    final String msg = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "当前休息中" : "正在接单中";
+
+                    AlertUtil.showAlert(MainActivity.this, R.string.ship_accept_status, msg,
+                            labelBtn, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Call<ResultBean<ShipAcceptStatus>> resultBeanCall;
+                                    if (shipAcceptStatus == Cts.SHIP_ACCEPT_ON) {
+                                        resultBeanCall = app.dao.shippingStopAccept(storeId);
+                                    } else {
+                                        resultBeanCall = app.dao.shippingStartAccept(storeId);
+                                    }
+
+                                    resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
+                                        @Override
+                                        public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                                               Response<ResultBean<ShipAcceptStatus>> response) {
+                                            ResultBean<ShipAcceptStatus> body = response.body();
+                                            if (body.isOk()) {
+                                                app.getAccountBean().setShipAcceptStatus(body.getObj());
+                                                initShipAccept(app);
+                                                Utility.toast("操作成功", MainActivity.this);
+                                            } else {
+                                                AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + body.getDesc());
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                                            AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+                                        }
+                                    });
+                                }
+                            },
+                            "知道了", null
+                    );
+                }
+            });
         }
-        printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
-        printerStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
-                MainActivity.this.startActivity(i);
-            }
-        });
-
-        bottomBar = (BottomBar) findViewById(R.id.toolbar_bottom);
-        bottomBar.setDefaultTab(R.id.menu_process);
-        bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
-            @Override
-            public boolean shouldInterceptTabSelection(@IdRes int oldTabId, @IdRes int newTabId) {
-//                if (newTabId == R.id.tab_pro_feature && !userHasProVersion()) {
-//                    startProVersionPurchaseFlow();
-//                    return true;
-//                }
-
-                return false;
-            }
-        });
-
-        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
-            @Override
-            public void onTabSelected(@IdRes int tabId) {
-                onMenuClick(tabId);
-                //TODO: 更新orders 表格的数据, store_order updated
-                ordersViewPager.getAdapter().notifyDataSetChanged();
-                requestUpdateBadges();
-            }
-        });
-
-        if (bottomBar.getCurrentTabId() != R.id.menu_process) {
-            bottomBar.selectTabWithId(R.id.menu_process);
-        }
-
-        remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
-
-/**
-        MenuItem item = menu.findItem(R.id.menu_accept);
-        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
-
-        View count = item.getActionView();
-        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
-        notifCount.setText(String.valueOf(mNotifCount));
-
-        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
-            @Override
-            public void callback(int count) {
-                mNotifCount = count;
-                updateHotCount(mNotifCount);
-            }
-        });
-
-        new MyMenuItemStuffListener(count, "查看任务") {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.getApplication().toTaskListActivity(MainActivity.this);
-            }
-        }; */
     }
 
     private void requestUpdateBadges() {

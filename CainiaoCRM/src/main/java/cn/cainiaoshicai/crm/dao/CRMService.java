@@ -6,6 +6,7 @@ import java.util.SortedMap;
 import cn.cainiaoshicai.crm.domain.FileBean;
 import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import okhttp3.MultipartBody;
@@ -53,13 +54,18 @@ public interface CRMService {
     Call<ResultBean> store_chg_price(@Path("store_id") int store_id, @Path("product_id") int product_id,
                                @Path("newCents") int newCents, @Path("oldCents") int nowPrice);
 
+    @POST("/api/shipping_start_accept/{storeId}")
+    Call<ResultBean<ShipAcceptStatus>> shippingStartAccept(@Path("storeId") long storeId);
+    @POST("/api/shipping_stop_accept/{storeId}")
+    Call<ResultBean<ShipAcceptStatus>> shippingStopAccept(@Path("storeId") long storeId);
+    @POST("/api/shipping_accept_status/{storeId}")
+    Call<ResultBean<ShipAcceptStatus>> shippingAcceptStatus(@Path("storeId") long storeId);
+
     class UploadRes {
         private FileBean file;
-
         public FileBean getFile() {
             return file;
         }
-
         public void setFile(FileBean file) {
             this.file = file;
         }

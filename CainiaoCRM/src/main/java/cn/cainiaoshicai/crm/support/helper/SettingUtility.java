@@ -503,6 +503,13 @@ public class SettingUtility {
     /**
      * @return never null
      */
+    public static long getListenerStore() {
+        Set<Integer> ls = getListenerStores();
+        return ls != null && !ls.isEmpty() ? ls.iterator().next() : 0;
+    }
+    /**
+     * @return never null
+     */
     public static Set<Integer> getListenerStores() {
         HashSet<Integer> listenerStores = new HashSet<>();
         String storesIdStr = SettingHelper.getSharedPreferences(getContext(), "listener_stores", "");
