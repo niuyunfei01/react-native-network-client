@@ -250,9 +250,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
 
-                Set<Integer> listenerStores =  SettingUtility.getListenerStores();
-                listenerStores.remove(Cts.STORE_UNKNOWN);
-                if (listenerStores.size() > 1 || listenerStores.isEmpty()) {
+                long currStoreId =  SettingUtility.getListenerStore();
+                if (currStoreId < 1) {
                     Utility.toast("排单/采购系统只支持一个店铺的订单，请修改设置！", OrderSingleActivity.this, null);
                     return;
                 } else if (order.getStore_id() == Cts.STORE_UNKNOWN){

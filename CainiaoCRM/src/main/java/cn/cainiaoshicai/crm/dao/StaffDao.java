@@ -34,11 +34,11 @@ public class StaffDao {
         return HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, params);
     }
 
-    public ResultBean<HashMap<String, String>> sign_in(int storeId, HashMap<String, String> extraParams) throws ServiceException {
+    public ResultBean<HashMap<String, String>> sign_in(long storeId, HashMap<String, String> extraParams) throws ServiceException {
         return convert(post("sign_in/" + storeId, extraParams));
     }
 
-    public ResultBean<HashMap<String, String>> sign_off(int storeId, HashMap<String, String> extraParams) throws ServiceException {
+    public ResultBean<HashMap<String, String>> sign_off(long storeId, HashMap<String, String> extraParams) throws ServiceException {
         return convert(post("sign_off/" + storeId, extraParams));
     }
 

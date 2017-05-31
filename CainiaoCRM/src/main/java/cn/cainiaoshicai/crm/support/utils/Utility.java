@@ -88,6 +88,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.GeoBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.othercomp.unreadnotification.NotificationServiceHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -104,6 +105,7 @@ import cn.cainiaoshicai.crm.ui.activity.PrePackageCheckActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 import cn.customer_serv.customer_servsdk.activity.MQConversationActivity;
 import cn.customer_serv.customer_servsdk.util.MQIntentBuilder;
 import cn.customer_serv.customer_servsdk.util.Utils;
@@ -703,12 +705,12 @@ public class Utility {
     }
 
     public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
-                                         final Set<Integer> selectedStores, DialogInterface.OnClickListener okCallback) {
+                                         final Long selectedStores, StoreSelectedListener okCallback) {
         showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, okCallback, null, null);
     }
     
     public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
-                                         final Set<Integer> selectedStores, DialogInterface.OnClickListener okCallback,
+                                         final Long selectedStore, final StoreSelectedListener okCallback,
                                          String neutralLabel, DialogInterface.OnClickListener neutralCallback) {
         final Collection<Store> stores = GlobalCtx.getInstance().listStores();
         if (stores == null) {
@@ -722,25 +724,31 @@ public class Utility {
         int i = 0;
         for (Store currStore : stores) {
             titles[i] = currStore.getName();
-            if (selectedStores.contains(currStore.getId())) {
+            if (selectedStore == (currStore.getId())) {
                 selected = i;
             }
             storeIds[i] = currStore.getId();
             i++;
         }
 
+        final Long[] selectedId = new Long[1];
+
         AlertDialog.Builder adb = new AlertDialog.Builder(context);
         adb.setSingleChoiceItems(titles, selected, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                int currId = storeIds[which];
-                selectedStores.clear();
-                selectedStores.add(currId);
+                long currId = storeIds[which];
+                selectedId[0] = currId;
             }
         });
 
         adb.setTitle(title)
-                .setPositiveButton(okLabel, okCallback);
+                .setPositiveButton(okLabel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        okCallback.done(selectedId[0]);
+                    }
+                });
 
         if (neutralLabel != null) {
             adb.setNeutralButton(neutralLabel, neutralCallback);
@@ -1209,6 +1217,20 @@ public class Utility {
     @NonNull
     public static String append_token(String url, String specialToken) {
         return url + (url.indexOf("?") > 0 ? "&" : "?") + "access_token=" + specialToken;
+    }
+
+    public static void tellSelectStore(String title, final StoreSelectedListener okCallback, final Activity context) {
+        final Long currStoreId = SettingUtility.getListenerStore();
+        AlertUtil.error(context, title, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String title = "切换门店";
+                String okLabel = context.getString(R.string.ok);
+                String cancelLabel = context.getString(R.string.cancel);
+
+                showStoreSelector(context, title, okLabel, cancelLabel, currStoreId, okCallback);
+            }
+        });
     }
 }
 

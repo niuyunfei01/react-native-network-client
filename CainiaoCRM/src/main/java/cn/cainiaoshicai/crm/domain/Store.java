@@ -11,6 +11,7 @@ public class Store {
     private float location_long;
     private float location_lat;
     private boolean shipCapable;
+    private int verdor_id;
 
     public Store() {
     }
@@ -47,5 +48,13 @@ public class Store {
 
     public void setShipCapable(boolean shipCapable) {
         this.shipCapable = shipCapable;
+    }
+
+    public int getVerdor_id() {
+        return verdor_id;
+    }
+
+    public void setVerdor_id(int verdor_id) {
+        this.verdor_id = verdor_id;
     }
 }

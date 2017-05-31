@@ -317,9 +317,9 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), BLACK_MAGIC, true);
     }
 
-    public static ArrayList<Integer> getAutoPrintStores() {
+    public static ArrayList<Long> getAutoPrintStores() {
         Boolean auto_print = SettingHelper.getSharedPreferences(getContext(), "auto_print", false);
-        return (auto_print ? new ArrayList<>(getListenerStores()) : new ArrayList<Integer>());
+        return (auto_print ? new ArrayList<>(getListenerStores()) : new ArrayList<Long>());
     }
 
     public static boolean isAutoPrint(int store_id) {
@@ -338,7 +338,7 @@ public class SettingUtility {
     @NonNull
     public static long[] listenStoreIds() {
 
-        Set<Integer> listenerStores = getListenerStores();
+        Set<Long> listenerStores = getListenerStores();
         if (!listenerStores.isEmpty()) {
             long[] storeIds = new long[listenerStores.size()];
             int i = 0;
@@ -493,9 +493,18 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
     }
 
-    public static void setListenerStores(Set<Integer> currSelectedStores) {
+    public static void setListenerStores(long selectedStoreId) {
+        Set<Long> currSelectedStores = new HashSet<>();
+        if (selectedStoreId > 0) {
+            currSelectedStores.add(selectedStoreId);
+        }
+        currSelectedStores.add((long) Cts.STORE_UNKNOWN);
+        SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
+    }
+
+    public static void setListenerStores(Set<Long> currSelectedStores) {
         if (!currSelectedStores.isEmpty()) {
-            currSelectedStores.add(Cts.STORE_UNKNOWN);
+            currSelectedStores.add((long) Cts.STORE_UNKNOWN);
         }
         SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
     }
@@ -504,29 +513,28 @@ public class SettingUtility {
      * @return never null
      */
     public static long getListenerStore() {
-        Set<Integer> ls = getListenerStores();
-        return ls != null && !ls.isEmpty() ? ls.iterator().next() : 0;
+        Set<Long> ls = getListenerStores();
+        if (ls != null && !ls.isEmpty()) {
+            for(Long storeId : ls) {
+                if (storeId > 0) {
+                    return storeId;
+                }
+            }
+        }
+        return 0;
     }
     /**
      * @return never null
      */
-    public static Set<Integer> getListenerStores() {
-        HashSet<Integer> listenerStores = new HashSet<>();
+    public static Set<Long> getListenerStores() {
+        HashSet<Long> listenerStores = new HashSet<>();
         String storesIdStr = SettingHelper.getSharedPreferences(getContext(), "listener_stores", "");
         if (!TextUtils.isEmpty(storesIdStr)) {
             for(String s : TextUtils.split(storesIdStr, ",")){
-                listenerStores.add(Integer.parseInt(s));
+                listenerStores.add(Long.parseLong(s));
             }
         }
         return listenerStores;
-    }
-
-    public static int getCurrentStorageStore() {
-        return SettingHelper.getSharedPreferences(getContext(), "storage_store", 0);
-    }
-
-    public static void setCurrentStorageStore(int storeId) {
-        SettingHelper.setEditor(getContext(), "storage_store", storeId);
     }
 
     public static void setSignIn(Integer signInStoreId, Integer signInTs) {
@@ -534,8 +542,8 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "sign_in_status", signInTs);
     }
 
-    public static Integer getSignInStore() {
-        return SettingHelper.getSharedPreferences(getContext(), "sign_in_store", 0);
+    public static Long getSignInStore() {
+        return SettingHelper.getSharedPreferences(getContext(), "sign_in_store", 0L);
     }
     public static Integer getSignInStatus() {
         return SettingHelper.getSharedPreferences(getContext(), "sign_in_status", 0);

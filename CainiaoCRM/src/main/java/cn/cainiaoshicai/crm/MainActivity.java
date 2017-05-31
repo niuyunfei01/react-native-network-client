@@ -17,7 +17,6 @@
 package cn.cainiaoshicai.crm;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,9 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
@@ -72,6 +69,7 @@ import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
+import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -140,7 +138,13 @@ public class MainActivity extends AbstractActionBarActivity {
 
         setContentView(R.layout.order_list_main);
 
-        tellSelectStore("请选择工作门店");
+        Utility.tellSelectStore("请选择工作门店", new StoreSelectedListener() {
+            @Override
+            public void done(long selectedId) {
+                SettingUtility.setListenerStores(selectedId);
+                resetPrinterStatusBar();
+            }
+        }, MainActivity.this);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -179,33 +183,9 @@ public class MainActivity extends AbstractActionBarActivity {
         }
     }
 
-    private void tellSelectStore(String title) {
-        final Set<Integer> currStores = SettingUtility.getListenerStores();
-        currStores.remove(Cts.STORE_UNKNOWN);
-        final Activity context = MainActivity.this;
-        if (currStores.size() > 1 || currStores.isEmpty()) {
-            AlertUtil.error(MainActivity.this, title, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String title = "切换门店";
-                    String okLabel = context.getString(R.string.ok);
-                    String cancelLabel = context.getString(R.string.cancel);
-
-                    Utility.showStoreSelector(context, title, okLabel, cancelLabel, currStores, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SettingUtility.setListenerStores(currStores);
-                            resetPrinterStatusBar();
-                        }
-                    });
-                }
-            });
-        }
-    }
-
     private void resetPrinterStatusBar() {
 
-        final ArrayList<Integer> autoPrintStores = SettingUtility.getAutoPrintStores();
+        final ArrayList<Long> autoPrintStores = SettingUtility.getAutoPrintStores();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
         final GlobalCtx app = GlobalCtx.getApplication();
         this.findViewById(R.id.head_orders_schedule).setOnClickListener(new View.OnClickListener() {
@@ -213,17 +193,21 @@ public class MainActivity extends AbstractActionBarActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
 
-                Set<Integer> listenerStores =  SettingUtility.getListenerStores();
-                listenerStores.remove(Cts.STORE_UNKNOWN);
-                if (listenerStores.size() > 1 || listenerStores.isEmpty()) {
-                    tellSelectStore("排单/采购系统只支持一个店铺的订单，请修改设置！");
+                long storeId =  SettingUtility.getListenerStore();
+                if (storeId < 1) {
+                    Utility.tellSelectStore("排单/采购系统需选定您工作的门店！", new StoreSelectedListener() {
+                        @Override
+                        public void done(long selectedId) {
+                            SettingUtility.setListenerStores(selectedId);
+                            resetPrinterStatusBar();
+                        }
+                    }, MainActivity.this);
                     return;
                 }
 
-                String storeStr = TextUtils.join(",", listenerStores);
                 String token = app.getSpecialToken();
                 intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token,
-                        URLHelper.getStoresPrefix(), storeStr));
+                        URLHelper.getStoresPrefix(),  storeId));
                 startActivity(intent);
             }
         });
@@ -322,7 +306,7 @@ public class MainActivity extends AbstractActionBarActivity {
                     AlertUtil.showAlert(MainActivity.this, "错误提示", "暂时无法检测您的位置，请打开GPS");
                     return;
                 }
-                final Integer signInStore = SettingUtility.getSignInStore();
+                final Long signInStore = SettingUtility.getSignInStore();
                 final Integer signInStatus = SettingUtility.getSignInStatus();
                 final HashMap<String, String> envInfos = extraEnvInfo();
                 if (signInStatus == Cts.SIGN_ACTION_IN) {
@@ -364,21 +348,21 @@ public class MainActivity extends AbstractActionBarActivity {
                     }.executeOnNormal();
 
                 } else {
-                    final HashSet<Integer> selectedStores = new HashSet<>();
+                    final Long defStoreId;
                     if (signInStore > 0) {
-                        selectedStores.add(signInStore);
+                        defStoreId = (signInStore);
+                    } else {
+                        defStoreId = SettingUtility.getListenerStore();
                     }
-                    Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", selectedStores,
-                            new DialogInterface.OnClickListener() {
+                    Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", defStoreId,
+                            new StoreSelectedListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (selectedStores.size() != 1) {
+                                public void done(final long selectedId) {
+                                    if (selectedId < 1) {
                                         AlertUtil.showAlert(MainActivity.this, "错误提醒", "选择一个工作门店");
                                     } else {
                                         final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
                                         Utility.forceShowDialog(MainActivity.this, pf);
-                                        final Integer signInStoreId = selectedStores.iterator().next();
-
                                         new MyAsyncTask<Void, Void, Void>() {
                                             private ResultBean<HashMap<String, String>> resultBean;
 
@@ -386,7 +370,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                             protected Void doInBackground(Void... params) {
                                                 StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
                                                 try {
-                                                    resultBean = fbDao.sign_in(signInStoreId, envInfos);
+                                                    resultBean = fbDao.sign_in(selectedId, envInfos);
                                                 } catch (ServiceException e) {
                                                     resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
                                                 }
@@ -473,7 +457,13 @@ public class MainActivity extends AbstractActionBarActivity {
 
                     final long storeId = SettingUtility.getListenerStore();
                     if (storeId <= 0) {
-                        tellSelectStore("请先选择工作门店");
+                        Utility.tellSelectStore("请先选择工作门店", new StoreSelectedListener() {
+                            @Override
+                            public void done(long selectedId) {
+                                SettingUtility.setListenerStores(selectedId);
+                                resetPrinterStatusBar();
+                            }
+                        }, MainActivity.this);
                         return;
                     }
 
@@ -695,11 +685,11 @@ public class MainActivity extends AbstractActionBarActivity {
     }
 
     private class SignOffOnClickListener implements DialogInterface.OnClickListener {
-        private final Integer signInStore;
+        private final Long signInStore;
         private final HashMap<String, String> envInfos;
         private final TextView signingText;
 
-        public SignOffOnClickListener(Integer signInStore, HashMap<String, String> envInfos, TextView signingText) {
+        public SignOffOnClickListener(Long signInStore, HashMap<String, String> envInfos, TextView signingText) {
             this.signInStore = signInStore;
             this.envInfos = envInfos;
             this.signingText = signingText;

@@ -177,8 +177,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                         AppLogger.d("start refresh data:");
                         refreshData();
                     }
-
-                    SettingUtility.setCurrentStorageStore(newStore.getId());
                 }
             }
         }, false, currStoreSpinner);
@@ -326,7 +324,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
     }
 
-    public void initCurrStore(int storeId) {
+    public void initCurrStore(long storeId) {
         if (storeId > 0) {
             Store store = GlobalCtx.getInstance().findStore(storeId);
             if (store != null) {
@@ -335,7 +333,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
 
         if (this.currStore == null) {
-            storeId = SettingUtility.getCurrentStorageStore();
+            storeId = SettingUtility.getListenerStore();
             Collection<Store> listStores = GlobalCtx.getInstance().listStores();
             if (listStores == null || listStores.isEmpty()) {
                 Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);

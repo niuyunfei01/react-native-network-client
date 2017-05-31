@@ -73,20 +73,20 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         Intent intent = getIntent();
         String url = intent.getStringExtra("url");
 
-        final int store_id;
+        final long store_id;
         String day = "tomorrow";;
         if (!TextUtils.isEmpty(url)) {
             Bundle urlParams = Utility.parseUrl(url);
             if (urlParams.containsKey("store_id")) {
                 store_id = Integer.valueOf(urlParams.getString("store_id"));
             } else {
-                store_id = SettingUtility.getCurrentStorageStore();
+                store_id = SettingUtility.getListenerStore();
             }
             if (urlParams.containsKey("day")) {
                 day = urlParams.getString("day");
             }
         } else {
-            store_id = intent.getIntExtra("store_id", SettingUtility.getCurrentStorageStore());
+            store_id = intent.getLongExtra("store_id", SettingUtility.getListenerStore());
             String dayExtra = intent.getStringExtra("day");
             if (!TextUtils.isEmpty(dayExtra)) {
                 day = dayExtra;
@@ -136,7 +136,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         this.init_data(store_id, day);
     }
 
-    private void init_data(final int store_id, final String day) {
+    private void init_data(final long store_id, final String day) {
         update_loading_url(store_id, day);
 
         AppLogger.i("loading url:" + url);
@@ -175,7 +175,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         }
     }
 
-    private void update_loading_url(int store_id, String day) {
+    private void update_loading_url(long store_id, String day) {
         String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
         this.url = String.format("%s/provide_prepare/%s.html", URLHelper.getStoresPrefix(), store_id)
                 + "?day="+day+"&access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;

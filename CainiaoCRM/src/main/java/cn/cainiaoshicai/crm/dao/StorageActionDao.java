@@ -111,7 +111,7 @@ public class StorageActionDao {
         }
     }
 
-    public ResultBean store_provide_estimate(int store_id, String day) {
+    public ResultBean store_provide_estimate(long store_id, String day) {
         try {
             String path;
             try {

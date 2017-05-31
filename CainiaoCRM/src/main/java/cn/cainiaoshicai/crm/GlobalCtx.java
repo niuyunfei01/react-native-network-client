@@ -581,7 +581,7 @@ public class GlobalCtx extends Application {
         return tags == null ? new ArrayList<Tag>(0) : tags;
     }
 
-    public String getStoreName(int storeId) {
+    public String getStoreName(long storeId) {
         Store s = findStore(storeId);
         if (s != null) return s.getName();
         return String.valueOf(storeId);
@@ -592,7 +592,7 @@ public class GlobalCtx extends Application {
         return (idStoreMap != null) ? idStoreMap.get(storeId) : null;
     }
 
-    public String getStoreNames(ArrayList<Integer> store_id_list) {
+    public String getStoreNames(ArrayList<Long> store_id_list) {
         if (!store_id_list.isEmpty()) {
             String[] names = new String[store_id_list.size()];
             for (int i = 0; i < store_id_list.size(); i++) {

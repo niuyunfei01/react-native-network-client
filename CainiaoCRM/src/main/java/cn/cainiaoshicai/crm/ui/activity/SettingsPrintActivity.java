@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,6 +38,7 @@ import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
+import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 
 public class SettingsPrintActivity extends ListActivity {
 
@@ -101,18 +103,12 @@ public class SettingsPrintActivity extends ListActivity {
 		((ImageView)findViewById(R.id.list_store_filter_arrow)).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.arrow));
 
 
-		final Set<Integer> selectedStores = SettingUtility.getListenerStores();
-		updateStoreFilterText(list_store_filter_values, selectedStores);
+		final long selectedStores = SettingUtility.getListenerStore();
+		HashSet<Long> longs = new HashSet<>();
+		longs.add(selectedStores);
+		updateStoreFilterText(list_store_filter_values, longs);
 
 		RelativeLayout v = (RelativeLayout) findViewById(R.id.settings_order_filter);
-
-
-		selectedStores.clear();
-
-		Set<Integer> savedIds = SettingUtility.getListenerStores();
-		if (!savedIds.isEmpty()) {
-			selectedStores.addAll(savedIds);
-		}
 
 		v.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -123,11 +119,13 @@ public class SettingsPrintActivity extends ListActivity {
 				String okLabel = context.getString(R.string.ok);
 				String cancelLabel = context.getString(R.string.cancel);
 
-				Utility.showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, new DialogInterface.OnClickListener() {
+				Utility.showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, new StoreSelectedListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						SettingUtility.setListenerStores(selectedStores);
-						updateStoreFilterText(list_store_filter_values, selectedStores);
+					public void done(long selectedId) {
+						SettingUtility.setListenerStores(selectedId);
+						HashSet<Long> longs = new HashSet<>();
+						longs.add(selectedId);
+						updateStoreFilterText(list_store_filter_values, longs);
 					}
 				});
 			}
@@ -149,13 +147,13 @@ public class SettingsPrintActivity extends ListActivity {
 		connectToLastOne();
 	}
 
-	private void updateStoreFilterText(TextView list_store_filter_values, Set<Integer> selectedStores) {
+	private void updateStoreFilterText(TextView list_store_filter_values, Set<Long> selectedStores) {
 		if (selectedStores.isEmpty()) {
 			list_store_filter_values.setText("全部店铺");
 		} else {
 			String[] storeNames = new String[selectedStores.size()];
 			int i = 0;
-			for(int storeId : selectedStores) {
+			for(Long storeId : selectedStores) {
 				storeNames[i++] = GlobalCtx.getInstance().getStoreName(storeId);
 			}
 			list_store_filter_values.setText(TextUtils.join(",", storeNames));
