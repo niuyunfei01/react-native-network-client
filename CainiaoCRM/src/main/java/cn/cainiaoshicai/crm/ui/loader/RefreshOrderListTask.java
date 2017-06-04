@@ -60,7 +60,7 @@ public class RefreshOrderListTask
 
         this.doneCallback = doneCallback;
         this.byPassCache = byPassCache;
-        if (this.byPassCache) {
+        if (!this.byPassCache) {
             progressFragment = ProgressFragment.newInstance(R.string.searching);
         }
     }
@@ -82,7 +82,7 @@ public class RefreshOrderListTask
             String token = GlobalCtx.getInstance().getSpecialToken();
             OrdersDao ordersDao = new OrdersDao(token);
             if (TextUtils.isEmpty(searchTerm)) {
-                return ordersDao.get(this.listType.getValue(), storeIds);
+                return ordersDao.get(this.listType.getValue(), storeIds, !this.byPassCache);
             } else {
                 return ordersDao.search(searchTerm, this.listType.getValue(), storeIds);
             }

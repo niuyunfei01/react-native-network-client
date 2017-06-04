@@ -731,7 +731,7 @@ public class Utility {
             i++;
         }
 
-        final Long[] selectedId = new Long[1];
+        final Long[] selectedId = new Long[]{selectedStore};
 
         AlertDialog.Builder adb = new AlertDialog.Builder(context);
         adb.setSingleChoiceItems(titles, selected, new DialogInterface.OnClickListener() {

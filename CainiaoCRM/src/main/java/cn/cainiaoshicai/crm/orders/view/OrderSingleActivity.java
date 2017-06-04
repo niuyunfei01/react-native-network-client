@@ -329,7 +329,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                 }
                             }
 
-                            helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                            helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
                         }
                     }
                 });

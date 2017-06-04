@@ -322,7 +322,7 @@ public class SettingUtility {
         return (auto_print ? new ArrayList<>(getListenerStores()) : new ArrayList<Long>());
     }
 
-    public static boolean isAutoPrint(int store_id) {
+    public static boolean isAutoPrint(long store_id) {
         Boolean auto_print = SettingHelper.getSharedPreferences(getContext(), "auto_print", false);
         return auto_print && getListenerStores().contains(store_id);
     }
@@ -542,8 +542,12 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "sign_in_status", signInTs);
     }
 
-    public static Long getSignInStore() {
-        return SettingHelper.getSharedPreferences(getContext(), "sign_in_store", 0L);
+    public static long getSignInStore() {
+        try {
+            return SettingHelper.getSharedPreferences(getContext(), "sign_in_store", 0L);
+        }catch (ClassCastException e) {
+            return SettingHelper.getSharedPreferences(getContext(), "sign_in_store", 0);
+        }
     }
     public static Integer getSignInStatus() {
         return SettingHelper.getSharedPreferences(getContext(), "sign_in_status", 0);

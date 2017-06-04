@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +31,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.MineItemsAdapter;
+import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 
 public class MineActivity extends AbstractActionBarActivity {
 
@@ -52,12 +55,15 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_COMMENT_SELF = 17;
 	private static final int TYPE_PROJECT_MANAGEMENT = 18;
 	private static final int TYPE_TEAM_PERF = 19;
+	private static final int TYPE_EDIT_STORE = 20;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		setTitleByCurrentStore();
 
 		this.setContentView(R.layout.mine_lists);
 		listView = (ListView) findViewById(R.id.nav_list);
@@ -130,6 +136,17 @@ public class MineActivity extends AbstractActionBarActivity {
 					MineActivity.this.startActivity(intent);
 				} else if (item.getType() == TYPE_TEAM_PERF) {
 					GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
+				} else if (item.getType() == TYPE_EDIT_STORE) {
+					final long currId = SettingUtility.getListenerStore();
+					Utility.showStoreSelector(MineActivity.this, "切换门店", "确定", "取消", currId, new StoreSelectedListener() {
+						@Override
+						public void done(long selectedId) {
+							SettingUtility.setListenerStores(selectedId);
+							if (selectedId != currId) {
+								setTitleByCurrentStore();
+							}
+						}
+					});
 				}
 			}
 
@@ -158,6 +175,17 @@ public class MineActivity extends AbstractActionBarActivity {
 				});
 			}
 		}.executeOnNormal();
+	}
+
+	public void setTitleByCurrentStore() {
+		ActionBar ab = this.getSupportActionBar();
+		if (ab != null) {
+			final long storeId = SettingUtility.getListenerStore();
+			String storeName = GlobalCtx.getApplication().getStoreName(storeId);
+			if (!TextUtils.isEmpty(storeName)) {
+				ab.setTitle(storeName);
+			}
+		}
 	}
 
 	private void initPerformList(HashMap<String, String> performStat) {
@@ -192,13 +220,18 @@ public class MineActivity extends AbstractActionBarActivity {
 		statInTime.setTotalSeriousLate(performStat.containsKey("totalSeriousLate") ? Integer.parseInt(performStat.get("totalSeriousLate")) : 0);
 		inTimeParams.add(statInTime);
 
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("切换门店", -1, TYPE_EDIT_STORE, null));
+
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
+
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
+
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("外卖评价", -1, TYPE_COMMENT_WM, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
+
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("反馈和业绩", -1,  TYPE_TEAM_PERF, null));
 		String accountId = GlobalCtx.getApplication().getCurrentAccountId();
 		if ("811485".equals(accountId)) {
@@ -230,36 +263,6 @@ public class MineActivity extends AbstractActionBarActivity {
 			AppLogger.e("error to userTalkStatus package info:" + e.getMessage(), e);
 		}
 		return versionDesc;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate menu from menu resource (res/menu/print)
-		getMenuInflater().inflate(R.menu.main_menu, menu);
-
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-			case R.id.menu_process:
-				startActivity(new Intent(getApplicationContext(), MainActivity.class));
-				return true;
-			case R.id.menu_accept:
-				GlobalCtx.getApplication().toTaskListActivity(this);
-				return true;
-			case R.id.menu_search:
-				this.onSearchRequested();
-				return true;
-			case R.id.menu_mine:
-				return true;
-			case R.id.menu_store_maint:
-				startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
 	}
 
 	static public class StatInTime {

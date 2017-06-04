@@ -138,13 +138,16 @@ public class MainActivity extends AbstractActionBarActivity {
 
         setContentView(R.layout.order_list_main);
 
-        Utility.tellSelectStore("请选择工作门店", new StoreSelectedListener() {
-            @Override
-            public void done(long selectedId) {
-                SettingUtility.setListenerStores(selectedId);
-                resetPrinterStatusBar();
-            }
-        }, MainActivity.this);
+        long storeId = SettingUtility.getListenerStore();
+        if (storeId < 1) {
+            Utility.tellSelectStore("请选择工作门店", new StoreSelectedListener() {
+                @Override
+                public void done(long selectedId) {
+                    SettingUtility.setListenerStores(selectedId);
+                    resetPrinterStatusBar();
+                }
+            }, MainActivity.this);
+        }
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -358,54 +361,50 @@ public class MainActivity extends AbstractActionBarActivity {
                             new StoreSelectedListener() {
                                 @Override
                                 public void done(final long selectedId) {
-                                    if (selectedId < 1) {
-                                        AlertUtil.showAlert(MainActivity.this, "错误提醒", "选择一个工作门店");
-                                    } else {
-                                        final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                                        Utility.forceShowDialog(MainActivity.this, pf);
-                                        new MyAsyncTask<Void, Void, Void>() {
-                                            private ResultBean<HashMap<String, String>> resultBean;
+                                final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                Utility.forceShowDialog(MainActivity.this, pf);
+                                new MyAsyncTask<Void, Void, Void>() {
+                                    private ResultBean<HashMap<String, String>> resultBean;
 
-                                            @Override
-                                            protected Void doInBackground(Void... params) {
-                                                StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
-                                                try {
-                                                    resultBean = fbDao.sign_in(selectedId, envInfos);
-                                                } catch (ServiceException e) {
-                                                    resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
-                                                }
-                                                return null;
-                                            }
-
-                                            @Override
-                                            protected void onPostExecute(Void aVoid) {
-                                                pf.dismissAllowingStateLoss();
-                                                if (resultBean.isOk()) {
-                                                    final HashMap<String, String> obj = resultBean.getObj();
-
-                                                    final String okTips = "打卡成功，今日值班店长："
-                                                            + (obj != null ? obj.get("working_mgr") : "未安排")
-                                                            + resultBean.getDesc();
-
-                                                    MainActivity.this.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
-                                                            updateSignInStatus(obj, signingText);
-                                                        }
-                                                    });
-                                                } else {
-                                                    Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
-                                                    MainActivity.this.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            updateSignInStatus(resultBean.getObj(), signingText);
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        }.executeOnNormal();
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                        try {
+                                            resultBean = fbDao.sign_in(selectedId, envInfos);
+                                        } catch (ServiceException e) {
+                                            resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
+                                        }
+                                        return null;
                                     }
+
+                                    @Override
+                                    protected void onPostExecute(Void aVoid) {
+                                        pf.dismissAllowingStateLoss();
+                                        if (resultBean.isOk()) {
+                                            final HashMap<String, String> obj = resultBean.getObj();
+
+                                            final String okTips = "打卡成功，今日值班店长："
+                                                    + (obj != null ? obj.get("working_mgr") : "未安排")
+                                                    + resultBean.getDesc();
+
+                                            MainActivity.this.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
+                                                    updateSignInStatus(obj, signingText);
+                                                }
+                                            });
+                                        } else {
+                                            Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
+                                            MainActivity.this.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    updateSignInStatus(resultBean.getObj(), signingText);
+                                                }
+                                            });
+                                        }
+                                    }
+                                }.executeOnNormal();
                                 }
                             }, "查看考勤表", new StaffDetailsClickListener());
                 }
