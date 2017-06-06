@@ -12,7 +12,6 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -20,6 +19,11 @@ import android.util.Log;
 import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.iflytek.cloud.SpeechUtility;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,12 +43,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
@@ -65,11 +69,6 @@ import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.iflytek.cloud.SpeechUtility;
 
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
@@ -289,7 +288,7 @@ public class GlobalCtx extends Application {
         // 替换成自己的key
         UserTalkDao userTalkDao = new UserTalkDao(this.getSpecialToken());
 
-        cn.customer_serv.customer_servsdk.util.MQConfig.init(this,
+        MQConfig.init(this,
                 GlobalCtx.getInstance().getSpecialToken(), userTalkDao, new OnInitCallback() {
                     @Override
                     public void onSuccess(String clientId) {
@@ -691,8 +690,18 @@ public class GlobalCtx extends Application {
         return this.getAccountBean().shipAcceptStatus(storeId);
     }
 
+    public void handleUncaughtException(Thread t, Throwable e) {
+        CrashReportHelper.handleUncaughtException(t, e);
+    }
+
     public interface TaskCountUpdated {
         void callback(int count);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        CrashReportHelper.attachBaseContext(base, this);
     }
 
     private volatile AtomicReference<Map<Integer, ShipOptions>> shipOptions = new AtomicReference<>();

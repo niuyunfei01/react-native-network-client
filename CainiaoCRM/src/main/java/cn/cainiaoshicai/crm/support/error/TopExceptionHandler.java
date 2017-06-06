@@ -6,6 +6,7 @@ import android.content.Context;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 public class TopExceptionHandler implements Thread.UncaughtExceptionHandler {
@@ -20,6 +21,7 @@ public class TopExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     public void uncaughtException(Thread t, Throwable e) {
+        GlobalCtx.getApplication().handleUncaughtException(t, e);
         StackTraceElement[] arr = e.getStackTrace();
         String report = e.toString() + "\n\n";
         report += "--------- Stack trace ---------\n\n";

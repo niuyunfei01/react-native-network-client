@@ -60,7 +60,7 @@ public class RefreshOrderListTask
 
         this.doneCallback = doneCallback;
         this.byPassCache = byPassCache;
-        if (!this.byPassCache) {
+        if (this.byPassCache) {
             progressFragment = ProgressFragment.newInstance(R.string.searching);
         }
     }
