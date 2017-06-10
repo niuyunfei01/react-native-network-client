@@ -308,7 +308,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                             "手动出发", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                                                    helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
                                                 }
                                             }, "暂不", null);
                                     return;
@@ -322,7 +322,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                             "确认无误", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    helper.chooseWorker((Activity) v.getContext(), listType, fromStatus, ACTION_NORMAL);
+                                                    helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
                                                 }
                                             }, "取消", null);
                                     return;
@@ -565,6 +565,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.single_order_menu, menu);
         refreshItem = menu.findItem(R.id.menu_refresh);
         return true;

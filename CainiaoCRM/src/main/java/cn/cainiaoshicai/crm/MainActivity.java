@@ -419,7 +419,7 @@ public class MainActivity extends AbstractActionBarActivity {
         long store_id = SettingUtility.getListenerStore();
         if (store_id > 0) {
             final Store store = app.findStore(store_id);
-            if (!store.isShipCapable()) {
+            if (store == null || !store.isShipCapable()) {
                 return;
             }
 
@@ -466,11 +466,42 @@ public class MainActivity extends AbstractActionBarActivity {
                         return;
                     }
 
+                    dlg(storeId);
+                }
+
+                void dlg(final long storeId) {
                     final int shipAcceptStatus = workStatus.getStatus();
                     final String labelBtn = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "开始接单" : "停止接单";
-                    final String msg = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "当前休息中" : "正在接单中";
+
+                    String myStatus = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "当前休息中" : "正在接单中";
+                    final String msg = myStatus + "\n" + workStatus.getDesc();
 
                     AlertUtil.showAlert(MainActivity.this, R.string.ship_accept_status, msg,
+                            "刷新状态", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    app.dao.shippingAcceptStatus(storeId).enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
+                                        @Override
+                                        public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                                               Response<ResultBean<ShipAcceptStatus>> response) {
+                                            ResultBean<ShipAcceptStatus> body = response.body();
+                                            if (body.isOk()) {
+                                                app.getAccountBean().setShipAcceptStatus(body.getObj());
+                                                dlg(storeId);
+                                            } else {
+                                                AlertUtil.error(MainActivity.this, "刷新失败，请稍后重试：" + body.getDesc());
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                                            AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+                                        }
+                                    });
+                                }
+                            }
+                            ,
+                            "关闭", null,
                             labelBtn, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -501,8 +532,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         }
                                     });
                                 }
-                            },
-                            "知道了", null
+                            }
                     );
                 }
             });

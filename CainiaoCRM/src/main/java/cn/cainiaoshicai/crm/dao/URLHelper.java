@@ -42,4 +42,8 @@ public class URLHelper {
     public static String getStoresPrefix() {
         return"https://" + getHost() + "/stores";
     }
+
+    public static String getAutoSchedulesUrl(long storeId) {
+        return getStoresPrefix() + "/shipping_status/"+storeId+".html";
+    }
 }

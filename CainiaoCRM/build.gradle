@@ -52,7 +52,7 @@ dependencies {
 
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.roughike:bottom-bar:2.3.1'
-    compile 'ch.acra:acra:4.9.2'
+    releaseCompile 'ch.acra:acra:4.9.2'
 }
 
 // The sample build uses multiple directories to

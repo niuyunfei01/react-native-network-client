@@ -10,6 +10,7 @@ public class ShipAcceptStatus {
     private int status = Cts.SHIP_ACCEPT_OFF;
     private int expireTs;
     private int storeId;
+    private String desc;
 
     public int getStatus() {
         return status;
@@ -35,4 +36,11 @@ public class ShipAcceptStatus {
         this.storeId = storeId;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 }

@@ -9,6 +9,8 @@ import org.acra.config.ACRAConfigurationException;
 import org.acra.config.ConfigurationBuilder;
 import org.acra.sender.HttpSender;
 
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+
 import static org.acra.ReportField.ANDROID_VERSION;
 import static org.acra.ReportField.APP_VERSION_CODE;
 import static org.acra.ReportField.APP_VERSION_NAME;
@@ -36,6 +38,7 @@ import static org.acra.ReportField.STACK_TRACE;
 import static org.acra.ReportField.TOTAL_MEM_SIZE;
 import static org.acra.ReportField.USER_APP_START_DATE;
 import static org.acra.ReportField.USER_CRASH_DATE;
+import static org.acra.ReportField.USER_IP;
 
 /**
  * Created by liuzhr on 6/6/17.
@@ -44,8 +47,6 @@ import static org.acra.ReportField.USER_CRASH_DATE;
 public class CrashReportHelper {
 
     public static void attachBaseContext(Context base, GlobalCtx ctx) {
-        // Create an ConfigurationBuilder. It is prepopulated with values specified via annotation.
-        // Set any additional value of the builder and then use it to construct an ACRAConfiguration.
         final ACRAConfiguration config;
         try {
             config = new ConfigurationBuilder(ctx)
@@ -54,7 +55,7 @@ public class CrashReportHelper {
                             PACKAGE_NAME, FILE_PATH, PHONE_MODEL, BRAND, PRODUCT, ANDROID_VERSION, BUILD, TOTAL_MEM_SIZE,
                             AVAILABLE_MEM_SIZE, BUILD_CONFIG, CUSTOM_DATA, IS_SILENT, STACK_TRACE, INITIAL_CONFIGURATION, CRASH_CONFIGURATION,
                             DISPLAY/*, USER_COMMENT, USER_EMAIL*/, USER_APP_START_DATE, USER_CRASH_DATE, DUMPSYS_MEMINFO, LOGCAT,
-                            INSTALLATION_ID, DEVICE_FEATURES, ENVIRONMENT, SHARED_PREFERENCES)
+                            INSTALLATION_ID, DEVICE_FEATURES, ENVIRONMENT, SHARED_PREFERENCES, CUSTOM_DATA, USER_IP)
                     .setReportingInteractionMode(ReportingInteractionMode.SILENT)
                     .setReportType(HttpSender.Type.JSON)
                     .build();
@@ -65,6 +66,12 @@ public class CrashReportHelper {
     }
 
     public static void handleUncaughtException(Thread t, Throwable e) {
+        try {
+            ACRA.getErrorReporter().putCustomData("UID", GlobalCtx.getApplication().getCurrentAccountId());
+            ACRA.getErrorReporter().putCustomData("CURR-STORE", String.valueOf(SettingUtility.getListenerStore()));
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }
         ACRA.getErrorReporter().handleSilentException(e);
     }
 }
