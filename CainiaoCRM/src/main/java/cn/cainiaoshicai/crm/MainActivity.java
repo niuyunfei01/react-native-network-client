@@ -343,7 +343,7 @@ public class MainActivity extends AbstractActionBarActivity {
                             }
 
                             if (!TextUtils.isEmpty(err)) {
-                                AlertUtil.showAlert(MainActivity.this, "发生错误", err);
+                                AlertUtil.errorOnActivity(MainActivity.this, "发生错误" + err);
                             }
 
                             return null;

@@ -16,10 +16,13 @@
 
 package cn.cainiaoshicai.crm.orders.util;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+
+import cn.cainiaoshicai.crm.MainActivity;
 
 /**
  * Alert Diaglog Util Class.
@@ -233,6 +236,15 @@ public final class AlertUtil {
             .create();
 
         dlg.show();
+    }
+
+    public static void errorOnActivity(final Activity activity, final String msg) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                error(activity, msg);
+            }
+        });
     }
 }
 

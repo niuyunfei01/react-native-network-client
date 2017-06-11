@@ -1063,7 +1063,9 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                         intent.putExtra("list_type", listType);
                         activity.startActivity(intent);
                     } else {
-                        AlertUtil.showAlert(activity, "操作提示", "操作失败：" + oc.getDesc());
+                        if (!activity.isFinishing()) {
+                            AlertUtil.showAlert(activity, "操作提示", "操作失败：" + oc.getDesc());
+                        }
                     }
                 }
             });
