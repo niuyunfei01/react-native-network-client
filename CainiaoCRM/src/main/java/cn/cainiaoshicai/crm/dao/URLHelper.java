@@ -46,4 +46,8 @@ public class URLHelper {
     public static String getAutoSchedulesUrl(long storeId) {
         return getStoresPrefix() + "/shipping_status/"+storeId+".html";
     }
+
+    public static String getForgotPasswd() {
+        return WEB_URL_ROOT + "/users/forgot";
+    }
 }

@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,14 +14,17 @@ import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.OauthTokenDao;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.orders.dao.OAuthDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
@@ -221,13 +225,24 @@ public class LoginActivity extends AbstractActionBarActivity {
                 progressFragment.dismissAllowingStateLoss();
             }
 
-            LoginActivity activity = oAuthActivityWeakReference.get();
+            final LoginActivity activity = oAuthActivityWeakReference.get();
             if (activity == null) {
                 return;
             }
 
             if (e != null) {
-                Toast.makeText(activity, e.getError(), Toast.LENGTH_SHORT).show();
+                if (Cts.ERR_INVALID_GRANT.equals(e.getError())) {
+                    AlertUtil.showAlert(activity, R.string.tip_dialog_title, R.string.auth_error_invalid_grant,
+                            "知道了", null,
+                            "重置密码", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    GeneralWebViewActivity.gotoWeb(activity, URLHelper.getForgotPasswd());
+                                }
+                            });
+                } else {
+                    Toast.makeText(activity, e.getError(), Toast.LENGTH_SHORT).show();
+                }
             }
 
             activity.mLoginButton.setEnabled(true);
