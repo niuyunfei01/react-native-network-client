@@ -294,7 +294,12 @@ public class StoreStorageHelper {
                                         String s = totalReqTxt.getText().toString();
 
                                         if (TextUtils.isEmpty(s)) {
-                                            AlertUtil.error(activity, "订货数不能为空串");
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AlertUtil.error(activity, "订货数不能为空串");
+                                                }
+                                            });
                                             return null;
                                         }
 
