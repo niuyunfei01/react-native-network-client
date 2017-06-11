@@ -351,7 +351,7 @@ public class OrderSingleHelper {
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
-                    final Activity ctx = (Activity) v.getContext();
+                    final Context ctx = v.getContext();
                     AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
 
                     helper.updateDadaCallLabelUI(_dadaStatus, btnCallDada);

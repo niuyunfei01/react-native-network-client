@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -290,7 +291,14 @@ public class StoreStorageHelper {
                                     @Override
                                     protected Void doInBackground(Void... params) {
                                         ResultEditReq rb;
-                                        final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
+                                        String s = totalReqTxt.getText().toString();
+
+                                        if (TextUtils.isEmpty(s)) {
+                                            AlertUtil.error(activity, "订货数不能为空串");
+                                            return null;
+                                        }
+
+                                        final int total_req_no = Integer.parseInt(s);
                                         final String remarkTxt = remark.getText().toString();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());

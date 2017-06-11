@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -271,7 +270,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         final Button actionButton = (Button) findViewById(R.id.button2);
         if(is_from_new_order) {
             actionButton.setText("确认接单");
-            actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, fromStatus, listType));
+            actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, fromStatus, listType, this));
         } else {
             if (fromStatus == Cts.WM_ORDER_STATUS_ARRIVED) {
                 actionButton.setVisibility(View.GONE);
@@ -287,7 +286,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                 .setPositiveButton("发送", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        new OrderActionOp(orderId, (Activity)v.getContext(), listType).executeOnNormal(fromStatus);
+                                        new OrderActionOp(orderId, OrderSingleActivity.this, listType).executeOnNormal(fromStatus);
                                     }
                                 });
                             adb.setNegativeButton(getString(R.string.cancel), null);
@@ -1080,12 +1079,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         private final String platformOid;
         private final int status;
         private final int listType;
+        private final Activity activity;
 
-        AccpetOrderButtonClicked(int platform, String platformOid, int status, int listType) {
+        AccpetOrderButtonClicked(int platform, String platformOid, int status, int listType, Activity activity) {
             this.platform = platform;
             this.platformOid = platformOid;
             this.status = status;
             this.listType = listType;
+            this.activity = activity;
         }
 
         @Override
@@ -1105,7 +1106,6 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 @Override
                 protected void onPostExecute(final ResultBean oc) {
                     super.onPostExecute(oc);
-                    final Activity activity = (Activity)v.getContext();
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
