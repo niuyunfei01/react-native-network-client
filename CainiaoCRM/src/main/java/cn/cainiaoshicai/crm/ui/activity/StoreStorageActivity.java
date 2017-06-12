@@ -254,6 +254,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
+        //init first before loading done
+        resetListAdapter(null, lv, ctv);
+
         currStatusSpinner = (Spinner) titleBar.findViewById(R.id.spinner_curr_status);
         final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
         statusAdapter.addAll(StatusItem.STATUS);
@@ -352,7 +355,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
     }
 
-    private void resetListAdapter(ArrayList<StorageItem> storageItems) {
+    private void resetListAdapter(ArrayList<StorageItem> storageItems, ListView lv, AutoCompleteTextView ctv) {
 
         if (storageItems == null) {
             storageItems = new ArrayList<>(0);
@@ -431,7 +434,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private void updateAdapterData(ArrayList<StorageItem> storageItems) {
-        resetListAdapter(storageItems);
+        resetListAdapter(storageItems, lv, ctv);
     }
 
     public void refreshData() {
