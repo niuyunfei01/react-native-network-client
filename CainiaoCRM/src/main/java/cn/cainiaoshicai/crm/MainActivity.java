@@ -198,7 +198,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                 long storeId =  SettingUtility.getListenerStore();
                 if (storeId < 1) {
-                    Utility.tellSelectStore("排单/采购系统需选定您工作的门店！", new StoreSelectedListener() {
+                    Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
                         @Override
                         public void done(long selectedId) {
                             SettingUtility.setListenerStores(selectedId);

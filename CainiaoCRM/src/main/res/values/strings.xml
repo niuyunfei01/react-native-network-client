@@ -21,7 +21,7 @@
     <string name="menu_print">打印</string>
     <string name="menu_call_dada">自动发单</string>
     <string name="delay_faq_btn">延误原因</string>
-    <string name="btn_go_buy">采购</string>
+    <string name="btn_go_buy">备货</string>
     <string name="main_description">This is a basic Activity showing an Action Bar which has been
         styled.
     </string>
@@ -240,7 +240,7 @@
     <string name="menu_provide_locked">已提交</string>
     <string name="menu_provide_ship">订单发货</string>
     <string name="menu_provide_accept">订单收货</string>
-    <string name="store_on_sale_now">库里有货或临时可采购，立即开卖</string>
+    <string name="store_on_sale_now">库里有货或临时可采货，立即开卖</string>
     <string name="store_on_sale_after_off_work">暂停售卖，下班后自动开售</string>
     <string name="store_on_sale_after_have_storage">暂停售卖，来货后自动开售</string>
     <string name="store_on_sale_none">长期下架(限店长操作)</string>

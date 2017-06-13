@@ -38,7 +38,7 @@
             android:layout_alignParentEnd="true"
             android:textColor="@color/white"
             android:background="@color/green"
-            android:text="排单"
+            android:text="备货"
             android:gravity="center"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"

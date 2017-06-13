@@ -251,7 +251,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
                 long currStoreId =  SettingUtility.getListenerStore();
                 if (currStoreId < 1) {
-                    Utility.toast("排单/采购系统只支持一个店铺的订单，请修改设置！", OrderSingleActivity.this, null);
+                    Utility.toast("排单/备货系统只支持一个店铺的订单，请修改设置！", OrderSingleActivity.this, null);
                     return;
                 } else if (order.getStore_id() == Cts.STORE_UNKNOWN){
                     Utility.toast("请先修改订单所属门店", OrderSingleActivity.this, null);
