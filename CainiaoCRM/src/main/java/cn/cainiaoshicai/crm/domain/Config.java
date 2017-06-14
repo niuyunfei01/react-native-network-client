@@ -7,6 +7,11 @@ import java.util.SortedMap;
  * Created by liuzhr on 3/8/17.
  */
 public class Config {
+
+    private final long createdTs = System.currentTimeMillis();
+
+    private String supportTel = "";
+
     private SortedMap<Integer, Worker> workers;
     private SortedMap<Integer, Worker> ship_workers;
     private String[] delayReasons;
@@ -45,5 +50,17 @@ public class Config {
 
     public void setCoupons(String[] coupons) {
         this.coupons = coupons;
+    }
+
+    public long getCreatedTs() {
+        return createdTs;
+    }
+
+    public String getSupportTel() {
+        return supportTel;
+    }
+
+    public void setSupportTel(String supportTel) {
+        this.supportTel = supportTel;
     }
 }

@@ -545,7 +545,7 @@ public class OrderSingleHelper {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
                 callIntent.setData(Uri.parse("tel:" + dada_mobile));
                 OrderSingleActivity ctx = helper.activity;
                 if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {

@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +29,7 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -56,6 +60,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_PROJECT_MANAGEMENT = 18;
 	private static final int TYPE_TEAM_PERF = 19;
 	private static final int TYPE_EDIT_STORE = 20;
+	private static final int TYPE_PHONE_TECH = 21;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 
@@ -147,6 +152,8 @@ public class MineActivity extends AbstractActionBarActivity {
 							}
 						}
 					});
+				} else if (item.getType() == TYPE_PHONE_TECH) {
+					GlobalCtx.getInstance().dial(GlobalCtx.getApplication().getSupportTel());
 				}
 			}
 
@@ -243,10 +250,9 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设  置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("联系技术支持", -1, TYPE_PHONE_TECH, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));
-
-
 	}
 
 	@NonNull

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -87,6 +88,7 @@ public class GlobalCtx extends Application {
     private Handler handler = new Handler();
 
     private AtomicReference<LinkedHashMap<Long, Store>> storesRef = new AtomicReference<>(null);
+    private AtomicReference<Config> serverCfg = new AtomicReference<>(null);
     private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
     private SortedMap<Integer, Worker> workers = new TreeMap<>();
     private SortedMap<Integer, Worker> ship_workers = new TreeMap<>();
@@ -109,6 +111,7 @@ public class GlobalCtx extends Application {
     private final LoadingCache<String, HashMap<String, String>> timedCache;
     private String agent;
     public CRMService dao;
+    private String supportTel;
 
     //private SpeechSynthesizer mTts;
 
@@ -273,6 +276,7 @@ public class GlobalCtx extends Application {
                         }
 
                         GlobalCtx.this.coupons = config.getCoupons();
+                        GlobalCtx.this.serverCfg.set(config);
                     }
                 } catch (Exception e) {
                     AppLogger.w("error to init config:" + e.getMessage(), e);
@@ -692,6 +696,20 @@ public class GlobalCtx extends Application {
 
     public void handleUncaughtException(Thread t, Throwable e) {
         CrashReportHelper.handleUncaughtException(t, e);
+    }
+
+    public void dial(String tel) {
+        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+        callIntent.setData(Uri.parse("tel:" + tel));
+        startActivity(callIntent);
+    }
+
+    public String getSupportTel() {
+        Config cfg = this.serverCfg.get();
+        if (cfg != null) {
+            return cfg.getSupportTel();
+        }
+        return "";
     }
 
     public interface TaskCountUpdated {

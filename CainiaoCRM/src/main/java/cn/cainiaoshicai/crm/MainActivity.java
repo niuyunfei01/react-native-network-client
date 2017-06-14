@@ -163,7 +163,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
             @Override
             public void onPageSelected(int position) {
-                OrderListFragment frag = (OrderListFragment) adapter.getItem(position);
+                OrderListFragment frag = (OrderListFragment) adapter.instantiateItem(ordersViewPager, position);
                 frag.refresh();
             }
 
@@ -607,7 +607,7 @@ public class MainActivity extends AbstractActionBarActivity {
             list_type = ListType.findByType(intent.getIntExtra("list_type", 0));
         }
 
-        if (list_type.getValue() > 0) {
+        if (list_type != null && list_type.getValue() > 0) {
             this.ordersViewPager.setCurrentItem(list_type.getValue() - 1);
         }
         this.resetPrinterStatusBar();

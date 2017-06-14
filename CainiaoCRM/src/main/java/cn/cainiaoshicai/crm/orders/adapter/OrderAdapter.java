@@ -310,7 +310,7 @@ public class OrderAdapter extends BaseAdapter {
     }
 
     private void callMobilePhone(View v, String mobile) {
-        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        Intent callIntent = new Intent(Intent.ACTION_DIAL);
         callIntent.setData(Uri.parse("tel:" + mobile));
         Context context = v.getContext();
         if (context == null) {

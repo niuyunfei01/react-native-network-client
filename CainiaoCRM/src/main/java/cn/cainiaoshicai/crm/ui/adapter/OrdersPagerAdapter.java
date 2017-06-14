@@ -30,14 +30,9 @@ public class OrdersPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        AppLogger.d("selected position: " + position);
-        OrderListFragment fragment = fragments[position];
-        if (fragment == null) {
-            ListType listType = MainActivity.getListTypeByTab(position);
-            fragment = OrderListFragment.newInstance(listType);
-            fragments[position] = fragment;
-            AppLogger.d("position=" + position + ", listType=" + listType);
-        }
+        ListType listType = MainActivity.getListTypeByTab(position);
+        OrderListFragment fragment = OrderListFragment.newInstance(listType);
+        AppLogger.d("position=" + position + ", listType=" + listType);
         return fragment;
     }
 
