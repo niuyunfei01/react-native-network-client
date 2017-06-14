@@ -153,7 +153,7 @@ public class MineActivity extends AbstractActionBarActivity {
 						}
 					});
 				} else if (item.getType() == TYPE_PHONE_TECH) {
-					GlobalCtx.getInstance().dial(GlobalCtx.getApplication().getSupportTel());
+					GlobalCtx.getInstance().dial(GlobalCtx.getApplication().getSupportTel(), MineActivity.this);
 				}
 			}
 
@@ -250,7 +250,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设  置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("联系技术支持", -1, TYPE_PHONE_TECH, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem("联系服务经理", -1, TYPE_PHONE_TECH, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));
 	}

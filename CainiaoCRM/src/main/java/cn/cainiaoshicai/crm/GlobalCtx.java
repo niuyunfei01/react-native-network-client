@@ -698,10 +698,10 @@ public class GlobalCtx extends Application {
         CrashReportHelper.handleUncaughtException(t, e);
     }
 
-    public void dial(String tel) {
+    public void dial(String tel,Activity activity) {
         Intent callIntent = new Intent(Intent.ACTION_DIAL);
         callIntent.setData(Uri.parse("tel:" + tel));
-        startActivity(callIntent);
+        activity.startActivity(callIntent);
     }
 
     public String getSupportTel() {
