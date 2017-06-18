@@ -18,6 +18,11 @@ public class Cts {
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 
+    public static final String BLX_TYPE_BASIC = "basic";
+    public static final String BLX_TYPE_PRO = "pro"; //带基本连锁功能
+    public static final String BLX_TYPE_FULL = "full"; //带完整连锁功能
+    public static final String BLX_TYPE_DIRECT = "direct";
+
     public static final Store ST_UNKNOWN = new Store("未知店",  STORE_UNKNOWN);
     public static final Store ST_ALL = new Store("全部",  STORE_ALL);
 

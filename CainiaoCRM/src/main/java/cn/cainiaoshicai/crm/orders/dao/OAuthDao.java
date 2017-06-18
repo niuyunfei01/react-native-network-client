@@ -34,7 +34,7 @@ public class OAuthDao {
         String result = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
 
         Gson gson = new Gson();
-        UserBean user = new UserBean();
+        UserBean user = null;
         try {
             user = gson.fromJson(result, UserBean.class);
         } catch (JsonSyntaxException e) {

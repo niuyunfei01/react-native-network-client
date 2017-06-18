@@ -23,10 +23,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
@@ -63,6 +66,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_PHONE_TECH = 21;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
+	private HashMap<String, String> stats;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +83,8 @@ public class MineActivity extends AbstractActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
 				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
-				String token = GlobalCtx.getApplication().getSpecialToken();
+				final GlobalCtx app = GlobalCtx.getApplication();
+				String token = app.getSpecialToken();
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
@@ -96,64 +101,78 @@ public class MineActivity extends AbstractActionBarActivity {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									SettingUtility.setDefaultAccountId("");
-									GlobalCtx.getApplication().setAccountBean(null);
+									app.setAccountBean(null);
 									startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 								}
 
 							})
 							.setNegativeButton(R.string.no, null)
 							.show();
-				} else if (item.getType() == TYPE_STORE_PERF) {
-					gotoWeb(Utility.append_token(String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix()), token));
-				} else if (item.getType() == TYPE_PROVIDE_LIST) {
-					gotoWeb(Utility.append_token(String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()), token));
-				} else if (item.getType() == TYPE_SYNC_STATUS) {
-					Intent intent = new Intent(Intent.ACTION_VIEW,
-							Uri.parse(GlobalCtx.getApplication().getUrl("sync_monitor.main") + "access_token=" + token));
-					startActivity(intent);
-				} else if (item.getType() == TYPE_USER_COMPLAINS) {
-					GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
-				} else if (item.getType() == TYPE_PROD_MANAGEMENT) {
-					gotoWeb(Utility.append_token(String.format("%s/products.html", URLHelper.getStoresPrefix()), token));
-				} else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
-					startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
-				} else if (item.getType() == TYPE_QUALITY_CASE) {
-					startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
-				} else if (item.getType() == TYPE_ORDER_SEARCH) {
-					onSearchRequested();
-				} else if (item.getType() == TYPE_TOTAL_SCORE) {
-					MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
-				} else if (item.getType() == TYPE_ORDER_DELAYED) {
-					MineActivity.this.startActivity(new Intent(getApplicationContext(), InTimeStatsActivity.class));
-				} else if (item.getType() == TYPE_ORDER_LIST) {
-					Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
-					intent.putExtra("list_type", ListType.INVALID.getValue());
-					MineActivity.this.startActivity(intent);
-				} else if (item.getType() == TYPE_USER_ITEMS) {
-					gotoWeb(Utility.append_token(String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT), token));
-				} else if (item.getType() == TYPE_COMMENT_SELF) {
-					gotoWeb(String.format("%s/stores/show_evaluations.html", URLHelper.WEB_URL_ROOT));
-				} else if (item.getType() == TYPE_COMMENT_WM) {
-					gotoWeb(String.format("%s/stores/show_waimai_evaluations.html", URLHelper.WEB_URL_ROOT));
-				} else if (item.getType() == TYPE_PROJECT_MANAGEMENT) {
-					Intent intent = new Intent(MineActivity.this, TowerActivity.class);
-					intent.putExtra("url", "https://tower.im/members/3f63c10bea974c03b05d1ab6a3f60965?me=1");
-					MineActivity.this.startActivity(intent);
-				} else if (item.getType() == TYPE_TEAM_PERF) {
-					GlobalCtx.getApplication().toFeedbackActivity(MineActivity.this);
-				} else if (item.getType() == TYPE_EDIT_STORE) {
-					final long currId = SettingUtility.getListenerStore();
-					Utility.showStoreSelector(MineActivity.this, "切换门店", "确定", "取消", currId, new StoreSelectedListener() {
-						@Override
-						public void done(long selectedId) {
-							SettingUtility.setListenerStores(selectedId);
-							if (selectedId != currId) {
-								setTitleByCurrentStore();
-							}
-						}
-					});
-				} else if (item.getType() == TYPE_PHONE_TECH) {
-					GlobalCtx.getInstance().dial(GlobalCtx.getApplication().getSupportTel(), MineActivity.this);
+				} else {
+					if (item.getType() == TYPE_STORE_PERF) {
+                        String url = String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix());
+						Vendor vendor = app.getVendor();
+						if (vendor != null) {
+                            url += "?&vendor_id=" + vendor.getId();
+                        }
+                        gotoWeb(Utility.append_token(url, token));
+                    } else if (item.getType() == TYPE_PROVIDE_LIST) {
+                        gotoWeb(Utility.append_token(String.format("%s/provide_req_all.html", URLHelper.getStoresPrefix()), token));
+                    } else if (item.getType() == TYPE_SYNC_STATUS) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(app.getUrl("sync_monitor.main") + "access_token=" + token));
+                        startActivity(intent);
+                    } else if (item.getType() == TYPE_USER_COMPLAINS) {
+                        app.toFeedbackActivity(MineActivity.this);
+                    } else if (item.getType() == TYPE_PROD_MANAGEMENT) {
+                        gotoWeb(Utility.append_token(String.format("%s/products.html", URLHelper.getStoresPrefix()), token));
+                    } else if (item.getType() == TYPE_STORE_SELF_STORAGE) {
+                        startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+                    } else if (item.getType() == TYPE_QUALITY_CASE) {
+                        startActivity(new Intent(getApplicationContext(), QualityCaseActivity.class));
+                    } else if (item.getType() == TYPE_ORDER_SEARCH) {
+                        onSearchRequested();
+                    } else if (item.getType() == TYPE_TOTAL_SCORE) {
+                        MineActivity.this.startActivity(new Intent(getApplicationContext(), MonthPerfActivity.class));
+                    } else if (item.getType() == TYPE_ORDER_DELAYED) {
+                        MineActivity.this.startActivity(new Intent(getApplicationContext(), InTimeStatsActivity.class));
+                    } else if (item.getType() == TYPE_ORDER_LIST) {
+                        Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
+                        intent.putExtra("list_type", ListType.INVALID.getValue());
+                        MineActivity.this.startActivity(intent);
+                    } else if (item.getType() == TYPE_USER_ITEMS) {
+                        gotoWeb(Utility.append_token(String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT), token));
+                    } else if (item.getType() == TYPE_COMMENT_SELF) {
+                        gotoWeb(String.format("%s/stores/show_evaluations.html", URLHelper.WEB_URL_ROOT));
+                    } else if (item.getType() == TYPE_COMMENT_WM) {
+                        gotoWeb(String.format("%s/stores/show_waimai_evaluations.html", URLHelper.WEB_URL_ROOT));
+                    } else if (item.getType() == TYPE_PROJECT_MANAGEMENT) {
+                        Intent intent = new Intent(MineActivity.this, TowerActivity.class);
+                        intent.putExtra("url", "https://tower.im/members/3f63c10bea974c03b05d1ab6a3f60965?me=1");
+                        MineActivity.this.startActivity(intent);
+                    } else if (item.getType() == TYPE_TEAM_PERF) {
+                        app.toFeedbackActivity(MineActivity.this);
+                    } else if (item.getType() == TYPE_EDIT_STORE) {
+                        final long currId = SettingUtility.getListenerStore();
+                        Utility.showStoreSelector(MineActivity.this, "切换门店", "确定", "取消", currId, new StoreSelectedListener() {
+                            @Override
+                            public void done(long selectedId) {
+                                SettingUtility.setListenerStores(selectedId);
+                                if (selectedId != currId) {
+                                    setTitleByCurrentStore();
+                                }
+                                HashMap<String, String> stats = MineActivity.this.stats;
+                                if (stats == null) {
+                                    stats = new HashMap<>();
+                                }
+                                listAdapter.clear();
+                                initPerformList(stats);
+                                listAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    } else if (item.getType() == TYPE_PHONE_TECH) {
+                        app.dial(app.getSupportTel(), MineActivity.this);
+                    }
 				}
 			}
 
@@ -172,6 +191,7 @@ public class MineActivity extends AbstractActionBarActivity {
 
 			@Override
 			protected void onPostExecute(final HashMap<String, String> performStat) {
+				MineActivity.this.stats = performStat;
 				MineActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -188,14 +208,19 @@ public class MineActivity extends AbstractActionBarActivity {
 		ActionBar ab = this.getSupportActionBar();
 		if (ab != null) {
 			final long storeId = SettingUtility.getListenerStore();
-			String storeName = GlobalCtx.getApplication().getStoreName(storeId);
-			if (!TextUtils.isEmpty(storeName)) {
-				ab.setTitle(storeName);
+			Store store = GlobalCtx.getApplication().findStore(storeId);
+			if (store != null) {
+				String name = store.namePrefixVendor();
+				if (!TextUtils.isEmpty(name)) {
+					ab.setTitle(name);
+				}
 			}
 		}
 	}
 
 	private void initPerformList(HashMap<String, String> performStat) {
+
+		Vendor vendorType = GlobalCtx.getApplication().getVendor();
 
 		Double lastWeekInTimeRatio = null;
 		try {
@@ -230,29 +255,43 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("切换门店", -1, TYPE_EDIT_STORE, null));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("准点率", -1, TYPE_ORDER_DELAYED, inTimeParams));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("门店商品管理", -1, TYPE_STORE_SELF_STORAGE, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"), performStat.get("myPackageTotalD"), performStat.get("myShipTotal")), -1 /*Integer.parseInt(performStat.userTalkStatus("globalLateTotalD"))*/, TYPE_STORE_PERF, null));
+		String perfAbs;
+		if (vendorType != null && Cts.BLX_TYPE_DIRECT.equals(vendorType.getVersion())) {
+			perfAbs = String.format("业绩 今日送%s单 打包%s 本月送%s单", performStat.get("myShipTotalD"),
+					performStat.get("myPackageTotalD"),
+					performStat.get("myShipTotal"));
+		} else {
+			perfAbs = "业绩统计";
+		}
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(perfAbs, -1, TYPE_STORE_PERF, null));
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("外卖评价", -1, TYPE_COMMENT_WM, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("反馈和业绩", -1,  TYPE_TEAM_PERF, null));
-		String accountId = GlobalCtx.getApplication().getCurrentAccountId();
-		if ("811485".equals(accountId)) {
-			listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
+		if (vendorType != null && Cts.BLX_TYPE_DIRECT.equals(vendorType.getVersion())) {
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("反馈和业绩", -1,  TYPE_TEAM_PERF, null));
+			String accountId = GlobalCtx.getApplication().getCurrentAccountId();
+			if ("811485".equals(accountId)) {
+				listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
+			}
 		}
 
 		String versionDesc = getVersionDesc();
 
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
+		boolean vendorEmpty = vendorType == null || TextUtils.isEmpty(vendorType.getVersion());
+		String vtDesc = vendorEmpty ? "" : (vendorType.getVersion() + "-");
+
+		String nickname = GlobalCtx.getInstance().getCurrentAccountName();
+
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设  置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("联系服务经理", -1, TYPE_PHONE_TECH, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s)", versionDesc), -1, TYPE_VERSION_UPDATE, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("退出登录", -1, TYPE_VERSION_LOGOUT, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s%s)", vtDesc, versionDesc), -1, TYPE_VERSION_UPDATE, null));
+		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("当前用户[%s]   点击退出", nickname), -1, TYPE_VERSION_LOGOUT, null));
 	}
 
 	@NonNull

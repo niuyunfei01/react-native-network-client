@@ -12,6 +12,8 @@ public class Config {
 
     private String supportTel = "";
 
+    private Vendor vendor;
+
     private SortedMap<Integer, Worker> workers;
     private SortedMap<Integer, Worker> ship_workers;
     private String[] delayReasons;
@@ -62,5 +64,13 @@ public class Config {
 
     public void setSupportTel(String supportTel) {
         this.supportTel = supportTel;
+    }
+
+    public Vendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 }

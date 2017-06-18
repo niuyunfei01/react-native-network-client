@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.domain;
 
+import android.text.TextUtils;
+
 /**
  * Created by liuzhr on 6/30/16.
  */
@@ -11,7 +13,8 @@ public class Store {
     private float location_long;
     private float location_lat;
     private boolean shipCapable;
-    private int verdor_id;
+    private int type;
+    private String vendor;
 
     public Store() {
     }
@@ -50,11 +53,24 @@ public class Store {
         this.shipCapable = shipCapable;
     }
 
-    public int getVerdor_id() {
-        return verdor_id;
+    public int getType() {
+        return type;
     }
 
-    public void setVerdor_id(int verdor_id) {
-        this.verdor_id = verdor_id;
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    public String namePrefixVendor() {
+        String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
+        return vendorName + this.getName();
     }
 }

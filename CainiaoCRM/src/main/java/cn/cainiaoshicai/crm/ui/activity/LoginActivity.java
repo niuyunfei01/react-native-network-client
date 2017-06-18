@@ -192,21 +192,27 @@ public class LoginActivity extends AbstractActionBarActivity {
                     String token = loginResult.getAccess_token();
                     long expiresInSeconds = loginResult.getExpires_in();
                     UserBean user = new OAuthDao(token).getOAuthUserInfo();
-                    AccountBean account = new AccountBean();
-                    account.setAccess_token(token);
-                    account.setExpires_time(System.currentTimeMillis() + expiresInSeconds * 1000);
-                    account.setInfo(user);
-                    AppLogger.e("token expires in " + Utility.calcTokenExpiresInDays(account) + " days");
-                    DBResult dbResult = AccountDBTask.addOrUpdateAccount(account, false);
-                    if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
-                        SettingUtility.setDefaultAccountId(account.getUid());
+                    if (user != null) {
+                        AccountBean account = new AccountBean();
+                        account.setAccess_token(token);
+                        account.setExpires_time(System.currentTimeMillis() + expiresInSeconds * 1000);
+                        account.setInfo(user);
+                        AppLogger.e("token expires in " + Utility.calcTokenExpiresInDays(account) + " days");
+                        DBResult dbResult = AccountDBTask.addOrUpdateAccount(account, false);
+                        if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
+                            SettingUtility.setDefaultAccountId(account.getUid());
+                        }
+                        if (SettingUtility.getListenerStore() <= 0 && user.getPrefer_store() > 0) {
+                            SettingUtility.setListenerStores(user.getPrefer_store());
+                        }
+
+                        GlobalCtx.getApplication().updateCfgInterval();
+                        return dbResult;
+                    } else {
+                        this.e = new ServiceException("获取登录信息失败，请重试");
                     }
-                    GlobalCtx.getApplication().updateCfgInterval();
-                    return dbResult;
                 } else {
                     AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()) );
-                    cancel(true);
-                    return null;
                 }
             } catch (ServiceException e) {
                 AppLogger.e(e.getError());
@@ -214,6 +220,7 @@ public class LoginActivity extends AbstractActionBarActivity {
             } catch (Exception e) {
                 AppLogger.e("error to login", e);
             }
+
             cancel(true);
             return null;
         }

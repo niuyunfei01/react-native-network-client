@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,32 +32,12 @@ public class CommonConfigDao {
         this.access_token = access_token;
     }
 
-    public Config get() throws ServiceException {
-        String url = URLHelper.API_ROOT() + "/common_config.json" ;
-
-        Map<String, String> map = new HashMap<>();
-        map.put("access_token", access_token);
-
-        String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
-
-        AppLogger.v("common config:" + json);
-
-        Config value = null;
-        try {
-            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            value = gson.fromJson(json, new TypeToken<Config>() {}.getType());
-        } catch (Exception e) {
-            AppLogger.e(e.getMessage(), e);
-        }
-
-        return value;
-    }
-
-    public LinkedHashMap<Long, Store> listStores() throws ServiceException {
+    public LinkedHashMap<Long, Store> listStores(long storeId) throws ServiceException {
         String url = URLHelper.API_ROOT() + "/list_store.json" ;
 
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
+        map.put("_sid", String.valueOf(storeId));
 
         String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
 
@@ -73,12 +54,13 @@ public class CommonConfigDao {
         return value;
     }
 
-    public ArrayList<Tag> getTags() throws ServiceException {
+    public ArrayList<Tag> getTags(long currStoreId) throws ServiceException {
         Map<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
 
         try {
-            String url = URLHelper.API_ROOT() + "/list_tags.json";
+            String storeIdPath = currStoreId > 0 ? String.valueOf(currStoreId) : "";
+            String url = URLHelper.API_ROOT() + "/list_tags/"+ storeIdPath +".json";
             String json = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, map);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             return gson.fromJson(json, new TypeToken<ArrayList<Tag>>() {

@@ -20,6 +20,7 @@ public class UserBean implements Parcelable {
     private String city;
     private String location;
     private String description;
+    private long prefer_store;
 
     public String getCover_image() {
         return cover_image;
@@ -132,6 +133,7 @@ public class UserBean implements Parcelable {
         dest.writeString(mobilephone);
         dest.writeString(cover_image);
         dest.writeString(remark);
+        dest.writeLong(prefer_store);
 
 //        dest.writeBooleanArray(new boolean[]{this.following, this.follow_me, this.verified});
     }
@@ -151,6 +153,7 @@ public class UserBean implements Parcelable {
                     userBean.mobilephone = in.readString();
                     userBean.cover_image = in.readString();
                     userBean.remark = in.readString();
+                    userBean.prefer_store = in.readLong();
 
 //                    boolean[] booleans = new boolean[3];
 //                    in.readBooleanArray(booleans);
@@ -174,5 +177,13 @@ public class UserBean implements Parcelable {
     @Override
     public int hashCode() {
         return getId().hashCode();
+    }
+
+    public long getPrefer_store() {
+        return prefer_store;
+    }
+
+    public void setPrefer_store(long prefer_store) {
+        this.prefer_store = prefer_store;
     }
 }

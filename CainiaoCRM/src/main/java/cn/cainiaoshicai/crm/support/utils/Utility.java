@@ -82,7 +82,6 @@ import javax.microedition.khronos.opengles.GL11;
 
 import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -99,10 +98,8 @@ import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
 import cn.cainiaoshicai.crm.ui.activity.CustomizedMQConversationActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.PrePackageCheckActivity;
-import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StorageProvideActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
@@ -723,7 +720,7 @@ public class Utility {
         int selected = 0;
         int i = 0;
         for (Store currStore : stores) {
-            titles[i] = currStore.getName();
+            titles[i] = currStore.namePrefixVendor();
             if (selectedStore == (currStore.getId())) {
                 selected = i;
             }

@@ -495,11 +495,18 @@ public class SettingUtility {
 
     public static void setListenerStores(long selectedStoreId) {
         Set<Long> currSelectedStores = new HashSet<>();
-        if (selectedStoreId > 0) {
+        boolean updated = false;
+        if (selectedStoreId > 0 && SettingUtility.getListenerStore() != selectedStoreId) {
             currSelectedStores.add(selectedStoreId);
+            updated = true;
         }
         currSelectedStores.add((long) Cts.STORE_UNKNOWN);
         SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
+
+        if (updated) {
+            GlobalCtx.getInstance().updateCfgInterval();
+            GlobalCtx.getInstance().listStores(true);
+        }
     }
 
     public static void setListenerStores(Set<Long> currSelectedStores) {

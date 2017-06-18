@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.dao;
 import java.util.Map;
 import java.util.SortedMap;
 
+import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.FileBean;
 import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
@@ -60,6 +61,9 @@ public interface CRMService {
     Call<ResultBean<ShipAcceptStatus>> shippingStopAccept(@Path("storeId") long storeId);
     @POST("/api/shipping_accept_status/{storeId}")
     Call<ResultBean<ShipAcceptStatus>> shippingAcceptStatus(@Path("storeId") long storeId);
+
+    @GET("/api/common_config2")
+    Call<ResultBean<Config>> commonConfig();
 
     class UploadRes {
         private FileBean file;

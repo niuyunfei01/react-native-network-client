@@ -51,6 +51,7 @@ import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -70,6 +71,9 @@ import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
@@ -122,29 +126,29 @@ public class GlobalCtx extends Application {
                 .maximumSize(10000)
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .build(new CacheLoader<String, HashMap<String, String>>() {
-                            public HashMap<String, String> load(final String key) {
+                    public HashMap<String, String> load(final String key) {
 
-                                new MyAsyncTask<Void, Void, Void>() {
-                                    @Override
-                                    protected Void doInBackground(Void... params) {
-                                        try {
-                                            CommonConfigDao dao = new CommonConfigDao(GlobalCtx.this.getSpecialToken());
-                                            ResultBean<HashMap<String, String>> config = dao.configItem(key);
-                                            if (config.isOk()) {
-                                                timedCache.put(key, config.getObj());
-                                            } else {
-                                                AppLogger.e("error:" + config.getDesc());
-                                            }
-                                        } catch (ServiceException e) {
-                                            e.printStackTrace();
-                                        }
-                                        return null;
+                        new MyAsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    CommonConfigDao dao = new CommonConfigDao(GlobalCtx.this.getSpecialToken());
+                                    ResultBean<HashMap<String, String>> config = dao.configItem(key);
+                                    if (config.isOk()) {
+                                        timedCache.put(key, config.getObj());
+                                    } else {
+                                        AppLogger.e("error:" + config.getDesc());
                                     }
-                                }.executeOnNormal();
-
-                                return new HashMap<>();
+                                } catch (ServiceException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
                             }
-                        });
+                        }.executeOnNormal();
+
+                        return new HashMap<>();
+                    }
+                });
     }
 
 
@@ -190,7 +194,7 @@ public class GlobalCtx extends Application {
 
         MultiDex.install(this);
 
-        new MyAsyncTask<Void, Void, Void>(){
+        new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 // 初始化合成对象
@@ -236,54 +240,58 @@ public class GlobalCtx extends Application {
 
     public void updateCfgInterval() {
         this.initConfigs();
-        this.listStores();
-        this.listTags();
+        this.listStores(true);
+        this.listTags(SettingUtility.getListenerStore());
         this.updateShipOptions();
     }
 
     private void initConfigs() {
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    String token = GlobalCtx.getInstance().getSpecialToken();
-                    if (!TextUtils.isEmpty(token)) {
+        String token = GlobalCtx.getInstance().getSpecialToken();
+        if (!TextUtils.isEmpty(token)) {
+            final GlobalCtx ctx = GlobalCtx.this;
+            try {
+                String uid = ctx.getCurrentAccountId();
+                if (!TextUtils.isEmpty(uid)) {
+                    JPushInterface.setAliasAndTags(ctx, "uid_" + uid, null);
+                }
+            } catch (Exception e) {
+                AppLogger.w("error to set jpush alias");
+            }
 
-                        try {
-                            GlobalCtx ctx = GlobalCtx.this;
-                            String uid = ctx.getCurrentAccountId();
-                            if (!TextUtils.isEmpty(uid)) {
-                                JPushInterface.setAliasAndTags(ctx, "uid_" + uid, null);
-                            }
-                        } catch (Exception e) {
-                            AppLogger.w("error to set jpush alias");
-                        }
-
-                        Config config = new CommonConfigDao(token).get();
-
+            Call<ResultBean<Config>> rbCall = ctx.dao.commonConfig();
+            rbCall.enqueue(new Callback<ResultBean<Config>>() {
+                @Override
+                public void onResponse(Call<ResultBean<Config>> call, Response<ResultBean<Config>> response) {
+                    ResultBean<Config> b = response.body();
+                    if (b.isOk()) {
+                        Config config = b.getObj();
                         SortedMap<Integer, Worker> workers = config.getWorkers();
                         if (workers != null) {
-                            GlobalCtx.this.workers = workers;
+                            ctx.workers = workers;
                         }
                         if (config.getShip_workers() != null) {
-                            GlobalCtx.this.ship_workers = config.getShip_workers();
+                            ctx.ship_workers = config.getShip_workers();
                         }
-                        GlobalCtx.this.delayReasons.set(config.getDelayReasons());
-                        GlobalCtx.this.configUrls.clear();
+                        ctx.delayReasons.set(config.getDelayReasons());
+                        ctx.configUrls.clear();
                         HashMap<String, String> configUrls = config.getConfigUrls();
                         if (configUrls != null) {
-                            GlobalCtx.this.configUrls.putAll(configUrls);
+                            ctx.configUrls.putAll(configUrls);
                         }
 
-                        GlobalCtx.this.coupons = config.getCoupons();
-                        GlobalCtx.this.serverCfg.set(config);
+                        ctx.coupons = config.getCoupons();
+                        ctx.serverCfg.set(config);
+                    } else {
+                        AppLogger.e("error to update local config:" + b.getDesc());
                     }
-                } catch (Exception e) {
-                    AppLogger.w("error to init config:" + e.getMessage(), e);
                 }
-                return null;
-            }
-        }.executeOnNormal();
+
+                @Override
+                public void onFailure(Call<ResultBean<Config>> call, Throwable t) {
+                    AppLogger.w("error to init config:" + t.getMessage(), t);
+                }
+            });
+        }
     }
 
     private void initTalkSDK() {
@@ -540,14 +548,19 @@ public class GlobalCtx extends Application {
     }
 
     public Collection<Store> listStores() {
+        return this.listStores(false);
+    }
+
+    public Collection<Store> listStores(boolean forceUpdate) {
+        final long storeId = SettingUtility.getListenerStore();
         LinkedHashMap<Long, Store> stores = storesRef.get();
-        if (stores == null || stores.isEmpty()) {
+        if (forceUpdate || stores == null || stores.isEmpty()) {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
                     CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
                     try {
-                        LinkedHashMap<Long, Store> s = cfgDao.listStores();
+                        LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
                         if (s != null) {
                             storesRef.set(s);
                         }
@@ -562,7 +575,7 @@ public class GlobalCtx extends Application {
     }
 
 
-    public ArrayList<Tag> listTags() {
+    public ArrayList<Tag> listTags(final long currStoreId) {
         ArrayList<Tag> tags = tagsRef.get();
         if (tags == null || tags.isEmpty()) {
             new MyAsyncTask<Void, Void, List<Store>>() {
@@ -570,7 +583,7 @@ public class GlobalCtx extends Application {
                 protected List<Store> doInBackground(Void... params) {
                     CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
                     try {
-                        ArrayList<Tag> s = cfgDao.getTags();
+                        ArrayList<Tag> s = cfgDao.getTags(currStoreId);
                         if (s != null) {
                             tagsRef.set(s);
                         }
@@ -668,7 +681,7 @@ public class GlobalCtx extends Application {
 
     private void updateShipOptions() {
         AppLogger.i("updateShipOptions");
-        new MyAsyncTask<Void, Void, Void>(){
+        new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 CommonConfigDao oad = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
@@ -676,7 +689,7 @@ public class GlobalCtx extends Application {
                     ResultBean<ArrayList<ShipOptions>> options = oad.shipOptions();
                     if (options.isOk() && options.getObj() != null) {
                         HashMap<Integer, ShipOptions> mm = new HashMap<>();
-                        for(ShipOptions so : options.getObj()) {
+                        for (ShipOptions so : options.getObj()) {
                             mm.put(so.getStore_id(), so);
                         }
                         shipOptions.set(mm);
@@ -698,9 +711,9 @@ public class GlobalCtx extends Application {
         CrashReportHelper.handleUncaughtException(t, e);
     }
 
-    public void dial(String tel,Activity activity) {
+    public void dial(String tel, Activity activity) {
         Intent callIntent = new Intent(Intent.ACTION_DIAL);
-        callIntent.setData(Uri.parse("tel:" + tel));
+        callIntent.setData(Uri.fromParts("tel", tel, null));
         activity.startActivity(callIntent);
     }
 
@@ -710,6 +723,14 @@ public class GlobalCtx extends Application {
             return cfg.getSupportTel();
         }
         return "";
+    }
+
+    public Vendor getVendor() {
+        Config cfg = this.serverCfg.get();
+        if (cfg != null) {
+            return cfg.getVendor();
+        }
+        return null;
     }
 
     public interface TaskCountUpdated {
@@ -965,7 +986,7 @@ public class GlobalCtx extends Application {
         }
 
         public boolean play_order_cancelled() {
-            return  (!check_disabled() && this.play_single_sound(this.orderCancelled));
+            return (!check_disabled() && this.play_single_sound(this.orderCancelled));
         }
 
         public boolean play_remind_deliver() {

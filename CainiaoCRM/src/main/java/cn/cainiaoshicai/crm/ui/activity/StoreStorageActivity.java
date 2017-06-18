@@ -149,7 +149,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             this.setContentView(R.layout.storage_status);
 
         this.filter = this.getIntent().getIntExtra("filter", filter);
-        int storeId = this.getIntent().getIntExtra("store_id", -1);
+        final int storeId = this.getIntent().getIntExtra("store_id", -1);
         this.searchTerm = this.getIntent().getStringExtra("search");
         initCurrStore(storeId);
 
@@ -282,7 +282,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         final ListView categoryLv = (ListView) findViewById(R.id.list_category);
         final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
-        ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags();
+        ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags(this.currStore != null ? this.currStore.getId() : 0);
         tagAdapter.addAll(allTags);
         categoryLv.setAdapter(tagAdapter);
         categoryLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -318,7 +318,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             Utility.runUIActionDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    tagAdapter.addAll(GlobalCtx.getInstance().listTags());
+                    int currStoreId = currStore != null ? currStore.getId() : 0;
+                    tagAdapter.addAll(GlobalCtx.getInstance().listTags(currStoreId));
                     tagAdapter.notifyDataSetChanged();
                 }
             }, 50);

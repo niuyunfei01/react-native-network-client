@@ -17,6 +17,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -57,7 +58,11 @@ public class DaoHelper {
             public Response intercept(Chain chain) throws IOException {
                 Request request = chain.request();
                 String token = GlobalCtx.getApplication().getSpecialToken();
-                HttpUrl url = request.url().newBuilder().addQueryParameter("access_token", token).build();
+                final long storeId = SettingUtility.getListenerStore();
+                HttpUrl url = request.url().newBuilder()
+                        .addQueryParameter("access_token", token)
+                        .addQueryParameter("_sid", String.valueOf(storeId))
+                        .build();
                 request = request.newBuilder().url(url).build();
                 return chain.proceed(request);
             }

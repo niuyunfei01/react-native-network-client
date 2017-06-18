@@ -83,7 +83,6 @@ public class AccountBean implements Parcelable {
                     accountBean.expires_time = in.readLong();
                     accountBean.navigationPosition = in.readInt();
                     accountBean.info = in.readParcelable(UserBean.class.getClassLoader());
-
                     return accountBean;
                 }
 
