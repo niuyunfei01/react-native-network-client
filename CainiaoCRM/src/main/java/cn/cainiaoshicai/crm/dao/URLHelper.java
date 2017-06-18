@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.dao;
 
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.customer_serv.customer_servsdk.util.Utils;
 
@@ -49,5 +50,9 @@ public class URLHelper {
 
     public static String getForgotPasswd() {
         return WEB_URL_ROOT + "/users/forgot";
+    }
+
+    public static String getWorkerListUrl(Vendor vendor) {
+        return getStoresPrefix() + "/worker_list/"+(vendor != null ? vendor.getId() : 0);
     }
 }

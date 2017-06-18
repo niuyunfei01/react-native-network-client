@@ -64,6 +64,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_TEAM_PERF = 19;
 	private static final int TYPE_EDIT_STORE = 20;
 	private static final int TYPE_PHONE_TECH = 21;
+	private static final int TYPE_WORKER_LIST= 22;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 	private HashMap<String, String> stats;
@@ -109,9 +110,9 @@ public class MineActivity extends AbstractActionBarActivity {
 							.setNegativeButton(R.string.no, null)
 							.show();
 				} else {
+					Vendor vendor = app.getVendor();
 					if (item.getType() == TYPE_STORE_PERF) {
                         String url = String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix());
-						Vendor vendor = app.getVendor();
 						if (vendor != null) {
                             url += "?&vendor_id=" + vendor.getId();
                         }
@@ -172,7 +173,9 @@ public class MineActivity extends AbstractActionBarActivity {
                         });
                     } else if (item.getType() == TYPE_PHONE_TECH) {
                         app.dial(app.getSupportTel(), MineActivity.this);
-                    }
+                    } else if (item.getType() == TYPE_WORKER_LIST) {
+						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getWorkerListUrl(vendor));
+					}
 				}
 			}
 
@@ -268,16 +271,24 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("外卖评价", -1, TYPE_COMMENT_WM, null));
 
+		MineItemsAdapter.PerformanceItem item = new MineItemsAdapter.PerformanceItem("员工管理", -1, TYPE_WORKER_LIST, null);
+
 		if (vendorType != null && Cts.BLX_TYPE_DIRECT.equals(vendorType.getVersion())) {
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("全部调货单", -1, TYPE_PROVIDE_LIST, null));
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("反馈和业绩", -1,  TYPE_TEAM_PERF, null));
-			String accountId = GlobalCtx.getApplication().getCurrentAccountId();
-			if ("811485".equals(accountId)) {
-				listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
-			}
+			listAdapter.add(item);
+		}
+
+		String accountId = GlobalCtx.getApplication().getCurrentAccountId();
+		if ("811485".equals(accountId)) {
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
+		}
+
+		if (vendorType != null && Cts.BLX_TYPE_FULL.equals(vendorType.getVersion())) {
+			listAdapter.add(item);
 		}
 
 		String versionDesc = getVersionDesc();
