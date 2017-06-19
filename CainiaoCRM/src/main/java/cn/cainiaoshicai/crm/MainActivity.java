@@ -106,7 +106,9 @@ public class MainActivity extends AbstractActionBarActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
+        if (ordersViewPager != null) {
+            ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
+        }
     }
 
     @Override
@@ -175,48 +177,55 @@ public class MainActivity extends AbstractActionBarActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.order_list_main);
         tabLayout.setupWithViewPager(ordersViewPager);
+        if (savedInstanceState != null) {
+            ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
+        }
+
 
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
         handleIntent(intent);
-
-        if (locationHelper == null) {
-            locationHelper = new LocationHelper(this);
-            locationHelper.initLocation();
-        }
     }
 
     private void resetPrinterStatusBar() {
 
         final ArrayList<Long> autoPrintStores = SettingUtility.getAutoPrintStores();
-        TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
         final GlobalCtx app = GlobalCtx.getApplication();
-        this.findViewById(R.id.head_orders_schedule).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+        TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
 
-                long storeId =  SettingUtility.getListenerStore();
-                if (storeId < 1) {
-                    Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
-                        @Override
-                        public void done(long selectedId) {
-                            SettingUtility.setListenerStores(selectedId);
-                            resetPrinterStatusBar();
-                        }
-                    }, MainActivity.this);
-                    return;
+        TextView tmpBuy = (TextView) this.findViewById(R.id.head_orders_schedule);
+        if (app.fnEnabledTmpBuy()) {
+            tmpBuy.setVisibility(View.VISIBLE);
+            tmpBuy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+
+                    long storeId = SettingUtility.getListenerStore();
+                    if (storeId < 1) {
+                        Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
+                            @Override
+                            public void done(long selectedId) {
+                                SettingUtility.setListenerStores(selectedId);
+                                resetPrinterStatusBar();
+                            }
+                        }, MainActivity.this);
+                        return;
+                    }
+
+                    String token = app.getSpecialToken();
+                    intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token=" + token,
+                            URLHelper.getStoresPrefix(), storeId));
+                    startActivity(intent);
                 }
+            });
+        } else {
+            tmpBuy.setVisibility(View.GONE);
+        }
 
-                String token = app.getSpecialToken();
-                intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token="+ token,
-                        URLHelper.getStoresPrefix(),  storeId));
-                startActivity(intent);
-            }
-        });
+        initSignButton(app);
 
         initShipAccept(app);
-        initSignButton(app);
 
         final int bgColorResId;
         if (!autoPrintStores.isEmpty()) {
@@ -305,12 +314,19 @@ public class MainActivity extends AbstractActionBarActivity {
             @SuppressLint("HardwareIds")
             @Override
             public void onClick(View v) {
+
+                if (locationHelper == null) {
+                    locationHelper = new LocationHelper(MainActivity.this);
+                    locationHelper.initLocation();
+                }
+
                 if (locationHelper == null) {
                     AlertUtil.showAlert(MainActivity.this, "错误提示", "暂时无法检测您的位置，请打开GPS");
                     return;
                 }
                 final Long signInStore = SettingUtility.getSignInStore();
                 final Integer signInStatus = SettingUtility.getSignInStatus();
+                final int vendorId = app.getVendor() != null ? app.getVendor().getId() : 0;
                 final HashMap<String, String> envInfos = extraEnvInfo();
                 if (signInStatus == Cts.SIGN_ACTION_IN) {
 
@@ -331,7 +347,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         @Override
                                         public void run() {
                                             AlertUtil.showAlert(MainActivity.this, R.string.working_status,
-                                                    msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(), "现在下班",
+                                                    msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
                                                     new SignOffOnClickListener(signInStore, envInfos, signingText));
                                         }
                                     });
@@ -406,7 +422,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                     }
                                 }.executeOnNormal();
                                 }
-                            }, "查看考勤表", new StaffDetailsClickListener());
+                            }, "查看考勤表", new StaffDetailsClickListener(vendorId));
                 }
             }
         });
@@ -800,11 +816,18 @@ public class MainActivity extends AbstractActionBarActivity {
     }
 
     private class StaffDetailsClickListener implements DialogInterface.OnClickListener {
+
+        private int vendorId;
+
+        private StaffDetailsClickListener(int vendorId) {
+            this.vendorId = vendorId;
+        }
+
         @Override
         public void onClick(DialogInterface dialog, int which) {
             String token = GlobalCtx.getInstance().getSpecialToken();
             GeneralWebViewActivity.gotoWeb(MainActivity.this,
-                    URLHelper.getStoresPrefix() + "/working_status.html?access_token=" + token);
+                    URLHelper.getStoresPrefix() + "/working_status.html?vendor_id="+ vendorId +"&access_token=" + token);
         }
     }
 }

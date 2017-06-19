@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.support;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -38,7 +40,7 @@ public class DaoHelper {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 //        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
@@ -59,8 +61,13 @@ public class DaoHelper {
                 Request request = chain.request();
                 String token = GlobalCtx.getApplication().getSpecialToken();
                 final long storeId = SettingUtility.getListenerStore();
-                HttpUrl url = request.url().newBuilder()
-                        .addQueryParameter("access_token", token)
+                HttpUrl originUrl = request.url();
+                HttpUrl.Builder b = originUrl.newBuilder();
+                if(TextUtils.isEmpty(originUrl.queryParameter("access_token"))){
+                    b = b.addQueryParameter("access_token", token);
+                }
+
+                HttpUrl url = b
                         .addQueryParameter("_sid", String.valueOf(storeId))
                         .build();
                 request = request.newBuilder().url(url).build();

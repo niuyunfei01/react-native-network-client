@@ -733,6 +733,10 @@ public class GlobalCtx extends Application {
         return null;
     }
 
+    public boolean fnEnabledTmpBuy() {
+        return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
+    }
+
     public interface TaskCountUpdated {
         void callback(int count);
     }

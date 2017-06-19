@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaRouter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -23,14 +24,19 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.orders.dao.OAuthDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class LoginActivity extends AbstractActionBarActivity {
@@ -189,10 +195,12 @@ public class LoginActivity extends AbstractActionBarActivity {
             try {
                 LoginResult loginResult = new OauthTokenDao().login(userName, password);
                 if (loginResult != null && loginResult.loginOk()) {
-                    String token = loginResult.getAccess_token();
-                    long expiresInSeconds = loginResult.getExpires_in();
-                    UserBean user = new OAuthDao(token).getOAuthUserInfo();
-                    if (user != null) {
+                    final String token = loginResult.getAccess_token();
+                    final long expiresInSeconds = loginResult.getExpires_in();
+                    final GlobalCtx app = GlobalCtx.getApplication();
+                    ResultBean<UserBean> uiRb = app.dao.userInfo(token).execute().body();
+                    if (uiRb != null && uiRb.isOk() && !TextUtils.isEmpty(uiRb.getObj().getId())) {
+                        UserBean user = uiRb.getObj();
                         AccountBean account = new AccountBean();
                         account.setAccess_token(token);
                         account.setExpires_time(System.currentTimeMillis() + expiresInSeconds * 1000);
@@ -206,10 +214,12 @@ public class LoginActivity extends AbstractActionBarActivity {
                             SettingUtility.setListenerStores(user.getPrefer_store());
                         }
 
-                        GlobalCtx.getApplication().updateCfgInterval();
+                        app.updateCfgInterval();
                         return dbResult;
                     } else {
-                        this.e = new ServiceException("获取登录信息失败，请重试");
+                        boolean denied = uiRb != null && String.valueOf(ErrorCode.CODE_ACCESS_DENIED).equals(uiRb.getDesc());
+                        String msg = denied ? "账户没有访问授权" : "获取不到账户相关信息";
+                        this.e = new ServiceException(msg);
                     }
                 } else {
                     AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()) );
@@ -248,7 +258,7 @@ public class LoginActivity extends AbstractActionBarActivity {
                                 }
                             });
                 } else {
-                    Toast.makeText(activity, e.getError(), Toast.LENGTH_SHORT).show();
+                    AlertUtil.error(activity, e.getError());
                 }
             }
 

@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.dao;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -10,6 +11,7 @@ import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -64,6 +66,9 @@ public interface CRMService {
 
     @GET("/api/common_config2")
     Call<ResultBean<Config>> commonConfig();
+
+    @GET("/api/user_info2")
+    Call<ResultBean<UserBean>> userInfo(@Query("access_token") String token);
 
     class UploadRes {
         private FileBean file;

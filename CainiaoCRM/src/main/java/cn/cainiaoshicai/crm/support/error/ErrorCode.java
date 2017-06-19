@@ -5,6 +5,9 @@ package cn.cainiaoshicai.crm.support.error;
  * Date: 12-8-22
  */
 public class ErrorCode {
+    public static final int CODE_OK = 0;
+    public static final int CODE_ACCESS_DENIED = 10001;
+
     /*304 Not Modified: 没有数据返回.
         400 Bad Request: 请求数据不合法，或者超过请求频率限制. 详细的错误代码如下：
     	40028:内部接口错误(如果有详细的错误信息，会给出更为详细的错误提示)
@@ -112,6 +115,5 @@ public class ErrorCode {
     public static final int USER_NOT_EXISTS = 20003;
 
     public static final int EXPIRED_TOKEN = 21327;
-
     public static final int INVALID_TOKEN = 21332;
 }

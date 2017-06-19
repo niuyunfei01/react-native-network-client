@@ -1,6 +1,5 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,16 +8,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,13 +21,11 @@ import java.util.HashMap;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
-import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.dao.NewOrderDao;
-import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -79,12 +72,13 @@ public class MineActivity extends AbstractActionBarActivity {
 		listView = (ListView) findViewById(R.id.nav_list);
         listAdapter = new MineItemsAdapter(this);
         this.listView.setAdapter(listAdapter);
+		final GlobalCtx app = GlobalCtx.getApplication();
+
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
 				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
-				final GlobalCtx app = GlobalCtx.getApplication();
 				String token = app.getSpecialToken();
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
@@ -189,7 +183,8 @@ public class MineActivity extends AbstractActionBarActivity {
 		new MyAsyncTask<Void,HashMap<String, String>, HashMap<String, String>>() {
 			@Override
 			protected HashMap<String, String> doInBackground(Void... params) {
-				return new NewOrderDao(GlobalCtx.getInstance().getSpecialToken()).getStatMap();
+				long storeId = SettingUtility.getListenerStore();
+				return new NewOrderDao(app.getSpecialToken()).getStatMap(storeId);
 			}
 
 			@Override

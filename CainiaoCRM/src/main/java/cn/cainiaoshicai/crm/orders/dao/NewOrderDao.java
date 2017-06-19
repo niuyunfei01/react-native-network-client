@@ -68,9 +68,9 @@ public class NewOrderDao {
         }
     }
 
-    public HashMap<String, String> getStatMap() {
+    public HashMap<String, String> getStatMap(long storeId) {
         try {
-            String url = URLHelper.API_ROOT() + "/perm_stats.json" ;
+            String url = URLHelper.API_ROOT() + "/perm_stats/"+storeId+".json" ;
 
             Map<String, String> map = new HashMap<String, String>();
             map.put("access_token", access_token);
