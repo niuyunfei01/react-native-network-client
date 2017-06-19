@@ -69,6 +69,8 @@ public class Order implements Serializable {
     private int additional_to_pay;
     private String ship_worker_mobile;
 
+    private boolean remark_warning;
+
     public int getId() {
         return id;
     }
@@ -525,6 +527,15 @@ public class Order implements Serializable {
         direction = updatedO.direction;
         additional_to_pay = updatedO.additional_to_pay;
         ship_worker_mobile = updatedO.ship_worker_mobile;
+        remark_warning = updatedO.remark_warning;
+    }
+
+    public boolean isRemark_warning() {
+        return remark_warning;
+    }
+
+    public void setRemark_warning(boolean remark_warning) {
+        this.remark_warning = remark_warning;
     }
 }
 

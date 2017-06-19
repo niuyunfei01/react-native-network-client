@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -459,7 +460,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     StoreStorageActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            AlertUtil.showAlert(StoreStorageActivity.this, "错误提示", e.getError());
+                            Activity parent = StoreStorageActivity.this.getParent();
+                            AlertUtil.showAlert(parent, "错误提示", e.getError());
                             cancel(true);
                         }
                     });

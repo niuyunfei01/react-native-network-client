@@ -315,7 +315,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
                             } else if (fromStatus == Cts.WM_ORDER_STATUS_TO_READY) {
 
-                                if (!TextUtils.isEmpty(o1.getRemark())) {
+                                if (o1.isRemark_warning()) {
                                     final String warnTip = "有备注：\n[备注：" + o1.getRemark() + "]";
                                     AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, warnTip,
                                             "确认无误", new DialogInterface.OnClickListener() {

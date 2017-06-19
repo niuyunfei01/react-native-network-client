@@ -94,7 +94,6 @@ public class GlobalCtx extends Application {
     private AtomicReference<LinkedHashMap<Long, Store>> storesRef = new AtomicReference<>(null);
     private AtomicReference<Config> serverCfg = new AtomicReference<>(null);
     private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
-    private SortedMap<Integer, Worker> workers = new TreeMap<>();
     private SortedMap<Integer, Worker> ship_workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
@@ -239,13 +238,13 @@ public class GlobalCtx extends Application {
 
 
     public void updateCfgInterval() {
-        this.initConfigs();
+        this.initConfigs(SettingUtility.getListenerStore());
         this.listStores(true);
         this.listTags(SettingUtility.getListenerStore());
         this.updateShipOptions();
     }
 
-    private void initConfigs() {
+    private void initConfigs(long storeId) {
         String token = GlobalCtx.getInstance().getSpecialToken();
         if (!TextUtils.isEmpty(token)) {
             final GlobalCtx ctx = GlobalCtx.this;
@@ -265,10 +264,6 @@ public class GlobalCtx extends Application {
                     ResultBean<Config> b = response.body();
                     if (b.isOk()) {
                         Config config = b.getObj();
-                        SortedMap<Integer, Worker> workers = config.getWorkers();
-                        if (workers != null) {
-                            ctx.workers = workers;
-                        }
                         if (config.getShip_workers() != null) {
                             ctx.ship_workers = config.getShip_workers();
                         }
@@ -336,11 +331,17 @@ public class GlobalCtx extends Application {
     }
 
     public SortedMap<Integer, Worker> getWorkers() {
-        if (workers == null || workers.isEmpty()) {
-            initConfigs();
+        Config cfg = getCfgNullCreated(SettingUtility.getListenerStore());
+        return cfg == null ? new TreeMap<Integer, Worker>() : cfg.getWorkers();
+    }
+
+    public Config getCfgNullCreated(long storeId) {
+        Config cfg = this.serverCfg.get();
+        if (cfg == null) {
+            initConfigs(storeId);
         }
 
-        return this.workers == null ? new TreeMap<Integer, Worker>() : this.workers;
+        return cfg;
     }
 
     public HashMap<String, String> listLaterTypes() {
@@ -354,7 +355,7 @@ public class GlobalCtx extends Application {
 
     public SortedMap<Integer, Worker> getShipWorkers() {
         if (ship_workers == null || ship_workers.isEmpty()) {
-            initConfigs();
+            initConfigs(SettingUtility.getListenerStore());
         }
 
         return this.ship_workers == null ? new TreeMap<Integer, Worker>() : this.ship_workers;
@@ -526,7 +527,7 @@ public class GlobalCtx extends Application {
         if (currUid != null) {
             try {
                 int iUid = Integer.parseInt(currUid);
-                return this.workers.get(iUid);
+                return this.getWorkers().get(iUid);
             } catch (NumberFormatException e) {
                 AppLogger.e("error to parse currUid:" + currUid, e);
             }
