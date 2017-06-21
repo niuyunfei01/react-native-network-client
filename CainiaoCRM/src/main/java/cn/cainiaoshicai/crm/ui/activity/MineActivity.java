@@ -108,7 +108,7 @@ public class MineActivity extends AbstractActionBarActivity {
 					if (item.getType() == TYPE_STORE_PERF) {
                         String url = String.format("%s/worker_stats_by_day.html", URLHelper.getStoresPrefix());
 						if (vendor != null) {
-                            url += "?&vendor_id=" + vendor.getId();
+                            url += "?&_v_id=" + vendor.getId();
                         }
                         gotoWeb(Utility.append_token(url, token));
                     } else if (item.getType() == TYPE_PROVIDE_LIST) {

@@ -631,7 +631,7 @@ public class OrderSingleHelper {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AlertUtil.showAlert(activity.getParent(), "错误提示", error);
+                AlertUtil.showAlert(activity, "错误提示", error);
             }
         });
     }
@@ -640,7 +640,7 @@ public class OrderSingleHelper {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AlertUtil.showAlert(activity.getParent(), "消息提示", msg);
+                AlertUtil.showAlert(activity, "消息提示", msg);
             }
         });
     }

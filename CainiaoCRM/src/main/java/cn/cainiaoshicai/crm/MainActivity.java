@@ -34,6 +34,7 @@ import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.roughike.bottombar.BottomBar;
@@ -181,7 +182,6 @@ public class MainActivity extends AbstractActionBarActivity {
             ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
         }
 
-
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
         handleIntent(intent);
@@ -192,10 +192,13 @@ public class MainActivity extends AbstractActionBarActivity {
         final ArrayList<Long> autoPrintStores = SettingUtility.getAutoPrintStores();
         final GlobalCtx app = GlobalCtx.getApplication();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
+        TextView signInTxt = (TextView) this.findViewById(R.id.head_orders_waiting);
 
         TextView tmpBuy = (TextView) this.findViewById(R.id.head_orders_schedule);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) signInTxt.getLayoutParams();
         if (app.fnEnabledTmpBuy()) {
             tmpBuy.setVisibility(View.VISIBLE);
+            params.removeRule(RelativeLayout.ALIGN_PARENT_END);
             tmpBuy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -221,9 +224,11 @@ public class MainActivity extends AbstractActionBarActivity {
             });
         } else {
             tmpBuy.setVisibility(View.GONE);
+            params.addRule(RelativeLayout.ALIGN_PARENT_END);
+            signInTxt.setLayoutParams(params);
         }
 
-        initSignButton(app);
+        initSignButton(app, signInTxt);
 
         initShipAccept(app);
 
@@ -306,8 +311,7 @@ public class MainActivity extends AbstractActionBarActivity {
         }; */
     }
 
-    private void initSignButton(final GlobalCtx app) {
-        final TextView signingText = (TextView) this.findViewById(R.id.head_orders_waiting);
+    private void initSignButton(final GlobalCtx app, final TextView signingText) {
         signingText.setText(Cts.getSignInLabel(SettingUtility.getSignInStatus()));
 
         signingText.setOnClickListener(new View.OnClickListener() {
@@ -827,7 +831,7 @@ public class MainActivity extends AbstractActionBarActivity {
         public void onClick(DialogInterface dialog, int which) {
             String token = GlobalCtx.getInstance().getSpecialToken();
             GeneralWebViewActivity.gotoWeb(MainActivity.this,
-                    URLHelper.getStoresPrefix() + "/working_status.html?vendor_id="+ vendorId +"&access_token=" + token);
+                    URLHelper.getStoresPrefix() + "/working_status.html?_v_id="+ vendorId +"&access_token=" + token);
         }
     }
 }

@@ -210,8 +210,12 @@ public class LoginActivity extends AbstractActionBarActivity {
                         if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
                             SettingUtility.setDefaultAccountId(account.getUid());
                         }
-                        if (SettingUtility.getListenerStore() <= 0 && user.getPrefer_store() > 0) {
-                            SettingUtility.setListenerStores(user.getPrefer_store());
+
+                        long prefer_store = user.getPrefer_store();
+                        if (prefer_store > 0) {
+                            SettingUtility.setListenerStores(prefer_store);
+                        } else {
+                            SettingUtility.removeListenerStores();
                         }
 
                         app.updateCfgInterval();

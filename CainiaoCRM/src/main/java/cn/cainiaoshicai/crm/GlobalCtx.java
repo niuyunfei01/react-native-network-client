@@ -92,8 +92,8 @@ public class GlobalCtx extends Application {
     private Handler handler = new Handler();
 
     private AtomicReference<LinkedHashMap<Long, Store>> storesRef = new AtomicReference<>(null);
-    private AtomicReference<Config> serverCfg = new AtomicReference<>(null);
-    private AtomicReference<ArrayList<Tag>> tagsRef = new AtomicReference<>(null);
+    private ConcurrentHashMap<Long, Config> serverCfg = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, ArrayList<Tag>> tagsRef = new ConcurrentHashMap<>();
     private SortedMap<Integer, Worker> ship_workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
@@ -240,11 +240,11 @@ public class GlobalCtx extends Application {
     public void updateCfgInterval() {
         this.initConfigs(SettingUtility.getListenerStore());
         this.listStores(true);
-        this.listTags(SettingUtility.getListenerStore());
+        this.listTags(SettingUtility.getListenerStore(), true);
         this.updateShipOptions();
     }
 
-    private void initConfigs(long storeId) {
+    private void initConfigs(final long storeId) {
         String token = GlobalCtx.getInstance().getSpecialToken();
         if (!TextUtils.isEmpty(token)) {
             final GlobalCtx ctx = GlobalCtx.this;
@@ -275,7 +275,7 @@ public class GlobalCtx extends Application {
                         }
 
                         ctx.coupons = config.getCoupons();
-                        ctx.serverCfg.set(config);
+                        ctx.serverCfg.put(storeId, config);
                     } else {
                         AppLogger.e("error to update local config:" + b.getDesc());
                     }
@@ -336,7 +336,7 @@ public class GlobalCtx extends Application {
     }
 
     public Config getCfgNullCreated(long storeId) {
-        Config cfg = this.serverCfg.get();
+        Config cfg = this.serverCfg.get(storeId);
         if (cfg == null) {
             initConfigs(storeId);
         }
@@ -577,8 +577,12 @@ public class GlobalCtx extends Application {
 
 
     public ArrayList<Tag> listTags(final long currStoreId) {
-        ArrayList<Tag> tags = tagsRef.get();
-        if (tags == null || tags.isEmpty()) {
+        return this.listTags(currStoreId, true);
+    }
+
+    public ArrayList<Tag> listTags(final long currStoreId, boolean force) {
+        ArrayList<Tag> tags = tagsRef.get(currStoreId);
+        if (tags == null || tags.isEmpty() || force) {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
@@ -586,7 +590,7 @@ public class GlobalCtx extends Application {
                     try {
                         ArrayList<Tag> s = cfgDao.getTags(currStoreId);
                         if (s != null) {
-                            tagsRef.set(s);
+                            tagsRef.put(currStoreId, s);
                         }
                     } catch (ServiceException e) {
                         AppLogger.e("获取产品分类列表错误:" + e.getMessage(), e);
@@ -719,7 +723,7 @@ public class GlobalCtx extends Application {
     }
 
     public String getSupportTel() {
-        Config cfg = this.serverCfg.get();
+        Config cfg = this.serverCfg.get(SettingUtility.getListenerStore());
         if (cfg != null) {
             return cfg.getSupportTel();
         }
@@ -727,7 +731,7 @@ public class GlobalCtx extends Application {
     }
 
     public Vendor getVendor() {
-        Config cfg = this.serverCfg.get();
+        Config cfg = this.serverCfg.get(SettingUtility.getListenerStore());
         if (cfg != null) {
             return cfg.getVendor();
         }
@@ -735,6 +739,14 @@ public class GlobalCtx extends Application {
     }
 
     public boolean fnEnabledTmpBuy() {
+        return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
+    }
+
+    public boolean fnEnabledLoss() {
+        return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
+    }
+
+    public boolean fnEnabledReqProvide() {
         return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
     }
 

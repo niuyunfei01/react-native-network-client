@@ -509,10 +509,8 @@ public class SettingUtility {
         }
     }
 
-    public static void setListenerStores(Set<Long> currSelectedStores) {
-        if (!currSelectedStores.isEmpty()) {
-            currSelectedStores.add((long) Cts.STORE_UNKNOWN);
-        }
+    public static void removeListenerStores() {
+        Set<Long> currSelectedStores = new HashSet<>();
         SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
     }
 

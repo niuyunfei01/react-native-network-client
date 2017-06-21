@@ -160,6 +160,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             return;
         }
 
+        final GlobalCtx app = GlobalCtx.getApplication();
+
         bar.setCustomView(R.layout.store_list_in_title);
         View titleBar = bar.getCustomView();
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
@@ -196,9 +198,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         this.btnReqList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(StoreStorageActivity.this, StorageProvideActivity.class);
-                intent.putExtra("store_id", currStore.getId());
-                startActivity(intent);
+
+                if (!app.fnEnabledReqProvide()) {
+                    AlertUtil.error(StoreStorageActivity.this, "您使用的版本还没有开启销存模块");
+                } else {
+                    Intent intent = new Intent(StoreStorageActivity.this, StorageProvideActivity.class);
+                    intent.putExtra("store_id", currStore.getId());
+                    startActivity(intent);
+                }
             }
         });
 
@@ -460,8 +467,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     StoreStorageActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Activity parent = StoreStorageActivity.this.getParent();
-                            AlertUtil.showAlert(parent, "错误提示", e.getError());
+                            StoreStorageActivity activity = StoreStorageActivity.this;
+                            if (!activity.isFinishing()) {
+                                AlertUtil.showAlert(activity, "错误提示", e.getError());
+                            }
                             cancel(true);
                         }
                     });
@@ -501,6 +510,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+
+        GlobalCtx app = GlobalCtx.getApplication();
+
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         StorageItem item = listAdapter.getItem(info.position);
         if (item != null) {
@@ -516,8 +528,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_SOLD_OUT_ID, Menu.NONE, "暂停售卖");
             }
 
-            if (item.getStatus() != STORE_PROD_OFF_SALE) {
-                menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
+            if (app.fnEnabledLoss()) {
+                if (item.getStatus() != STORE_PROD_OFF_SALE) {
+                    menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
+                }
             }
 
             menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
@@ -576,7 +590,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
         AppLogger.d("reset storage item pos=" + info.position);
         final StorageItem item = this.listAdapter.getItem(info.position);
-
+        final GlobalCtx app = GlobalCtx.getApplication();
         ItemStatusUpdated changed = new ItemStatusUpdated(this);
         changed.setAdditional(new Runnable() {
             @Override
@@ -626,9 +640,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 dlg.show();
                 return true;
             case MENU_CONTEXT_TO_LOSS:
-                if (item != null) {
-                    int itemId = item.getId();
-                    GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, URLHelper.WEB_URL_ROOT + "/stores/prod_loss/" + itemId);
+                if (!app.fnEnabledLoss()) {
+                    AlertUtil.error(this, "您使用的版本还没有开启报损模块");
+                } else {
+                    if (item != null) {
+                        int itemId = item.getId();
+                        GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, URLHelper.WEB_URL_ROOT + "/stores/prod_loss/" + itemId);
+                    }
                 }
                 return true;
             case MENU_CONTEXT_VIEW_DETAIL:
