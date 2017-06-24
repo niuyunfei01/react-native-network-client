@@ -195,10 +195,17 @@ public class MainActivity extends AbstractActionBarActivity {
         TextView signInTxt = (TextView) this.findViewById(R.id.head_orders_waiting);
 
         TextView tmpBuy = (TextView) this.findViewById(R.id.head_orders_schedule);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) signInTxt.getLayoutParams();
+        RelativeLayout.LayoutParams params = null;
+        if (signInTxt != null) {
+            params = (RelativeLayout.LayoutParams) signInTxt.getLayoutParams();
+        }
         if (app.fnEnabledTmpBuy()) {
             tmpBuy.setVisibility(View.VISIBLE);
-            params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+            if (params != null) {
+                params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+                signInTxt.setLayoutParams(params);
+            }
+
             tmpBuy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -224,8 +231,11 @@ public class MainActivity extends AbstractActionBarActivity {
             });
         } else {
             tmpBuy.setVisibility(View.GONE);
-            params.addRule(RelativeLayout.ALIGN_PARENT_END);
-            signInTxt.setLayoutParams(params);
+
+            if (signInTxt != null) {
+                params.addRule(RelativeLayout.ALIGN_PARENT_END);
+                signInTxt.setLayoutParams(params);
+            }
         }
 
         initSignButton(app, signInTxt);
