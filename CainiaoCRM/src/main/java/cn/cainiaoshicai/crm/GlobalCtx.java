@@ -262,7 +262,7 @@ public class GlobalCtx extends Application {
                 @Override
                 public void onResponse(Call<ResultBean<Config>> call, Response<ResultBean<Config>> response) {
                     ResultBean<Config> b = response.body();
-                    if (b.isOk()) {
+                    if (b != null && b.isOk()) {
                         Config config = b.getObj();
                         if (config.getShip_workers() != null) {
                             ctx.ship_workers = config.getShip_workers();
@@ -277,7 +277,7 @@ public class GlobalCtx extends Application {
                         ctx.coupons = config.getCoupons();
                         ctx.serverCfg.put(storeId, config);
                     } else {
-                        AppLogger.e("error to update local config:" + b.getDesc());
+                        AppLogger.e("error to update local config:" + (b != null ? b.getDesc() : "result is null"));
                     }
                 }
 

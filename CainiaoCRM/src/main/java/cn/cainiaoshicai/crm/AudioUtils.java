@@ -62,34 +62,37 @@ public class AudioUtils {
         //处理语音合成关键类
         mySynthesizer = SpeechSynthesizer.createSynthesizer(context, myInitListener);
         String mEngineType = SpeechConstant.TYPE_CLOUD;
-        // 清空参数
-        mySynthesizer.setParameter(SpeechConstant.PARAMS, null);
-        // 根据合成引擎设置相应参数
-        if (mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
-            mySynthesizer.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
-            // 设置在线合成发音人
-            mySynthesizer.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");
-            //设置音调
-            mySynthesizer.setParameter(SpeechConstant.PITCH, "50");
-            //设置音量
-            mySynthesizer.setParameter(SpeechConstant.VOLUME, "50");
-        } else {
-            mySynthesizer.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
-            // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
-            mySynthesizer.setParameter(SpeechConstant.VOICE_NAME, "");
-            /**
-             * TODO 本地合成不设置语速、音调、音量，默认使用语记设置
-             * 开发者如需自定义参数，请参考在线合成参数设置
-             */
-        }
-        //设置播放器音频流类型
+
+        if (mySynthesizer != null) {
+            // 清空参数
+            mySynthesizer.setParameter(SpeechConstant.PARAMS, null);
+            // 根据合成引擎设置相应参数
+            if (mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
+                mySynthesizer.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
+                // 设置在线合成发音人
+                mySynthesizer.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");
+                //设置音调
+                mySynthesizer.setParameter(SpeechConstant.PITCH, "50");
+                //设置音量
+                mySynthesizer.setParameter(SpeechConstant.VOLUME, "50");
+            } else {
+                mySynthesizer.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
+                // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
+                mySynthesizer.setParameter(SpeechConstant.VOICE_NAME, "");
+                /**
+                 * TODO 本地合成不设置语速、音调、音量，默认使用语记设置
+                 * 开发者如需自定义参数，请参考在线合成参数设置
+                 */
+            }
+            //设置播放器音频流类型
 //        mTts.setParameter(SpeechConstant.STREAM_TYPE, mSharedPreferences.getString("stream_preference", "3"));
-        // 设置播放合成音频打断音乐播放，默认为true
-        mySynthesizer.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
-        // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
-        // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
-        mySynthesizer.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
-        mySynthesizer.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/tts.wav");
+            // 设置播放合成音频打断音乐播放，默认为true
+            mySynthesizer.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
+            // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
+            // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
+            mySynthesizer.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
+            mySynthesizer.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/tts.wav");
+        }
 
     }
 
