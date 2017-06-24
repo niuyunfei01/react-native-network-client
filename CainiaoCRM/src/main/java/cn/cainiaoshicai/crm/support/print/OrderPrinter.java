@@ -178,7 +178,7 @@ public class OrderPrinter {
             btos.write(new byte[]{0x1B, 0x21, 0});
             btos.write(GPrinterCommand.left);
 
-            printer.starLine().highBigText("   菜鸟食材").newLine()
+            printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
                     .newLine().highBigText("  #" + order.getSimplifiedId());
 
             printer.normalText(order.platformWithId()).newLine();

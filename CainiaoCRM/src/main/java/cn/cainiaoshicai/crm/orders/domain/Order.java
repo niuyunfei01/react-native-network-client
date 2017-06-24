@@ -70,6 +70,7 @@ public class Order implements Serializable {
     private String ship_worker_mobile;
 
     private boolean remark_warning;
+    private String fullStoreName;
 
     public int getId() {
         return id;
@@ -536,6 +537,14 @@ public class Order implements Serializable {
 
     public void setRemark_warning(boolean remark_warning) {
         this.remark_warning = remark_warning;
+    }
+
+    public String getFullStoreName() {
+        return fullStoreName;
+    }
+
+    public void setFullStoreName(String fullStoreName) {
+        this.fullStoreName = fullStoreName;
     }
 }
 
