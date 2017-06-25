@@ -65,12 +65,15 @@ public class Order implements Serializable {
     private int source_ready;
 
     private Feedback feedback;
-    private String direction;
+    private String direction = "";
     private int additional_to_pay;
     private String ship_worker_mobile;
 
     private boolean remark_warning;
-    private String fullStoreName;
+    private String fullStoreName = "";
+    private String printFooter1 = "";
+    private String printFooter2 = "";
+    private String printFooter3 = "";
 
     public int getId() {
         return id;
@@ -545,6 +548,30 @@ public class Order implements Serializable {
 
     public void setFullStoreName(String fullStoreName) {
         this.fullStoreName = fullStoreName;
+    }
+
+    public String getPrintFooter1() {
+        return printFooter1;
+    }
+
+    public void setPrintFooter1(String printFooter1) {
+        this.printFooter1 = printFooter1;
+    }
+
+    public String getPrintFooter2() {
+        return printFooter2;
+    }
+
+    public void setPrintFooter2(String printFooter2) {
+        this.printFooter2 = printFooter2;
+    }
+
+    public String getPrintFooter3() {
+        return printFooter3;
+    }
+
+    public void setPrintFooter3(String printFooter3) {
+        this.printFooter3 = printFooter3;
     }
 }
 

@@ -152,7 +152,8 @@ public class OrderAdapter extends BaseAdapter {
             final String direction;
             if (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP
                     || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
-                    || "未知".equals(order.getDirection())) {
+                    || "未知".equals(order.getDirection())
+                    || TextUtils.isEmpty(order.getDirection())) {
                 direction = "";
             } else {
                 direction = " [ " + order.getDirection() + " ]";

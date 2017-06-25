@@ -339,13 +339,11 @@ public class OrderSingleHelper {
 
             new MyAsyncTask<Void, Void, Void>(){
 
-                private int _dadaStatus;
                 private Order _order;
                 @Override
                 protected Void doInBackground(Void... params) {
                     OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
                     this._order = dao.getOrder(orderId);
-                    this._dadaStatus = this._order.getDada_status();
                     return null;
                 }
 
@@ -354,6 +352,13 @@ public class OrderSingleHelper {
                     final Context ctx = helper.activity;
                     AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
 
+                    if (_order == null) {
+                        AlertUtil.error(helper.activity, "获取订单失败，请重试！");
+                        return;
+                    }
+
+                    int _dadaStatus;
+                    _dadaStatus = this._order.getDada_status();
                     helper.updateDadaCallLabelUI(_dadaStatus, btnCallDada);
 
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {

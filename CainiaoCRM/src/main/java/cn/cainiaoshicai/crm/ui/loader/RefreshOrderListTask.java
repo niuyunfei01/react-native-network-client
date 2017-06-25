@@ -15,6 +15,7 @@ import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 
@@ -104,7 +105,7 @@ public class RefreshOrderListTask
         if (progressFragment != null) {
             progressFragment.dismissAllowingStateLoss();
         }
-        Toast.makeText(this.activity, "已取消：" + this.error, Toast.LENGTH_LONG).show();
+        Toast.makeText(this.activity, "已取消刷新", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -112,7 +113,11 @@ public class RefreshOrderListTask
         super.onPostExecute(value);
         swipeRefreshLayout.setRefreshing(false);
         if (progressFragment != null) {
-            progressFragment.dismissAllowingStateLoss();
+            try {
+                progressFragment.dismissAllowingStateLoss();
+            }catch (Exception e) {
+                AppLogger.e("exception:" + e.getMessage(), e);
+            }
         }
 
         if (doneCallback != null) {

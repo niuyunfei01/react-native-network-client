@@ -418,8 +418,7 @@ public class SettingUtility {
     }
 
     public static <T> void removeSR(String key) {
-        SettingHelper.removeEditor(getContext(), "ca_" + key);
-        SettingHelper.removeEditor(getContext(), "ca_tl_" + key);
+        SettingHelper.removeEditor(getContext(), "ca_" + key, "ca_tl_" + key);
     }
 
     public static <T> void putSR(String key, T value) {
@@ -437,15 +436,17 @@ public class SettingUtility {
     }
 
     public static <T> T getSR(String key, Type type) {
-
-        long ts = SettingHelper.getSharedPreferences(getContext(), "ca_tl_" + key, System.currentTimeMillis());
-        if (System.currentTimeMillis() - ts > 30 * 1000) {
+        String objKey = "ca_" + key;
+        String json = SettingHelper.getSharedPreferences(getContext(), objKey, (String)null);
+        if (json == null) {
             return null;
-        }
-
-        String json = SettingHelper.getSharedPreferences(getContext(), "ca_" + key, "");
-        if (TextUtil.isEmpty(json)) {
-            return null;
+        } else {
+            String tlKey = "ca_tl_" + key;
+            long ts = SettingHelper.getSharedPreferences(getContext(), tlKey, 0L);
+            if ("".equals(json) || System.currentTimeMillis() - ts > 30 * 1000) {
+                SettingHelper.removeEditor(getContext(), tlKey, objKey);
+                return null;
+            }
         }
 
         T value;

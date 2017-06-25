@@ -51,8 +51,17 @@ public class SettingHelper {
         return sharedPreferences;
     }
 
-    public static void removeEditor(Context paramContext, String paramString) {
-        getEditorObject(paramContext).remove(paramString).commit();
+    public static void removeEditor(Context paramContext, String... paramStrings) {
+        if (paramStrings != null) {
+            SharedPreferences.Editor eo = getEditorObject(paramContext);
+            for(String key : paramStrings) {
+                eo.remove(key);
+            }
+
+            if (paramStrings.length > 0) {
+                eo.commit();
+            }
+        }
     }
 
     public static void setEditor(Context paramContext, String paramString, int paramInt) {

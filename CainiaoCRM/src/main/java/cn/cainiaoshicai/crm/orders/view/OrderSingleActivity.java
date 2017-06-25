@@ -186,7 +186,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                             }
                         });
                     } else {
-                        Toast.makeText(act, "获取订单失败", Toast.LENGTH_LONG).show();
+                        AlertUtil.errorOnActivity(act, "获取订单失败，请检查网络并重试");
                     }
                     return null;
                 }
