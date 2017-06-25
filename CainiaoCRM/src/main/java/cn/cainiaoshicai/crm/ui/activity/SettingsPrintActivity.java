@@ -165,7 +165,7 @@ public class SettingsPrintActivity extends ListActivity {
 		if (!TextUtils.isEmpty(lastAddress)) {
 			for (int pos = 0; pos < listAdapter.getCount(); pos++) {
 				BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
-				if (lastAddress.equals(item.getAddr())) {
+				if (item != null && lastAddress.equals(item.getAddr())) {
 					connectPrinter(item);
 					break;
 				}
@@ -178,7 +178,7 @@ public class SettingsPrintActivity extends ListActivity {
 		if (!TextUtils.isEmpty(lastAddress) && listAdapter != null) {
 			for (int pos = 0; pos < listAdapter.getCount(); pos++) {
 				BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
-				if (lastAddress.equals(item.getAddr())) {
+				if (item != null && lastAddress.equals(item.getAddr())) {
 					return item.isConnected();
 				}
 			}
@@ -211,7 +211,7 @@ public class SettingsPrintActivity extends ListActivity {
 		btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
 		if (btAdapter == null) {
 			Toast.makeText(getApplicationContext(),
-					"Bluetooth not supported!!", Toast.LENGTH_LONG).show();
+					"手机没有开启蓝牙，请先开启", Toast.LENGTH_LONG).show();
 			return -1;
 		}
 
@@ -228,7 +228,7 @@ public class SettingsPrintActivity extends ListActivity {
 		}
 
 		Toast.makeText(getApplicationContext(),
-				"Getting all available Bluetooth Devices", Toast.LENGTH_SHORT)
+				"正在查找蓝牙打印机...", Toast.LENGTH_SHORT)
 				.show();
 
 		return 0;
@@ -307,7 +307,7 @@ public class SettingsPrintActivity extends ListActivity {
 		}
 
 		Toast.makeText(getApplicationContext(),
-				String.format("Connecting to %s,%s", item.getName(), item.getAddr()),
+				String.format("正在连接打印机 %s,%s", item.getName(), item.getAddr()),
 				Toast.LENGTH_SHORT).show();
 
 		Thread connectThread = new Thread(new Runnable() {
@@ -378,7 +378,7 @@ public class SettingsPrintActivity extends ListActivity {
 		@Override
 		public void run() {
 			Toast.makeText(getApplicationContext(),
-					"Cannot establish connection", Toast.LENGTH_SHORT).show();
+					"打印机链接失败", Toast.LENGTH_SHORT).show();
 			btAdapter.startDiscovery();
 
 		}
@@ -388,7 +388,7 @@ public class SettingsPrintActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
-		menu.add(0, Menu.FIRST, Menu.NONE, "Refresh Scanning");
+		menu.add(0, Menu.FIRST, Menu.NONE, "查找附近打印机");
 
 		return true;
 	}
