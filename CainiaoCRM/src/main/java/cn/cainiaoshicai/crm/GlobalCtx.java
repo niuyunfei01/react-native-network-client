@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.multidex.BuildConfig;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -213,7 +214,7 @@ public class GlobalCtx extends Application {
         @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
-        dao = DaoHelper.factory(agent);
+        dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
 
         initTalkSDK();
 
@@ -361,7 +362,7 @@ public class GlobalCtx extends Application {
         return this.ship_workers == null ? new TreeMap<Integer, Worker>() : this.ship_workers;
     }
 
-    public SortedMap<Integer, Worker> getStoreWorkers(final int posType, final int storeId) {
+    public SortedMap<Integer, Worker> getStoreWorkers(final int posType, final long storeId) {
 
         if (System.currentTimeMillis() - storeWorkersTs > 2 * 60 * 1000) {
             new MyAsyncTask<Void, Void, Void>() {
@@ -513,7 +514,7 @@ public class GlobalCtx extends Application {
         return s;
     }
 
-    public static boolean isAutoPrint(int store_id) {
+    public static boolean isAutoPrint(long store_id) {
         return store_id == Cts.STORE_UNKNOWN
                 || (SettingUtility.isAutoPrint(store_id));
     }
@@ -670,7 +671,7 @@ public class GlobalCtx extends Application {
         }
     }
 
-    public ShipOptions getShipOptions(final int storeId) {
+    public ShipOptions getShipOptions(final long storeId) {
         Map<Integer, ShipOptions> p = shipOptions.get();
         ShipOptions ret;
         if (p == null) {

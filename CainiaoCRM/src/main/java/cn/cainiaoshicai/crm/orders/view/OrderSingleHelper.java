@@ -47,9 +47,9 @@ public class OrderSingleHelper {
 
     private OrderSingleActivity activity;
     private int orderId;
-    private final int store_id;
+    private final long store_id;
 
-    public OrderSingleHelper(OrderSingleActivity activity, int orderId, int store_id) {
+    public OrderSingleHelper(OrderSingleActivity activity, int orderId, long store_id) {
         this.activity = activity;
         this.orderId = orderId;
         this.store_id = store_id;

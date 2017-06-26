@@ -42,7 +42,7 @@ public class StorageActionDao {
         return actionWithResult(String.format("/store_status_reset_stat_num/%d/%d/%d", storeId, product_id, lastStat), null);
     }
 
-    public ResultBean chg_item_status(int storeId, int product_id, int status, int destStatus) throws ServiceException {
+    public ResultBean chg_item_status(long storeId, int product_id, int status, int destStatus) throws ServiceException {
 
         return actionWithResult(String.format("/store_chg_status/%d/%d/%d/%d", storeId, product_id, status, destStatus), null);
     }

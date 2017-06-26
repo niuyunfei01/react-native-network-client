@@ -36,11 +36,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DaoHelper {
 
 
-    public static CRMService factory(final String agent) {
+    public static CRMService factory(final String agent, boolean isDebug) {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-//        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        if (isDebug) {
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);

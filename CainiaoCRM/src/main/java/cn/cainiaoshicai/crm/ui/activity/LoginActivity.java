@@ -43,8 +43,8 @@ public class LoginActivity extends AbstractActionBarActivity {
 
     private static final String KEY_PREFIX = LoginActivity.class.getName() + '.';
     private static final int REQUEST_CODE_AUTH = 0;
-    private static final String ACTION_OPEN_FROM_APP_INNER = "org.qii.weiciyuan:accountactivity";
-    private static final String ACTION_OPEN_FROM_APP_INNER_REFRESH_TOKEN = "org.qii.weiciyuan:accountactivity_refresh_token";
+    private static final String ACTION_OPEN_FROM_APP_INNER = "cn.cainiaoshicai.crm:accountactivity";
+    private static final String ACTION_OPEN_FROM_APP_INNER_REFRESH_TOKEN = "cn.cainiaoshicai.crm:accountactivity_refresh_token";
 
     private static final String REFRESH_ACTION_EXTRA = "refresh_account";
 
@@ -75,6 +75,13 @@ public class LoginActivity extends AbstractActionBarActivity {
         mPasswordEdit = (EditText) findViewById(R.id.password);
         mLoginButton = (Button) findViewById(R.id.login);
 
+        if (TextUtils.isEmpty(mUsername) && getIntent() != null) {
+            String m = getIntent().getStringExtra("mobile");
+            if (!TextUtils.isEmpty(m)) {
+                mUsername = m;
+            }
+        }
+
         if (!TextUtils.isEmpty(mUsername)) {
             mUsernameEdit.setText(mUsername);
         }
@@ -97,6 +104,21 @@ public class LoginActivity extends AbstractActionBarActivity {
             @Override
             public void onClick(View view) {
                 attemptStartAuth();
+            }
+        });
+
+
+        ((TextView)findViewById(R.id.link_register)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GeneralWebViewActivity.gotoWeb(LoginActivity.this, URLHelper.getRigsterForCRM());
+            }
+        });
+
+        ((TextView)findViewById(R.id.link_reset)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GeneralWebViewActivity.gotoWeb(LoginActivity.this, URLHelper.getForgotPasswd());
             }
         });
 
@@ -160,7 +182,15 @@ public class LoginActivity extends AbstractActionBarActivity {
     }
 
     public static Intent newIntent() {
-        return new Intent(GlobalCtx.getInstance(), LoginActivity.class);
+        return newIntent("");
+    }
+
+    public static Intent newIntent(String mobile) {
+        Intent intent = new Intent(GlobalCtx.getInstance(), LoginActivity.class);
+        if (TextUtils.isEmpty(mobile)) {
+            intent.putExtra("mobile", mobile);
+        }
+        return intent;
     }
 
     public enum DBResult {
@@ -222,7 +252,7 @@ public class LoginActivity extends AbstractActionBarActivity {
                         return dbResult;
                     } else {
                         boolean denied = uiRb != null && String.valueOf(ErrorCode.CODE_ACCESS_DENIED).equals(uiRb.getDesc());
-                        String msg = denied ? "账户没有访问授权" : "获取不到账户相关信息";
+                        String msg = denied ? "账户没有授权，请联系店长开通" : "获取不到账户相关信息";
                         this.e = new ServiceException(msg);
                     }
                 } else {

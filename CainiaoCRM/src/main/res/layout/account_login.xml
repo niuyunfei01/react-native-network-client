@@ -19,6 +19,12 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <ImageView android:layout_gravity="center"
+            android:src="@drawable/ic_launcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="比邻鲜CRM" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,7 +34,6 @@
             android:maxLines="1"
             android:text="@string/app_name"
             android:textColor="@android:color/white"
-            android:textSize="72dp"
             tools:ignore="SpUsage" />
 
         <Space
@@ -68,6 +73,28 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="@dimen/weight_1_when_tablet" />
+
+        <RelativeLayout
+            android:layout_marginTop="@dimen/screen_edge_horizontal_margin"
+            android:layout_marginLeft="@dimen/card_content_horizontal_margin_with_4dp_padding"
+            android:layout_marginRight="@dimen/card_content_horizontal_margin_with_4dp_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView android:id="@+id/link_register"
+                android:layout_toStartOf="@+id/link_reset"
+                android:text="注册新账号"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView android:id="@+id/link_reset"
+                android:text="重设密码"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="@dimen/screen_edge_horizontal_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"

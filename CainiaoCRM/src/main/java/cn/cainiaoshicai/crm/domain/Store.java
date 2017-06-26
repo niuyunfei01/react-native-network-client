@@ -7,7 +7,7 @@ import android.text.TextUtils;
  */
 public class Store {
     private String name;
-    private int id;
+    private long id;
     private String mobile;
     private String tel;
     private float location_long;
@@ -32,7 +32,7 @@ public class Store {
         this.name = name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

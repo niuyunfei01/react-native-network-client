@@ -806,7 +806,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
                 final int[] selectedIdx = new int[1];
                 String[] storeNames = new String[stores.size()];
-                final int[] storeIds = new int[stores.size()];
+                final long[] storeIds = new long[stores.size()];
                 int idx = 0;
                 for(Store store : stores) {
                     storeNames[idx] = store.getName();
@@ -828,7 +828,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Order order = orderRef.get();
-                        final int storeId = storeIds[selectedIdx[0]];
+                        final long storeId = storeIds[selectedIdx[0]];
                         if (storeId != order.getStore_id()) {
                             new MyAsyncTask<Void, Void, Void>() {
                                 @Override

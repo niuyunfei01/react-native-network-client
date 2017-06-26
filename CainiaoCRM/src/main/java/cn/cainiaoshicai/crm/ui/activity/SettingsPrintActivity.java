@@ -378,7 +378,7 @@ public class SettingsPrintActivity extends ListActivity {
 		@Override
 		public void run() {
 			Toast.makeText(getApplicationContext(),
-					"打印机链接失败", Toast.LENGTH_SHORT).show();
+					"连接打印机时发生错误", Toast.LENGTH_SHORT).show();
 			btAdapter.startDiscovery();
 
 		}

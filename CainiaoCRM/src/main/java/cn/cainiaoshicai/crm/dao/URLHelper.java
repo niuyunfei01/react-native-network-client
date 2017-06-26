@@ -49,10 +49,14 @@ public class URLHelper {
     }
 
     public static String getForgotPasswd() {
-        return WEB_URL_ROOT + "/users/forgot";
+        return WEB_URL_ROOT + "/users/forgot/crm.html";
     }
 
     public static String getWorkerListUrl(Vendor vendor) {
         return getStoresPrefix() + "/worker_list/"+(vendor != null ? vendor.getId() : 0);
+    }
+
+    public static String getRigsterForCRM() {
+        return PROTO + getHost() + "/users/logout.html?refer=/users/register/crm.html";
     }
 }

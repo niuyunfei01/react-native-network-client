@@ -84,7 +84,7 @@ public class StaffDao {
         this.access_token = access_token;
     }
 
-    public SortedMap<Integer,Worker> getStoreTodayWorkers(int storeId) throws ServiceException {
+    public SortedMap<Integer,Worker> getStoreTodayWorkers(long storeId) throws ServiceException {
         ResultBean<HashMap<Integer, Worker>> workers = convertWorkers(post("store_day_workers/" + storeId));
         TreeMap<Integer, Worker> rtn = new TreeMap<>();
         if (workers != null && workers.isOk() && workers.getObj() != null) {

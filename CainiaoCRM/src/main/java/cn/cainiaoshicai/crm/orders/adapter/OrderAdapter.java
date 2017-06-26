@@ -367,9 +367,9 @@ public class OrderAdapter extends BaseAdapter {
 
         private final String initOption;
         private final long orderId;
-        private int storeId;
+        private long storeId;
 
-        private ScheClickedListener(String initOption, long orderId, int storeId) {
+        private ScheClickedListener(String initOption, long orderId, long storeId) {
             this.initOption = initOption;
             this.orderId = orderId;
             this.storeId = storeId;

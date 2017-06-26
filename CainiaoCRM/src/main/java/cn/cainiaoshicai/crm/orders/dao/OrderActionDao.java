@@ -211,7 +211,7 @@ public class OrderActionDao<T extends Order> {
         return actionWithResult("/order_dada_query/" + orderId);
     }
 
-    public ResultBean orderChgStore(int orderId, int storeId, int oldStoreId, int status) throws ServiceException {
+    public ResultBean orderChgStore(int orderId, long storeId, long oldStoreId, int status) throws ServiceException {
         String path = String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId);
         return invalidListRequired(actionWithResult(path), new ListType[]{ListType.findByType(status)});
     }

@@ -326,7 +326,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             Utility.runUIActionDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    int currStoreId = currStore != null ? currStore.getId() : 0;
+                    long currStoreId = currStore != null ? currStore.getId() : 0;
                     tagAdapter.addAll(GlobalCtx.getInstance().listTags(currStoreId));
                     tagAdapter.notifyDataSetChanged();
                 }

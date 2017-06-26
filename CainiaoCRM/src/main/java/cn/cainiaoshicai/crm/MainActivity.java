@@ -436,7 +436,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                     }
                                 }.executeOnNormal();
                                 }
-                            }, "查看考勤表", new StaffDetailsClickListener(vendorId));
+                            }, "查看考勤表", new StaffDetailsClickListener(vendorId), true);
                 }
             }
         });

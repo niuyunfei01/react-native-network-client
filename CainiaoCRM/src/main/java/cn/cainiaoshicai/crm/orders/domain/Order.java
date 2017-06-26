@@ -38,7 +38,7 @@ public class Order implements Serializable {
 
     private int print_times;
 
-    private int store_id;
+    private long store_id;
 
     private List<CartItem> items = new ArrayList<>();
     private String ship_worker_name;
@@ -279,11 +279,11 @@ public class Order implements Serializable {
         this.print_times ++;
     }
 
-    public int getStore_id() {
+    public long getStore_id() {
         return store_id;
     }
 
-    public void setStore_id(int store_id) {
+    public void setStore_id(long store_id) {
         this.store_id = store_id;
     }
 

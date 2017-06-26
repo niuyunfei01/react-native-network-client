@@ -71,6 +71,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,7 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 import cn.cainiaoshicai.crm.BuildConfig;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
@@ -703,23 +705,23 @@ public class Utility {
 
     public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
                                          final Long selectedStores, StoreSelectedListener okCallback) {
-        showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, okCallback, null, null);
+        showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, okCallback, null, null, false);
     }
     
     public static void showStoreSelector(Activity context, String title, String okLabel, String cancelLabel,
                                          final Long selectedStore, final StoreSelectedListener okCallback,
-                                         String neutralLabel, DialogInterface.OnClickListener neutralCallback) {
-        final Collection<Store> stores = GlobalCtx.getInstance().listStores();
-        if (stores == null) {
+                                         String neutralLabel, DialogInterface.OnClickListener neutralCallback, boolean includeUnknown) {
+        ArrayList<Store> filtered = copyStores(includeUnknown);
+        if (filtered.isEmpty()) {
             Toast.makeText(context, "暂时无法修改：(获取店铺列表错误)", Toast.LENGTH_LONG).show();
             return;
         }
 
-        final String[] titles = new String[stores.size()];
-        final int[] storeIds = new int[stores.size()];
+        final String[] titles = new String[filtered.size()];
+        final long[] storeIds = new long[filtered.size()];
         int selected = 0;
         int i = 0;
-        for (Store currStore : stores) {
+        for (Store currStore : filtered) {
             titles[i] = currStore.namePrefixVendor();
             if (selectedStore == (currStore.getId())) {
                 selected = i;
@@ -728,7 +730,7 @@ public class Utility {
             i++;
         }
 
-        final Long[] selectedId = new Long[]{selectedStore};
+        final Long[] selectedId = new Long[]{filtered.get(selected).getId()};
 
         AlertDialog.Builder adb = new AlertDialog.Builder(context);
         adb.setSingleChoiceItems(titles, selected, new DialogInterface.OnClickListener() {
@@ -752,6 +754,23 @@ public class Utility {
         }
         adb.setNegativeButton(cancelLabel, null);
         adb.show();
+    }
+
+    @NonNull
+    public static ArrayList<Store> copyStores(boolean includeUnknown) {
+        Collection<Store> stores = GlobalCtx.getInstance().listStores();
+
+        ArrayList<Store> filtered = new ArrayList<>();
+        if (!includeUnknown) {
+            for(Store store : stores) {
+                if (store.getId() != Cts.STORE_UNKNOWN) {
+                    filtered.add(store);
+                }
+            }
+        } else {
+            filtered.addAll(stores);
+        }
+        return filtered;
     }
 
     //the position within the adapter's data set, will plus header view count
@@ -1203,6 +1222,10 @@ public class Utility {
                 } else if (url.indexOf("/stores/store_product/") > 0) {
                     GeneralWebViewActivity.gotoWeb((Activity) ctx, url);
                     return true;
+                } else if (url.indexOf("/users/login/crm/") > 0) {
+                    Bundle urlParams = Utility.parseUrl(url);
+                    String mobile = urlParams.getString("m");
+                    ctx.startActivity(LoginActivity.newIntent(mobile));
                 }
             }
         }
