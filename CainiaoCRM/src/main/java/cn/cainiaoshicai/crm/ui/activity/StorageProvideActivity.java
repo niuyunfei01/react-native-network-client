@@ -70,7 +70,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         btn_provide_print = (Button) findViewById(R.id.btn_provide_print);
 
         Intent intent = getIntent();
-        int store_id = intent.getIntExtra("store_id", 0);
+        long store_id = intent.getLongExtra("store_id", 0L);
         int req_id = intent.getIntExtra("req_id", 0);
         supplierId = intent.getIntExtra("supplier_id", 0);
 
@@ -159,17 +159,17 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         }
     }
 
-    private void init_data(int store_id, int req_id) {
+    private void init_data(final long store_id, final int req_id) {
         update_loading_url(store_id, req_id);
 
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
-        new MyAsyncTask<Integer, Void, Void>() {
+        new MyAsyncTask<Void, Void, Void>() {
 
             @Override
-            protected Void doInBackground(Integer... params) {
+            protected Void doInBackground(Void... params) {
                 try {
-                    ResultBean ro = sad.store_provide_req(params[0], params[1]);
+                    ResultBean ro = sad.store_provide_req(store_id, req_id);
                     if (ro.isOk()) {
                         final ProvideReq req = (ProvideReq) ro.getObj();
                         if (req != null) {
@@ -194,7 +194,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                 }
                 return null;
             }
-        }.executeOnIO(store_id, req_id);
+        }.executeOnIO();
 
 
         this.btn_provide_ship.setOnClickListener(new View.OnClickListener() {
@@ -349,7 +349,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         }.executeOnNormal();
     }
 
-    private void update_loading_url(int store_id, int req_id) {
+    private void update_loading_url(long store_id, int req_id) {
         String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
         String gotoUrl = String.format("%s/provide_list/%s.html", URLHelper.getStoresPrefix(), store_id)
                 + "?access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;

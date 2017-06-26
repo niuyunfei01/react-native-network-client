@@ -156,8 +156,9 @@ public class Utility {
             for (String parameter : array) {
                 String v[] = parameter.split("=");
                 try {
-                    params.putString(URLDecoder.decode(v[0], "UTF-8"),
-                            URLDecoder.decode(v[1], "UTF-8"));
+                    String name = URLDecoder.decode(v[0], "UTF-8");
+                    String value = v.length > 1 ? URLDecoder.decode(v[1], "UTF-8") : "";
+                    params.putString(name, value);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }

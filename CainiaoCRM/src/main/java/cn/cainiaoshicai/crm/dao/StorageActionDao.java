@@ -54,7 +54,7 @@ public class StorageActionDao {
         return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d", pid, store_id, total_req), params);
     }
 
-    public ResultBean store_provide_req(Integer storeId, int reqId) throws ServiceException {
+    public ResultBean store_provide_req(Long storeId, int reqId) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         String json = getJson("/store_curr_provide_req/" + storeId +"/" + reqId, params);
 
