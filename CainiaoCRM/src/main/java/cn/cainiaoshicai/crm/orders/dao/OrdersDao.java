@@ -97,7 +97,7 @@ public class OrdersDao {
             value = gson.fromJson(json, new TypeToken<OrderContainer>() {}.getType());
 
             if (value != null) {
-                GlobalCtx.getApplication().setTaskCount(value.getTotal_task_mine());
+                GlobalCtx.app().setTaskCount(value.getTotal_task_mine());
             }
         } catch (Exception e) {
             AppLogger.e(e.getMessage(), e);

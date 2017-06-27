@@ -441,7 +441,7 @@ public class ImageUtility {
             }
             file = new File(filePath);
             if (file.exists()) {
-                DisplayMetrics displayMetrics = GlobalCtx.getInstance().getDisplayMetrics();
+                DisplayMetrics displayMetrics = GlobalCtx.app().getDisplayMetrics();
                 return decodeBitmapFromSDCard(filePath, displayMetrics.widthPixels, 900);
             }
             return null;

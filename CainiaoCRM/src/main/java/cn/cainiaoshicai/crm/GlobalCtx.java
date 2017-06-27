@@ -56,6 +56,7 @@ import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -160,10 +161,6 @@ public class GlobalCtx extends Application {
         this.imageLoader = imageLoader;
     }
 
-    public static GlobalCtx getInstance() {
-        return getApplication();
-    }
-
     private volatile boolean imageLoaderInited = false;
 
     public void initImageLoader(Context appCtx) {
@@ -182,7 +179,7 @@ public class GlobalCtx extends Application {
 
     public static FileCache getFileCache() {
         if (fileCache.get() == null) {
-            fileCache.compareAndSet(null, new FileCache(GlobalCtx.getApplication()));
+            fileCache.compareAndSet(null, new FileCache(GlobalCtx.app()));
         }
         return fileCache.get();
     }
@@ -246,7 +243,7 @@ public class GlobalCtx extends Application {
     }
 
     private void initConfigs(final long storeId) {
-        String token = GlobalCtx.getInstance().getSpecialToken();
+        String token = app().getSpecialToken();
         if (!TextUtils.isEmpty(token)) {
             final GlobalCtx ctx = GlobalCtx.this;
             try {
@@ -297,7 +294,7 @@ public class GlobalCtx extends Application {
         UserTalkDao userTalkDao = new UserTalkDao(this.getSpecialToken());
 
         MQConfig.init(this,
-                GlobalCtx.getInstance().getSpecialToken(), userTalkDao, new OnInitCallback() {
+                app().getSpecialToken(), userTalkDao, new OnInitCallback() {
                     @Override
                     public void onSuccess(String clientId) {
                         Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
@@ -394,7 +391,7 @@ public class GlobalCtx extends Application {
         return activity;
     }
 
-    public static GlobalCtx getApplication() {
+    public static GlobalCtx app() {
         return application;
     }
 
@@ -524,7 +521,7 @@ public class GlobalCtx extends Application {
     }
 
     public Worker getCurrentWorker() {
-        String currUid = GlobalCtx.getApplication().getCurrentAccountId();
+        String currUid = GlobalCtx.app().getCurrentAccountId();
         if (currUid != null) {
             try {
                 int iUid = Integer.parseInt(currUid);
@@ -560,7 +557,7 @@ public class GlobalCtx extends Application {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
-                    CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
+                    CommonConfigDao cfgDao = new CommonConfigDao(app().getSpecialToken());
                     try {
                         LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
                         if (s != null) {
@@ -587,7 +584,7 @@ public class GlobalCtx extends Application {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
-                    CommonConfigDao cfgDao = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
+                    CommonConfigDao cfgDao = new CommonConfigDao(app().getSpecialToken());
                     try {
                         ArrayList<Tag> s = cfgDao.getTags(currStoreId);
                         if (s != null) {
@@ -640,7 +637,7 @@ public class GlobalCtx extends Application {
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
         Intent intent = new Intent(ctx, RemindersActivity.class);
-        String token = GlobalCtx.getApplication().getSpecialToken();
+        String token = GlobalCtx.app().getSpecialToken();
         intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
         return intent;
     }
@@ -690,7 +687,7 @@ public class GlobalCtx extends Application {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                CommonConfigDao oad = new CommonConfigDao(GlobalCtx.getInstance().getSpecialToken());
+                CommonConfigDao oad = new CommonConfigDao(app().getSpecialToken());
                 try {
                     ResultBean<ArrayList<ShipOptions>> options = oad.shipOptions();
                     if (options.isOk() && options.getObj() != null) {
@@ -749,6 +746,20 @@ public class GlobalCtx extends Application {
 
     public boolean fnEnabledReqProvide() {
         return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
+    }
+
+    public boolean fnEnabledStoreMgr() {
+        try {
+            int currUid = Integer.parseInt(this.getCurrentAccountId());
+            return this.getVendor() != null
+                    && (this.getVendor().getService_uid() == currUid || this.getVendor().getCreator() == currUid);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean is811485() {
+        return "811485".equals(this.getCurrentAccountId());
     }
 
     public interface TaskCountUpdated {
@@ -818,7 +829,7 @@ public class GlobalCtx extends Application {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
             newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
 
-            //readyDelayWarnSound = soundPool.load(GlobalCtx.getApplication().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
+            //readyDelayWarnSound = soundPool.load(GlobalCtx.app().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
             readyDelayWarnSound = soundPool.load(ctx, R.raw.should_be_ready, 1);
 
             storeSoundUnknown = soundPool.load(ctx, R.raw.store_unknown, 1);
@@ -971,7 +982,7 @@ public class GlobalCtx extends Application {
             if (soundLoaded) {
                 boolean shouldWarn = false;
                 if (notifyWorkers != null && !notifyWorkers.isEmpty()) {
-                    AccountBean accountBean = GlobalCtx.getInstance().getAccountBean();
+                    AccountBean accountBean = app().getAccountBean();
                     if (accountBean != null) {
                         int currUid = Integer.parseInt(accountBean.getUid());
                         if (notifyWorkers.contains(currUid)) {

@@ -95,7 +95,7 @@ public class MainActivity extends AbstractActionBarActivity {
     private BottomBar bottomBar;
 
     public static Intent newIntent() {
-        return new Intent(GlobalCtx.getInstance(), MainActivity.class);
+        return new Intent(GlobalCtx.app(), MainActivity.class);
     }
 
     public static Intent newIntent(AccountBean accountBean) {
@@ -129,14 +129,14 @@ public class MainActivity extends AbstractActionBarActivity {
         }
 
         if (accountBean == null) {
-            accountBean = GlobalCtx.getInstance().getAccountBean();
+            accountBean = GlobalCtx.app().getAccountBean();
         }
 
         if (accountBean == null) {
             Utility.showExpiredTokenDialogOrNotification();
             return;
         }
-        GlobalCtx.getInstance().setAccountBean(accountBean);
+        GlobalCtx.app().setAccountBean(accountBean);
         SettingUtility.setDefaultAccountId(accountBean.getUid());
 
         setContentView(R.layout.order_list_main);
@@ -190,7 +190,7 @@ public class MainActivity extends AbstractActionBarActivity {
     private void resetPrinterStatusBar() {
 
         final ArrayList<Long> autoPrintStores = SettingUtility.getAutoPrintStores();
-        final GlobalCtx app = GlobalCtx.getApplication();
+        final GlobalCtx app = GlobalCtx.app();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
         TextView signInTxt = (TextView) this.findViewById(R.id.head_orders_waiting);
 
@@ -305,7 +305,7 @@ public class MainActivity extends AbstractActionBarActivity {
         notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
         notifCount.setText(String.valueOf(mNotifCount));
 
-        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+        GlobalCtx.app().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
             @Override
             public void callback(int count) {
                 mNotifCount = count;
@@ -316,7 +316,7 @@ public class MainActivity extends AbstractActionBarActivity {
         new MyMenuItemStuffListener(count, "查看任务") {
             @Override
             public void onClick(View v) {
-                GlobalCtx.getApplication().toTaskListActivity(MainActivity.this);
+                GlobalCtx.app().toTaskListActivity(MainActivity.this);
             }
         }; */
     }
@@ -398,7 +398,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                        StaffDao fbDao = new StaffDao(GlobalCtx.app().getSpecialToken());
                                         try {
                                             resultBean = fbDao.sign_in(selectedId, envInfos);
                                         } catch (ServiceException e) {
@@ -570,7 +570,7 @@ public class MainActivity extends AbstractActionBarActivity {
     }
 
     private void requestUpdateBadges() {
-        GlobalCtx.getApplication().getTaskCount(MainActivity.this, new GlobalCtx.TaskCountUpdated() {
+        GlobalCtx.app().getTaskCount(MainActivity.this, new GlobalCtx.TaskCountUpdated() {
             @Override
             public void callback(int count) {
                 mNotifCount = count;
@@ -693,7 +693,7 @@ public class MainActivity extends AbstractActionBarActivity {
                 return true;
             case R.id.menu_accept:
 //                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
-                GlobalCtx.getApplication().toTaskListActivity(this);
+                GlobalCtx.app().toTaskListActivity(this);
                 return true;
             case R.id.menu_search:
                 this.onSearchRequested();
@@ -791,7 +791,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                                 @Override
                                 protected Void doInBackground(Void... params) {
-                                    StaffDao fbDao = new StaffDao(GlobalCtx.getInstance().getSpecialToken());
+                                    StaffDao fbDao = new StaffDao(GlobalCtx.app().getSpecialToken());
                                     try {
                                         resultBean = fbDao.sign_off(signInStore, envInfos);
                                     } catch (ServiceException e) {
@@ -839,7 +839,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            String token = GlobalCtx.getInstance().getSpecialToken();
+            String token = GlobalCtx.app().getSpecialToken();
             GeneralWebViewActivity.gotoWeb(MainActivity.this,
                     URLHelper.getStoresPrefix() + "/working_status.html?_v_id="+ vendorId +"&access_token=" + token);
         }

@@ -94,7 +94,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView ship_schedule = (TextView)vi.findViewById(R.id.ship_schedule);
         ship_schedule.setVisibility(View.GONE);
 
-        GlobalCtx ctx = GlobalCtx.getApplication();
+        GlobalCtx ctx = GlobalCtx.app();
         ColorStateList defTextColor = labelExpectTxt.getTextColors();
         int redTextColor = ContextCompat.getColor(ctx, R.color.red);
         int lightBlue = ContextCompat.getColor(activity, R.color.light_blue);
@@ -230,7 +230,7 @@ public class OrderAdapter extends BaseAdapter {
                     int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) /(60 * 1000));
                     shipTimeCost.setText(String.valueOf(minutes));
 //                    int colorResource = minutes <= Cts.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
-//                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.getApplication(), colorResource));
+//                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.app(), colorResource));
                 } else {
                     shipTimeCost.setVisibility(View.GONE);
                     shipTimeText.setVisibility(View.GONE);
@@ -344,7 +344,7 @@ public class OrderAdapter extends BaseAdapter {
             } else if (!TextUtils.isEmpty(order.getShip_worker_mobile())) {
                 mobilephone = order.getShip_worker_mobile();
             } else {
-                SortedMap<Integer, Worker> workers = GlobalCtx.getInstance().getWorkers();
+                SortedMap<Integer, Worker> workers = GlobalCtx.app().getWorkers();
                 if (workers != null) {
                     Worker worker = workers.get(order.getShip_worker_id());
                     if (worker != null) {
@@ -376,7 +376,7 @@ public class OrderAdapter extends BaseAdapter {
         @Override
         public void onClick(final View v) {
 
-            final ShipOptions options = GlobalCtx.getInstance().getShipOptions(storeId);
+            final ShipOptions options = GlobalCtx.app().getShipOptions(storeId);
             if (options == null || options.getValues() == null || options.getNames() == null) {
                 AlertUtil.showAlert(activity, "错误提示", "该订单所在店铺暂无自动排单功能");
                 return;
@@ -400,7 +400,7 @@ public class OrderAdapter extends BaseAdapter {
                 public void onClick(DialogInterface dialog, int which) {
 
                     if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
-                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().getSpecialToken());
                         new MyAsyncTask<Void, Void, Void>(){
 
                             ResultBean rb;

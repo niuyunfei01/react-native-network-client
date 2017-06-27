@@ -11,6 +11,7 @@ public class Vendor {
     private String brand_name;
     private String contact_name;
     private String version;
+    private int service_uid;
 
     public Vendor() {
     }
@@ -53,5 +54,13 @@ public class Vendor {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getService_uid() {
+        return service_uid;
+    }
+
+    public void setService_uid(int service_uid) {
+        this.service_uid = service_uid;
     }
 }

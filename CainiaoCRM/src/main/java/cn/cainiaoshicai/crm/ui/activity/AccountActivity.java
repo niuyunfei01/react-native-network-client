@@ -9,10 +9,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -36,7 +34,6 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.lib.changedialog.ChangeLogDialog;
-import cn.cainiaoshicai.crm.support.utils.ThemeUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.interfaces.AbstractAppActivity;
 
@@ -56,13 +53,13 @@ public class AccountActivity extends AbstractAppActivity
     private List<AccountBean> accountList = new ArrayList<AccountBean>();
 
     public static Intent newIntent() {
-        Intent intent = new Intent(GlobalCtx.getInstance(), AccountActivity.class);
+        Intent intent = new Intent(GlobalCtx.app(), AccountActivity.class);
         intent.setAction(ACTION_OPEN_FROM_APP_INNER);
         return intent;
     }
 
     public static Intent newIntent(AccountBean refreshAccount) {
-        Intent intent = new Intent(GlobalCtx.getInstance(), AccountActivity.class);
+        Intent intent = new Intent(GlobalCtx.app(), AccountActivity.class);
         intent.setAction(ACTION_OPEN_FROM_APP_INNER_REFRESH_TOKEN);
         intent.putExtra(REFRESH_ACTION_EXTRA, refreshAccount);
         return intent;

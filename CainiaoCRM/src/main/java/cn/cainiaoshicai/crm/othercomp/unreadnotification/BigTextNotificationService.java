@@ -6,8 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
@@ -39,7 +37,7 @@ public class BigTextNotificationService extends NotificationServiceHelper {
             MessageListBean mentionsWeiboData,
             Intent clickNotificationToOpenAppPendingIntentInner, String ticker, int currentIndex) {
 
-        Intent intent = new Intent(GlobalCtx.getInstance(),
+        Intent intent = new Intent(GlobalCtx.app(),
                 BigTextNotificationService.class);
 
         intent.putExtra(NotificationServiceHelper.ACCOUNT_ARG, accountBean);
@@ -159,7 +157,7 @@ public class BigTextNotificationService extends NotificationServiceHelper {
         }
 
         Utility.unregisterReceiverIgnoredReceiverNotRegisteredException(
-                GlobalCtx.getInstance(), valueWrapper.clearNotificationEventReceiver);
+                GlobalCtx.app(), valueWrapper.clearNotificationEventReceiver);
 
         valueWrapper.clearNotificationEventReceiver = new RecordOperationAppBroadcastReceiver() {
 
@@ -184,7 +182,7 @@ public class BigTextNotificationService extends NotificationServiceHelper {
                             ids.clear();
                         } finally {
                             Utility.unregisterReceiverIgnoredReceiverNotRegisteredException(
-                                    GlobalCtx.getInstance(),
+                                    GlobalCtx.app(),
                                     valueWrapper.clearNotificationEventReceiver);
                             if (Utility.isDebugMode()) {
 
@@ -207,13 +205,13 @@ public class BigTextNotificationService extends NotificationServiceHelper {
         IntentFilter intentFilter = new IntentFilter(RESET_UNREAD_MENTIONS_WEIBO_ACTION);
 
         Utility.registerReceiverIgnoredReceiverHasRegisteredHereException(
-                GlobalCtx.getInstance(), valueWrapper.clearNotificationEventReceiver,
+                GlobalCtx.app(), valueWrapper.clearNotificationEventReceiver,
                 intentFilter);
 
         Intent broadcastIntent = new Intent(RESET_UNREAD_MENTIONS_WEIBO_ACTION);
 
         PendingIntent deletedPendingIntent = PendingIntent
-                .getBroadcast(GlobalCtx.getInstance(), accountBean.getUid().hashCode(),
+                .getBroadcast(GlobalCtx.app(), accountBean.getUid().hashCode(),
                         broadcastIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setDeleteIntent(deletedPendingIntent);

@@ -44,18 +44,18 @@ public class FileManager {
 
     public static String getSdCardPath() {
         if (isExternalStorageMounted()) {
-            File path = GlobalCtx.getInstance().getExternalCacheDir();
+            File path = GlobalCtx.app().getExternalCacheDir();
             if (path != null) {
                 return path.getAbsolutePath();
             } else {
                 if (!cantReadBecauseOfAndroidBugPermissionProblem) {
                     cantReadBecauseOfAndroidBugPermissionProblem = true;
-                    final Activity activity = GlobalCtx.getInstance().getActivity();
+                    final Activity activity = GlobalCtx.app().getActivity();
                     if (activity == null || activity.isFinishing()) {
-                        GlobalCtx.getInstance().getUIHandler().post(new Runnable() {
+                        GlobalCtx.app().getUIHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(GlobalCtx.getInstance(),
+                                Toast.makeText(GlobalCtx.app(),
                                         R.string.please_deleted_cache_dir, Toast.LENGTH_SHORT)
                                         .show();
                             }

@@ -28,7 +28,7 @@ public class FeedbackWebViewActivity extends WebViewActivity {
         crmHeader.put("crm_version", "true");
         if (fbId > 0) {
             //TODO: 替换为oauth的方式去获得token，并且避免将 access_token 放在 queryString 里
-            String token = GlobalCtx.getInstance().getSpecialToken();
+            String token = GlobalCtx.app().getSpecialToken();
             this.mWebView.loadUrl(URLHelper.WEB_URL_ROOT + "/vm?access_token=" + token + "#!/feedback/" + fbId, crmHeader);
         } else {
             Utility.toast("参数错误：没有 fb_id", this, null, Toast.LENGTH_LONG);

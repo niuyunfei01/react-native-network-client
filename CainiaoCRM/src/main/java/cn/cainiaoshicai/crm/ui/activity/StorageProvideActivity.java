@@ -48,7 +48,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
     private MenuItem refreshItem;
     private String url;
 
-    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
 
     private Button btn_provide_print;
     private Button btn_provide_edit;
@@ -77,7 +77,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            String storeName = GlobalCtx.getApplication().getStoreName(store_id);
+            String storeName = GlobalCtx.app().getStoreName(store_id);
             actionBar.setTitle(storeName + "订货单");
         }
 
@@ -182,7 +182,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                                     act.updateBtnStatus();
                                     android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
                                     if (actionBar != null) {
-                                        String storeName = GlobalCtx.getApplication().getStoreName(req.getStore_id());
+                                        String storeName = GlobalCtx.app().getStoreName(req.getStore_id());
                                         actionBar.setTitle(storeName + "订货单");
                                     }
                                 }
@@ -350,9 +350,9 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
     }
 
     private void update_loading_url(long store_id, int req_id) {
-        String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
+        String currentAccountId = GlobalCtx.app().getCurrentAccountId();
         String gotoUrl = String.format("%s/provide_list/%s.html", URLHelper.getStoresPrefix(), store_id)
-                + "?access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;
+                + "?access_token=" + GlobalCtx.app().getSpecialToken() + "&client_id=" + currentAccountId;
         if (req_id > 0) {
             gotoUrl += "&req_id=" + req_id;
         }

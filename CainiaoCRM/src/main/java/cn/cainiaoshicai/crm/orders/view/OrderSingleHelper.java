@@ -69,7 +69,7 @@ public class OrderSingleHelper {
 
         int posType = isWaitingReady ? Cts.POSITION_PACK :  Cts.POSITION_ALL;
         final SortedMap<Integer, Worker> workers;
-        GlobalCtx app = GlobalCtx.getApplication();
+        GlobalCtx app = GlobalCtx.app();
         if (isWaitingReady) {
            workers = app.getStoreWorkers(posType, store_id);
         } else if (is_choosing_ship) {
@@ -87,7 +87,7 @@ public class OrderSingleHelper {
             }
         }
 
-        String currUid = GlobalCtx.getInstance().getCurrentAccountId();
+        String currUid = GlobalCtx.app().getCurrentAccountId();
 
         if (defaultWorker == null) {
             defaultWorker = new ArrayList<>();
@@ -206,7 +206,7 @@ public class OrderSingleHelper {
                                         final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
                                         final String remarkTxt = remark.getText().toString();
                                         try {
-                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
                                             rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
@@ -259,7 +259,7 @@ public class OrderSingleHelper {
 
      @Override
      protected ResultBean doInBackground(Integer... params) {
-         OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+         OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
          ResultBean resultBean;
          try {
              resultBean = dao.order_dada_cancel(orderId, this.cancelCode, this.cancelReason);
@@ -285,7 +285,7 @@ public class OrderSingleHelper {
 
         @Override
        protected ResultBean doInBackground(Integer... params) {
-           OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+            OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
            ResultBean resultBean;
            try {
                resultBean = dao.orderDadaQuery(this.orderId);
@@ -342,7 +342,7 @@ public class OrderSingleHelper {
                 private Order _order;
                 @Override
                 protected Void doInBackground(Void... params) {
-                    OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                    OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
                     this._order = dao.getOrder(orderId);
                     return null;
                 }
@@ -463,7 +463,7 @@ public class OrderSingleHelper {
 
             @Override
             protected ResultBean doInBackground(Integer... params) {
-                OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
                 ResultBean resultBean;
                 try {
                     resultBean = restart ? dao.order_dada_restart(orderId) : dao.order_dada_start(orderId);
@@ -496,7 +496,7 @@ public class OrderSingleHelper {
                     List<DadaCancelReason> reasonList = null;
                     @Override
                     protected Void doInBackground(Void... params) {
-                        OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+                        OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
                         reasonList = dao.getDadaCancelReasons(orderId);
                         return null;
                     }
@@ -573,7 +573,7 @@ public class OrderSingleHelper {
         @Override
         protected Boolean doInBackground(Integer... params) {
             String error;
-            OrderActionDao dao = new OrderActionDao(GlobalCtx.getInstance().getSpecialToken());
+            OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
             try {
                 ResultBean result = dao.chg_ship_worker(orderId, activity.getShip_worker_id(), selectedWorker);
                 if (result.isOk()) {
@@ -610,7 +610,7 @@ public class OrderSingleHelper {
         @Override
         protected Boolean doInBackground(Integer... params) {
             String error;
-            String token = GlobalCtx.getInstance().getSpecialToken();
+            String token = GlobalCtx.app().getSpecialToken();
             OrderActionDao dao = new OrderActionDao(token);
             try {
                 ResultBean result = dao.order_chg_pack_worker(orderId, activity.getPack_worker_id(), selectedWorker);

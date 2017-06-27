@@ -120,7 +120,7 @@ public class JavaHttpUtility {
     }
 
     public String doPost(String urlAddress, Map<String, String> param) throws ServiceException {
-        GlobalCtx globalContext = GlobalCtx.getInstance();
+        GlobalCtx globalContext = GlobalCtx.app();
         String errorStr = globalContext.getString(R.string.timeout);
         globalContext = null;
         try {
@@ -157,7 +157,7 @@ public class JavaHttpUtility {
     }
 
     private String handleResponse(HttpURLConnection httpURLConnection) throws ServiceException {
-        GlobalCtx globalContext = GlobalCtx.getInstance();
+        GlobalCtx globalContext = GlobalCtx.app();
         String errorStr = globalContext.getString(R.string.timeout);
         globalContext = null;
         int status = 0;
@@ -209,7 +209,7 @@ public class JavaHttpUtility {
     private String readResult(HttpURLConnection urlConnection) throws ServiceException {
         InputStream is = null;
         BufferedReader buffer = null;
-        GlobalCtx globalContext = GlobalCtx.getInstance();
+        GlobalCtx globalContext = GlobalCtx.app();
         String errorStr = globalContext.getString(R.string.timeout);
         globalContext = null;
         try {
@@ -243,7 +243,7 @@ public class JavaHttpUtility {
     private String readError(HttpURLConnection urlConnection) throws ServiceException {
         InputStream is = null;
         BufferedReader buffer = null;
-        GlobalCtx globalContext = GlobalCtx.getInstance();
+        GlobalCtx globalContext = GlobalCtx.app();
         String errorStr = globalContext.getString(R.string.timeout);
 
         try {
@@ -282,7 +282,7 @@ public class JavaHttpUtility {
 
     public String doGet(String urlStr, Map<String, String> param) throws ServiceException {
         long start = System.currentTimeMillis();
-        GlobalCtx globalContext = GlobalCtx.getInstance();
+        GlobalCtx globalContext = GlobalCtx.app();
         String errorStr = globalContext.getString(R.string.timeout);
         globalContext = null;
         InputStream is = null;
@@ -470,7 +470,7 @@ public class JavaHttpUtility {
         HttpURLConnection urlConnection = null;
         BufferedOutputStream out = null;
         FileInputStream fis = null;
-        GlobalCtx globalContext = GlobalCtx.getInstance();
+        GlobalCtx globalContext = GlobalCtx.app();
         String errorStr = globalContext.getString(R.string.timeout);
         globalContext = null;
         try {

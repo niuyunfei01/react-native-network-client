@@ -1,6 +1,5 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -63,7 +62,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_TO_LOSS = 10997;
     private static final int MENU_CONTEXT_VIEW_DETAIL = 10998;
     private StorageItemAdapter<StorageItem> listAdapter;
-    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
     private ListView lv;
     private AutoCompleteTextView ctv;
     private Spinner tagFilterSpinner;
@@ -160,7 +159,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             return;
         }
 
-        final GlobalCtx app = GlobalCtx.getApplication();
+        final GlobalCtx app = GlobalCtx.app();
 
         bar.setCustomView(R.layout.store_list_in_title);
         View titleBar = bar.getCustomView();
@@ -290,7 +289,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         final ListView categoryLv = (ListView) findViewById(R.id.list_category);
         final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
-        ArrayList<Tag> allTags = GlobalCtx.getInstance().listTags(this.currStore != null ? this.currStore.getId() : 0);
+        ArrayList<Tag> allTags = GlobalCtx.app().listTags(this.currStore != null ? this.currStore.getId() : 0);
         tagAdapter.addAll(allTags);
         categoryLv.setAdapter(tagAdapter);
         categoryLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -327,7 +326,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 @Override
                 public void run() {
                     long currStoreId = currStore != null ? currStore.getId() : 0;
-                    tagAdapter.addAll(GlobalCtx.getInstance().listTags(currStoreId));
+                    tagAdapter.addAll(GlobalCtx.app().listTags(currStoreId));
                     tagAdapter.notifyDataSetChanged();
                 }
             }, 50);
@@ -338,7 +337,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     public void initCurrStore(long storeId) {
         if (storeId > 0) {
-            Store store = GlobalCtx.getInstance().findStore(storeId);
+            Store store = GlobalCtx.app().findStore(storeId);
             if (store != null) {
                 this.currStore = store;
             }
@@ -346,7 +345,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         if (this.currStore == null) {
             storeId = SettingUtility.getListenerStore();
-            Collection<Store> listStores = GlobalCtx.getInstance().listStores();
+            Collection<Store> listStores = GlobalCtx.app().listStores();
             if (listStores == null || listStores.isEmpty()) {
                 Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
             } else {
@@ -511,7 +510,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        GlobalCtx app = GlobalCtx.getApplication();
+        GlobalCtx app = GlobalCtx.app();
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         StorageItem item = listAdapter.getItem(info.position);
@@ -590,7 +589,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
         AppLogger.d("reset storage item pos=" + info.position);
         final StorageItem item = this.listAdapter.getItem(info.position);
-        final GlobalCtx app = GlobalCtx.getApplication();
+        final GlobalCtx app = GlobalCtx.app();
         ItemStatusUpdated changed = new ItemStatusUpdated(this);
         changed.setAdditional(new Runnable() {
             @Override

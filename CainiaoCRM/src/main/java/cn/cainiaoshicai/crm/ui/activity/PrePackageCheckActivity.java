@@ -1,8 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,7 +9,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebResourceError;
@@ -22,23 +19,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.IOException;
-
-import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StorageActionDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
-import cn.cainiaoshicai.crm.domain.ProvideReq;
-import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.Util;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
-import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -64,7 +54,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         setContentView(R.layout.pre_package_estimate);
 
         if (sad == null) {
-            String token = GlobalCtx.getInstance().getSpecialToken();
+            String token = GlobalCtx.app().getSpecialToken();
             if (token != null) {
                this.sad = new StorageActionDao(token);
             }
@@ -96,7 +86,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            String storeName = GlobalCtx.getApplication().getStoreName(store_id);
+            String storeName = GlobalCtx.app().getStoreName(store_id);
             actionBar.setTitle(storeName + "备货估算表");
         }
 
@@ -159,7 +149,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
                                         PrePackageCheckActivity act = PrePackageCheckActivity.this;
                                         android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
                                         if (actionBar != null) {
-                                            String storeName = GlobalCtx.getApplication().getStoreName(req.getStore_id());
+                                            String storeName = GlobalCtx.app().getStoreName(req.getStore_id());
                                             actionBar.setTitle(storeName + "备货估算表");
                                         }
                                     }
@@ -176,9 +166,9 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
     }
 
     private void update_loading_url(long store_id, String day) {
-        String currentAccountId = GlobalCtx.getInstance().getCurrentAccountId();
+        String currentAccountId = GlobalCtx.app().getCurrentAccountId();
         this.url = String.format("%s/provide_prepare/%s.html", URLHelper.getStoresPrefix(), store_id)
-                + "?day="+day+"&access_token=" + GlobalCtx.getInstance().getSpecialToken() + "&client_id=" + currentAccountId;
+                + "?day="+day+"&access_token=" + GlobalCtx.app().getSpecialToken() + "&client_id=" + currentAccountId;
     }
 
     @Override

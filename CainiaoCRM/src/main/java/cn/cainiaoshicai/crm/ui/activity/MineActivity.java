@@ -58,6 +58,7 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_EDIT_STORE = 20;
 	private static final int TYPE_PHONE_TECH = 21;
 	private static final int TYPE_WORKER_LIST= 22;
+	private static final int TYPE_STORES_LIST= 23;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 	private HashMap<String, String> stats;
@@ -72,7 +73,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		listView = (ListView) findViewById(R.id.nav_list);
         listAdapter = new MineItemsAdapter(this);
         this.listView.setAdapter(listAdapter);
-		final GlobalCtx app = GlobalCtx.getApplication();
+		final GlobalCtx app = GlobalCtx.app();
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -169,6 +170,8 @@ public class MineActivity extends AbstractActionBarActivity {
                         app.dial(app.getSupportTel(), MineActivity.this);
                     } else if (item.getType() == TYPE_WORKER_LIST) {
 						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getWorkerListUrl(vendor));
+					}else if (item.getType() == TYPE_STORES_LIST) {
+						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getStoreListUrl(vendor));
 					}
 				}
 			}
@@ -206,7 +209,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		ActionBar ab = this.getSupportActionBar();
 		if (ab != null) {
 			final long storeId = SettingUtility.getListenerStore();
-			Store store = GlobalCtx.getApplication().findStore(storeId);
+			Store store = GlobalCtx.app().findStore(storeId);
 			if (store != null) {
 				String name = store.namePrefixVendor();
 				if (!TextUtils.isEmpty(name)) {
@@ -218,7 +221,9 @@ public class MineActivity extends AbstractActionBarActivity {
 
 	private void initPerformList(HashMap<String, String> performStat) {
 
-		Vendor vendorType = GlobalCtx.getApplication().getVendor();
+		GlobalCtx app = GlobalCtx.app();
+
+		Vendor vendorType = GlobalCtx.app().getVendor();
 
 		Double lastWeekInTimeRatio = null;
 		try {
@@ -266,7 +271,7 @@ public class MineActivity extends AbstractActionBarActivity {
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("外卖评价", -1, TYPE_COMMENT_WM, null));
 
-		MineItemsAdapter.PerformanceItem item = new MineItemsAdapter.PerformanceItem("员工管理", -1, TYPE_WORKER_LIST, null);
+		MineItemsAdapter.PerformanceItem employee = new MineItemsAdapter.PerformanceItem("员工管理", -1, TYPE_WORKER_LIST, null);
 
 		if (vendorType != null && Cts.BLX_TYPE_DIRECT.equals(vendorType.getVersion())) {
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("菜鸟评价", -1, TYPE_COMMENT_SELF, null));
@@ -274,16 +279,19 @@ public class MineActivity extends AbstractActionBarActivity {
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("产品维护", -1, TYPE_PROD_MANAGEMENT, null));
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("客  户", -1, TYPE_USER_ITEMS, null));
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("反馈和业绩", -1,  TYPE_TEAM_PERF, null));
-			listAdapter.add(item);
-		}
-
-		String accountId = GlobalCtx.getApplication().getCurrentAccountId();
-		if ("811485".equals(accountId)) {
-			listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
+			listAdapter.add(employee);
 		}
 
 		if (vendorType != null && Cts.BLX_TYPE_FULL.equals(vendorType.getVersion())) {
-			listAdapter.add(item);
+			listAdapter.add(employee);
+		}
+
+		if (app.fnEnabledStoreMgr() || app.is811485()) {
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("门店管理", -1, TYPE_STORES_LIST, null));
+		}
+
+		if (app.is811485()) {
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
 		}
 
 		String versionDesc = getVersionDesc();
@@ -291,7 +299,7 @@ public class MineActivity extends AbstractActionBarActivity {
 		boolean vendorEmpty = vendorType == null || TextUtils.isEmpty(vendorType.getVersion());
 		String vtDesc = vendorEmpty ? "" : (vendorType.getVersion() + "-");
 
-		String nickname = GlobalCtx.getInstance().getCurrentAccountName();
+		String nickname = app.getCurrentAccountName();
 
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设  置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));

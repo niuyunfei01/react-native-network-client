@@ -2,7 +2,6 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.MediaRouter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -22,7 +21,6 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.OauthTokenDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.LoginResult;
-import cn.cainiaoshicai.crm.orders.dao.OAuthDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -34,9 +32,6 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class LoginActivity extends AbstractActionBarActivity {
@@ -186,7 +181,7 @@ public class LoginActivity extends AbstractActionBarActivity {
     }
 
     public static Intent newIntent(String mobile) {
-        Intent intent = new Intent(GlobalCtx.getInstance(), LoginActivity.class);
+        Intent intent = new Intent(GlobalCtx.app(), LoginActivity.class);
         if (TextUtils.isEmpty(mobile)) {
             intent.putExtra("mobile", mobile);
         }
@@ -227,7 +222,7 @@ public class LoginActivity extends AbstractActionBarActivity {
                 if (loginResult != null && loginResult.loginOk()) {
                     final String token = loginResult.getAccess_token();
                     final long expiresInSeconds = loginResult.getExpires_in();
-                    final GlobalCtx app = GlobalCtx.getApplication();
+                    final GlobalCtx app = GlobalCtx.app();
                     ResultBean<UserBean> uiRb = app.dao.userInfo(token).execute().body();
                     if (uiRb != null && uiRb.isOk() && !TextUtils.isEmpty(uiRb.getObj().getId())) {
                         UserBean user = uiRb.getObj();

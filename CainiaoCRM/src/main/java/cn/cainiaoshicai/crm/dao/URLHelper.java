@@ -56,6 +56,10 @@ public class URLHelper {
         return getStoresPrefix() + "/worker_list/"+(vendor != null ? vendor.getId() : 0);
     }
 
+    public static String getStoreListUrl(Vendor vendor) {
+        return getStoresPrefix() + "/stores_of_vendor/"+(vendor != null ? vendor.getId() : 0);
+    }
+
     public static String getRigsterForCRM() {
         return PROTO + getHost() + "/users/logout.html?refer=/users/register/crm.html";
     }

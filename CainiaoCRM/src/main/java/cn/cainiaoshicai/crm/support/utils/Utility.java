@@ -213,18 +213,18 @@ public class Utility {
     }
 
     public static int dip2px(int dipValue) {
-        float reSize = GlobalCtx.getInstance().getResources().getDisplayMetrics().density;
+        float reSize = GlobalCtx.app().getResources().getDisplayMetrics().density;
         return (int) ((dipValue * reSize) + 0.5);
     }
 
     public static int px2dip(int pxValue) {
-        float reSize = GlobalCtx.getInstance().getResources().getDisplayMetrics().density;
+        float reSize = GlobalCtx.app().getResources().getDisplayMetrics().density;
         return (int) ((pxValue / reSize) + 0.5);
     }
 
     public static float sp2px(int spValue) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue,
-                GlobalCtx.getInstance().getResources().getDisplayMetrics());
+                GlobalCtx.app().getResources().getDisplayMetrics());
     }
 
     public static int length(String paramString) {
@@ -395,7 +395,7 @@ public class Utility {
     }
 
     public static int getScreenWidth() {
-        Activity activity = GlobalCtx.getInstance().getActivity();
+        Activity activity = GlobalCtx.app().getActivity();
         if (activity != null) {
             Display display = activity.getWindowManager().getDefaultDisplay();
             DisplayMetrics metrics = new DisplayMetrics();
@@ -407,7 +407,7 @@ public class Utility {
     }
 
     public static int getScreenHeight() {
-        Activity activity = GlobalCtx.getInstance().getActivity();
+        Activity activity = GlobalCtx.app().getActivity();
         if (activity != null) {
             Display display = activity.getWindowManager().getDefaultDisplay();
             DisplayMetrics metrics = new DisplayMetrics();
@@ -759,7 +759,7 @@ public class Utility {
 
     @NonNull
     public static ArrayList<Store> copyStores(boolean includeUnknown) {
-        Collection<Store> stores = GlobalCtx.getInstance().listStores();
+        Collection<Store> stores = GlobalCtx.app().listStores();
 
         ArrayList<Store> filtered = new ArrayList<>();
         if (!includeUnknown) {
@@ -802,7 +802,7 @@ public class Utility {
     }
 
     public static boolean isDevicePort() {
-        return GlobalCtx.getInstance().getResources().getConfiguration().orientation
+        return GlobalCtx.app().getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_PORTRAIT;
     }
 
@@ -858,9 +858,8 @@ public class Utility {
     }
 
     public static void showExpiredTokenDialogOrNotification() {
-        final Activity activity = GlobalCtx.getInstance().getCurrentRunningActivity();
-        if (activity != null && !GlobalCtx
-                .getInstance().tokenExpiredDialogIsShowing) {
+        final Activity activity = GlobalCtx.app().getCurrentRunningActivity();
+        if (activity != null && !GlobalCtx.app().tokenExpiredDialogIsShowing) {
             if (activity.getClass() == LoginActivity.class) {
                 return;
             }
@@ -875,7 +874,7 @@ public class Utility {
                                         public void onClick(DialogInterface dialog, int which) {
                                             activity.startActivity(LoginActivity.newIntent());
                                             activity.finish();
-                                             GlobalCtx.getInstance().tokenExpiredDialogIsShowing = false;
+                                            GlobalCtx.app().tokenExpiredDialogIsShowing = false;
                                         }
                                     }).setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
@@ -883,7 +882,7 @@ public class Utility {
                             //do nothing
                         }
                     }).show();
-                    GlobalCtx.getInstance().tokenExpiredDialogIsShowing = true;
+                    GlobalCtx.app().tokenExpiredDialogIsShowing = true;
                 }
             });
         } else if (activity == null) {
@@ -891,25 +890,23 @@ public class Utility {
             Intent i = AccountActivity.newIntent();
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pendingIntent = PendingIntent
-                    .getActivity(GlobalCtx.getInstance(), 0, i,
+                    .getActivity(GlobalCtx.app(), 0, i,
                             PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification.Builder builder = new Notification.Builder(GlobalCtx.getInstance())
-                    .setContentTitle(GlobalCtx.getInstance().getString(R.string.login_again))
-                    .setContentText(GlobalCtx.getInstance()
+            Notification.Builder builder = new Notification.Builder(GlobalCtx.app())
+                    .setContentTitle(GlobalCtx.app().getString(R.string.login_again))
+                    .setContentText(GlobalCtx.app()
                             .getString(R.string.have_account_whose_token_is_expired))
                     .setSmallIcon(R.drawable.ic_notification)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setOnlyAlertOnce(true);
-            NotificationManager notificationManager = (NotificationManager) GlobalCtx
-                    .getInstance()
+            NotificationManager notificationManager = (NotificationManager) GlobalCtx.app()
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NotificationServiceHelper.getTokenExpiredNotificationId(),
                     builder.build());
-        } else if (GlobalCtx.getInstance().tokenExpiredDialogIsShowing) {
-            NotificationManager notificationManager = (NotificationManager) GlobalCtx
-                    .getInstance()
+        } else if (GlobalCtx.app().tokenExpiredDialogIsShowing) {
+            NotificationManager notificationManager = (NotificationManager) GlobalCtx.app()
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(NotificationServiceHelper.getTokenExpiredNotificationId());
         }
@@ -1072,7 +1069,7 @@ public class Utility {
         String type = options.outMimeType;
 
         MediaScannerConnection
-                .scanFile(GlobalCtx.getInstance(), new String[]{path}, new String[]{type},
+                .scanFile(GlobalCtx.app(), new String[]{path}, new String[]{type},
                         null);
     }
 
@@ -1124,7 +1121,7 @@ public class Utility {
 
 
     public static boolean handleUrlJump(Context ctx, WebView view, String url) {
-        String specialToken = GlobalCtx.getApplication().getSpecialToken();
+        String specialToken = GlobalCtx.app().getSpecialToken();
         if (url != null) {
             if (url.startsWith("tel:")) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

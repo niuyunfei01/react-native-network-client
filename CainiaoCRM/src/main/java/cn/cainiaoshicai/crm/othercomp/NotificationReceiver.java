@@ -1,6 +1,5 @@
 package cn.cainiaoshicai.crm.othercomp;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -69,12 +68,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 				if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notificationId);
-					if (GlobalCtx.getInstance().acceptNotifyNew()) {
+					if (GlobalCtx.app().acceptNotifyNew()) {
 						OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
 					}
 				}
 
-				GlobalCtx.SoundManager soundManager = GlobalCtx.getInstance().getSoundManager();
+				GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
 
 				if (!TextUtils.isEmpty(notify.getSpeak_word())) {
 					int repeatTimes = Math.min(Math.max(notify.getSpeak_times(), 1), 3);
@@ -87,7 +86,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 					//仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
 					if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 						GlobalCtx.newOrderNotifies.add(notificationId);
-						if (GlobalCtx.getInstance().acceptNotifyNew()) {
+						if (GlobalCtx.app().acceptNotifyNew()) {
 							soundManager.play_new_order_sound(notify.getStore_id());
 						}
 						SettingUtility.removeOrderContainerCache(ListType.WAITING_READY);
@@ -96,11 +95,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 						if (totalLate > 10) {
 							totalLate = 10;
 						}
-						if (GlobalCtx.getInstance().acceptReadyTimeoutNotify()) {
+						if (GlobalCtx.app().acceptReadyTimeoutNotify()) {
 							soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
 						}
 					} else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
-						if (GlobalCtx.getInstance().acceptTechNotify()) {
+						if (GlobalCtx.app().acceptTechNotify()) {
 							soundManager.play_sync_not_work_sound();
 						}
 					} else if (Cts.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
@@ -184,7 +183,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 					i = new Intent(context, GeneralWebViewActivity.class);
 					i.putExtra("url", URLHelper.WEB_URL_ROOT + "/market_tools/user_feedback.html?fb_id=" + notify.getFb_id());
 				} else if (Cts.PUSH_TYPE_TASK_REMIND.equals(notify.getType())) {
-					i = GlobalCtx.getApplication().toTaskListIntent(context);
+					i = GlobalCtx.app().toTaskListIntent(context);
 				} else {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 				}

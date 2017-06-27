@@ -18,8 +18,6 @@ import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
-import static android.R.attr.order;
-
 /**
  * Created by liuzhr on 10/27/16.
  */
@@ -44,7 +42,7 @@ public class OrderPrinter {
             @Override
             protected Void doInBackground(Void... params) {
 
-                final String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
+                final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
                 final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
                 if (order != null) {
                     OrderPrinter._print(order, true, printedCallback);
@@ -67,7 +65,7 @@ public class OrderPrinter {
             printer.starLine().highBigText("   估货单").newLine()
                     .newLine().highBigText("  #" + estimate.getDay());
 
-            printer.normalText(GlobalCtx.getApplication().getStoreName(estimate.getStore_id()) ).newLine();
+            printer.normalText(GlobalCtx.app().getStoreName(estimate.getStore_id()) ).newLine();
 
             printer.normalText("负责人：___________").newLine();
 
@@ -282,7 +280,7 @@ public class OrderPrinter {
             return;
         }
 
-        final String access_token = GlobalCtx.getInstance().getAccountBean().getAccess_token();
+        final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
         new MyAsyncTask<Void, Order, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {

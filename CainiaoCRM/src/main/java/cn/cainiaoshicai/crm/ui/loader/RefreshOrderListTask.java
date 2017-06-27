@@ -80,7 +80,7 @@ public class RefreshOrderListTask
     @Override
     protected OrderContainer doInBackground(Void... params) {
         try {
-            String token = GlobalCtx.getInstance().getSpecialToken();
+            String token = GlobalCtx.app().getSpecialToken();
             OrdersDao ordersDao = new OrdersDao(token);
             if (TextUtils.isEmpty(searchTerm)) {
                 return ordersDao.get(this.listType.getValue(), storeIds, !this.byPassCache);

@@ -18,7 +18,7 @@ public class InTimeStatsActivity extends WebViewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String url = GlobalCtx.getInstance().getUrl("me.in_time_stats");
+        String url = GlobalCtx.app().getUrl("me.in_time_stats");
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }

@@ -14,7 +14,6 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
 /**
@@ -65,7 +64,7 @@ public class StoreSpinnerHelper {
         if (supportAll) {
             stores.add(Cts.ST_ALL);
         }
-        Collection<Store> listStores = GlobalCtx.getInstance().listStores();
+        Collection<Store> listStores = GlobalCtx.app().listStores();
         if (listStores == null || listStores.isEmpty()) {
             Utility.toast("正在加载店铺列表，请重试...", activity, null, Toast.LENGTH_LONG);
         } else {

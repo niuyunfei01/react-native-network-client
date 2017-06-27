@@ -17,20 +17,20 @@ public class TimeUtility {
     private static int MILL_HOUR = MILL_MIN * 60;
     private static int MILL_DAY = MILL_HOUR * 24;
 
-    private static String JUST_NOW = GlobalCtx.getInstance().getString(R.string.justnow);
-    private static String MIN = GlobalCtx.getInstance().getString(R.string.min);
-    private static String HOUR = GlobalCtx.getInstance().getString(R.string.hour);
-    private static String DAY = GlobalCtx.getInstance().getString(R.string.day);
-    private static String MONTH = GlobalCtx.getInstance().getString(R.string.month);
-    private static String YEAR = GlobalCtx.getInstance().getString(R.string.year);
+    private static String JUST_NOW = GlobalCtx.app().getString(R.string.justnow);
+    private static String MIN = GlobalCtx.app().getString(R.string.min);
+    private static String HOUR = GlobalCtx.app().getString(R.string.hour);
+    private static String DAY = GlobalCtx.app().getString(R.string.day);
+    private static String MONTH = GlobalCtx.app().getString(R.string.month);
+    private static String YEAR = GlobalCtx.app().getString(R.string.year);
 
-    private static String YESTER_DAY = GlobalCtx.getInstance().getString(R.string.yesterday);
-    private static String THE_DAY_BEFORE_YESTER_DAY = GlobalCtx.getInstance()
+    private static String YESTER_DAY = GlobalCtx.app().getString(R.string.yesterday);
+    private static String THE_DAY_BEFORE_YESTER_DAY = GlobalCtx.app()
             .getString(R.string.the_day_before_yesterday);
-    private static String TODAY = GlobalCtx.getInstance().getString(R.string.today);
+    private static String TODAY = GlobalCtx.app().getString(R.string.today);
 
-    private static String DATE_FORMAT = GlobalCtx.getInstance().getString(R.string.date_format);
-    private static String YEAR_FORMAT = GlobalCtx.getInstance().getString(R.string.year_format);
+    private static String DATE_FORMAT = GlobalCtx.app().getString(R.string.date_format);
+    private static String YEAR_FORMAT = GlobalCtx.app().getString(R.string.year_format);
 
     private static Calendar msgCalendar = null;
     private static java.text.SimpleDateFormat dayFormat = null;

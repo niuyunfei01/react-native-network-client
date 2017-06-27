@@ -18,7 +18,7 @@ public class MonthPerfActivity extends WebViewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String url = GlobalCtx.getInstance().getUrl("me.monthly_performance");
+        String url = GlobalCtx.app().getUrl("me.monthly_performance");
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }

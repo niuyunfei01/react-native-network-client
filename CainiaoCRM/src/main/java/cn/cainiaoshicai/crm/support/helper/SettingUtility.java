@@ -13,7 +13,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
@@ -51,7 +50,7 @@ public class SettingUtility {
     }
 
     private static Context getContext() {
-        return GlobalCtx.getInstance();
+        return GlobalCtx.app();
     }
 
     public static boolean firstStart() {
@@ -505,8 +504,8 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
 
         if (updated) {
-            GlobalCtx.getInstance().updateCfgInterval();
-            GlobalCtx.getInstance().listStores(true);
+            GlobalCtx.app().updateCfgInterval();
+            GlobalCtx.app().listStores(true);
         }
     }
 

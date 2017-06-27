@@ -109,7 +109,7 @@ public class NewOrderFragment extends Fragment {
         @Override
         protected List<NewOrderReminder> doInBackground(Void... params) {
             try {
-                String token = GlobalCtx.getInstance().getSpecialToken();
+                String token = GlobalCtx.app().getSpecialToken();
                 return new NewOrderDao(token).newOrders();
             } catch (ServiceException e) {
                 cancel(true);

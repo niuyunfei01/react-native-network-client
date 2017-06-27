@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -108,7 +107,7 @@ public class MineItemsAdapter<T extends MineItemsAdapter.PerformanceItem> extend
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(v.getContext(), GeneralWebViewActivity.class);
-                    i.putExtra("url", GlobalCtx.getInstance().getUrl("delay_analysis.main", true));
+                    i.putExtra("url", GlobalCtx.app().getUrl("delay_analysis.main", true));
                     v.getContext().startActivity(i);
                 }
             });

@@ -66,7 +66,7 @@ public class DelayFaqFragment extends DialogFragment {
         DelayFaqFragment delayFaqFragment = new DelayFaqFragment();
         Bundle args = new Bundle();
         args.putString("title", title);
-        args.putStringArray("reasons", GlobalCtx.getInstance().getDelayReasons());
+        args.putStringArray("reasons", GlobalCtx.app().getDelayReasons());
         delayFaqFragment.setArguments(args);
         return delayFaqFragment;
     }
@@ -144,12 +144,12 @@ public class DelayFaqFragment extends DialogFragment {
 
     private boolean validateDelayReason(){
         if(checkedReason.size()==0){
-            Toast.makeText(GlobalCtx.getInstance(), "选择延误原因",Toast.LENGTH_LONG).show();
+            Toast.makeText(GlobalCtx.app(), "选择延误原因",Toast.LENGTH_LONG).show();
             return false;
         }
         String customReason = editText.getText().toString();
         if(delayReasonCheckState[delayReasonCheckState.length-1]&& TextUtil.isBlank(customReason)){
-            Toast.makeText(GlobalCtx.getInstance(), "填写其他延误原因",Toast.LENGTH_LONG).show();
+            Toast.makeText(GlobalCtx.app(), "填写其他延误原因",Toast.LENGTH_LONG).show();
             editText.requestFocus();
             return false;
         }
@@ -160,7 +160,7 @@ public class DelayFaqFragment extends DialogFragment {
         new MyAsyncTask<Void, ResultBean, ResultBean>(){
             @Override
             protected ResultBean doInBackground(Void... params) {
-                String token = GlobalCtx.getInstance().getSpecialToken();
+                String token = GlobalCtx.app().getSpecialToken();
                 try {
                     StringBuffer reason = new StringBuffer();
                     int index = 0;
@@ -179,7 +179,7 @@ public class DelayFaqFragment extends DialogFragment {
             @Override
             protected void onPostExecute(final ResultBean oc) {
                 super.onPostExecute(oc);
-                Toast.makeText(GlobalCtx.getInstance(), oc.isOk() ? "操作成功，正在刷新页面..." : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
+                Toast.makeText(GlobalCtx.app(), oc.isOk() ? "操作成功，正在刷新页面..." : "操作失败：" + oc.getDesc(), Toast.LENGTH_LONG).show();
                 if (oc.isOk()) {
                     mListener.afterDelayReasonSaved();
                 }

@@ -18,7 +18,7 @@ import cn.cainiaoshicai.crm.R;
 public class ThemeUtility {
 
     public static int getColor(int attr) {
-        return getColor(GlobalCtx.getInstance().getActivity(), attr);
+        return getColor(GlobalCtx.app().getActivity(), attr);
     }
 
     public static int getColor(Activity activity, int attr) {
@@ -31,7 +31,7 @@ public class ThemeUtility {
 
     public static Drawable getDrawable(int attr) {
         int[] attrs = new int[]{attr};
-        Context context = GlobalCtx.getInstance().getActivity();
+        Context context = GlobalCtx.app().getActivity();
         TypedArray ta = context.obtainStyledAttributes(attrs);
         Drawable drawable = ta.getDrawable(0);
         ta.recycle();
@@ -40,7 +40,7 @@ public class ThemeUtility {
 
     public static int getResourceId(int attr) {
         int[] attrs = new int[]{attr};
-        Context context = GlobalCtx.getInstance().getActivity();
+        Context context = GlobalCtx.app().getActivity();
         TypedArray ta = context.obtainStyledAttributes(attrs);
         int id = ta.getResourceId(0, 430);
         ta.recycle();

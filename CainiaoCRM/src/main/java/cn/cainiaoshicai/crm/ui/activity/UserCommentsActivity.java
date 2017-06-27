@@ -19,7 +19,7 @@ public class UserCommentsActivity extends WebViewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String url = GlobalCtx.getInstance().getUrl("user_comments.list");
+        String url = GlobalCtx.app().getUrl("user_comments.list");
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }

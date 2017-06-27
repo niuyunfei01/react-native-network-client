@@ -29,7 +29,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
-import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 
 /**
  * Created by liuzhr on 10/31/16.
@@ -89,7 +88,7 @@ public class StoreStorageHelper {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                StorageActionDao sad = new StorageActionDao(GlobalCtx.getApplication().getSpecialToken());
+                StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
                 ResultBean rb = sad.chg_item_when_on_sale_again(item.getId(), option);
                 final String msg;
                 Runnable uiCallback = null;
@@ -147,7 +146,7 @@ public class StoreStorageHelper {
                 @Override protected Void doInBackground(Void... params) {
                     ResultBean rb;
                     try {
-                        StorageActionDao sad = new StorageActionDao(GlobalCtx.getApplication().getSpecialToken());
+                        StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
                         rb = sad.chg_item_status(currStore.getId(), item.getProduct_id(), item.getStatus(), destStatus);
                     } catch (ServiceException e) {
                         rb = new ResultBean(false, "访问服务器出错");
@@ -241,7 +240,7 @@ public class StoreStorageHelper {
                                     return;
                                 }
 
-                                Call<ResultBean> rb = GlobalCtx.getApplication().dao.store_chg_price(item.getStore_id(),
+                                Call<ResultBean> rb = GlobalCtx.app().dao.store_chg_price(item.getStore_id(),
                                         item.getProduct_id(), newCents, item.getPrice());
                                 rb.enqueue(new Callback<ResultBean>() {
                                     @Override
@@ -306,7 +305,7 @@ public class StoreStorageHelper {
                                         final int total_req_no = Integer.parseInt(s);
                                         final String remarkTxt = remark.getText().toString();
                                         try {
-                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
                                             rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
@@ -363,7 +362,7 @@ public class StoreStorageHelper {
         void invoke() {
             ResultBean rb;
             try {
-                StorageActionDao sad = new StorageActionDao(GlobalCtx.getInstance().getSpecialToken());
+                StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
                 rb = sad.store_status_reset_stat_num(item.getStore_id(), item.getProduct_id(), lastStat);
             } catch (ServiceException e) {
                 rb = new ResultBean(false, "访问服务器出错");

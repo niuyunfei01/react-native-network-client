@@ -1,6 +1,5 @@
 package cn.cainiaoshicai.crm.ui.interfaces;
 
-import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -25,14 +24,14 @@ public class AbstractAppActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        GlobalCtx.getInstance().setCurrentRunningActivity(this);
+        GlobalCtx.app().setCurrentRunningActivity(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (GlobalCtx.getInstance().getCurrentRunningActivity() == this) {
-            GlobalCtx.getInstance().setCurrentRunningActivity(null);
+        if (GlobalCtx.app().getCurrentRunningActivity() == this) {
+            GlobalCtx.app().setCurrentRunningActivity(null);
         }
     }
 
@@ -46,7 +45,7 @@ public class AbstractAppActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         forceShowActionBarOverflowMenu();
         initNFC();
-        GlobalCtx.getInstance().setActivity(this);
+        GlobalCtx.app().setActivity(this);
     }
 
     private void forceShowActionBarOverflowMenu() {
@@ -71,7 +70,7 @@ public class AbstractAppActivity extends FragmentActivity {
         mNfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
             @Override
             public NdefMessage createNdefMessage(NfcEvent event) {
-                String text = (GlobalCtx.getInstance().getCurrentAccountName());
+                String text = (GlobalCtx.app().getCurrentAccountName());
 
                 NdefMessage msg = new NdefMessage(
                         new NdefRecord[]{createMimeRecord(

@@ -134,7 +134,7 @@ public class RemindersActivity extends AbstractActionBarActivity {
         View count = item.getActionView();
         notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
         notifCount.setText(String.valueOf(mNotifCount));
-        GlobalCtx.getApplication().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+        GlobalCtx.app().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
             @Override
             public void callback(int count) {
                 mNotifCount = count;
@@ -144,7 +144,7 @@ public class RemindersActivity extends AbstractActionBarActivity {
         new MyMenuItemStuffListener(count, "查看任务") {
             @Override
             public void onClick(View v) {
-                GlobalCtx.getApplication().toTaskListActivity(RemindersActivity.this);
+                GlobalCtx.app().toTaskListActivity(RemindersActivity.this);
             }
         };
 

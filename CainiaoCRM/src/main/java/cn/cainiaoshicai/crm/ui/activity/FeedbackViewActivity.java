@@ -8,7 +8,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.List;
@@ -60,7 +59,7 @@ public class FeedbackViewActivity extends AbstractActionBarActivity {
 
                 @Override
                 protected Feedback doInBackground(Integer... params) {
-                    String token = GlobalCtx.getInstance().getSpecialToken();
+                    String token = GlobalCtx.app().getSpecialToken();
                     UserFeedbackDao dao = new UserFeedbackDao(token);
                     ResultBean<Feedback> fbx = dao.getFeedback(params[0]);
                     if (fbx.isOk()) {
@@ -104,7 +103,7 @@ public class FeedbackViewActivity extends AbstractActionBarActivity {
 
                                 boolean success;
 
-                                UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.getInstance().getSpecialToken());
+                                UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.app().getSpecialToken());
                                 ResultBean rb = dao.saveFeedbackLog(feedback_id, log);
                                 success = rb.isOk();
                                 if (success) {

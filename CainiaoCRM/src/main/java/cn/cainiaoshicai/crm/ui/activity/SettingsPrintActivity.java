@@ -1,17 +1,14 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -30,7 +27,6 @@ import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -154,7 +150,7 @@ public class SettingsPrintActivity extends ListActivity {
 			String[] storeNames = new String[selectedStores.size()];
 			int i = 0;
 			for(Long storeId : selectedStores) {
-				storeNames[i++] = GlobalCtx.getInstance().getStoreName(storeId);
+                storeNames[i++] = GlobalCtx.app().getStoreName(storeId);
 			}
 			list_store_filter_values.setText(TextUtils.join(",", storeNames));
 		}

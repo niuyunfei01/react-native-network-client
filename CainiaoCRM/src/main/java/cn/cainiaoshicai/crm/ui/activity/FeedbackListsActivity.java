@@ -37,7 +37,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
         super.onCreate(savedInstanceState);
 
         Intent gog = new Intent(this, GeneralWebViewActivity.class);
-        String url = String.format("%s/vm/index.html?time=%d&access_token=%s#!/home", URLHelper.WEB_URL_ROOT, System.currentTimeMillis(), GlobalCtx.getApplication().getSpecialToken());
+        String url = String.format("%s/vm/index.html?time=%d&access_token=%s#!/home", URLHelper.WEB_URL_ROOT, System.currentTimeMillis(), GlobalCtx.app().getSpecialToken());
         gog.putExtra("url", url);
         startActivity(gog);
 //
@@ -130,7 +130,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 return true;
             case R.id.menu_accept:
-                GlobalCtx.getApplication().toTaskListActivity(this);
+                GlobalCtx.app().toTaskListActivity(this);
                 return true;
             case R.id.menu_search:
                 this.onSearchRequested();
@@ -151,7 +151,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
             new MyAsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.getInstance().getSpecialToken());
+                    UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.app().getSpecialToken());
                     final ResultList<Feedback> results = dao.getFeedbackList(Integer.MAX_VALUE);
                     if (results.isOk()) {
                         FeedbackListsActivity.this.runOnUiThread(new Runnable() {
