@@ -48,13 +48,11 @@ public class OrderAdapter extends BaseAdapter {
 
     private final Activity activity;
     private ArrayList<Order> orders = new ArrayList<>();
-    private final int listType;
     private static LayoutInflater inflater = null;
 
     public OrderAdapter(Activity activity, ArrayList<Order> orders, int listType) {
         this.activity = activity;
         this.orders = orders;
-        this.listType = listType;
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

@@ -22,6 +22,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.MainActivity;
 
 /**
@@ -46,8 +47,8 @@ public final class AlertUtil {
             .setPositiveButton(android.R.string.ok, null)
             .setMessage(messageId)
             .create();
-        
-        dlg.show();
+
+        showDlg(context, dlg, context.getString(messageId));
     }
 
     /**
@@ -71,8 +72,7 @@ public final class AlertUtil {
             .setPositiveButton(android.R.string.ok, listener)
             .setMessage(message)
             .create();
-
-        dlg.show();
+        showDlg(context, dlg, message);
     }
 
     /**
@@ -89,7 +89,7 @@ public final class AlertUtil {
             .setMessage(message)
             .create();
 
-        dlg.show();
+        showDlg(context, dlg, message);
     }
 
     /**
@@ -113,8 +113,8 @@ public final class AlertUtil {
             .setMessage(messageId)
             .setCancelable(false)
             .create();
-        
-        dlg.show();
+
+        showDlg(context, dlg, context.getString(messageId));
     }
 
     /**
@@ -139,6 +139,15 @@ public final class AlertUtil {
             .setCancelable(false)
             .create();
 
+        showDlg(context, dlg, message);
+    }
+
+    private static void showDlg(Context context, Dialog dlg, String msg) {
+        if (context instanceof Activity && ((Activity)context).isFinishing()) {
+            Exception e = new Exception("show dlg that activity is finished! context="+context.getClass()+", msg:" + msg);
+            CrashReportHelper.handleUncaughtException(null, e);
+            return;
+        }
         dlg.show();
     }
 
@@ -166,7 +175,7 @@ public final class AlertUtil {
             .setCancelable(false)
             .create();
 
-        dlg.show();
+        showDlg(context, dlg, context.getString(messageId));
     }
 
     /**
@@ -193,7 +202,7 @@ public final class AlertUtil {
             .setCancelable(false)
             .create();
 
-        dlg.show();
+        showDlg(context, dlg, message);
     }
     
     /**
@@ -213,8 +222,8 @@ public final class AlertUtil {
             .setMessage(message)
             .setCancelable(false)
             .create();
-        
-        dlg.show();
+
+        showDlg(context, dlg, message);
     }
 
     /**
@@ -235,7 +244,7 @@ public final class AlertUtil {
             .setCancelable(false)
             .create();
 
-        dlg.show();
+        showDlg(context, dlg, context.getString(messageId));
     }
 
     public static void errorOnActivity(final Activity activity, final String msg) {
