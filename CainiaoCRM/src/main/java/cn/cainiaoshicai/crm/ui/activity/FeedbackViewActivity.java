@@ -59,7 +59,7 @@ public class FeedbackViewActivity extends AbstractActionBarActivity {
 
                 @Override
                 protected Feedback doInBackground(Integer... params) {
-                    String token = GlobalCtx.app().getSpecialToken();
+                    String token = GlobalCtx.app().token();
                     UserFeedbackDao dao = new UserFeedbackDao(token);
                     ResultBean<Feedback> fbx = dao.getFeedback(params[0]);
                     if (fbx.isOk()) {
@@ -103,7 +103,7 @@ public class FeedbackViewActivity extends AbstractActionBarActivity {
 
                                 boolean success;
 
-                                UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.app().getSpecialToken());
+                                UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.app().token());
                                 ResultBean rb = dao.saveFeedbackLog(feedback_id, log);
                                 success = rb.isOk();
                                 if (success) {

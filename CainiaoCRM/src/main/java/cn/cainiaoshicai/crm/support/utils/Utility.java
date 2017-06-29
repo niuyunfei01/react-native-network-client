@@ -1121,7 +1121,7 @@ public class Utility {
 
 
     public static boolean handleUrlJump(Context ctx, WebView view, String url) {
-        String specialToken = GlobalCtx.app().getSpecialToken();
+        String specialToken = GlobalCtx.app().token();
         if (url != null) {
             if (url.startsWith("tel:")) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -1224,6 +1224,8 @@ public class Utility {
                     Bundle urlParams = Utility.parseUrl(url);
                     String mobile = urlParams.getString("m");
                     ctx.startActivity(LoginActivity.newIntent(mobile));
+                } else if (url.indexOf("/users/login?") > 0 || url.indexOf("/users/login/") > 0) {
+                    ctx.startActivity(LoginActivity.newIntent());
                 }
             }
         }

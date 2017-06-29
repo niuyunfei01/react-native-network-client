@@ -160,7 +160,7 @@ public class DelayFaqFragment extends DialogFragment {
         new MyAsyncTask<Void, ResultBean, ResultBean>(){
             @Override
             protected ResultBean doInBackground(Void... params) {
-                String token = GlobalCtx.app().getSpecialToken();
+                String token = GlobalCtx.app().token();
                 try {
                     StringBuffer reason = new StringBuffer();
                     int index = 0;

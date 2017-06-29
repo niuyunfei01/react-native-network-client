@@ -53,7 +53,7 @@ public class FeedBackEditActivity extends AbstractActionBarActivity {
                 @Override
                 protected Feedback doInBackground(Integer... params) {
 
-                    String token = GlobalCtx.app().getSpecialToken();
+                    String token = GlobalCtx.app().token();
                     UserFeedbackDao dao = new UserFeedbackDao(token);
                     ResultBean<Feedback> fbObj = dao.findByOrderId(order_id);
                     if (fbObj.isOk() && fbObj.getObj() != null) {
@@ -102,7 +102,7 @@ public class FeedBackEditActivity extends AbstractActionBarActivity {
                         private ResultBean resultBean;
                         @Override
                         protected Void doInBackground(Void... params) {
-                            UserFeedbackDao fbDao = new UserFeedbackDao(GlobalCtx.app().getSpecialToken());
+                            UserFeedbackDao fbDao = new UserFeedbackDao(GlobalCtx.app().token());
                             try {
                                 resultBean = fbDao.saveFeedbackForOrder(wmId, feedback_source, content);
                             } catch (ServiceException e) {

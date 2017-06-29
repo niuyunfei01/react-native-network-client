@@ -67,7 +67,7 @@ public class CrashReportHelper {
 
     public static void handleUncaughtException(Thread t, Throwable e) {
         try {
-            ACRA.getErrorReporter().putCustomData("UID", GlobalCtx.getApplication().getCurrentAccountId());
+            ACRA.getErrorReporter().putCustomData("UID", GlobalCtx.app().getCurrentAccountId());
             ACRA.getErrorReporter().putCustomData("CURR-STORE", String.valueOf(SettingUtility.getListenerStore()));
         }catch (Exception ex) {
             ex.printStackTrace();

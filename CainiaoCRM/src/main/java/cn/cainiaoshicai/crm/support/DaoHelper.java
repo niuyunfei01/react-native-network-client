@@ -60,7 +60,7 @@ public class DaoHelper {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request request = chain.request();
-                String token = GlobalCtx.app().getSpecialToken();
+                String token = GlobalCtx.app().token();
                 final long storeId = SettingUtility.getListenerStore();
                 HttpUrl originUrl = request.url();
                 HttpUrl.Builder b = originUrl.newBuilder();

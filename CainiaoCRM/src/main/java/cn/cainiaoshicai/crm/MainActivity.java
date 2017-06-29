@@ -223,7 +223,7 @@ public class MainActivity extends AbstractActionBarActivity {
                         return;
                     }
 
-                    String token = app.getSpecialToken();
+                    String token = app.token();
                     intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token=" + token,
                             URLHelper.getStoresPrefix(), storeId));
                     startActivity(intent);
@@ -354,7 +354,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                             String err = "";
                             try {
-                                StaffDao staffDao = new StaffDao(app.getSpecialToken());
+                                StaffDao staffDao = new StaffDao(app.token());
                                 final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
                                 if (msg.isOk()) {
                                     MainActivity.this.runOnUiThread(new Runnable() {
@@ -398,7 +398,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        StaffDao fbDao = new StaffDao(GlobalCtx.app().getSpecialToken());
+                                        StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
                                         try {
                                             resultBean = fbDao.sign_in(selectedId, envInfos);
                                         } catch (ServiceException e) {
@@ -791,7 +791,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
                                 @Override
                                 protected Void doInBackground(Void... params) {
-                                    StaffDao fbDao = new StaffDao(GlobalCtx.app().getSpecialToken());
+                                    StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
                                     try {
                                         resultBean = fbDao.sign_off(signInStore, envInfos);
                                     } catch (ServiceException e) {
@@ -839,7 +839,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            String token = GlobalCtx.app().getSpecialToken();
+            String token = GlobalCtx.app().token();
             GeneralWebViewActivity.gotoWeb(MainActivity.this,
                     URLHelper.getStoresPrefix() + "/working_status.html?_v_id="+ vendorId +"&access_token=" + token);
         }

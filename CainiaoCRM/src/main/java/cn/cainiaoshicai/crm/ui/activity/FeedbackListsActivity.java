@@ -37,7 +37,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
         super.onCreate(savedInstanceState);
 
         Intent gog = new Intent(this, GeneralWebViewActivity.class);
-        String url = String.format("%s/vm/index.html?time=%d&access_token=%s#!/home", URLHelper.WEB_URL_ROOT, System.currentTimeMillis(), GlobalCtx.app().getSpecialToken());
+        String url = String.format("%s/vm/index.html?time=%d&access_token=%s#!/home", URLHelper.WEB_URL_ROOT, System.currentTimeMillis(), GlobalCtx.app().token());
         gog.putExtra("url", url);
         startActivity(gog);
 //
@@ -151,7 +151,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
             new MyAsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.app().getSpecialToken());
+                    UserFeedbackDao dao = new UserFeedbackDao(GlobalCtx.app().token());
                     final ResultList<Feedback> results = dao.getFeedbackList(Integer.MAX_VALUE);
                     if (results.isOk()) {
                         FeedbackListsActivity.this.runOnUiThread(new Runnable() {

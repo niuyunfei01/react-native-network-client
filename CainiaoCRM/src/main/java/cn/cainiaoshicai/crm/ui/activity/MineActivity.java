@@ -80,7 +80,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
 				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
-				String token = app.getSpecialToken();
+				String token = app.token();
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
@@ -169,9 +169,9 @@ public class MineActivity extends AbstractActionBarActivity {
                     } else if (item.getType() == TYPE_PHONE_TECH) {
                         app.dial(app.getSupportTel(), MineActivity.this);
                     } else if (item.getType() == TYPE_WORKER_LIST) {
-						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getWorkerListUrl(vendor));
+						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getWorkerListUrl(vendor, app.token()));
 					}else if (item.getType() == TYPE_STORES_LIST) {
-						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getStoreListUrl(vendor));
+						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getStoreListUrl(vendor, app.token()));
 					}
 				}
 			}
@@ -187,7 +187,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			@Override
 			protected HashMap<String, String> doInBackground(Void... params) {
 				long storeId = SettingUtility.getListenerStore();
-				return new NewOrderDao(app.getSpecialToken()).getStatMap(storeId);
+				return new NewOrderDao(app.token()).getStatMap(storeId);
 			}
 
 			@Override

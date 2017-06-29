@@ -173,7 +173,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             new MyAsyncTask<Integer, Void, Order>() {
                 @Override
                 protected Order doInBackground(Integer... params) {
-                    OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                    OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
                     final Order o = dao.getOrder(order_id);
                     final OrderSingleActivity act = OrderSingleActivity.this;
                     if (o != null) {
@@ -258,7 +258,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     return;
                 }
 
-                String token = GlobalCtx.app().getSpecialToken();
+                String token = GlobalCtx.app().token();
                 intent.putExtra("url", String.format("%s/orders_go_to_buy/%s.html?access_token=%s",
                         URLHelper.getStoresPrefix(), order.getId(), token));
                 startActivity(intent);
@@ -335,7 +335,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             }
         }
 
-        String token = GlobalCtx.app().getSpecialToken();
+        String token = GlobalCtx.app().token();
         String clientId = GlobalCtx.app().getCurrentAccountId();
         url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", URLHelper.getStoresPrefix(), token, order.getId(), clientId);
         AppLogger.i("loading url:" + url);
@@ -374,7 +374,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                         cal.set(Calendar.MINUTE, minute);
                                             ResultBean rb;
                                         try {
-                                            String token = GlobalCtx.app().getSpecialToken();
+                                            String token = GlobalCtx.app().token();
                                             rb = new OrderActionDao(token).order_chg_arrived_time(order.getId(), order.getTime_arrived(), cal.getTime());
                                             if (rb.isOk()) {
                                                 helper.updateUI(new Runnable() {
@@ -591,7 +591,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             case R.id.menu_user_feedback:
 
                 Intent gog = new Intent(this, GeneralWebViewActivity.class);
-                String token = GlobalCtx.app().getSpecialToken();
+                String token = GlobalCtx.app().token();
                 final String vm_path;
                 Feedback fb = null;
                 if (this.orderRef.get() != null && this.orderRef.get().getFeedback() != null) {
@@ -619,7 +619,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                     private String errorDesc = null;
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                                        OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
                                         try {
                                             ResultBean resultBean = dao.setOrderInvalid(orderId, fromStatus);
                                             if(!resultBean.isOk()) {
@@ -694,7 +694,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                         }
 
                                         if (type > 0) {
-                                            OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                                            OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
                                             try {
                                                 ResultBean resultBean = dao.genCoupon(type, orderId);
                                                 if (!resultBean.isOk()) {
@@ -764,7 +764,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                         String tips = "";
                                         String taskType = checkedType[0];
                                         if (!TextUtils.isEmpty(taskType)) {
-                                            OrderActionDao dao = new OrderActionDao(app.getSpecialToken());
+                                            OrderActionDao dao = new OrderActionDao(app.token());
                                             try {
                                                 ResultBean rb = dao.order_waiting_list(orderRef.get().getId(), taskType);
                                                 if (rb.isOk()) {
@@ -833,7 +833,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                             new MyAsyncTask<Void, Void, Void>() {
                                 @Override
                                 protected Void doInBackground(Void... params) {
-                                    OrderActionDao dao = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                                    OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
                                     try {
                                         ResultBean rb = dao.orderChgStore(order.getId(), storeId, order.getStore_id(), order.getOrderStatus());
                                         if (rb.isOk()) {
@@ -898,7 +898,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                                             return null;
                                         }
                                         try {
-                                            OrderActionDao sad = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                                            OrderActionDao sad = new OrderActionDao(GlobalCtx.app().token());
                                             rb = sad.coupon_by_kf(uid, orderId, remarkTxt, (int)(reduce * 100), (int)(least * 100));
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
@@ -952,7 +952,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
                                         ResultBean rb;
                                         try {
-                                            OrderActionDao sad = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                                            OrderActionDao sad = new OrderActionDao(GlobalCtx.app().token());
                                             rb = sad.save_remark(orderId, remarkTxt);
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
@@ -1028,7 +1028,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         @Override
         protected ResultBean doInBackground(Integer... params) {
             int fromStatus = params[0];
-            String token = GlobalCtx.app().getSpecialToken();
+            String token = GlobalCtx.app().token();
             ResultBean oc;
             try {
                 switch (fromStatus) {
@@ -1096,7 +1096,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
             new MyAsyncTask<Void, ResultBean, ResultBean>(){
                 @Override
                 protected ResultBean doInBackground(Void... params) {
-                    String token = GlobalCtx.app().getSpecialToken();
+                    String token = GlobalCtx.app().token();
                     try {
                         return new OrderActionDao(token).confirmAccepted(Cts.Platform.find(platform), platformOid);
                     } catch (Exception ex) {

@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
@@ -311,6 +312,7 @@ public class OrderPrinter {
                                     ds.closeSocket();
                                     ds.reconnect();
                                 }
+                                CrashReportHelper.handleUncaughtException(Thread.currentThread(), e);
                             }
                         } else {
                             AppLogger.e("Printer is not connected!");
@@ -319,7 +321,13 @@ public class OrderPrinter {
                             if (ds != null) {
                                 //FIXME: should try to reset the socket
                             }
-
+                            String msg = "";
+                            if (ds == null) {
+                                msg =  "ds=null,";
+                            } else {
+                                msg = "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
+                            }
+                            CrashReportHelper.handleUncaughtException(Thread.currentThread(), new Exception(msg));
                         }
                     }
                 } else {

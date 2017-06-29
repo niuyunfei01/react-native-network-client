@@ -48,7 +48,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
     private MenuItem refreshItem;
     private String url;
 
-    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
+    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
 
     private Button btn_provide_print;
     private Button btn_provide_edit;
@@ -352,7 +352,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
     private void update_loading_url(long store_id, int req_id) {
         String currentAccountId = GlobalCtx.app().getCurrentAccountId();
         String gotoUrl = String.format("%s/provide_list/%s.html", URLHelper.getStoresPrefix(), store_id)
-                + "?access_token=" + GlobalCtx.app().getSpecialToken() + "&client_id=" + currentAccountId;
+                + "?access_token=" + GlobalCtx.app().token() + "&client_id=" + currentAccountId;
         if (req_id > 0) {
             gotoUrl += "&req_id=" + req_id;
         }

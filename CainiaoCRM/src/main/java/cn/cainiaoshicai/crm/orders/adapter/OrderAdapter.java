@@ -400,7 +400,7 @@ public class OrderAdapter extends BaseAdapter {
                 public void onClick(DialogInterface dialog, int which) {
 
                     if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
-                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().getSpecialToken());
+                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
                         new MyAsyncTask<Void, Void, Void>(){
 
                             ResultBean rb;

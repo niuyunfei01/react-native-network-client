@@ -56,7 +56,6 @@ import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -133,7 +132,7 @@ public class GlobalCtx extends Application {
                             @Override
                             protected Void doInBackground(Void... params) {
                                 try {
-                                    CommonConfigDao dao = new CommonConfigDao(GlobalCtx.this.getSpecialToken());
+                                    CommonConfigDao dao = new CommonConfigDao(GlobalCtx.this.token());
                                     ResultBean<HashMap<String, String>> config = dao.configItem(key);
                                     if (config.isOk()) {
                                         timedCache.put(key, config.getObj());
@@ -243,7 +242,7 @@ public class GlobalCtx extends Application {
     }
 
     private void initConfigs(final long storeId) {
-        String token = app().getSpecialToken();
+        String token = app().token();
         if (!TextUtils.isEmpty(token)) {
             final GlobalCtx ctx = GlobalCtx.this;
             try {
@@ -291,10 +290,10 @@ public class GlobalCtx extends Application {
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
         // 替换成自己的key
-        UserTalkDao userTalkDao = new UserTalkDao(this.getSpecialToken());
+        UserTalkDao userTalkDao = new UserTalkDao(this.token());
 
         MQConfig.init(this,
-                app().getSpecialToken(), userTalkDao, new OnInitCallback() {
+                app().token(), userTalkDao, new OnInitCallback() {
                     @Override
                     public void onSuccess(String clientId) {
                         Toast.makeText(GlobalCtx.this, "init success", Toast.LENGTH_SHORT).show();
@@ -366,7 +365,7 @@ public class GlobalCtx extends Application {
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
-                        GlobalCtx.this.storeWorkers = new StaffDao(GlobalCtx.this.getSpecialToken()).getStoreTodayWorkers(storeId);
+                        GlobalCtx.this.storeWorkers = new StaffDao(GlobalCtx.this.token()).getStoreTodayWorkers(storeId);
                         GlobalCtx.this.storeWorkersTs = System.currentTimeMillis();
                     } catch (ServiceException e) {
                         e.printStackTrace();
@@ -439,11 +438,11 @@ public class GlobalCtx extends Application {
         this.currentRunningActivity = currentRunningActivity;
     }
 
-    public String getSpecialToken() {
-        return getSpecialToken(true);
+    public String token() {
+        return token(true);
     }
 
-    public String getSpecialToken(boolean required) {
+    public String token(boolean required) {
         String token;
         if (getAccountBean() != null) {
             token = getAccountBean().getAccess_token();
@@ -506,7 +505,7 @@ public class GlobalCtx extends Application {
     public String getUrl(String key, boolean appendAcess) {
         String s = URLHelper.WEB_URL_ROOT + this.configUrls.get(key);
         if (appendAcess) {
-            s += "&access_token=" + this.getSpecialToken();
+            s += "&access_token=" + this.token();
         }
         return s;
     }
@@ -557,7 +556,7 @@ public class GlobalCtx extends Application {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
-                    CommonConfigDao cfgDao = new CommonConfigDao(app().getSpecialToken());
+                    CommonConfigDao cfgDao = new CommonConfigDao(app().token());
                     try {
                         LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
                         if (s != null) {
@@ -584,7 +583,7 @@ public class GlobalCtx extends Application {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
-                    CommonConfigDao cfgDao = new CommonConfigDao(app().getSpecialToken());
+                    CommonConfigDao cfgDao = new CommonConfigDao(app().token());
                     try {
                         ArrayList<Tag> s = cfgDao.getTags(currStoreId);
                         if (s != null) {
@@ -629,7 +628,7 @@ public class GlobalCtx extends Application {
     public void toFeedbackActivity(Activity ctx) {
         Intent gog = new Intent(ctx, GeneralWebViewActivity.class);
         String url = String.format("%s/vm/index.html?time=%d&access_token=%s#!/home", URLHelper.WEB_URL_ROOT,
-                System.currentTimeMillis(), this.getSpecialToken());
+                System.currentTimeMillis(), this.token());
         gog.putExtra("url", url);
         ctx.startActivity(gog);
     }
@@ -637,7 +636,7 @@ public class GlobalCtx extends Application {
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
         Intent intent = new Intent(ctx, RemindersActivity.class);
-        String token = GlobalCtx.app().getSpecialToken();
+        String token = GlobalCtx.app().token();
         intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
         return intent;
     }
@@ -687,7 +686,7 @@ public class GlobalCtx extends Application {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                CommonConfigDao oad = new CommonConfigDao(app().getSpecialToken());
+                CommonConfigDao oad = new CommonConfigDao(app().token());
                 try {
                     ResultBean<ArrayList<ShipOptions>> options = oad.shipOptions();
                     if (options.isOk() && options.getObj() != null) {
@@ -789,7 +788,7 @@ public class GlobalCtx extends Application {
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
-                        taskCount = new StaffDao(GlobalCtx.this.getSpecialToken()).getTaskCount();
+                        taskCount = new StaffDao(GlobalCtx.this.token()).getTaskCount();
                     } catch (ServiceException e) {
                         e.printStackTrace();
                     }

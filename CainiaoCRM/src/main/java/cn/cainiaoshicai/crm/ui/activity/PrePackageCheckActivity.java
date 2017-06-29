@@ -54,7 +54,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         setContentView(R.layout.pre_package_estimate);
 
         if (sad == null) {
-            String token = GlobalCtx.app().getSpecialToken();
+            String token = GlobalCtx.app().token();
             if (token != null) {
                this.sad = new StorageActionDao(token);
             }
@@ -168,7 +168,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
     private void update_loading_url(long store_id, String day) {
         String currentAccountId = GlobalCtx.app().getCurrentAccountId();
         this.url = String.format("%s/provide_prepare/%s.html", URLHelper.getStoresPrefix(), store_id)
-                + "?day="+day+"&access_token=" + GlobalCtx.app().getSpecialToken() + "&client_id=" + currentAccountId;
+                + "?day="+day+"&access_token=" + GlobalCtx.app().token() + "&client_id=" + currentAccountId;
     }
 
     @Override

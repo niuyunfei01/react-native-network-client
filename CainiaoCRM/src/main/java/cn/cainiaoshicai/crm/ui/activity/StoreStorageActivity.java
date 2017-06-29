@@ -62,7 +62,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_TO_LOSS = 10997;
     private static final int MENU_CONTEXT_VIEW_DETAIL = 10998;
     private StorageItemAdapter<StorageItem> listAdapter;
-    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
+    private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
     private ListView lv;
     private AutoCompleteTextView ctv;
     private Spinner tagFilterSpinner;

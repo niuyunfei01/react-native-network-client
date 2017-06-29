@@ -88,7 +88,7 @@ public class StoreStorageHelper {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
+                StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
                 ResultBean rb = sad.chg_item_when_on_sale_again(item.getId(), option);
                 final String msg;
                 Runnable uiCallback = null;
@@ -146,7 +146,7 @@ public class StoreStorageHelper {
                 @Override protected Void doInBackground(Void... params) {
                     ResultBean rb;
                     try {
-                        StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
+                        StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
                         rb = sad.chg_item_status(currStore.getId(), item.getProduct_id(), item.getStatus(), destStatus);
                     } catch (ServiceException e) {
                         rb = new ResultBean(false, "访问服务器出错");
@@ -305,7 +305,7 @@ public class StoreStorageHelper {
                                         final int total_req_no = Integer.parseInt(s);
                                         final String remarkTxt = remark.getText().toString();
                                         try {
-                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
+                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
                                             rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
@@ -362,7 +362,7 @@ public class StoreStorageHelper {
         void invoke() {
             ResultBean rb;
             try {
-                StorageActionDao sad = new StorageActionDao(GlobalCtx.app().getSpecialToken());
+                StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
                 rb = sad.store_status_reset_stat_num(item.getStore_id(), item.getProduct_id(), lastStat);
             } catch (ServiceException e) {
                 rb = new ResultBean(false, "访问服务器出错");
