@@ -473,6 +473,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             cancel(true);
                         }
                     });
+                    result = null;
                 }
 
                 cancel(true);
@@ -480,9 +481,15 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
 
             @Override
+            protected void onCancelled(Void aVoid) {
+                super.onCancelled(aVoid);
+                progressFragment.dismissAllowingStateLoss();
+            }
+
+            @Override
             protected void onPostExecute(Void aVoid) {
+                progressFragment.dismissAllowingStateLoss();
                 if (result != null) {
-                    progressFragment.dismissAllowingStateLoss();
                     StoreStorageActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
