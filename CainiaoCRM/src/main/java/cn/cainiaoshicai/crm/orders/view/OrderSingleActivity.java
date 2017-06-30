@@ -49,6 +49,7 @@ import cn.cainiaoshicai.crm.orders.domain.Feedback;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -531,14 +532,14 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 @Override
                 protected void onPostExecute(Boolean aBoolean) {
                     super.onPostExecute(aBoolean);
-                    if (!aBoolean) {
-                        Toast.makeText(getApplication(), "操作失败：" + this.error, Toast.LENGTH_SHORT).show();
+                    if (!TextUtil.isEmpty(this.error)) {
+                        AlertUtil.errorOnActivity(OrderSingleActivity.this, "操作失败：" + this.error);
                     }
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (printButton != null) {
+                            if (printButton != null && order != null) {
                                 showPrintTimes(order.getPrint_times());
                             } else {
                                 AppLogger.w("printButton is null");
