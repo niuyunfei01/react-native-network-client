@@ -64,6 +64,7 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
+import cn.cainiaoshicai.crm.ui.activity.DataActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
@@ -703,6 +704,9 @@ public class MainActivity extends AbstractActionBarActivity {
                 return true;
             case R.id.menu_store_maint:
                 startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+                return true;
+            case R.id.menu_operation:
+                startActivity(new Intent(this, DataActivity.class));
                 return true;
             default:
         }

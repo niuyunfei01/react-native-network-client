@@ -19,6 +19,12 @@
         />
 
     <tab
+        id="@+id/menu_operation"
+        title="@string/menu_menu_operation"
+        icon="@drawable/ic_monetization_on_black_24dp"
+        />
+
+    <tab
         id="@+id/menu_mine"
         title="@string/menu_mine"
         icon="@drawable/ic_settings_applications_black_24dp"

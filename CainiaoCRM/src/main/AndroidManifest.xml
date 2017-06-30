@@ -110,6 +110,8 @@
         <activity android:name=".ui.activity.StorageProvideActivity" android:screenOrientation="portrait"
             android:parentActivityName=".ui.activity.StoreStorageActivity">
         </activity>
+        <activity android:name=".ui.activity.DataActivity" android:screenOrientation="portrait">
+        </activity>
 
         <activity android:name=".ui.activity.CustomizedMQConversationActivity"
             android:screenOrientation="portrait"
@@ -135,7 +137,6 @@
                 <category android:name="jpush.testCategory" />
             </intent-filter>
         </activity>
-
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
