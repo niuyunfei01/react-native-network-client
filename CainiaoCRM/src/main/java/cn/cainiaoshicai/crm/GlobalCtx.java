@@ -18,6 +18,7 @@ import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
@@ -58,6 +59,7 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
@@ -564,6 +566,10 @@ public class GlobalCtx extends Application {
                         }
                     } catch (ServiceException e) {
                         AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
+                        Activity runningActivity = app().getCurrentRunningActivity();
+                        if (runningActivity != null) {
+                            AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
+                        }
                     }
                     return null;
                 }
@@ -668,7 +674,7 @@ public class GlobalCtx extends Application {
     }
 
     public ShipOptions getShipOptions(final long storeId) {
-        Map<Integer, ShipOptions> p = shipOptions.get();
+        LongSparseArray<ShipOptions> p = shipOptions.get();
         ShipOptions ret;
         if (p == null) {
             updateShipOptions();
@@ -690,7 +696,7 @@ public class GlobalCtx extends Application {
                 try {
                     ResultBean<ArrayList<ShipOptions>> options = oad.shipOptions();
                     if (options.isOk() && options.getObj() != null) {
-                        HashMap<Integer, ShipOptions> mm = new HashMap<>();
+                        LongSparseArray<ShipOptions> mm = new LongSparseArray<ShipOptions>();
                         for (ShipOptions so : options.getObj()) {
                             mm.put(so.getStore_id(), so);
                         }
@@ -771,7 +777,7 @@ public class GlobalCtx extends Application {
         CrashReportHelper.attachBaseContext(base, this);
     }
 
-    private volatile AtomicReference<Map<Integer, ShipOptions>> shipOptions = new AtomicReference<>();
+    private volatile AtomicReference<LongSparseArray<ShipOptions>> shipOptions = new AtomicReference<>();
     private volatile int taskCount = 0;
     private long taskUpdateTs;
 

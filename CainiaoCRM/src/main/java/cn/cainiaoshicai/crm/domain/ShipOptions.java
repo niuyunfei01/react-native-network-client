@@ -6,15 +6,15 @@ import java.util.List;
  * Created by liuzhr on 5/14/17.
  */
 public class ShipOptions {
-    private int store_id;
+    private long store_id;
     List<String> names;
     List<String> values;
 
-    public int getStore_id() {
+    public long getStore_id() {
         return store_id;
     }
 
-    public void setStore_id(int store_id) {
+    public void setStore_id(long store_id) {
         this.store_id = store_id;
     }
 

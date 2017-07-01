@@ -18,11 +18,11 @@
         icon="@drawable/ic_widgets_black_24dp"
         />
 
-    <tab
+    <!--tab
         id="@+id/menu_operation"
         title="@string/menu_menu_operation"
         icon="@drawable/ic_monetization_on_black_24dp"
-        />
+        /-->
 
     <tab
         id="@+id/menu_mine"

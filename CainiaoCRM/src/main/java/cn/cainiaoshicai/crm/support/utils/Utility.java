@@ -762,7 +762,11 @@ public class Utility {
         Collection<Store> stores = GlobalCtx.app().listStores();
 
         ArrayList<Store> filtered = new ArrayList<>();
-        if (!includeUnknown && stores != null) {
+        if (stores == null) {
+            return filtered;
+        }
+
+        if (!includeUnknown) {
             for(Store store : stores) {
                 if (store.getId() != Cts.STORE_UNKNOWN) {
                     filtered.add(store);

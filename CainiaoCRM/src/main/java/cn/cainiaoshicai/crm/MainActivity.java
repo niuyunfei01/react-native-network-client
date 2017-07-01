@@ -705,9 +705,9 @@ public class MainActivity extends AbstractActionBarActivity {
             case R.id.menu_store_maint:
                 startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
                 return true;
-            case R.id.menu_operation:
-                startActivity(new Intent(this, DataActivity.class));
-                return true;
+//            case R.id.menu_operation:
+//                startActivity(new Intent(this, DataActivity.class));
+//                return true;
             default:
         }
 
