@@ -203,7 +203,12 @@ public class OrderSingleHelper {
                                     @Override
                                     protected Void doInBackground(Void... params) {
                                         ResultEditReq rb;
-                                        final int total_req_no = Integer.parseInt(totalReqTxt.getText().toString());
+                                        String reqNumStr = totalReqTxt.getText().toString();
+                                        if (TextUtils.isEmpty(reqNumStr)) {
+                                            AlertUtil.errorOnActivity(activity, "订货数不能为空");
+                                            return null;
+                                        }
+                                        final int total_req_no = Integer.parseInt(reqNumStr);
                                         final String remarkTxt = remark.getText().toString();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());

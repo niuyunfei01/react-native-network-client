@@ -203,7 +203,12 @@ public class StoreStorageHelper {
                 .setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                final int lastStat = Integer.parseInt(et.getText().toString());
+                                String s = et.getText().toString();
+                                if (TextUtils.isEmpty(s)) {
+                                    AlertUtil.errorOnActivity(activity, "库存数不能为空");
+                                    return;
+                                }
+                                final int lastStat = Integer.parseInt(s);
                                 new MyAsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
