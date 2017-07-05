@@ -239,7 +239,12 @@ public class StoreStorageHelper {
                 .setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                final int newCents = (int) (100 * Double.parseDouble(et.getText().toString()));
+                                String priceStr = et.getText().toString();
+                                if (TextUtils.isEmpty(priceStr)) {
+                                    AlertUtil.error(activity, "价格不能为空");
+                                    return;
+                                }
+                                final int newCents = (int) (100 * Double.parseDouble(priceStr));
                                 if (newCents < 1) {
                                     AlertUtil.error(activity, "价格不能低于1分钱");
                                     return;
