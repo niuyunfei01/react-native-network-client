@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -294,6 +295,9 @@ public class OrderPrinter {
                         AppLogger.e("[print] auto print failed for store");
                         reason = "此订单不在您设置的自动打印店面中！";
                     } else {
+
+                        String speak = "";
+                        Throwable ex = null;
                         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         if (ds != null && ds.getSocket() != null && ds.isConnected()) {
                             try {
@@ -312,26 +316,27 @@ public class OrderPrinter {
                                     ds.closeSocket();
                                     ds.reconnect();
                                 }
-                                CrashReportHelper.handleUncaughtException(Thread.currentThread(), e);
+                                speak = "订单打印发生错误，请重新连接打印机！";
+                                ex = e;
                             }
                         } else {
-                            AppLogger.e("Printer is not connected!");
                             reason = "未连接到打印机";
-
+                            speak = "订单打印失败，请重新连接打印机，然后手动打印！";
                             if (ds != null) {
                                 //FIXME: should try to reset the socket
                             }
-                            String msg = "";
-                            if (ds == null) {
-                                msg =  "ds=null,";
-                            } else {
-                                msg = "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
-                            }
-                            CrashReportHelper.handleUncaughtException(Thread.currentThread(), new Exception(msg));
+                            String msg = ds == null ? "ds=null," : "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
+                            ex =  new Exception(msg);
+                        }
+
+                        if (ex != null) {
+                            CrashReportHelper.handleUncaughtException(Thread.currentThread(), ex);
+                        }
+                        if (!TextUtils.isEmpty(speak)) {
+                            AudioUtils.getInstance().speakText(speak);
                         }
                     }
                 } else {
-                    AppLogger.e("order is already printed!");
                     reason = "订单已经打印过啦";
                 }
 
