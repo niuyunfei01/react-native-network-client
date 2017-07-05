@@ -142,17 +142,6 @@ public class MainActivity extends AbstractActionBarActivity {
 
         setContentView(R.layout.order_list_main);
 
-        long storeId = SettingUtility.getListenerStore();
-        if (storeId < 1) {
-            Utility.tellSelectStore("请选择工作门店", new StoreSelectedListener() {
-                @Override
-                public void done(long selectedId) {
-                    SettingUtility.setListenerStores(selectedId);
-                    resetPrinterStatusBar();
-                }
-            }, MainActivity.this);
-        }
-
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
         final OrdersPagerAdapter adapter = new OrdersPagerAdapter(getSupportFragmentManager(),
@@ -189,6 +178,18 @@ public class MainActivity extends AbstractActionBarActivity {
     }
 
     private void resetPrinterStatusBar() {
+
+        long storeId = SettingUtility.getListenerStore();
+        if (storeId < 1) {
+            Utility.tellSelectStore("请选择工作门店", new StoreSelectedListener() {
+                @Override
+                public void done(long selectedId) {
+                    SettingUtility.setListenerStores(selectedId);
+                    resetPrinterStatusBar();
+                    ordersViewPager.setCurrentItem(0);
+                }
+            }, MainActivity.this);
+        }
 
         final ArrayList<Long> autoPrintStores = SettingUtility.getAutoPrintStores();
         final GlobalCtx app = GlobalCtx.app();
