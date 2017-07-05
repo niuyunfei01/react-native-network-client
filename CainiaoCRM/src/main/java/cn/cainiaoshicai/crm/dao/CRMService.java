@@ -64,8 +64,8 @@ public interface CRMService {
     @POST("/api/shipping_accept_status/{storeId}")
     Call<ResultBean<ShipAcceptStatus>> shippingAcceptStatus(@Path("storeId") long storeId);
 
-    @GET("/api/common_config2")
-    Call<ResultBean<Config>> commonConfig();
+    @POST("/api/common_config2")
+    Call<ResultBean<Config>> commonConfig(@Query("client_status") String clientStatus);
 
     @GET("/api/user_info2")
     Call<ResultBean<UserBean>> userInfo(@Query("access_token") String token);

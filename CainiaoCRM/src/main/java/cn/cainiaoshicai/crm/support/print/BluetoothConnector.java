@@ -13,6 +13,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
+
 public class BluetoothConnector {
 
     private BluetoothSocketWrapper bluetoothSocket;
@@ -49,7 +51,7 @@ public class BluetoothConnector {
 
             try {
                 bluetoothSocket.connect();
-                success = true;
+                success = bluetoothSocket.isConnected();
                 break;
             } catch (IOException e) {
                 //try the fallback
@@ -57,14 +59,11 @@ public class BluetoothConnector {
                     bluetoothSocket = new FallbackBluetoothSocket(bluetoothSocket.getUnderlyingSocket());
                     Thread.sleep(500);                  
                     bluetoothSocket.connect();
-                    success = true;
+                    success = bluetoothSocket.isConnected();
                     break;  
-                } catch (FallbackException e1) {
-                    Log.w("BT", "Could not initialize FallbackBluetoothSocket classes.", e);
-                } catch (InterruptedException e1) {
-                    Log.w("BT", e1.getMessage(), e1);
-                } catch (IOException e1) {
+                } catch (Exception e1) {
                     Log.w("BT", "Fallback failed. Cancelling.", e1);
+                    CrashReportHelper.handleUncaughtException(null, e1);
                 }
             }
         }
@@ -111,6 +110,8 @@ public class BluetoothConnector {
 
         BluetoothSocket getUnderlyingSocket();
 
+        boolean isConnected();
+
     }
 
 
@@ -155,6 +156,11 @@ public class BluetoothConnector {
         @Override
         public BluetoothSocket getUnderlyingSocket() {
             return socket;
+        }
+
+        @Override
+        public boolean isConnected() {
+            return socket != null && socket.isConnected();
         }
 
     }

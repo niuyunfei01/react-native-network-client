@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="270"
+    android:versionCode="271"
     android:versionName="2.2.2">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->

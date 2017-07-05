@@ -142,7 +142,17 @@ public final class AlertUtil {
         showDlg(context, dlg, message);
     }
 
-    private static void showDlg(Context context, Dialog dlg, String msg) {
+    public static void showDlg(AlertDialog.Builder dlg) {
+        Context ctx = dlg.getContext();
+        if ((ctx instanceof Activity) && ((Activity)ctx).isFinishing()) {
+            Exception e = new Exception("activity is finished! context="+ctx.getClass()+", dlg:" + dlg);
+            CrashReportHelper.handleUncaughtException(null, e);
+        } else {
+            dlg.show();
+        }
+    }
+
+    public static void showDlg(Context context, Dialog dlg, String msg) {
         if (context instanceof Activity && ((Activity)context).isFinishing()) {
             Exception e = new Exception("show dlg that activity is finished! context="+context.getClass()+", msg:" + msg);
             CrashReportHelper.handleUncaughtException(null, e);

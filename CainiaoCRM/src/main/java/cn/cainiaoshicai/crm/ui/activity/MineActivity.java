@@ -74,13 +74,13 @@ public class MineActivity extends AbstractActionBarActivity {
         listAdapter = new MineItemsAdapter(this);
         this.listView.setAdapter(listAdapter);
 		final GlobalCtx app = GlobalCtx.app();
+		final String token = app.token();
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.d(GlobalCtx.ORDERS_TAG, "list item view clicked");
 				MineItemsAdapter.PerformanceItem item = listAdapter.getItem(position);
-				String token = app.token();
 				if (item.getType() == TYPE_PRINT_SETTINGS) {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {

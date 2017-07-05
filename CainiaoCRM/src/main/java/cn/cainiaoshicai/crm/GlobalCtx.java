@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.gson.Gson;
+import com.iflytek.cloud.Setting;
 import com.iflytek.cloud.SpeechUtility;
 
 import java.util.ArrayList;
@@ -71,6 +73,7 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
+import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -118,6 +121,7 @@ public class GlobalCtx extends Application {
     private String agent;
     public CRMService dao;
     private String supportTel;
+    private boolean printerConnected;
 
     //private SpeechSynthesizer mTts;
 
@@ -256,7 +260,16 @@ public class GlobalCtx extends Application {
                 AppLogger.w("error to set jpush alias");
             }
 
-            Call<ResultBean<Config>> rbCall = ctx.dao.commonConfig();
+            HashMap<String, Object> ss = new HashMap<>();
+            boolean autoPrint = SettingUtility.isAutoPrint(storeId);
+//                            .addQueryParameter("_auto_print", String.valueOf(autoPrint ? 1 : 0))
+
+            ss.put("printer", SettingUtility.getLastConnectedPrinterAddress());
+            ss.put("printer_auto_store", storeId);
+            ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
+            String clientStatus = new Gson().toJson(ss);
+
+            Call<ResultBean<Config>> rbCall = ctx.dao.commonConfig(clientStatus);
             rbCall.enqueue(new Callback<ResultBean<Config>>() {
                 @Override
                 public void onResponse(Call<ResultBean<Config>> call, Response<ResultBean<Config>> response) {
@@ -425,7 +438,8 @@ public class GlobalCtx extends Application {
     }
 
     public String getCurrentAccountName() {
-        return getAccountBean().getUsernick();
+        AccountBean bean = getAccountBean();
+        return bean != null ? bean.getUsernick() : "[未登录]";
     }
 
     public void setActivity(Activity activity) {
@@ -765,6 +779,14 @@ public class GlobalCtx extends Application {
 
     public boolean is811485() {
         return "811485".equals(this.getCurrentAccountId());
+    }
+
+    public void setPrinterConnected(boolean printerConnected) {
+        this.printerConnected = printerConnected;
+    }
+
+    public boolean isPrinterConnected() {
+        return printerConnected;
     }
 
     public interface TaskCountUpdated {

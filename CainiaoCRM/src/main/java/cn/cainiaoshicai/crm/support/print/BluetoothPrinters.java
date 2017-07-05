@@ -45,13 +45,11 @@ public class BluetoothPrinters {
         private BluetoothDevice device;
         private String name;
         private String addr;
-        private boolean connected;
         private BluetoothConnector.BluetoothSocketWrapper mbtSocket;
 
-        public DeviceStatus(BluetoothDevice device, boolean connected) {
+        public DeviceStatus(BluetoothDevice device) {
             this.name = device.getName();
             this.addr = device.getAddress();
-            this.connected = connected;
             this.device = device;
         }
 
@@ -68,7 +66,7 @@ public class BluetoothPrinters {
         }
 
         public boolean isConnected() {
-            return connected;
+            return this.mbtSocket != null && this.mbtSocket.isConnected();
         }
 
         public BluetoothDevice getDevice() {
@@ -106,7 +104,6 @@ public class BluetoothPrinters {
         public void resetSocket(BluetoothConnector.BluetoothSocketWrapper mbtSocket) {
             closeSocket();
             this.mbtSocket = mbtSocket;
-            this.connected = true;
             INS.printers.add(this);
         }
 
@@ -121,7 +118,6 @@ public class BluetoothPrinters {
 
             }
                 INS.printers.remove(this);
-            this.connected = false;
         }
 
         public void reconnect() {

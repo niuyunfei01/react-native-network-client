@@ -38,7 +38,7 @@ public class BluetoothItemAdapter<T extends BluetoothPrinters.DeviceStatus> exte
         BluetoothPrinters.DeviceStatus deviceStatus = this.getItem(pos);
         label.setText(deviceStatus.getName() + " " + deviceStatus.getAddr());
 
-        String statusText = deviceStatus.isBound() ? (deviceStatus.isConnected() ? "已连接" : "未连接") : "未配对";
+        String statusText = deviceStatus.isConnected() ? "已连接" : (deviceStatus.isBound() ? "未连接" : "未配对");
         statusLabel.setText(statusText);
 
         ImageView icon = (ImageView) row.findViewById(imageId);

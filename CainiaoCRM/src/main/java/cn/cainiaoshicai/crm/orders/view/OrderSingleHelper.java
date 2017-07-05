@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -375,7 +376,7 @@ public class OrderSingleHelper {
                                         callDada(_order, ctx);
                                     }
                                 }).setNegativeButton("暂不呼叫", null);
-                        adb.show();
+                        AlertUtil.showDlg(adb);
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_ACCEPT) {
                         String msg;
                         if (_order != null) {
@@ -394,7 +395,7 @@ public class OrderSingleHelper {
                                     }
                                 })
                                 .setNegativeButton("撤回呼叫", new DadaCancelClicked(false));
-                        adb.show();
+                        AlertUtil.showDlg(adb);
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_FETCH) {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
@@ -406,7 +407,7 @@ public class OrderSingleHelper {
                         if (_order != null && !TextUtils.isEmpty(_order.getDada_mobile())) {
                             adb.setNeutralButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile));
                         }
-                        adb.show();
+                        AlertUtil.showDlg(adb);
                     } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL || _dadaStatus == Cts.DADA_STATUS_TIMEOUT) {
                         adb.setTitle("呼叫自动(达达|蜂鸟）")
                                 .setMessage("订单已"+(_dadaStatus == Cts.DADA_STATUS_TIMEOUT ? "超时":"取消")+"，重新发单？")
@@ -416,7 +417,7 @@ public class OrderSingleHelper {
                                         callDada(_order, ctx, true);
                                     }
                                 }).setPositiveButton(R.string.cancel, null);
-                        adb.show();
+                        AlertUtil.showDlg(adb);
                     } else if (_dadaStatus == Cts.DADA_STATUS_SHIPPING || _dadaStatus == Cts.DADA_STATUS_ARRIVED) {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
@@ -425,7 +426,7 @@ public class OrderSingleHelper {
                                 .setMessage(String.format("%s %s (%s) " + (_dadaStatus == Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达"), autoPlat, dada_dm_name, dada_mobile))
                                 .setNegativeButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile))
                                 .setPositiveButton("知道了", null);
-                        adb.show();
+                        AlertUtil.showDlg(adb);
                     }
                 }
             }.executeOnNormal();

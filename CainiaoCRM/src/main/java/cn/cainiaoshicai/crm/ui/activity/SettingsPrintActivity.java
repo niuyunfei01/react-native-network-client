@@ -25,6 +25,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -175,11 +176,14 @@ public class SettingsPrintActivity extends ListActivity {
 			for (int pos = 0; pos < listAdapter.getCount(); pos++) {
 				BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
 				if (item != null && lastAddress.equals(item.getAddr())) {
-					return item.isConnected();
+					boolean connected = item.isConnected();
+					GlobalCtx.app().setPrinterConnected(connected);
+					return connected;
 				}
 			}
 		}
 
+		GlobalCtx.app().setPrinterConnected(false);
 		return false;
 	}
 
@@ -242,7 +246,7 @@ public class SettingsPrintActivity extends ListActivity {
 				try {
 					if (btDeviceList.size() > 0) {
 						for (BluetoothDevice device : btDeviceList) {
-							BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(device, false);
+							BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(device);
 							if (listAdapter.getPosition(deviceStatus) < 0) {
 								listAdapter.add(deviceStatus);
 								listAdapter.notifyDataSetInvalidated();
@@ -273,7 +277,7 @@ public class SettingsPrintActivity extends ListActivity {
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                 try {
-                    BluetoothPrinters.DeviceStatus ds = new BluetoothPrinters.DeviceStatus(device, false);
+                    BluetoothPrinters.DeviceStatus ds = new BluetoothPrinters.DeviceStatus(device);
                     if (listAdapter.getPosition(ds) < 0) {
                         listAdapter.add(ds);
                         listAdapter.notifyDataSetInvalidated();
@@ -326,6 +330,7 @@ public class SettingsPrintActivity extends ListActivity {
 					});
 				} catch (IOException ex) {
 					AppLogger.e("exception to connect BT device:" + device.getName(), ex);
+					CrashReportHelper.handleUncaughtException(null, ex);
 					runOnUiThread(socketErrorRunnable);
 				} finally {
 					runOnUiThread(new Runnable() {
@@ -334,34 +339,6 @@ public class SettingsPrintActivity extends ListActivity {
 							listAdapter.notifyDataSetChanged();
 						}
 					});
-				}
-			}
-		});
-
-		connectThread.start();
-	}
-
-	private static void connectPrinterNoUI(final BluetoothPrinters.DeviceStatus item) {
-		if (btAdapter == null) {
-			return;
-		}
-
-		if (btAdapter.isDiscovering()) {
-			btAdapter.cancelDiscovery();
-		}
-
-		Thread connectThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				final BluetoothDevice device = item.getDevice();
-				try {
-					final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
-					final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
-					item.resetSocket(socketWrapper);
-					SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
-					AppLogger.e("connect with wrapper: connected");
-				} catch (IOException ex) {
-					AppLogger.e("exception to connect BT device:" + device.getName(), ex);
 				}
 			}
 		});
