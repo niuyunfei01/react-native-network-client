@@ -219,7 +219,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                connect(platform, platformOid);
+                connectAndPrint(platform, platformOid);
             }
         });
 //        sourceReadyButton = (Switch) findViewById(R.id.button_source_ready);
@@ -476,16 +476,17 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         }
     }
 
-    protected void connect(final int platform, final String platformOid) {
+    protected void connectAndPrint(final int platform, final String platformOid) {
         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-        if(ds == null || ds.getSocket() == null){
-            Intent BTIntent = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+        if(ds == null || ds.getSocket() == null || !ds.isConnected()){
+            Intent BTIntent = new Intent(this, SettingsPrintActivity.class);
             this.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
         }
         else{
             new MyAsyncTask<Void,Order, Boolean>(){
                 private String error;
-                private Order order;
+                private boolean gotoConnecting = false;
+                OrderSingleActivity context = OrderSingleActivity.this;
 
                 @Override
                 protected Boolean doInBackground(Void... params) {
@@ -495,34 +496,23 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                         this.error = getApplication().getString(R.string.error_get_order);
                         return false;
                     } else {
-                        this.order = order;
-                        OrderSingleActivity.this.orderRef.set(order);
-
-                        OrderSingleActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                OrderSingleActivity.this.update_dada_btn(order.getDada_status(), order);
-                            }
-
-                        });
-
+                        orderRef.set(order);
                         try {
                             OrderPrinter.printOrder(ds.getSocket(), order);
-                            order.incrPrintTimes();
-                            try {
-                                new OrderActionDao(access_token).logOrderPrinted(order.getId());
-                            } catch (ServiceException e) {
-                                AppLogger.e("error Service Exception:" + e.getMessage(), e);
-                            }
                         } catch (Exception e) {
-                            AppLogger.e("error IOException:" + e.getMessage(), e);
-                            this.error = "打印错误:" + e.getMessage();
-
+                            this.error = "打印错误: 请重新连接打印机";
+                            gotoConnecting = true;
                             if (e instanceof IOException) {
                                 ds.closeSocket();
                             }
-
                             return false;
+                        }
+
+                        order.incrPrintTimes();
+                        try {
+                            new OrderActionDao(access_token).logOrderPrinted(order.getId());
+                        } catch (ServiceException e) {
+                            AppLogger.e("error Service Exception:" + e.getMessage(), e);
                         }
                     }
 
@@ -533,19 +523,27 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 protected void onPostExecute(Boolean aBoolean) {
                     super.onPostExecute(aBoolean);
                     if (!TextUtil.isEmpty(this.error)) {
-                        AlertUtil.errorOnActivity(OrderSingleActivity.this, "操作失败：" + this.error);
+                        if (gotoConnecting) {
+                            AlertUtil.error(context, this.error, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent BTIntent = new Intent(context, SettingsPrintActivity.class);
+                                    context.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
+                                }
+                            });
+                        } else {
+                            AlertUtil.errorOnActivity(context, this.error);
+                        }
                     }
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (printButton != null && order != null) {
-                                showPrintTimes(order.getPrint_times());
-                            } else {
-                                AppLogger.w("printButton is null");
-                            }
-                        }
-                    });
+                    Order order = orderRef.get();
+                    if (order != null) {
+                        update_dada_btn(order.getDada_status(), order);
+                    }
+
+                    if (printButton != null && order != null) {
+                        showPrintTimes(order.getPrint_times());
+                    }
                 }
             }.executeOnNormal();
         }

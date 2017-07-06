@@ -282,15 +282,14 @@ public class OrderPrinter {
             return;
         }
 
-        final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+        final String access_token = GlobalCtx.app().token();
         new MyAsyncTask<Void, Order, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
 
                 boolean result = false;
                 String reason = "";
-                if (!isAutoPrint || (order.shouldTryAutoPrint()) ) {
-
+                if (!isAutoPrint || (order.shouldTryAutoPrint()) )
                     if (isAutoPrint && !GlobalCtx.isAutoPrint(order.getStore_id())) {
                         AppLogger.e("[print] auto print failed for store");
                         reason = "此订单不在您设置的自动打印店面中！";
@@ -302,15 +301,10 @@ public class OrderPrinter {
                         if (ds != null && ds.getSocket() != null && ds.isConnected()) {
                             try {
                                 OrderPrinter.printOrder(ds.getSocket(), order);
-                                try {
-                                    new OrderActionDao(access_token).logOrderPrinted(order.getId());
-                                } catch (ServiceException e) {
-                                    AppLogger.e("error Service Exception:" + e.getMessage());
-                                }
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);
-                                reason = "打印错误：" + e.getMessage();
+                                reason = "打印错误：请从运行中程序列表清除CRM，重新启动CRM并连接打印机";
                                 //FIXME: should try to reset the socket
                                 if (e instanceof IOException) {
                                     ds.closeSocket();
@@ -319,14 +313,20 @@ public class OrderPrinter {
                                 speak = "订单打印发生错误，请重新连接打印机！";
                                 ex = e;
                             }
+
+                            if (result) {
+                                try {
+                                    new OrderActionDao(access_token).logOrderPrinted(order.getId());
+                                } catch (ServiceException e) {
+                                    AppLogger.e("error Service Exception:" + e.getMessage());
+                                }
+                            }
+
                         } else {
                             reason = "未连接到打印机";
                             speak = "订单打印失败，请重新连接打印机，然后手动打印！";
-                            if (ds != null) {
-                                //FIXME: should try to reset the socket
-                            }
                             String msg = ds == null ? "ds=null," : "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
-                            ex =  new Exception(msg);
+                            ex = new Exception(msg);
                         }
 
                         if (ex != null) {
@@ -336,7 +336,7 @@ public class OrderPrinter {
                             AudioUtils.getInstance().speakText(speak);
                         }
                     }
-                } else {
+                else {
                     reason = "订单已经打印过啦";
                 }
 
