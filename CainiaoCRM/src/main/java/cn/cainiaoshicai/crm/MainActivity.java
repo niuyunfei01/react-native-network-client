@@ -64,7 +64,6 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
-import cn.cainiaoshicai.crm.ui.activity.DataActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
@@ -331,19 +330,10 @@ public class MainActivity extends AbstractActionBarActivity {
             @Override
             public void onClick(View v) {
 
-                if (locationHelper == null) {
-                    locationHelper = new LocationHelper(MainActivity.this);
-                    locationHelper.initLocation();
-                }
-
-                if (locationHelper == null) {
-                    AlertUtil.showAlert(MainActivity.this, "错误提示", "暂时无法检测您的位置，请打开GPS");
-                    return;
-                }
                 final Long signInStore = SettingUtility.getSignInStore();
                 final Integer signInStatus = SettingUtility.getSignInStatus();
                 final int vendorId = app.getVendor() != null ? app.getVendor().getId() : 0;
-                final HashMap<String, String> envInfos = extraEnvInfo();
+
                 if (signInStatus == Cts.SIGN_ACTION_IN) {
 
                     final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
@@ -364,7 +354,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         public void run() {
                                             AlertUtil.showAlert(MainActivity.this, R.string.working_status,
                                                     msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
-                                                    new SignOffOnClickListener(signInStore, envInfos, signingText));
+                                                    new SignOffOnClickListener(signInStore, signingText));
                                         }
                                     });
                                 } else {
@@ -383,65 +373,81 @@ public class MainActivity extends AbstractActionBarActivity {
                     }.executeOnNormal();
 
                 } else {
-                    final Long defStoreId;
-                    if (signInStore > 0) {
-                        defStoreId = (signInStore);
-                    } else {
-                        defStoreId = SettingUtility.getListenerStore();
-                    }
+                    final Long defStoreId = signInStore > 0 ? signInStore : Long.valueOf(SettingUtility.getListenerStore());
+
                     Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", defStoreId,
                             new StoreSelectedListener() {
                                 @Override
                                 public void done(final long selectedId) {
-                                final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                                Utility.forceShowDialog(MainActivity.this, pf);
-                                new MyAsyncTask<Void, Void, Void>() {
-                                    private ResultBean<HashMap<String, String>> resultBean;
+                                    final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                    Utility.forceShowDialog(MainActivity.this, pf);
 
-                                    @Override
-                                    protected Void doInBackground(Void... params) {
-                                        StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
-                                        try {
-                                            resultBean = fbDao.sign_in(selectedId, envInfos);
-                                        } catch (ServiceException e) {
-                                            resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
+                                    periodEnabledLocation();
+                                    final HashMap<String, String> envInfos = extraEnvInfo();
+
+                                    new MyAsyncTask<Void, Void, Void>() {
+                                        private ResultBean<HashMap<String, String>> resultBean;
+
+                                        @Override
+                                        protected Void doInBackground(Void... params) {
+                                            StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
+                                            try {
+                                                resultBean = fbDao.sign_in(selectedId, envInfos);
+                                            } catch (ServiceException e) {
+                                                resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
+                                            }
+                                            return null;
                                         }
-                                        return null;
-                                    }
 
-                                    @Override
-                                    protected void onPostExecute(Void aVoid) {
-                                        pf.dismissAllowingStateLoss();
-                                        if (resultBean.isOk()) {
-                                            final HashMap<String, String> obj = resultBean.getObj();
+                                        @Override
+                                        protected void onPostExecute(Void aVoid) {
+                                            pf.dismissAllowingStateLoss();
+                                            if (resultBean.isOk()) {
+                                                final HashMap<String, String> obj = resultBean.getObj();
 
-                                            final String okTips = "打卡成功，今日值班店长："
-                                                    + (obj != null ? obj.get("working_mgr") : "未安排")
-                                                    + resultBean.getDesc();
+                                                final String okTips = "打卡成功，今日值班店长："
+                                                        + (obj != null ? obj.get("working_mgr") : "未安排")
+                                                        + resultBean.getDesc();
 
-                                            MainActivity.this.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
-                                                    updateSignInStatus(obj, signingText);
-                                                }
-                                            });
-                                        } else {
-                                            Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
-                                            MainActivity.this.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    updateSignInStatus(resultBean.getObj(), signingText);
-                                                }
-                                            });
+                                                MainActivity.this.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
+                                                        updateSignInStatus(obj, signingText);
+                                                    }
+                                                });
+                                            } else {
+                                                Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
+                                                MainActivity.this.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        updateSignInStatus(resultBean.getObj(), signingText);
+                                                    }
+                                                });
+                                            }
                                         }
-                                    }
-                                }.executeOnNormal();
+                                    }.executeOnNormal();
                                 }
                             }, "查看考勤表", new StaffDetailsClickListener(vendorId), true);
                 }
             }
         });
+    }
+
+    public void periodEnabledLocation() {
+        if (locationHelper == null) {
+            locationHelper = new LocationHelper(MainActivity.this);
+        }
+        locationHelper.initLocationIfRequired();
+
+        long nextRecycleTs = System.currentTimeMillis() + LocationHelper.MINUTES;
+        locationHelper.nextRecycleTime(nextRecycleTs);
+        Utility.runUIActionDelayed(new Runnable() {
+            @Override
+            public void run() {
+                locationHelper.removeUpdates();
+            }
+        }, 2 *  LocationHelper.MINUTES);
     }
 
     private void initShipAccept(final GlobalCtx app) {
@@ -750,12 +756,10 @@ public class MainActivity extends AbstractActionBarActivity {
 
     private class SignOffOnClickListener implements DialogInterface.OnClickListener {
         private final Long signInStore;
-        private final HashMap<String, String> envInfos;
         private final TextView signingText;
 
-        public SignOffOnClickListener(Long signInStore, HashMap<String, String> envInfos, TextView signingText) {
+        public SignOffOnClickListener(Long signInStore, TextView signingText) {
             this.signInStore = signInStore;
-            this.envInfos = envInfos;
             this.signingText = signingText;
         }
 
@@ -788,6 +792,9 @@ public class MainActivity extends AbstractActionBarActivity {
                                     return;
                                 }
                             }
+
+                            periodEnabledLocation();
+                            final HashMap<String, String> envInfos = extraEnvInfo();
 
                             final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
                             Utility.forceShowDialog(MainActivity.this, pf);

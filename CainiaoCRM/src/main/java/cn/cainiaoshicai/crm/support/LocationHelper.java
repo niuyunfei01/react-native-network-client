@@ -1,23 +1,15 @@
 package cn.cainiaoshicai.crm.support;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
-import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.PermissionChecker;
 
-import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.support.utils.Utility;
-
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  * Created by liuzhr on 2/22/17.
@@ -26,20 +18,25 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class LocationHelper {
 
     private static final int LOCATION_REFRESH_DISTANCE = 100;
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
-    private static final int LOCATION_REFRESH_TIME = TWO_MINUTES;
+    public static final int MINUTES = 1000 * 60;
+    private static final int LOCATION_REFRESH_TIME = MINUTES;
 
     private Activity ctx;
     private LocationManager locationManager;
     private Location currentBestLocation = null;
     private LocationListener locationListener;
+    private long nextRecycle;
 
     public LocationHelper(Activity ctx) {
         this.ctx = ctx;
-        this.initLocation();
+        this.initLocationIfRequired();
     }
 
-    public void initLocation() {
+    public void initLocationIfRequired() {
+        if (locationManager != null) {
+            return;
+        }
+
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) this.ctx.getSystemService(Context.LOCATION_SERVICE);
         // Define a listener that responds to location updates
@@ -96,11 +93,20 @@ public class LocationHelper {
                 , locationListener);
     }
 
-    public void destroy() {
-        try {
-            locationManager.removeUpdates(locationListener);
-        } catch (SecurityException e) {
-            e.printStackTrace();
+    public void nextRecycleTime(long ts) {
+        this.nextRecycle = Math.max(ts, this.nextRecycle);
+    }
+
+    public void removeUpdates() {
+
+        if (System.currentTimeMillis() > this.nextRecycle) {
+            try {
+                locationManager.removeUpdates(locationListener);
+                this.locationManager = null;
+                this.locationListener = null;
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -115,8 +121,8 @@ public class LocationHelper {
         }
         // Check whether the new location fix is newer or older
         long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isSignificantlyNewer = timeDelta > MINUTES;
+        boolean isSignificantlyOlder = timeDelta < -MINUTES;
         boolean isNewer = timeDelta > 0;
         // If it's been more than two minutes since the current location, use the new location
         // because the user has likely moved
