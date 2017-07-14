@@ -393,7 +393,7 @@ public class OrderSingleHelper {
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
                         final String autoPlat = _order == null ? "-" : _order.getAuto_plat();
                         adb.setTitle("自动待取货")
-                                .setMessage(String.format("%s %s (%s) 已接单，如强制取消扣1元费用", autoPlat, dada_dm_name, dada_mobile))
+                                .setMessage(String.format("%s %s (%s) 已接单，如强制取消扣2元费用", autoPlat, dada_dm_name, dada_mobile))
                                 .setPositiveButton("知道了", null)
                                 .setNegativeButton("强行撤单", new DadaCancelClicked(true));
                         if (_order != null && !TextUtils.isEmpty(_order.getDada_mobile())) {
