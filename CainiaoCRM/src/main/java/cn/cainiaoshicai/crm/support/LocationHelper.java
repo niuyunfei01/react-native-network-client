@@ -101,7 +101,9 @@ public class LocationHelper {
 
         if (System.currentTimeMillis() > this.nextRecycle) {
             try {
-                locationManager.removeUpdates(locationListener);
+                if (locationManager != null) {
+                    locationManager.removeUpdates(locationListener);
+                }
                 this.locationManager = null;
                 this.locationListener = null;
             } catch (SecurityException e) {

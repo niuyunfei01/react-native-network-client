@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.domain;
 
+import java.util.List;
+
 /**
  * Created by liuzhr on 6/16/17.
  */
@@ -12,6 +14,9 @@ public class Vendor {
     private String contact_name;
     private String version;
     private int service_uid;
+    private List<Long> service_mgr;
+    private List<Long> store_mgr;
+    private List<Long> store_vice_mgr;
 
     public Vendor() {
     }
@@ -62,5 +67,37 @@ public class Vendor {
 
     public void setService_uid(int service_uid) {
         this.service_uid = service_uid;
+    }
+
+    public List<Long> getService_mgr() {
+        return service_mgr;
+    }
+
+    public void setService_mgr(List<Long> service_mgr) {
+        this.service_mgr = service_mgr;
+    }
+
+    public boolean isServiceMgr(long currUid) {
+        return this.service_mgr != null && this.service_mgr.contains(currUid);
+    }
+
+    public boolean isStoreMgr(long currUid) {
+        return this.store_mgr != null && this.store_mgr.contains(currUid);
+    }
+
+    public void setStore_mgr(List<Long> store_mgr) {
+        this.store_mgr = store_mgr;
+    }
+
+    public List<Long> getStore_vice_mgr() {
+        return store_vice_mgr;
+    }
+
+    public void setStore_vice_mgr(List<Long> store_vice_mgr) {
+        this.store_vice_mgr = store_vice_mgr;
+    }
+
+    public boolean isStoreViceMgr(long currUid) {
+        return this.store_vice_mgr != null && this.store_vice_mgr.contains(currUid);
     }
 }

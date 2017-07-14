@@ -286,7 +286,7 @@ public class MineActivity extends AbstractActionBarActivity {
 			listAdapter.add(employee);
 		}
 
-		if (app.fnEnabledStoreMgr() || app.is811485()) {
+		if (app.fnEnabledStoreInfoMgr() || app.is811485()) {
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("门店管理", -1, TYPE_STORES_LIST, null));
 		}
 

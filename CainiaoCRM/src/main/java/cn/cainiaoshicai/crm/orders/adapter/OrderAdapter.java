@@ -231,6 +231,10 @@ public class OrderAdapter extends BaseAdapter {
                     shipTimeCost.setText(String.valueOf(minutes));
 //                    int colorResource = minutes <= Cts.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
 //                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.app(), colorResource));
+                    shipTimeCost.setVisibility(View.VISIBLE);
+                    shipTimeText.setVisibility(View.VISIBLE);
+                    text_ship_start.setVisibility(View.VISIBLE);
+                    text_ship_end.setVisibility(View.VISIBLE);
                 } else {
                     shipTimeCost.setVisibility(View.GONE);
                     shipTimeText.setVisibility(View.GONE);

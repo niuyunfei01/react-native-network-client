@@ -97,6 +97,12 @@ public class AudioUtils {
     }
 
     public boolean speakText(String content) {
+
+        if (mySynthesizer  != null) {
+            CrashReportHelper.handleUncaughtException(null, new Exception("mySynthesizer is null"));
+            return false;
+        }
+
         int code = mySynthesizer.startSpeaking(content, new SynthesizerListener() {
             @Override
             public void onSpeakBegin() {
@@ -138,7 +144,7 @@ public class AudioUtils {
             public void onCompleted(SpeechError error) {
                 if (error == null) {
                     showTip("播放完成");
-                } else if (error != null) {
+                } else {
                     showTip(error.getPlainDescription(true));
                 }
             }

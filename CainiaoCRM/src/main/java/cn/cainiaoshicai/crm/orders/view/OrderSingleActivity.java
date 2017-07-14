@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -68,7 +69,12 @@ import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
  */
 public class OrderSingleActivity extends AbstractActionBarActivity
         implements DelayFaqFragment.NoticeDialogListener, UserFeedbackDialogFragment.NoticeDialogListener {
+
     private static final int REQUEST_CODE_ADDFB = 1001;
+    private static final String KEY_ORDER_ID = "wm_id";
+    private static final String KEY_LIST_TYPE = "key_listType";
+    private static final String KEY_FROM_STATUS = "key_fromStatus";
+
     private WebView mWebView;
     private DelayFaqFragment delayFaqFragment;
     private MenuItem refreshItem;
@@ -87,6 +93,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
     private int pack_worker_id;
     private OrderSingleHelper helper;
     private AtomicReference<Order> orderRef = new AtomicReference<>();
+    private boolean is_from_new_order;
 
 
     public int getPack_worker_id() {
@@ -117,6 +124,22 @@ public class OrderSingleActivity extends AbstractActionBarActivity
     public static final int ACTION_EDIT_SHIP_WORKER = 1;
     public static final int ACTION_EDIT_PACK_WORKER = 2;
     private String platformWithId;
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        this.orderId = savedInstanceState.getInt(KEY_ORDER_ID);
+        this.listType = savedInstanceState.getInt(KEY_LIST_TYPE);
+        this.fromStatus = savedInstanceState.getInt(KEY_FROM_STATUS);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt(KEY_ORDER_ID, this.orderId);
+        outState.putInt(KEY_LIST_TYPE, this.listType);
+        outState.putInt(KEY_FROM_STATUS, this.fromStatus);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,17 +183,16 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         });
 
         mWebView.setWebViewClient(client);
-
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         Intent intent = getIntent();
-
         final Order order = (Order) intent.getSerializableExtra("order");
-        final boolean is_from_new_order = "new_order".equals(intent.getStringExtra("from"));
-        listType = intent.getIntExtra("list_type", 0);
+
+        is_from_new_order = "new_order".equals(intent.getStringExtra("from"));
+        listType = this.listType > 0 ? this.listType : intent.getIntExtra("list_type", 0);
 
         if (order == null) {
-            final int order_id = intent.getIntExtra("order_id", 0);
+            final int order_id = this.orderId > 0 ? this.orderId : intent.getIntExtra("order_id", 0);
             new MyAsyncTask<Integer, Void, Order>() {
                 @Override
                 protected Order doInBackground(Integer... params) {

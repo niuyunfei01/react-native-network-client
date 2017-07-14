@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.domain.ShipCallOption;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 
 public class Order implements Serializable {
@@ -74,6 +75,9 @@ public class Order implements Serializable {
     private String printFooter1 = "";
     private String printFooter2 = "";
     private String printFooter3 = "";
+
+    private ArrayList<ShipCallOption> callWays = new ArrayList<>();
+    private int selected_way;
 
     public int getId() {
         return id;
@@ -572,6 +576,48 @@ public class Order implements Serializable {
 
     public void setPrintFooter3(String printFooter3) {
         this.printFooter3 = printFooter3;
+    }
+
+    public ArrayList<ShipCallOption> getCallWays() {
+        return callWays;
+    }
+
+    public void setCallWays(ArrayList<ShipCallOption> callWays) {
+        this.callWays = callWays;
+    }
+
+    public String[] callOptions() {
+        ArrayList<String> labels;
+        if (this.callWays != null && !this.callWays.isEmpty()) {
+            labels = new ArrayList<>(callWays.size());
+            for (int i = 0; i < callWays.size(); i++) {
+                labels.add(this.callWays.get(i).desc());
+            }
+        } else {
+            labels = new ArrayList<>(0);
+        }
+        return labels.toArray(new String[0]);
+    }
+
+    public int getSelected_way() {
+        return this.selected_way;
+    }
+
+    public void setSelected_way(int way) {
+        this.selected_way = way;
+    }
+
+    public int getSelectedCallOptionIdx() {
+        for(int idx = 0; idx < this.callWays.size(); idx++) {
+            if (this.selected_way == this.callWays.get(idx).getWay()) {
+                return idx;
+            }
+        }
+        return 0;
+    }
+
+    public void setSelectedCallOptionIdx(int selectedCallOptionIdx) {
+        this.selected_way = this.callWays.get(selectedCallOptionIdx).getWay();
     }
 }
 

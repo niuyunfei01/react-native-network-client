@@ -196,18 +196,6 @@ public class GlobalCtx extends Application {
 
         MultiDex.install(this);
 
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                // 初始化合成对象
-                SpeechUtility.createUtility(getApplicationContext(), "appid=" + getString(R.string.app_id));
-                AudioUtils.getInstance().init(getApplicationContext());
-                //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
-                //mInstaller = new  ApkInstaller(TtsDemo.this);
-                return null;
-            }
-        }.execute();
-
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
         JPushInterface.setDebugMode(BuildConfig.DEBUG);    // 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);            // 初始化 JPush
@@ -226,6 +214,18 @@ public class GlobalCtx extends Application {
 
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
+
+        new MyAsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                // 初始化合成对象
+                SpeechUtility.createUtility(getApplicationContext(), "appid=" + getString(R.string.app_id));
+                AudioUtils.getInstance().init(getApplicationContext());
+                //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
+                //mInstaller = new  ApkInstaller(TtsDemo.this);
+                return null;
+            }
+        }.execute();
         //this.soundManager.play_by_xunfei("你好，我是讯飞！");
     }
 
@@ -540,7 +540,8 @@ public class GlobalCtx extends Application {
         if (currUid != null) {
             try {
                 int iUid = Integer.parseInt(currUid);
-                return this.getWorkers().get(iUid);
+                SortedMap<Integer, Worker> workers = this.getWorkers();
+                return workers != null ? workers.get(iUid) : null;
             } catch (NumberFormatException e) {
                 AppLogger.e("error to parse currUid:" + currUid, e);
             }
@@ -767,11 +768,12 @@ public class GlobalCtx extends Application {
         return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
     }
 
-    public boolean fnEnabledStoreMgr() {
+    public boolean fnEnabledStoreInfoMgr() {
         try {
-            int currUid = Integer.parseInt(this.getCurrentAccountId());
+            long currUid = Long.parseLong(this.getCurrentAccountId());
             return this.getVendor() != null
-                    && (this.getVendor().getService_uid() == currUid || this.getVendor().getCreator() == currUid);
+                    && (this.getVendor().getService_uid() == currUid || this.getVendor().getCreator() == currUid
+                    || this.getVendor().isServiceMgr(currUid) || this.getVendor().isStoreMgr(currUid) || this.getVendor().isStoreViceMgr(currUid));
         } catch (Exception e) {
             return false;
         }

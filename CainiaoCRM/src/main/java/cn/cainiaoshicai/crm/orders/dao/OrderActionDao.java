@@ -109,16 +109,24 @@ public class OrderActionDao<T extends Order> {
     }
 
     public Order getOrder(int platform, String platformOid) {
-        return _order("/order/" + platform + "/" + platformOid);
+        return _order("/order/" + platform + "/" + platformOid, new HashMap<String, String>());
     }
 
     public Order getOrder(int orderId) {
-        return _order("/order_by_id/" + orderId);
+        return getOrder(orderId, false);
     }
 
-    private Order _order(String path) {
+    public Order getOrder(int orderId, boolean shipCallOptions) {
+        HashMap<String, String> params = new HashMap<>();
+        if (shipCallOptions) {
+            params.put("op_ship_call", "1");
+        }
+        return _order("/order_by_id/" + orderId, params);
+    }
+
+    private Order _order(String path, HashMap<String, String> params) {
         try {
-            String json = getJson(path, new HashMap<String, String>());
+            String json = getJson(path, params);
             AppLogger.v("action: order " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             return gson.fromJson(json, new TypeToken<Order>() {}.getType());
@@ -194,11 +202,11 @@ public class OrderActionDao<T extends Order> {
         return actionWithResult("/coupon_by_kf/" + to_uid + "/" + orderId, params);
     }
 
-    public ResultBean order_dada_start(int orderId) throws ServiceException {
-        return wrapUpdateOrder(actionWithResult("/order_dada_start/" + orderId), orderId);
+    public ResultBean order_dada_start(int orderId, int callOption) throws ServiceException {
+        return wrapUpdateOrder(actionWithResult("/order_dada_start/" + orderId + "/" + callOption), orderId);
     }
-    public ResultBean order_dada_restart(int orderId) throws ServiceException {
-        return actionWithResult("/order_dada_restart/" + orderId);
+    public ResultBean order_dada_restart(int orderId, int callOption) throws ServiceException {
+        return actionWithResult("/order_dada_restart/" + orderId + "/" + callOption);
     }
 
     public ResultBean order_dada_cancel(int orderId, int cancelReason, String reasonTxt) throws ServiceException {

@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 
-import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -160,7 +159,7 @@ public class OrderSingleHelper {
                     }
                 });
         adb.setNegativeButton(activity.getString(R.string.cancel), null);
-        adb.show();
+        AlertUtil.showDlg(adb);
     }
 
     public void updateUI(Runnable runnable) {
@@ -349,34 +348,27 @@ public class OrderSingleHelper {
                 @Override
                 protected Void doInBackground(Void... params) {
                     OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
-                    this._order = dao.getOrder(orderId);
+                    this._order = dao.getOrder(orderId, true);
                     return null;
                 }
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     final Context ctx = helper.activity;
-                    AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
 
                     if (_order == null) {
                         AlertUtil.error(helper.activity, "获取订单失败，请重试！");
                         return;
                     }
 
+                    AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
+
                     int _dadaStatus;
                     _dadaStatus = this._order.getDada_status();
                     helper.updateDadaCallLabelUI(_dadaStatus, btnCallDada);
 
                     if (_dadaStatus == Cts.DADA_STATUS_NEVER_START) {
-                        adb.setTitle("自动发单")
-                                .setMessage("系统自动选择达达或者蜂鸟发单，接单或者被拒单都会语音通知，请留意")
-                                .setPositiveButton("自动发单", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        callDada(_order, ctx);
-                                    }
-                                }).setNegativeButton("暂不呼叫", null);
-                        AlertUtil.showDlg(adb);
+                        callShipDlg(ctx);
                     } else if (_dadaStatus == Cts.DADA_STATUS_TO_ACCEPT) {
                         String msg;
                         if (_order != null) {
@@ -385,7 +377,7 @@ public class OrderSingleHelper {
                         } else {
                             msg = "已自动发单，等待接单";
                         }
-                        adb.setTitle("达达待接单")
+                        adb.setTitle("自动待接单")
                                 .setMessage(msg)
                                 .setPositiveButton("继续等待", null)
                                 .setNeutralButton("刷新状态", new DialogInterface.OnClickListener() {
@@ -409,12 +401,12 @@ public class OrderSingleHelper {
                         }
                         AlertUtil.showDlg(adb);
                     } else if (_dadaStatus == Cts.DADA_STATUS_CANCEL || _dadaStatus == Cts.DADA_STATUS_TIMEOUT) {
-                        adb.setTitle("呼叫自动(达达|蜂鸟）")
+                        adb.setTitle("通过系统呼叫配送")
                                 .setMessage("订单已"+(_dadaStatus == Cts.DADA_STATUS_TIMEOUT ? "超时":"取消")+"，重新发单？")
                                 .setNegativeButton("重新发单", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        callDada(_order, ctx, true);
+                                        callShipDlg(ctx);
                                     }
                                 }).setPositiveButton(R.string.cancel, null);
                         AlertUtil.showDlg(adb);
@@ -422,49 +414,69 @@ public class OrderSingleHelper {
                         String dada_dm_name = _order == null ? "-" :  _order.getDada_dm_name();
                         final String dada_mobile = _order == null ? "-" : _order.getDada_mobile();
                         final String autoPlat = _order == null ? "-" : _order.getAuto_plat();
-                        adb.setTitle("自动在途")
+                        adb.setTitle("配送在途")
                                 .setMessage(String.format("%s %s (%s) " + (_dadaStatus == Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达"), autoPlat, dada_dm_name, dada_mobile))
                                 .setNegativeButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile))
                                 .setPositiveButton("知道了", null);
                         AlertUtil.showDlg(adb);
                     }
                 }
+
+                private void callShipDlg(final Context ctx) {
+                    String[] callOptions = _order.callOptions();
+
+                    if (callOptions == null || callOptions.length == 0) {
+                        AlertUtil.error(ctx, "此订单不支持自动呼叫，请使用其他配送方式");
+                        return;
+                    }
+
+                    final int[] clicked = new int[]{_order.getSelectedCallOptionIdx()};
+                    AlertDialog.Builder adbx = new AlertDialog.Builder(ctx);
+                    adbx.setTitle("通过系统呼叫配送")
+                            .setSingleChoiceItems(callOptions, clicked[0], new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    clicked[0] = which;
+                                }
+                            })
+                            .setPositiveButton("立即呼叫", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    _order.setSelectedCallOptionIdx(clicked[0]);
+                                    callDada(_order, ctx, _order.getSelected_way());
+                                }
+                            }).setNegativeButton("暂不呼叫", null);
+                    AlertUtil.showDlg(adbx);
+                }
             }.executeOnNormal();
         }
 
-        private void callDada(Order _order, Context ctx, final boolean restart) {
+        private void callDada(Order _order, Context ctx, final int callOption) {
             if (_order.getPlatform() == Cts.PLAT_JDDJ.id) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
-                adb.setMessage("这是京东到家订单！确定要使用达达发单吗？")
+                adb.setMessage("这是京东到家订单通常由京东到家配送！确定要发单吗？")
                         .setPositiveButton("确定呼叫", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                new DadaCallTask(orderId, helper, restart).executeOnNormal();
+                                new DadaCallTask(orderId, helper, callOption).executeOnNormal();
                             }
                         }).setNegativeButton("取消", null);
+                AlertUtil.showDlg(adb);
             } else {
-                new DadaCallTask(orderId, helper, restart).executeOnNormal();
+                new DadaCallTask(orderId, helper, callOption).executeOnNormal();
             }
-        }
-
-        private void callDada(Order _order, Context ctx) {
-            this.callDada(_order, ctx, false);
         }
 
         private class DadaCallTask extends MyAsyncTask<Integer, ResultBean, ResultBean> {
 
-            private final boolean restart;
+            private final int callOption;
             private int orderId;
             private OrderSingleHelper helper;
 
-            public DadaCallTask(int orderId, OrderSingleHelper helper) {
-                this(orderId, helper, false);
-            }
-
-            public DadaCallTask(int orderId, OrderSingleHelper helper, boolean restart) {
+            public DadaCallTask(int orderId, OrderSingleHelper helper, int callOption) {
                 this.orderId = orderId;
                 this.helper = helper;
-                this.restart = restart;
+                this.callOption = callOption;
             }
 
             @Override
@@ -472,9 +484,9 @@ public class OrderSingleHelper {
                 OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
                 ResultBean resultBean;
                 try {
-                    resultBean = restart ? dao.order_dada_restart(orderId) : dao.order_dada_start(orderId);
+                    resultBean = dao.order_dada_start(orderId, callOption);
                     if (resultBean != null && resultBean.isOk()) {
-                        helper.showTipsInUI("已发出自动发单请求:" + resultBean.getDesc());
+                        helper.showTipsInUI("已发出，等待接单:" + resultBean.getDesc());
                         dadaStatus = Cts.DADA_STATUS_TO_ACCEPT;
                         helper.updateDadaCallLabelUI(dadaStatus, btnCallDada);
                     }else {
@@ -537,7 +549,8 @@ public class OrderSingleHelper {
                                         }
                                     })
                                         .setNegativeButton("不撤回", null);
-                                    build.show();
+
+                                    AlertUtil.showDlg(build);
                                 }
                             });
                         }
