@@ -19,6 +19,7 @@ public class Config {
     private String[] delayReasons;
     private HashMap<String, String> configUrls;
     private String[] coupons;
+    private String lastHash;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
@@ -72,5 +73,13 @@ public class Config {
 
     public void setVendor(Vendor vendor) {
         this.vendor = vendor;
+    }
+
+    public String getLastHash() {
+        return lastHash;
+    }
+
+    public void setLastHash(String lastHash) {
+        this.lastHash = lastHash;
     }
 }

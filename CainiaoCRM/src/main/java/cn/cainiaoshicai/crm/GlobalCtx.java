@@ -267,6 +267,11 @@ public class GlobalCtx extends Application {
             ss.put("printer", SettingUtility.getLastConnectedPrinterAddress());
             ss.put("printer_auto_store", storeId);
             ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
+            Config cfg = ctx.serverCfg.get(storeId);
+            final String lastHash = cfg == null ? "" : cfg.getLastHash();
+            ss.put("last_hash", lastHash);
+            ss.put("disable_notify", SettingUtility.isDisableSoundNotify());
+
             String clientStatus = new Gson().toJson(ss);
 
             Call<ResultBean<Config>> rbCall = ctx.dao.commonConfig(clientStatus);
@@ -275,7 +280,13 @@ public class GlobalCtx extends Application {
                 public void onResponse(Call<ResultBean<Config>> call, Response<ResultBean<Config>> response) {
                     ResultBean<Config> b = response.body();
                     if (b != null && b.isOk()) {
+
                         Config config = b.getObj();
+                        if (!TextUtils.isEmpty(config.getLastHash())
+                            && lastHash.equals(b.getObj().getLastHash()) ) {
+                            return;
+                        }
+
                         if (config.getShip_workers() != null) {
                             ctx.ship_workers = config.getShip_workers();
                         }
