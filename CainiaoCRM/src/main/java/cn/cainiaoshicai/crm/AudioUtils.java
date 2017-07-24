@@ -60,7 +60,7 @@ public class AudioUtils {
     public void init(Context context) {
         this.context = context;
         //处理语音合成关键类
-        synchronized (this) {
+//        synchronized (this) {
             if (mySynthesizer == null) {
                 mySynthesizer = SpeechSynthesizer.createSynthesizer(context, myInitListener);
                 String mEngineType = SpeechConstant.TYPE_CLOUD;
@@ -96,7 +96,7 @@ public class AudioUtils {
                     mySynthesizer.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/tts.wav");
                 }
             }
-        }
+//        }
     }
 
     public boolean speakText(String content) {

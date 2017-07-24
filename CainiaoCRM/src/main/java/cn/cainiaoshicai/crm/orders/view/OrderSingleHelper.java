@@ -417,6 +417,12 @@ public class OrderSingleHelper {
                         adb.setTitle("配送在途")
                                 .setMessage(String.format("%s %s (%s) " + (_dadaStatus == Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达"), autoPlat, dada_dm_name, dada_mobile))
                                 .setNegativeButton("呼叫配送员", new CallDadaPhoneClicked(dada_mobile))
+                                .setNeutralButton("刷新状态", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new DadaQueryTask(orderId, helper).executeOnNormal();
+                                    }
+                                })
                                 .setPositiveButton("知道了", null);
                         AlertUtil.showDlg(adb);
                     }

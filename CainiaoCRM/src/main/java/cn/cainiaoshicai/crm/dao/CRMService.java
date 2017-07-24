@@ -70,6 +70,9 @@ public interface CRMService {
     @GET("/api/user_info2")
     Call<ResultBean<UserBean>> userInfo(@Query("access_token") String token);
 
+    @GET("/api/print_in_cloud/{orderId}")
+    Call<ResultBean<Integer>> printInCloud(@Path("orderId") int orderId);
+
     class UploadRes {
         private FileBean file;
         public FileBean getFile() {

@@ -198,18 +198,21 @@ public class OrderAdapter extends BaseAdapter {
                 ShipWorkerOnClickListener shipWorkerClicked = new ShipWorkerOnClickListener(order);
 
                 TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
+                View shipTextView = vi.findViewById(R.id.start_ship_text);
                 if (!TextUtils.isEmpty(order.getShip_worker_name())) {
                     workerText.setText(order.getShip_worker_name());
                     workerText.setOnClickListener(shipWorkerClicked);
+                    workerText.setVisibility(View.VISIBLE);
+                    shipTextView.setVisibility(View.VISIBLE);
                 } else {
                     workerText.setVisibility(View.GONE);
-                    View shipTextView = vi.findViewById(R.id.start_ship_text);
                     shipTextView.setVisibility(View.GONE);
                 }
 
                 TextView packTime = (TextView) vi.findViewById(R.id.start_ship_time);
                 if (order.getTime_start_ship() != null) {
                     packTime.setText(DateTimeUtils.hourMin(order.getTime_start_ship()));
+                    packTime.setVisibility(View.VISIBLE);
                 } else {
                     packTime.setVisibility(View.GONE);
                 }
@@ -246,6 +249,8 @@ public class OrderAdapter extends BaseAdapter {
             }
 
             TextView inTimeView = (TextView) vi.findViewById(R.id.is_in_time);
+            TextView print_times = (TextView) vi.findViewById(R.id.print_times);
+            TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
             if (order.getExpectTime() != null ) {
                 if (order.getTime_arrived() != null) {
                     Cts.DeliverReview reviewDeliver = Cts.DeliverReview.find(order.getReview_deliver());
@@ -255,10 +260,10 @@ public class OrderAdapter extends BaseAdapter {
                         inTimeView.setTextColor(ContextCompat.getColor(ctx, colorResource));
                         inTimeView.setBackground(ContextCompat.getDrawable(ctx, reviewDeliver.isGood() ? R.drawable.list_text_border_green : R.drawable.list_text_border_red));
                     }
+                    readyDelayWarn.setVisibility(View.GONE);
+                    print_times.setVisibility(View.GONE);
                 } else {
 
-                    TextView print_times = (TextView) vi.findViewById(R.id.print_times);
-                    TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
                     readyDelayWarn.setTextColor(defTextColor);
                     readyDelayWarn.setBackground(null);
 

@@ -30,6 +30,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
+import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.jpush.android.api.JPushInterface;
@@ -157,10 +158,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 						i = new Intent(context, GeneralWebViewActivity.class);
 						i.putExtra("url", notify.getUrl());
 					}
-				} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
-					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
-//					i.setAction(Intent.ACTION_SEARCH);
-//					i.putExtra(SearchManager.QUERY, "ready_delayed:");
+				} else if (!TextUtils.isEmpty(notify.getQuery_term())) {
+					i = new Intent(context, OrderQueryActivity.class);
+					i.putExtra("query", notify.getQuery_term());
 				} else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 				} else if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
@@ -201,7 +201,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				context.startActivity(i);
 			} else {
-				AppLogger.e("error to userTalkStatus notify from bundle!");
+				AppLogger.e("error to notify from bundle!");
 			}
 		} else if (JPushInterface.ACTION_RICHPUSH_CALLBACK.equals(intent.getAction())) {
 			Log.d(TAG, "[NotificationReceiver] 用户收到到RICH PUSH CALLBACK: " + bundle.getString(JPushInterface.EXTRA_EXTRA));
@@ -289,6 +289,7 @@ class Notify {
 	private String url;
 	private String speak_word;
 	private int speak_times = 1;
+	private String query_term = "";
 	private Set<Integer> notify_workers;
 
 	private boolean storage_provided_self;
@@ -415,5 +416,13 @@ class Notify {
 
 	public void setFb_id(String fb_id) {
 		this.fb_id = fb_id;
+	}
+
+	public String getQuery_term() {
+		return query_term;
+	}
+
+	public void setQuery_term(String query_term) {
+		this.query_term = query_term;
 	}
 }

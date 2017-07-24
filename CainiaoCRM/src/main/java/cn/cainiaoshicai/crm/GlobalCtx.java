@@ -780,11 +780,23 @@ public class GlobalCtx extends Application {
     }
 
     public boolean fnEnabledStoreInfoMgr() {
+        if (isSuperMgr()) return true;
+
+        try {
+            long currUid = Long.parseLong(this.getCurrentAccountId());
+            return this.getVendor() != null
+                    && (this.getVendor().isStoreMgr(currUid) || this.getVendor().isStoreViceMgr(currUid));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isSuperMgr() {
         try {
             long currUid = Long.parseLong(this.getCurrentAccountId());
             return this.getVendor() != null
                     && (this.getVendor().getService_uid() == currUid || this.getVendor().getCreator() == currUid
-                    || this.getVendor().isServiceMgr(currUid) || this.getVendor().isStoreMgr(currUid) || this.getVendor().isStoreViceMgr(currUid));
+                    || this.getVendor().isServiceMgr(currUid));
         } catch (Exception e) {
             return false;
         }
@@ -800,6 +812,11 @@ public class GlobalCtx extends Application {
 
     public boolean isPrinterConnected() {
         return printerConnected;
+    }
+
+    public boolean isCloudPrint(long storeId) {
+        Config storeCfg = this.serverCfg.get(storeId);
+        return storeCfg != null && storeCfg.isCloudPrint();
     }
 
     public interface TaskCountUpdated {

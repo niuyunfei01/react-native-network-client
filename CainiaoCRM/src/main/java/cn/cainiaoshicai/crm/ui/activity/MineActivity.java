@@ -58,7 +58,9 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_EDIT_STORE = 20;
 	private static final int TYPE_PHONE_TECH = 21;
 	private static final int TYPE_WORKER_LIST= 22;
-	private static final int TYPE_STORES_LIST= 23;
+	private static final int TYPE_STORES_LIST = 23;
+	private static final int TYPE_ORDER_COULD_LATE = 24;
+	private static final int TYPE_ORDER_COULD_LATE_SERIOUS = 24;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 	private HashMap<String, String> stats;
@@ -135,6 +137,14 @@ public class MineActivity extends AbstractActionBarActivity {
                     } else if (item.getType() == TYPE_ORDER_LIST) {
                         Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
                         intent.putExtra("list_type", ListType.INVALID.getValue());
+                        MineActivity.this.startActivity(intent);
+                    } else if (item.getType() == TYPE_ORDER_COULD_LATE) {
+                        Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
+                        intent.putExtra("query", "to_ship_late:");
+                        MineActivity.this.startActivity(intent);
+                    } else if (item.getType() == TYPE_ORDER_COULD_LATE_SERIOUS) {
+                        Intent intent = new Intent(getApplicationContext(), OrderQueryActivity.class);
+                        intent.putExtra("query", "to_ship_late_serious:");
                         MineActivity.this.startActivity(intent);
                     } else if (item.getType() == TYPE_USER_ITEMS) {
                         gotoWeb(Utility.append_token(String.format("%s/market_tools/users.html", URLHelper.WEB_URL_ROOT), token));
@@ -293,6 +303,10 @@ public class MineActivity extends AbstractActionBarActivity {
 		if (app.is811485()) {
 			listAdapter.add(new MineItemsAdapter.PerformanceItem("Tower Web", -1, TYPE_PROJECT_MANAGEMENT, null));
 		}
+
+		if (app.isSuperMgr())
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("可能延误订单", -1,  TYPE_ORDER_COULD_LATE, null));
+			listAdapter.add(new MineItemsAdapter.PerformanceItem("严重延误订单", -1,  TYPE_ORDER_COULD_LATE_SERIOUS, null));
 
 		String versionDesc = getVersionDesc();
 

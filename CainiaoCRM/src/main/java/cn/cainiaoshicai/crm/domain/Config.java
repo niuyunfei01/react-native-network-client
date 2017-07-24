@@ -19,6 +19,7 @@ public class Config {
     private String[] delayReasons;
     private HashMap<String, String> configUrls;
     private String[] coupons;
+    private boolean cloudPrint = false;
     private String lastHash;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
@@ -81,5 +82,13 @@ public class Config {
 
     public void setLastHash(String lastHash) {
         this.lastHash = lastHash;
+    }
+
+    public boolean isCloudPrint() {
+        return cloudPrint;
+    }
+
+    public void setCloudPrint(boolean cloudPrint) {
+        this.cloudPrint = cloudPrint;
     }
 }

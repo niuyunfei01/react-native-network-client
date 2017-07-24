@@ -64,6 +64,9 @@ import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  */
@@ -241,7 +244,27 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                connectAndPrint(platform, platformOid);
+                GlobalCtx app = GlobalCtx.app();
+                if (app.isCloudPrint(order.getStore_id())) {
+                    Call<ResultBean<Integer>> rb = app.dao.printInCloud(order.getId());
+                    rb.enqueue(new Callback<ResultBean<Integer>>() {
+                        @Override
+                        public void onResponse(Call<ResultBean<Integer>> call, Response<ResultBean<Integer>> response) {
+                            if (response.body().isOk()) {
+                                Utility.toast("已发送到云端打印机", OrderSingleActivity.this);
+                            } else {
+                                AlertUtil.error(OrderSingleActivity.this, "云端打印失败");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResultBean<Integer>> call, Throwable t) {
+                            AlertUtil.error(OrderSingleActivity.this, "云端打印失败");
+                        }
+                    });
+                } else {
+                    connectAndPrint(platform, platformOid);
+                }
             }
         });
 //        sourceReadyButton = (Switch) findViewById(R.id.button_source_ready);
@@ -360,7 +383,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
         String token = GlobalCtx.app().token();
         String clientId = GlobalCtx.app().getCurrentAccountId();
-        url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", URLHelper.getStoresPrefix(), token, order.getId(), clientId);
+        int wmId = order.getId() > 0 ? order.getId() : this.orderId;
+        url = String.format("%s/view_order.html?access_token=%s&wm_id=%d&client_id=%s", URLHelper.getStoresPrefix(), token, wmId, clientId);
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
 
