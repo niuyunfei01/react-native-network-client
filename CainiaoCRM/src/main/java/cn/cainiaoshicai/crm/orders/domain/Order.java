@@ -22,6 +22,7 @@ public class Order implements Serializable {
     private String address;
     private String mobile;
     private double orderMoney;
+    private double paid_by_user;
     private Date expectTime;
     private String expectTimeStr;
     private Date orderTime;
@@ -78,6 +79,8 @@ public class Order implements Serializable {
 
     private ArrayList<ShipCallOption> callWays = new ArrayList<>();
     private int selected_way;
+    private String line_additional;
+    private String line_money_total;
 
     public int getId() {
         return id;
@@ -488,6 +491,7 @@ public class Order implements Serializable {
         address = updatedO.address;
         mobile = updatedO.mobile;
         orderMoney = updatedO.orderMoney;
+        paid_by_user = updatedO.paid_by_user;
         expectTime = updatedO.expectTime;
         expectTimeStr = updatedO.expectTimeStr;
         orderTime = updatedO.orderTime;
@@ -586,6 +590,14 @@ public class Order implements Serializable {
         this.callWays = callWays;
     }
 
+    public double getPaid_by_user() {
+        return paid_by_user;
+    }
+
+    public void setPaid_by_user(double paid_by_user) {
+        this.paid_by_user = paid_by_user;
+    }
+
     public String[] callOptions() {
         ArrayList<String> labels;
         if (this.callWays != null && !this.callWays.isEmpty()) {
@@ -618,6 +630,22 @@ public class Order implements Serializable {
 
     public void setSelectedCallOptionIdx(int selectedCallOptionIdx) {
         this.selected_way = this.callWays.get(selectedCallOptionIdx).getWay();
+    }
+
+    public String getLine_additional() {
+        return line_additional;
+    }
+
+    public void setLine_additional(String line_additional) {
+        this.line_additional = line_additional;
+    }
+
+    public String getLine_money_total() {
+        return line_money_total;
+    }
+
+    public void setLine_money_total(String line_money_total) {
+        this.line_money_total = line_money_total;
     }
 }
 

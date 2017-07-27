@@ -238,12 +238,17 @@ public class OrderPrinter {
 
             printer.highText(String.format("合计 %27s", "x" + total)).newLine();
 
-            if (order.getAdditional_to_pay() > 0) {
-                printer.starLine(). normalText(String.format("客户追加应付：%14.2f", (order.getAdditional_to_pay()/100.0))).newLine();
+            if (!TextUtils.isEmpty(order.getLine_additional())) {
+                printer.starLine().normalText(order.getLine_additional());
             }
+//            if (order.getAdditional_to_pay() != 0) {
+//                printer.starLine(). normalText(String.format("客户追加：%14.2f", (order.getAdditional_to_pay()/100.0))).newLine();
+//            }
 
-            double totalMoney = (order.getOrderMoney() * 100 + order.getAdditional_to_pay()) / 100;
-            printer.starLine().highText(String.format("%s：%22.2f", (order.isPaidDone() ? "实付金额" : "客户合计待付"), totalMoney)).newLine();
+//            double totalMoney = order.isPaidDone() ? ((order.getOrderMoney() * 100 + order.getAdditional_to_pay()) / 100) : ((order.getPaid_by_user() * 100 + order.getAdditional_to_pay()) / 100);
+//            String lineMoneyTotal = String.format("%s：%22.2f", (order.isPaidDone() ? "实付金额" : "客户待付(含追加)"), totalMoney);
+
+            printer.starLine().highText(order.getLine_money_total()).newLine();
 
             printer.starLine().normalText(order.getPrintFooter1())
                     .newLine().normalText(order.getPrintFooter2());
