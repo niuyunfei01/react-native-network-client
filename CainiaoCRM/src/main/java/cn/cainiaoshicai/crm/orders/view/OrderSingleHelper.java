@@ -202,36 +202,6 @@ public class OrderSingleHelper {
                                 new MyAsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        ResultEditReq rb;
-                                        String reqNumStr = totalReqTxt.getText().toString();
-                                        if (TextUtils.isEmpty(reqNumStr)) {
-                                            AlertUtil.errorOnActivity(activity, "订货数不能为空");
-                                            return null;
-                                        }
-                                        final int total_req_no = Integer.parseInt(reqNumStr);
-                                        final String remarkTxt = remark.getText().toString();
-                                        try {
-                                            StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
-                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
-                                        } catch (ServiceException e) {
-                                            rb = new ResultEditReq(false, "访问服务器出错");
-                                        }
-                                        final int total_req_cnt = rb.isOk() ? rb.getTotal_req_cnt() : -1;
-
-                                        final ResultBean finalRb = rb;
-                                        activity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (finalRb.isOk()) {
-                                                    item.setTotalInReq(total_req_no);
-                                                    item.setReqMark(remarkTxt);
-                                                    Toast.makeText(activity, "已保存", Toast.LENGTH_SHORT).show();
-                                                    activity.refreshData();
-                                                } else {
-                                                    Toast.makeText(activity, "保存失败：" + finalRb.getDesc(), Toast.LENGTH_LONG).show();
-                                                }
-                                            }
-                                        });
                                         return null;
                                     }
                                 }.executeOnIO();

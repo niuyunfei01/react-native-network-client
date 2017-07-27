@@ -284,12 +284,14 @@ public class StoreStorageHelper {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
         final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
+        final EditText nowStatTxt = (EditText) npView.findViewById(R.id.now_stat);
         final EditText remark = (EditText) npView.findViewById(R.id.remark);
 
         int totalInReq = item.getTotalInReq();
         int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
         totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
         remark.setText(item.getReqMark());
+//        nowStatTxt.setText(String.valueOf(item.getLeft_since_last_stat()));
         AlertDialog dlg = new AlertDialog.Builder(activity)
                 .setTitle(String.format("订货:(%s)", item.getName()))
                 .setView(npView)
@@ -301,22 +303,29 @@ public class StoreStorageHelper {
                                     protected Void doInBackground(Void... params) {
                                         ResultEditReq rb;
                                         String s = totalReqTxt.getText().toString();
+                                        String nowStatStr = nowStatTxt.getText().toString();
+
+                                        if (TextUtils.isEmpty(nowStatStr)) {
+                                            AlertUtil.errorOnActivity(activity, "订货前请盘点当前的库存，务必保持准确！");
+                                            return null;
+                                        }
 
                                         if (TextUtils.isEmpty(s)) {
                                             activity.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    AlertUtil.error(activity, "订货数不能为空串");
+                                                    AlertUtil.error(activity, "订货数和当前库存数不能为空串");
                                                 }
                                             });
                                             return null;
                                         }
 
                                         final int total_req_no = Integer.parseInt(s);
+                                        final int nowStat = Integer.parseInt(nowStatStr);
                                         final String remarkTxt = remark.getText().toString();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
-                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt);
+                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt, nowStat);
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
                                         }
@@ -327,6 +336,7 @@ public class StoreStorageHelper {
                                             @Override
                                             public void run() {
                                                 if (finalRb.isOk()) {
+                                                    item.setLeft_since_last_stat(nowStat);
                                                     item.setTotalInReq(total_req_no);
                                                     item.setReqMark(remarkTxt);
                                                     activity.updateReqListBtn(total_req_cnt);

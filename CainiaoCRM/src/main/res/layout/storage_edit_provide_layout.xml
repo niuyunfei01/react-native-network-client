@@ -1,52 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-<TextView android:id="@+id/label_least_amount"
-    android:text="份数:"
-    android:textColor="@color/light_blue"
-    android:layout_alignParentTop="true"
-    android:layout_alignParentStart="true"
-    android:layout_marginTop="10dp"
-    android:layout_width="wrap_content"
-    android:layout_height="36dp" />
-
-<EditText android:id="@+id/total_req"
-    android:textColor="@color/light_blue"
-    android:layout_alignParentTop="true"
-    android:layout_toEndOf="@id/label_least_amount"
-    android:inputType="number"
-    android:layout_marginTop="10dp"
     android:layout_width="match_parent"
-    android:layout_height="36dp"
-    android:background="@drawable/edittext_style"/>
+    android:layout_height="match_parent"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:orientation="vertical">
 
-<TextView
-    android:id="@+id/label_kf_msg"
-    android:layout_below="@+id/label_least_amount"
-    android:layout_alignParentStart="true"
-    android:text="备注:"
-    android:textColor="@color/light_blue"
-    android:layout_width="wrap_content"
-    android:layout_height="36dp" />
+    <TextView
+        android:id="@+id/label_now_stat"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:text="库存:"
+        android:textColor="@color/light_blue" />
 
-<EditText android:id="@+id/remark"
-    android:layout_below="@id/label_least_amount"
-    android:textColor="@color/light_blue"
-    android:layout_toEndOf="@+id/label_kf_msg"
-    android:inputType="textMultiLine"
-    android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:background="@drawable/edittext_style"/>
 
-<TextView
-    android:id="@+id/hint_req_day"
-    android:layout_below="@+id/label_least_amount"
-    android:layout_alignParentStart="true"
-    android:text="备注:"
-    android:textColor="@color/light_blue"
-    android:layout_width="wrap_content"
-    android:layout_height="36dp" />
+    <EditText
+        android:id="@+id/now_stat"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/label_now_stat"
+        android:background="@drawable/edittext_style"
+        android:inputType="number"
+        android:textColor="@color/light_blue" />
+
+
+    <TextView
+        android:id="@+id/label_least_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/label_now_stat"
+        android:layout_marginTop="10dp"
+        android:text="份数:"
+        android:textColor="@color/light_blue" />
+
+    <EditText
+        android:id="@+id/total_req"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_below="@id/now_stat"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/label_least_amount"
+        android:background="@drawable/edittext_style"
+        android:inputType="number"
+        android:textColor="@color/light_blue" />
+
+    <TextView
+        android:id="@+id/label_kf_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/label_least_amount"
+        android:layout_marginTop="10dp"
+        android:text="备注:"
+        android:textColor="@color/light_blue" />
+
+    <EditText
+        android:id="@+id/remark"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_below="@id/label_least_amount"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/label_kf_msg"
+        android:background="@drawable/edittext_style"
+        android:inputType="textMultiLine"
+        android:textColor="@color/light_blue" />
 
 </RelativeLayout>
