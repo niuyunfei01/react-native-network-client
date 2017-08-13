@@ -296,13 +296,13 @@ public class OrderSingleHelper {
             String label;
             switch (dada_status) {
                 case Cts.DADA_STATUS_TO_ACCEPT: label = "自动:待接单"; break;
-                case Cts.DADA_STATUS_NEVER_START: label = "待呼叫发单"; break;
+                case Cts.DADA_STATUS_NEVER_START: label = "待呼叫配送"; break;
                 case Cts.DADA_STATUS_SHIPPING: label = "自动:已在途"; break;
                 case Cts.DADA_STATUS_ARRIVED: label = "自动:已送达"; break;
                 case Cts.DADA_STATUS_CANCEL: label = "自动:已取消"; break;
                 case Cts.DADA_STATUS_TO_FETCH: label = "自动:已接单"; break;
                 case Cts.DADA_STATUS_ABNORMAL: label = "自动:配送异常"; break;
-                case Cts.DADA_STATUS_TIMEOUT: label = "自动:超时未接单"; break;
+                case Cts.DADA_STATUS_TIMEOUT: label = "自动:呼叫超时"; break;
                 default:
                     label = String.valueOf(dada_status);
             }

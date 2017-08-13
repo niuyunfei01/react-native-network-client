@@ -302,10 +302,6 @@ public class Order implements Serializable {
         this.ship_worker_id = ship_worker_id;
     }
 
-    public int getSimplifiedId() {
-        return getId()%1000;
-    }
-
     public int getSource_ready() {
         return source_ready;
     }

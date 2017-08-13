@@ -412,6 +412,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         if (curr_req != null) {
             update_loading_url(curr_req.getStore_id(), curr_req.getId());
         }
+        this.mWebView.loadUrl("about:blank");
         this.mWebView.loadUrl(this.url);
     }
 

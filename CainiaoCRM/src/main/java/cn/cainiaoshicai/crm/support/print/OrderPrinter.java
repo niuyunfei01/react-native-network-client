@@ -179,7 +179,7 @@ public class OrderPrinter {
             btos.write(GPrinterCommand.left);
 
             printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
-                    .newLine().highBigText("  #" + order.getSimplifiedId());
+                    .newLine().highBigText("  #" + order.getDayId());
 
             printer.normalText(order.platformWithId()).newLine();
 

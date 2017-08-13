@@ -180,7 +180,7 @@ public class OrderAdapter extends BaseAdapter {
             });
 
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
-            dayNo.setText("#" + order.getSimplifiedId());
+            dayNo.setText("#" + order.getDayId());
 
             sourcePlatform.setText(order.platformWithId());
             sourcePlatform.setOnClickListener(new View.OnClickListener() {

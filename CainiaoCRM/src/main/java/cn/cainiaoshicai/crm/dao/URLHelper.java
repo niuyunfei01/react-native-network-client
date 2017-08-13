@@ -53,11 +53,11 @@ public class URLHelper {
     }
 
     public static String getWorkerListUrl(Vendor vendor, String token) {
-        return getStoresPrefix() + "/worker_list/"+(vendor != null ? vendor.getId() : 0) + "?access_token=" + token;
+        return getStoresPrefix() + "/worker_list/" + "?access_token=" + token + "&_v_id=" + (vendor != null ? vendor.getId() : 0);
     }
 
     public static String getStoreListUrl(Vendor vendor, String token) {
-        return getStoresPrefix() + "/stores_of_vendor/"+(vendor != null ? vendor.getId() : 0) + "?access_token=" + token;
+        return getStoresPrefix() + "/stores_of_vendor/" + "?access_token=" + token + "&_v_id=" + (vendor != null ? vendor.getId() : 0);
     }
 
     public static String getRigsterForCRM() {
