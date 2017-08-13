@@ -321,7 +321,9 @@ public class Order implements Serializable {
     public String platformWithId() {
         boolean dayIdInvalid = TextUtil.isEmpty(this.getPlatform_dayId()) || "0".equals(this.getPlatform_dayId());
         String dayNo = dayIdInvalid ? this.getPlatform_oid() : this.getPlatform_dayId();
-        if (this.getPlatform() == Cts.PLAT_JDDJ.id) {
+
+        //避免京东的一长串单子
+        if (this.getPlatform() == Cts.PLAT_JDDJ.id && (dayNo != null && dayNo.length() > 8)) {
             dayNo = "";
         }
         return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayNo);
