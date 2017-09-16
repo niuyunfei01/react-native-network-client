@@ -12,7 +12,7 @@ import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainReactPackage;
 
 
-public class MyReactActivity extends AppCompatActivity implements DefaultHardwareBackBtnHandler {
+public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
