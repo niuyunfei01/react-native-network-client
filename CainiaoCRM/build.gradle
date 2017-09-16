@@ -28,6 +28,8 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$ANDROID_LIB_VERSION"
     compile "com.android.support:appcompat-v7:$ANDROID_LIB_VERSION"
 
+    compile "com.facebook.react:react-native:+" // From node_modules.
+
 //    compile 'com.github.lzyzsd:jsbridge:1.0.4'
     compile "com.github.johnpersano:supertoasts:$SUPPER_TOAST_VERSION"
 
@@ -52,6 +54,7 @@ dependencies {
 
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.roughike:bottom-bar:2.3.1'
+
     releaseCompile 'ch.acra:acra:4.9.2'
 }
 

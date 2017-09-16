@@ -1,0 +1,24 @@
+{
+  "name": "android-crm",
+  "version": "1.0.0",
+  "description": "Android ActionBarCompat-Styled Sample ===================================",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jeffliu/android-crm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jeffliu/android-crm/issues"
+  },
+  "homepage": "https://github.com/Jeffliu/android-crm#readme",
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-native": "^0.48.3"
+  }
+}

@@ -5,3 +5,4 @@ Application/build
 gradle/wrapper/gradle-wrapper.properties
 build/
 local.properties
+node_modules/*

@@ -156,6 +156,15 @@
             </intent-filter>
         </activity>
         <!-- Required  SDK核心功能-->
+
+        <activity
+            android:name=".MyReactActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
+
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
         <service
             android:name="cn.jpush.android.service.DownloadService"
             android:enabled="true"
