@@ -36,6 +36,7 @@ import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
+import cn.cainiaoshicai.crm.ui.interfaces.AbstractAppActivity;
 
 public class SettingsPrintActivity extends ListActivity {
 
@@ -297,6 +298,8 @@ public class SettingsPrintActivity extends ListActivity {
 		connectPrinter(listAdapter.getItem(position));
 	}
 
+	private ProgressFragment progressFragment;
+
 	private void connectPrinter(final BluetoothPrinters.DeviceStatus item) {
 		if (btAdapter == null) {
 			return;
@@ -306,10 +309,23 @@ public class SettingsPrintActivity extends ListActivity {
 			btAdapter.cancelDiscovery();
 		}
 
+		String connecting = String.format("正在连接打印机 %s,%s", item.getName(), item.getAddr());
 		Toast.makeText(getApplicationContext(),
-				String.format("正在连接打印机 %s,%s", item.getName(), item.getAddr()),
+				connecting,
 				Toast.LENGTH_SHORT).show();
 
+//		if (progressFragment != null) {
+//			if (progressFragment.getFragmentManager() != null) {
+//				progressFragment.dismissAllowingStateLoss();
+//			}
+//			if (this.activity != null) {
+//				Utility.forceShowDialog(this, progressFragment);
+//			}
+//		}
+//		progressFragment = ProgressFragment.newInstance(connecting);
+//		if (progressFragment != null) {
+//		}
+//		progressFragment.setAsyncTask(this);
 		Thread connectThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -337,6 +353,9 @@ public class SettingsPrintActivity extends ListActivity {
 						@Override
 						public void run() {
 							listAdapter.notifyDataSetChanged();
+							if (progressFragment != null) {
+								progressFragment.dismissAllowingStateLoss();
+							}
 						}
 					});
 				}

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.text.TextUtils;
 
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -25,13 +26,27 @@ public class ProgressFragment extends DialogFragment {
         frag.setArguments(args);
         return frag;
     }
+    public static ProgressFragment newInstance(String msg) {
+        ProgressFragment frag = new ProgressFragment();
+        frag.setRetainInstance(true);
+        Bundle args = new Bundle();
+        args.putString("msg", msg);
+        frag.setArguments(args);
+        return frag;
+    }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         ProgressDialog dialog = new ProgressDialog(getActivity());
-        int messageResId = getArguments().getInt("msgResId");
-        dialog.setMessage(getString(messageResId));
+        String msg;
+
+        msg = getArguments().getString("msg", null);
+        if (TextUtils.isEmpty(msg)) {
+            int messageResId = getArguments().getInt("msgResId", 0);
+            msg = getString(messageResId);
+        }
+        dialog.setMessage(msg);
         dialog.setIndeterminate(false);
         dialog.setCancelable(true);
         return dialog;

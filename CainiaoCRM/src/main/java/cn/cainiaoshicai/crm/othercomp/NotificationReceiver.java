@@ -177,8 +177,15 @@ public class NotificationReceiver extends BroadcastReceiver {
 						|| Cts.PUSH_TYPE_ORDER_UPDATE.equals(notify.getType())
 						|| Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())
 						) {
-					i = new Intent(context, OrderSingleActivity.class);
-					i.putExtra("order_id", notify.getOrder_id());
+
+					if (TextUtils.isEmpty(notify.getUrl())) {
+						i = new Intent(context, GeneralWebViewActivity.class);
+						i.putExtra("url", notify.getUrl());
+					} else {
+						i = new Intent(context, OrderSingleActivity.class);
+						i.putExtra("order_id", notify.getOrder_id());
+					}
+
 				} else if (Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
 					i = new Intent(context, GeneralWebViewActivity.class);
 					i.putExtra("url", URLHelper.WEB_URL_ROOT + "/market_tools/user_feedback.html?fb_id=" + notify.getFb_id());

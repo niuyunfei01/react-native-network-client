@@ -237,6 +237,11 @@ public class OrderActionDao<T extends Order> {
         return actionWithResult("/order_edit_store_remark/" + orderId, params);
     }
 
+    public ResultBean pay_refund_request(int orderId, int refund_cents, String remarkTxt) throws ServiceException {
+        HashMap<String, String> params = new HashMap<>();
+        return actionWithResult("/pay_refund_request/" + orderId+"/" + refund_cents + "/" + remarkTxt, params);
+    }
+
     public ResultBean order_waiting_list(int orderId, String taskType) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("task_type", taskType);

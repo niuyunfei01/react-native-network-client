@@ -12,7 +12,7 @@ public class StoreProduct {
     private int total_to_store;
     private int expect_store_in_store;
     private int giveaway_in_store;
-    private int loss_in_store;
+    private float loss_in_store;
     private int sold_in_store;
     private int deleted;
     private int status;
@@ -20,8 +20,8 @@ public class StoreProduct {
     private int sold_from_last_stat;
     private Date last_stat;
     private int total_last_stat;
-    private int store_gap;
-    private int total_left_in_store;
+    private float store_gap;
+    private float total_left_in_store;
     private int left_since_last_stat;
     private int re_on_sale_time;
 
@@ -81,11 +81,11 @@ public class StoreProduct {
         this.giveaway_in_store = giveaway_in_store;
     }
 
-    public int getLoss_in_store() {
+    public float getLoss_in_store() {
         return loss_in_store;
     }
 
-    public void setLoss_in_store(int loss_in_store) {
+    public void setLoss_in_store(float loss_in_store) {
         this.loss_in_store = loss_in_store;
     }
 
@@ -145,19 +145,19 @@ public class StoreProduct {
         this.total_last_stat = total_last_stat;
     }
 
-    public int getStore_gap() {
+    public float getStore_gap() {
         return store_gap;
     }
 
-    public void setStore_gap(int store_gap) {
+    public void setStore_gap(float store_gap) {
         this.store_gap = store_gap;
     }
 
-    public int getTotal_left_in_store() {
+    public float getTotal_left_in_store() {
         return total_left_in_store;
     }
 
-    public void setTotal_left_in_store(int total_left_in_store) {
+    public void setTotal_left_in_store(float total_left_in_store) {
         this.total_left_in_store = total_left_in_store;
     }
 
