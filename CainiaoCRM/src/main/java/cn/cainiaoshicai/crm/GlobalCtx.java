@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -90,6 +91,7 @@ public class GlobalCtx extends Application {
     public static final int INT_SUCESS_API = 1;
 
     public static final CopyOnWriteArrayList<Integer> newOrderNotifies = new CopyOnWriteArrayList<>();
+    private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
     ;
     private static GlobalCtx application;
 
@@ -226,7 +228,6 @@ public class GlobalCtx extends Application {
                 return null;
             }
         }.execute();
-        //this.soundManager.play_by_xunfei("你好，我是讯飞！");
     }
 
     public void updateAfterGap(final int fiveMin) {

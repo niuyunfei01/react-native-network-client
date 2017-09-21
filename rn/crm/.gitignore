@@ -1,14 +1,3 @@
-Application/build
-*.iml
-.idea
-.gradle
-gradle/wrapper/gradle-wrapper.properties
-build/
-local.properties
-node_modules/*
-CainiaoCRM/src/main/assets/index.android.*
-rn/crm/yarn.lock
-
 # OSX
 #
 .DS_Store

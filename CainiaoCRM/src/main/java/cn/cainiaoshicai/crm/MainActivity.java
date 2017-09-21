@@ -22,10 +22,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -81,6 +84,7 @@ public class MainActivity extends AbstractActionBarActivity {
             ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
     public static final int REQUEST_DAY = 1;
     public static final int REQUEST_INFO = 1;
+    private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
 
     public static String POSITION = "tab_position";
 
@@ -138,6 +142,14 @@ public class MainActivity extends AbstractActionBarActivity {
         }
         GlobalCtx.app().setAccountBean(accountBean);
         SettingUtility.setDefaultAccountId(accountBean.getUid());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+            }
+        }
 
         setContentView(R.layout.order_list_main);
 
@@ -744,6 +756,13 @@ public class MainActivity extends AbstractActionBarActivity {
         if (requestCode == REQUEST_DAY) {
             if (resultCode == RESULT_OK) {
                 if (data != null) {
+                }
+            }
+        } else if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    // SYSTEM_ALERT_WINDOW permission not granted...
+                    AlertUtil.error(MainActivity.this, "授权ALERT_WINDOW限失败");
                 }
             }
         }
