@@ -1,15 +1,14 @@
 
-Android ActionBarCompat-Styled Sample
+编译和调试 RN
 ===================================
 
-This sample shows you how to use ActionBarCompat with a customized theme. It utilizes a 
-split action bar when running on a device with a narrow display, and shows three tabs.
+RN放在一个单独的目录下，可使用 Webstorm 或者其他工具单独编辑和调试。 在release 时，需要先将 release 输出到 src/main/assets 目录下。
 
-Introduction
+调试
 ------------
 
-This sample shows how to style an ActionBar using the [support com.andexert.calendarlistview.library][1] on devices running
-Android v2.1+ using a custom theme.
+ 1. 在 rn/crm 下运行 npm start
+ 2. 在手机或者模拟器上设置调试端口 xxxx:8081
 
 This Activity extends from ActionBarActivity, which provides all of the function 
 necessary to display a compatible Action Bar on devices running Android v2.1+.
@@ -20,17 +19,31 @@ Assets have been generated using the ['Android Action Bar Style Generator'][2].
 [1]: http://developer.android.com/tools/support-com.andexert.calendarlistview.library/
 [2]: http://jgilfelt.github.io/android-actionbarstylegenerator
 
-Pre-requisites
+发布
 --------------
 
-- Android SDK v23
-- Android Build Tools v23.0.2
-- Android Support Repository
+```
+cd rn/crm
 
-Screenshots
+react-native bundle --platform android --dev false --entry-file index.android.js \
+--bundle-output ../../CainiaoCRM/src/main/assets/index.android.bundle \
+--sourcemap-output ../../CainiaoCRM/src/main/assets/index.android.map \
+--assets-dest ../../CainiaoCRM/src/main/res/
+```
+
+设置 Node 使用 Taobao 的镜像
 -------------
 
-<img src="screenshots/1-activity.png" height="400" alt="Screenshot"/> 
+```yarn config set registry https://registry.npm.taobao.org --global
+yarn config set disturl https://npm.taobao.org/dist --global```
+
+在 ~/.bash_profile 中设置 cnpm 来替代 npm
+
+```alias cnpm="npm --registry=https://registry.npm.taobao.org \
+   --cache=$HOME/.npm/.cache/cnpm \
+   --disturl=https://npm.taobao.org/dist \
+   --userconfig=$HOME/.cnpmrc"
+   ```
 
 Getting Started
 ---------------

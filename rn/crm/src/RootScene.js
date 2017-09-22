@@ -17,6 +17,7 @@ import TabBarItem from './widget/TabBarItem'
 
 import HomeScene from './scene/Home/HomeScene'
 import MineScene from './scene/Mine/MineScene'
+import OrderScene from './scene/Order/OrderScene'
 
 import WebScene from './widget/WebScene'
 import GroupPurchaseScene from './scene/GroupPurchase/GroupPurchaseScene'
@@ -69,7 +70,7 @@ const Tab = TabNavigator(
         Home: {
             screen: HomeScene,
             navigationOptions: ({ navigation }) => ({
-                tabBarLabel: '团购',
+                tabBarLabel: '商品',
                 tabBarIcon: ({ focused, tintColor }) => (
                     <TabBarItem
                         tintColor={tintColor}
@@ -80,35 +81,22 @@ const Tab = TabNavigator(
                 )
             }),
         },
-        // Nearby: {
-        //     screen: NearbyScene,
-        //     navigationOptions: ({ navigation }) => ({
-        //         tabBarLabel: '附近',
-        //         tabBarIcon: ({ focused, tintColor }) => (
-        //             <TabBarItem
-        //                 tintColor={tintColor}
-        //                 focused={focused}
-        //                 normalImage={require('./img/tabbar/pfb_tabbar_merchant@2x.png')}
-        //                 selectedImage={require('./img/tabbar/pfb_tabbar_merchant_selected@2x.png')}
-        //             />
-        //         )
-        //     }),
-        // },
 
-        // Order: {
-        //     screen: OrderScene,
-        //     navigationOptions: ({ navigation }) => ({
-        //         tabBarLabel: '订单',
-        //         tabBarIcon: ({ focused, tintColor }) => (
-        //             <TabBarItem
-        //                 tintColor={tintColor}
-        //                 focused={focused}
-        //                 normalImage={require('./img/tabbar/pfb_tabbar_order@2x.png')}
-        //                 selectedImage={require('./img/tabbar/pfb_tabbar_order_selected@2x.png')}
-        //             />
-        //         )
-        //     }),
-        // },
+        Nearby: {
+            screen: OrderScene,
+            navigationOptions: ({ navigation }) => ({
+                tabBarLabel: '订单',
+                tabBarIcon: ({ focused, tintColor }) => (
+                    <TabBarItem
+                        tintColor={tintColor}
+                        focused={focused}
+                        normalImage={require('./img/tabbar/tab_list.png')}
+                        selectedImage={require('./img/tabbar/tab_list_pre.png')}
+                    />
+                )
+            }),
+        },
+
 
         Mine: {
             screen: MineScene,
@@ -118,8 +106,8 @@ const Tab = TabNavigator(
                     <TabBarItem
                         tintColor={tintColor}
                         focused={focused}
-                        normalImage={require('./img/tabbar/pfb_tabbar_mine_2x.png')}
-                        selectedImage={require('./img/tabbar/pfb_tabbar_mine_selected_2x.png')}
+                        normalImage={require('./img/tabbar/tab_me.png')}
+                        selectedImage={require('./img/tabbar/tab_me_pre.png')}
                     />
                 )
             }),

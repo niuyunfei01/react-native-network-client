@@ -21,13 +21,13 @@ class MineScene extends PureComponent {
         headerRight: (
             <View style={{ flexDirection: 'row' }}>
                 <NavigationItem
-                    icon={{uri: '../../img/Mine/icon_navigationItem_set_white@2x.png'}}
+                    icon={require('../../img/Mine/icon_navigationItem_set_white_2x.png')}
                     onPress={() => {
 
                     }}
                 />
                 <NavigationItem
-                    icon={{uri: '../../img/Home/icon_navigationItem_message_white@2x.png'}}
+                    icon={require('../../img/Home/icon_navigationItem_message_white_2x.png')}
                     onPress={() => {
 
                     }}
@@ -81,11 +81,11 @@ class MineScene extends PureComponent {
         return (
             <View style={styles.header}>
                 <View style={styles.userContainer}>
-                    <Image style={styles.avatar} source={{uri: '../../img/Mine/avatar.png'}} />
+                    <Image style={styles.avatar} source={require('../../img/Mine/avatar.png')} />
                     <View>
                         <View style={{ flexDirection: 'row' }}>
                             <Heading1 style={{ color: 'white' }}>素敌</Heading1>
-                            <Image style={{ marginLeft: 4 }} source={{uri: '../../img/Mine/beauty_technician_v15@2x.png'}} />
+                            <Image style={{ marginLeft: 4 }} source={require('../../img/Mine/beauty_technician_v15_2x.png')} />
                         </View>
                         <Paragraph style={{ color: 'white', marginTop: 4 }}>个人信息 ></Paragraph>
                     </View>
