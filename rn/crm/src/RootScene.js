@@ -68,7 +68,7 @@ class RootScene extends PureComponent {
 
 const Tab = TabNavigator(
     {
-        Home: {
+        Alert: {
             screen: AlertScene,
             navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '提醒',
