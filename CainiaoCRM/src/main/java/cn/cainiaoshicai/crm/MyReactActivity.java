@@ -30,7 +30,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
-        mReactRootView.startReactApplication(mReactInstanceManager, "AndroidCrm", null);
+        mReactRootView.startReactApplication(mReactInstanceManager, "crm", null);
 
         setContentView(mReactRootView);
     }
