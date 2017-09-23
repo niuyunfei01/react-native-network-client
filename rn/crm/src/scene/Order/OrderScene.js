@@ -12,21 +12,48 @@ import { color, Button, NavigationItem, RefreshListView, RefreshState, Separator
 import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
 import { screen, system, tool } from '../../common'
 import api, { orderUrlWithId} from '../../api'
+import {bindActionCreators} from "redux";
 
-// create a component
+/**
+ * The actions we need
+ */
+import * as orderActions from '../../reducers/order/orderActions'
+import * as globalActions from '../../reducers/global/globalActions'
+import {connect} from "react-redux";
+
+/**
+ * ## Redux boilerplate
+ */
+
+function mapStateToProps (state) {
+    return {
+        isFetching: state.isFetching,
+        order_id: state.order_id,
+        order: state.order,
+        global: {
+            currentUser: state.global.currentUser,
+            currentState: state.global.currentState,
+            showState: state.global.showState
+        }
+    }
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        actions: bindActionCreators({ ...orderActions, ...globalActions }, dispatch)
+    }
+}
+
 class OrderScene extends PureComponent {
 
-    state: {
-        info: Object,
-        isRefreshing: false
-    }
+    static access_token = '19917687f923260dd9fa87caf0cf04a9cdb06a2d';
 
     static navigationOptions = ({ navigation }) => ({
         headerTitle: '订单详情',
         headerStyle: { backgroundColor: 'white' },
         headerRight: (
             <NavigationItem
-                icon={{uri: '../../img/Public/icon_navigationItem_share.png'}}
+                icon={require('../../img/Public/icon_navigationItem_share.png')}
                 onPress={() => {
 
                 }}
@@ -36,28 +63,43 @@ class OrderScene extends PureComponent {
 
     constructor(props: Object) {
         super(props);
+    }
 
-        this.state = {
-            info: {},
-            isRefreshing: false
-            // dataSource: ds.cloneWithRows([]),
-        }
+    /**
+     * ### componentWillReceiveProps
+     *
+     * Since the Forms are looking at the state for the values of the
+     * fields, when we we need to set them
+     */
+    componentWillReceiveProps (props) {
+
     }
 
     componentDidMount() {
+        // this.requestData();
+
+        const order_id = 652001;//this.props.navigation.state.params.order_id;
 
         InteractionManager.runAfterInteractions(() => {
         });
+
+        if (!this.props.order || !this.props.order.id) {
+            this.props.actions.getOrder(OrderScene.access_token, order_id)
+        } else {
+            this.setState({
+                order: this.props.order
+            })
+        }
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />
+                {/*<View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />*/}
                 <ScrollView
                     refreshControl={
                         <RefreshControl
-                            refreshing={this.state.isRefreshing}
+                            refreshing={this.props.isFetching}
                             onRefresh={() => this.onHeaderRefresh()}
                             tintColor='gray'
                         />
@@ -75,29 +117,44 @@ class OrderScene extends PureComponent {
     }
 
     onHeaderRefresh() {
-        this.requestData()
+        //this.requestData()
+
+        this.props.actions.getOrder(OrderScene.access_token, 652001)
     }
 
     renderHeader() {
-        let info = {}; //this.props.navigation.state.params.info
+        let info = {};
+        const {order } = this.props.order;
+        let self = this;
+
+        let onButtonPress = () => {
+            this.props.actions.updateOrder(
+                this.props.order.id,
+                this.props.profile.form.fields.username,
+                this.props.profile.form.fields.email,
+                this.props.global.currentUser)
+        }
+
         return (
             <View>
                 <View>
-
-                    <Text>王若曲女士</Text>
-                    <Button>15600003456</Button>
-                    <Text>第2次</Text>
-                    <Text>#33</Text>
+                    <View style={{flexDirection: 'column'}}>
+                    <Paragraph>{order.userName}</Paragraph>
+                    <Button>{order.mobile}</Button>
+                    <Paragraph>第{order.order_times}次</Paragraph>
+                    <Paragraph>#{order.dayNo}</Paragraph>
+                        <View style={{ flex: 1 }} />
                     <Image style={styles.icon} source={require('../../img/Public/wx_yes_icon.png')}/>
+                    </View>
 
                     <Paragraph>
-                        国风美唐二期回龙观东大街科星西路5号楼3单元
+                        {order.address}
                     </Paragraph>
                     <Button>地图</Button>
                     <Button>呼叫门店</Button>
 
-                    <Paragraph>期望配送：<Text> 2017-07-09 10:11</Text></Paragraph>
-                    <Paragraph>支付方式：<Text> 在线支付</Text></Paragraph>
+                    <Paragraph>期望配送：<Text> {order.expectTime}</Text></Paragraph>
+                    <Paragraph>支付方式：<Text> {order.paid_done === '1' ? '在线支付':'货到付款'}</Text></Paragraph>
 
                 </View>
 
@@ -129,8 +186,9 @@ class OrderScene extends PureComponent {
                     <Paragraph style={{ marginLeft: 10 }}>门市价：￥{(info.price * 1.1).toFixed(0)}</Paragraph>
                     <View style={{ flex: 1 }} />
                     <Button
-                        title='立即抢购'
+                        title='延迟送达'
                         style={{ color: 'white', fontSize: 18 }}
+                        onPress={onButtonPress}
                         containerStyle={styles.buyButton}
                     />
                 </View>
@@ -144,24 +202,27 @@ class OrderScene extends PureComponent {
         )
     }
 
-    info () {
-        return {id: 655439}
-    }
+    // info () {
+    //     return {id: 655439}
+    // }
 
-    async requestData() {
-
-        this.setState({
-            isRefreshing: true
-        })
-
-        let info = this.info(); //this.props.navigation.state.params.info
-        let response = await fetch(orderUrlWithId(info.id))
-        let json = await response.json()
-
-        this.setState({
-            isRefreshing: false
-        })
-    }
+    // async requestData() {
+    //
+    //     this.setState({
+    //         isRefreshing: true
+    //     })
+    //
+    //     let info = this.info(); //this.props.navigation.state.params.info
+    //     let response = await fetch(orderUrlWithId(info.id))
+    //     let json = await response.json()
+    //
+    //     console.log(json)
+    //
+    //     this.setState({
+    //         isRefreshing: false,
+    //         order: json
+    //     })
+    // }
 
     async requestRecommend() {
         try {
@@ -200,6 +261,7 @@ const styles = StyleSheet.create({
     icon: {
         width: 32,
         height: 32,
+        alignItems: 'flex-end'
     },
     banner: {
         width: screen.width,
@@ -232,5 +294,4 @@ const styles = StyleSheet.create({
     }
 });
 
-//make this component available to the app
-export default OrderScene;
+export default connect(mapStateToProps, mapDispatchToProps)(OrderScene)
