@@ -91,66 +91,23 @@ class AlertScene extends PureComponent {
 
     render() {
         return (
-            <App/>
-            // {/*<View style={styles.container}>*/}
-            //     {/*<NavBox/>*/}
-            //     {/*<NodeBox/>*/}
-            //     {/*<NodeBox/>*/}
-            // {/*</View>*/}
+            <ScrollableTabView tabBarActiveTextColor={"#333"} tabBarUnderlineStyle={{backgroundColor: "#59b26a"}} tabBarTextStyle={{fontSize: pxToDp(26)}}>
+                <AlertList tabLabel="待退款" />
+                <AlertList tabLabel="催单/异常" />
+                <AlertList tabLabel="售后单" />
+                <AlertList tabLabel="其他" />
+            </ScrollableTabView>
         );
     }
 }
 let ScrollableTabView = require('react-native-scrollable-tab-view');
-
-let App = React.createClass({
-    render() {
-        return (
-            <ScrollableTabView>
-                <ReactPage tabLabel="React" />
-                <FlowPage tabLabel="Flow" />
-                <JestPage tabLabel="Jest" />
-            </ScrollableTabView>
-        );
-    }
-});
-
-
-class ReactPage extends React.Component {
-    render() {
-        return (
-            <Text>Hello React</Text>
-        );
-    }
-}
-class FlowPage extends React.Component {
-    render() {
-        return (
-            <Text>Hello Flow</Text>
-        );
-    }
-}
-class JestPage extends React.Component {
-    render() {
-        return (
-            <Text>Hello Jest</Text>
-        );
-    }
-}
-
-
-
-
-
-
 
 // define your styles
 const styles = StyleSheet.create({
 
 });
 
-
-
-class NavBox extends React.Component {
+/*class NavBox extends React.Component {
     constructor() {
         super()
     }
@@ -199,9 +156,22 @@ const nav_styles = StyleSheet.create({
         borderBottomWidth: 4,
         borderBottomColor: '#59b26a',
     },
-});
+});*/
 
-class NodeBox extends React.Component {
+class AlertList extends React.Component {
+    render() {
+        return (
+            <ScrollView>
+                <AlertRow />
+                <AlertRow />
+                <AlertRow />
+                <AlertRow />
+            </ScrollView>
+        );
+    }
+}
+
+class AlertRow extends React.Component {
     constructor() {
         super()
     }
@@ -211,14 +181,14 @@ class NodeBox extends React.Component {
                 <View style={[top_styles.order_box]}>
                     <View style={top_styles.box_top}>
                         <View style={[top_styles.order_head]}>
-                            <Image style={[top_styles.icon_ji]} source={{uri: 'https://facebook.github.io/react/img/logo_og.png',}} />
+                            <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')} />
                             <View>
                                 <Text style={top_styles.o_index_text}>0907#97</Text>
                             </View>
                             <View>
                                 <Text style={top_styles.o_store_name_text}>回龙观</Text>
                             </View>
-                            <Image style={[top_styles.icon_dropDown]} source={{uri: 'https://facebook.github.io/react/img/logo_og.png',}} />
+                            <Image style={[top_styles.icon_dropDown]} source={require('../../img/Alert/drop-down.png')} />
                         </View>
                         <View style={[top_styles.order_body]}>
                             <Text style={[top_styles.order_body_text]}>
@@ -240,7 +210,7 @@ class NodeBox extends React.Component {
                         <View>
                             <Text style={bottom_styles.time_start}>17.50生成</Text>
                         </View>
-                        <Image style={[bottom_styles.icon_clock]} source={{uri: 'https://facebook.github.io/react/img/logo_og.png',}} />
+                        <Image style={[bottom_styles.icon_clock]}  source={require('../../img/Alert/clock.png')} />
                         <View>
                             <Text style={bottom_styles.time_end}>18:30</Text>
                         </View>
@@ -355,8 +325,10 @@ const bottom_styles = StyleSheet.create({
     },
     icon_clock: {
         marginLeft: pxToDp(70),
-        width: pxToDp(40),
-        height: pxToDp(40),
+        marginRight: pxToDp(5),
+        width: pxToDp(35),
+        height: pxToDp(35),
+        marginTop: pxToDp(5),
         alignSelf: 'center',
     },
     time_end: {
