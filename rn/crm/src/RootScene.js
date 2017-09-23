@@ -16,6 +16,7 @@ import { screen, system, tool } from './common'
 import TabBarItem from './widget/TabBarItem'
 
 import HomeScene from './scene/Home/HomeScene'
+import AlertScene from './scene/Alert/AlertScene'
 import MineScene from './scene/Mine/MineScene'
 import OrderScene from './scene/Order/OrderScene'
 
@@ -68,7 +69,7 @@ class RootScene extends PureComponent {
 const Tab = TabNavigator(
     {
         Home: {
-            screen: HomeScene,
+            screen: AlertScene,
             navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '提醒',
                 tabBarIcon: ({ focused, tintColor }) => (
