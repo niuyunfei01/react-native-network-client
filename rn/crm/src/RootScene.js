@@ -17,6 +17,7 @@ import TabBarItem from './widget/TabBarItem'
 
 import HomeScene from './scene/Home/HomeScene'
 import AlertScene from './scene/Alert/AlertScene'
+import TopBarIconExample from './scene/Alert/TopBarIconExample'
 import MineScene from './scene/Mine/MineScene'
 import OrderScene from './scene/Order/OrderScene'
 
@@ -69,7 +70,7 @@ class RootScene extends PureComponent {
 const Tab = TabNavigator(
     {
         Alert: {
-            screen: AlertScene,
+            screen: TopBarIconExample,
             navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '提醒',
                 tabBarIcon: ({ focused, tintColor }) => (
