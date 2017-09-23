@@ -91,14 +91,57 @@ class AlertScene extends PureComponent {
 
     render() {
         return (
-            <View style={styles.container}>
-                <NavBox/>
-                <NodeBox/>
-                <NodeBox/>
-            </View>
+            <App/>
+            // {/*<View style={styles.container}>*/}
+            //     {/*<NavBox/>*/}
+            //     {/*<NodeBox/>*/}
+            //     {/*<NodeBox/>*/}
+            // {/*</View>*/}
         );
     }
 }
+let ScrollableTabView = require('react-native-scrollable-tab-view');
+
+let App = React.createClass({
+    render() {
+        return (
+            <ScrollableTabView>
+                <ReactPage tabLabel="React" />
+                <FlowPage tabLabel="Flow" />
+                <JestPage tabLabel="Jest" />
+            </ScrollableTabView>
+        );
+    }
+});
+
+
+class ReactPage extends React.Component {
+    render() {
+        return (
+            <Text>Hello React</Text>
+        );
+    }
+}
+class FlowPage extends React.Component {
+    render() {
+        return (
+            <Text>Hello Flow</Text>
+        );
+    }
+}
+class JestPage extends React.Component {
+    render() {
+        return (
+            <Text>Hello Jest</Text>
+        );
+    }
+}
+
+
+
+
+
+
 
 // define your styles
 const styles = StyleSheet.create({
