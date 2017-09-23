@@ -22,6 +22,43 @@ import OrderScene from './scene/Order/OrderScene'
 import WebScene from './widget/WebScene'
 import GroupPurchaseScene from './scene/GroupPurchase/GroupPurchaseScene'
 
+import {Provider} from 'react-redux'
+
+/**
+ * ## Actions
+ *  The necessary actions for dispatching our bootstrap values
+ */
+import {setPlatform, setVersion} from './reducers/device/deviceActions'
+import {setStore} from './reducers/global/globalActions'
+
+/**
+ * ## States
+ * Snowflake explicitly defines initial state
+ *
+ */
+import AuthInitialState from './reducers/auth/authInitialState'
+import DeviceInitialState from './reducers/device/deviceInitialState'
+import GlobalInitialState from './reducers/global/globalInitialState'
+import ProfileInitialState from './reducers/profile/profileInitialState'
+import configureStore from "./common/configureStore";
+import {VERSION} from "./api";
+
+/**
+ *
+ * ## Initial state
+ * Create instances for the keys of each structure in snowflake
+ * @returns {Object} object with 4 keys
+ */
+function getInitialState () {
+    const _initState = {
+        auth: new AuthInitialState(),
+        device: (new DeviceInitialState()).set('isMobile', true),
+        global: (new GlobalInitialState()),
+        profile: new ProfileInitialState()
+    }
+    return _initState
+}
+
 const lightContentScenes = ['Home', 'Mine']
 
 function getCurrentRouteName(navigationState) {
@@ -40,12 +77,22 @@ function getCurrentRouteName(navigationState) {
 class RootScene extends PureComponent {
     constructor() {
         super()
-
         StatusBar.setBarStyle('light-content')
     }
 
     render() {
+
+
+        const store = configureStore(getInitialState())
+
+        // configureStore will combine reducers from snowflake and main application
+        // it will then create the store based on aggregate state from all reducers
+        store.dispatch(setPlatform('android')) //FIXME: should be determined dynamically
+        store.dispatch(setVersion(VERSION))
+        store.dispatch(setStore(store))
+
         return (
+            <Provider store={store}>
             <Navigator
                 onNavigationStateChange={
                     (prevState, currentState) => {
@@ -61,6 +108,7 @@ class RootScene extends PureComponent {
                     }
                 }
             />
+            </Provider>
         );
     }
 }
@@ -136,7 +184,7 @@ const Tab = TabNavigator(
         lazy: true,
         tabBarOptions: {
             activeTintColor: color.theme,
-            inactiveTintColor: '#979797',
+            inactiveTintColor: '#99579797',
             style: { backgroundColor: '#ffffff' },
         },
     }
