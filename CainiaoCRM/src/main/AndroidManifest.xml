@@ -158,7 +158,7 @@
         <!-- Required  SDK核心功能-->
 
         <activity
-            android:name=".MyReactActivity"
+            android:name=".support.react.MyReactActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
 

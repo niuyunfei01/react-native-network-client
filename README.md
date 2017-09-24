@@ -45,11 +45,13 @@ yarn config set disturl https://npm.taobao.org/dist --global```
    --userconfig=$HOME/.cnpmrc"
    ```
 
-Getting Started
+特殊情况
 ---------------
 
-This sample uses the Gradle build system. To build this project, use the
-"gradlew build" command or use "Import Project" in Android Studio.
+ - 目前React Navigation 已发布的 npm 上的版本不支持 tab 上点击跳转，需要使用 github 上的版本。
+  ```
+  npm install react-community/react-navigation#fe4b1e2
+  ```
 
 Support
 -------

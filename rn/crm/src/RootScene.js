@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { StatusBar } from 'react-native'
+import { StatusBar, NativeModules, Platform } from 'react-native'
 import { StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation';
 
 import color from './widget/color'
@@ -83,7 +83,8 @@ class RootScene extends PureComponent {
 
     render() {
 
-
+        // on Android, the URI prefix typically contains a host in addition to scheme
+        const prefix = Platform.OS === 'android' ? 'bilinxian://bilinxian/' : 'bilinxian://';
         const store = configureStore(getInitialState())
 
         // configureStore will combine reducers from snowflake and main application
@@ -94,7 +95,7 @@ class RootScene extends PureComponent {
 
         return (
             <Provider store={store}>
-            <Navigator
+            <Navigator uriPrefix={prefix}
                 onNavigationStateChange={
                     (prevState, currentState) => {
                         const currentScene = getCurrentRouteName(currentState);
@@ -142,7 +143,11 @@ const Tab = TabNavigator(
                         normalImage={require('./img/tabbar/tab_list.png')}
                         selectedImage={require('./img/tabbar/tab_list_pre.png')}
                     />
-                )
+                ),
+                tabBarOnPress: () => {
+                    console.log('do tabBarOnPress');
+                    NativeModules.ActivityStarter.navigateToOrders();
+                }
             }),
         },
 
@@ -157,7 +162,11 @@ const Tab = TabNavigator(
                         normalImage={require('./img/tabbar/tab_goods.png')}
                         selectedImage={require('./img/tabbar/tab_goods_pre.png')}
                     />
-                )
+                ),
+                tabBarOnPress: () => {
+                    console.log('do navigateToGoods');
+                    NativeModules.ActivityStarter.navigateToGoods();
+                }
             }),
         },
 
@@ -197,7 +206,11 @@ const Navigator = StackNavigator(
         Tab: { screen: Tab },
         Web: { screen: WebScene },
         GroupPurchase: { screen: GroupPurchaseScene },
-        Home: { screen: AlertScene }
+        Home: { screen: AlertScene },
+        Order: {
+            screen: OrderScene,
+            path: 'order/:order_id',
+        },
     },
     {
         navigationOptions: {

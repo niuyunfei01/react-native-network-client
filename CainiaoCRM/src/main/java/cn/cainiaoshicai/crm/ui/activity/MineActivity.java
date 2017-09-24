@@ -21,7 +21,7 @@ import java.util.HashMap;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
-import cn.cainiaoshicai.crm.MyReactActivity;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
