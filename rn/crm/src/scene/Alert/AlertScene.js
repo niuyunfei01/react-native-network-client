@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, ScrollView,  Image} from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Image} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from './pxToDp';
 import LoadingView from '../../widget/LoadingView';
@@ -17,7 +17,7 @@ import * as alertActions from '../../reducers/alert/alertActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
 import {bindActionCreators} from "redux";
-
+let ScrollableTabView = require('react-native-scrollable-tab-view');
 
 /**
  * ## Redux boilerplate
@@ -43,10 +43,10 @@ class AlertScene extends PureComponent {
     static navigationOptions = { title: 'Welcome', header: null };
 
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             isProcessing:false
-        }
+        };
         this.loadData = this.loadData.bind(this)
     }
 
@@ -56,21 +56,21 @@ class AlertScene extends PureComponent {
 
     loadData(){
         const self_ = this;
-        this.setState({ isProcessing: true })
+        this.setState({ isProcessing: true });
         this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', '3', '0', 1)
             .then(()=>{
                 self_.setState({isProcessing:false});
             });
     }
 
-
     render() {
         if (this.state.isProcessing){
             return (<LoadingView isLoading={this.state.isProcessing} tip='加载中'/>);
         }
+
         return (
             <ScrollableTabView tabBarActiveTextColor={"#333"} tabBarUnderlineStyle={{backgroundColor: "#59b26a"}} tabBarTextStyle={{fontSize: pxToDp(26)}}>
-                <AlertList tabLabel={JSON.stringify((this.props.result||{}).desc)} />
+                <AlertList tabLabel="待退款" alert_data={(this.props.result||{})}/>
                 <AlertList tabLabel="催单/异常" />
                 <AlertList tabLabel="售后单" />
                 <AlertList tabLabel="其他" />
@@ -78,75 +78,92 @@ class AlertScene extends PureComponent {
         );
     }
 }
-let ScrollableTabView = require('react-native-scrollable-tab-view');
 
-// define your styles
-const styles = StyleSheet.create({
-});
+class AlertList extends PureComponent {
+    constructor(props) {
+        super(props);
+    }
 
-class AlertList extends React.Component {
     render() {
-        return (
-            <ScrollView>
-                <AlertRow />
-                <AlertRow />
-                <AlertRow />
-                <AlertRow />
-            </ScrollView>
-        );
+        let alert_data = (this.props.alert_data || {});
+        if(alert_data.ok){
+            let alertList = alert_data.obj.list;
+            let alert_row = Array.from(alertList).map(function (row, index) {
+                return (
+                    <AlertRow alertList={row} key={index}/>
+                );
+            });
+            return (
+                <ScrollView>
+                    {alert_row}
+                </ScrollView>
+            );
+        }else{
+            return (
+                <Text>{JSON.stringify(alert_data)}</Text>
+            );
+        }
     }
 }
 
 class AlertRow extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props);
     }
     render() {
-        return (
-            <View style={top_styles.container}>
-                <View style={[top_styles.order_box]}>
-                    <View style={top_styles.box_top}>
-                        <View style={[top_styles.order_head]}>
-                            <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')} />
-                            <View>
-                                <Text style={top_styles.o_index_text}>0907#97</Text>
+        let row = this.props.alertList||{};
+        if(row){
+            // {"order_id":"653848","remark":"饿了么 望京 南湖西园 用户 赵佳玮 的 59 号订单 催单了, 请尽快处理","delegation_to":"830885","created_by":"0","deleted":"0","created":"2017-09-06 17:47:11","modified":"2017-09-06 17:47:11","remind_id":"532151529","orderTime":"2017-09-06 16:59:40","store_id":"望京","dayId":"59","orderStatus":"已送达","orderDate":"0906","delegation_to_user":"吴冬梅","noticeDate":"09\/06","noticeTime":"17.47","expect_end_time":"18.17","quick":false}]}}
+            return (
+                <View style={top_styles.container}>
+                    <View style={[top_styles.order_box]}>
+                        <View style={top_styles.box_top}>
+                            <View style={[top_styles.order_head]}>
+                                <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')} />
+                                <View>
+                                    <Text style={top_styles.o_index_text}>{row.noticeDate}#{row.dayId}</Text>
+                                </View>
+                                <View>
+                                    <Text style={top_styles.o_store_name_text}>{row.store_id}</Text>
+                                </View>
+                                <Image style={[top_styles.icon_dropDown]} source={require('../../img/Alert/drop-down.png')} />
                             </View>
-                            <View>
-                                <Text style={top_styles.o_store_name_text}>回龙观</Text>
-                            </View>
-                            <Image style={[top_styles.icon_dropDown]} source={require('../../img/Alert/drop-down.png')} />
-                        </View>
-                        <View style={[top_styles.order_body]}>
-                            <Text style={[top_styles.order_body_text]}>
-                                <Text style={top_styles.o_operate}> 加货 </Text>
-                                <Text style={top_styles.o_content}>
-                                    糖三角*2 鸡胸肉糖三角*2 鸡胸肉糖三角*2 鸡胸肉糖三角*2 鸡胸肉糖三角*2 鸡胸肉糖三角*2 鸡胸肉糖三角*2 鸡胸肉
-                                </Text>
+                            <View style={[top_styles.order_body]}>
+                                <Text style={[top_styles.order_body_text]}>
+                                    {/*<Text style={top_styles.o_operate}> 加货 </Text>*/}
+                                    <Text style={top_styles.o_content}>
+                                        {row.remark}
+                                    </Text>
 
-                            </Text>
-                            <View style={[top_styles.ship_status]}>
-                                <Text style={[top_styles.ship_status_text]}>在途</Text>
+                                </Text>
+                                <View style={[top_styles.ship_status]}>
+                                    <Text style={[top_styles.ship_status_text]}>{row.orderStatus}</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    <View style={bottom_styles.container}>
-                        <View style={bottom_styles.time_date}>
-                            <Text style={bottom_styles.time_date_text}>9/20</Text>
-                        </View>
-                        <View>
-                            <Text style={bottom_styles.time_start}>17.50生成</Text>
-                        </View>
-                        <Image style={[bottom_styles.icon_clock]}  source={require('../../img/Alert/clock.png')} />
-                        <View>
-                            <Text style={bottom_styles.time_end}>18:30</Text>
-                        </View>
-                        <View style={bottom_styles.operator}>
-                            <Text style={bottom_styles.operator_text}>处理人：XXX</Text>
+                        <View style={bottom_styles.container}>
+                            <View style={bottom_styles.time_date}>
+                                <Text style={bottom_styles.time_date_text}>{row.noticeDate}</Text>
+                            </View>
+                            <View>
+                                <Text style={bottom_styles.time_start}>{row.noticeTime}生成</Text>
+                            </View>
+                            <Image style={[bottom_styles.icon_clock]}  source={require('../../img/Alert/clock.png')} />
+                            <View>
+                                <Text style={bottom_styles.time_end}>18:30</Text>
+                            </View>
+                            <View style={bottom_styles.operator}>
+                                <Text style={bottom_styles.operator_text}>处理人：{row.delegation_to_user}</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
-            </View>
-        );
+            );
+        } else {
+            return (
+                <Text>数据有误</Text>
+            );
+        }
     }
 }
 
@@ -275,5 +292,5 @@ const bottom_styles = StyleSheet.create({
 });
 
 //make this component available to the app
-//export default AlertScene;
+// export default AlertScene;
 export default connect(mapStateToProps, mapDispatchToProps)(AlertScene)
