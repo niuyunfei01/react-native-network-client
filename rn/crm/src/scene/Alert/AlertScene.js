@@ -8,91 +8,69 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, StatusBar, FlatList } from 'react-native'
+import { View, Text, StyleSheet, ScrollView,  Image} from 'react-native'
+import {connect} from "react-redux";
 import pxToDp from './pxToDp';
-import api from '../../api'
+import LoadingView from '../../widget/LoadingView';
+
+import * as alertActions from '../../reducers/alert/alertActions'
+import * as globalActions from '../../reducers/global/globalActions'
+
+import {bindActionCreators} from "redux";
 
 
+/**
+ * ## Redux boilerplate
+ */
+
+function mapStateToProps ({alert}) {
+    return {
+        type: alert.type,
+        status: alert.status,
+        result: alert.result
+    }
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        actions: bindActionCreators({ ...alertActions,...globalActions }, dispatch)
+    }
+}
 
 // create a component
 class AlertScene extends PureComponent {
 
-    state: {
-        discounts: Array<Object>,
-        dataList: Array<Object>,
-        refreshing: boolean,
-    }
-
     static navigationOptions = { title: 'Welcome', header: null };
 
-    constructor(props: Object) {
+    constructor(props) {
         super(props)
         this.state = {
-            discounts: [],
-            dataList: [],
-            refreshing: false,
+            isProcessing:false
         }
-
-         { (this: any).requestData = this.requestData.bind(this) }
-         { (this: any).keyExtractor = this.keyExtractor.bind(this) }
+        this.loadData = this.loadData.bind(this)
     }
 
     componentDidMount() {
-        this.requestData()
+        this.loadData();
     }
 
-    requestData() {
-        this.setState({ refreshing: true })
-
-        this.requestDiscount()
-        this.requestRecommend()
+    loadData(){
+        const self_ = this;
+        this.setState({ isProcessing: true })
+        this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', '3', '0', 1)
+            .then(()=>{
+                self_.setState({isProcessing:false});
+            });
     }
 
-    async requestRecommend() {
-        try {
-            let response = await fetch(api.recommend)
-            let json = await response.json()
-
-            let dataList = json.data.map(
-                (info) => {
-                    return {
-                        id: info.id,
-                        imageUrl: info.squareimgurl,
-                        title: info.mname,
-                        subtitle: `[${info.range}]${info.title}`,
-                        price: info.price
-                    }
-                }
-            )
-
-            this.setState({
-                dataList: dataList,
-                refreshing: false,
-            })
-        } catch (error) {
-            this.setState({ refreshing: false })
-        }
-    }
-
-    async requestDiscount() {
-        try {
-            let response = await fetch(api.discount)
-            let json = await response.json()
-            this.setState({ discounts: json.data })
-        } catch (error) {
-            alert(error)
-        }
-    }
-
-
-    keyExtractor(item: Object, index: number) {
-        return item.id
-    }
 
     render() {
+        if (this.state.isProcessing){
+            return (<LoadingView isLoading={this.state.isProcessing} tip='加载中'/>);
+        }
         return (
             <ScrollableTabView tabBarActiveTextColor={"#333"} tabBarUnderlineStyle={{backgroundColor: "#59b26a"}} tabBarTextStyle={{fontSize: pxToDp(26)}}>
-                <AlertList tabLabel="待退款" />
+                <AlertList tabLabel={JSON.stringify((this.props.result||{}).desc)} />
                 <AlertList tabLabel="催单/异常" />
                 <AlertList tabLabel="售后单" />
                 <AlertList tabLabel="其他" />
@@ -104,59 +82,7 @@ let ScrollableTabView = require('react-native-scrollable-tab-view');
 
 // define your styles
 const styles = StyleSheet.create({
-
 });
-
-/*class NavBox extends React.Component {
-    constructor() {
-        super()
-    }
-    render() {
-        return (
-            <View style={nav_styles.container}>
-                <View style={nav_styles.nav_box}>
-                    <View style={nav_styles.nav_bar}>
-                        <Text style={nav_styles.nav_bar_text}>待退款</Text>
-                    </View>
-                    <View style={nav_styles.nav_bar}>
-                        <Text style={nav_styles.nav_bar_text}>催单/异常</Text>
-                    </View>
-                    <View style={nav_styles.nav_bar}>
-                        <Text style={nav_styles.nav_bar_text}>售后单</Text>
-                    </View>
-                    <View style={[nav_styles.nav_bar]}>
-                        <Text style={[nav_styles.nav_bar_text, nav_styles.active_bar]}>其他</Text>
-                    </View>
-                </View>
-            </View>
-        );
-    }
-}
-
-const nav_styles = StyleSheet.create({
-    nav_box: {
-        height: pxToDp(78),
-        backgroundColor: '#e6e6e6',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    nav_bar: {
-        height: pxToDp(74),
-        flex: 1,
-        justifyContent: 'space-between',
-    },
-    nav_bar_text: {
-        height: pxToDp(78),
-        textAlign: 'center',
-        textAlignVertical: 'center',
-    },
-    active_bar: {
-        fontWeight: 'bold',
-        borderBottomWidth: 4,
-        borderBottomColor: '#59b26a',
-    },
-});*/
 
 class AlertList extends React.Component {
     render() {
@@ -349,4 +275,5 @@ const bottom_styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default AlertScene;
+//export default AlertScene;
+export default connect(mapStateToProps, mapDispatchToProps)(AlertScene)
