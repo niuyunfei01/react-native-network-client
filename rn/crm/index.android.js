@@ -17,8 +17,11 @@ import RootScene from "./src/RootScene";
 
 export default class crm extends Component {
     render() {
+
+      console.log("crm launch props:", this.props);
+
         return (
-            <RootScene />
+            <RootScene launchProps={this.props}/>
         );
     }
 }

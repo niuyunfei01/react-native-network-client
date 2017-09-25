@@ -8,20 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { StatusBar, NativeModules, Platform } from 'react-native'
-import { StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation';
-
-import color from './widget/color'
-import { screen, system, tool } from './common'
-import TabBarItem from './widget/TabBarItem'
-
-import HomeScene from './scene/Home/HomeScene'
-import AlertScene from './scene/Alert/AlertScene'
-import MineScene from './scene/Mine/MineScene'
-import OrderScene from './scene/Order/OrderScene'
-
-import WebScene from './widget/WebScene'
-import GroupPurchaseScene from './scene/GroupPurchase/GroupPurchaseScene'
+import { StatusBar, Platform } from 'react-native'
 
 import {Provider} from 'react-redux'
 
@@ -30,7 +17,7 @@ import {Provider} from 'react-redux'
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
-import {setStore} from './reducers/global/globalActions'
+import {setSessionToken, setStore} from './reducers/global/globalActions'
 
 /**
  * ## States
@@ -43,6 +30,8 @@ import GlobalInitialState from './reducers/global/globalInitialState'
 import ProfileInitialState from './reducers/profile/profileInitialState'
 import configureStore from "./common/configureStore";
 import {VERSION} from "./api";
+import AppNavigator from './common/AppNavigator'
+
 
 /**
  *
@@ -51,13 +40,13 @@ import {VERSION} from "./api";
  * @returns {Object} object with 4 keys
  */
 function getInitialState () {
-    const _initState = {
+    return {
         auth: new AuthInitialState(),
         device: (new DeviceInitialState()).set('isMobile', true),
         global: (new GlobalInitialState()),
-        profile: new ProfileInitialState()
+        profile: new ProfileInitialState(),
+        nav: {},
     }
-    return _initState
 }
 
 const lightContentScenes = ['Home', 'Mine']
@@ -81,11 +70,45 @@ class RootScene extends PureComponent {
         StatusBar.setBarStyle('light-content')
     }
 
+    componentDidMount() {
+        let launchProps = this.props.launchProps;
+        let orderId = launchProps['order_id'];
+        if (orderId) {
+            console.log('do navigate');
+            if (this.navigator) {
+                console.log(this.navigator);
+                this.navigator.navigate('Order', {'order_id': orderId});
+                this.
+            }
+        }
+    }
+
     render() {
 
         // on Android, the URI prefix typically contains a host in addition to scheme
         const prefix = Platform.OS === 'android' ? 'bilinxian://bilinxian/' : 'bilinxian://';
-        const store = configureStore(getInitialState())
+        const store = configureStore(getInitialState());
+
+        let launchProps = this.props.launchProps;
+
+        if (launchProps['access_token']) {
+            store.dispatch(setSessionToken(launchProps['access_token']));
+        }
+
+        // console.log(self.navigator);
+        // self.navigator && self.navigator.dispatch(
+        //     NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
+        // );
+
+        let orderId = launchProps['order_id'];
+        if (orderId) {
+            console.log('do navigate');
+            if (this.navigator) {
+                console.log(this.navigator);
+                //self.navigator.navigate('Order', {'order_id': orderId});
+            }
+        }
+
 
         // configureStore will combine reducers from snowflake and main application
         // it will then create the store based on aggregate state from all reducers
@@ -95,7 +118,7 @@ class RootScene extends PureComponent {
 
         return (
             <Provider store={store}>
-            <Navigator uriPrefix={prefix}
+            <AppNavigator uriPrefix={prefix} ref={nav => { this.navigator = nav; }}
                 onNavigationStateChange={
                     (prevState, currentState) => {
                         const currentScene = getCurrentRouteName(currentState);
@@ -115,111 +138,5 @@ class RootScene extends PureComponent {
     }
 }
 
-const Tab = TabNavigator(
-    {
-        Alert: {
-            screen: AlertScene,
-            navigationOptions: ({ navigation }) => ({
-                tabBarLabel: '提醒',
-                tabBarIcon: ({ focused, tintColor }) => (
-                    <TabBarItem
-                        tintColor={tintColor}
-                        focused={focused}
-                        normalImage={require('./img/tabbar/tab_warn.png')}
-                        selectedImage={require('./img/tabbar/tab_warn_pre.png')}
-                    />
-                )
-            }),
-        },
 
-        Nearby: {
-            screen: OrderScene,
-            navigationOptions: ({ navigation }) => ({
-                tabBarLabel: '订单',
-                tabBarIcon: ({ focused, tintColor }) => (
-                    <TabBarItem
-                        tintColor={tintColor}
-                        focused={focused}
-                        normalImage={require('./img/tabbar/tab_list.png')}
-                        selectedImage={require('./img/tabbar/tab_list_pre.png')}
-                    />
-                ),
-                tabBarOnPress: () => {
-                    console.log('do tabBarOnPress');
-                    NativeModules.ActivityStarter.navigateToOrders();
-                }
-            }),
-        },
-
-        Goods: {
-            screen: OrderScene,
-            navigationOptions: ({ navigation }) => ({
-                tabBarLabel: '商品',
-                tabBarIcon: ({ focused, tintColor }) => (
-                    <TabBarItem
-                        tintColor={tintColor}
-                        focused={focused}
-                        normalImage={require('./img/tabbar/tab_goods.png')}
-                        selectedImage={require('./img/tabbar/tab_goods_pre.png')}
-                    />
-                ),
-                tabBarOnPress: () => {
-                    console.log('do navigateToGoods');
-                    NativeModules.ActivityStarter.navigateToGoods();
-                }
-            }),
-        },
-
-
-        Mine: {
-            screen: MineScene,
-            navigationOptions: ({ navigation }) => ({
-                tabBarLabel: '我的',
-                tabBarIcon: ({ focused, tintColor }) => (
-                    <TabBarItem
-                        tintColor={tintColor}
-                        focused={focused}
-                        normalImage={require('./img/tabbar/tab_me.png')}
-                        selectedImage={require('./img/tabbar/tab_me_pre.png')}
-                    />
-                )
-            }),
-        },
-    },
-    {
-        tabBarComponent: TabBarBottom,
-        tabBarPosition: 'bottom',
-        swipeEnabled: false,
-        animationEnabled: true,
-        lazy: true,
-        tabBarOptions: {
-            activeTintColor: color.theme,
-            inactiveTintColor: '#99579797',
-            style: { backgroundColor: '#ffffff' },
-        },
-    }
-
-);
-
-const Navigator = StackNavigator(
-    {
-        Tab: { screen: Tab },
-        Web: { screen: WebScene },
-        GroupPurchase: { screen: GroupPurchaseScene },
-        Home: { screen: AlertScene },
-        Order: {
-            screen: OrderScene,
-            path: 'order/:order_id',
-        },
-    },
-    {
-        navigationOptions: {
-            // headerStyle: { backgroundColor: color.theme }
-            headerBackTitle: null,
-            headerTintColor: '#333333',
-            showIcon: true,
-        },
-    }
-);
-//make this component available to the app
 export default RootScene;

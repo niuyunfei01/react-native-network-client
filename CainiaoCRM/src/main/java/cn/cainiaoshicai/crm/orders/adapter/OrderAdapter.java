@@ -32,14 +32,17 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Worker;
+import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 
 /**
@@ -49,11 +52,13 @@ public class OrderAdapter extends BaseAdapter {
     private final Activity activity;
     private ArrayList<Order> orders = new ArrayList<>();
     private static LayoutInflater inflater = null;
+    private final int listType;
 
     public OrderAdapter(Activity activity, ArrayList<Order> orders, int listType) {
         this.activity = activity;
         this.orders = orders;
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.listType = listType;
     }
 
     @Override
@@ -157,6 +162,27 @@ public class OrderAdapter extends BaseAdapter {
                 direction = " [ " + order.getDirection() + " ]";
             }
             orderAddr.setText((isInvalid ? "[已无效]" : "") + order.getAddress() + direction);
+
+            orderAddr.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context ctx = v.getContext();
+                    if (ctx  == null) {
+                        return;
+                    }
+
+                    Intent openOrder = new Intent(ctx, MyReactActivity.class);
+                    openOrder.putExtra("order_id", Long.valueOf(order.getId()));
+                    openOrder.putExtra("list_type", listType);
+                    openOrder.putExtra("order", order);
+                    try {
+                        ctx.startActivity(openOrder);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
             userName.setText(order.getUserName());
             phone.setText(order.getMobile());
             phone.setOnClickListener(new View.OnClickListener() {
@@ -165,6 +191,7 @@ public class OrderAdapter extends BaseAdapter {
                     callMobilePhone(v, order.getMobile());
                 }
             });
+
             genderText.setText(order.getGenderText());
             orderMoney.setText(String.valueOf(order.getOrderMoney()));
             orderTimesTxt.setText(order.getOrder_times() > 1 ? "第" + order.getOrder_times() + "次" : "新用户");

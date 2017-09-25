@@ -42,7 +42,7 @@ export default function globalReducer (state = initialState, action) {
      * ### Save the sessionToken
      */
     case SET_SESSION_TOKEN:
-      return state.set('sessionToken', action.payload)
+      return state.set('currentUser', action.payload)
 
     /**
      * ### Save the payload in the store

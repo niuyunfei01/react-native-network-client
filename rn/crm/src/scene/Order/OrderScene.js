@@ -78,6 +78,9 @@ class OrderScene extends PureComponent {
     componentDidMount() {
         // this.requestData();
 
+        console.log(this.props.navigation);
+        console.log('order_id prop:', this.props.navigation.order_id);
+
         const order_id = 652001;//this.props.navigation.state.params.order_id;
 
         InteractionManager.runAfterInteractions(() => {

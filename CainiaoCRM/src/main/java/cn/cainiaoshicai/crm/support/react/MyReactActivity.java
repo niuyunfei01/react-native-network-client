@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.support.react;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -12,6 +13,7 @@ import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainReactPackage;
 
 import cn.cainiaoshicai.crm.BuildConfig;
+import cn.cainiaoshicai.crm.GlobalCtx;
 
 
 public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
@@ -33,7 +35,17 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
-        mReactRootView.startReactApplication(mReactInstanceManager, "crm", null);
+
+        Bundle init = new Bundle();
+
+        Intent intent = getIntent();
+        Long orderId = intent.getLongExtra("order_id", 0);
+        if (orderId > 0) {
+            init.putLong("order_id", orderId);
+        }
+        init.putString("access_token", GlobalCtx.app().token());
+
+        mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
 
         setContentView(mReactRootView);
     }
