@@ -89,6 +89,7 @@ class OrderScene extends PureComponent {
 
         if (!this.props.order || !this.props.order.id || this.props.order.id !== order_id) {
             this.props.actions.getOrder(OrderScene.access_token, order_id)
+            this.setState({order_id: order_id});
         } else {
             this.setState({
                 order: this.props.order
@@ -123,7 +124,7 @@ class OrderScene extends PureComponent {
     onHeaderRefresh() {
         //this.requestData()
 
-        this.props.actions.getOrder(OrderScene.access_token, 652001)
+        this.props.actions.getOrder(OrderScene.access_token, this.state.order_id)
     }
 
     renderHeader() {
