@@ -74,12 +74,9 @@ class RootScene extends PureComponent {
         let orderId = launchProps['order_id'];
         if (orderId) {
             console.log('do navigate');
-            if (this.navigator) {
-                console.log("did mount", this.navigator.navigation);
-                this.navigator && this.navigator.props.navigation(
-                    NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
-                )
-            }
+            this.navigator && this.navigator.dispatch(
+                NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
+            )
         }
     }
 
