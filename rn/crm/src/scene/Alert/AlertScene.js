@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image} from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, RefreshControl} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from './pxToDp';
 import LoadingView from '../../widget/LoadingView';
@@ -45,92 +45,186 @@ class AlertScene extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            isProcessing:false
+            isProcessing : false,
+            type: 5,
         };
-        this.loadData = this.loadData.bind(this)
+        this.loadData = this.loadData.bind(this);
+        this.onChildChanged = this.onChildChanged.bind(this);
     }
 
-    componentDidMount() {
+    // static get defaultProps() {
+    //     return {
+    //         group_num: {},
+    //     }
+    // }
+
+    // componentDidMount() {
+    //     this.loadData();
+    // }
+
+    loadData(type, status = 0, page = 1){
+        this.setState({type: type});
+        let search_type = type ? type : this.state.type;
+        // const self_ = this;
+        this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', search_type, status, page)
+            // .then(()=>{
+            //     self_.setState({isProcessing:false});
+            // });
+    }
+
+    onChildChanged () {
         this.loadData();
     }
 
-    loadData(){
-        const self_ = this;
-        this.setState({ isProcessing: true });
-        this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', '3', '0', 1)
-            .then(()=>{
-                self_.setState({isProcessing:false});
-            });
-    }
-
     render() {
-        if (this.state.isProcessing){
-            return (<LoadingView isLoading={this.state.isProcessing} tip='加载中'/>);
-        }
+        let group_num = (this.props.result.obj || {}).total_num || {};
 
         return (
-            <ScrollableTabView tabBarActiveTextColor={"#333"} tabBarUnderlineStyle={{backgroundColor: "#59b26a"}} tabBarTextStyle={{fontSize: pxToDp(26)}}>
-                <AlertList tabLabel="待退款" alert_data={(this.props.result||{})}/>
-                <AlertList tabLabel="催单/异常" />
-                <AlertList tabLabel="售后单" />
-                <AlertList tabLabel="其他" />
+            <ScrollableTabView tabBarActiveTextColor={"#333"} tabBarUnderlineStyle={{backgroundColor: "#59b26a"}} tabBarTextStyle={{fontSize: pxToDp(26)}} onChangeTab={(obj) => {
+                console.log('index:' + obj.i);
+                let type = 5;
+                if(obj.i == 0){
+                    type = 5;//用户申请退款
+                } else if(obj.i == 1) {
+                    type = 4;//催单
+                } else if(obj.i == 2) {
+                    type = 1;//待处理评价
+                } else if(obj.i == 3) {
+                    type = 3;//其他事项
+                }
+
+                this.loadData(type);
+            }}>
+                <AlertList
+                    tabLabel={group_num.refund_type > 0 ? "待退款("+group_num.refund_type+")" : "待退款"}
+                    alert_data={(this.props.result||{})}
+                    callbackParent={() => this.onChildChanged()}
+                />
+                <AlertList
+                    tabLabel={group_num.remind_type > 0 ? "催单/异常("+group_num.remind_type+")" : "催单/异常"}
+                    alert_data={(this.props.result||{})}
+                    callbackParent={() => this.onChildChanged()}
+                />
+                <AlertList
+                    tabLabel={group_num.complain_type > 0 ? "售后单("+group_num.complain_type+")" : "售后单"}
+                    alert_data={(this.props.result||{})}
+                    callbackParent={() => this.onChildChanged()}
+                />
+                <AlertList
+                    tabLabel={group_num.other_type > 0 ? "其他("+group_num.other_type+")" : "其他"}
+                    alert_data={(this.props.result||{})}
+                    callbackParent={() => this.onChildChanged()}
+                />
             </ScrollableTabView>
         );
     }
 }
 
-class AlertList extends PureComponent {
+class AlertList extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            isRefreshing: false,
+        };
+        this._onRefresh = this._onRefresh.bind(this)
+    }
+
+    static get defaultProps() {
+        return {
+            // alert_data: this.props.alert_data,
+            loadMore: false,
+            isRefreshing : false,
+            loaded: 0,
+        }
+    }
+
+    _onRefresh() {
+        // this.setState({isRefreshing: true});
+        // this.props.isRefreshing = true;
+        // console.log(this.props);
+        // setTimeout(() => {
+        //     this.setState({
+        //         isRefreshing: false,
+        //         // rowData: rowData,
+        //     });
+        // }, 5000);
+        this.props.callbackParent();
     }
 
     render() {
-        let alert_data = (this.props.alert_data || {});
+        let alert_data = this.props.alert_data;
+        console.log(alert_data);
         if(alert_data.ok){
-            let alertList = alert_data.obj.list;
-            let alert_row = Array.from(alertList).map(function (row, index) {
+            let alert_list = alert_data.obj.list;
+            let alert_row = Array.from(alert_list).map(function (row, index) {
                 return (
-                    <AlertRow alertList={row} key={index}/>
+                    <AlertRow alert_detail={row} key={index}/>
                 );
             });
             return (
-                <ScrollView>
+                <ScrollView refreshControl={
+                    <RefreshControl
+                        refreshing={this.props.isRefreshing}
+                        onRefresh={this._onRefresh}
+                        tintColor="#ff0000"
+                        title="Loading..."
+                        titleColor="#00ff00"
+                        colors={['#ff0000', '#00ff00', '#0000ff']}
+                        progressBackgroundColor="#ffff00"
+                    />
+                }>
+                    {/*<Text>{JSON.stringify(this.props)}</Text>*/}
                     {alert_row}
                 </ScrollView>
             );
         }else{
             return (
-                <Text>{JSON.stringify(alert_data)}</Text>
+                //<Text>{JSON.stringify(this.props)}</Text>
+                <LoadingView isLoading={true} tip='加载中...'/>
             );
         }
     }
 }
 
 class AlertRow extends React.Component {
-    constructor(props) {
-        super(props);
+    static get defaultProps() {
+        return {
+            alert_detail: {},
+
+        }
     }
+
+    _onPressButton(id){
+        alert(id);
+    }
+
     render() {
-        let row = this.props.alertList||{};
+        let row = this.props.alert_detail;
         if(row){
-            // {"order_id":"653848","remark":"饿了么 望京 南湖西园 用户 赵佳玮 的 59 号订单 催单了, 请尽快处理","delegation_to":"830885","created_by":"0","deleted":"0","created":"2017-09-06 17:47:11","modified":"2017-09-06 17:47:11","remind_id":"532151529","orderTime":"2017-09-06 16:59:40","store_id":"望京","dayId":"59","orderStatus":"已送达","orderDate":"0906","delegation_to_user":"吴冬梅","noticeDate":"09\/06","noticeTime":"17.47","expect_end_time":"18.17","quick":false}]}}
+            // {"order_id":"653848","remark":"饿了么 望京 南湖西园 用户 赵佳玮 的 59 号订单 催单了, 请尽快处理","delegation_to":"830885","created_by":"0","deleted":"0","created":"2017-09-06 17:47:11","modified":"2017-09-06 17:47:11","remind_id":"532151529","orderTime":"2017-09-06 16:59:40","store_id":"望京","dayId":"59","orderStatus":"已送达","orderDate":"0906","delegation_to_user":"吴冬梅","noticeDate":"09\/06","noticeTime":"17:47","expect_end_time":"18:17","quick":false}]}}
             return (
                 <View style={top_styles.container}>
                     <View style={[top_styles.order_box]}>
                         <View style={top_styles.box_top}>
                             <View style={[top_styles.order_head]}>
-                                <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')} />
+                                {row.quick ? <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')} /> : null}
                                 <View>
                                     <Text style={top_styles.o_index_text}>{row.noticeDate}#{row.dayId}</Text>
                                 </View>
                                 <View>
                                     <Text style={top_styles.o_store_name_text}>{row.store_id}</Text>
                                 </View>
-                                <Image style={[top_styles.icon_dropDown]} source={require('../../img/Alert/drop-down.png')} />
+                                <TouchableOpacity
+                                    style={[top_styles.icon_dropDown]}
+                                    onPress={() => this._onPressButton(row.order_id)}
+                                    activeOpacity={0.7} >
+                                    <Image
+                                        style={[top_styles.icon_dropDown]}
+                                        source={require('../../img/Alert/drop-down.png')} />
+                                </TouchableOpacity>
                             </View>
                             <View style={[top_styles.order_body]}>
                                 <Text style={[top_styles.order_body_text]}>
-                                    {/*<Text style={top_styles.o_operate}> 加货 </Text>*/}
                                     <Text style={top_styles.o_content}>
                                         {row.remark}
                                     </Text>
@@ -150,10 +244,12 @@ class AlertRow extends React.Component {
                             </View>
                             <Image style={[bottom_styles.icon_clock]}  source={require('../../img/Alert/clock.png')} />
                             <View>
-                                <Text style={bottom_styles.time_end}>18:30</Text>
+                                <Text style={bottom_styles.time_end}>{row.expect_end_time}</Text>
                             </View>
                             <View style={bottom_styles.operator}>
-                                <Text style={bottom_styles.operator_text}>处理人：{row.delegation_to_user}</Text>
+                                <Text style={bottom_styles.operator_text}>
+                                    处理人：{row.delegation_to_user}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -161,7 +257,7 @@ class AlertRow extends React.Component {
             );
         } else {
             return (
-                <Text>数据有误</Text>
+                <Text>数据加载异常</Text>
             );
         }
     }
@@ -225,9 +321,6 @@ const top_styles = StyleSheet.create({
     order_body_text: {
         fontSize: pxToDp(30),
         color: '#333',
-    },
-    o_operate: {
-        fontWeight: 'bold',
     },
     o_content: {
         fontWeight: 'bold',
