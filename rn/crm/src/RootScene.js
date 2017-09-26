@@ -6,9 +6,9 @@
  * @flow
  */
 
-//import liraries
-import React, { PureComponent } from 'react'
-import { StatusBar, Platform } from 'react-native'
+import React, {PureComponent} from 'react'
+import {StatusBar, Platform} from 'react-native'
+import {NavigationActions} from 'react-navigation'
 
 import {Provider} from 'react-redux'
 
@@ -45,7 +45,6 @@ function getInitialState () {
         device: (new DeviceInitialState()).set('isMobile', true),
         global: (new GlobalInitialState()),
         profile: new ProfileInitialState(),
-        nav: {},
     }
 }
 
@@ -76,9 +75,10 @@ class RootScene extends PureComponent {
         if (orderId) {
             console.log('do navigate');
             if (this.navigator) {
-                console.log(this.navigator);
-                this.navigator.navigate('Order', {'order_id': orderId});
-                this.
+                console.log("did mount", this.navigator.navigation);
+                this.navigator && this.navigator.props.navigation(
+                    NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
+                )
             }
         }
     }
@@ -102,16 +102,19 @@ class RootScene extends PureComponent {
 
         let orderId = launchProps['order_id'];
         if (orderId) {
-            console.log('do navigate');
+
+            AppNavigator.router.initialRouteName = 'Order';
+            AppNavigator.router.initialRouteParams = {order_id: orderId};
+
+            console.log('do navigate order_id=', orderId);
             if (this.navigator) {
-                console.log(this.navigator);
-                //self.navigator.navigate('Order', {'order_id': orderId});
+                console.log("render:", this.navigator);
+                // this.navigator && this.navigator.dispatch(
+                //     NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
+                // )
             }
+
         }
-
-
-        // configureStore will combine reducers from snowflake and main application
-        // it will then create the store based on aggregate state from all reducers
         store.dispatch(setPlatform('android')) //FIXME: should be determined dynamically
         store.dispatch(setVersion(VERSION))
         store.dispatch(setStore(store))
