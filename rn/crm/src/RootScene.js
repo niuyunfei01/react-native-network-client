@@ -73,17 +73,14 @@ class RootScene extends PureComponent {
         let launchProps = this.props.launchProps;
         let orderId = launchProps['order_id'];
         if (orderId) {
-            console.log('do navigate');
-            this.navigator && this.navigator.dispatch(
-                NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
-            )
+            this.reset_to(orderId);
         }
     }
 
     render() {
 
         // on Android, the URI prefix typically contains a host in addition to scheme
-        const prefix = Platform.OS === 'android' ? 'bilinxian://bilinxian/' : 'bilinxian://';
+        const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
         const store = configureStore(getInitialState());
 
         let launchProps = this.props.launchProps;
@@ -92,25 +89,9 @@ class RootScene extends PureComponent {
             store.dispatch(setSessionToken(launchProps['access_token']));
         }
 
-        // console.log(self.navigator);
-        // self.navigator && self.navigator.dispatch(
-        //     NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
-        // );
-
         let orderId = launchProps['order_id'];
         if (orderId) {
-
-            AppNavigator.router.initialRouteName = 'Order';
-            AppNavigator.router.initialRouteParams = {order_id: orderId};
-
-            console.log('do navigate order_id=', orderId);
-            if (this.navigator) {
-                console.log("render:", this.navigator);
-                // this.navigator && this.navigator.dispatch(
-                //     NavigationActions.navigate({routerName: 'Order', params: {'order_id': orderId}})
-                // )
-            }
-
+            this.reset_to(orderId);
         }
         store.dispatch(setPlatform('android')) //FIXME: should be determined dynamically
         store.dispatch(setVersion(VERSION))
@@ -135,6 +116,18 @@ class RootScene extends PureComponent {
             />
             </Provider>
         );
+    }
+
+    reset_to(orderId) {
+        if (this.navigator) {
+            if (this.navigator._navigation) {
+                this.navigator._navigation.navigate('Order', {order_id: orderId})
+                this.navigator._navigation.dispatch(NavigationActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({routeName: 'Order', params:{'order_id': orderId,}})]
+                }));
+            }
+        }
     }
 }
 

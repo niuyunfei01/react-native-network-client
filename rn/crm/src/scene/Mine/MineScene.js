@@ -49,6 +49,10 @@ class MineScene extends PureComponent {
         }
     }
 
+    componentWillMount() {
+        //this.props.navigation.navigate('Order', {order_id: 6111029});
+    }
+
     onHeaderRefresh() {
         this.setState({ isRefreshing: true })
 

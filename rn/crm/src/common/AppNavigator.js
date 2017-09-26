@@ -31,7 +31,7 @@ const Tab = TabNavigator(
             }),
         },
 
-        Nearby: {
+        Orders: {
             screen: OrderScene,
             navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '订单',
@@ -86,6 +86,7 @@ const Tab = TabNavigator(
         },
     },
     {
+        initialRouteName: 'Orders',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,
@@ -103,12 +104,12 @@ const Tab = TabNavigator(
 export const AppNavigator = StackNavigator(
     {
         Tab: { screen: Tab },
-        Web: { screen: WebScene },
-        Home: { screen: AlertScene },
         Order: {
             screen: OrderScene,
             path: 'order/:order_id',
         },
+        Web: { screen: WebScene },
+        Home: { screen: AlertScene },
     },
     {
         navigationOptions: {

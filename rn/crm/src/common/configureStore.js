@@ -28,7 +28,7 @@ import reducer from '../reducers'
  */
 const createStoreWithMiddleware = applyMiddleware(
   thunk,
-logger
+// logger
 )(createStore)
 
 /**
