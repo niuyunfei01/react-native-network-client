@@ -52,7 +52,6 @@ export function getOrder(sessionToken, orderId) {
                 // })
                 return res.json()
             }).then( (res_data) => {
-                console.log(res_data);
                 return res_data;
             })
             .then((json) => {

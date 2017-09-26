@@ -160,6 +160,11 @@
         <activity
             android:name=".support.react.MyReactActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="blx-crm"
+                android:host="blx" />
         </activity>
 
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
