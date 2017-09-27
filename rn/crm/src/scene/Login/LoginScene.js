@@ -1,9 +1,10 @@
 import React, {PureComponent} from 'react'
-import {TouchableOpacity, StyleSheet, View, ScrollView, Text, ImageBackground, Image} from 'react-native'
+import {TouchableOpacity, StyleSheet, View, ScrollView, Text, ImageBackground, Image, Button} from 'react-native'
 import { FormLabel, Button as EButton, FormInput, FormValidationMessage } from 'react-native-elements'
 import Dimensions from 'Dimensions'
 import {Paragraph} from "../../widget/Text";
-import colors from '../../widget/color'
+import colors from '../../styles/colors'
+import pxToDp from '../Alert/pxToDp'
 
 import * as authActions from '../../reducers/auth/authActions'
 import * as globalActions from '../../reducers/global/globalActions'
@@ -58,8 +59,10 @@ class LoginScene extends PureComponent {
     });
 
     constructor(props) {
-        super(props)
-
+        super(props);
+        this.state = {
+            mobile: '',
+        };
         this.onMobileChanged = this.onMobileChanged.bind(this)
         this.onLogin = this.onLogin.bind(this)
     }
@@ -77,9 +80,10 @@ class LoginScene extends PureComponent {
                 <View style={styles.container}>
             <ScrollView horizontal={false} width={width} height={height} >
                 <View style={{marginTop: 100}}>
-                    <View style={styles.inputs}>
-                        <FormInput onChangeText={this.onMobileChanged}
-                                   keyboardType="numberic"
+                    <View>
+                        <FormInput onChangeText={(mobile) => {this.setState({mobile})}}
+                                   value={this.state.mobile}
+                                   keyboardType="numeric"
                                    placeholder="请输入手机号"/>
                         <FormValidationMessage>Error message</FormValidationMessage>
                     </View>
@@ -89,16 +93,25 @@ class LoginScene extends PureComponent {
                         <FormValidationMessage>Error message</FormValidationMessage>
                     </View>
 
-                    <View>
+                    <View style={{marginLeft: 15, marginRight: 15}}>
                         <TouchableOpacity>
                             <Text>比邻鲜使用协议</Text>
                         </TouchableOpacity>
+                        <Button style={{marginTop: pxToDp(110)}} color={colors.main_color} title="登录"
+                                 onPress={this.onLogin}></Button>
+
+                        <View style={{alignItems:'center'}} >
+                        <TouchableOpacity>
+                        <Text onPress={this.props.navigation.navigate('Register')}
+                              style={{color:colors.main_color, fontSize: pxToDp(28), marginTop: pxToDp(50)}}>注册新帐号</Text>
+                        </TouchableOpacity>
+                        </View>
                     </View>
 
-                    <EButton disabled={false} color={colors.main_color} title="登录"
-                             onPress={this.onLogin}></EButton>
 
+                    <View style={{alignItems: 'center'}}>
                     <Paragraph>语音技术由科大讯飞提供支持</Paragraph>
+                    </View>
 
                 </View>
             </ScrollView>
