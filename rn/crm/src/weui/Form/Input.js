@@ -1,27 +1,43 @@
 import React, { PropTypes } from 'react'
-import { TextInput, StyleSheet } from 'react-native'
-import V from '../variable'
+import {
+  TextInput,
+  StyleSheet,
+} from 'react-native'
+import $V from '../variable'
 
 const styles = StyleSheet.create({
   input: {
-    fontSize: V.weuiCellFontSize,
-    height: V.weuiCellLineHeight,
-  },
+    fontSize: $V.weuiCellFontSize,
+    height: $V.weuiCellLineHeight,
+      marginTop: ($V.weuiCellLineHeight - $V.weuiCellFontSize) / 2,
+      marginBottom: ($V.weuiCellLineHeight - $V.weuiCellFontSize) / 2,
+  }
 })
 
-const Input = ({ value, onChange, disabled = false, style, ...others }) =>
-  <TextInput
-    style={[styles.input, style]}
-    value={value}
-    onChangeText={onChange}
-    editable={!disabled}
-    {...others}
-  />
+const Input = (props) => {
+  const {
+    value,
+    onChange,
+    onChangeText,
+    style,
+    ...others
+  } = props
+
+  return (
+    <TextInput
+      style={[styles.input, style]}
+      value={value}
+      onChangeText={onChangeText || onChange}
+      underlineColorAndroid='transparent'
+      {...others}
+    />
+  )
+}
 
 Input.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
-  disabled: PropTypes.bool,
+  onChangeText: PropTypes.func,
   style: TextInput.propTypes.style,
 }
 

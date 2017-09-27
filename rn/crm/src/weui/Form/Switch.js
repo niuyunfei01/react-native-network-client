@@ -1,20 +1,37 @@
 import React, { PropTypes } from 'react'
-import { Switch as RNSwitch } from 'react-native'
+import {
+  Switch as RNSwitch,
+  StyleSheet,
+} from 'react-native'
 
-const Switch = ({ value, onChange, disabled, style, ...others }) =>
-  <RNSwitch
-    style={style}
-    onValueChange={onChange}
-    value={value}
-    disabled={disabled}
-    {...others}
-  />
+const styles = StyleSheet.create({
+  switch: {}
+})
+
+const Switch = (props) => {
+  const {
+    value,
+    onChange,
+    onValueChange,
+    style,
+    ...others
+  } = props
+
+  return (
+    <RNSwitch
+      style={[styles.switch, style]}
+      onValueChange={onValueChange || onChange}
+      value={value}
+      {...others}
+    />
+  )
+}
 
 Switch.propTypes = {
   value: PropTypes.bool,
-  onChange: PropTypes.func,
-  disabled: PropTypes.bool,
   style: RNSwitch.propTypes.style,
+  onChange: PropTypes.func,
+  onValueChange: PropTypes.func,
 }
 
 export default Switch

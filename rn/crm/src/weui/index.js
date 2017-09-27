@@ -1,13 +1,11 @@
 import StyleSheet from './StyleSheet'
-
-// 0.4.x
 import { Grids, Grid, GridIcon, GridLabel } from './Grid'
-import { Button, ButtonArea, ButtonPreview } from './Button'
+import { Button, ButtonArea } from './Button'
 import {
   Cells, CellsTitle, CellsTips, Cell, CellHeader, CellBody, CellFooter, CellText,
 } from './Cell'
 import {
-  TextArea, Input, Switch, RadioCells, CheckboxCells, Uploader, Label, Select, Slider, Agreement
+  TextArea, Input, Switch, RadioCells, CheckboxCells, Picker, Uploader, Label, Select,
 } from './Form'
 import { Icon } from './Icon'
 import { Toast } from './Toast'
@@ -20,28 +18,17 @@ import {
   Media, MediaHeader, MediaBody, MediaTitle, MediaDescription, MediaInfo, MediaInfoMeta,
 } from './Media'
 import { Progress } from './Progress'
-import { TabBar, NavBar } from './Tab'
+import { Tab } from './Tab'
 import { Dialog } from './Dialog'
 import { ActionSheet } from './ActionSheet'
 import { SearchBar } from './SearchBar'
 
-// 1.0
-import { Mask } from './Mask'
-import { Badge } from './Badge'
-import { Flex, FlexItem } from './Flex'
-import { LoadMore } from './LoadMore'
-import { Popup, PopupHeader } from './Popup'
-import { Picker, PickerSection } from './Picker'
-import { Gallery, GalleryDelete } from './Gallery'
-import { Preview, PreviewHeader, PreviewBody, PreviewFooter, PreviewItem, PreviewLabel, PreviewValue } from './Preview'
-import { Toptips } from './Toptips'
-
 export {
   StyleSheet,
-  Button, ButtonArea, ButtonPreview,
+  Button, ButtonArea,
   Grids, Grid, GridIcon, GridLabel,
   Cells, CellsTitle, CellsTips, Cell, CellHeader, CellBody, CellFooter, CellText,
-  TextArea, Input, Switch, RadioCells, CheckboxCells, Uploader, Label, Select, Slider, Agreement,
+  TextArea, Input, Switch, RadioCells, CheckboxCells, Picker, Uploader, Label, Select,
   Icon,
   Toast,
   Msg,
@@ -49,18 +36,8 @@ export {
   Media, MediaHeader, MediaBody, MediaTitle, MediaDescription, MediaInfo, MediaInfoMeta,
   Panel, PanelHeader, PanelBody, PanelFooter,
   Progress,
-  TabBar, NavBar,
+  Tab,
   Dialog,
   ActionSheet,
-  SearchBar,
-  Mask,
-  Badge,
-  Flex, FlexItem,
-  LoadMore,
-  Popup, PopupHeader,
-  Picker, PickerSection,
-  Gallery, GalleryDelete,
-  Preview, PreviewHeader, PreviewBody, PreviewFooter, PreviewItem, PreviewLabel,
-  PreviewValue,
-  Toptips
+  SearchBar
 }

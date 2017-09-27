@@ -6,17 +6,18 @@ const styles = StyleSheet.create({
   gridLabel: {
     textAlign: 'center',
     fontSize: V.weuiGridFontSize,
-    color: V.weuiTextColorTitle,
-    marginTop: 5,
+    color: V.globalTitleColor,
+    marginTop: 5
   }
 })
-
-const GridLabel = ({ children, style, ...others }) =>
-  <Text style={[styles.gridLabel, style]} {...others}>{children}</Text>
-
+const GridLabel = (props) => {
+  const { children, style, ...others } = props
+  return <Text style={[styles.gridLabel, style]} {...others}>{children}</Text>
+}
 GridLabel.propTypes = {
   children: PropTypes.node,
   style: Text.propTypes.style,
+  others: PropTypes.object
 }
 
 export default GridLabel

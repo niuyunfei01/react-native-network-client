@@ -1,5 +1,9 @@
 import React, { PropTypes } from 'react'
-import { StyleSheet, View, TouchableHighlight } from 'react-native'
+import {
+  StyleSheet,
+  View,
+  TouchableHighlight,
+} from 'react-native'
 import ButtonText from './ButtonText'
 import V from '../variable'
 
@@ -39,7 +43,7 @@ const styles = StyleSheet.create({
   primaryPlain: {
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: V.weuiBtnPlainPrimaryBorderColor,
+    borderColor: V.weuiBtnPrimaryBg,
     backgroundColor: 'transparent'
   },
 
@@ -47,26 +51,10 @@ const styles = StyleSheet.create({
   defaultPlain: {
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: V.weuiBtnPlainDefaultBorderColor,
+    borderColor: '#5A5A5A',
     backgroundColor: 'transparent'
   },
-
-  // disabled
-  primaryDisabled: {
-    backgroundColor: V.weuiBtnPrimaryDisabledBg
-  },
-  warnDisabled: {
-    backgroundColor: V.weuiBtnWarnDisabledBg
-  },
-  defaultDisabled: {
-    backgroundColor: V.weuiBtnDefaultDisabledBg
-  },
-  plainDisabled: {
-    borderColor: 'rgba(0,0,0,.2)',
-    backgroundColor: 'transparent'
-  }
 })
-
 const underlayColors = {
   primaryActive: V.weuiBtnPrimaryActiveBg,
   warnActive: V.weuiBtnWarnActiveBg,
@@ -75,34 +63,35 @@ const underlayColors = {
   defaultPlainActive: 'transparent',
 }
 
-const getButtonStyles = ({ type, plain, size, disabled }) => {
+const getButtonStyles = ({ type, plain, size }) => {
   const config = [styles[type]]
   if (plain) config.push(styles[`${type}Plain`])
   if (size === 'small') config.push(styles.mini)
-  if (disabled) config.push(styles[`${type}Disabled`])
-  if (disabled && plain) config.push(styles.plainDisabled)
   return config
 }
-
 const getUnderlayColor = ({ type, plain }) => {
   if (plain) return underlayColors[`${type}PlainActive`]
   return underlayColors[`${type}Active`]
 }
 
-const Button = ({
-  disabled = false,
-  type = 'default',
-  size,
-  plain = false,
-  style,
-  children,
-  ...others
-}) => {
+const Button = (props) => {
+  const {
+    disabled = false,
+    type = 'default',
+    size,
+    plain = false,
+    style,
+    children,
+    ...others
+  } = props
+
   const buttonStyles = getButtonStyles({ type, plain, size, disabled })
   const underlayColor = getUnderlayColor({ type, plain })
 
   let touchableProps = {}
-  if (!disabled) touchableProps = others
+  if (!disabled) {
+    touchableProps = others
+  }
 
   return (
     <TouchableHighlight
@@ -126,7 +115,7 @@ Button.propTypes = {
   onPressIn: PropTypes.func,
   onPressOut: PropTypes.func,
   onLongPress: PropTypes.func,
-  style: View.propTypes.style,
+  style: TouchableHighlight.propTypes.style,
   children: PropTypes.node,
 }
 

@@ -1,5 +1,9 @@
 import React, { PropTypes } from 'react'
-import { View, TouchableHighlight, StyleSheet } from 'react-native'
+import {
+  View,
+  TouchableHighlight,
+  StyleSheet
+} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -21,12 +25,9 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     paddingRight: 0,
   },
-  disabledCell: {
-    opacity: 0.5
-  }
 })
-
-const Cell = ({ access, vcode, error, first, disabled, children, style, ...others }) => {
+const Cell = (props) => {
+  const { access, vcode, error, first, children, style, ...others } = props
   const childrenWithProps = React.Children.map(children, (child) => {
     if (access && child.type.name === 'CellFooter') {
       return React.cloneElement(child, { access: true })
@@ -36,30 +37,26 @@ const Cell = ({ access, vcode, error, first, disabled, children, style, ...other
     }
     return child
   })
-
   return (
-    <TouchableHighlight underlayColor={V.weuiBgColorActive} {...others} >
+    <TouchableHighlight style={style} underlayColor={V.itemActiveColor} {...others} >
       <View
         style={[
           styles.cell,
-          style,
           first ? styles.firstCell : null,
-          vcode ? styles.vcodeCell : null,
-          disabled ? styles.disabledCell : null,
+          vcode ? styles.vcodeCell : null
         ]}
       >{childrenWithProps}</View>
     </TouchableHighlight>
   )
 }
-
 Cell.propTypes = {
   first: PropTypes.bool,
   access: PropTypes.bool,
   vcode: PropTypes.bool,
   error: PropTypes.bool,
-  disabled: PropTypes.bool,
   children: PropTypes.node,
   style: View.propTypes.style,
+  others: PropTypes.object
 }
 
 export default Cell

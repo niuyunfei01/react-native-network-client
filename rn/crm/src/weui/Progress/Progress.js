@@ -1,7 +1,11 @@
 import React, { Component, PropTypes } from 'react'
-import { View, TouchableOpacity, StyleSheet } from 'react-native'
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native'
 import { Icon } from '../Icon'
-import V from '../variable'
+import $V from '../variable'
 
 const styles = StyleSheet.create({
   progress: {
@@ -9,14 +13,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressBar: {
-    backgroundColor: V.weuiProgressBg,
-    height: V.weuiProgressHeight,
+    backgroundColor: $V.weuiProgressBg,
+    height: $V.weuiProgressHeight,
     flex: 1,
   },
   progressInnerBar: {
     width: 0,
-    height: V.weuiProgressHeight,
-    backgroundColor: V.weuiProgressColor,
+    height: $V.weuiProgressHeight,
+    backgroundColor: $V.weuiProgressColor,
   },
   progressOpr: {
     marginLeft: 15,
@@ -31,15 +35,13 @@ class Progress extends Component {
     }
     this.onLayout = this.onLayout.bind(this)
   }
-
   onLayout() {
-    this.progressBar.measure((x, y, width) => {
+    this.refs.progressBar.measure((x, y, width) => {
       this.setState({
         base: width / 100
       })
     })
   }
-
   _renderOpr = (onCancel) => {
     if (!onCancel) return null
     return (
@@ -48,7 +50,6 @@ class Progress extends Component {
       </TouchableOpacity>
     )
   }
-
   render() {
     const {
       onCancel,
@@ -61,11 +62,7 @@ class Progress extends Component {
 
     return (
       <View style={[styles.progress, style]}>
-        <View
-          style={styles.progressBar}
-          ref={(ref) => { this.progressBar = ref }}
-          onLayout={this.onLayout}
-        >
+        <View style={styles.progressBar} ref="progressBar" onLayout={this.onLayout}>
           <View
             style={[styles.progressInnerBar, { width: value * this.state.base }]}
           />

@@ -1,58 +1,58 @@
 import React, { PropTypes } from 'react'
-import { StyleSheet, Text } from 'react-native'
-import V from '../variable'
+import {
+  StyleSheet,
+  Text,
+} from 'react-native'
+import $V from '../variable'
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: V.weuiBtnFontSize,
+    fontSize: $V.weuiBtnFontSize,
     textAlign: 'center',
-    marginTop: (V.weuiBtnHeight - V.weuiBtnFontSize) / 2,
-    marginBottom: (V.weuiBtnHeight - V.weuiBtnFontSize) / 2,
+    marginTop: ($V.weuiBtnHeight - $V.weuiBtnFontSize) / 2,
+    marginBottom: ($V.weuiBtnHeight - $V.weuiBtnFontSize) / 2,
   },
 
   miniText: {
-    fontSize: V.weuiBtnMiniFontSize,
-    marginTop: ((V.weuiBtnMiniHeight * V.weuiBtnMiniFontSize) - V.weuiBtnMiniFontSize) / 2,
-    marginBottom: ((V.weuiBtnMiniHeight * V.weuiBtnMiniFontSize) - V.weuiBtnMiniFontSize) / 2,
+    fontSize: $V.weuiBtnMiniFontSize,
+    marginTop: ($V.weuiBtnMiniHeight * $V.weuiBtnMiniFontSize
+      - $V.weuiBtnMiniFontSize) / 2,
+    marginBottom: ($V.weuiBtnMiniHeight * $V.weuiBtnMiniFontSize
+      - $V.weuiBtnMiniFontSize) / 2,
   },
 
   // primary
   primaryText: {
-    color: V.weuiBtnFontColor,
+    color: $V.weuiBtnFontColor,
   },
 
   // warn
   warnText: {
-    color: V.weuiBtnFontColor,
+    color: $V.weuiBtnFontColor,
   },
 
   // default
   defaultText: {
-    color: V.weuiBtnDefaultFontColor,
+    color: $V.weuiBtnDefaultFontColor,
   },
 
   // primaryPlain
   primaryPlainText: {
-    color: V.weuiBtnPlainPrimaryColor,
+    color: $V.weuiBtnPrimaryBg,
   },
 
   // defaultPlain
   defaultPlainText: {
-    color: V.weuiBtnPlainDefaultColor,
+    color: '#5A5A5A',
   },
 
   // disabled
   disabledText: {
-    color: V.weuiBtnDisabledFontColor
+    color: $V.weuiBtnDisabledFontColor
   },
-
   defaultDisabledText: {
-    color: V.weuiBtnDefaultDisabledFontColor
+    color: $V.weuiBtnDefaultDisabledFontColor
   },
-
-  plainDisabledText: {
-    color: 'rgba(0,0,0,.2)'
-  }
 })
 
 const getTextStyles = ({ type, plain, size, disabled }) => {
@@ -66,14 +66,24 @@ const getTextStyles = ({ type, plain, size, disabled }) => {
       config.push(styles.disabledText)
     }
   }
-  if (disabled && plain) config.push(styles.plainDisabledText)
   return config
 }
 
-const ButtonText = ({ disabled = false, type = 'default', size, plain = false, style, children, }) => {
+const ButtonText = (props) => {
+  const {
+    disabled = false,
+    type = 'default',
+    size,
+    plain = false,
+    style,
+    children,
+  } = props
+
   const textStyles = getTextStyles({ type, plain, size, disabled })
 
-  return <Text style={[styles.text, ...textStyles, style]}>{children}</Text>
+  return (
+    <Text style={[styles.text, ...textStyles, style]}>{children}</Text>
+  )
 }
 
 ButtonText.propTypes = {

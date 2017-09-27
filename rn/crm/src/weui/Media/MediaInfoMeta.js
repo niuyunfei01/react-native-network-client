@@ -1,5 +1,9 @@
 import React, { PropTypes } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet
+} from 'react-native'
 
 const styles = StyleSheet.create({
   mediaInfoMeta: {
@@ -16,13 +20,23 @@ const styles = StyleSheet.create({
     color: '#CECECE',
   }
 })
+const MediaInfoMeta = (props) => {
+  const {
+    extra,
+    style,
+    textStyle,
+    children,
+    ...others
+  } = props
 
-const MediaInfoMeta = ({ extra, style, textStyle, children, ...others }) =>
-  <View style={[styles.mediaInfoMeta, extra ? styles.mediaInfoMetaExtra : {}, style]}>
-    <Text style={[styles.mediaInfoMetaText, textStyle]} {...others}>
-      {children}
-    </Text>
-  </View>
+  return (
+    <View style={[styles.mediaInfoMeta, extra ? styles.mediaInfoMetaExtra : {}, style]}>
+      <Text style={[styles.mediaInfoMetaText, textStyle]} {...others}>
+        {children}
+      </Text>
+    </View>
+  )
+}
 
 MediaInfoMeta.propTypes = {
   extra: PropTypes.bool,

@@ -1,23 +1,25 @@
 import React, { PropTypes } from 'react'
-import { Text } from 'react-native'
-import { create } from '../StyleSheet'
-import V from '../variable'
+import {
+  Text,
+} from 'react-native'
+import StyleSheet from '../StyleSheet'
+import $V from '../variable'
 
-const styles = create({
+const styles = StyleSheet.create({
   h2: {
     fontSize: 16,
     fontWeight: '400',
-    marginBottom: 16 * 0.34,
-    lineHeight: 16 * V.baseLineHeight,
+    marginBottom: 16 * 0.3,
+    lineHeight: 16 * $V.baseLineHeight,
     android: {
-      lineHeight: Math.round(16 * V.baseLineHeight),
+      lineHeight: Math.round(16 * $V.baseLineHeight),
     },
   }
 })
 
-const H2 = ({ style, children }) =>
-  <Text style={[styles.h2, style]}>
-    {children}
+const H2 = (props) =>
+  <Text style={[styles.h2, props.style]}>
+    {props.children}
   </Text>
 
 H2.propTypes = {

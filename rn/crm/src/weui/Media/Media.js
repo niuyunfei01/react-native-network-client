@@ -1,7 +1,11 @@
 import React, { PropTypes } from 'react'
-import { TouchableHighlight, StyleSheet, View } from 'react-native'
-import V from '../variable'
+import {
+  TouchableHighlight,
+  StyleSheet,
+  View,
+} from 'react-native'
 
+const lineColor = '#E5E5E5'
 const underlayColor = '#ECECEC'
 
 const styles = StyleSheet.create({
@@ -12,7 +16,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderStyle: 'solid',
-    borderColor: V.weuiLineColorLight,
+    borderColor: lineColor,
   },
 
   // appmsg
@@ -32,16 +36,34 @@ const styles = StyleSheet.create({
   }
 })
 
-const Media = ({ type, style, children, first, ...others }) =>
-  <TouchableHighlight
-    style={style}
-    underlayColor={underlayColor}
-    {...others}
-  >
-    <View
-      style={[styles.media, styles[`${type}Media`] || {}, first ? styles.firstMedia : {}]}
-    >{children}</View>
-  </TouchableHighlight>
+const Media = (props) => {
+  const {
+    type,
+    style,
+    children,
+    first,
+    ...others
+  } = props
+
+  const childrenWithProps = React.Children.map(children, child => {
+    if (child.type.name === 'MediaTitle') {
+      return React.cloneElement(child, { style: [{ marginBottom: 8 }, child.props.style] })
+    }
+    return child
+  })
+
+  return (
+    <TouchableHighlight
+      style={style}
+      underlayColor={underlayColor}
+      {...others}
+    >
+      <View
+        style={[styles.media, styles[`${type}Media`] || {}, first ? styles.firstMedia : {}]}
+      >{childrenWithProps}</View>
+    </TouchableHighlight>
+  )
+}
 
 Media.propTypes = {
   type: PropTypes.oneOf(['text', 'appmsg', 'small_appmsg']),

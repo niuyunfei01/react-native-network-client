@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, TextInput, Image, View, TouchableHighlight, StatusBar, Dimensions} from 'react-native';
-import Button from "react-native-button";
-let windowSize = Dimensions.get('window');
-import Icon from 'react-native-vector-icons/Ionicons';
+import { View, ScrollView , Image} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+
+import {CellsTitle, Cell,CellHeader, CellBody, CellFooter, Label, Input, Cells} from "../../weui/index";
 
 /**
  * ## Redux boilerplate
@@ -24,137 +23,50 @@ function mapDispatchToProps (dispatch) {
 
 class RegisterScene extends Component {
 
+    static navigationOptions = ({ navigation }) => ({
+        header: null
+    });
+
     constructor(props) {
         super(props)
         this.state = {
             username: '',
-            password: '',
-            height: ''
+            password: ''
         }
     }
 
     componentDidMount() {
         this.setState({
-            height: windowSize.height
+
         })
     }
 
     render() {
         return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.mark}>OSC</Text>
-                </View>
-                <View style={styles.inputs}>
-                    <View style={styles.inputContainer}>
-                        <Icon name="ios-person" size={30} color="#D8D8D8"/>
-                        <TextInput
-                            style={[styles.input, styles.greyFont]}
-                            placeholder="用户名或电话号码"
-                            placeholderTextColor="#333"
-                            value={this.state.username}
-                        />
-                    </View>
-                    <View style={styles.inputContainer}>
-                        <Icon name="ios-lock" size={30} color="#D8D8D8"/>
-                        <TextInput
-                            password={true}
-                            style={[styles.input, styles.greyFont]}
-                            placeholder="密码"
-                            placeholderTextColor="#333"
-                            value={this.state.password}
-                        />
-                    </View>
-                    <View style={styles.forgotContainer}>
-                        <Text style={styles.greyFont}>忘记密码?</Text>
-                    </View>
-                </View>
-                <View style={styles.signin}>
-                    <Button  style={styles.whiteFont}>注册</Button>
-                </View>
-                <View style={styles.signup}>
-                    <Button style={styles.greyFont}>已有账户? 立即登录</Button>
-                </View>
+            <View style={{ flex: 1, backgroundColor: 'white' }}>
+                <ScrollView style={{ flex: 1 }}>
+                    <CellsTitle>表单</CellsTitle>
+                    <Cells>
+                        <Cell>
+                            <CellHeader><Label>qq</Label></CellHeader>
+                            <CellBody>
+                                <Input
+                                    placeholder="请输入 qq 号"
+                                    value={this.state.text}
+                                />
+                            </CellBody>
+                        </Cell>
+                        <Cell vcode error>
+                            <CellHeader><Label>验证码</Label></CellHeader>
+                            <CellBody><Input placeholder="请输入验证码" defaultValue="111" /></CellBody>
+                            <CellFooter><Image source={{ uri: 'https://weui.io/images/vcode.jpg' }} /></CellFooter>
+                        </Cell>
+                    </Cells>
+                </ScrollView>
             </View>
         )
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-        flex: 1,
-        backgroundColor: 'transparent'
-    },
-    header: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: .5,
-        backgroundColor: 'transparent'
-    },
-    mark: {
-        fontSize: 30
-    },
-    signin: {
-        backgroundColor: '#300e60',
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 30,
-        marginRight: 30,
-        padding: 10,
-        alignItems: 'center'
-    },
-    signup: {
-        backgroundColor: 'transparent',
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 30,
-        marginRight: 30,
-        padding: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    inputs: {
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 30,
-        marginRight: 30,
-        flex: .25
-    },
-    inputPassword: {
-        marginLeft: 15,
-        width: 20,
-        height: 21
-    },
-    inputUsername: {
-        marginLeft: 15,
-        width: 20,
-        height: 20
-    },
-    inputContainer: {
-        padding: 10,
-        borderWidth: 1,
-        borderBottomColor: '#CCC',
-        borderColor: 'transparent'
-    },
-    input: {
-        position: 'absolute',
-        left: 61,
-        top: 15,
-        right: 0,
-        height: 20,
-        fontSize: 14
-    },
-    forgotContainer: {
-        alignItems: 'flex-end',
-        padding: 15,
-    },
-    greyFont: {
-        color: '#333'
-    },
-    whiteFont: {
-        color: '#FFF'
-    }
-})
 
 export default connect(mapStateToProps, mapDispatchToProps)(RegisterScene)

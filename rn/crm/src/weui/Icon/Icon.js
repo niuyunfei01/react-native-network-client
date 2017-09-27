@@ -65,14 +65,6 @@ const glyphMap = {
     size: 22,
     color: '#F43530'
   },
-  back: {
-    size: 22,
-    color: '#fff'
-  },
-  delete: {
-    size: 22,
-    color: '#fff'
-  },
 
   search: {
     size: 14,
@@ -84,39 +76,36 @@ const glyphMap = {
     color: '#B2B2B2'
   },
   msg: {
-    size: 93,
+    size: 104,
     warn: {
       color: '#F76260'
     },
   },
   safe: {
-    size: 93,
+    size: 104,
   },
 }
 
-const Icon = ({
-  name = 'success',
-  msg = false,
-  size = msg ? glyphMap.msg.size : glyphMap[name].size,
-  color = glyphMap[name].color,
-  style,
-  ...others
-}) =>
-  <WeuiIcon
+const Icon = (props) => {
+  const {
+    name = 'success',
+    msg = false,
+    size = msg ? glyphMap.msg.size : glyphMap[name].size,
+    color = glyphMap[name].color,
+    style
+  } = props
+
+  return (<WeuiIcon
     name={name}
     size={size}
     color={color}
     style={[styles.icon, style]}
-    {...others}
-  />
+  />)
+}
 
 Icon.propTypes = {
   msg: PropTypes.bool,
-  name: PropTypes.oneOf(['success', 'waiting', 'warn', 'info', 'success_circle',
-    'success_no_circle', 'waiting_circle', 'circle', 'download',
-    'info_circle', 'safe_success', 'safe_warn', 'cancel', 'back', 'delete',
-    'search', 'clear'
-  ]),
+  name: PropTypes.string,
   size: PropTypes.number,
   color: PropTypes.string,
   style: Text.propTypes.style,

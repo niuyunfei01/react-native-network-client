@@ -1,18 +1,28 @@
 import React, { PropTypes } from 'react'
-import { Modal, View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import { Mask } from '../Mask'
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  ProgressBarAndroid,
+  ActivityIndicatorIOS,
+} from 'react-native'
 import { Icon } from '../Icon'
-import V from '../variable'
+import $V from '../variable'
 
 const styles = StyleSheet.create({
   toastWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   },
   toast: {
-    width: V.baseFontSize * 7.6,
-    height: V.baseFontSize * 7.6,
+    width: $V.baseFontSize * 7.6,
+    height: $V.baseFontSize * 7.6,
     backgroundColor: 'rgba(40, 40, 40, 0.75)',
     borderRadius: 5,
   },
@@ -33,42 +43,53 @@ const styles = StyleSheet.create({
   }
 })
 
-const Toast = ({
-  icon = 'toast',
-  show = false,
-  onShow,
-  onClose,
-  style,
-  maskStyle,
-  textStyle,
-  children
-}) =>
-  <Modal
-    animationType="fade"
-    transparent={!false}
-    visible={show}
-    onShow={onShow}
-    onRequefstClose={onClose}
-  >
-    <Mask transparent={!false} style={[styles.toastWrapper, maskStyle]} onPress={onClose}>
-      <View style={[styles.toast, style]}>
-        {icon === 'loading'
-          ? <ActivityIndicator color="#fff" size="large" style={styles.toastLoading} />
-          : <Icon name={icon} style={[styles.toastIcon]} />}
-        <Text style={[styles.toastContent, textStyle]}>{children}</Text>
+const renderLoading = () => {
+  if (Platform.OS === 'ios') {
+    return <ActivityIndicatorIOS color="#fff" size="large" style={styles.toastLoading} />
+  }
+  return <ProgressBarAndroid color="#fff" styleAttr="Large" style={styles.toastLoading} />
+}
+
+const Toast = (props) => {
+  const {
+    icon = 'toast',
+    show = false,
+    onShow,
+    onRequestClose,
+    style,
+    wrapperStyle,
+    textStyle,
+    children
+  } = props
+
+  return (
+    <Modal
+      animationType="fade"
+      transparent={!false}
+      visible={show}
+      onShow={onShow}
+      onRequestClose={onRequestClose}
+    >
+      <View style={[styles.toastWrapper, wrapperStyle]}>
+        <View style={[styles.toast, style]}>
+          {icon === 'loading' ? renderLoading() : <Icon name={icon} style={[styles.toastIcon]} />}
+          <Text style={[styles.toastContent, textStyle]}>{children}</Text>
+        </View>
       </View>
-    </Mask>
-  </Modal>
+    </Modal>
+  )
+}
 
 Toast.propTypes = {
   icon: PropTypes.string,
   show: PropTypes.bool,
   onShow: PropTypes.func,
-  onClose: PropTypes.func,
-  maskStyle: View.propTypes.style,
+  onRequestClose: PropTypes.func,
+  wrapperStyle: View.propTypes.style,
   style: View.propTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node
 }
 
 export default Toast
+

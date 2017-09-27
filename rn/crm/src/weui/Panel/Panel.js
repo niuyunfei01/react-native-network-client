@@ -1,7 +1,10 @@
 import React, { PropTypes } from 'react'
-import { View, StyleSheet } from 'react-native'
-import V from '../variable'
+import {
+  View,
+  StyleSheet
+} from 'react-native'
 
+const lineColor = '#E5E5E5'
 const styles = StyleSheet.create({
   panel: {
     backgroundColor: '#fff',
@@ -10,18 +13,21 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderStyle: 'solid',
-    borderColor: V.weuiLineColorLight,
+    borderColor: lineColor,
   }
 })
-
-const Panel = ({ children, style, ...others }) =>
-  <View style={[styles.panel, style]} {...others} >
-    {children}
-  </View>
-
+const Panel = (props) => {
+  const { children, style, ...others } = props
+  return (
+    <View style={[styles.panel, style]} {...others} >
+      {children}
+    </View>
+  )
+}
 Panel.propTypes = {
   children: PropTypes.node,
   style: View.propTypes.style,
+  others: PropTypes.object
 }
 
 export default Panel

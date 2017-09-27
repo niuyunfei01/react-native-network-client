@@ -2,8 +2,8 @@
  * Icon icon set component.
  * Usage: <Weui name=icon_name size={20} color=#4F8EF7 />
  */
-import createIconSet from './lib/create-icon-set'
 
+import createIconSet from './lib/create-icon-set'
 const glyphMap = {
   circle: 59905,
   download: 59906,
@@ -19,9 +19,7 @@ const glyphMap = {
   info_circle: 59916,
   cancel: 59917,
   search: 59918,
-  clear: 59919,
-  back: 59920,
-  delete: 59921,
+  clear: 59919
 }
 
 const Weui = createIconSet(glyphMap, 'Weui', 'Weui.ttf')

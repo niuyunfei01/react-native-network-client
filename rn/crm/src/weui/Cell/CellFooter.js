@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
   cellFooterText: {
     textAlign: 'center',
-    color: V.weuiTextColorGray,
+    color: V.globalTextColor,
     fontSize: V.weuiCellFontSize
   },
   vcode: {
@@ -18,16 +18,15 @@ const styles = StyleSheet.create({
     height: 44,
   }
 })
-
-const CellFooter = ({ children, style, access, ...others }) => {
-  const childrenWithProps = React.Children.map(children, (child) => {
+const CellFooter = (props) => {
+  const { children, style, access, ...others } = props
+  const childrenWithProps = React.Children.map(children, child => {
     if (!child.type) return <Text style={[styles.cellFooterText, style]} {...others}>{child}</Text>
     if (child.type && child.type.displayName === 'Image' && !child.props.style) {
       return React.cloneElement(child, { style: [styles.vcode, child.props.style] })
     }
     return child
   })
-
   return (
     <View style={styles.cellFooter}>
       {childrenWithProps}
@@ -39,11 +38,11 @@ const CellFooter = ({ children, style, access, ...others }) => {
     </View>
   )
 }
-
 CellFooter.propTypes = {
   access: PropTypes.bool,
   children: PropTypes.node,
   style: Text.propTypes.style,
+  others: PropTypes.object
 }
 
 export default CellFooter

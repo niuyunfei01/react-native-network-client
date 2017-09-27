@@ -1,26 +1,44 @@
-import React, { PropTypes } from 'react'
-import { View, StyleSheet } from 'react-native'
+import React, { Component, PropTypes } from 'react'
+import {
+  View,
+  StyleSheet,
+} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
-  weuiBtnArea: {
-    marginTop: V.weuiCellsMarginTop,
+  weui_btn_area: {
+    marginTop: 3,
     marginRight: V.weuiBtnDefaultGap,
-    marginBottom: 16 * 0.3,
+    marginBottom: 5,
     marginLeft: V.weuiBtnDefaultGap
   },
-  weuiBtnAreaInline: {
+  weui_btn_area_inline: {
     flexDirection: 'row'
   },
 })
 
-const ButtonArea = ({ direction = 'vertical', style, children }) => {
-  const buttonAreaStyle = [styles.weuiBtnArea]
-  if (direction === 'horizontal') {
-    buttonAreaStyle.push(styles.weuiBtnAreaInline)
+export default class ButtonArea extends Component {
+  static defaultProps = {
+    direction: 'vertical'
   }
+  render() {
+    const {
+      direction,
+      style,
+      children
+    } = this.props
 
-  return <View style={[...buttonAreaStyle, style]}>{children}</View>
+    const buttonAreaStyle = [styles.weui_btn_area]
+    if (direction === 'horizontal') {
+      buttonAreaStyle.push(styles.weui_btn_area_inline)
+    }
+
+    return (
+      <View style={[...buttonAreaStyle, style]}>
+        {children}
+      </View>
+    )
+  }
 }
 
 ButtonArea.propTypes = {
@@ -28,5 +46,3 @@ ButtonArea.propTypes = {
   style: View.propTypes.style,
   children: PropTypes.node,
 }
-
-export default ButtonArea

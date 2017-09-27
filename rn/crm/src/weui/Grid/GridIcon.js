@@ -9,13 +9,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   }
 })
-
-const GridIcon = ({ children, style, ...others }) =>
-  <View style={[styles.gridIcon, style]} {...others}>{children}</View>
-
+const GridIcon = (props) => {
+  const { children, style, ...others } = props
+  return <View style={[styles.gridIcon, style]} {...others}>{children}</View>
+}
 GridIcon.propTypes = {
   children: PropTypes.node,
   style: View.propTypes.style,
+  others: PropTypes.object
 }
 
 export default GridIcon

@@ -1,10 +1,13 @@
 import React, { PropTypes } from 'react'
-import { View, StyleSheet } from 'react-native'
-import V from '../variable'
+import {
+  View,
+  StyleSheet,
+} from 'react-native'
+import $V from '../variable'
 
 const styles = StyleSheet.create({
   mediaHeader: {
-    marginRight: V.baseFontSize * 0.8,
+    marginRight: $V.baseFontSize * 0.8,
     width: 60,
     height: 60,
   },
@@ -14,8 +17,14 @@ const styles = StyleSheet.create({
   }
 })
 
-const MediaHeader = ({ style, children, ...others }) => {
-  const childrenWithProps = React.Children.map(children, (child) => {
+const MediaHeader = (props) => {
+  const {
+    style,
+    children,
+    ...others
+  } = props
+
+  const childrenWithProps = React.Children.map(children, child => {
     if (child.type.displayName === 'Image' && !child.props.style) {
       return React.cloneElement(child, { style: [styles.mediaAppmsgThumb, child.props.style] })
     }

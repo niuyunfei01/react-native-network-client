@@ -1,118 +1,77 @@
-import React, { PropTypes } from 'react'
+import React, { Component, PropTypes } from 'react'
 import {
   Modal,
   View,
   Text,
   TouchableHighlight,
+  TouchableWithoutFeedback,
+  Animated,
+  Easing,
   Dimensions,
-  StyleSheet,
-  Platform,
 } from 'react-native'
-import { Mask } from '../Mask'
-import { create } from '../StyleSheet'
-import V from '../variable'
+import StyleSheet from '../StyleSheet'
+import $V from '../variable'
 
-const { width } = Dimensions.get('window')
-const styles = create({
+const styles = StyleSheet.create({
   dialogWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    backgroundColor: 'rgba(0,0,0,.6)',
   },
   dialog: {
-    width: width - 60,
-    backgroundColor: V.weuiDialogBackgroundColor,
+    width: Dimensions.get('window').width - 60,
+    backgroundColor: $V.weuiDialogBackgroundColor,
     borderRadius: 3,
     overflow: 'hidden',
   },
   dialogHeader: {
-    paddingTop: 1.3 * V.baseFontSize,
-    paddingBottom: 0.5 * V.baseFontSize,
-    paddingLeft: V.weuiDialogGapWidth,
-    paddingRight: V.weuiDialogGapWidth,
+    paddingTop: 1.2 * $V.baseFontSize,
+    paddingBottom: 0.5 * $V.baseFontSize,
   },
   dialogTitle: {
     fontWeight: '400',
-  },
-  iosDialogTitle: {
-    fontSize: 18,
+    fontSize: 17,
     textAlign: 'center',
-  },
-  androidDialogTitle: {
-    fontSize: 21,
-    textAlign: 'left',
   },
   dialogBody: {
-    paddingLeft: V.weuiDialogGapWidth,
-    paddingRight: V.weuiDialogGapWidth,
-  },
-  iosDialogBody: {
-    paddingBottom: (0.8 * 15) + 20,
-  },
-  androidDialogBody: {
-    paddingTop: 0.25 * 17,
-    paddingBottom: (17 * 2) + 20,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   dialogBodyText: {
-    color: V.weuiTextColorGray,
-    lineHeight: 15 * 1.3,
+    fontSize: 15,
+    color: $V.globalTextColor,
+    textAlign: 'center',
+    lineHeight: 15 * $V.baseLineHeight,
     android: {
-      lineHeight: Math.round(15 * 1.3),
+      lineHeight: Math.round(15 * $V.baseLineHeight),
     },
   },
-  iosDialogBodyText: {
-    fontSize: 15,
-    textAlign: 'center',
-  },
-  androidDialogBodyText: {
-    fontSize: 17,
-    textAlign: 'left',
-  },
   dialogFooter: {
+    marginTop: 30,
+    height: 42,
     flexDirection: 'row',
-  },
-  iosDialogFooter: {
-    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: V.weuiDialogLineColor,
+    borderColor: $V.weuiDialogLineColor,
     borderStyle: 'solid',
   },
-  androidDialogFooter: {
-    height: 42,
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    paddingLeft: V.weuiDialogGapWidth,
-    paddingRight: V.weuiDialogGapWidth,
-    paddingBottom: 16 * 0.7,
-  },
   dialogFooterOpr: {
+    height: 42,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iosDialogFooterOpr: {
-    height: 48,
-    flex: 1,
-  },
-  androidDialogFooterOpr: {
-    height: 42,
-    paddingLeft: 16 * 0.8,
-    paddingRight: 16 * 0.8,
-  },
-  dialogFooterOprWithNegativeMarginRight: {
-    marginRight: 0 - (16 * 0.8),
-  },
   dialogFooterOprWithBorder: {
     borderLeftWidth: StyleSheet.hairlineWidth,
-    borderColor: V.weuiDialogLineColor,
+    borderColor: $V.weuiDialogLineColor,
     borderStyle: 'solid',
   },
-  iosDialogFooterOprText: {
-    fontSize: 18,
-  },
-  androidDialogFooterOprText: {
-    fontSize: 16,
+  dialogFooterOprText: {
+    fontSize: 17,
   },
   defaultDialogFooterOprText: {
     color: '#353535',
@@ -121,94 +80,133 @@ const styles = create({
     color: '#0BB20C',
   },
   warnDialogFooterOprText: {
-    color: V.weuiColorWarn,
+    color: $V.globalWarnColor,
   }
 })
 
-const underlayColor = V.weuiDialogLinkActiveBc
+const underlayColor = $V.weuiDialogLinkActiveBc
 
-const Dialog = ({
-  visible = false,
-  buttons = [],
-  title,
-  style,
-  maskStyle,
-  headerStyle,
-  titleStyle,
-  bodyStyle,
-  bodyTextStyle,
-  footerStyle,
-  children,
-  onShow,
-  onClose,
-  autoDectect = true,
-  type = 'ios'
-}) => {
-  let _type = type
-  if (autoDectect) _type = Platform.OS
-
-  const _renderButtons = () =>
-    buttons.map(({ type: btnType, label, ...others }, idx) =>
-      <TouchableHighlight
-        key={idx}
-        style={[
-          styles.dialogFooterOpr,
-          styles[`${_type}DialogFooterOpr`],
-          _type === 'ios' && idx > 0 ? styles.dialogFooterOprWithBorder : {},
-          _type === 'android' && idx === buttons.length - 1 ? styles.dialogFooterOprWithNegativeMarginRight : {}
-        ]}
-        underlayColor={underlayColor}
-        {...others}
-      >
-        <Text
-          style={[styles[`${_type}DialogFooterOprText`], styles[`${btnType}DialogFooterOprText`]]}
-        >{label}</Text>
-      </TouchableHighlight>
-    )
-
-  const childrenWithProps = React.Children.map(children, (child) => {
-    if (child.type.displayName === 'Text') {
-      return React.cloneElement(child, {
-        style: [styles.dialogBodyText, styles[`${type}DialogBodyText`], bodyTextStyle, child.props.style]
-      })
+class Dialog extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      fadeAnim: new Animated.Value(0),
+      visible: false,
     }
-    return child
-  })
+  }
 
-  return (
-    <Modal
-      visible={visible}
-      transparent={!false}
-      onShow={onShow}
-      onRequestClose={onClose}
-    >
-      <Mask style={[styles.dialogWrapper, maskStyle]} onPress={onClose}>
-        <View style={[styles.dialog, style]}>
-          <View style={[styles.dialogHeader, headerStyle]}>
-            <Text style={[styles.dialogTitle, styles[`${type}DialogTitle`], titleStyle]}>{title}</Text>
-          </View>
-          <View style={[styles.dialogBody, styles[`${type}DialogBody`], bodyStyle]}>
-            {childrenWithProps}
-          </View>
-          <View style={[styles.dialogFooter, styles[`${type}DialogFooter`], footerStyle]}>
-            {_renderButtons()}
-          </View>
-        </View>
-      </Mask>
-    </Modal>
-  )
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible !== this.props.visible) {
+      if (nextProps.visible) {
+        this.setState({ visible: true })
+        Animated.timing(
+          this.state.fadeAnim,
+          {
+            toValue: 1,
+            duration: this.props.duration || 200,
+            easing: Easing.easeOut,
+          }
+        ).start()
+      } else {
+        Animated.timing(
+          this.state.fadeAnim,
+          {
+            toValue: 0,
+            duration: this.props.duration || 200,
+            easing: Easing.easeOut,
+          }
+        ).start(() => this.setState({ visible: false }))
+      }
+    }
+  }
+
+  _renderButtons() {
+    return this.props.buttons.map((button, idx) => {
+      const {
+        type,
+        label,
+        ...others
+      } = button
+
+      return (
+        <TouchableHighlight
+          key={idx}
+          style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+          underlayColor={underlayColor}
+          {...others}
+        >
+          <Text
+            style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
+          >{label}</Text>
+        </TouchableHighlight>
+      )
+    })
+  }
+
+  render() {
+    const {
+      title,
+      style,
+      wrapperStyle,
+      headerStyle,
+      titleStyle,
+      bodyStyle,
+      bodyTextStyle,
+      footerStyle,
+      children,
+      onShow,
+      onRequestClose,
+    } = this.props
+
+    const childrenWithProps = React.Children.map(children, (child) => {
+      if (child.type.displayName === 'Text') {
+        return React.cloneElement(child, {
+          style: [styles.dialogBodyText, bodyTextStyle, child.props.style]
+        })
+      }
+      return child
+    })
+
+    return (
+      <Modal
+        visible={this.state.visible}
+        transparent={!false}
+        onShow={onShow}
+        onRequestClose={onRequestClose}
+      >
+        <TouchableWithoutFeedback onPress={onRequestClose}>
+          <Animated.View
+            style={[styles.dialogWrapper, wrapperStyle, { opacity: this.state.fadeAnim }]}
+          >
+            <Animated.View style={{ opacity: this.state.fadeAnim }}>
+              <View style={[styles.dialog, style]}>
+                <View style={[styles.dialogHeader, headerStyle]}>
+                  <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
+                </View>
+                <View style={[styles.dialogBody, bodyStyle]}>
+                  {childrenWithProps}
+                </View>
+                <View style={[styles.dialogFooter, footerStyle]}>
+                  {this._renderButtons()}
+                </View>
+              </View>
+            </Animated.View>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    )
+  }
 }
 
 Dialog.propTypes = {
-  autoDectect: PropTypes.bool,
-  type: PropTypes.oneOf(['ios', 'android']),
   title: PropTypes.string,
-  buttons: PropTypes.arrayOf(PropTypes.object),
+  buttons: PropTypes.array,
   visible: PropTypes.bool,
   onShow: PropTypes.func,
-  onClose: PropTypes.func,
+  duration: PropTypes.number,
+  onRequestClose: PropTypes.func,
   style: View.propTypes.style,
-  maskStyle: View.propTypes.style,
+  wrapperStyle: View.propTypes.style,
   headerStyle: View.propTypes.style,
   titleStyle: Text.propTypes.style,
   bodyStyle: View.propTypes.style,

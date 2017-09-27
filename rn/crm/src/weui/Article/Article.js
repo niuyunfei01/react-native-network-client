@@ -1,5 +1,8 @@
 import React, { PropTypes } from 'react'
-import { ScrollView, StyleSheet } from 'react-native'
+import {
+  ScrollView,
+  StyleSheet,
+} from 'react-native'
 
 const styles = StyleSheet.create({
   article: {
@@ -10,9 +13,9 @@ const styles = StyleSheet.create({
   },
 })
 
-const Article = ({ style, children }) =>
-  <ScrollView style={[styles.article, style]}>
-    {children}
+const Article = (props) =>
+  <ScrollView style={[styles.article, props.style]}>
+    {props.children}
   </ScrollView>
 
 Article.propTypes = {

@@ -1,50 +1,58 @@
 import React, { PropTypes } from 'react'
-import { View, Text, TextInput } from 'react-native'
-import { create } from '../StyleSheet'
-import V from '../variable'
+import {
+  View,
+  Text,
+  TextInput,
+} from 'react-native'
+import StyleSheet from '../StyleSheet'
+import $V from '../variable'
 
-const styles = create({
+const styles = StyleSheet.create({
   textarea: {
-    fontSize: V.weuiCellFontSize,
-    height: V.weuiCellFontSize * V.baseLineHeight * 3,
-    lineHeight: V.weuiCellFontSize * V.baseLineHeight,
+    fontSize: $V.weuiCellFontSize,
+    height: $V.weuiCellFontSize * $V.baseLineHeight * 3,
+    lineHeight: $V.weuiCellFontSize * $V.baseLineHeight,
     android: {
-      lineHeight: Math.round(V.weuiCellFontSize * V.baseLineHeight),
+      lineHeight: Math.round($V.weuiCellFontSize * $V.baseLineHeight),
     },
   },
   textareaCounter: {
-    color: V.weuiTextColorTips,
+    color: $V.globalDescColor,
     textAlign: 'right',
   }
 })
 
-const TextArea = ({
-  value,
-  onChange,
-  showCounter = true,
-  maxLength,
-  defaultValue,
-  disabled = false,
-  style,
-  ...others
-}) =>
-  <View>
-    <TextInput
-      multiline={!false}
-      maxLength={maxLength}
-      onChangeText={onChange}
-      value={value}
-      defaultValue={defaultValue}
-      editable={!disabled}
-      style={[styles.textarea, style]}
-      {...others}
-    />
-    {showCounter ?
-      <Text
-        style={styles.textareaCounter}
-      >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false}</Text>
-    : false}
-  </View>
+const TextArea = (props) => {
+  const {
+    style,
+    value,
+    onChange,
+    onChangeText,
+    showCounter = true,
+    maxLength,
+    defaultValue,
+    ...others
+  } = props
+
+  return (
+    <View>
+      <TextInput
+        multiline={!false}
+        maxLength={maxLength}
+        onChangeText={onChangeText || onChange}
+        value={value}
+        defaultValue={defaultValue}
+        style={[styles.textarea, style]}
+        {...others}
+      />
+      {showCounter ?
+        <Text
+          style={styles.textareaCounter}
+        >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false}</Text>
+      : false}
+    </View>
+  )
+}
 
 TextArea.propTypes = {
   value: PropTypes.string,
@@ -52,7 +60,7 @@ TextArea.propTypes = {
   maxLength: PropTypes.number,
   defaultValue: PropTypes.string,
   onChange: PropTypes.func,
-  disabled: PropTypes.bool,
+  onChangeText: PropTypes.func,
   style: TextInput.propTypes.style,
 }
 

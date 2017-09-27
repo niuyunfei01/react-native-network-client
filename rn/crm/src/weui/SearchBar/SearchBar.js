@@ -1,5 +1,11 @@
 import React, { Component, PropTypes } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native'
 import { Icon } from '../Icon'
 
 const styles = StyleSheet.create({
@@ -115,11 +121,11 @@ class SearchBar extends Component {
   }
 
   focus() {
-    this.searchInput.focus()
+    this.refs.searchInput.focus()
   }
 
   blur() {
-    this.searchInput.blur()
+    this.refs.searchInput.blur()
   }
 
   render() {
@@ -136,7 +142,7 @@ class SearchBar extends Component {
           <View style={styles.searchInner}>
             <Icon name="search" />
             <TextInput
-              ref={(ref) => { this.searchInput = ref }}
+              ref="searchInput"
               style={styles.searchInput}
               placeholder={placeholder}
               onFocus={this.handleFocus}
@@ -154,14 +160,14 @@ class SearchBar extends Component {
             ) : null}
           </View>
           {(focus || text) ? null :
-          <TouchableOpacity style={styles.searchCover} onPress={this.focus}>
-            <Icon name="search" />
-            <Text style={styles.searchCoverText}>{placeholder}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.searchCover} onPress={this.focus}>
+              <Icon name="search" />
+              <Text style={styles.searchCoverText}>{placeholder}</Text>
+            </TouchableOpacity>
           }
         </View>
         {!focus ? null :
-        <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel}</Text>}
+          <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel}</Text>}
       </View>
     )
   }

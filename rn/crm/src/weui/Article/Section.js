@@ -1,5 +1,8 @@
 import React, { PropTypes } from 'react'
-import { View, StyleSheet } from 'react-native'
+import {
+  View,
+  StyleSheet,
+} from 'react-native'
 
 const styles = StyleSheet.create({
   section: {
@@ -7,8 +10,10 @@ const styles = StyleSheet.create({
   }
 })
 
-const Section = ({ style, children }) =>
-  <View style={[styles.section, style]}>{children}</View>
+const Section = (props) =>
+  <View style={[styles.section, props.style]}>
+    {props.children}
+  </View>
 
 Section.propTypes = {
   style: View.propTypes.style,

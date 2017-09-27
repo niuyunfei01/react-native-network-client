@@ -1,7 +1,6 @@
 export default {
-  weuiDialogBackgroundColor: '#FFFFFF',
+  weuiDialogBackgroundColor: '#FAFAFC',
   weuiDialogLineColor: '#D5D5D6',
   weuiDialogLinkColor: '#3CC51F',
   weuiDialogLinkActiveBc: '#EEEEEE',
-  weuiDialogGapWidth: 1.6 * 16
 }

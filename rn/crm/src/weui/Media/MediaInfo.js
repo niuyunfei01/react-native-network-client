@@ -1,5 +1,8 @@
 import React, { PropTypes } from 'react'
-import { View, StyleSheet } from 'react-native'
+import {
+  View,
+  StyleSheet
+} from 'react-native'
 
 const styles = StyleSheet.create({
   mediaInfo: {
@@ -10,11 +13,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   }
 })
+const MediaInfo = (props) => {
+  const {
+    style,
+    children,
+    ...others
+  } = props
 
-const MediaInfo = ({ style, children, ...others }) =>
-  <View style={[styles.mediaInfo, style]} {...others}>
-    {children}
-  </View>
+  return (
+    <View style={[styles.mediaInfo, style]} {...others}>
+      {children}
+    </View>
+  )
+}
 
 MediaInfo.propTypes = {
   style: View.propTypes.style,

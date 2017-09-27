@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import { View, StyleSheet } from 'react-native'
-import V from '../variable'
+import $V from '../variable'
 
 const styles = StyleSheet.create({
   cellHeader: {
@@ -11,12 +11,13 @@ const styles = StyleSheet.create({
     height: 24,
   },
   error: {
-    color: V.weuiColorWarn
+    color: $V.globalWarnColor
   }
 })
 
-const CellHeader = ({ error, children, style, ...others }) => {
-  const childrenWithProps = React.Children.map(children, (child) => {
+const CellHeader = (props) => {
+  const { error, children, style, ...others } = props
+  const childrenWithProps = React.Children.map(children, child => {
     if (child.type.displayName === 'Image' && !child.props.style) {
       return React.cloneElement(child, { style: [styles.image, child.props.style] })
     }
@@ -25,14 +26,13 @@ const CellHeader = ({ error, children, style, ...others }) => {
     }
     return child
   })
-
   return <View style={[styles.cellHeader, style]} {...others}>{childrenWithProps}</View>
 }
-
 CellHeader.propTypes = {
   error: PropTypes.bool,
   children: PropTypes.node,
   style: View.propTypes.style,
+  others: PropTypes.object
 }
 
 export default CellHeader

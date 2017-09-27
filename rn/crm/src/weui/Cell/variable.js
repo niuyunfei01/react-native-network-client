@@ -10,18 +10,7 @@ export default {
   weuiCellLabelWidth: 105,
 
   // unit((weuiCellHeight - 2 * weuiCellGapV) / weuiCellFontSize)
-  // 高度为44，减去上下padding的行高
-  weuiCellLineHeight: 44 - 20,
+  weuiCellLineHeight: 44,
   // unit(20 / @weuiCellFontSize, em),
   weuiCellsMarginTop: 20,
-
-  // weui switch
-  weuiSwitchHeight: 32,
-
-  // weui uploader
-  weuiUploaderBorderColor: '#D9D9D9',
-  weuiUploaderActiveBorderColor: '#999999',
-  weuiUploaderFileSpacing: '9px',
-  weuiUploaderSize: '79px',
-  weuiUploaderBorderWidth: '1px',
 }
