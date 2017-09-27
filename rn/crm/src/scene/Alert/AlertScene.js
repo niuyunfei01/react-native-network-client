@@ -47,7 +47,7 @@ class AlertScene extends PureComponent {
         this.state = {
             isProcessing : false,
             type: 5,
-            total_num: {},
+            group_num: {},
         };
         this.loadData = this.loadData.bind(this);
     }
@@ -61,81 +61,93 @@ class AlertScene extends PureComponent {
     }
 
     loadData(type, page = 1, status = 0){
-        console.log('type', type);
-        console.log('this.state.type', this.state.type);
+        console.log('load_data_type => ', type, this.state.type);
         let search_type = type ? type : this.state.type;
         const self_ = this;
         this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', search_type, status, page).then(()=>{
-            self_.setState({
-                type: search_type,
-                total_num: (this.props.result.obj || {}).total_num || {} ,
-            });
+            let result = this.props.result;
+            if(result.ok){
+                let {total_num} = result.obj;
+                self_.setState({
+                    type: search_type,
+                    group_num: total_num,
+                });
+            } else {
+                self_.setState({
+                    type: search_type,
+                });
+            }
         });
     }
 
     render() {
-        let group_num = this.state.total_num.length === 0 ? ( (this.props.result.obj || {}).total_num || {} ) : this.state.total_num;
+        let group_num = this.state.group_num;
         let type = this.state.type;
-        let alert_data = this.props.result||{};
-        let total_page = 0;
-        let curr_page = 0;
-        if(alert_data.ok){
-            total_page = alert_data.obj.total_page;
-            curr_page = alert_data.obj.curr_page;
-
-            console.log('in_render_before_view', curr_page, total_page, )
-        }
+        let result = this.props.result;
+        console.log('in render group_num => ', group_num);
+        console.log('in render type => ', type);
+        console.log('in render result => ', result);
+        // let total_page = 0;
+        // let curr_page = 0;
+        // if(result.ok){
+        //     let {curr_page, total_page} = result.obj;
+        //     console.log('in_render_before_view', curr_page, total_page);
+        // }
 
         return (
-            <ScrollableTabView tabBarActiveTextColor={"#333"} tabBarUnderlineStyle={{backgroundColor: "#59b26a"}} tabBarTextStyle={{fontSize: pxToDp(26)}} onChangeTab={(obj) => {
-                // let type = 5;
-                if(obj.i == 0) {
-                    type = 5;//用户申请退款
-                } else if(obj.i == 1) {
-                    type = 4;//催单
-                } else if(obj.i == 2) {
-                    type = 1;//待处理评价
-                } else if(obj.i == 3) {
-                    type = 3;//其他事项
-                }
-                this.setState({
-                    type: type,
-                });
-                if(this.state.type !== type){
-                    this.loadData(type);
-                }
-            }}>
+            <ScrollableTabView
+                tabBarActiveTextColor={"#333"}
+                tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
+                tabBarTextStyle={{fontSize: pxToDp(26)}} onChangeTab={(obj) => {
+                    if (obj.i == 0) {
+                        type = 5;//用户申请退款
+                    } else if (obj.i == 1) {
+                        type = 4;//催单
+                    } else if (obj.i == 2) {
+                        type = 1;//待处理评价
+                    } else if (obj.i == 3) {
+                        type = 3;//其他事项
+                    }
+                    this.setState({
+                        type: type,
+                    });
+                    if (this.state.type !== type) {
+                        this.loadData(type);
+                    }
+                }}
+                locked={true}
+            >
                 <AlertList
                     tabLabel={group_num.refund_type > 0 ? "待退款("+group_num.refund_type+")" : "待退款"}
-                    alert_data={(this.props.result||{})}
+                    result={result}
                     alert_type={type}
-                    callbackParent={() => this.loadData()}
-                    total_page={total_page}
-                    curr_page={curr_page}
+                    callbackParent={this.loadData}
+                    // total_page={total_page}
+                    // curr_page={curr_page}
                 />
                 <AlertList
                     tabLabel={group_num.remind_type > 0 ? "催单/异常("+group_num.remind_type+")" : "催单/异常"}
-                    alert_data={(this.props.result||{})}
+                    result={result}
                     alert_type={type}
-                    callbackParent={() => this.loadData()}
-                    total_page={total_page}
-                    curr_page={curr_page}
+                    callbackParent={this.loadData}
+                    // total_page={total_page}
+                    // curr_page={curr_page}
                 />
                 <AlertList
                     tabLabel={group_num.complain_type > 0 ? "售后单("+group_num.complain_type+")" : "售后单"}
-                    alert_data={(this.props.result||{})}
+                    result={result}
                     alert_type={type}
-                    callbackParent={() => this.loadData()}
-                    total_page={total_page}
-                    curr_page={curr_page}
+                    callbackParent={this.loadData}
+                    // total_page={total_page}
+                    // curr_page={curr_page}
                 />
                 <AlertList
                     tabLabel={group_num.other_type > 0 ? "其他("+group_num.other_type+")" : "其他"}
-                    alert_data={(this.props.result||{})}
+                    result={result}
                     alert_type={type}
-                    callbackParent={() => this.loadData()}
-                    total_page={total_page}
-                    curr_page={curr_page}
+                    callbackParent={this.loadData}
+                    // total_page={total_page}
+                    // curr_page={curr_page}
                 />
             </ScrollableTabView>
         );
@@ -148,10 +160,9 @@ class AlertList extends React.Component {
         this.state = {
             isRefreshing: false,
             loadMore: false,
-            curr_page: this.props.curr_page,
-            total_page: this.props.total_page,
+            result: [],
+            list_pages: [],
         };
-        console.log('props => ', this.props);
         this._onRefresh = this._onRefresh.bind(this);
         this._onScroll = this._onScroll.bind(this);
     }
@@ -168,16 +179,16 @@ class AlertList extends React.Component {
     }
 
     _onScroll(event) {
-        if(this.state.loadMore){
+        let {curr_page, total_page} = this.state;
+        if(this.state.loadMore || curr_page >= total_page){
             return;
         }
+        let next_page = curr_page+1;
         let y = event.nativeEvent.contentOffset.y;
         let height = event.nativeEvent.layoutMeasurement.height;
         let contentHeight = event.nativeEvent.contentSize.height;
-        // console.log('offsetY-->' + y);
-        // console.log('height-->' + height);
-        // console.log('contentHeight-->' + contentHeight);
         if(y+height>=contentHeight-20){
+            this.props.callbackParent(this.props.alert_type, next_page);
             this.setState({
                 loadMore:true
             });
@@ -185,14 +196,31 @@ class AlertList extends React.Component {
         }
     }
 
+    componentWillReceiveProps(){
+        let result = this.props.result;
+        if(result.ok){
+            let {curr_page, total_page, list} = result.obj;
+            let list_pages = this.state.list_pages;
+            console.log('list_pages => ', list_pages);
+            if(list_pages.indexOf(curr_page) === -1){
+                list_pages.push(curr_page);
+                console.log('list_pages => ', list_pages);
+            }
+            this.setState({
+                result: result,
+                curr_page: curr_page,
+                total_page: total_page,
+            });
+        }
+    }
+
     render() {
-        let alert_data = this.props.alert_data;
-        if(alert_data.ok){
-            let total_page = alert_data.obj.total_page;
-            let curr_page = alert_data.obj.curr_page;
+        let result = this.state.result || {};
+        if(result.ok){
+            let {curr_page, total_page, list} = result.obj;
             console.log('in_alert_list_render:', curr_page, total_page);
-            let alert_list = alert_data.obj.list;
-            let alert_row = Array.from(alert_list).map(function (row, index) {
+            let alert_list = Array.from(list);
+            let alert_row = alert_list.map(function (row, index) {
                 return (
                     <AlertRow alert_detail={row} key={index}/>
                 );
@@ -207,13 +235,11 @@ class AlertList extends React.Component {
                     onScroll={this._onScroll}
                     scrollEventThrottle={50}
                 >
-                    {/*<Text>{JSON.stringify(this.props)}</Text>*/}
                     {alert_row}
                 </ScrollView>
             );
         }else{
             return (
-                //<Text>{JSON.stringify(this.props)}</Text>
                 <LoadingView isLoading={true} tip='加载中...'/>
             );
         }
