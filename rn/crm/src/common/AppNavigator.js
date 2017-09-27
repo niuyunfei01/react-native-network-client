@@ -86,7 +86,6 @@ const Tab = TabNavigator(
         },
     },
     {
-        initialRouteName: 'Orders',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,

@@ -13,6 +13,7 @@ import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
 import { screen, system, tool } from '../../common'
 import api, { orderUrlWithId} from '../../api'
 import {bindActionCreators} from "redux";
+import { Button } from 'react-native-elements';
 
 /**
  * The actions we need
@@ -141,15 +142,16 @@ class OrderScene extends PureComponent {
         }
 
         return (
-            <View>
+            <View style={styles.topContainer}>
                 <View>
-                    <View style={{flexDirection: 'column'}}>
-                    <Paragraph>{order.userName}</Paragraph>
-                    <Button>{order.mobile}</Button>
-                    <Paragraph>第{order.order_times}次</Paragraph>
-                    <Paragraph>#{order.dayNo}</Paragraph>
-                        <View style={{ flex: 1 }} />
-                    <Image style={styles.icon} source={require('../../img/Public/wx_yes_icon.png')}/>
+                    <View style={styles.userInfoRow}>
+                        <Paragraph>{order.userName}</Paragraph>
+                        <Text>{order.mobile}</Text>
+                        <Button>1891000119</Button>
+                        <Paragraph>第{order.order_times}次</Paragraph>
+                        <Paragraph>#{order.dayId}</Paragraph>
+                        <View style={{flex: 1}}/>
+                        <Image style={styles.icon} source={require('../../img/Public/wx_yes_icon.png')}/>
                     </View>
 
                     <Paragraph>
@@ -160,22 +162,9 @@ class OrderScene extends PureComponent {
 
                     <Paragraph>期望配送：<Text> {order.expectTime}</Text></Paragraph>
                     <Paragraph>支付方式：<Text> {order.paid_done === '1' ? '在线支付':'货到付款'}</Text></Paragraph>
-
                 </View>
 
                 <Separator />
-
-                <View>
-                    <View style={styles.tagContainer}>
-                        <Image style={{ width: 20, height: 20 }} source={require('../../img/Home/icon_deal_anytime_refund.png')} />
-                        <Paragraph style={{ color: '#89B24F' }}>  随时退</Paragraph>
-                        <View style={{ flex: 1 }} />
-                        <Paragraph>已售{1234}</Paragraph>
-                    </View>
-
-                </View>
-
-                <Separator/>
 
                 <View>
                     <Heading1>订单状态： 已送达</Heading1>
@@ -185,24 +174,13 @@ class OrderScene extends PureComponent {
 
                 <Separator/>
 
-                <View style={styles.topContainer}>
-                    <Heading1 style={{ color: color.theme }}>￥</Heading1>
-                    <HeadingBig style={{ marginBottom: -8 }}>{info.price}</HeadingBig>
-                    <Paragraph style={{ marginLeft: 10 }}>门市价：￥{(info.price * 1.1).toFixed(0)}</Paragraph>
-                    <View style={{ flex: 1 }} />
-                    <Button
-                        title='延迟送达'
-                        style={{ color: 'white', fontSize: 18 }}
-                        onPress={onButtonPress}
-                        containerStyle={styles.buyButton}
-                    />
-                </View>
-
-                <SpacingView />
-
-                <View style={styles.tipHeader}>
-                    <Heading2>看了本团购的用户还看了</Heading2>
-                </View>
+                <Button
+                    raised
+                    icon={{name: 'home', size: 32}}
+                    buttonStyle={{backgroundColor: 'red', borderRadius: 10}}
+                    textStyle={{textAlign: 'center'}}
+                    title={`Welcome to\nReact Native Elements`}
+                />
             </View>
         )
     }
@@ -274,6 +252,8 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         padding: 10,
+    },
+    userInfoRow: {
         flexDirection: 'row',
         alignItems: 'flex-end',
     },
