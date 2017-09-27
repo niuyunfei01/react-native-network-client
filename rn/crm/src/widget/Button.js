@@ -35,8 +35,7 @@ class Button extends PureComponent {
                 style={[styles.container, containerStyle]}
                 onPress={onPress}
                 disabled={disabled}
-                activeOpacity={activeOpacity}
-            >
+                activeOpacity={activeOpacity}>
                 <Text style={style}>
                     {title}
                 </Text>

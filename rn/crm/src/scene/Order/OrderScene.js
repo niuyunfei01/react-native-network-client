@@ -13,7 +13,7 @@ import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
 import { screen, system, tool } from '../../common'
 import api, { orderUrlWithId} from '../../api'
 import {bindActionCreators} from "redux";
-// import { Button } from 'react-native-elements';
+import {Button as EButton} from 'react-native-elements';
 
 /**
  * The actions we need
@@ -21,6 +21,7 @@ import {bindActionCreators} from "redux";
 import * as orderActions from '../../reducers/order/orderActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
+import colors from "../../styles/colors";
 
 /**
  * ## Redux boilerplate
@@ -68,6 +69,8 @@ class OrderScene extends PureComponent {
         this.state={
             isFetching: false,
         }
+
+        this._onLogin = this._onLogin.bind(this)
     }
 
     /**
@@ -128,6 +131,10 @@ class OrderScene extends PureComponent {
         this.props.actions.getOrder(OrderScene.access_token, this.state.order_id)
     }
 
+    _onLogin() {
+        this.props.navigation.navigate('Login')
+    }
+
     renderHeader() {
         let info = {};
         const {order } = this.props.order;
@@ -181,6 +188,17 @@ class OrderScene extends PureComponent {
                     textStyle={{textAlign: 'center'}}
                     title={`Welcome to\nReact Native Elements`}
                 />
+
+                <Separator/>
+
+                <EButton
+                    raised
+                    disabled={false}
+                    color={colors.main_color}
+                    onPress={this._onLogin}
+                    icon={{name: 'cached'}}
+                    title='登录' />
+
             </View>
         )
     }
