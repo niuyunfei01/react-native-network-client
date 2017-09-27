@@ -82,6 +82,8 @@ class AlertScene extends PureComponent {
         if(alert_data.ok){
             total_page = alert_data.obj.total_page;
             curr_page = alert_data.obj.curr_page;
+
+            console.log('in_render_before_view', curr_page, total_page, )
         }
 
         return (
@@ -146,6 +148,8 @@ class AlertList extends React.Component {
         this.state = {
             isRefreshing: false,
             loadMore: false,
+            curr_page: this.props.curr_page,
+            total_page: this.props.total_page,
         };
         console.log('props => ', this.props);
         this._onRefresh = this._onRefresh.bind(this);
@@ -186,9 +190,7 @@ class AlertList extends React.Component {
         if(alert_data.ok){
             let total_page = alert_data.obj.total_page;
             let curr_page = alert_data.obj.curr_page;
-            console.log('111total_page => ', total_page);
-            console.log('111curr_page => ', curr_page);
-            console.log('111state => ', this.state);
+            console.log('in_alert_list_render:', curr_page, total_page);
             let alert_list = alert_data.obj.list;
             let alert_row = Array.from(alert_list).map(function (row, index) {
                 return (

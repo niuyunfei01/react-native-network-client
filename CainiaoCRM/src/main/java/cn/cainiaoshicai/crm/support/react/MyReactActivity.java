@@ -44,6 +44,8 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
             init.putLong("order_id", orderId);
         }
         init.putString("access_token", GlobalCtx.app().token());
+        init.putString("_action", intent.getStringExtra("_action"));
+        init.putString("_next_action", intent.getStringExtra("_next_action"));
 
         mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
 

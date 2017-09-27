@@ -13,7 +13,7 @@ import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
 import { screen, system, tool } from '../../common'
 import api, { orderUrlWithId} from '../../api'
 import {bindActionCreators} from "redux";
-import { Button } from 'react-native-elements';
+// import { Button } from 'react-native-elements';
 
 /**
  * The actions we need

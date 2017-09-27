@@ -31,6 +31,7 @@ import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
 
@@ -52,18 +53,26 @@ public class LoginActivity extends AbstractActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String action = getIntent() != null ? getIntent().getAction() : null;
+        super.onCreate(savedInstanceState);
 
+        boolean gotoMain = false;
+        String action = getIntent() != null ? getIntent().getAction() : null;
         if (ACTION_OPEN_FROM_APP_INNER.equals(action)) {
             //empty
         } else if (ACTION_OPEN_FROM_APP_INNER_REFRESH_TOKEN.equals(action)) {
             //empty
         } else {
             //finish current Activity
-            jumpToMainActivity();
+            gotoMain = jumpToMainActivity();
         }
 
-        super.onCreate(savedInstanceState);
+        if (!gotoMain) {
+            Intent loginIntent = new Intent(this, MyReactActivity.class);
+            loginIntent.putExtra("_action", "loginIntent");
+            loginIntent.putExtra("_next_action", "orders");
+            startActivity(loginIntent);
+        }
+
         setContentView(R.layout.account_login);
 
         mUsernameEdit = (EditText) findViewById(R.id.username);
@@ -120,7 +129,7 @@ public class LoginActivity extends AbstractActionBarActivity {
         AppLogger.e("display login activity");
     }
 
-    protected void jumpToMainActivity() {
+    protected boolean jumpToMainActivity() {
         String id = SettingUtility.getDefaultAccountId();
 
         if (!TextUtils.isEmpty(id)) {
@@ -129,8 +138,11 @@ public class LoginActivity extends AbstractActionBarActivity {
                 Intent start = MainActivity.newIntent(bean);
                 startActivity(start);
                 finish();
+                return true;
             }
         }
+
+        return false;
     }
 
     @Override

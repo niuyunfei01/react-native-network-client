@@ -19,6 +19,7 @@
     "react-native-simple-store": "^1.3.0",
     "react-native-tab-view": "0.0.69",
     "react-native-vector-icons": "^4.4.0",
+    "react-navigation": "github:react-community/react-navigation#fe4b1e2",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
