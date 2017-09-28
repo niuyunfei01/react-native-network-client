@@ -23,8 +23,9 @@ export function FetchAlert(token, type, status, page){
         return  AlertServices.FetchAlert(token, type, status, page)
             .then(response=>response.json())
             .then(json => {
-                dispatch(receiveAlert(type,status,{ok:json.ok,reason:json.reason,desc: json.desc,obj:json.obj}));
-            }).catch((error)=>{dispatch(receiveAlert(type,status,{ok:0,msg:'系统异常，'+error.message,obj:null}))})
+                let {ok, reason, desc, obj} = json;
+                dispatch(receiveAlert(type,status,{ok, reason, desc, obj}));
+            }).catch((error)=>{dispatch(receiveAlert(type,status,{ok:false, desc:'系统异常，'+error.message, obj:null}))})
     }
 }
 

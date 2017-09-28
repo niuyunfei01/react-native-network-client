@@ -20,7 +20,7 @@ export default {
         })
     },
     post(action,formData){
-        var url = AppConfig.ServiceUrl+'/'+action;
+        let url = AppConfig.ServiceUrl+action;
         return fetch(url, {
             credential:'include',//带上cookie发送请求请求
             method: 'POST',
@@ -30,11 +30,11 @@ export default {
             body: formData
         });
     },
-    get(action,paras){
+    get(action, paras = ''){
         if(!paras)
             paras='';
-        var url = AppConfig.ServiceUrl+'/'+action+(paras===''?'':'?'+paras);
-        console.log(url)
+        let url = AppConfig.ServiceUrl+action+(paras===''?'':'?'+paras);
+        console.log('url: ', url);
         return fetch(url, {
             credential:'include',//带上cookie发送请求请求
             method: 'GET'
