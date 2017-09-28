@@ -11,8 +11,10 @@ import TabBarItem from '../widget/TabBarItem'
 import AlertScene from '../scene/Alert/AlertScene'
 import MineScene from '../scene/Mine/MineScene'
 import OrderScene from '../scene/Order/OrderScene'
+import LoginScene from '../scene/Login/LoginScene'
 
 import WebScene from '../widget/WebScene'
+import RegisterScene from "../scene/Register/RegisterScene";
 
 const Tab = TabNavigator(
     {
@@ -109,6 +111,8 @@ export const AppNavigator = StackNavigator(
         },
         Web: { screen: WebScene },
         Home: { screen: AlertScene },
+        Login: {screen: LoginScene},
+        Register: {screen: RegisterScene}
     },
     {
         navigationOptions: {

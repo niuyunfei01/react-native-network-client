@@ -13,6 +13,8 @@ import { View, Text, StyleSheet, StatusBar, Image, TouchableOpacity, ScrollView,
 import { Heading1, Heading2, Paragraph } from '../../widget/Text'
 import { screen, system, tool } from '../../common'
 import { color, DetailCell, NavigationItem, SpacingView } from '../../widget'
+import {Button as EButton} from 'react-native-elements';
+import colors from "../../styles/colors";
 
 // create a component
 class MineScene extends PureComponent {
@@ -23,7 +25,7 @@ class MineScene extends PureComponent {
                 <NavigationItem
                     icon={require('../../img/Mine/icon_navigationItem_set_white_2x.png')}
                     onPress={() => {
-
+                        navigation.navigate('Register')
                     }}
                 />
                 <NavigationItem
@@ -60,6 +62,7 @@ class MineScene extends PureComponent {
             this.setState({ isRefreshing: false })
         }, 2000);
     }
+
 
     renderCells() {
         let cells = []
