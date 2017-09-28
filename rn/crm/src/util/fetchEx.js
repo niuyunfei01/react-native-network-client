@@ -30,13 +30,13 @@ export default {
             body: formData
         });
     },
-    get(action, paras) {
-        if (!paras)
-            paras = '';
-        var url = AppConfig.ServiceUrl + '/' + action + (paras === '' ? '' : '?' + paras);
-        console.log(url)
+    get(action, paras = ''){
+        if(!paras)
+            paras='';
+        let url = AppConfig.ServiceUrl+action+(paras===''?'':'?'+paras);
+        console.log('url: ', url);
         return fetch(url, {
-            credential: 'include',//带上cookie发送请求请求
+            credential:'include',//带上cookie发送请求请求
             method: 'GET'
         });
     }
