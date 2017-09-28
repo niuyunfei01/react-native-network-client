@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, RefreshControl} from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, RefreshControl} from 'react-native';
 import {connect} from "react-redux";
 import pxToDp from './pxToDp';
 import LoadingView from '../../widget/LoadingView';
@@ -63,30 +63,35 @@ class AlertScene extends PureComponent {
     loadData(type, page = 1, status = 0){
         console.log('load_data_type => ', type, this.state.type);
         let search_type = type ? type : this.state.type;
-        const self_ = this;
-        this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', search_type, status, page).then(()=>{
-            let result = this.props.result;
-            if(result.ok){
-                let {total_num} = result.obj;
-                self_.setState({
-                    type: search_type,
-                    group_num: total_num,
-                });
-            } else {
-                self_.setState({
-                    type: search_type,
-                });
-            }
-        });
+        if(search_type > 0){
+            this.setState({
+                isProcessing: true,
+            });
+            const self_ = this;
+            this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', search_type, status, page).then(()=>{
+                let result = this.props.result;
+                if(result.ok){
+                    let {total_num} = result.obj;
+                    self_.setState({
+                        type: search_type,
+                        group_num: total_num,
+                        isProcessing: false,
+                    });
+                } else {
+                    self_.setState({
+                        type: search_type,
+                        isProcessing: false,
+                    });
+                }
+            });
+        } else {
+            alert('查询参数有误!');
+        }
     }
 
     render() {
-        let group_num = this.state.group_num;
-        let type = this.state.type;
+        let {group_num, type, isProcessing} = this.state;
         let result = this.props.result;
-        console.log('in render group_num => ', group_num);
-        console.log('in render type => ', type);
-        console.log('in render result => ', result);
         // let total_page = 0;
         // let curr_page = 0;
         // if(result.ok){
@@ -122,39 +127,35 @@ class AlertScene extends PureComponent {
                     result={result}
                     alert_type={type}
                     callbackParent={this.loadData}
-                    // total_page={total_page}
-                    // curr_page={curr_page}
+                    isProcessing={isProcessing}
                 />
                 <AlertList
                     tabLabel={group_num.remind_type > 0 ? "催单/异常("+group_num.remind_type+")" : "催单/异常"}
                     result={result}
                     alert_type={type}
                     callbackParent={this.loadData}
-                    // total_page={total_page}
-                    // curr_page={curr_page}
+                    isProcessing={isProcessing}
                 />
                 <AlertList
                     tabLabel={group_num.complain_type > 0 ? "售后单("+group_num.complain_type+")" : "售后单"}
                     result={result}
                     alert_type={type}
                     callbackParent={this.loadData}
-                    // total_page={total_page}
-                    // curr_page={curr_page}
+                    isProcessing={isProcessing}
                 />
                 <AlertList
                     tabLabel={group_num.other_type > 0 ? "其他("+group_num.other_type+")" : "其他"}
                     result={result}
                     alert_type={type}
                     callbackParent={this.loadData}
-                    // total_page={total_page}
-                    // curr_page={curr_page}
+                    isProcessing={isProcessing}
                 />
             </ScrollableTabView>
         );
     }
 }
 
-class AlertList extends React.Component {
+class AlertList extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -162,65 +163,93 @@ class AlertList extends React.Component {
             loadMore: false,
             result: [],
             list_pages: [],
+            data_list: [],
+            alert_type: this.props.alert_type,
         };
         this._onRefresh = this._onRefresh.bind(this);
         this._onScroll = this._onScroll.bind(this);
     }
 
     _onRefresh() {
-        this.setState({isRefreshing: true});
-        console.log('alert_type', this.props.alert_type);
+        let {isRefreshing} = this.state;
+        let {isProcessing} = this.props;
+        if(isRefreshing || isProcessing){
+            return;
+        }
+        this.setState({
+            isRefreshing: true,
+            data_list: [],
+            list_pages: [],
+            result: [],
+        });
         this.props.callbackParent(this.props.alert_type);
-        setTimeout(() => {
-            this.setState({
-                isRefreshing: false,
-            });
-        }, 1000);
+        this.setState({
+            isRefreshing: false,
+        });
     }
 
     _onScroll(event) {
-        let {curr_page, total_page} = this.state;
-        if(this.state.loadMore || curr_page >= total_page){
+        let {curr_page, total_page, loadMore, list_pages} = this.state;
+        let {isProcessing} = this.props;
+        let next_page = parseInt(curr_page)+1;
+        if(loadMore || isProcessing || curr_page >= total_page || list_pages.indexOf(next_page) !== -1){
+            if(loadMore && !isProcessing){
+                this.setState({
+                    loadMore: false,
+                });
+            }
             return;
         }
-        let next_page = curr_page+1;
         let y = event.nativeEvent.contentOffset.y;
         let height = event.nativeEvent.layoutMeasurement.height;
         let contentHeight = event.nativeEvent.contentSize.height;
-        if(y+height>=contentHeight-20){
-            this.props.callbackParent(this.props.alert_type, next_page);
+        if(y+height>=contentHeight-10){
             this.setState({
                 loadMore:true
             });
-            console.log('lodeMore......');
+
+            this.props.callbackParent(this.props.alert_type, next_page);
         }
     }
 
     componentWillReceiveProps(){
-        let result = this.props.result;
+        let {result} = this.props;
+        let new_alert_type = this.props.alert_type;
+        let {list_pages, data_list, alert_type} = this.state;
         if(result.ok){
             let {curr_page, total_page, list} = result.obj;
-            let list_pages = this.state.list_pages;
-            console.log('list_pages => ', list_pages);
-            if(list_pages.indexOf(curr_page) === -1){
+            if(list_pages.indexOf(curr_page) === -1){//不存在
+                if(parseInt(curr_page) === 1 || alert_type !== new_alert_type){
+                    data_list = [];
+                    list_pages = [];
+                }
                 list_pages.push(curr_page);
+                data_list.push.apply(data_list, list);
                 console.log('list_pages => ', list_pages);
+                // console.log('data_list => ', data_list);
+
+                this.setState({
+                    result: result,
+                    curr_page: curr_page,
+                    total_page: total_page,
+                    data_list: data_list,
+                    alert_type: this.props.alert_type,
+                });
             }
-            this.setState({
-                result: result,
-                curr_page: curr_page,
-                total_page: total_page,
-            });
         }
     }
 
     render() {
-        let result = this.state.result || {};
-        if(result.ok){
-            let {curr_page, total_page, list} = result.obj;
-            console.log('in_alert_list_render:', curr_page, total_page);
-            let alert_list = Array.from(list);
-            let alert_row = alert_list.map(function (row, index) {
+        // let result = this.state.result || {};
+        // if(result.ok){
+        //     let {curr_page, total_page, list} = result.obj;
+        //     console.log('in_alert_list_render:', curr_page, total_page);
+        //     let alert_list = Array.from(list);
+        //     let alert_row = alert_list.map(function (row, index) {
+        let {data_list, loadMore} = this.state;
+        let {isProcessing} = this.props;
+        if(data_list.length){
+            let alert_row = data_list.map(function (row, index) {
                 return (
                     <AlertRow alert_detail={row} key={index}/>
                 );
@@ -236,6 +265,11 @@ class AlertList extends React.Component {
                     scrollEventThrottle={50}
                 >
                     {alert_row}
+                    {isProcessing || loadMore ?
+                        <View style={{height: pxToDp(20), marginBottom: pxToDp(20)}}>
+                            <Text style={{textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', }}>加载中...</Text>
+                        </View>
+                        : null}
                 </ScrollView>
             );
         }else{
@@ -246,7 +280,7 @@ class AlertList extends React.Component {
     }
 }
 
-class AlertRow extends React.Component {
+class AlertRow extends PureComponent {
     static get defaultProps() {
         return {
             alert_detail: {},
