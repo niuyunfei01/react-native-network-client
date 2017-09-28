@@ -3,4 +3,5 @@ export default {
     default_container_bg:'#FAFAFA',
     main_color:'#59b26a',
     main_vice_color:'#006837',
+    actionSecondSize: 28,
 };

@@ -1,10 +1,15 @@
 package cn.cainiaoshicai.crm.support.react;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
@@ -23,6 +28,10 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= 20) {
+            setTranslucent();
+        }
+
         super.onCreate(savedInstanceState);
 
         mReactRootView = new ReactRootView(this);
@@ -97,5 +106,22 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
             return true;
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    @TargetApi(20)
+    private void setTranslucent() {
+        final Activity activity = this;
+        ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+        decorView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                WindowInsets defaultInsets = v.onApplyWindowInsets(insets);
+                return defaultInsets.replaceSystemWindowInsets(
+                        defaultInsets.getSystemWindowInsetLeft(),
+                        0,
+                        defaultInsets.getSystemWindowInsetRight(),
+                        defaultInsets.getSystemWindowInsetBottom());
+            }
+        });
     }
 }

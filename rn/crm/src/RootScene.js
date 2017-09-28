@@ -7,7 +7,7 @@
  */
 
 import React, {PureComponent} from 'react'
-import {StatusBar, Platform} from 'react-native'
+import {StatusBar, Platform, StyleSheet, View} from 'react-native'
 import {NavigationActions} from 'react-navigation'
 
 import {Provider} from 'react-redux'
@@ -62,6 +62,16 @@ function getCurrentRouteName(navigationState) {
     return route.routeName;
 }
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    statusBar: {
+        height: (Platform.OS === 'ios' ? 20 :  StatusBar.currentHeight),
+        backgroundColor: 'rgba(0, 0, 0, 0.20)',
+    },
+});
+
 // create a component
 class RootScene extends PureComponent {
     constructor() {
@@ -71,10 +81,7 @@ class RootScene extends PureComponent {
 
     componentDidMount() {
         let launchProps = this.props.launchProps;
-        let orderId = launchProps['order_id'];
-        if (orderId) {
-            this.reset_to(orderId);
-        }
+        this.reset_to(launchProps);
     }
 
     render() {
@@ -89,16 +96,21 @@ class RootScene extends PureComponent {
             store.dispatch(setSessionToken(launchProps['access_token']));
         }
 
-        let orderId = launchProps['order_id'];
-        if (orderId) {
-            this.reset_to(orderId);
-        }
+        this.reset_to(launchProps);
+
         store.dispatch(setPlatform('android')) //FIXME: should be determined dynamically
         store.dispatch(setVersion(VERSION))
         store.dispatch(setStore(store))
 
         return (
             <Provider store={store}>
+                <View style={styles.container}>
+                <View style={styles.statusBar}>
+                    <StatusBar
+                        backgroundColor={'transparent'}
+                        translucent
+                    />
+                </View>
             <AppNavigator uriPrefix={prefix} ref={nav => { this.navigator = nav; }}
                 onNavigationStateChange={
                     (prevState, currentState) => {
@@ -114,18 +126,33 @@ class RootScene extends PureComponent {
                     }
                 }
             />
+                </View>
             </Provider>
         );
     }
 
-    reset_to(orderId) {
+    reset_to(launchProps) {
         if (this.navigator) {
             if (this.navigator._navigation) {
-                this.navigator._navigation.navigate('Order', {order_id: orderId})
-                this.navigator._navigation.dispatch(NavigationActions.reset({
-                    index: 0,
-                    actions: [NavigationActions.navigate({routeName: 'Order', params:{'order_id': orderId,}})]
-                }));
+                let orderId = launchProps['order_id'];
+                if (orderId) {
+                    this.navigator._navigation.navigate('Order', {order_id: orderId})
+                    this.navigator._navigation.dispatch(NavigationActions.reset({
+                        index: 0,
+                        actions: [NavigationActions.navigate({routeName: 'Order', params: {'order_id': orderId,}})]
+                    }));
+                    return;
+                }
+
+                let _action = launchProps['_action'];
+                if (_action) {
+                    this.navigator._navigation.navigate('Login', {order_id: orderId})
+                    this.navigator._navigation.dispatch(NavigationActions.reset({
+                        index: 0,
+                        actions: [NavigationActions.navigate({routeName: 'Login', params: {}})]
+                    }));
+                }
+
             }
         }
     }

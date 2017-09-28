@@ -53,6 +53,8 @@ const BackendFactory = require('../../common/BackendFactory').default
 
 import {appAuthToken} from '../../common/AppAuthToken'
 
+import {smsCodeRequest} from '../../services/account'
+
 const _ = require('underscore')
 
 /**
@@ -411,4 +413,20 @@ export function resetPassword (email) {
         dispatch(resetPasswordFailure(error))
       })
   }
+}
+
+
+export function requestSmsCode(mobile, callback) {
+    return dispatch => {
+        return smsCodeRequest(1000001, mobile)
+            .then(response=>response.json())
+            .then(json => {
+                // dispatch(doneSmsCodeRequest(type, status, {ok: json.ok, reason: json.reason, desc: json.desc, obj: json.obj}));
+                console.log("res", json)
+                callback(json.success, json.reason)
+            }).catch((error) => {
+                // dispatch(errorSmsCodeRequest(type, status, {ok: 0, msg: '网络异常，' + error.message, obj: null}))
+                callback(false, '网络错误，请检查您的网络连接')
+            })
+    }
 }
