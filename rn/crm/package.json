@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "immutability-helper": "^2.4.0",
     "immutable": "^3.8.1",
     "key-mirror": "1.0.1",
     "lodash": "^4.17.4",

@@ -7,6 +7,7 @@
  * fails, setting it back to false.
  *
  */
+
 'use strict'
 
 /**
@@ -53,7 +54,7 @@ const BackendFactory = require('../../common/BackendFactory').default
 
 import {appAuthToken} from '../../common/AppAuthToken'
 
-import {smsCodeRequest} from '../../services/account'
+import {serviceSignIn, smsCodeRequest} from '../../services/account'
 
 const _ = require('underscore')
 
@@ -415,6 +416,28 @@ export function resetPassword (email) {
   }
 }
 
+export function signIn(mobile, password, callback) {
+    return dispatch => {
+        return serviceSignIn(1000001, mobile, password)
+            .then(response => response.json())
+            .then(json => {
+                console.log("sign-in", json);
+
+                const {access_token, refresh_token, expires_in_ts} = json;
+
+                if (access_token) {
+                    //dispatch(loginSuccess({access_token, refresh_token, expires_in_ts}))
+                    callback(true)
+                } else {
+                  //fixme: 需要给出明确提示
+                    callback(false, "登录失败，请检查验证码是否正确")
+                }
+            }).catch((error) => {
+                console.log('request error', error);
+                callback(false, '网络错误，请检查您的网络连接')
+            })
+    }
+}
 
 export function requestSmsCode(mobile, callback) {
     return dispatch => {
@@ -425,7 +448,7 @@ export function requestSmsCode(mobile, callback) {
                 console.log("res", json)
                 callback(json.success, json.reason)
             }).catch((error) => {
-                // dispatch(errorSmsCodeRequest(type, status, {ok: 0, msg: '网络异常，' + error.message, obj: null}))
+                console.log('request error', error);
                 callback(false, '网络错误，请检查您的网络连接')
             })
     }

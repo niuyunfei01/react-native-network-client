@@ -99,15 +99,15 @@ countDown.prototype = {
     },
     // 刷新数据, isStart 是否自动开始
     refreshTime : function(isStart) {
-        var time = 0;
+        let time = 0;
         this.timePassed = (this.timeLeft * 1000 + this.step * 1000 * this.counter++) / 1000;
-        if (this.countType == "date") {
+        if (this.countType === "date") {
             var day = this.ten(Math.floor(this.timePassed / (60 * 60 * 24))),
                 hour = this.ten(Math.floor(this.timePassed / (60 * 60)) - day * 24),
                 minute = this.ten(Math.floor(this.timePassed / 60) - (day * 24 * 60) - (hour * 60)),
                 second = this.ten(Math.floor(this.timePassed) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60));
             this.onInterval(day, hour, minute, second); // 回调
-        } else if (this.countType == "seconds") {
+        } else if (this.countType === "seconds") {
             this.onInterval(this.timePassed); // 回调
         }
         if (isStart)// 是否开始计时
