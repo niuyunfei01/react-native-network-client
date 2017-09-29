@@ -15,9 +15,14 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableNativeArray;
 
+import java.io.IOException;
+
 import javax.annotation.Nonnull;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 
 /**
@@ -44,6 +49,17 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             Intent intent = new Intent(activity, StoreStorageActivity.class);
             activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void updateAfterTokenGot(@Nonnull String token, long expiresInSeconds, @Nonnull Callback callback){
+        try {
+            LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
+            callback.invoke(true, GlobalCtx.app().getCurrentAccountId(), "ok");
+        } catch (IOException | ServiceException e) {
+            e.printStackTrace();
+            callback.invoke(false, 0, "exception:" + e.getMessage());
         }
     }
 

@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.multidex.BuildConfig;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
@@ -31,6 +32,7 @@ import com.google.gson.Gson;
 import com.iflytek.cloud.Setting;
 import com.iflytek.cloud.SpeechUtility;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -60,6 +62,7 @@ import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
@@ -69,10 +72,12 @@ import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
+import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
@@ -157,6 +162,38 @@ public class GlobalCtx extends Application {
                         return new HashMap<>();
                     }
                 });
+    }
+
+    @Nullable
+    public LoginActivity.DBResult afterTokenUpdated(String token, long expiresInSeconds)
+            throws IOException, ServiceException {
+        ResultBean<UserBean> uiRb = this.dao.userInfo(token).execute().body();
+        if (uiRb != null && uiRb.isOk() && !TextUtils.isEmpty(uiRb.getObj().getId())) {
+            UserBean user = uiRb.getObj();
+            AccountBean account = new AccountBean();
+            account.setAccess_token(token);
+            account.setExpires_time(System.currentTimeMillis() + expiresInSeconds * 1000);
+            account.setInfo(user);
+            AppLogger.e("token expires in " + Utility.calcTokenExpiresInDays(account) + " days");
+            LoginActivity.DBResult dbResult = AccountDBTask.addOrUpdateAccount(account, false);
+            if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
+                SettingUtility.setDefaultAccountId(account.getUid());
+            }
+
+            long prefer_store = user.getPrefer_store();
+            if (prefer_store > 0) {
+                SettingUtility.setListenerStores(prefer_store);
+            } else {
+                SettingUtility.removeListenerStores();
+            }
+
+            this.updateCfgInterval();
+            return dbResult;
+        } else {
+            boolean denied = uiRb != null && String.valueOf(ErrorCode.CODE_ACCESS_DENIED).equals(uiRb.getDesc());
+            String msg = denied ? "账户没有授权，请联系店长开通" : "获取不到账户相关信息";
+            throw new ServiceException(msg);
+        }
     }
 
 

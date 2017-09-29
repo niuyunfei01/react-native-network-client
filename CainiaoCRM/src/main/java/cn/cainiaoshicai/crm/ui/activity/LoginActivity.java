@@ -22,14 +22,12 @@ import cn.cainiaoshicai.crm.dao.OauthTokenDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -235,33 +233,8 @@ public class LoginActivity extends AbstractActionBarActivity {
                     final String token = loginResult.getAccess_token();
                     final long expiresInSeconds = loginResult.getExpires_in();
                     final GlobalCtx app = GlobalCtx.app();
-                    ResultBean<UserBean> uiRb = app.dao.userInfo(token).execute().body();
-                    if (uiRb != null && uiRb.isOk() && !TextUtils.isEmpty(uiRb.getObj().getId())) {
-                        UserBean user = uiRb.getObj();
-                        AccountBean account = new AccountBean();
-                        account.setAccess_token(token);
-                        account.setExpires_time(System.currentTimeMillis() + expiresInSeconds * 1000);
-                        account.setInfo(user);
-                        AppLogger.e("token expires in " + Utility.calcTokenExpiresInDays(account) + " days");
-                        DBResult dbResult = AccountDBTask.addOrUpdateAccount(account, false);
-                        if (TextUtils.isEmpty(SettingUtility.getDefaultAccountId())) {
-                            SettingUtility.setDefaultAccountId(account.getUid());
-                        }
-
-                        long prefer_store = user.getPrefer_store();
-                        if (prefer_store > 0) {
-                            SettingUtility.setListenerStores(prefer_store);
-                        } else {
-                            SettingUtility.removeListenerStores();
-                        }
-
-                        app.updateCfgInterval();
-                        return dbResult;
-                    } else {
-                        boolean denied = uiRb != null && String.valueOf(ErrorCode.CODE_ACCESS_DENIED).equals(uiRb.getDesc());
-                        String msg = denied ? "账户没有授权，请联系店长开通" : "获取不到账户相关信息";
-                        this.e = new ServiceException(msg);
-                    }
+                    DBResult dbResult = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
+                    if (dbResult != null) return dbResult;
                 } else {
                     AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()) );
                 }
