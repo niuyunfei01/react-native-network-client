@@ -26,10 +26,11 @@ import reducer from '../reducers'
 
 /**
  * ## configureStore
- * @param initialState the state with for keys:
+ * @param persistDoneCall
+ * the state with for keys:
  * device, global, auth, profile
  */
-export default function configureStore () {
+export default function configureStore (persistDoneCall) {
     const store = createStore(
         reducer,
         undefined,
@@ -49,6 +50,9 @@ export default function configureStore () {
 
     persistStore(store, cfg, () => {
         console.log('rehydration complete')
+        if (persistDoneCall) {
+            persistDoneCall()
+        }
     });
 
   return store

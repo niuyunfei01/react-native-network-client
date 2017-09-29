@@ -7,7 +7,7 @@
  */
 
 import React, {PureComponent} from 'react'
-import {StatusBar, Platform, StyleSheet, View} from 'react-native'
+import {StatusBar, Platform, StyleSheet, View, Text} from 'react-native'
 import {NavigationActions} from 'react-navigation'
 
 import {Provider} from 'react-redux'
@@ -58,6 +58,10 @@ class RootScene extends PureComponent {
     constructor() {
         super()
         StatusBar.setBarStyle('light-content')
+
+        this.state = {
+            rehydrate: false
+        }
     }
 
     componentDidMount() {
@@ -69,22 +73,22 @@ class RootScene extends PureComponent {
 
         // on Android, the URI prefix typically contains a host in addition to scheme
         const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
-        const store = configureStore();
 
-        console.log('store:', store.getState());
+        const launchProps = this.props.launchProps;
 
-        let launchProps = this.props.launchProps;
+        const store = configureStore(function(){
+            if (launchProps['access_token']) {
+                store.dispatch(setAccessToken(launchProps['access_token']));
+                store.dispatch(setPlatform('android'))
+                store.dispatch(setVersion(VERSION))
+            }
+            console.log('store:', store.getState());
+            this.setState({rehydrated: true});
+            this.reset_to(launchProps);
+        }.bind(this));
 
-        if (launchProps['access_token']) {
-            store.dispatch(setAccessToken(launchProps['access_token']));
-        }
-
-        this.reset_to(launchProps);
-
-        store.dispatch(setPlatform('android')) //FIXME: should be determined dynamically
-        store.dispatch(setVersion(VERSION))
-
-        return (
+        return !this.state.rehydrate ? <Text>Loading...</Text>
+            : (
             <Provider store={store}>
                 <View style={styles.container}>
                 <View style={styles.statusBar}>
