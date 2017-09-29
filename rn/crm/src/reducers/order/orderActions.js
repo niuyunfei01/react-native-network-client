@@ -41,19 +41,8 @@ export function getOrder(sessionToken, orderId) {
         dispatch(getOrderRequest())
         // store or get a sessionToken
         return fetch(orderUrlWithId(sessionToken, orderId))
-            .then((res) => {
-                // return res.json().then(function (resp) {
-                //     if ((res.status === 200 || res.status === 201)) {
-                //         console.log(resp)
-                //         return resp
-                //     } else {
-                //         throw (resp)
-                //     }
-                // })
-                return res.json()
-            }).then( (res_data) => {
-                return res_data;
-            })
+            .then((res) => res.json())
+            .then((res_data) => res_data)
             .then((json) => {
                 dispatch(getOrderSuccess(json))
             })

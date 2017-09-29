@@ -24,12 +24,22 @@ const {
     SET_STATE
 } = require('../../common/constants').default
 
+import {REHYDRATE} from 'redux-persist/constants'
+
 /**
  * ## Initial State
  *
  */
-const InitialState = require('./orderInitialState').default
-const initialState = new InitialState()
+const initialState = {
+    isFetching: false,
+    error:'',
+    order: {},
+    order_id: 0,
+    currentUser: null,
+    showState: false,
+    currentState: null,
+    store: null
+}
 
 /**
  * ## profileReducer function
@@ -39,8 +49,6 @@ const initialState = new InitialState()
 export default function orderReducer (state = initialState, action) {
     let nextProfileState = null
 
-    if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
-
     switch (action.type) {
         /**
          * ### Request starts
@@ -48,14 +56,14 @@ export default function orderReducer (state = initialState, action) {
          */
         case GET_ORDER_REQUEST:
         case ORDER_UPDATE_REQUEST:
-            return state.setIn(['isFetching'], true);
+            return state;
 
         /**
          * ### Request end successfully
          * set the form to fetching as done
          */
         case ORDER_UPDATE_SUCCESS:
-            return state.setIn(['isFetching'], false);
+            return state;
 
         /**
          * ### Request ends successfully
@@ -66,16 +74,18 @@ export default function orderReducer (state = initialState, action) {
          * mung it up through some other mechanism
          */
         case GET_ORDER_SUCCESS:
-
-            return state.setIn(['order'], action.payload)
-                .setIn(['isFetching'], false);
+            console.log('get_order_success: order_id', action.payload.id)
+            return {...state,
+                order: action.payload,
+                order_id: action.payload.id,
+            };
 
         /**
          * User logged out, so reset form fields and original profile.
          *
          */
         case LOGOUT_SUCCESS:
-            return state.setIn(['order'], {});
+            return {...state, order: null, order_id: 0};
 
         /**
          * ### Request fails
@@ -83,9 +93,10 @@ export default function orderReducer (state = initialState, action) {
          */
         case GET_ORDER_FAILURE:
         case ORDER_UPDATE_FAILURE:
-            return state.setIn(['isFetching'], false)
-                .setIn(['error'], action.payload);
+            return {...state, error: action.payload};
 
+        // case REHYDRATE:
+        //     return state
 
     }// switch
     /**

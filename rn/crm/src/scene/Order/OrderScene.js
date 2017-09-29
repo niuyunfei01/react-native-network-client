@@ -32,11 +32,7 @@ function mapStateToProps (state) {
         isFetching: state.isFetching,
         order_id: state.order_id,
         order: state.order,
-        global: {
-            currentUser: state.global.currentUser,
-            currentState: state.global.currentState,
-            showState: state.global.showState
-        }
+        global: state.global,
     }
 }
 
@@ -47,8 +43,6 @@ function mapDispatchToProps (dispatch) {
 }
 
 class OrderScene extends PureComponent {
-
-    static access_token = '19917687f923260dd9fa87caf0cf04a9cdb06a2d';
 
     static navigationOptions = ({ navigation }) => ({
         headerTitle: '订单详情',
@@ -92,7 +86,7 @@ class OrderScene extends PureComponent {
         });
 
         if (!this.props.order || !this.props.order.id || this.props.order.id !== order_id) {
-            this.props.actions.getOrder(OrderScene.access_token, order_id)
+            this.props.actions.getOrder(this.props.global.accessToken, order_id)
             this.setState({order_id: order_id});
         } else {
             this.setState({

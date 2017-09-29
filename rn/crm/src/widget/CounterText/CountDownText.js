@@ -150,17 +150,17 @@ CountDownText.defaultProps = {
 };
 
 CountDownText.propTypes = {
-    countType:  React.PropTypes.string,
-    onEnd:  React.PropTypes.func,
-    timeLeft:  React.PropTypes.number,
-    step:  React.PropTypes.number,
-    startText: React.PropTypes.string,
+    countType:  PropTypes.string,
+    onEnd:  PropTypes.func,
+    timeLeft:  PropTypes.number,
+    step:  PropTypes.number,
+    startText: PropTypes.string,
     intervalText: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.func,
     ]),
-    endText: React.PropTypes.string,
-    auto:  React.PropTypes.boolean,
+    endText: PropTypes.string,
+    auto:  PropTypes.boolean,
 }
 
 module.exports = CountDownText;

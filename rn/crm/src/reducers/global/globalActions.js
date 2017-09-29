@@ -15,9 +15,6 @@ import {serviceSignIn, smsCodeRequest} from '../../services/account'
  * The actions supported
  */
 const {
-    SET_STORE,
-    SET_STATE,
-    GET_STATE,
     LOGIN_PROFILE_SUCCESS,
     SESSION_TOKEN_SUCCESS
 } = require('../../common/constants').default
@@ -26,43 +23,6 @@ export function setAccessToken(token) {
     return {
         type: SESSION_TOKEN_SUCCESS,
         payload: token
-    }
-}
-
-/**
- * ## set the store
- *
- * this is the Redux store
- *
- * this is here to support Hot Loading
- *
- */
-export function setStore(store) {
-    return {
-        type: SET_STORE,
-        payload: store
-    }
-}
-
-/**
- * ## set state
- *
- */
-export function setState(newState) {
-    return {
-        type: SET_STATE,
-        payload: newState
-    }
-}
-
-/**
- * ## getState
- *
- */
-export function getState(toggle) {
-    return {
-        type: GET_STATE,
-        payload: toggle
     }
 }
 

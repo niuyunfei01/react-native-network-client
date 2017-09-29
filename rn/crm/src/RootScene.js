@@ -17,34 +17,17 @@ import {Provider} from 'react-redux'
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
-import {setAccessToken, setStore} from './reducers/global/globalActions'
+import {setAccessToken} from './reducers/global/globalActions'
 
 /**
  * ## States
  * Snowflake explicitly defines initial state
  *
  */
-import DeviceInitialState from './reducers/device/deviceInitialState'
-import GlobalInitialState from './reducers/global/globalInitialState'
-import ProfileInitialState from './reducers/profile/profileInitialState'
 import configureStore from "./common/configureStore";
 import {VERSION} from "./api";
 import AppNavigator from './common/AppNavigator'
 
-
-/**
- *
- * ## Initial state
- * Create instances for the keys of each structure in snowflake
- * @returns {Object} object with 4 keys
- */
-function getInitialState () {
-    return {
-        device: (new DeviceInitialState()).set('isMobile', true),
-        global: (new GlobalInitialState()),
-        profile: new ProfileInitialState(),
-    }
-}
 
 const lightContentScenes = ['Home', 'Mine']
 
@@ -86,7 +69,9 @@ class RootScene extends PureComponent {
 
         // on Android, the URI prefix typically contains a host in addition to scheme
         const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
-        const store = configureStore(getInitialState());
+        const store = configureStore();
+
+        console.log('store:', store.getState());
 
         let launchProps = this.props.launchProps;
 
@@ -98,7 +83,6 @@ class RootScene extends PureComponent {
 
         store.dispatch(setPlatform('android')) //FIXME: should be determined dynamically
         store.dispatch(setVersion(VERSION))
-        store.dispatch(setStore(store))
 
         return (
             <Provider store={store}>

@@ -11,9 +11,11 @@
  *
  * redux functions
  */
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import logger from 'redux-logger'
+import {persistStore, autoRehydrate} from 'redux-persist'
+import {AsyncStorage} from 'react-native'
 
 /**
 * ## Reducer
@@ -23,19 +25,32 @@ import logger from 'redux-logger'
 import reducer from '../reducers'
 
 /**
- * ## creatStoreWithMiddleware
- * Like the name...
- */
-const createStoreWithMiddleware = applyMiddleware(
-  thunk,
-// logger
-)(createStore)
-
-/**
  * ## configureStore
  * @param initialState the state with for keys:
  * device, global, auth, profile
  */
-export default function configureStore (initialState) {
-  return createStoreWithMiddleware(reducer, initialState)
+export default function configureStore () {
+    const store = createStore(
+        reducer,
+        undefined,
+        compose(
+            applyMiddleware(
+                thunk,
+              logger
+            ),
+            autoRehydrate()
+        )
+    );
+
+    const cfg = {
+      keyPrefix: 'cn.cainiaoshicai.blx.crm',
+        debounce: 100,
+        storage: AsyncStorage
+    };
+
+    persistStore(store, cfg, () => {
+        console.log('rehydration complete')
+    });
+
+  return store
 }

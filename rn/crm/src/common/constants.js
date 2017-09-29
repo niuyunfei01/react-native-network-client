@@ -53,10 +53,6 @@ export default keyMirror({
     ORDER_UPDATE_SUCCESS: null,
     ORDER_UPDATE_FAILURE: null,
 
-  SET_STATE: null,
-  GET_STATE: null,
-  SET_STORE: null,
-
   FORGOT_PASSWORD: null,
   LOGIN: null,
   REGISTER: null
