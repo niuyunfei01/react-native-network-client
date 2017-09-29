@@ -96,7 +96,7 @@ export default function orderReducer (state = initialState, action) {
             return {...state, error: action.payload};
 
         // case REHYDRATE:
-        //     return state
+        //     return  { ...state, ...action.payload }
 
     }// switch
     /**

@@ -1,16 +1,21 @@
 'use strict';
-import * as types from '../actionTypes';
+
+const {
+    RECEIVE_ALERT,
+    REQUEST_ALERT,
+} = require('../../common/constants').default
+
 import * as AlertServices from '../../services/alert';
 
 function requestAlert() {
     return {
-        type: types.REQUEST_ALERT
+        type: REQUEST_ALERT
     };
 }
 
 function receiveAlert(alertType,alertStatus,result) {
     return {
-        type: types.RECEIVE_ALERT,
+        type: RECEIVE_ALERT,
         alertType,
         alertStatus,
         result

@@ -1,6 +1,9 @@
 
 'use strict';
-import * as types from '../actionTypes';
+const {
+    RECEIVE_ALERT,
+    REQUEST_ALERT,
+} = require('../../common/constants').default
 
 const initialState = {
     alertType: '',
@@ -10,13 +13,13 @@ const initialState = {
 
 export default function alert(state=initialState, action={}) {
     switch (action.type) {
-        case types.REQUEST_ALERT:
+        case REQUEST_ALERT:
             return Object.assign({}, state, {
                 alertType: '',
                 alertStatus: '',
                 result: {}
             });
-        case types.RECEIVE_ALERT:
+        case RECEIVE_ALERT:
             return Object.assign({}, state, {
                 alertType: action.alertType,
                 alertStatus: action.alertStatus,
