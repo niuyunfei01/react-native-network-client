@@ -19,8 +19,6 @@ const initialState = {
     currentUser: null,
     accessToken: '',
     currentUserProfile: null,
-    currentState: null,
-    store: null
 }
 /**
  * ## globalReducer function

@@ -36,9 +36,6 @@ const initialState = {
     order: {},
     order_id: 0,
     currentUser: null,
-    showState: false,
-    currentState: null,
-    store: null
 }
 
 /**

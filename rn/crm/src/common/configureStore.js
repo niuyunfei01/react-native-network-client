@@ -43,8 +43,7 @@ export default function configureStore () {
     );
 
     const cfg = {
-      keyPrefix: 'cn.cainiaoshicai.blx.crm',
-        debounce: 100,
+      keyPrefix: 'cn.blx.crm.',
         storage: AsyncStorage
     };
 
