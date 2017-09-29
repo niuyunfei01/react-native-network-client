@@ -61,11 +61,11 @@ class AlertScene extends PureComponent {
     }
 
     componentDidMount() {
-        this.loadData();
+
     }
 
     componentWillMount() {
-        // this.loadData();
+        this.loadData();
     }
 
     loadData(type, page = 1, status = 0){
@@ -98,6 +98,7 @@ class AlertScene extends PureComponent {
     }
 
     render() {
+
         let {group_num, type, isProcessing} = this.state;
         let result = this.props.result;
 
