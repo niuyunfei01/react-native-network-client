@@ -16,6 +16,7 @@ this.refs.countDownText.end();
 'use strict'
 
 import update from 'immutability-helper'
+import PropTypes from 'prop-types';
 
 import React, { Component } from 'react';
 import {StyleSheet, Text} from 'react-native'
@@ -27,22 +28,11 @@ class CountDownText extends Component {
 
     constructor(props) {
         super(props);
-        this.props = Object.assign({
-            countType: "seconds",
-            onEnd: null, // 结束回调
-            timeLeft: 0,//正向计时 时间起点为0秒
-            step: -1, // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-            startText: null, // 开始的文本
-            intervalText: null, // 定时的文本，可以是回调函数
-            endText: null, // 结束的文本
-            auto: false, // 是否自动开始
-        }, props);
-
         console.log("this.props=", this.props);
 
      this.state = {
          text: this.props.startText, // 要显示文本
-     }
+     };
 
      this.onInterval = this.onInterval.bind(this);
      this.onEnd = this.onEnd.bind(this)
@@ -57,7 +47,7 @@ class CountDownText extends Component {
   componentWillReceiveProps(nextProps){
     // 判断是否要重新计时
       let updating = true;
-      if(this.props.step == nextProps.step && this.props.step < 0){ // 倒计时的情况
+      if(this.props.step === nextProps.step && this.props.step < 0){ // 倒计时的情况
       if(this.props.endTime){ // 1 按起始日期来计时
         // console.log('prev: startTime: ' + this.props.startTime + ' endTime: ' + this.props.endTime)
         // console.log('next: startTime: ' + nextProps.startTime + ' endTime: ' + nextProps.endTime)
@@ -146,6 +136,31 @@ class CountDownText extends Component {
   getTimePassed(){
     return this.counter.timePassed;
   }
+}
+
+CountDownText.defaultProps = {
+    countType: "seconds",
+    onEnd: null, // 结束回调
+    timeLeft: 0,//正向计时 时间起点为0秒
+    step: -1, // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
+    startText: null, // 开始的文本
+    intervalText: null, // 定时的文本，可以是回调函数
+    endText: null, // 结束的文本
+    auto: false, // 是否自动开始
+};
+
+CountDownText.propTypes = {
+    countType:  React.PropTypes.string,
+    onEnd:  React.PropTypes.func,
+    timeLeft:  React.PropTypes.number,
+    step:  React.PropTypes.number,
+    startText: React.PropTypes.string,
+    intervalText: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.func,
+    ]),
+    endText: React.PropTypes.string,
+    auto:  React.PropTypes.boolean,
 }
 
 module.exports = CountDownText;
