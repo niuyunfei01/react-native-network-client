@@ -201,13 +201,16 @@ class LoginScene extends PureComponent {
                                 ref={counter => this.counterText = counter}
                                 style={styles.counter}
                                 countType='seconds' // 计时类型：seconds / date
-                                auto={false} // 自动开始
-                                afterEnd={this.onCounterReReqEnd} // 结束回调
-                                timeLeft={60} // 正向计时 时间起点为0秒
+                                auto={false}
+                                afterEnd={this.onCounterReReqEnd}
+                                timeLeft={this.state.reRequestAfterSeconds}
                                 step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-                                startText='获取验证码' // 开始的文本
-                                endText='获取验证码' // 结束的文本
-                                intervalText={(sec) => sec + '秒重新获取'} // 定时的文本回调
+                                startText='获取验证码'
+                                endText='获取验证码'
+                                intervalText={(sec) => {
+                                        this.setState({reRequestAfterSeconds: sec});
+                                        return sec + '秒重新获取'; }
+                                }
                             />
                             : <TouchableOpacity style={{alignSelf: 'center'}} onPress={this.onRequestSmsCode}>
                                 <Text style={{ fontSize: pxToDp(colors.actionSecondSize), color: colors.main_vice_color}}>获取验证码</Text>
