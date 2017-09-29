@@ -2,12 +2,9 @@ import React, {PureComponent} from 'react'
 import {TouchableOpacity, StyleSheet, View, ScrollView, Text, ImageBackground, Image, Button, ToastAndroid, NativeModules, ActivityIndicator} from 'react-native'
 import { FormLabel, Button as EButton, FormInput, FormValidationMessage } from 'react-native-elements'
 import Dimensions from 'Dimensions'
-import {Paragraph} from "../../widget/Text";
 import colors from '../../styles/colors'
 import pxToDp from '../Alert/pxToDp'
-import Toast from '../../weui/Toast'
 
-import * as authActions from '../../reducers/auth/authActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -54,13 +51,13 @@ let {height, width} = Dimensions.get('window')
 
 function mapStateToProps (state) {
     return {
-        auth: state.auth,
+        userProfile: state.global.currentUserPfile
     }
 }
 
 function mapDispatchToProps (dispatch) {
     return {
-        actions: bindActionCreators({ ...authActions,...globalActions }, dispatch)
+        actions: bindActionCreators({ ...globalActions }, dispatch)
     }
 }
 
@@ -232,11 +229,6 @@ class LoginScene extends PureComponent {
                               style={{color:colors.main_color, fontSize: pxToDp(colors.actionSecondSize), marginTop: pxToDp(50)}}>注册新帐号</Text>
                         </TouchableOpacity>
                         </View>
-                    </View>
-
-
-                    <View style={{alignItems: 'center'}}>
-                    <Paragraph>语音技术由科大讯飞提供支持</Paragraph>
                     </View>
 
                 </View>

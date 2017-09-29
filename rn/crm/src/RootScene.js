@@ -17,14 +17,13 @@ import {Provider} from 'react-redux'
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
-import {setSessionToken, setStore} from './reducers/global/globalActions'
+import {setAccessToken, setStore} from './reducers/global/globalActions'
 
 /**
  * ## States
  * Snowflake explicitly defines initial state
  *
  */
-import AuthInitialState from './reducers/auth/authInitialState'
 import DeviceInitialState from './reducers/device/deviceInitialState'
 import GlobalInitialState from './reducers/global/globalInitialState'
 import ProfileInitialState from './reducers/profile/profileInitialState'
@@ -41,7 +40,6 @@ import AppNavigator from './common/AppNavigator'
  */
 function getInitialState () {
     return {
-        auth: new AuthInitialState(),
         device: (new DeviceInitialState()).set('isMobile', true),
         global: (new GlobalInitialState()),
         profile: new ProfileInitialState(),
@@ -93,7 +91,7 @@ class RootScene extends PureComponent {
         let launchProps = this.props.launchProps;
 
         if (launchProps['access_token']) {
-            store.dispatch(setSessionToken(launchProps['access_token']));
+            store.dispatch(setAccessToken(launchProps['access_token']));
         }
 
         this.reset_to(launchProps);

@@ -13,22 +13,11 @@
  * ## Import
  */
 import {Record} from 'immutable'
-/**
- * ## InitialState
- *
- * * currentUser - object returned from server when validated
- * * showState - toggle for Header to display state
- * * currentState - object in Json format of the entire state
- * * store - the Redux store which is an object w/ 4 initial states
- *   * device
- *   * auth
- *   * global
- *   * profile
- *
- */
+
 var InitialState = Record({
   currentUser: null,
-  showState: false,
+  accessToken: '',
+    currentUserProfile: null,
   currentState: null,
   store: null
 })

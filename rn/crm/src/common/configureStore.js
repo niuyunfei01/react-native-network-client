@@ -18,7 +18,7 @@ import logger from 'redux-logger'
 /**
 * ## Reducer
 * The reducer contains the 4 reducers from
-* device, global, auth, profile
+* device, global, profile
 */
 import reducer from '../reducers'
 

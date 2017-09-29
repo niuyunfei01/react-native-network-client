@@ -20,7 +20,7 @@ export default {
         })
     },
     post(action, formData) {
-        const url = AppConfig.ServiceUrl + '/' + action;
+        const url = AppConfig.ServiceUrl + action;
         return fetch(url, {
             credential: 'include',//带上cookie发送请求请求
             method: 'POST',

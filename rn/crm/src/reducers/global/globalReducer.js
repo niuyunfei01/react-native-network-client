@@ -4,18 +4,9 @@
  *
  */
 'use strict'
-/**
- * ## Imports
- * The InitialState for auth
- * fieldValidation for validating the fields
- * formValidation for setting the form's valid flag
- */
-const {
-  SET_SESSION_TOKEN,
 
-  GET_PROFILE_SUCCESS,
-  SIGNUP_SUCCESS,
-  LOGIN_SUCCESS,
+const {
+  GET_PROFILE_SUCCESS: LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
 
   LOGOUT_SUCCESS,
@@ -38,37 +29,21 @@ export default function globalReducer (state = initialState, action) {
   if (!(state instanceof InitialState)) return initialState.merge(state)
 
   switch (action.type) {
-    /**
-     * ### Save the sessionToken
-     */
-    case SET_SESSION_TOKEN:
-      return state.set('currentUser', action.payload)
 
-    /**
-     * ### Save the payload in the store
-     *
-     * This payload is the ```currentUser``` object returned by
-     * the server.  It contains the ```sessionToken``` and the user's
-     * ```objectId``` which will be needed for some calls to the server
-     */
-    case SIGNUP_SUCCESS:
-    case LOGIN_SUCCESS:
-    case GET_PROFILE_SUCCESS:
-      return state.set('currentUser', action.payload)
+    case LOGIN_PROFILE_SUCCESS:
+        if (action.payload.user && action.payload.user.user_id) {
+            return state.set('currentUser', action.payload.user.user_id)
+                .set('currentUserProfile', action.payload.user);
+        } else return state;
 
     case SESSION_TOKEN_SUCCESS:
-      return state.set('currentUser', action.payload.sessionToken)
+      //STORAGE
+      return state.set('accessToken', action.payload.access_token);
 
-    /**
-     * ### Clear currentUser
-     *
-     *
-     *
-     *
-     */
     case LOGOUT_SUCCESS:
-
-      return state.set('currentUser', null)
+      return state.set('currentUser', '')
+          .set('currentUserProfile', null)
+          .set('accessToken', '');
 
     /**
      * ### sets the payload into the store

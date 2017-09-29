@@ -20,5 +20,5 @@ export function serviceSignIn(deviceId, mobile, password) {
     formData.append("client_id", AppConfig.GRANT_CLIENT_ID);
     formData.append("device_uuid", deviceId);
 
-    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post('/oauth/token', formData))
+    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post('oauth/token', formData))
 }

@@ -7,6 +7,7 @@ export default keyMirror({
   SESSION_TOKEN_REQUEST: null,
   SESSION_TOKEN_SUCCESS: null,
   SESSION_TOKEN_FAILURE: null,
+  LOGIN_PROFILE_SUCCESS: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
@@ -29,8 +30,6 @@ export default keyMirror({
 
   LOGGED_IN: null,
   LOGGED_OUT: null,
-
-  SET_SESSION_TOKEN: null,
 
   RESET_PASSWORD_REQUEST: null,
   RESET_PASSWORD_SUCCESS: null,
