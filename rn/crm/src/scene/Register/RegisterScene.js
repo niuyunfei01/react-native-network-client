@@ -2,13 +2,10 @@ import React, {PureComponent} from 'react';
 import {View, ScrollView, Image, Text, SearchButton} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import Dimensions from 'Dimensions';
 import pxToDp from '../Alert/pxToDp';
 
-import {Cell, CellHeader, CellBody, CellFooter, Button, Input, Cells, ButtonArea, Flex} from "../../weui/index";
+import {Cell, CellHeader, CellBody, CellFooter, Button, Input, Cells, ButtonArea, Flex, Toast} from "../../weui/index";
 
-
-let {height, width} = Dimensions.get('window')
 
 /**
  * ## Redux boilerplate

@@ -13,6 +13,7 @@ import LoginScene from '../scene/Login/LoginScene'
 import WebScene from '../widget/WebScene'
 import RegisterScene from "../scene/Register/RegisterScene";
 import * as native from "./native";
+import TestWeuiScene from "../scene/TestWeui/TestWeui";
 
 const Tab = TabNavigator(
     {
@@ -138,7 +139,8 @@ class Navigator extends Component {
                     screen: LoginScene,
                     path: 'Login/:next/:nextParams'
                 },
-                Register: {screen: RegisterScene}
+                Register: {screen: RegisterScene},
+                TestWeui: {screen: TestWeuiScene}
             },
             stackNavigatorConfigs
         );
