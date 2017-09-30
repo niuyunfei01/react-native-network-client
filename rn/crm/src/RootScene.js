@@ -71,8 +71,9 @@ class RootScene extends PureComponent {
         const launchProps = this.props.launchProps;
 
         this.store = configureStore(function(store){
-            if (launchProps['access_token']) {
-                store.dispatch(setAccessToken(launchProps['access_token']));
+            const accessToken = launchProps['access_token'];
+            if (accessToken) {
+                store.dispatch(setAccessToken({access_token: accessToken}));
                 store.dispatch(setPlatform('android'))
                 store.dispatch(setVersion(VERSION))
             }

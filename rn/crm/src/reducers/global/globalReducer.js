@@ -6,7 +6,7 @@
 'use strict'
 
 const {
-  GET_PROFILE_SUCCESS: LOGIN_PROFILE_SUCCESS,
+  LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
 
   LOGOUT_SUCCESS,
@@ -18,6 +18,8 @@ import {REHYDRATE} from 'redux-persist/constants'
 const initialState = {
     currentUser: null,
     accessToken: '',
+    refreshToken: '',
+    expireTs: 0,
     currentUserProfile: null,
 }
 /**
@@ -36,7 +38,11 @@ export default function globalReducer (state = initialState, action) {
           } else return state;
 
       case SESSION_TOKEN_SUCCESS:
-          return {...state, 'accessToken': action.payload};
+          return {...state,
+              accessToken: action.payload.access_token,
+              refreshToken: action.payload.refresh_token,
+              expireTs: action.payload.expires_in_ts,
+          };
 
       case LOGOUT_SUCCESS:
           return state.set('currentUser', '')
