@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { NativeModules } from 'react-native';
@@ -102,26 +102,39 @@ const Tab = TabNavigator(
 
 );
 
-export const AppNavigator = StackNavigator(
-    {
-        Tab: { screen: Tab },
-        Order: {
-            screen: OrderScene,
-            path: 'order/:order_id',
-        },
-        Web: { screen: WebScene },
-        Home: { screen: AlertScene },
-        Login: {screen: LoginScene},
-        Register: {screen: RegisterScene}
-    },
-    {
-        navigationOptions: {
-            // headerStyle: { backgroundColor: color.theme }
-            headerBackTitle: null,
-            headerTintColor: '#333333',
-            showIcon: true,
-        },
-    }
-);
+class Navigator extends Component {
+    render() {
+        const {initialRouteName, screenProps} = this.props;
+        let stackNavigatorConfigs = {
+            navigationOptions: {
+                // headerStyle: { backgroundColor: color.theme }
+                headerBackTitle: null,
+                headerTintColor: '#333333',
+                showIcon: true,
+            },
+        };
 
-export default AppNavigator
+        if (initialRouteName) {
+            stackNavigatorConfigs = {...stackNavigatorConfigs, initialRouteName: initialRouteName}
+        }
+
+        const CustomNavigator = StackNavigator(
+            {
+                Tab: {screen: Tab},
+                Order: {
+                    screen: OrderScene,
+                    path: 'order/:order_id',
+                },
+                Web: {screen: WebScene},
+                Home: {screen: AlertScene},
+                Login: {screen: LoginScene},
+                Register: {screen: RegisterScene}
+            },
+            stackNavigatorConfigs
+        );
+
+        return <CustomNavigator screenProps={screenProps}/>
+    }
+}
+
+export default Navigator

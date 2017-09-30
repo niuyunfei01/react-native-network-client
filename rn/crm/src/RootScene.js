@@ -60,36 +60,46 @@ class RootScene extends PureComponent {
         StatusBar.setBarStyle('light-content')
 
         this.state = {
-            rehydrate: false
+            rehydrated: false
         }
+
+        this.store = null;
     }
 
-    componentDidMount() {
-        let launchProps = this.props.launchProps;
-        this.reset_to(launchProps);
-    }
-
-    render() {
-
-        // on Android, the URI prefix typically contains a host in addition to scheme
-        const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
-
+    componentWillMount() {
         const launchProps = this.props.launchProps;
 
-        const store = configureStore(function(){
+        this.store = configureStore(function(store){
             if (launchProps['access_token']) {
                 store.dispatch(setAccessToken(launchProps['access_token']));
                 store.dispatch(setPlatform('android'))
                 store.dispatch(setVersion(VERSION))
             }
-            console.log('store:', store.getState());
             this.setState({rehydrated: true});
-            this.reset_to(launchProps);
         }.bind(this));
+    }
 
-        return !this.state.rehydrate ? <Text>Loading...</Text>
+    componentDidMount() {
+        const launchProps = this.props.launchProps;
+        if (this.state.rehydrated) {
+            this.reset_to(launchProps);
+        }
+    }
+
+    render() {
+
+        const launchProps = this.props.launchProps;
+        if (this.state.rehydrated) {
+            this.reset_to(launchProps);
+        }
+
+        const initialRouteName = launchProps['orderId'] ? 'Order' : '';
+
+        // on Android, the URI prefix typically contains a host in addition to scheme
+        const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
+        return !this.state.rehydrated ? <Text>Loading...</Text>
             : (
-            <Provider store={store}>
+            <Provider store={this.store}>
                 <View style={styles.container}>
                 <View style={styles.statusBar}>
                     <StatusBar
@@ -98,6 +108,7 @@ class RootScene extends PureComponent {
                     />
                 </View>
             <AppNavigator uriPrefix={prefix} ref={nav => { this.navigator = nav; }}
+                initRouteName={initialRouteName}
                 onNavigationStateChange={
                     (prevState, currentState) => {
                         const currentScene = getCurrentRouteName(currentState);
@@ -127,6 +138,7 @@ class RootScene extends PureComponent {
                         index: 0,
                         actions: [NavigationActions.navigate({routeName: 'Order', params: {'order_id': orderId,}})]
                     }));
+                    console.log('navigation to order and dispatch...', orderId);
                     return;
                 }
 

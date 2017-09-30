@@ -51,7 +51,7 @@ export default function configureStore (persistDoneCall) {
     persistStore(store, cfg, () => {
         console.log('rehydration complete')
         if (persistDoneCall) {
-            persistDoneCall()
+            persistDoneCall(store)
         }
     });
 
