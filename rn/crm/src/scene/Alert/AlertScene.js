@@ -70,15 +70,15 @@ class AlertScene extends PureComponent {
     }
 
     loadData(type, page = 1, status = 0){
-        console.log('load_data_type => ', type, this.state.type);
+        // console.log('load_data_type => ', type, this.state.type);
         let search_type = type ? type : this.state.type;
         if(search_type > 0){
             this.setState({
                 isProcessing: true,
             });
-            const self_ = this;
-            this.props.actions.FetchAlert(this.props.accessToken, search_type, status, page).then(()=>{
-                let result = this.props.result;
+            let self_ = this;
+            this.props.actions.FetchAlert(this.props.accessToken, search_type, status, page, ((result)=>{
+                console.log('=====>', result);
                 if(result.ok){
                     let {total_num} = result.obj;
                     self_.setState({
@@ -92,7 +92,7 @@ class AlertScene extends PureComponent {
                         isProcessing: false,
                     });
                 }
-            });
+            }));
         } else {
             alert('查询参数有误!');
         }
