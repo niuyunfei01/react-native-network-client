@@ -101,7 +101,7 @@ class OrderScene extends PureComponent {
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {flex: 1}]}>
                 {/*<View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />*/}
                 <ScrollView
                     refreshControl={
@@ -115,6 +115,10 @@ class OrderScene extends PureComponent {
                     <SpacingView />
                     {this.renderGoods()}
                 </ScrollView>
+                <View style={{flexDirection: 'row', justifyContent: 'space-around', }}>
+                    <Button title="联系配送"/>
+                    <Button title="提醒送达"/>
+                </View>
             </View>
         );
     }
@@ -252,7 +256,6 @@ class OrderScene extends PureComponent {
 // define your styles
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: colors.back_color,
     },
     icon: {
