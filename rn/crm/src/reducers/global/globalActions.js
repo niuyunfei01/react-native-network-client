@@ -19,10 +19,10 @@ const {
     SESSION_TOKEN_SUCCESS
 } = require('../../common/constants').default
 
-export function setAccessToken(token) {
+export function setAccessToken(oauthToken) {
     return {
         type: SESSION_TOKEN_SUCCESS,
-        payload: token
+        payload: oauthToken
     }
 }
 
