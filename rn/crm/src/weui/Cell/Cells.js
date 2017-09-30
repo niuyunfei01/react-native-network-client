@@ -7,7 +7,7 @@ import V from '../variable'
 
 const styles = StyleSheet.create({
   cells: {
-    marginTop: V.weuiCellssMarginTop,
+    marginTop: V.weuiCellsMarginTop,
     backgroundColor: V.weuiCellBg,
     overflow: 'hidden',
     borderTopWidth: StyleSheet.hairlineWidth,
