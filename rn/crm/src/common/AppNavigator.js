@@ -103,8 +103,13 @@ const Tab = TabNavigator(
 );
 
 class Navigator extends Component {
+
+    constructor(props) {
+        super(props)
+    }
+
     render() {
-        const {initialRouteName, screenProps} = this.props;
+        const {initialRouteName, screenProps, initialRouteParams} = this.props;
         let stackNavigatorConfigs = {
             navigationOptions: {
                 // headerStyle: { backgroundColor: color.theme }
@@ -115,7 +120,11 @@ class Navigator extends Component {
         };
 
         if (initialRouteName) {
-            stackNavigatorConfigs = {...stackNavigatorConfigs, initialRouteName: initialRouteName}
+            stackNavigatorConfigs = {
+                ...stackNavigatorConfigs,
+                initialRouteName: initialRouteName,
+                initialRouteParams: initialRouteParams || {}
+            }
         }
 
         const CustomNavigator = StackNavigator(
@@ -132,7 +141,7 @@ class Navigator extends Component {
             },
             stackNavigatorConfigs
         );
-
+        console.log('go with config:', stackNavigatorConfigs, "props", this.props);
         return <CustomNavigator screenProps={screenProps}/>
     }
 }

@@ -37,7 +37,7 @@ export default function configureStore (persistDoneCall) {
         compose(
             applyMiddleware(
                 thunk,
-              logger
+              // logger
             ),
             autoRehydrate()
         )

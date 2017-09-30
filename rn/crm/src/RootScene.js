@@ -93,7 +93,9 @@ class RootScene extends PureComponent {
             this.reset_to(launchProps);
         }
 
-        const initialRouteName = launchProps['orderId'] ? 'Order' : '';
+        const order_id = launchProps['order_id'];
+        const initialRouteName = order_id ? 'Order' : '';
+        const initialRouteParams = order_id ? {'order_id': order_id} : {};
 
         // on Android, the URI prefix typically contains a host in addition to scheme
         const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
@@ -108,7 +110,7 @@ class RootScene extends PureComponent {
                     />
                 </View>
             <AppNavigator uriPrefix={prefix} ref={nav => { this.navigator = nav; }}
-                initRouteName={initialRouteName}
+                          initialRouteName={initialRouteName} initialRouteParams={initialRouteParams}
                 onNavigationStateChange={
                     (prevState, currentState) => {
                         const currentScene = getCurrentRouteName(currentState);
