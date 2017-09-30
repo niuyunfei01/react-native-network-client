@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, RefreshControl} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Touchable, TouchableOpacity, RefreshControl} from 'react-native';
 import {connect} from "react-redux";
 import pxToDp from './pxToDp';
 import LoadingView from '../../widget/LoadingView';
@@ -59,6 +59,7 @@ class AlertScene extends PureComponent {
             group_num: {},
         };
         this.loadData = this.loadData.bind(this);
+        // this.serStatus = this.serStatus.bind(this);
     }
 
     componentDidMount() {
@@ -97,6 +98,12 @@ class AlertScene extends PureComponent {
             alert('查询参数有误!');
         }
     }
+
+    // serStatus(order_id){
+    //     this.props.actions.setTaskStatus(this.state.mobile, (success) => {
+    //
+    //     });
+    // }
 
     render() {
 
@@ -314,12 +321,12 @@ class AlertRow extends PureComponent {
     static get defaultProps() {
         return {
             alert_detail: {},
-
         }
     }
 
     constructor(props) {
         super(props);
+        this._onPressToOrder = this._onPressToOrder.bind(this);
     }
 
     _onPressSelect(index, order_id){
@@ -332,12 +339,20 @@ class AlertRow extends PureComponent {
         return false;
     }
 
+    _onPressToOrder(order_id){
+        try {
+            this.props.navigation.navigate('Order', order_id);
+        } catch(e) {
+            alert("跳转订单:"+order_id + '; 异常信息: ' + e);
+        }
+    }
+
     render() {
         let row = this.props.alert_detail;
         if(row){
             // {"order_id":"653848","remark":"饿了么 望京 南湖西园 用户 赵佳玮 的 59 号订单 催单了, 请尽快处理","delegation_to":"830885","created_by":"0","deleted":"0","created":"2017-09-06 17:47:11","modified":"2017-09-06 17:47:11","remind_id":"532151529","orderTime":"2017-09-06 16:59:40","store_id":"望京","dayId":"59","orderStatus":"已送达","orderDate":"0906","delegation_to_user":"吴冬梅","noticeDate":"09\/06","noticeTime":"17:47","expect_end_time":"18:17","quick":false}]}}
             return (
-                <View style={top_styles.container}>
+                <TouchableOpacity style={top_styles.container} onPress={() => this._onPressToOrder(row.order_id)} activeOpacity={0.9}>
                     <View style={[top_styles.order_box]}>
                         <View style={top_styles.box_top}>
                             <View style={[top_styles.order_head]}>
@@ -396,7 +411,7 @@ class AlertRow extends PureComponent {
                             </View>
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
             );
         } else {
             return (

@@ -3,7 +3,7 @@
 const {
     RECEIVE_ALERT,
     REQUEST_ALERT,
-} = require('../../common/constants').default
+} = require('../../common/constants').default;
 
 import * as AlertServices from '../../services/alert';
 
@@ -25,11 +25,8 @@ function receiveAlert(alertType,alertStatus,result) {
 export function FetchAlert(token, type, status, page, callback){
     return dispatch => {
         dispatch(requestAlert());
-        return  AlertServices.FetchAlert(token, type, status, page)
-            .then(response=>{
-                console.log('response.json: ', response.json);
-                return response.json()
-            })
+        return  AlertServices.FetchList(token, type, status, page)
+            .then(response=>response.json())
             .then(json => {
                 let {ok, reason, desc, obj} = json;
                 callback(json);
