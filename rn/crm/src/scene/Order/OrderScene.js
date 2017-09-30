@@ -46,9 +46,10 @@ function mapDispatchToProps (dispatch) {
 
 class OrderScene extends PureComponent {
 
-    static navigationOptions = ({ navigation }) => ({
+    static navigationOptions = ({navigation}) => ({
         headerTitle: '订单详情',
-        headerStyle: { backgroundColor: colors.back_color, color: '#111111', height: pxToDp(78) },
+        headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
+        headerTitleStyle: {color: '#111111',},
         headerRight: (
             <NavigationItem
                 icon={require('../../img/Public/icon_navigationItem_share.png')}
