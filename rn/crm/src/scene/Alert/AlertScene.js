@@ -24,11 +24,12 @@ import ModalDropdown from 'react-native-modal-dropdown';
  * ## Redux boilerplate
  */
 
-function mapStateToProps ({alert}) {
+function mapStateToProps ({alert, global}) {
     return {
         type: alert.type,
         status: alert.status,
-        result: alert.result
+        result: alert.result,
+        accessToken: global.accessToken
     }
 }
 
@@ -76,7 +77,7 @@ class AlertScene extends PureComponent {
                 isProcessing: true,
             });
             const self_ = this;
-            this.props.actions.FetchAlert('19917687f923260dd9fa87caf0cf04a9cdb06a2d', search_type, status, page).then(()=>{
+            this.props.actions.FetchAlert(this.props.accessToken, search_type, status, page).then(()=>{
                 let result = this.props.result;
                 if(result.ok){
                     let {total_num} = result.obj;
