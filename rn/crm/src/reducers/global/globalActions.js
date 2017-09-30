@@ -5,9 +5,9 @@
  */
 'use strict'
 
-import {NativeModules} from 'react-native'
 import Config from '../../config'
 import {serviceSignIn, smsCodeRequest} from '../../services/account'
+import * as native from "../../common/native";
 
 /**
  * ## Imports
@@ -36,7 +36,7 @@ export function signIn(mobile, password, callback) {
                 if (access_token) {
                     dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}})
                     const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
-                    NativeModules.ActivityStarter.updateAfterTokenGot(access_token, expire, (ok, msg, user) => {
+                    native.updateAfterTokenGot(access_token, expire, (ok, msg, user) => {
                         if (ok) {
                             dispatch({type: LOGIN_PROFILE_SUCCESS, payload: user})
                         } else {

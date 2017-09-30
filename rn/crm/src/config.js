@@ -9,4 +9,9 @@ export default {
     GRANT_CLIENT_ID: "NTQ5NTE5MGViMTgzMDUw",
 
     ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
+
+    ROUTE_LOGIN: 'Login',
+    ROUTE_ORDER: 'Order',
+    ROUTE_ALERT: 'Alert',
+    ROUTE_ORDERS: 'Orders',
 };

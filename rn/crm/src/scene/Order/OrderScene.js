@@ -15,6 +15,8 @@ import api, { orderUrlWithId} from '../../api'
 import {bindActionCreators} from "redux";
 import {Button as EButton} from 'react-native-elements';
 
+import Config from '../../config'
+
 /**
  * The actions we need
  */
@@ -30,7 +32,6 @@ import colors from "../../styles/colors";
 function mapStateToProps (state) {
     return {
         isFetching: state.isFetching,
-        order_id: state.order_id,
         order: state.order,
         global: state.global,
     }
@@ -80,7 +81,7 @@ class OrderScene extends PureComponent {
     componentDidMount() {
         // this.requestData();
 
-        const order_id = (this.props.navigation.state.params||{}).order_id;//this.props.navigation.state.params.order_id;
+        const order_id = (this.props.navigation.state.params||{}).order_id;
 
         InteractionManager.runAfterInteractions(() => {
         });
@@ -122,11 +123,11 @@ class OrderScene extends PureComponent {
     onHeaderRefresh() {
         //this.requestData()
 
-        this.props.actions.getOrder(OrderScene.access_token, this.state.order_id)
+        this.props.actions.getOrder(this.props.global.accessToken, this.state.order_id)
     }
 
     _onLogin() {
-        this.props.navigation.navigate('Login')
+        this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.order_id}})
     }
 
     renderHeader() {

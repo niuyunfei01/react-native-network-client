@@ -1,11 +1,8 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { NativeModules } from 'react-native';
 import { addNavigationHelpers, NavigationActions, StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation';
 
 import color from '../widget/color'
-// import { screen, system, tool } from './common'
 import TabBarItem from '../widget/TabBarItem'
 
 import AlertScene from '../scene/Alert/AlertScene'
@@ -15,6 +12,7 @@ import LoginScene from '../scene/Login/LoginScene'
 
 import WebScene from '../widget/WebScene'
 import RegisterScene from "../scene/Register/RegisterScene";
+import * as native from "./native";
 
 const Tab = TabNavigator(
     {
@@ -47,7 +45,7 @@ const Tab = TabNavigator(
                 ),
                 tabBarOnPress: () => {
                     console.log('do tabBarOnPress');
-                    NativeModules.ActivityStarter.navigateToOrders();
+                    native.toOrders();
                 }
             }),
         },
@@ -66,7 +64,7 @@ const Tab = TabNavigator(
                 ),
                 tabBarOnPress: () => {
                     console.log('do navigateToGoods');
-                    NativeModules.ActivityStarter.navigateToGoods();
+                    native.toGoods();
                 }
             }),
         },
@@ -132,11 +130,14 @@ class Navigator extends Component {
                 Tab: {screen: Tab},
                 Order: {
                     screen: OrderScene,
-                    path: 'order/:order_id',
+                    path: 'order/:orderId',
                 },
                 Web: {screen: WebScene},
                 Home: {screen: AlertScene},
-                Login: {screen: LoginScene},
+                Login: {
+                    screen: LoginScene,
+                    path: 'Login/:next/:nextParams'
+                },
                 Register: {screen: RegisterScene}
             },
             stackNavigatorConfigs

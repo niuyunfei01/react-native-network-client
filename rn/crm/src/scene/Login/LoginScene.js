@@ -12,6 +12,9 @@ import {CountDownText} from "../../widget/CounterText";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
+import Config from '../../config'
+import * as native from "../../common/native";
+
 var styles = StyleSheet.create({
     backgroundImage: {
         flex: 1,
@@ -91,6 +94,10 @@ class LoginScene extends PureComponent {
         this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
         this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
         this.doneReqSign = this.doneReqSign.bind(this)
+
+        const params = (this.props.navigation.state.params || {});
+        this.next = params.next;
+        this.nextParams = params.nextParams;
     }
 
     clearTimeouts() {
@@ -106,7 +113,8 @@ class LoginScene extends PureComponent {
             this.setState({canAskReqSmsCode: true});
             //this.counterText.start();
             this.props.actions.requestSmsCode(this.state.mobile, (success) => {
-                ToastAndroid.showWithGravity(success ? "短信验证码已发送" : "短信验证码发送失败", success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER)
+                ToastAndroid.showWithGravity(success ? "短信验证码已发送" : "短信验证码发送失败",
+                    success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER)
             });
         } else {
             ToastAndroid.showWithGravity("请输入您的手机号", ToastAndroid.SHORT, ToastAndroid.CENTER)
@@ -160,7 +168,11 @@ class LoginScene extends PureComponent {
         this.props.actions.signIn(mobile, password, (ok, msg) => {
             self.doneReqSign()
             if (ok) {
-                NativeModules.ActivityStarter.navigateToOrders();
+                if (Config.ROUTE_ORDERS === this.next) {
+                    native.toOrders();
+                } else {
+                    this.props.navigation.navigate(this.next || Config.ROUTE_ALERT, this.nextParams)
+                }
             } else {
                 ToastAndroid.show("登录失败，请输入正确的"+name, ToastAndroid.LONG)
                 return false;

@@ -7,7 +7,7 @@
  */
 
 import React, {PureComponent} from 'react'
-import {StatusBar, Platform, StyleSheet, View, Text} from 'react-native'
+import {StatusBar, Platform, StyleSheet, View, Text, ToastAndroid} from 'react-native'
 import {NavigationActions} from 'react-navigation'
 
 import {Provider} from 'react-redux'
@@ -28,6 +28,7 @@ import configureStore from "./common/configureStore";
 import {VERSION} from "./api";
 import AppNavigator from './common/AppNavigator'
 
+import Config from './config'
 
 const lightContentScenes = ['Home', 'Mine']
 
@@ -79,23 +80,27 @@ class RootScene extends PureComponent {
         }.bind(this));
     }
 
-    componentDidMount() {
-        const launchProps = this.props.launchProps;
-        if (this.state.rehydrated) {
-            this.reset_to(launchProps);
-        }
-    }
-
     render() {
 
         const launchProps = this.props.launchProps;
+        const orderId = launchProps['order_id'];
+
+        let initialRouteName = '';
+        let initialRouteParams = {};
+
         if (this.state.rehydrated) {
-            this.reset_to(launchProps);
+            if (!this.store.getState().global.accessToken) {
+                ToastAndroid.showWithGravity("请您先登录", ToastAndroid.SHORT, ToastAndroid.CENTER)
+                initialRouteName = Config.ROUTE_LOGIN;
+                initialRouteParams = {next: '', nextParams: {}};
+            } else {
+                if (orderId) {
+                    initialRouteName = Config.ROUTE_ORDER;
+                    initialRouteParams = {orderId};
+                }
+            }
         }
 
-        const order_id = launchProps['order_id'];
-        const initialRouteName = order_id ? 'Order' : '';
-        const initialRouteParams = order_id ? {'order_id': order_id} : {};
 
         // on Android, the URI prefix typically contains a host in addition to scheme
         const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
@@ -128,33 +133,6 @@ class RootScene extends PureComponent {
                 </View>
             </Provider>
         );
-    }
-
-    reset_to(launchProps) {
-        if (this.navigator) {
-            if (this.navigator._navigation) {
-                let orderId = launchProps['order_id'];
-                if (orderId) {
-                    this.navigator._navigation.navigate('Order', {order_id: orderId})
-                    this.navigator._navigation.dispatch(NavigationActions.reset({
-                        index: 0,
-                        actions: [NavigationActions.navigate({routeName: 'Order', params: {'order_id': orderId,}})]
-                    }));
-                    console.log('navigation to order and dispatch...', orderId);
-                    return;
-                }
-
-                let _action = launchProps['_action'];
-                if (_action) {
-                    this.navigator._navigation.navigate('Login', {order_id: orderId})
-                    this.navigator._navigation.dispatch(NavigationActions.reset({
-                        index: 0,
-                        actions: [NavigationActions.navigate({routeName: 'Login', params: {}})]
-                    }));
-                }
-
-            }
-        }
     }
 }
 
