@@ -4,4 +4,10 @@ export default {
     main_color:'#59b26a',
     main_vice_color:'#006837',
     actionSecondSize: 28,
+    color333: '#333333',
+    color666: '#666',
+    color999: '#999',
+    white: '#ffffff',
+    mobile_color: '#407c49',
+    back_color: '#e5e6e7',
 };

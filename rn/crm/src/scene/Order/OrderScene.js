@@ -10,10 +10,9 @@ import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import { color, Button, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
-import { screen, system, tool } from '../../common'
-import api, { orderUrlWithId} from '../../api'
+import { screen, system } from '../../common'
+import {shortOrderDay, orderOrderTimeShort, orderExpectTime} from '../../common/tool'
 import {bindActionCreators} from "redux";
-import {Button as EButton} from 'react-native-elements';
 
 import Config from '../../config'
 
@@ -24,6 +23,7 @@ import * as orderActions from '../../reducers/order/orderActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
+import pxToDp from "../Alert/pxToDp";
 
 /**
  * ## Redux boilerplate
@@ -43,11 +43,12 @@ function mapDispatchToProps (dispatch) {
     }
 }
 
+
 class OrderScene extends PureComponent {
 
     static navigationOptions = ({ navigation }) => ({
         headerTitle: '订单详情',
-        headerStyle: { backgroundColor: 'white' },
+        headerStyle: { backgroundColor: colors.back_color, color: '#111111', height: pxToDp(78) },
         headerRight: (
             <NavigationItem
                 icon={require('../../img/Public/icon_navigationItem_share.png')}
@@ -78,17 +79,18 @@ class OrderScene extends PureComponent {
 
     }
 
-    componentDidMount() {
-        // this.requestData();
+    componentWillMount() {
 
-        const order_id = (this.props.navigation.state.params||{}).order_id;
+        const orderId = (this.props.navigation.state.params||{}).orderId;
+
+        console.log("params orderId:", orderId)
 
         InteractionManager.runAfterInteractions(() => {
         });
 
-        if (!this.props.order || !this.props.order.id || this.props.order.id !== order_id) {
-            this.props.actions.getOrder(this.props.global.accessToken, order_id)
-            this.setState({order_id: order_id});
+        if (!this.props.order || !this.props.order.id || this.props.order.id !== orderId) {
+            this.props.actions.getOrder(this.props.global.accessToken, orderId)
+            this.setState({order_id: orderId});
         } else {
             this.setState({
                 order: this.props.order
@@ -145,106 +147,104 @@ class OrderScene extends PureComponent {
 
         return (
             <View style={styles.topContainer}>
-                <View>
-                    <View style={styles.userInfoRow}>
-                        <Paragraph>{order.userName}</Paragraph>
-                        <Text>{order.mobile}</Text>
-                        <Button>1891000119</Button>
-                        <Paragraph>第{order.order_times}次</Paragraph>
-                        <Paragraph>#{order.dayId}</Paragraph>
+                <View style={{backgroundColor: '#fff'}}>
+                    <View style={styles.row}>
+                        <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
+                        <Text style={{fontSize: pxToDp(24), color: colors.white, backgroundColor: colors.main_color, borderRadius:5}}>用户资料</Text>
                         <View style={{flex: 1}}/>
                         <Image style={styles.icon} source={require('../../img/Public/wx_yes_icon.png')}/>
                     </View>
-
-                    <Paragraph>
+                    <Text style={[styles.row, {fontSize: pxToDp(30), fontWeight: 'bold', color: colors.color666, marginTop: pxToDp(20)}]}>
                         {order.address}
-                    </Paragraph>
-                    <Button>地图</Button>
-                    <Button>呼叫门店</Button>
-
-                    <Paragraph>期望配送：<Text> {order.expectTime}</Text></Paragraph>
-                    <Paragraph>支付方式：<Text> {order.paid_done === '1' ? '在线支付':'货到付款'}</Text></Paragraph>
+                    </Text>
+                    <View style={[styles.row, {paddingLeft: 0, marginLeft: 15}]}>
+                        <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white, backgroundColor: colors.main_color, borderRadius: 1}}>第{order.order_times}次</Text>
+                        <TouchableOpacity><Text style={{fontSize: pxToDp(32), color: colors.mobile_color}}>{order.mobile}</Text></TouchableOpacity>
+                        <View style={{flex: 1}}/>
+                        <Image style={styles.icon} source={require('../../img/Public/icon_food_merchant_address_2x.png')}/>
+                    </View>
+                    <Separator style={{backgroundColor: colors.color999}}/>
+                    <View style={[styles.row]}>
+                        <Text style={styles.remarkText}>客户备注:</Text>
+                        <Text style={[styles.remarkText, {marginLeft: 5}]}>您好，麻烦把我买的排骨用热水焯一下，不然差评！谢谢！</Text>
+                    </View>
+                    <View style={[styles.row, {marginRight: 40}]}>
+                        <Text style={styles.remarkText}>商家备注:</Text>
+                        <Text style={[styles.remarkText, {marginLeft: 5, marginRight:40}]}>好的，我们会切上葱段和生姜加上料酒，一定给您焯干净。</Text>
+                    </View>
                 </View>
 
-                <Separator />
+                <View style={{marginTop: pxToDp(20), backgroundColor:'#f0f9ef'}}>
+                    <View style={styles.row}>
+                        <Text>{shortOrderDay(order.orderTime)}#{order.dayId}</Text>
+                        <View style={{flex: 1}}/>
+                        <Button title={order.storeName} style={{color:'#407c49'}}/>
+                    </View>
+                    <View style={styles.row}>
+                        <Text>订单号：{order.id}</Text>
+                        <View style={{flex: 1}}/>
+                        <Text>期望送达 {orderExpectTime(order.expectTime)}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text>{order.platform}#{order.platformId} {order.platform_oid}</Text>
+                        <View style={{flex: 1}}/>
+                        <Text>{orderOrderTimeShort(order.orderTime)}下单</Text>
+                    </View>
+                    <View style={{height: pxToDp(170), backgroundColor: colors.white, flexDirection: 'row',
+                        justifyContent:'space-around'}}>
+                        <View style={{flexDirection: 'column',}}>
+                            <Text style={styles.stepText}>打包中</Text>
+                            <Text style={styles.stepText}>刘子墨分拣</Text>
+                            <Text style={styles.stepText}>27分钟前</Text>
+                        </View>
+                        <View style={{flexDirection: 'column'}}>
+                            <Text style={styles.stepText}>打包中</Text>
+                            <Text style={styles.stepText}>刘子墨分拣</Text>
+                            <Text style={styles.stepText}>27分钟前</Text>
+                        </View>
+                        <View style={{flexDirection: 'column'}}>
+                            <Text style={styles.stepText}>打包中</Text>
+                            <Text style={styles.stepText}>刘子墨分拣</Text>
+                            <Text style={styles.stepText}>27分钟前</Text>
+                        </View>
+                        <View style={{flexDirection: 'column'}}>
+                            <Text style={styles.stepText}>打包中</Text>
+                            <Text style={styles.stepText}>刘子墨分拣</Text>
+                            <Text style={styles.stepText}>27分钟前</Text>
+                        </View>
+                    </View>
+                </View>
 
-                <View>
-                    <Heading1>订单状态： 已送达</Heading1>
-                    <Paragraph>订单号：659864（饿了么回龙观-300093902094802）</Paragraph>
-                    <Paragraph>下单时间： 2017-09-22</Paragraph>
+                <View style={{marginTop: pxToDp(20), backgroundColor: colors.white}}>
+                    <View style={styles.row}>
+                        <Text>商品明细</Text>
+                        <Text>{order.items.length}种商品</Text>
+                        <View style={{flex: 1}}/>
+                        <Button title="修改商品"/>
+                        <Button title="下拉" style={{marginLeft: 10}}/>
+                    </View>
+                    {order.items.map((item, idx) => {
+                        return (<View><View style={styles.row}>
+                            <View style={{flex: 1}}>
+                                <Text>{item.product_name}</Text>
+                                <View style={{flexDirection: 'row'}}>
+                                <Text>{item.price}</Text>
+                                <Text style={{marginLeft: 30}}>{item.price * item.num}</Text>
+                                </View>
+                            </View>
+                            <Text style={{alignSelf: 'flex-end'}}>X{item.num}</Text>
+                        </View>
+                            <Separator/>
+                        </View>);
+                    })}
                 </View>
 
                 <Separator/>
 
-                <Button
-                    raised
-                    icon={{name: 'home', size: 32}}
-                    buttonStyle={{backgroundColor: 'red', borderRadius: 10}}
-                    textStyle={{textAlign: 'center'}}
-                    title={`Welcome to\nReact Native Elements`}
-                />
-
                 <Separator/>
-
-                <EButton
-                    raised
-                    disabled={false}
-                    color={colors.main_color}
-                    onPress={this._onLogin}
-                    icon={{name: 'cached'}}
-                    title='登录' />
 
             </View>
         )
-    }
-
-    // info () {
-    //     return {id: 655439}
-    // }
-
-    // async requestData() {
-    //
-    //     this.setState({
-    //         isRefreshing: true
-    //     })
-    //
-    //     let info = this.info(); //this.props.navigation.state.params.info
-    //     let response = await fetch(orderUrlWithId(info.id))
-    //     let json = await response.json()
-    //
-    //     console.log(json)
-    //
-    //     this.setState({
-    //         isRefreshing: false,
-    //         order: json
-    //     })
-    // }
-
-    async requestRecommend() {
-        try {
-            let info = this.info(); //this.props.navigation.state.params.info
-            let response = await fetch(orderUrlWithId(info.id))
-            let json = await response.json()
-
-            console.log(JSON.stringify(json));
-
-            let dataList = json.data.items.map((info) => {
-                return {
-                    id: info.id,
-                    imageUrl: info.imgurl,
-                    title: info.brandname,
-                    subtitle: `[${info.range}]${info.title}`,
-                    price: info.price
-                }
-            })
-
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(dataList)
-            })
-            setTimeout(() => {
-            }, 500);
-        } catch (error) {
-        }
     }
 }
 
@@ -252,7 +252,7 @@ class OrderScene extends PureComponent {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: colors.back_color,
     },
     icon: {
         width: 32,
@@ -263,12 +263,20 @@ const styles = StyleSheet.create({
         width: screen.width,
         height: screen.width * 0.5
     },
-    topContainer: {
-        padding: 10,
-    },
-    userInfoRow: {
+    row: {
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        marginLeft: 10,
+        marginRight: 15,
+        alignContent: 'center',
+        marginTop: pxToDp(14)
+    },
+    remarkText: {
+        color: '#808080',
+        fontWeight: 'bold',
+        fontSize: pxToDp(24),
+    },
+    stepText: {
+        textAlign: 'center'
     },
     buyButton: {
         backgroundColor: '#fc9e28',

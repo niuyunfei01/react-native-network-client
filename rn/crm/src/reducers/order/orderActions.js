@@ -39,8 +39,9 @@ export function getOrderFailure (json) {
 export function getOrder(sessionToken, orderId) {
     return dispatch => {
         dispatch(getOrderRequest())
-        // store or get a sessionToken
-        return fetch(orderUrlWithId(sessionToken, orderId))
+        const url = orderUrlWithId(sessionToken, orderId);
+        console.log("url", url)
+        return fetch(url)
             .then((res) => res.json())
             .then((res_data) => res_data)
             .then((json) => {
