@@ -15,7 +15,8 @@ export default {
   weuiBtnDefaultDisabledFontColor: '#C9C9C9',
   weuiBtnDefaultActiveFontColor: '#A1A1A1',
 
-  weuiBtnPrimaryBg: '#04BE02',
+  //weuiBtnPrimaryBg: '#04BE02',
+  weuiBtnPrimaryBg: '#59b26a',
   weuiBtnPrimaryActiveBg: '#039702',
 
   weuiBtnWarnBg: '#EF4F4F',
