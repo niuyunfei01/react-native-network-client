@@ -160,7 +160,7 @@ CountDownText.propTypes = {
         PropTypes.func,
     ]),
     endText: PropTypes.string,
-    auto:  PropTypes.boolean,
+    auto:  PropTypes.bool,
 }
 
 module.exports = CountDownText;
