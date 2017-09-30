@@ -7,7 +7,7 @@
  */
 
 //import liraries
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import { View, Text, StyleSheet, ScrollView, Image, Touchable, TouchableOpacity, RefreshControl} from 'react-native';
 import {connect} from "react-redux";
 import pxToDp from './pxToDp';
@@ -19,6 +19,7 @@ import * as globalActions from '../../reducers/global/globalActions'
 import {bindActionCreators} from "redux";
 let ScrollableTabView = require('react-native-scrollable-tab-view');
 import ModalDropdown from 'react-native-modal-dropdown';
+import Config from '../../config'
 
 /**
  * ## Redux boilerplate
@@ -60,6 +61,7 @@ class AlertScene extends PureComponent {
         };
         this.loadData = this.loadData.bind(this);
         // this.serStatus = this.serStatus.bind(this);
+        this._onRowClick = this._onRowClick.bind(this);
     }
 
     componentDidMount() {
@@ -68,6 +70,10 @@ class AlertScene extends PureComponent {
 
     componentWillMount() {
         this.loadData();
+    }
+
+    _onRowClick (route, params) {
+        this.props.navigation.navigate(route, params);
     }
 
     loadData(type, page = 1, status = 0){
@@ -159,6 +165,7 @@ class AlertScene extends PureComponent {
                     alert_type={type}
                     callbackLoadData={this.loadData}
                     isProcessing={isProcessing}
+                    onPress={(route, params)=>this._onRowClick(route, params)}
                 />
                 <AlertList
                     tabLabel={group_num.remind_type > 0 ? "催单/异常("+group_num.remind_type+")" : "催单/异常"}
@@ -166,6 +173,7 @@ class AlertScene extends PureComponent {
                     alert_type={type}
                     callbackLoadData={this.loadData}
                     isProcessing={isProcessing}
+                    onPress={(route, params)=>this._onRowClick(route, params)}
                 />
                 <AlertList
                     tabLabel={group_num.complain_type > 0 ? "售后单("+group_num.complain_type+")" : "售后单"}
@@ -173,6 +181,7 @@ class AlertScene extends PureComponent {
                     alert_type={type}
                     callbackLoadData={this.loadData}
                     isProcessing={isProcessing}
+                    onPress={(route, params)=>this._onRowClick(route, params)}
                 />
                 <AlertList
                     tabLabel={group_num.other_type > 0 ? "其他("+group_num.other_type+")" : "其他"}
@@ -180,13 +189,14 @@ class AlertScene extends PureComponent {
                     alert_type={type}
                     callbackLoadData={this.loadData}
                     isProcessing={isProcessing}
+                    onPress={(route, params)=>this._onRowClick(route, params)}
                 />
             </ScrollableTabView>
         );
     }
 }
 
-class AlertList extends PureComponent {
+class AlertList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -290,9 +300,10 @@ class AlertList extends PureComponent {
             // }
         }
 
+        const {onPress} = this.props;
         let alert_row = data_list.map(function (row, index) {
             return (
-                <AlertRow alert_detail={row} key={index}/>
+                <AlertRow alert_detail={row} key={index} onPress={onPress}/>
             );
         });
         return (
@@ -317,7 +328,7 @@ class AlertList extends PureComponent {
     }
 }
 
-class AlertRow extends PureComponent {
+class AlertRow extends Component {
     static get defaultProps() {
         return {
             alert_detail: {},
@@ -348,11 +359,14 @@ class AlertRow extends PureComponent {
     }
 
     render() {
+        const {onPress} = this.props;
+        console.log("onPress variable:", onPress);
+
         let row = this.props.alert_detail;
         if(row){
             // {"order_id":"653848","remark":"饿了么 望京 南湖西园 用户 赵佳玮 的 59 号订单 催单了, 请尽快处理","delegation_to":"830885","created_by":"0","deleted":"0","created":"2017-09-06 17:47:11","modified":"2017-09-06 17:47:11","remind_id":"532151529","orderTime":"2017-09-06 16:59:40","store_id":"望京","dayId":"59","orderStatus":"已送达","orderDate":"0906","delegation_to_user":"吴冬梅","noticeDate":"09\/06","noticeTime":"17:47","expect_end_time":"18:17","quick":false}]}}
             return (
-                <TouchableOpacity style={top_styles.container} onPress={() => this._onPressToOrder(row.order_id)} activeOpacity={0.9}>
+                <TouchableOpacity style={top_styles.container} onPress={() => onPress(Config.ROUTE_ORDER, {orderId: row.order_id})} activeOpacity={0.9}>
                     <View style={[top_styles.order_box]}>
                         <View style={top_styles.box_top}>
                             <View style={[top_styles.order_head]}>
