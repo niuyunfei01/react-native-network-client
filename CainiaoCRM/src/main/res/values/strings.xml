@@ -274,8 +274,5 @@
         <item>只看总部备货</item>
         <item>只看门店备货</item>
     </string-array>
-
-    <string name="chocoyo_labs_splash_class_name">cn.cainiaoshicai.crm.ui.activity.LoginActivity</string>
-    <string name="chocoyo_labs_splash_content_description">菜鸟食材</string>
-    <string name="chocoyo_labs_splash_drawable_name">splash</string>
+    
 </resources>

@@ -25,6 +25,10 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.ReactPackage;
+import com.facebook.react.shell.MainReactPackage;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -32,8 +36,11 @@ import com.google.gson.Gson;
 import com.iflytek.cloud.Setting;
 import com.iflytek.cloud.SpeechUtility;
 
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -197,7 +204,6 @@ public class GlobalCtx extends Application {
         }
     }
 
-
     public ImageLoader getImageLoader() {
         return imageLoader;
     }
@@ -252,18 +258,12 @@ public class GlobalCtx extends Application {
 
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
+        // 初始化合成对象
+        SpeechUtility.createUtility(getApplicationContext(), "appid=" + R.string.app_id);
+        AudioUtils.getInstance().init(getApplicationContext());
+
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
-
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
-                //mInstaller = new  ApkInstaller(TtsDemo.this);
-                return null;
-            }
-        }.execute();
     }
 
     public void updateAfterGap(final int fiveMin) {
@@ -320,7 +320,7 @@ public class GlobalCtx extends Application {
 
                         Config config = b.getObj();
                         if (!TextUtils.isEmpty(config.getLastHash())
-                            && lastHash.equals(b.getObj().getLastHash()) ) {
+                                && lastHash.equals(b.getObj().getLastHash())) {
                             return;
                         }
 
@@ -894,6 +894,7 @@ public class GlobalCtx extends Application {
             }.executeOnNormal();
         }
     }
+
 
     public class SoundManager {
         private static final int STORE_SOUND_LEN = 1700;

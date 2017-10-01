@@ -18,6 +18,9 @@ import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainReactPackage;
 
+import org.devio.rn.splashscreen.SplashScreen;
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
+
 import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.BuildConfig;
@@ -35,6 +38,8 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
             setTranslucent();
         }
 
+        SplashScreen.show(this);
+
         super.onCreate(savedInstanceState);
 
         mReactRootView = new ReactRootView(this);
@@ -44,6 +49,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 .setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
+                .addPackage(new SplashScreenReactPackage())
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
