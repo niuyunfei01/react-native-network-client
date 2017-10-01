@@ -84,8 +84,8 @@ class RootScene extends PureComponent {
         const launchProps = this.props.launchProps;
         const orderId = launchProps['order_id'];
 
-        let initialRouteName = '';
-        let initialRouteParams = {};
+        let initialRouteName = launchProps['_action'];
+        let initialRouteParams = launchProps['_action_params']||{};
 
         if (this.state.rehydrated) {
             if (!this.store.getState().global.accessToken) {
@@ -93,7 +93,7 @@ class RootScene extends PureComponent {
                 initialRouteName = Config.ROUTE_LOGIN;
                 initialRouteParams = {next: '', nextParams: {}};
             } else {
-                if (orderId) {
+                if (!initialRouteName && orderId) {
                     initialRouteName = Config.ROUTE_ORDER;
                     initialRouteParams = {orderId};
                 }

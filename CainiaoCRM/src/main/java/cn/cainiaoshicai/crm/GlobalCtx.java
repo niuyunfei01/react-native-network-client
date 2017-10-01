@@ -75,6 +75,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
@@ -705,10 +706,11 @@ public class GlobalCtx extends Application {
 
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
-        Intent intent = new Intent(ctx, RemindersActivity.class);
-        String token = GlobalCtx.app().token();
-        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
-        return intent;
+//        Intent intent = new Intent(ctx, RemindersActivity.class);
+//        String token = GlobalCtx.app().token();
+//        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
+
+        return new Intent(ctx, MyReactActivity.class);
     }
 
     public void setTaskCount(int taskCount) {

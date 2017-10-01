@@ -16,13 +16,21 @@ import * as native from "../../common/native";
  */
 const {
     LOGIN_PROFILE_SUCCESS,
-    SESSION_TOKEN_SUCCESS
+    SESSION_TOKEN_SUCCESS,
+    LOGOUT_SUCCESS
 } = require('../../common/constants').default
 
 export function setAccessToken(oauthToken) {
     return {
         type: SESSION_TOKEN_SUCCESS,
         payload: oauthToken
+    }
+}
+
+export function logout() {
+    return dispatch => {
+        dispatch({type: LOGOUT_SUCCESS})
+        native.logout()
     }
 }
 

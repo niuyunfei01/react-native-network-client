@@ -104,6 +104,10 @@ class LoginScene extends PureComponent {
         this.timeouts.forEach(clearTimeout);
     }
 
+    componentWillMount() {
+        this.props.actions.logout();
+    }
+
     componentWillUnmount() {
         this.clearTimeouts();
     }

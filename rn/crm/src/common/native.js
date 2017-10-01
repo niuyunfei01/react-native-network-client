@@ -17,3 +17,10 @@ export function toGoods() {
     NativeModules.ActivityStarter &&
         NativeModules.ActivityStarter.navigateToGoods();
 }
+
+
+export function logout() {
+    NativeModules.ActivityStarter &&
+        NativeModules.ActivityStarter.logout();
+}
+
