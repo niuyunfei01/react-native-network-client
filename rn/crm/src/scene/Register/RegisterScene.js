@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, SearchButton} from 'react-native'
+import {View, StyleSheet, Image, Text, SearchButton, ScrollView} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../Alert/pxToDp';
@@ -145,8 +145,8 @@ class RegisterScene extends PureComponent {
 
     render() {
         return (
-            <View style={styles.container}>
-                <View style={{height: pxToDp(100)}}/>
+            <ScrollView style={styles.container}>
+                <View style={{height: pxToDp(50)}}/>
                 <View style={styles.register_panel}>
                     <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
                         <Cell>
@@ -252,7 +252,7 @@ class RegisterScene extends PureComponent {
                         </Cell>
                     </Cells>
 
-                    <ButtonArea style={{marginBottom: 2, marginTop: pxToDp(100)}}>
+                    <ButtonArea style={{marginBottom: pxToDp(50), marginTop: pxToDp(50)}}>
                         <Button type="primary" onPress={() => {
                         }}>我要开店</Button>
                     </ButtonArea>
@@ -270,7 +270,7 @@ class RegisterScene extends PureComponent {
                     <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
                     }}>{this.state.opErrorMsg}</Toast>
                 </View>
-            </View>
+            </ScrollView>
         )
     }
 }

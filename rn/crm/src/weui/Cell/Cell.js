@@ -42,7 +42,6 @@ const Cell = (props) => {
             <View
                 style={[
                     styles.cell,
-                    cellStyle ? cellStyle : null,
                     first ? styles.firstCell : null,
                     vcode ? styles.vcodeCell : null
                 ]}
