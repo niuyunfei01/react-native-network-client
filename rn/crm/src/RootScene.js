@@ -24,6 +24,8 @@ import Caught from './common/Caught'
 
 import Config from './config'
 
+import SplashScreen from 'react-native-splash-screen'
+
 const lightContentScenes = ['Home', 'Mine']
 
 
@@ -64,6 +66,10 @@ class RootScene extends PureComponent {
         }
 
         this.store = null;
+    }
+
+    componentDidMount() {
+        SplashScreen.hide()
     }
 
     componentWillMount() {
