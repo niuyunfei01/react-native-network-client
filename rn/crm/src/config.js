@@ -14,4 +14,9 @@ export default {
     ROUTE_ORDER: 'Order',
     ROUTE_ALERT: 'Alert',
     ROUTE_ORDERS: 'Orders',
+
+    //任务状态
+    TASK_STATUS_WAITING: 0,//未处理
+    TASK_STATUS_DONE: 1,//已处理
+    TASK_STATUS_CONFIRMED: 2,//已确认
 };
