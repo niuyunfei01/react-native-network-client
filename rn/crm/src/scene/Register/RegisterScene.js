@@ -148,7 +148,7 @@ class RegisterScene extends PureComponent {
             <View style={styles.container}>
                 <View style={{height: pxToDp(100)}}/>
                 <View style={styles.register_panel}>
-                    <Cells>
+                    <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
                         <Cell>
                             <CellHeader>
                                 <Image source={require('../../img/Register/login_phone_.png')} style={{
@@ -280,7 +280,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white'
     },
-
     register_panel: {
         flex: 1,
         backgroundColor: 'white',
@@ -299,8 +298,6 @@ const styles = StyleSheet.create({
         paddingBottom: 6 * 0.75,
     },
     input: {
-        fontSize: pxToDp(32),
-        height: pxToDp(50),
         color: "#999"
     }
 });
