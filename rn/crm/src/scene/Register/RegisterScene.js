@@ -45,7 +45,7 @@ class RegisterScene extends PureComponent {
                     color: "#ffffff",
                     fontWeight: 'bold',
                     fontSize: 20
-                }}>注册</Text>
+                }}>我要开店</Text>
             </View>
         ),
         headerStyle: {backgroundColor: '#59b26a'},
@@ -175,7 +175,7 @@ class RegisterScene extends PureComponent {
                                     height: pxToDp(29),
                                 }}/>
                             </CellHeader>
-                            <CellBody>
+                            <CellBody style={styles.cell_body}>
                                 <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
                                        value={this.state.verifyCode}
                                        style={styles.input}
@@ -252,9 +252,9 @@ class RegisterScene extends PureComponent {
                         </Cell>
                     </Cells>
 
-                    <ButtonArea style={{marginBottom: 2}}>
+                    <ButtonArea style={{marginBottom: 2, marginTop: pxToDp(100)}}>
                         <Button type="primary" onPress={() => {
-                        }}>注册</Button>
+                        }}>我要开店</Button>
                     </ButtonArea>
 
                     <Flex direction="row" style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
