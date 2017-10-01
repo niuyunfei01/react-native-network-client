@@ -62,7 +62,6 @@ public class MineActivity extends AbstractActionBarActivity {
 	private static final int TYPE_STORES_LIST = 23;
 	private static final int TYPE_ORDER_COULD_LATE = 24;
 	private static final int TYPE_ORDER_COULD_LATE_SERIOUS = 24;
-	private static final int TYPE_TEST_CALL_RN = 100;
 	private MineItemsAdapter<MineItemsAdapter.PerformanceItem> listAdapter;
 	private ListView listView;
 	private HashMap<String, String> stats;
@@ -184,9 +183,6 @@ public class MineActivity extends AbstractActionBarActivity {
 						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getWorkerListUrl(vendor, app.token()));
 					}else if (item.getType() == TYPE_STORES_LIST) {
 						GeneralWebViewActivity.gotoWeb(MineActivity.this, URLHelper.getStoreListUrl(vendor, app.token()));
-					}else if(item.getType()==TYPE_TEST_CALL_RN){
-						Intent intent = new Intent(getApplicationContext(), MyReactActivity.class);
-						MineActivity.this.startActivity(intent);
 					}
 				}
 			}
@@ -323,7 +319,6 @@ public class MineActivity extends AbstractActionBarActivity {
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("设  置", -1, TYPE_PRINT_SETTINGS, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("无效订单", -1, TYPE_ORDER_LIST, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem("联系服务经理", -1, TYPE_PHONE_TECH, null));
-		listAdapter.add(new MineItemsAdapter.PerformanceItem("测试RN", -1, TYPE_TEST_CALL_RN, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("版本更新 (当前版本:%s%s)", vtDesc, versionDesc), -1, TYPE_VERSION_UPDATE, null));
 		listAdapter.add(new MineItemsAdapter.PerformanceItem(String.format("当前用户[%s]   点击退出", nickname), -1, TYPE_VERSION_LOGOUT, null));
 	}

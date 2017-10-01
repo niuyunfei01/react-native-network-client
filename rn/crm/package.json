@@ -32,7 +32,8 @@
     "redux-persist": "latest",
     "redux-thunk": "^2.2.0",
     "underscore": "^1.8.3",
-    "validate.js": "0.10.0"
+    "validate.js": "0.10.0",
+    "stacktrace-parser": "latest"
   },
   "devDependencies": {
     "babel-jest": "21.0.2",

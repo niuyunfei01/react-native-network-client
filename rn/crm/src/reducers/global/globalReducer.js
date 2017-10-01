@@ -33,8 +33,11 @@ export default function globalReducer (state = initialState, action) {
 
       case LOGIN_PROFILE_SUCCESS:
           if (action.payload.user && action.payload.user.user_id) {
-              return state.set('currentUser', action.payload.user.user_id)
-                  .set('currentUserProfile', action.payload.user);
+              return {
+                  ...state,
+                  currentUser: action.payload.user.user_id,
+                  currentUserProfile: action.payload.user
+              };
           } else return state;
 
       case SESSION_TOKEN_SUCCESS:
@@ -45,10 +48,12 @@ export default function globalReducer (state = initialState, action) {
           };
 
       case LOGOUT_SUCCESS:
-          return state.set('currentUser', '')
-              .set('currentUserProfile', null)
-              .set('accessToken', '');
-
+          return {
+              ...state,
+              currentUser: '',
+              currentUserProfile: null,
+              accessToken: ''
+          }
   }
   return state
 }

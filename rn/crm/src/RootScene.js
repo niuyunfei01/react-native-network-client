@@ -8,7 +8,6 @@
 
 import React, {PureComponent} from 'react'
 import {StatusBar, Platform, StyleSheet, View, Text, ToastAndroid} from 'react-native'
-import {NavigationActions} from 'react-navigation'
 
 import {Provider} from 'react-redux'
 
@@ -19,17 +18,18 @@ import {Provider} from 'react-redux'
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
 import {setAccessToken} from './reducers/global/globalActions'
 
-/**
- * ## States
- * Snowflake explicitly defines initial state
- *
- */
 import configureStore from "./common/configureStore";
 import AppNavigator from './common/AppNavigator'
+import Caught from './common/Caught'
 
 import Config from './config'
 
 const lightContentScenes = ['Home', 'Mine']
+
+
+//global exception handlers
+const cauht = new Caught;
+
 
 function getCurrentRouteName(navigationState) {
     if (!navigationState) {
@@ -84,8 +84,8 @@ class RootScene extends PureComponent {
         const launchProps = this.props.launchProps;
         const orderId = launchProps['order_id'];
 
-        let initialRouteName = '';
-        let initialRouteParams = {};
+        let initialRouteName = launchProps['_action'];
+        let initialRouteParams = launchProps['_action_params']||{};
 
         if (this.state.rehydrated) {
             if (!this.store.getState().global.accessToken) {
@@ -93,7 +93,7 @@ class RootScene extends PureComponent {
                 initialRouteName = Config.ROUTE_LOGIN;
                 initialRouteParams = {next: '', nextParams: {}};
             } else {
-                if (orderId) {
+                if (!initialRouteName && orderId) {
                     initialRouteName = Config.ROUTE_ORDER;
                     initialRouteParams = {orderId};
                 }

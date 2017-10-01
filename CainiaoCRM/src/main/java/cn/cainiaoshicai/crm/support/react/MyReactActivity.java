@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import com.facebook.react.ReactRootView;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainReactPackage;
+
+import java.util.HashMap;
 
 import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -48,13 +51,24 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         Bundle init = new Bundle();
 
         Intent intent = getIntent();
+        String toRoute = intent.getStringExtra("_action");
+        Bundle _action_params = new Bundle();
+        String nextRoute = intent.getStringExtra("_next_action");
         Long orderId = intent.getLongExtra("order_id", 0);
         if (orderId > 0) {
             init.putLong("order_id", orderId);
+            _action_params.putString("orderId", String.valueOf(orderId));
+            if (TextUtils.isEmpty(toRoute)) {
+                toRoute = "Order";
+            }
         }
+        init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
-        init.putString("_action", intent.getStringExtra("_action"));
-        init.putString("_next_action", intent.getStringExtra("_next_action"));
+        init.putString("_action", toRoute);
+
+        if (!TextUtils.isEmpty(nextRoute)) {
+            init.putString("_next_action", nextRoute);
+        }
 
         mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
 

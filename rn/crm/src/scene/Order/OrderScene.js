@@ -8,8 +8,7 @@
 
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
-import { color, Button, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
-import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
+import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { screen, system } from '../../common'
 import {shortOrderDay, orderOrderTimeShort, orderExpectTime} from '../../common/tool'
 import {bindActionCreators} from "redux";
@@ -24,7 +23,7 @@ import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../Alert/pxToDp";
-
+import {Button, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
 /**
  * ## Redux boilerplate
  */
@@ -50,14 +49,19 @@ class OrderScene extends PureComponent {
         headerTitle: '订单详情',
         headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
         headerTitleStyle: {color: '#111111',},
-        headerRight: (
+        headerRight: (<View style={{flexDirection: 'row'}}>
             <NavigationItem
-                icon={require('../../img/Public/icon_navigationItem_share.png')}
+                icon={require('../../img/Order/print.png')}
                 onPress={() => {
 
                 }}
+            /><NavigationItem
+            icon={require('../../img/Public/menu.png')}
+            onPress={() => {
+
+            }}
             />
-        ),
+        </View>),
     });
 
     constructor(props: Object) {
@@ -150,32 +154,43 @@ class OrderScene extends PureComponent {
                 this.props.global.currentUser)
         }
 
-        return (
+        return !order ? <Text>Empty Order, refreshing</Text>
+            :
+            (
             <View style={styles.topContainer}>
                 <View style={{backgroundColor: '#fff'}}>
-                    <View style={styles.row}>
+                    <View style={[styles.row, {height: pxToDp(40), alignItems:'center'}]}>
                         <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
-                        <Text style={{fontSize: pxToDp(24), color: colors.white, backgroundColor: colors.main_color, borderRadius:5}}>用户资料</Text>
+                        <TouchableOpacity>
+                        <Image source={require('../../img/Order/profile.png')} style={{width: pxToDp(152), height: pxToDp(40), alignSelf: 'center', marginLeft: pxToDp(20)}}/>
+                        </TouchableOpacity>
                         <View style={{flex: 1}}/>
-                        <Image style={styles.icon} source={require('../../img/Public/wx_yes_icon.png')}/>
+                        <Image style={styles.icon} source={require('../../img/Order/talk.png')}/>
                     </View>
-                    <Text style={[styles.row, {fontSize: pxToDp(30), fontWeight: 'bold', color: colors.color666, marginTop: pxToDp(20)}]}>
+                    <Text style={[styles.row, {fontSize: pxToDp(30), fontWeight: 'bold', color: colors.color666, marginTop: pxToDp(20), marginRight: pxToDp(114 + 20)}]}>
                         {order.address}
                     </Text>
-                    <View style={[styles.row, {paddingLeft: 0, marginLeft: 15}]}>
-                        <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white, backgroundColor: colors.main_color, borderRadius: 1}}>第{order.order_times}次</Text>
-                        <TouchableOpacity><Text style={{fontSize: pxToDp(32), color: colors.mobile_color}}>{order.mobile}</Text></TouchableOpacity>
+                    <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
+                        <TouchableOpacity style={{width: pxToDp(96), height: pxToDp(42), backgroundColor: colors.main_color, borderRadius: 1, justifyContent: 'center', alignItems: 'center'}}>
+                        <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{flexDirection: 'row', marginLeft: pxToDp(14)}}>
+                            <Text style={{fontSize: pxToDp(32), color: colors.mobile_color}}>{order.mobile}</Text>
+                            <Image source={require('../../img/Public/call.png')} style={{width: pxToDp(20), height: pxToDp(28), marginLeft: pxToDp(6)}}/>
+                        </TouchableOpacity>
                         <View style={{flex: 1}}/>
-                        <Image style={styles.icon} source={require('../../img/Public/icon_food_merchant_address_2x.png')}/>
+                        <Image style={styles.icon} source={require('../../img/Order/navi.png')}/>
                     </View>
                     <Separator style={{backgroundColor: colors.color999}}/>
-                    <View style={[styles.row]}>
-                        <Text style={styles.remarkText}>客户备注:</Text>
-                        <Text style={[styles.remarkText, {marginLeft: 5}]}>您好，麻烦把我买的排骨用热水焯一下，不然差评！谢谢！</Text>
-                    </View>
-                    <View style={[styles.row, {marginRight: 40}]}>
-                        <Text style={styles.remarkText}>商家备注:</Text>
-                        <Text style={[styles.remarkText, {marginLeft: 5, marginRight:40}]}>好的，我们会切上葱段和生姜加上料酒，一定给您焯干净。</Text>
+                    <View style={[styles.row, {marginBottom:pxToDp(14), flexDirection: 'column'}]}>
+                        <View style={{flexDirection: 'row'}}>
+                            <Text style={styles.remarkText}>客户备注:</Text>
+                            <Text style={[styles.remarkText, {marginLeft: pxToDp(6), marginRight: pxToDp(140)}]}>您好，麻烦把我买的排骨用热水焯一下，不然差评！谢谢！</Text>
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            <Text style={styles.remarkText}>商家备注:</Text>
+                            <Text style={[styles.remarkText, {marginLeft: pxToDp(6), marginRight: pxToDp(140)}]}>好的，我们会切上葱段和生姜加上料酒，一定给您焯干净。</Text>
+                        </View>
                     </View>
                 </View>
 
@@ -183,7 +198,7 @@ class OrderScene extends PureComponent {
                     <View style={styles.row}>
                         <Text>{shortOrderDay(order.orderTime)}#{order.dayId}</Text>
                         <View style={{flex: 1}}/>
-                        <Button title={order.storeName} style={{color:'#407c49'}}/>
+                        <Button>{order.storeName}</Button>
                     </View>
                     <View style={styles.row}>
                         <Text>订单号：{order.id}</Text>
@@ -223,13 +238,13 @@ class OrderScene extends PureComponent {
                 <View style={{marginTop: pxToDp(20), backgroundColor: colors.white}}>
                     <View style={styles.row}>
                         <Text>商品明细</Text>
-                        <Text>{order.items.length}种商品</Text>
+                        <Text>{(order.items||{}).length}种商品</Text>
                         <View style={{flex: 1}}/>
                         <Button title="修改商品"/>
                         <Button title="下拉" style={{marginLeft: 10}}/>
                     </View>
-                    {order.items.map((item, idx) => {
-                        return (<View><View style={styles.row}>
+                    {(order.items||{}).map((item, idx) => {
+                        return (<View key={idx}><View style={styles.row}>
                             <View style={{flex: 1}}>
                                 <Text>{item.product_name}</Text>
                                 <View style={{flexDirection: 'row'}}>
@@ -259,8 +274,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.back_color,
     },
     icon: {
-        width: 32,
-        height: 32,
+        width: pxToDp(74),
+        height: pxToDp(56),
         alignItems: 'flex-end'
     },
     banner: {
@@ -269,8 +284,8 @@ const styles = StyleSheet.create({
     },
     row: {
         flexDirection: 'row',
-        marginLeft: 10,
-        marginRight: 15,
+        marginLeft: pxToDp(30),
+        marginRight: pxToDp(40),
         alignContent: 'center',
         marginTop: pxToDp(14)
     },

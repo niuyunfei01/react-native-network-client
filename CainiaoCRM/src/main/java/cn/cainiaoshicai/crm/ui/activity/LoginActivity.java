@@ -66,8 +66,8 @@ public class LoginActivity extends AbstractActionBarActivity {
 
         if (!gotoMain) {
             Intent loginIntent = new Intent(this, MyReactActivity.class);
-            loginIntent.putExtra("_action", "loginIntent");
-            loginIntent.putExtra("_next_action", "orders");
+            loginIntent.putExtra("_action", "Login");
+            loginIntent.putExtra("_next_action", "Orders");
             startActivity(loginIntent);
         }
 

@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 
@@ -53,7 +54,13 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void updateAfterTokenGot(@Nonnull String token, long expiresInSeconds, @Nonnull Callback callback){
+    void logout() {
+        SettingUtility.setDefaultAccountId("");
+        GlobalCtx.app().setAccountBean(null);
+    }
+
+    @ReactMethod
+    void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback){
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             callback.invoke(true, GlobalCtx.app().getCurrentAccountId(), "ok");
