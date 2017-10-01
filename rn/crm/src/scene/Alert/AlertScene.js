@@ -47,6 +47,12 @@ const tab_list = new Map([
     ['other_type' , '其他'],
 ]);
 
+const TASK_TYPE_REFUND = 5;//退款
+const TASK_TYPE_REMIND = 4;//催单
+const TASK_TYPE_COMPLAIN = 1;//客服待处理退款
+const TASK_TYPE_OTHER = 3;//其他事项
+
+
 // create a component
 class AlertScene extends PureComponent {
 
@@ -57,7 +63,7 @@ class AlertScene extends PureComponent {
         this.state = {
             isProcessing : false,
             idUpdating : false,
-            type: 5,
+            type: TASK_TYPE_REFUND,
             group_num: {},
             result_obj: {},
             next_less_than_id: 0,
@@ -69,7 +75,6 @@ class AlertScene extends PureComponent {
     }
 
     componentDidMount() {
-
     }
 
     componentWillMount() {
@@ -175,13 +180,13 @@ class AlertScene extends PureComponent {
                 tabBarTextStyle={{fontSize: pxToDp(26)}} onChangeTab={(obj) => {
                     let tab_bar = obj.i;
                     if (tab_bar === 0) {
-                        type = 5;//用户申请退款
+                        type = TASK_TYPE_REFUND;//用户申请退款
                     } else if (tab_bar === 1) {
-                        type = 4;//催单
+                        type = TASK_TYPE_REMIND;//催单
                     } else if (tab_bar === 2) {
-                        type = 1;//待处理评价
+                        type = TASK_TYPE_COMPLAIN;//待处理评价
                     } else if (tab_bar === 3) {
-                        type = 3;//其他事项
+                        type = TASK_TYPE_OTHER;//其他事项
                     }
 
                     if (this.state.type !== type) {
