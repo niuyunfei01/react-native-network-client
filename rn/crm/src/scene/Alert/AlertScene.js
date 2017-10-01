@@ -40,18 +40,64 @@ function mapDispatchToProps (dispatch) {
     }
 }
 
-const tab_list = new Map([
+const TASK_TYPE_REFUND = 5;//退款
+const TASK_TYPE_REMIND = 4;//催单
+const TASK_TYPE_COMPLAIN = 1;//客服待处理退款
+const TASK_TYPE_OTHER = 3;//其他事项
+
+// 用于循环导航栏的初始数据
+const tab_nav = new Map([
     ['refund_type' , '待退款'],
     ['remind_type' , '催单/异常'],
     ['complain_type' , '售后单'],
     ['other_type' , '其他'],
 ]);
 
-const TASK_TYPE_REFUND = 5;//退款
-const TASK_TYPE_REMIND = 4;//催单
-const TASK_TYPE_COMPLAIN = 1;//客服待处理退款
-const TASK_TYPE_OTHER = 3;//其他事项
+// 定义服务器定义的返回数据类型
+const group_type_key = new Map([
+    [TASK_TYPE_REFUND, 'refund_type'],
+    [TASK_TYPE_REMIND, 'remind_type'],
+    [TASK_TYPE_COMPLAIN, 'complain_type'],
+    [TASK_TYPE_OTHER, 'other_type'],
+]);
 
+// 表示当前在所处分类
+let global_alert_type = TASK_TYPE_REFUND;
+
+// 存储分类列表
+const global_type_data =  new Map([
+    [TASK_TYPE_REFUND , []],
+    [TASK_TYPE_REMIND , []],
+    [TASK_TYPE_COMPLAIN , []],
+    [TASK_TYPE_OTHER , []],
+]);
+
+function get_type_data(type) {
+    return global_type_data.get(type);
+}
+
+function get_type_list(type) {
+    return global_type_data.get(type)['list'];
+}
+
+function get_curr_page(type) {
+    return global_type_data.get(type)['curr_page'];
+}
+
+function get_total_page(type) {
+    return global_type_data.get(type)['total_page'];
+}
+
+function get_list_pages(type) {
+    return global_type_data.get(type)['list_pages'];
+}
+
+function get_less_than_id(type) {
+    return global_type_data.get(type)['less_than_id'];
+}
+
+// 存储导航栏数据
+const global_group_num = new Map();
 
 // create a component
 class AlertScene extends PureComponent {
@@ -64,10 +110,6 @@ class AlertScene extends PureComponent {
             isProcessing : false,
             idUpdating : false,
             type: TASK_TYPE_REFUND,
-            group_num: {},
-            result_obj: {},
-            next_less_than_id: 0,
-            row_index_ok: false,
         };
         this.loadData = this.loadData.bind(this);
         this.setTaskStatus = this.setTaskStatus.bind(this);
@@ -85,93 +127,122 @@ class AlertScene extends PureComponent {
         this.props.navigation.navigate(route, params);
     }
 
-    loadData(type, page = 1, status = 0){
-        console.log('load_data_type => ', type, this.state.type);
-        let search_type = type ? type : this.state.type;
-        if(search_type > 0){
-            this.setState({
-                isProcessing: true,
+    // 加载或刷新数据
+    loadData(page = 1, status = 0){
+        // let search_type = type ? type : this.state.type;
+        this.setState({
+            isProcessing: true,
+        });
+        let less_than_id = parseInt(page) === 1 ? 0 : get_less_than_id(global_alert_type);
+        let self_ = this;
+        let type_list = get_type_list(global_alert_type);
+        console.log('global_alert_type => ', global_alert_type);
+        if(this.state.type !== global_alert_type && type_list !== undefined && type_list.length > 0){
+            self_.setState({
+                type: global_alert_type,
+                isProcessing: false,
             });
-            let less_than_id = parseInt(page) === 1 ? 0 : this.state.next_less_than_id;
-            let self_ = this;
-            console.log('less_than_id =====>', less_than_id);
-            this.props.actions.FetchAlert(this.props.accessToken, search_type, status, page, less_than_id, ((result)=>{
+        } else {
+            this.props.actions.FetchAlert(this.props.accessToken, global_alert_type, status, page, less_than_id, ((result)=>{
                 // console.log('fetch =====>', result);
                 if(result.ok){
-                    let {total_num, next_less_than_id} = result.obj;
+                    let {curr_page, total_page, total_num, next_less_than_id, list} = result.obj;
+
+                    let list_pages = get_list_pages(global_alert_type);
+                    if(list_pages === undefined){
+                        list_pages = [];
+                    } else if (parseInt(curr_page) > 1 && list_pages.indexOf(curr_page) === -1){//不存在
+                        console.log('curr_page ->', curr_page);
+                        let list_data = get_type_list(global_alert_type);
+                        list_data.push.apply(list_data, list);
+                        list = list_data;
+                    }
+                    list_pages.push(curr_page);
+                    console.log('list_pages ->', list_pages);
+                    let type_data = {
+                        curr_page: curr_page,
+                        total_page: total_page,
+                        list: list,
+                        list_pages: list_pages,
+                        less_than_id: next_less_than_id,
+                    };
+                    global_type_data.set(global_alert_type, type_data);
+
+                    for(let v of group_type_key) {
+                        let tab_key = v[1];//refund_type, remind_type...
+                        let g_num = total_num[tab_key];
+                        global_group_num.set(tab_key, g_num);
+                    }
+
                     self_.setState({
-                        result_obj: result.obj,
-                        type: search_type,
-                        group_num: total_num,
+                        type: global_alert_type,
                         isProcessing: false,
-                        next_less_than_id: next_less_than_id,
                     });
                 } else {
                     self_.setState({
-                        type: search_type,
+                        type: global_alert_type,
                         isProcessing: false,
-                        next_less_than_id: 0,
                     });
                     console.log("error result => ", result);
                 }
-                // console.log("result_desc => ", result);
             }));
-        } else {
-            alert('查询参数有误!');
         }
     }
 
+    // 设置任务状态
     setTaskStatus(task_id, status, row_index){
         if(this.state.idUpdating){
             return false;
         }
         this.setState({
             idUpdating: true,
-            row_index_ok: false,
         });
         let self_ = this;
         this.props.actions.setTaskNoticeStatus(this.props.accessToken, task_id, status,(result) => {
-            console.log('update =====>', result);
+            console.log('update_result =====>', result);
             alert(result.desc);
             if(result.ok){
-                self_.setState({
-                    idUpdating: false,
-                    row_index_ok: row_index,
-                });
-                setTimeout(function () {
-                    self_.setState({
-                        row_index_ok: false,
-                    });
-                }, 1000);
-            }else{
-                self_.setState({
-                    idUpdating: false,
-                });
+                let type_data = get_type_data(global_alert_type);
+                type_data.list.splice(row_index, 1);
+                if(status === Config.TASK_STATUS_DONE){
+                    let tab_key = group_type_key.get(global_alert_type);
+                    let type_num = global_group_num.get(tab_key);
+                    let new_type_num = type_num > 0 ? type_num-1 : 0;
+                    global_group_num.set(tab_key, new_type_num);
+                }
             }
+            self_.setState({
+                idUpdating: false,
+            });
         });
     }
 
     render() {
-        let {group_num, type, isProcessing, result_obj, row_index_ok} = this.state;
-
-        /*console.log("item => ",group_num);
+        let {isProcessing} = this.state;
         let AlertLists = [];
-        let group_num_key = 1;
-        for(let type_bar in group_num){
-            if (group_num.hasOwnProperty(type_bar) === true){
-                let type_num = group_num[type_bar];
-                let tab_text = tab_list.get(type_bar);
-                console.log("tab_text => ",tab_text);
-                AlertLists.push(<AlertList key={group_num_key}
-                    tabLabel={type_num > 0 ? tab_text+"("+type_num+")" : tab_text}
-                    result={result}
-                    alert_type={type}
+        let group_num_key = 0;
+        for(let tab of tab_nav) {
+            let tab_key = tab[0];
+            let tab_name = tab[1];
+            let type_num = global_group_num.get(tab_key);
+            AlertLists.push(
+                <AlertList
+                    key={group_num_key}
+                    tabLabel={type_num > 0 ? tab_name+"("+type_num+")" : tab_name}
                     callbackLoadData={this.loadData}
+                    onPress={(route, params)=>this._onRowClick(route, params)}
+                    setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
                     isProcessing={isProcessing}
-                />);
-                group_num_key++;
-            }
-        }*/
+                />
+            );
+            group_num_key++;
+        }
+
+        if(AlertLists.length === 0){
+            return (
+                <LoadingView isLoading={true} tip='加载中...'/>
+            );
+        }
 
         return (
             <ScrollableTabView
@@ -180,69 +251,29 @@ class AlertScene extends PureComponent {
                 tabBarTextStyle={{fontSize: pxToDp(26)}} onChangeTab={(obj) => {
                     let tab_bar = obj.i;
                     if (tab_bar === 0) {
-                        type = TASK_TYPE_REFUND;//用户申请退款
+                        global_alert_type = TASK_TYPE_REFUND;//用户申请退款
                     } else if (tab_bar === 1) {
-                        type = TASK_TYPE_REMIND;//催单
+                        global_alert_type = TASK_TYPE_REMIND;//催单
                     } else if (tab_bar === 2) {
-                        type = TASK_TYPE_COMPLAIN;//待处理评价
+                        global_alert_type = TASK_TYPE_COMPLAIN;//待处理评价
                     } else if (tab_bar === 3) {
-                        type = TASK_TYPE_OTHER;//其他事项
+                        global_alert_type = TASK_TYPE_OTHER;//其他事项
                     }
 
-                    if (this.state.type !== type) {
+                    if (this.state.type !== global_alert_type) {
                         this.setState({
-                            type: type,
-                            next_less_than_id: 0,
+                            type: global_alert_type,
                         });
-                        this.loadData(type);
+                        this.loadData();
                     } else {
                         this.setState({
-                            type: type,
+                            type: global_alert_type,
                         });
                     }
                 }}
                 // locked={true}
             >
-                <AlertList
-                    tabLabel={group_num.refund_type > 0 ? "待退款("+group_num.refund_type+")" : "待退款"}
-                    result_obj={result_obj}
-                    alert_type={type}
-                    callbackLoadData={this.loadData}
-                    isProcessing={isProcessing}
-                    onPress={(route, params)=>this._onRowClick(route, params)}
-                    setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
-                    row_index_ok={row_index_ok}
-                />
-                <AlertList
-                    tabLabel={group_num.remind_type > 0 ? "催单/异常("+group_num.remind_type+")" : "催单/异常"}
-                    result_obj={result_obj}
-                    alert_type={type}
-                    callbackLoadData={this.loadData}
-                    isProcessing={isProcessing}
-                    onPress={(route, params)=>this._onRowClick(route, params)}
-                    setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
-                    row_index_ok={row_index_ok}
-                />
-                <AlertList
-                    tabLabel={group_num.complain_type > 0 ? "售后单("+group_num.complain_type+")" : "售后单"}
-                    result_obj={result_obj}
-                    alert_type={type}
-                    callbackLoadData={this.loadData}
-                    isProcessing={isProcessing}
-                    onPress={(route, params)=>this._onRowClick(route, params)}
-                    setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
-                    row_index_ok={row_index_ok}
-                />
-                <AlertList
-                    tabLabel={group_num.other_type > 0 ? "其他("+group_num.other_type+")" : "其他"}
-                    result_obj={result_obj}
-                    alert_type={type}
-                    callbackLoadData={this.loadData}
-                    isProcessing={isProcessing}
-                    onPress={(route, params)=>this._onRowClick(route, params)}
-                    setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
-                    row_index_ok={row_index_ok}
-                />
+                {AlertLists}
             </ScrollableTabView>
         );
     }
@@ -254,10 +285,7 @@ class AlertList extends Component {
         this.state = {
             isRefreshing: false,
             loadMore: false,
-            result_obj: [],
             list_pages: [],
-            data_list: [],
-            alert_type: this.props.alert_type,
         };
         this._onRefresh = this._onRefresh.bind(this);
         this._onScroll = this._onScroll.bind(this);
@@ -271,19 +299,19 @@ class AlertList extends Component {
             return;
         }
         this.setState({
-            // isRefreshing: true,
-            data_list: [],
+            isRefreshing: true,
             list_pages: [],
-            result_obj: [],
         });
-        this.props.callbackLoadData(this.props.alert_type);
-        // this.setState({
-        //     isRefreshing: false,
-        // });
+        this.props.callbackLoadData();
+        this.setState({
+            isRefreshing: false,
+        });
     }
 
     _onScroll(event) {
-        let {curr_page, total_page, loadMore, list_pages} = this.state;
+        let curr_page = get_curr_page(global_alert_type);
+        let total_page = get_total_page(global_alert_type);
+        let {loadMore, list_pages} = this.state;
         let {isProcessing} = this.props;
         let next_page = parseInt(curr_page)+1;
         if(loadMore || isProcessing || curr_page >= total_page || list_pages.indexOf(next_page) !== -1){
@@ -302,62 +330,34 @@ class AlertList extends Component {
                 loadMore:true
             });
 
-            this.props.callbackLoadData(this.props.alert_type, next_page);
+            this.props.callbackLoadData(next_page);
         }
     }
 
     componentWillReceiveProps(){
-        let {result_obj, row_index_ok} = this.props;
-        let {list_pages, data_list, alert_type} = this.state;
-        let {curr_page, total_page, list} = result_obj;
-        if(row_index_ok !== false){
-            data_list.splice(row_index_ok, 1);
-            this.setState({data_list: data_list});
-            list = data_list;
-        }
-        let new_alert_type = this.props.alert_type;
-        if(curr_page && total_page){
-            if(list_pages.indexOf(curr_page) === -1){//不存在
-                if(parseInt(curr_page) === 1 || alert_type !== new_alert_type){
-                    data_list = [];
-                    list_pages = [];
-                }
-                list_pages.push(curr_page);
-                data_list.push.apply(data_list, list);
-                console.log('list_pages => ', list_pages);
-
-                this.setState({
-                    result_obj: result_obj,
-                    curr_page: curr_page,
-                    total_page: total_page,
-                    data_list: data_list,
-                    alert_type: this.props.alert_type,
-                });
-            }
-        }
     }
 
     _onSelectOperate(_row_index, task_id, status){
         const {setTaskStatus} = this.props;
-        console.log('_row_index => '+_row_index+';   task_id:'+task_id+';status:'+status);
         setTaskStatus(task_id, status, _row_index);
-        this._onRefresh(this.state.curr_page);
     }
 
     render() {
-        let {data_list, loadMore, isRefreshing} = this.state;
-        // if(isRefreshing){
-        //     return (
-        //         <LoadingView isLoading={true} tip='加载中...'/>
-        //     );
-        // }
-        if(data_list.length === 0){
+        let {loadMore, isRefreshing} = this.state;
+        let type_list = get_type_list(global_alert_type);
+        // console.log('type_list => ', type_list);
+
+        if(type_list === undefined || type_list === false){
+            return (
+                <LoadingView isLoading={true} tip='加载中...'/>
+            );
+        } else if (type_list.length === 0) {
             //返回没有订单的图片
         }
 
         const {isProcessing, onPress} = this.props;
         let _this_onSelectOperate = this._onSelectOperate;
-        let alert_row = data_list.map(function (row, index) {
+        let alert_row = type_list.map(function (row, index) {
             return (
                 <AlertRow
                     alert_detail={row}
@@ -407,7 +407,6 @@ class AlertRow extends Component {
         if(parseInt(key) === 0){//暂停提示
             alert(task_id+'暂停提示; index: '+row_index);
         } else {//强制关闭
-            // alert(task_id+'强制关闭; index: '+row_id);
             let status = Config.TASK_STATUS_DONE;
             _this_onSelectOperate(row_index, task_id, status);
         }
