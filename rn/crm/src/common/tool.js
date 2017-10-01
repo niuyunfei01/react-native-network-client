@@ -28,9 +28,9 @@ export function shortOrderDay(dt) {
 }
 
 export function orderOrderTimeShort(dt) {
-    return Moment(dt).format('MMDD')
+    return Moment(dt).format('M/DD HH:mm')
 }
 
 export function orderExpectTime(dt) {
-    return Moment(dt).format('MMDD')
+    return Moment(dt).format('M/DD HH:mm')
 }

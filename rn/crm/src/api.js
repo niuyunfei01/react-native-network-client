@@ -37,7 +37,7 @@ export default {
 }
 
 export function orderUrlWithId(token, id) {
-    return 'https://www.cainiaoshicai.cn/api/order_by_id/' + id + '.json?access_token=' + token + '&op_ship_call=1'
+    return 'https://preview.cainiaoshicai.cn/api/order_by_id/' + id + '.json?access_token=' + token + '&op_ship_call=1'
 }
 
 export function groupPurchaseDetailWithId(id) {
