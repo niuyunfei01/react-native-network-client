@@ -146,7 +146,7 @@ class RegisterScene extends PureComponent {
     render() {
         return (
             <View style={styles.container}>
-                <View style={{height: 20}}/>
+                <View style={{height: pxToDp(100)}}/>
                 <View style={styles.register_panel}>
                     <Cells>
                         <Cell>
@@ -161,6 +161,7 @@ class RegisterScene extends PureComponent {
                                     this.setState({mobile})
                                 }}
                                        value={this.state.mobile}
+                                       style={styles.input}
                                        keyboardType="numeric"
                                        placeholder={mobileInputPlaceHold} placeholderStyle={{color: "#999"}}
                                        underlineColorAndroid="#999"/>
@@ -177,6 +178,7 @@ class RegisterScene extends PureComponent {
                             <CellBody>
                                 <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
                                        value={this.state.verifyCode}
+                                       style={styles.input}
                                        placeholder={validCodePlaceHold} placeholderStyle={{color: "#999"}}
                                        underlineColorAndroid="#999"/>
                             </CellBody>
@@ -212,7 +214,9 @@ class RegisterScene extends PureComponent {
                                 }}/>
                             </CellHeader>
                             <CellBody>
-                                <Input placeholder={namePlaceHold} placeholderStyle={{color: "#999"}}
+                                <Input placeholder={namePlaceHold}
+                                       placeholderStyle={{color: "#999"}}
+                                       style={styles.input}
                                        underlineColorAndroid="#999"/>
                             </CellBody>
                         </Cell>
@@ -227,6 +231,7 @@ class RegisterScene extends PureComponent {
                             <CellBody>
                                 <Input secureTextEntry={true} placeholder={passwordPlaceHold}
                                        placeholderStyle={{color: "#999"}}
+                                       style={styles.input}
                                        underlineColorAndroid="#999"/>
                             </CellBody>
                         </Cell>
@@ -241,6 +246,7 @@ class RegisterScene extends PureComponent {
                             <CellBody>
                                 <Input secureTextEntry={true} placeholder={rePasswordPlaceHold}
                                        placeholderStyle={{color: "#999"}}
+                                       style={styles.input}
                                        underlineColorAndroid="#999"/>
                             </CellBody>
                         </Cell>
@@ -276,7 +282,10 @@ const styles = StyleSheet.create({
     },
 
     register_panel: {
-        flex: 1, backgroundColor: 'white', marginLeft: 25, marginRight: 25
+        flex: 1,
+        backgroundColor: 'white',
+        marginLeft: pxToDp(72),
+        marginRight: pxToDp(72)
     },
     counter: {
         borderRadius: 5,
@@ -288,6 +297,11 @@ const styles = StyleSheet.create({
         paddingRight: 14 * 0.75,
         paddingTop: 6 * 0.75,
         paddingBottom: 6 * 0.75,
+    },
+    input: {
+        fontSize: pxToDp(32),
+        height: pxToDp(50),
+        color: "#999"
     }
 });
 
