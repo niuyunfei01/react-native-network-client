@@ -8,7 +8,6 @@
 
 import React, {PureComponent} from 'react'
 import {StatusBar, Platform, StyleSheet, View, Text, ToastAndroid} from 'react-native'
-import {NavigationActions} from 'react-navigation'
 
 import {Provider} from 'react-redux'
 
@@ -19,17 +18,18 @@ import {Provider} from 'react-redux'
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
 import {setAccessToken} from './reducers/global/globalActions'
 
-/**
- * ## States
- * Snowflake explicitly defines initial state
- *
- */
 import configureStore from "./common/configureStore";
 import AppNavigator from './common/AppNavigator'
+import Caught from './common/Caught'
 
 import Config from './config'
 
 const lightContentScenes = ['Home', 'Mine']
+
+
+//global exception handlers
+const cauht = new Caught;
+
 
 function getCurrentRouteName(navigationState) {
     if (!navigationState) {

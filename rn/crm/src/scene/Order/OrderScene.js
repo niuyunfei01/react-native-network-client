@@ -8,7 +8,7 @@
 
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
-import { color, Button, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
+import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { Heading1, Heading2, Paragraph, HeadingBig } from '../../widget/Text'
 import { screen, system } from '../../common'
 import {shortOrderDay, orderOrderTimeShort, orderExpectTime} from '../../common/tool'
@@ -24,7 +24,7 @@ import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../Alert/pxToDp";
-
+import {Button, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
 /**
  * ## Redux boilerplate
  */
@@ -150,7 +150,9 @@ class OrderScene extends PureComponent {
                 this.props.global.currentUser)
         }
 
-        return (
+        return !order ? <Text>Empty Order, refreshing</Text>
+            :
+            (
             <View style={styles.topContainer}>
                 <View style={{backgroundColor: '#fff'}}>
                     <View style={styles.row}>
@@ -183,7 +185,7 @@ class OrderScene extends PureComponent {
                     <View style={styles.row}>
                         <Text>{shortOrderDay(order.orderTime)}#{order.dayId}</Text>
                         <View style={{flex: 1}}/>
-                        <Button title={order.storeName} style={{color:'#407c49'}}/>
+                        <Button>{order.storeName}</Button>
                     </View>
                     <View style={styles.row}>
                         <Text>订单号：{order.id}</Text>
@@ -223,13 +225,13 @@ class OrderScene extends PureComponent {
                 <View style={{marginTop: pxToDp(20), backgroundColor: colors.white}}>
                     <View style={styles.row}>
                         <Text>商品明细</Text>
-                        <Text>{order.items.length}种商品</Text>
+                        <Text>{(order.items||{}).length}种商品</Text>
                         <View style={{flex: 1}}/>
                         <Button title="修改商品"/>
                         <Button title="下拉" style={{marginLeft: 10}}/>
                     </View>
-                    {order.items.map((item, idx) => {
-                        return (<View><View style={styles.row}>
+                    {(order.items||{}).map((item, idx) => {
+                        return (<View key={idx}><View style={styles.row}>
                             <View style={{flex: 1}}>
                                 <Text>{item.product_name}</Text>
                                 <View style={{flexDirection: 'row'}}>
