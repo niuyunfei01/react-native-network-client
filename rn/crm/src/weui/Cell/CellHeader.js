@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
   image: {
     width: 24,
     height: 24,
+    marginRight:5
   },
   error: {
     color: $V.globalWarnColor
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
 const CellHeader = (props) => {
   const { error, children, style, ...others } = props
   const childrenWithProps = React.Children.map(children, child => {
-    if (child.type.displayName === 'Image' && !child.props.style) {
+    if (child.type.displayName === 'Image') {
       return React.cloneElement(child, { style: [styles.image, child.props.style] })
     }
     if (error && child.type.name === 'Label') {

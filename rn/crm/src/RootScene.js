@@ -25,7 +25,6 @@ import {setAccessToken} from './reducers/global/globalActions'
  *
  */
 import configureStore from "./common/configureStore";
-import {VERSION} from "./api";
 import AppNavigator from './common/AppNavigator'
 
 import Config from './config'
@@ -75,7 +74,6 @@ class RootScene extends PureComponent {
             if (accessToken) {
                 store.dispatch(setAccessToken({access_token: accessToken}));
                 store.dispatch(setPlatform('android'))
-                store.dispatch(setVersion(VERSION))
             }
             this.setState({rehydrated: true});
         }.bind(this));

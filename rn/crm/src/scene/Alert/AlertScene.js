@@ -196,7 +196,7 @@ class AlertScene extends PureComponent {
                         });
                     }
                 }}
-                locked={true}
+                // locked={true}
             >
                 <AlertList
                     tabLabel={group_num.refund_type > 0 ? "待退款("+group_num.refund_type+")" : "待退款"}

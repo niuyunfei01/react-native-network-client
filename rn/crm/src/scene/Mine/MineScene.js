@@ -31,7 +31,7 @@ class MineScene extends PureComponent {
                 <NavigationItem
                     icon={require('../../img/Home/icon_navigationItem_message_white_2x.png')}
                     onPress={() => {
-
+                        navigation.navigate('TestWeui')
                     }}
                 />
             </View>
@@ -139,7 +139,7 @@ class MineScene extends PureComponent {
                 ],
                 [
                     { title: '客服中心', image: require('../../img/Mine/icon_mine_customerService_2x.png') },
-                    { title: '关于美团', subtitle: '我要合作', image: require('../../img/Mine/icon_mine_aboutmeituan_2x.png') }
+                    { title: '关于美团', subtitle: '我要合作', image: require('../../img/Mine/icon_mine_aboutmeituan_2x.png') },
                 ]
             ]
         )
