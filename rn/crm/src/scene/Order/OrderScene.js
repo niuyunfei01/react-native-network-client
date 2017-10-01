@@ -106,14 +106,23 @@ class OrderScene extends PureComponent {
     }
 
     render() {
-        return (
+        const {order } = this.props.order;
+        return (!order || order.id !== this.state.orderId) ?
+            <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}} refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isFetching}
+                    onRefresh={() => this.onHeaderRefresh}
+                    tintColor='gray'
+                />
+            }><Text style={{textAlign: 'center'}}>下拉刷新</Text></ScrollView>
+            :(
             <View style={[styles.container, {flex: 1}]}>
                 {/*<View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />*/}
                 <ScrollView
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.isFetching}
-                            onRefresh={() => this.onHeaderRefresh()}
+                            onRefresh={() => this.onHeaderRefresh}
                             tintColor='gray'
                         />
                     }>
@@ -145,7 +154,7 @@ class OrderScene extends PureComponent {
 
     renderHeader() {
         let info = {};
-        let {order } = this.props.order;
+        const {order } = this.props.order;
 
         let onButtonPress = () => {
             this.props.actions.updateOrder(
@@ -155,11 +164,7 @@ class OrderScene extends PureComponent {
                 this.props.global.currentUser)
         }
 
-        return (!order || order.id !== this.state.orderId) ?
-            <View style={{alignItems: 'center', justifyContent: 'center'}}><Text>下拉刷新</Text></View>
-            :
-            (
-            <View style={styles.topContainer}>
+        return (<View style={styles.topContainer}>
                 <View style={{backgroundColor: '#fff'}}>
                     <View style={[styles.row, {height: pxToDp(40), alignItems:'center'}]}>
                         <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
@@ -250,7 +255,6 @@ class OrderScene extends PureComponent {
                 <Separator/>
 
                 <Separator/>
-
             </View>
         )
     }
