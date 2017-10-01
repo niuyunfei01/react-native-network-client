@@ -258,9 +258,7 @@ public class GlobalCtx extends Application {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                // 初始化合成对象
-                SpeechUtility.createUtility(getApplicationContext(), "appid=" + getString(R.string.app_id));
-                AudioUtils.getInstance().init(getApplicationContext());
+
                 //mTts = SpeechSynthesizer.createSynthesizer(GlobalCtx.this, mTtsInitListener);
                 //mInstaller = new  ApkInstaller(TtsDemo.this);
                 return null;

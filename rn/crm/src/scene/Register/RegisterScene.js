@@ -175,7 +175,7 @@ class RegisterScene extends PureComponent {
                                     height: pxToDp(29),
                                 }}/>
                             </CellHeader>
-                            <CellBody style={styles.cell_body}>
+                            <CellBody>
                                 <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
                                        value={this.state.verifyCode}
                                        style={styles.input}
