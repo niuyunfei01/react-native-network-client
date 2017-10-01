@@ -31,9 +31,7 @@ export default {
             body: formData
         });
     },
-    get(action, paras) {
-        if (!paras)
-            paras = '';
+    get(action, paras = '') {
         let url = AppConfig.ServiceUrl + action + (paras === '' ? '' : '?' + paras);
         console.log('url: ', url);
         return fetch(url, {
