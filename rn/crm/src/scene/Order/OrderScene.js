@@ -68,8 +68,9 @@ class OrderScene extends PureComponent {
     constructor(props: Object) {
         super(props);
 
-        this.state={
+        this.state = {
             isFetching: false,
+            orderId: 0,
         }
 
         this._onLogin = this._onLogin.bind(this)
@@ -95,12 +96,12 @@ class OrderScene extends PureComponent {
         });
 
         if (!this.props.order || !this.props.order.id || this.props.order.id !== orderId) {
-            this.props.actions.getOrder(this.props.global.accessToken, orderId)
-            this.setState({order_id: orderId});
-        } else {
-            this.setState({
-                order: this.props.order
+            this.props.actions.getOrder(this.props.global.accessToken, orderId, (ok, data) => {
+                this.setState({
+                    isFetching: false,
+                })
             })
+            this.setState({orderId: orderId, isFetching: true});
         }
     }
 
@@ -135,17 +136,16 @@ class OrderScene extends PureComponent {
     onHeaderRefresh() {
         //this.requestData()
 
-        this.props.actions.getOrder(this.props.global.accessToken, this.state.order_id)
+        this.props.actions.getOrder(this.props.global.accessToken, this.state.orderId)
     }
 
     _onLogin() {
-        this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.order_id}})
+        this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.orderId}})
     }
 
     renderHeader() {
         let info = {};
-        const {order } = this.props.order;
-        let self = this;
+        let {order } = this.props.order;
 
         let onButtonPress = () => {
             this.props.actions.updateOrder(
@@ -155,7 +155,8 @@ class OrderScene extends PureComponent {
                 this.props.global.currentUser)
         }
 
-        return !order ? <Text>Empty Order, refreshing</Text>
+        return (!order || order.id !== this.state.orderId) ?
+            <View style={{alignItems: 'center', justifyContent: 'center'}}><Text>下拉刷新</Text></View>
             :
             (
             <View style={styles.topContainer}>
