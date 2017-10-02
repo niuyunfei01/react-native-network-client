@@ -281,7 +281,7 @@ class AlertScene extends PureComponent {
     }
 }
 
-class AlertList extends Component {
+class AlertList extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

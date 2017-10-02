@@ -213,19 +213,22 @@ class OrderScene extends PureComponent {
                         <View style={{flex: 1}}/>
                         <Text>期望送达 {orderExpectTime(order.expectTime)}</Text>
                     </View>
-                    <View style={styles.row}>
+                    <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
                         <Text>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
                         <View style={{flex: 1}}/>
                         <Text>{orderOrderTimeShort(order.orderTime)}下单</Text>
                     </View>
                     <View style={{height: pxToDp(170), backgroundColor: colors.white, flexDirection: 'row',
                         justifyContent:'space-around'}}>
-                        <OrderStep/>
-                        <OrderStep/>
-                        <OrderStep/>
-                        <OrderStep/>
-
+                        <OrderStep bgColor={colors.main_color}/>
+                        <OrderStep bgColor={colors.main_color}/>
+                        <OrderStep bgColor={'#ccc'}/>
+                        <OrderStep bgColor={'#ccc'}/>
                     </View>
+                    <View style={[styles.stepCircle, {backgroundColor: colors.main_color, left: (screen.width/8-5)}]}/>
+                    <View style={[styles.stepCircle, {backgroundColor: colors.main_color, left: (screen.width/8*3-5)}]}/>
+                    <View style={[styles.stepCircle, {backgroundColor: '#ccc', left: (screen.width/8*5-5)}]}/>
+                    <View style={[styles.stepCircle, {backgroundColor: '#ccc', left: (screen.width/8*7-5)}]}/>
                 </View>
 
                 <View style={{marginTop: pxToDp(20), backgroundColor: colors.white}}>
@@ -294,9 +297,9 @@ class OrderStep extends PureComponent {
 
     render() {
         return <View style={{flexDirection: 'column', flex: 1, alignItems:'center'}}>
-            <View style={{borderColor: colors.main_color, height: pxToDp(4), width: '100%', borderTopWidth: pxToDp(4), marginTop: pxToDp(10), position: 'absolute', top: pxToDp(-20)}}></View>
-            <View style={[{borderRadius: pxToDp(10), padding: pxToDp(10), width:pxToDp(10), height:pxToDp(10), backgroundColor: colors.main_color, position: 'absolute', top: pxToDp(2)}]}/>
-            <Text style={styles.stepText}>打包中</Text>
+            <View style={{backgroundColor: this.props.bgColor , height: pxToDp(4), width: '100%', marginBottom: pxToDp(18)}}/>
+
+            <Text style={[styles.stepText]}>打包中</Text>
             <Text style={styles.stepText}>刘子墨分拣</Text>
             <Text style={styles.stepText}>27分钟前</Text>
         </View>;
@@ -359,6 +362,14 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingLeft: 20,
         backgroundColor: 'white'
+    },
+
+    stepCircle: {
+        borderRadius: pxToDp(10),
+        width:pxToDp(20),
+        height:pxToDp(20),
+        position: 'absolute',
+        top: pxToDp(178),
     }
 });
 
