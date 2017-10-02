@@ -2,10 +2,11 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,16 +15,10 @@ import android.view.WindowInsets;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
-import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
-import com.facebook.react.shell.MainReactPackage;
 
 import org.devio.rn.splashscreen.SplashScreen;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
-import java.util.HashMap;
-
-import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
 
 
@@ -31,31 +26,19 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
+    private static String REACT_PREFERENCES = "react_preferences";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT >= 20) {
             setTranslucent();
         }
-
-        SplashScreen.show(this);
-
+        if (isFirstLoad(getApplicationContext())) {
+            SplashScreen.show(this);
+        }
         super.onCreate(savedInstanceState);
-
         mReactRootView = new ReactRootView(this);
-        mReactInstanceManager = ReactInstanceManager.builder()
-                .setApplication(getApplication())
-                .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("index.android")
-                .addPackage(new MainReactPackage())
-                .addPackage(new ActivityStarterReactPackage())
-                .addPackage(new SplashScreenReactPackage())
-                .setUseDeveloperSupport(BuildConfig.DEBUG)
-                .setInitialLifecycleState(LifecycleState.RESUMED)
-                .build();
-
         Bundle init = new Bundle();
-
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
         Bundle _action_params = new Bundle();
@@ -71,13 +54,11 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
         init.putString("_action", toRoute);
-
         if (!TextUtils.isEmpty(nextRoute)) {
             init.putString("_next_action", nextRoute);
         }
-
+        mReactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
         mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
-
         setContentView(mReactRootView);
     }
 
@@ -143,5 +124,16 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                         defaultInsets.getSystemWindowInsetBottom());
             }
         });
+    }
+
+    public static boolean isFirstLoad(Context context) {
+        final SharedPreferences reader = context.getSharedPreferences(REACT_PREFERENCES, Context.MODE_PRIVATE);
+        final boolean first = reader.getBoolean("is_first", true);
+        if (first) {
+            final SharedPreferences.Editor editor = reader.edit();
+            editor.putBoolean("is_first", false);
+            editor.commit();
+        }
+        return first;
     }
 }

@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -25,27 +24,23 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
-import com.iflytek.cloud.Setting;
 import com.iflytek.cloud.SpeechUtility;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -82,11 +77,11 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.error.TopExceptionHandler;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.react.ActivityStarterReactPackage;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -105,7 +100,7 @@ public class GlobalCtx extends Application {
 
     public static final CopyOnWriteArrayList<Integer> newOrderNotifies = new CopyOnWriteArrayList<>();
     private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
-    ;
+
     private static GlobalCtx application;
 
     private Activity activity = null;
@@ -139,6 +134,8 @@ public class GlobalCtx extends Application {
     private boolean printerConnected;
 
     //private SpeechSynthesizer mTts;
+
+    private ReactInstanceManager mReactInstanceManager;
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -251,17 +248,25 @@ public class GlobalCtx extends Application {
                 Settings.Secure.ANDROID_ID);
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-
         initTalkSDK();
-
         updateAfterGap(5 * 60 * 1000);
-
         cn.customer_serv.core.MQManager.setDebugMode(true);
+
+        //init react
+        mReactInstanceManager = ReactInstanceManager.builder()
+                .setApplication(this)
+                .setBundleAssetName("index.android.bundle")
+                .setJSMainModuleName("index.android")
+                .addPackage(new MainReactPackage())
+                .addPackage(new ActivityStarterReactPackage())
+                .addPackage(new SplashScreenReactPackage())
+                .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
+                .setInitialLifecycleState(LifecycleState.RESUMED)
+                .build();
 
         // 初始化合成对象
         SpeechUtility.createUtility(getApplicationContext(), "appid=" + R.string.app_id);
         AudioUtils.getInstance().init(getApplicationContext());
-
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
     }
@@ -388,6 +393,14 @@ public class GlobalCtx extends Application {
 //        MQConfig.ui.robotEvaluateTextColorResId = R.color.test_red;
 //        MQConfig.ui.robotMenuItemTextColorResId = R.color.test_blue;
 //        MQConfig.ui.robotMenAuTipTextColorResId = R.color.test_blue;
+    }
+
+    public ReactInstanceManager getmReactInstanceManager() {
+        return mReactInstanceManager;
+    }
+
+    public void setmReactInstanceManager(ReactInstanceManager mReactInstanceManager) {
+        this.mReactInstanceManager = mReactInstanceManager;
     }
 
     public SortedMap<Integer, Worker> getWorkers() {
