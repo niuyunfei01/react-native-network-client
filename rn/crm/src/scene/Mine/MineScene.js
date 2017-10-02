@@ -13,8 +13,6 @@ import { View, Text, StyleSheet, StatusBar, Image, TouchableOpacity, ScrollView,
 import { Heading1, Heading2, Paragraph } from '../../widget/Text'
 import { screen, system, tool } from '../../common'
 import { color, DetailCell, NavigationItem, SpacingView } from '../../widget'
-import {Button as EButton} from 'react-native-elements';
-import colors from "../../styles/colors";
 
 // create a component
 class MineScene extends PureComponent {
