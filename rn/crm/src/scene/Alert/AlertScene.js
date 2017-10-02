@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent, Component } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, Touchable, TouchableOpacity, RefreshControl} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Touchable, TouchableOpacity, RefreshControl, FlatList} from 'react-native';
 import {connect} from "react-redux";
 import pxToDp from './pxToDp';
 import LoadingView from '../../widget/LoadingView';
@@ -157,7 +157,9 @@ class AlertScene extends PureComponent {
                         list_data.push.apply(list_data, list);
                         list = list_data;
                     }
-                    list_pages.push(curr_page);
+                    if(list_pages.indexOf(curr_page) === -1){
+                        list_pages.push(curr_page);
+                    }
                     console.log('list_pages ->', list_pages);
                     let type_data = {
                         curr_page: curr_page,
@@ -285,30 +287,57 @@ class AlertList extends Component {
         this.state = {
             isRefreshing: false,
             loadMore: false,
-            list_pages: [],
+            list_data: false,
         };
         this._onRefresh = this._onRefresh.bind(this);
         this._onScroll = this._onScroll.bind(this);
         this._onSelectOperate = this._onSelectOperate.bind(this);
+        this.renderItem = this.renderItem.bind(this);
     }
 
     _onRefresh() {
         let {isRefreshing} = this.state;
         let {isProcessing} = this.props;
         if(isRefreshing || isProcessing){
-            return;
+            if(isRefreshing && !isProcessing){
+                let type_list = get_type_list(global_alert_type);
+                this.setState({
+                    isRefreshing: false,
+                    list_data: type_list,
+                });
+            }
+        } else {
+            this.setState({
+                isRefreshing: true,
+            });
+            this.props.callbackLoadData();
         }
-        this.setState({
-            isRefreshing: true,
-            list_pages: [],
-        });
-        this.props.callbackLoadData();
-        this.setState({
-            isRefreshing: false,
-        });
     }
 
-    _onScroll(event) {
+    _onScroll() {
+        let curr_page = get_curr_page(global_alert_type);
+        let next_page = parseInt(curr_page)+1;
+        let total_page = get_total_page(global_alert_type);
+        let list_pages = get_list_pages(global_alert_type);
+        let {loadMore} = this.state;
+        let {isProcessing} = this.props;
+        if(loadMore || isProcessing || curr_page >= total_page || list_pages.indexOf(next_page) !== -1){
+            if(loadMore && !isProcessing){
+                let type_list = get_type_list(global_alert_type);
+                this.setState({
+                    loadMore: false,
+                    list_data: type_list,
+                });
+            }
+        } else {
+            this.setState({
+                loadMore:true
+            });
+            this.props.callbackLoadData(next_page);
+        }
+    }
+
+    /*_onScroll(event) {
         let curr_page = get_curr_page(global_alert_type);
         let total_page = get_total_page(global_alert_type);
         let {loadMore, list_pages} = this.state;
@@ -332,9 +361,29 @@ class AlertList extends Component {
 
             this.props.callbackLoadData(next_page);
         }
-    }
+    }*/
 
     componentWillReceiveProps(){
+        let {isRefreshing} = this.state;
+        let {isProcessing} = this.props;
+        if(isRefreshing || isProcessing){
+            if(isRefreshing && !isProcessing){
+                let type_list = get_type_list(global_alert_type);
+                if(type_list !== undefined && type_list !== false){
+                    this.setState({
+                        isRefreshing: false,
+                        list_data: type_list,
+                    });
+                }
+            }
+        } else {
+            let type_list = get_type_list(global_alert_type);
+            if(type_list !== undefined && type_list !== false){
+                this.setState({
+                    list_data : type_list,
+                });
+            }
+        }
     }
 
     _onSelectOperate(_row_index, task_id, status){
@@ -342,7 +391,54 @@ class AlertList extends Component {
         setTaskStatus(task_id, status, _row_index);
     }
 
+    renderItem({item,index}) {
+        const {onPress} = this.props;
+        let _this_onSelectOperate = this._onSelectOperate;
+        return (
+            <AlertRow
+                alert_detail={item}
+                key={index}
+                row_index={index}
+                onPress={onPress}
+                _this_onSelectOperate={(_row_index, task_id, status) => _this_onSelectOperate(_row_index, task_id, status)}
+            />
+        );
+    }
+
     render() {
+        let type_list = get_type_list(global_alert_type);
+        // let type_list = this.state.list_data;
+
+        if(type_list === undefined || type_list === false){
+            return (
+                <LoadingView isLoading={true} tip='加载中...'/>
+            );
+        } else if (type_list.length === 0) {
+            //返回没有订单的图片
+        }
+        type_list = type_list.map(function (row) {
+            row.key = row.id;
+            return row;
+        });
+        return (
+            <FlatList
+                data = {type_list}
+                renderItem={this.renderItem}
+                onEndReached={()=>{
+                     // 到达底部，加载更多列表项
+                    this._onScroll();
+                }}
+                onEndReachedThreshold={0.6}
+                onRefresh={this._onRefresh}
+                refreshing={this.state.isRefreshing}
+                getItemLayout={(data, index) => (
+                    {length: pxToDp(255), offset: pxToDp(255) * index, index}
+                )}
+            />
+        )
+    }
+
+    /*render() {
         let {loadMore, isRefreshing} = this.state;
         let type_list = get_type_list(global_alert_type);
         // console.log('type_list => ', type_list);
@@ -387,7 +483,7 @@ class AlertList extends Component {
                     : null}
             </ScrollView>
         );
-    }
+    }*/
 }
 
 class AlertRow extends Component {
