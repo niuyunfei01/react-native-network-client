@@ -12,7 +12,7 @@ import { color, NavigationItem, RefreshListView, RefreshState, Separator, Spacin
 import { screen, system } from '../../common'
 import {shortOrderDay, orderOrderTimeShort, orderExpectTime} from '../../common/tool'
 import {bindActionCreators} from "redux";
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from '../../config'
 
 /**
@@ -24,9 +24,8 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../Alert/pxToDp";
 import {Button, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
-/**
- * ## Redux boilerplate
- */
+
+const numeral = require('numeral')
 
 function mapStateToProps (state) {
     return {
@@ -71,19 +70,11 @@ class OrderScene extends PureComponent {
         this.state = {
             isFetching: false,
             orderId: 0,
+            isEditing: false,
+            itemsHided: true,
         }
 
         this._onLogin = this._onLogin.bind(this)
-    }
-
-    /**
-     * ### componentWillReceiveProps
-     *
-     * Since the Forms are looking at the state for the values of the
-     * fields, when we we need to set them
-     */
-    componentWillReceiveProps (props) {
-
     }
 
     componentWillMount() {
@@ -91,9 +82,6 @@ class OrderScene extends PureComponent {
         const orderId = (this.props.navigation.state.params||{}).orderId;
 
         console.log("params orderId:", orderId)
-
-        InteractionManager.runAfterInteractions(() => {
-        });
 
         if (!this.props.order || !this.props.order.id || this.props.order.id !== orderId) {
             this.props.actions.getOrder(this.props.global.accessToken, orderId, (ok, data) => {
@@ -107,6 +95,9 @@ class OrderScene extends PureComponent {
 
     render() {
         const {order } = this.props.order;
+
+        console.log(this.state);
+
         return (!order || order.id !== this.state.orderId) ?
             <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}} refreshControl={
                 <RefreshControl
@@ -231,10 +222,25 @@ class OrderScene extends PureComponent {
                         <Text>商品明细</Text>
                         <Text>{(order.items||{}).length}种商品</Text>
                         <View style={{flex: 1}}/>
-                        <ImageBtn source={require('../../img/Order/items_edit_disabled.png')} />
-                        <ImageBtn source={require('../../img/Order/pull_up.png')} />
+
+                        {this.state.isEditing ?
+                            <ImageBtn source={require('../../img/Order/items_edit.png')}/>
+                           : <ImageBtn source = {require('../../img/Order/items_edit_disabled.png')} />
+                        }
+
+                        {this.state.itemsHided ?
+                            <ImageBtn source={require('../../img/Order/pull_down.png')} onPress={
+                                ()=> {
+                                    this.setState({itemsHided: false});
+                                    console.log("after click pull_down", this.state)
+                                }
+                            }/>
+                            : <ImageBtn source = {require('../../img/Order/pull_up.png')} onPress={()=>{
+                                this.setState({itemsHided : true});
+                            console.log("after click pull_up", this.state)}}/>
+                        }
                     </View>
-                    {(order.items||{}).map((item, idx) => {
+                    {!this.state.itemsHided && (order.items||{}).map((item, idx) => {
                         return (<View key={idx}><View style={styles.row}>
                             <View style={{flex: 1}}>
                                 <Text>{item.product_name}</Text>
@@ -248,11 +254,56 @@ class OrderScene extends PureComponent {
                             <Separator/>
                         </View>);
                     })}
+
+                    <View style={styles.row}>
+                        <View style={styles.moneyLeft}>
+                        <Text style={{flex: 1}}>商品总额</Text>
+                        <Text style={{textDecorationLine: 'line-through'}}>
+                            {numeral(order.total_goods_price/100).format('0.00')}
+                        </Text>
+                        </View>
+                        <View style={{flex: 1}}/>
+                        <Text>
+                            {numeral(order.total_goods_price/100).format('0.00')}
+                        </Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Text style={{width: pxToDp(480)}}>配送费</Text>
+                        <View style={{flex: 1}}/>
+                        <Text>{numeral(order.deliver_fee/100).format('0.00')}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <View style={styles.moneyLeft}>
+                            <Text>优惠</Text>
+                            <TouchableOpacity><Icon name='question-circle-o'/></TouchableOpacity>
+                        </View>
+                        <View style={{flex: 1}}/>
+                        <Text>{numeral(order.self_activity_fee/100).format('0.00')}</Text>
+                    </View>
+                    <View style={styles.row}>
+                        <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+                            <Text>用户已付</Text>
+                            <Text style={{fontSize: pxToDp(12), flex: 1}}>含平台扣费、优惠等</Text>
+                            <Text>微信支付</Text>
+                        </View>
+                        <View style={{flex: 1}}/>
+                        <Text>
+                            {numeral(order.orderMoney/100).format('0.00')}
+                        </Text>
+                    </View>
+                    {order.addition_to_pay !== 0 &&
+                    <View style={styles.row}>
+                        <View style={styles.moneyLeft}>
+                            <Text style={{flex: 1}}>需加收/退款</Text>
+                            <Text>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>
+                        </View>
+                        <View style={{flex: 1}}/>
+                        <Text>
+                            {numeral(order.additional_to_pay/100).format('+0.00')}
+                        </Text>
+                    </View>
+                    }
                 </View>
-
-                <Separator/>
-
-                <Separator/>
             </View>
         )
     }
@@ -309,9 +360,9 @@ class ImageBtn extends PureComponent {
 
     render() {
 
-        const {source} = this.props
+        const {source, onPress} = this.props
 
-        return <TouchableOpacity>
+        return <TouchableOpacity onPress={onPress}>
             <Image source={source} style={[styles.btn4text,{alignSelf: 'center', marginLeft: pxToDp(20)}]}/>
         </TouchableOpacity>
     }
@@ -357,6 +408,10 @@ const styles = StyleSheet.create({
     },
     stepText: {
         textAlign: 'center'
+    },
+    moneyLeft: {
+        width: pxToDp(480),
+        flexDirection: 'row',
     },
     buyButton: {
         backgroundColor: '#fc9e28',
