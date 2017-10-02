@@ -131,8 +131,8 @@ class OrderScene extends PureComponent {
                     {this.renderGoods()}
                 </ScrollView>
                 <View style={{flexDirection: 'row', justifyContent: 'space-around', }}>
-                    <Button title="联系配送"/>
-                    <Button title="提醒送达"/>
+                    <Button>联系配送</Button>
+                    <Button type={'primary'}>提醒送达</Button>
                 </View>
             </View>
         );
@@ -168,9 +168,7 @@ class OrderScene extends PureComponent {
                 <View style={{backgroundColor: '#fff'}}>
                     <View style={[styles.row, {height: pxToDp(40), alignItems:'center'}]}>
                         <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
-                        <TouchableOpacity>
-                        <Image source={require('../../img/Order/profile.png')} style={{width: pxToDp(152), height: pxToDp(40), alignSelf: 'center', marginLeft: pxToDp(20)}}/>
-                        </TouchableOpacity>
+                        <ImageBtn source={require('../../img/Order/profile.png')}/>
                         <View style={{flex: 1}}/>
                         <Image style={styles.icon} source={require('../../img/Order/talk.png')}/>
                     </View>
@@ -233,8 +231,8 @@ class OrderScene extends PureComponent {
                         <Text>商品明细</Text>
                         <Text>{(order.items||{}).length}种商品</Text>
                         <View style={{flex: 1}}/>
-                        <Button title="修改商品"/>
-                        <Button title="下拉" style={{marginLeft: 10}}/>
+                        <ImageBtn source={require('../../img/Order/items_edit_disabled.png')} />
+                        <ImageBtn source={require('../../img/Order/pull_up.png')} />
                     </View>
                     {(order.items||{}).map((item, idx) => {
                         return (<View key={idx}><View style={styles.row}>
@@ -303,6 +301,22 @@ class OrderStep extends PureComponent {
     }
 }
 
+class ImageBtn extends PureComponent {
+
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+
+        const {source} = this.props
+
+        return <TouchableOpacity>
+            <Image source={source} style={[styles.btn4text,{alignSelf: 'center', marginLeft: pxToDp(20)}]}/>
+        </TouchableOpacity>
+    }
+}
+
 // define your styles
 const styles = StyleSheet.create({
     container: {
@@ -317,6 +331,10 @@ const styles = StyleSheet.create({
         width: pxToDp(20),
         height: pxToDp(28),
         marginLeft: pxToDp(6)
+    },
+    btn4text: {
+        width: pxToDp(152),
+        height: pxToDp(40)
     },
     banner: {
         width: screen.width,
