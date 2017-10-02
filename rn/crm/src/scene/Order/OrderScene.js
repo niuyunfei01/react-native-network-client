@@ -42,6 +42,7 @@ function mapDispatchToProps (dispatch) {
     }
 }
 
+const hasRemark = (order) => (!!order.user_remark) || (!!order.store_remark)
 
 class OrderScene extends PureComponent {
 
@@ -67,8 +68,9 @@ class OrderScene extends PureComponent {
     constructor(props: Object) {
         super(props);
 
-        this.state={
+        this.state = {
             isFetching: false,
+            orderId: 0,
         }
 
         this._onLogin = this._onLogin.bind(this)
@@ -94,24 +96,33 @@ class OrderScene extends PureComponent {
         });
 
         if (!this.props.order || !this.props.order.id || this.props.order.id !== orderId) {
-            this.props.actions.getOrder(this.props.global.accessToken, orderId)
-            this.setState({order_id: orderId});
-        } else {
-            this.setState({
-                order: this.props.order
+            this.props.actions.getOrder(this.props.global.accessToken, orderId, (ok, data) => {
+                this.setState({
+                    isFetching: false,
+                })
             })
+            this.setState({orderId: orderId, isFetching: true});
         }
     }
 
     render() {
-        return (
+        const {order } = this.props.order;
+        return (!order || order.id !== this.state.orderId) ?
+            <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}} refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isFetching}
+                    onRefresh={() => this.onHeaderRefresh}
+                    tintColor='gray'
+                />
+            }><Text style={{textAlign: 'center'}}>下拉刷新</Text></ScrollView>
+            :(
             <View style={[styles.container, {flex: 1}]}>
                 {/*<View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />*/}
                 <ScrollView
                     refreshControl={
                         <RefreshControl
                             refreshing={this.state.isFetching}
-                            onRefresh={() => this.onHeaderRefresh()}
+                            onRefresh={() => this.onHeaderRefresh}
                             tintColor='gray'
                         />
                     }>
@@ -134,17 +145,16 @@ class OrderScene extends PureComponent {
     onHeaderRefresh() {
         //this.requestData()
 
-        this.props.actions.getOrder(this.props.global.accessToken, this.state.order_id)
+        this.props.actions.getOrder(this.props.global.accessToken, this.state.orderId)
     }
 
     _onLogin() {
-        this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.order_id}})
+        this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.orderId}})
     }
 
     renderHeader() {
         let info = {};
         const {order } = this.props.order;
-        let self = this;
 
         let onButtonPress = () => {
             this.props.actions.updateOrder(
@@ -154,10 +164,7 @@ class OrderScene extends PureComponent {
                 this.props.global.currentUser)
         }
 
-        return !order ? <Text>Empty Order, refreshing</Text>
-            :
-            (
-            <View style={styles.topContainer}>
+        return (<View style={styles.topContainer}>
                 <View style={{backgroundColor: '#fff'}}>
                     <View style={[styles.row, {height: pxToDp(40), alignItems:'center'}]}>
                         <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
@@ -176,29 +183,30 @@ class OrderScene extends PureComponent {
                         </TouchableOpacity>
                         <TouchableOpacity style={{flexDirection: 'row', marginLeft: pxToDp(14)}}>
                             <Text style={{fontSize: pxToDp(32), color: colors.mobile_color}}>{order.mobile}</Text>
-                            <Image source={require('../../img/Public/call.png')} style={{width: pxToDp(20), height: pxToDp(28), marginLeft: pxToDp(6)}}/>
+                            <CallImg/>
                         </TouchableOpacity>
                         <View style={{flex: 1}}/>
                         <Image style={styles.icon} source={require('../../img/Order/navi.png')}/>
                     </View>
-                    <Separator style={{backgroundColor: colors.color999}}/>
-                    <View style={[styles.row, {marginBottom:pxToDp(14), flexDirection: 'column'}]}>
-                        <View style={{flexDirection: 'row'}}>
-                            <Text style={styles.remarkText}>客户备注:</Text>
-                            <Text style={[styles.remarkText, {marginLeft: pxToDp(6), marginRight: pxToDp(140)}]}>您好，麻烦把我买的排骨用热水焯一下，不然差评！谢谢！</Text>
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            <Text style={styles.remarkText}>商家备注:</Text>
-                            <Text style={[styles.remarkText, {marginLeft: pxToDp(6), marginRight: pxToDp(140)}]}>好的，我们会切上葱段和生姜加上料酒，一定给您焯干净。</Text>
-                        </View>
-                    </View>
+                    {(order.user_remark && order.store_remark) &&
+                    <Separator style={{backgroundColor: colors.color999}}/>}
+
+                    { hasRemark(order) &&
+                    <View style={[styles.row, {marginBottom: pxToDp(14), flexDirection: 'column'}]}>
+                        {!!order.user_remark &&
+                        <Remark label="客户备注" remark={order.user_remark}/>}
+                        {!!order.store_remark &&
+                        <Remark label="商家备注" remark={order.store_remark}/>}
+                    </View>}
+
                 </View>
 
                 <View style={{marginTop: pxToDp(20), backgroundColor:'#f0f9ef'}}>
                     <View style={styles.row}>
                         <Text>{shortOrderDay(order.orderTime)}#{order.dayId}</Text>
                         <View style={{flex: 1}}/>
-                        <Button>{order.storeName}</Button>
+                        <Text>{order.store_name}</Text>
+                        <CallImg/>
                     </View>
                     <View style={styles.row}>
                         <Text>订单号：{order.id}</Text>
@@ -206,32 +214,17 @@ class OrderScene extends PureComponent {
                         <Text>期望送达 {orderExpectTime(order.expectTime)}</Text>
                     </View>
                     <View style={styles.row}>
-                        <Text>{order.platform}#{order.platformId} {order.platform_oid}</Text>
+                        <Text>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
                         <View style={{flex: 1}}/>
                         <Text>{orderOrderTimeShort(order.orderTime)}下单</Text>
                     </View>
                     <View style={{height: pxToDp(170), backgroundColor: colors.white, flexDirection: 'row',
                         justifyContent:'space-around'}}>
-                        <View style={{flexDirection: 'column',}}>
-                            <Text style={styles.stepText}>打包中</Text>
-                            <Text style={styles.stepText}>刘子墨分拣</Text>
-                            <Text style={styles.stepText}>27分钟前</Text>
-                        </View>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={styles.stepText}>打包中</Text>
-                            <Text style={styles.stepText}>刘子墨分拣</Text>
-                            <Text style={styles.stepText}>27分钟前</Text>
-                        </View>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={styles.stepText}>打包中</Text>
-                            <Text style={styles.stepText}>刘子墨分拣</Text>
-                            <Text style={styles.stepText}>27分钟前</Text>
-                        </View>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={styles.stepText}>打包中</Text>
-                            <Text style={styles.stepText}>刘子墨分拣</Text>
-                            <Text style={styles.stepText}>27分钟前</Text>
-                        </View>
+                        <OrderStep/>
+                        <OrderStep/>
+                        <OrderStep/>
+                        <OrderStep/>
+
                     </View>
                 </View>
 
@@ -262,9 +255,51 @@ class OrderScene extends PureComponent {
                 <Separator/>
 
                 <Separator/>
-
             </View>
         )
+    }
+}
+
+class CallImg extends PureComponent {
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return <Image source={require('../../img/Public/call.png')} style={styles.callIcon}/>;
+    }
+}
+
+class Remark extends  PureComponent {
+
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        const {label, remark} = this.props;
+        return (<View style={{flexDirection: 'row'}}>
+            <Text style={styles.remarkText}>{label}:</Text>
+            <Text style={[styles.remarkText, styles.remarkTextBody]}>{remark}</Text>
+        </View>)
+    }
+}
+
+class OrderStep extends PureComponent {
+
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return <View style={{flexDirection: 'column', flex: 1, alignItems:'center'}}>
+            <View style={{borderColor: colors.main_color, height: pxToDp(4), width: '100%', borderTopWidth: pxToDp(4), marginTop: pxToDp(10), position: 'absolute', top: pxToDp(-20)}}></View>
+            <View style={[{borderRadius: pxToDp(10), padding: pxToDp(10), width:pxToDp(10), height:pxToDp(10), backgroundColor: colors.main_color, position: 'absolute', top: pxToDp(2)}]}/>
+            <Text style={styles.stepText}>打包中</Text>
+            <Text style={styles.stepText}>刘子墨分拣</Text>
+            <Text style={styles.stepText}>27分钟前</Text>
+        </View>;
     }
 }
 
@@ -277,6 +312,11 @@ const styles = StyleSheet.create({
         width: pxToDp(74),
         height: pxToDp(56),
         alignItems: 'flex-end'
+    },
+    callIcon: {
+        width: pxToDp(20),
+        height: pxToDp(28),
+        marginLeft: pxToDp(6)
     },
     banner: {
         width: screen.width,
@@ -293,6 +333,9 @@ const styles = StyleSheet.create({
         color: '#808080',
         fontWeight: 'bold',
         fontSize: pxToDp(24),
+    },
+    remarkTextBody: {
+        marginLeft: pxToDp(6), marginRight: pxToDp(140)
     },
     stepText: {
         textAlign: 'center'

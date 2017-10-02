@@ -5,7 +5,7 @@ export default {
   weuiCellGapH: 10,
   weuiCellInnerGapH: 17 * 0.35, // '.35em'
   weuiCellHeight: 42,
-  weuiCellFontSize: 17,
+  weuiCellFontSize: 16,
   weuiCellTipsFontSize: 14,
   weuiCellLabelWidth: 105,
 

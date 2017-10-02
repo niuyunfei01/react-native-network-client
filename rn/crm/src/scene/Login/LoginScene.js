@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {TouchableOpacity, StyleSheet, View, ScrollView, Text, ImageBackground, Image, Button, ToastAndroid, NativeModules, ActivityIndicator} from 'react-native'
-import { FormLabel, Button as EButton, FormInput, FormValidationMessage } from 'react-native-elements'
+import { FormInput  } from 'react-native-elements'
 import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../Alert/pxToDp'

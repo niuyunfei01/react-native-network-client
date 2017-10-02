@@ -1,5 +1,6 @@
 'use strict'
-import {orderUrlWithId} from "../../api";
+import AppConfig from '../../config.js';
+import FetchEx from "../../util/fetchEx";
 /**
  * ## Imports
  *
@@ -36,20 +37,21 @@ export function getOrderFailure (json) {
 
 /**
  */
-export function getOrder(sessionToken, orderId) {
+export function
+getOrder(sessionToken, orderId, callback) {
     return dispatch => {
         dispatch(getOrderRequest())
-        const url = orderUrlWithId(sessionToken, orderId);
-        console.log("url", url)
-        return fetch(url)
-            .then((res) => res.json())
-            .then((res_data) => res_data)
-            .then((json) => {
+        const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`
+        FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+            .then(res => res.json())
+            .then(json => {
                 dispatch(getOrderSuccess(json))
-            })
-            .catch((error) => {
-                dispatch(getOrderFailure(error))
-            })
+                const ok = json && json.id === orderId;
+                callback(ok, ok ? json : "返回数据错误")
+            }).catch((error) => {
+            dispatch(getOrderFailure(error))
+            callback(false, "网络错误")
+        });
     }
 }
 

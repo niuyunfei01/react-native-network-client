@@ -24,11 +24,13 @@ import Caught from './common/Caught'
 
 import Config from './config'
 
+import SplashScreen from 'react-native-splash-screen'
+
 const lightContentScenes = ['Home', 'Mine']
 
 
 //global exception handlers
-const cauht = new Caught;
+const caught = new Caught;
 
 
 function getCurrentRouteName(navigationState) {
@@ -66,6 +68,10 @@ class RootScene extends PureComponent {
         this.store = null;
     }
 
+    componentDidMount() {
+
+    }
+
     componentWillMount() {
         const launchProps = this.props.launchProps;
 
@@ -88,6 +94,8 @@ class RootScene extends PureComponent {
         let initialRouteParams = launchProps['_action_params']||{};
 
         if (this.state.rehydrated) {
+            //hiding after state recovered
+            SplashScreen.hide();
             if (!this.store.getState().global.accessToken) {
                 ToastAndroid.showWithGravity("请您先登录", ToastAndroid.SHORT, ToastAndroid.CENTER)
                 initialRouteName = Config.ROUTE_LOGIN;
@@ -100,10 +108,9 @@ class RootScene extends PureComponent {
             }
         }
 
-
         // on Android, the URI prefix typically contains a host in addition to scheme
         const prefix = Platform.OS === 'android' ? 'blx-crm://blx/' : 'blx-crm://';
-        return !this.state.rehydrated ? <Text>Loading...</Text>
+        return !this.state.rehydrated ? <View/>
             : (
             <Provider store={this.store}>
                 <View style={styles.container}>
