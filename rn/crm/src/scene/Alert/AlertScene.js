@@ -149,17 +149,17 @@ class AlertScene extends PureComponent {
                     let {curr_page, total_page, total_num, next_less_than_id, list} = result.obj;
 
                     let list_pages = get_list_pages(global_alert_type);
-                    if(list_pages === undefined){
+                    console.log('curr_page ->', curr_page);
+                    if(list_pages === undefined || parseInt(curr_page) === 1){
                         list_pages = [];
                     } else if (parseInt(curr_page) > 1 && list_pages.indexOf(curr_page) === -1){//不存在
-                        console.log('curr_page ->', curr_page);
                         let list_data = get_type_list(global_alert_type);
                         list_data.push.apply(list_data, list);
                         list = list_data;
                     }
-                    if(list_pages.indexOf(curr_page) === -1){
+                    // if(list_pages.indexOf(curr_page) === -1){
+                    // }
                         list_pages.push(curr_page);
-                    }
                     console.log('list_pages ->', list_pages);
                     let type_data = {
                         curr_page: curr_page,
@@ -281,7 +281,7 @@ class AlertScene extends PureComponent {
     }
 }
 
-class AlertList extends Component {
+class AlertList extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -310,7 +310,7 @@ class AlertList extends Component {
             this.setState({
                 isRefreshing: true,
             });
-            this.props.callbackLoadData();
+            this.props.callbackLoadData(1);
         }
     }
 
@@ -406,8 +406,8 @@ class AlertList extends Component {
     }
 
     render() {
-        let type_list = get_type_list(global_alert_type);
-        // let type_list = this.state.list_data;
+        // let type_list = get_type_list(global_alert_type);
+        let type_list = this.state.list_data;
 
         if(type_list === undefined || type_list === false){
             return (
@@ -428,11 +428,11 @@ class AlertList extends Component {
                      // 到达底部，加载更多列表项
                     this._onScroll();
                 }}
-                onEndReachedThreshold={0.6}
+                onEndReachedThreshold={0.4}
                 onRefresh={this._onRefresh}
                 refreshing={this.state.isRefreshing}
                 getItemLayout={(data, index) => (
-                    {length: pxToDp(255), offset: pxToDp(255) * index, index}
+                    {length: pxToDp(250), offset: pxToDp(250) * index, index}
                 )}
             />
         )
