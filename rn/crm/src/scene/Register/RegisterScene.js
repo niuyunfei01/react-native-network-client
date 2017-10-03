@@ -8,6 +8,7 @@ import * as globalActions from '../../reducers/global/globalActions'
 
 import {Cell, CellHeader, CellBody, CellFooter, Button, Input, Cells, ButtonArea, Flex, Toast} from "../../weui/index";
 
+import {NavigationItem} from "../../widget/index"
 
 /**
  * ## Redux boilerplate
@@ -26,13 +27,23 @@ function mapDispatchToProps(dispatch) {
 
 const mobileInputPlaceHold = "手机号码";
 const validCodePlaceHold = "短信验证码";
-const namePlaceHold = "姓名";
-const passwordPlaceHold = "密码";
-const rePasswordPlaceHold = "确认密码";
-const requestCodeSuccessMsg = "";
-const requestCodeErrorMsg = "";
-const registerSuccessMsg = "";
-const registerErrorMsg = "";
+const namePlaceHold = "负责人";
+const shopNamePlaceHold = "店名";
+const classifyPlaceHold = "经营项目 如:生鲜、水果";
+const addressPlaceHold = "店铺详细地址";
+const requestCodeSuccessMsg = "短信验证码已发送";
+const requestCodeErrorMsg = "短信验证码发送失败";
+const registerSuccessMsg = "申请成功";
+const registerErrorMsg = "申请失败，请重试!";
+
+
+const validEmptyMobile = "请出入手机号";
+const validErrorMobile = "手机号码不正确";
+const validEmptyName = "请输入负责人";
+const validEmptyAddress = "请输入店铺地址";
+const validEmptyCode = "请输入短信验证码";
+const validEmptyShopName = "请输入店铺名字";
+const validEmptyClassify = "请输入经营项目";
 
 class RegisterScene extends PureComponent {
 
@@ -50,7 +61,14 @@ class RegisterScene extends PureComponent {
         ),
         headerStyle: {backgroundColor: '#59b26a'},
         headerRight: (<View/>),
-        headerLeft: (<View/>),
+        headerLeft: (
+            <NavigationItem
+                icon={require('../../img/Register/back_.png')}
+                iconStyle = {{width:pxToDp(87), height:pxToDp(79)}}
+                onPress={() => {
+                    navigation.navigate('Login')
+                }}
+            />),
     })
 
     constructor(props) {
@@ -58,38 +76,65 @@ class RegisterScene extends PureComponent {
         this.state = {
             mobile: '',
             verifyCode: '',
+            serverCode: '',
             name: '',
-            password: '',
-            rePassword: '',
+            address: '',
+            shopName: '',
+            classify: '',
             canAskReqSmsCode: false,
             reRequestAfterSeconds: 60,
-            doingRegister: false,
+            doingApply: false,
             opSuccessMsg: '',
             opErrorMsg: '',
             visibleSuccessToast: false,
             visibleErrorToast: false,
             toastTimer: null,
+            loadingTimer: null,
         }
 
-        this.onMobileChanged = this.onMobileChanged.bind(this);
-        this.doRegister = this.doRegister.bind(this);
-        this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
+        this.onMobileChanged = this.onMobileChanged.bind(this)
+        this.doApply = this.doApply.bind(this)
+        this.onApply = this.onApply.bind(this)
+        this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
         this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
-        this.doneRegister = this.doneRegister.bind(this)
+        this.doneApply = this.doneApply.bind(this)
         this.showSuccessToast = this.showSuccessToast.bind(this)
         this.showErrorToast = this.showErrorToast.bind(this)
     }
 
-    doRegister() {
-        this.setState({doingRegister: true});
+    onApply() {
+        if (!this.state.mobile) {
+            this.showErrorToast(validEmptyMobile)
+            return false
+        }
+        if (!this.state.verifyCode) {
+            this.showErrorToast(validEmptyCode)
+        }
+        if (!this.state.name) {
+            this.showErrorToast(validEmptyName)
+        }
+        if (!this.state.shopName) {
+            this.showErrorToast(validEmptyShopName)
+        }
+        if (!this.state.classify) {
+            this.showErrorToast(validEmptyClassify)
+        }
+        if (!this.state.address) {
+            this.showErrorToast(validEmptyAddress)
+        }
     }
 
-    doneRegister() {
-        this.setState({doingRegister: false})
+    doApply() {
+        this.setState({doingApply: true});
+    }
+
+    doneApply() {
+        this.setState({doingApply: false})
     }
 
     clearTimeouts() {
-        this.timeouts.forEach(clearTimeout);
+        if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
+        if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
     }
 
     showSuccessToast(msg) {
@@ -117,13 +162,13 @@ class RegisterScene extends PureComponent {
             this.setState({canAskReqSmsCode: true});
             this.props.actions.requestSmsCode(this.state.mobile, (success) => {
                 if (success) {
-                    this.showSuccessToast("短信验证码已发送")
+                    this.showSuccessToast(requestCodeSuccessMsg)
                 } else {
-                    this.showErrorToast("短信验证码发送失败")
+                    this.showErrorToast(requestCodeErrorMsg)
                 }
             });
         } else {
-            this.showErrorToast("请输入您的手机号")
+            this.showErrorToast(validEmptyMobile)
         }
     }
 
@@ -146,7 +191,6 @@ class RegisterScene extends PureComponent {
     render() {
         return (
             <ScrollView style={styles.container}>
-                <View style={{height: pxToDp(50)}}/>
                 <View style={styles.register_panel}>
                     <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
                         <Cell>
@@ -223,13 +267,13 @@ class RegisterScene extends PureComponent {
 
                         <Cell>
                             <CellHeader>
-                                <Image source={require('../../img/Register/password.png')} style={{
-                                    width: pxToDp(35),
-                                    height: pxToDp(41),
+                                <Image source={require('../../img/Register/dianming_.png')} style={{
+                                    width: pxToDp(39),
+                                    height: pxToDp(35),
                                 }}/>
                             </CellHeader>
                             <CellBody>
-                                <Input secureTextEntry={true} placeholder={passwordPlaceHold}
+                                <Input placeholder={shopNamePlaceHold}
                                        placeholderStyle={{color: "#999"}}
                                        style={styles.input}
                                        underlineColorAndroid="#999"/>
@@ -238,13 +282,27 @@ class RegisterScene extends PureComponent {
 
                         <Cell>
                             <CellHeader>
-                                <Image source={require('../../img/Register/re_password.png')} style={{
-                                    width: pxToDp(35),
-                                    height: pxToDp(41),
+                                <Image source={require('../../img/Register/jingying_.png')} style={{
+                                    width: pxToDp(39),
+                                    height: pxToDp(39),
                                 }}/>
                             </CellHeader>
                             <CellBody>
-                                <Input secureTextEntry={true} placeholder={rePasswordPlaceHold}
+                                <Input placeholder={classifyPlaceHold}
+                                       placeholderStyle={{color: "#999"}}
+                                       style={styles.input}
+                                       underlineColorAndroid="#999"/>
+                            </CellBody>
+                        </Cell>
+                        <Cell>
+                            <CellHeader>
+                                <Image source={require('../../img/Register/map_.png')} style={{
+                                    width: pxToDp(39),
+                                    height: pxToDp(45),
+                                }}/>
+                            </CellHeader>
+                            <CellBody>
+                                <Input placeholder={addressPlaceHold}
                                        placeholderStyle={{color: "#999"}}
                                        style={styles.input}
                                        underlineColorAndroid="#999"/>
@@ -252,19 +310,21 @@ class RegisterScene extends PureComponent {
                         </Cell>
                     </Cells>
 
-                    <ButtonArea style={{marginBottom: pxToDp(50), marginTop: pxToDp(50)}}>
+                    <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
                         <Button type="primary" onPress={() => {
                         }}>我要开店</Button>
                     </ButtonArea>
 
                     <Flex direction="row" style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                        <Text style={{fontSize: 16}}>已有账号?</Text>
+                        <Text style={{fontSize: 16}}>有不明处?</Text>
                         <Text> </Text>
                         <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
                         }}>
-                            返回登录
+                            联系客服
                         </Text>
                     </Flex>
+                    <Toast icon="loading" show={this.state.visibleLoading} onRequestClose={() => {
+                    }}>提交中</Toast>
                     <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
                     }}>{this.state.opSuccessMsg}</Toast>
                     <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {

@@ -78,3 +78,16 @@ export function requestSmsCode(mobile, callback) {
     }
 }
 
+export function customerApply(applyData, callback) {
+    return dispatch => {
+        return customerApplyRequest(applyData)
+            .then(response => response.json())
+            .then(json => {
+                callback(true)
+            })
+            .catch((error) => {
+                callback(false, '网络错误，请检查您的网络连接')
+            })
+    }
+}
+
