@@ -87,12 +87,12 @@ class ApplyScene extends PureComponent {
     constructor(props) {
         super(props)
         this.state = {
-            mobile: '',
-            verifyCode: '',
-            name: '',
-            address: '',
-            shopName: '',
-            classify: '',
+            mobile: '18295711875',
+            verifyCode: '123456',
+            name: 'shi',
+            address: 'glg',
+            shopName: 'jjj',
+            classify: 'aaa',
             canAskReqSmsCode: false,
             reRequestAfterSeconds: 60,
             doingApply: false,

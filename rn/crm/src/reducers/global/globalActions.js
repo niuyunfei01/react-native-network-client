@@ -83,6 +83,7 @@ export function customerApply(applyData, callback) {
         return customerApplyRequest(applyData)
             .then(response => response.json())
             .then(json => {
+                console.log("customerApply res", json)
                 callback(true)
             })
             .catch((error) => {
