@@ -9,6 +9,8 @@ import Config from '../../config'
 import {serviceSignIn, smsCodeRequest, customerApplyRequest} from '../../services/account'
 import * as native from "../../common/native";
 
+import DeviceInfo from 'react-native-device-info';
+
 /**
  * ## Imports
  *
@@ -19,6 +21,15 @@ const {
     SESSION_TOKEN_SUCCESS,
     LOGOUT_SUCCESS
 } = require('../../common/constants').default
+
+function getDeviceUUID() {
+    DeviceInfo.isPinOrFingerprintSet()(isPinOrFingerprintSet => {
+        if (!isPinOrFingerprintSet) {
+
+        }
+    })
+    return DeviceInfo.getUniqueID();
+}
 
 export function setAccessToken(oauthToken) {
     return {
@@ -36,7 +47,7 @@ export function logout() {
 
 export function signIn(mobile, password, callback) {
     return dispatch => {
-        return serviceSignIn(1000001, mobile, password)
+        return serviceSignIn(getDeviceUUID(), mobile, password)
             .then(response => response.json())
             .then(json => {
                 const {access_token, refresh_token, expires_in_ts} = json;
@@ -66,7 +77,7 @@ export function signIn(mobile, password, callback) {
 
 export function requestSmsCode(mobile, type, callback) {
     return dispatch => {
-        return smsCodeRequest(1000001, mobile, type)
+        return smsCodeRequest(getDeviceUUID(), mobile, type)
             .then(response => response.json())
             .then(json => {
                 console.log("requestSmsCode res", json)
