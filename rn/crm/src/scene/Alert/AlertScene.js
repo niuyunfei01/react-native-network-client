@@ -10,7 +10,7 @@
 import React, { PureComponent, Component } from 'react'
 import { View, Text, StyleSheet, ScrollView, Image, Touchable, TouchableOpacity, RefreshControl, FlatList} from 'react-native';
 import {connect} from "react-redux";
-import pxToDp from './pxToDp';
+import pxToDp from '../../util/pxToDp';
 import LoadingView from '../../widget/LoadingView';
 
 import * as alertActions from '../../reducers/alert/alertActions'

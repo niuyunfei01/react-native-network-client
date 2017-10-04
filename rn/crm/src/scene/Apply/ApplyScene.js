@@ -2,13 +2,27 @@ import React, {PureComponent} from 'react';
 import {View, StyleSheet, Image, Text, SearchButton, ScrollView} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../Alert/pxToDp';
+import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
 
-import {Cell, CellHeader, CellBody, CellFooter, Button, Input, Cells, ButtonArea, Flex, Toast} from "../../weui/index";
+import {
+    Cell,
+    CellHeader,
+    CellBody,
+    CellFooter,
+    Button,
+    Input,
+    Cells,
+    ButtonArea,
+    Flex,
+    Toast,
+    Dialog
+} from "../../weui/index";
 
 import {NavigationItem} from "../../widget/index"
+
+import stringEx from "../../util/stringEx"
 
 /**
  * ## Redux boilerplate
@@ -33,19 +47,18 @@ const classifyPlaceHold = "经营项目 如:生鲜、水果";
 const addressPlaceHold = "店铺详细地址";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
-const registerSuccessMsg = "申请成功";
-const registerErrorMsg = "申请失败，请重试!";
+const applySuccessMsg = "申请成功";
+const applyErrorMsg = "申请失败，请重试!";
 
 
-const validEmptyMobile = "请出入手机号";
-const validErrorMobile = "手机号码不正确";
+const validErrorMobile = "手机号有误";
 const validEmptyName = "请输入负责人";
 const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入店铺名字";
 const validEmptyClassify = "请输入经营项目";
 
-class RegisterScene extends PureComponent {
+class ApplyScene extends PureComponent {
 
     static navigationOptions = ({navigation}) => ({
         headerTitle: (
@@ -64,7 +77,7 @@ class RegisterScene extends PureComponent {
         headerLeft: (
             <NavigationItem
                 icon={require('../../img/Register/back_.png')}
-                iconStyle = {{width:pxToDp(87), height:pxToDp(79)}}
+                iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
                 onPress={() => {
                     navigation.navigate('Login')
                 }}
@@ -76,7 +89,6 @@ class RegisterScene extends PureComponent {
         this.state = {
             mobile: '',
             verifyCode: '',
-            serverCode: '',
             name: '',
             address: '',
             shopName: '',
@@ -88,11 +100,11 @@ class RegisterScene extends PureComponent {
             opErrorMsg: '',
             visibleSuccessToast: false,
             visibleErrorToast: false,
+            visibleDialog: false,
             toastTimer: null,
             loadingTimer: null,
         }
 
-        this.onMobileChanged = this.onMobileChanged.bind(this)
         this.doApply = this.doApply.bind(this)
         this.onApply = this.onApply.bind(this)
         this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
@@ -103,29 +115,55 @@ class RegisterScene extends PureComponent {
     }
 
     onApply() {
-        if (!this.state.mobile) {
-            this.showErrorToast(validEmptyMobile)
+        if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
+            this.showErrorToast(validErrorMobile)
             return false
         }
         if (!this.state.verifyCode) {
             this.showErrorToast(validEmptyCode)
+            return false
         }
         if (!this.state.name) {
             this.showErrorToast(validEmptyName)
+            return false
         }
         if (!this.state.shopName) {
             this.showErrorToast(validEmptyShopName)
+            return false
         }
         if (!this.state.classify) {
             this.showErrorToast(validEmptyClassify)
+            return false
         }
         if (!this.state.address) {
             this.showErrorToast(validEmptyAddress)
+            return false
         }
+        if (this.state.doingApply) {
+            return false;
+        }
+        this.doApply();
     }
 
     doApply() {
+        var self = this;
         this.setState({doingApply: true});
+        let data = {
+            mobile: this.state.mobile,
+            address: this.state.address,
+            shop_name: this.state.shopName,
+            verifyCode: this.state.verifyCode,
+            classify: this.state.classify,
+            name: this.state.name
+        };
+        this.props.actions.customerApply(data, (success) => {
+            self.doneApply();
+            if (success) {
+                this.showSuccessToast(applySuccessMsg)
+            } else {
+                this.showErrorToast(applyErrorMsg)
+            }
+        })
     }
 
     doneApply() {
@@ -158,26 +196,24 @@ class RegisterScene extends PureComponent {
     }
 
     onRequestSmsCode() {
-        if (this.state.mobile) {
+        if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
             this.setState({canAskReqSmsCode: true});
-            this.props.actions.requestSmsCode(this.state.mobile, (success) => {
+            this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
                 if (success) {
                     this.showSuccessToast(requestCodeSuccessMsg)
                 } else {
+                    this.setState({canAskReqSmsCode: false});
                     this.showErrorToast(requestCodeErrorMsg)
                 }
             });
         } else {
-            this.showErrorToast(validEmptyMobile)
+            this.setState({canAskReqSmsCode: false});
+            this.showErrorToast(validErrorMobile)
         }
     }
 
     onCounterReReqEnd() {
         this.setState({canAskReqSmsCode: false});
-    }
-
-    onMobileChanged() {
-
     }
 
     componentWillUnmount() {
@@ -259,6 +295,10 @@ class RegisterScene extends PureComponent {
                             </CellHeader>
                             <CellBody>
                                 <Input placeholder={namePlaceHold}
+                                       onChangeText={(name) => {
+                                           this.setState({name})
+                                       }}
+                                       value={this.state.name}
                                        placeholderStyle={{color: "#999"}}
                                        style={styles.input}
                                        underlineColorAndroid="#999"/>
@@ -274,6 +314,10 @@ class RegisterScene extends PureComponent {
                             </CellHeader>
                             <CellBody>
                                 <Input placeholder={shopNamePlaceHold}
+                                       onChangeText={(shopName) => {
+                                           this.setState({shopName})
+                                       }}
+                                       value={this.state.shopName}
                                        placeholderStyle={{color: "#999"}}
                                        style={styles.input}
                                        underlineColorAndroid="#999"/>
@@ -289,6 +333,10 @@ class RegisterScene extends PureComponent {
                             </CellHeader>
                             <CellBody>
                                 <Input placeholder={classifyPlaceHold}
+                                       onChangeText={(classify) => {
+                                           this.setState({classify})
+                                       }}
+                                       value={this.state.classify}
                                        placeholderStyle={{color: "#999"}}
                                        style={styles.input}
                                        underlineColorAndroid="#999"/>
@@ -303,6 +351,10 @@ class RegisterScene extends PureComponent {
                             </CellHeader>
                             <CellBody>
                                 <Input placeholder={addressPlaceHold}
+                                       onChangeText={(address) => {
+                                           this.setState({address})
+                                       }}
+                                       value={this.state.address}
                                        placeholderStyle={{color: "#999"}}
                                        style={styles.input}
                                        underlineColorAndroid="#999"/>
@@ -311,8 +363,7 @@ class RegisterScene extends PureComponent {
                     </Cells>
 
                     <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-                        <Button type="primary" onPress={() => {
-                        }}>我要开店</Button>
+                        <Button type="primary" onPress={this.onApply}>我要开店</Button>
                     </ButtonArea>
 
                     <Flex direction="row" style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -323,12 +374,25 @@ class RegisterScene extends PureComponent {
                             联系客服
                         </Text>
                     </Flex>
-                    <Toast icon="loading" show={this.state.visibleLoading} onRequestClose={() => {
+                    <Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {
                     }}>提交中</Toast>
                     <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
                     }}>{this.state.opSuccessMsg}</Toast>
                     <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
                     }}>{this.state.opErrorMsg}</Toast>
+                    <Dialog
+                        onRequestClose={() => {
+                        }}
+                        visible={this.state.visibleDialog}
+                        title="申请成功"
+                        buttons={[
+                            {
+                                type: 'default',
+                                label: '确定',
+                                onPress: this.hideDialog1,
+                            }
+                        ]}
+                    ><Text>客服马上会联系你</Text></Dialog>
                 </View>
             </ScrollView>
         )
@@ -362,4 +426,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RegisterScene)
+export default connect(mapStateToProps, mapDispatchToProps)(ApplyScene)

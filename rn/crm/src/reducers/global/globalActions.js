@@ -6,7 +6,7 @@
 'use strict'
 
 import Config from '../../config'
-import {serviceSignIn, smsCodeRequest} from '../../services/account'
+import {serviceSignIn, smsCodeRequest, customerApplyRequest} from '../../services/account'
 import * as native from "../../common/native";
 
 /**
@@ -64,9 +64,9 @@ export function signIn(mobile, password, callback) {
     }
 }
 
-export function requestSmsCode(mobile, callback) {
+export function requestSmsCode(mobile, type, callback) {
     return dispatch => {
-        return smsCodeRequest(1000001, mobile)
+        return smsCodeRequest(1000001, mobile, type)
             .then(response => response.json())
             .then(json => {
                 console.log("requestSmsCode res", json)

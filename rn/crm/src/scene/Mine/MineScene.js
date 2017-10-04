@@ -23,7 +23,7 @@ class MineScene extends PureComponent {
                 <NavigationItem
                     icon={require('../../img/Mine/icon_navigationItem_set_white_2x.png')}
                     onPress={() => {
-                        navigation.navigate('Register')
+                        navigation.navigate('Apply')
                     }}
                 />
                 <NavigationItem
@@ -50,7 +50,7 @@ class MineScene extends PureComponent {
     }
 
     componentWillMount() {
-        //this.props.navigation.navigate('Order', {order_id: 6111029});
+
     }
 
     onHeaderRefresh() {

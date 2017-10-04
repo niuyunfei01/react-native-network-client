@@ -9,9 +9,10 @@ import AlertScene from '../scene/Alert/AlertScene'
 import MineScene from '../scene/Mine/MineScene'
 import OrderScene from '../scene/Order/OrderScene'
 import LoginScene from '../scene/Login/LoginScene'
+import GoodsScene from '../scene/Goods/GoodsScene'
 
 import WebScene from '../widget/WebScene'
-import RegisterScene from "../scene/Register/RegisterScene";
+import ApplyScene from "../scene/Apply/ApplyScene";
 import * as native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeui";
 
@@ -52,7 +53,7 @@ const Tab = TabNavigator(
         },
 
         Goods: {
-            screen: OrderScene,
+            screen: GoodsScene,
             navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '商品',
                 tabBarIcon: ({ focused, tintColor }) => (
@@ -139,7 +140,7 @@ class Navigator extends Component {
                     screen: LoginScene,
                     path: 'Login/:next/:nextParams'
                 },
-                Register: {screen: RegisterScene},
+                Apply: {screen: ApplyScene},
                 TestWeui: {screen: TestWeuiScene}
             },
             stackNavigatorConfigs
