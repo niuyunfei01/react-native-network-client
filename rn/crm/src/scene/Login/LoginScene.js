@@ -3,7 +3,7 @@ import {TouchableOpacity, StyleSheet, View, ScrollView, Text, ImageBackground, I
 import { FormInput  } from 'react-native-elements'
 import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
-import pxToDp from '../Alert/pxToDp'
+import pxToDp from '../../util/pxToDp'
 
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
@@ -116,7 +116,7 @@ class LoginScene extends PureComponent {
         if (this.state.mobile) {
             this.setState({canAskReqSmsCode: true});
             //this.counterText.start();
-            this.props.actions.requestSmsCode(this.state.mobile, (success) => {
+            this.props.actions.requestSmsCode(this.state.mobile, 0,(success) => {
                 ToastAndroid.showWithGravity(success ? "短信验证码已发送" : "短信验证码发送失败",
                     success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER)
             });
@@ -241,8 +241,8 @@ class LoginScene extends PureComponent {
 
                         <View style={{alignItems:'center'}}>
                         <TouchableOpacity>
-                        <Text onPress={() => {this.props.navigation.navigate('Register')}}
-                              style={{color:colors.main_color, fontSize: pxToDp(colors.actionSecondSize), marginTop: pxToDp(50)}}>注册新帐号</Text>
+                        <Text onPress={() => {this.props.navigation.navigate('Apply')}}
+                              style={{color:colors.main_color, fontSize: pxToDp(colors.actionSecondSize), marginTop: pxToDp(50)}}>我要开店</Text>
                         </TouchableOpacity>
                         </View>
                     </View>

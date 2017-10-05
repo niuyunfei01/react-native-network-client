@@ -31,6 +31,18 @@ export default {
             body: formData
         });
     },
+    postJSON(action, data) {
+        const url = AppConfig.ServiceUrl + action
+        return fetch(url, {
+            credential: 'include',
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+    },
     get(action, paras = '') {
         let url = AppConfig.ServiceUrl + action + (paras === '' ? '' : '?' + paras);
         console.log('url: ', url);

@@ -22,7 +22,7 @@ import * as orderActions from '../../reducers/order/orderActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import pxToDp from "../Alert/pxToDp";
+import pxToDp from "../../util/pxToDp";
 import {Button, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
 
 const numeral = require('numeral')

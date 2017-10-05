@@ -32,6 +32,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.iflytek.cloud.SpeechUtility;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -260,6 +261,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())
+                .addPackage(new RNDeviceInfo())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
