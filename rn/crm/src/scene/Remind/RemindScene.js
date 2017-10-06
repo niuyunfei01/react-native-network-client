@@ -249,8 +249,8 @@ class RemindScene extends PureComponent {
         });
         return (
             <ScrollableTabView
-                renderTabBar={() => <ScrollableTabBar/>}
                 tabBarActiveTextColor={"#333"}
+                tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
                 tabBarTextStyle={{fontSize: pxToDp(26)}}>
                 {lists}
             </ScrollableTabView>
