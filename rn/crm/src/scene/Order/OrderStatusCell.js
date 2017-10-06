@@ -2,18 +2,23 @@
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native'
 import * as tool from '../../common/tool'
-import * as screen from '../../common/screen'
+import screen from '../../common/screen'
 import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
 import CallBtn from './CallBtn'
 import colors from "../../styles/colors";
 import _ from 'underscore'
+import moment from 'moment'
 
 
 class OrderStatusCell extends PureComponent {
 
   constructor(props) {
     super(props)
+  }
+
+  _validStepColor(datetimeStr) {
+    return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
   }
 
   render() {
@@ -44,16 +49,16 @@ class OrderStatusCell extends PureComponent {
 
       <View style={{height: pxToDp(170), backgroundColor: colors.white, flexDirection: 'row',
         justifyContent:'space-around'}}>
-        <OrderStep statusTxt="分拣" workerNames={packWorkers} loggerName={packLoggerName}
+        <OrderStep statusTxt="已收单" bgColor={this._validStepColor(order.orderTime)} timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
+        <OrderStep statusTxt="已分拣" bgColor={this._validStepColor(order.time_ready)} workerNames={packWorkers} loggerName={packLoggerName}
                    timeAtStr={tool.shortTimeDesc(order.time_ready)}/>
-        <OrderStep statusTxt="待配送" wokerNames={_.defaults(order.workers[order.ship_status], {}).nickname}/>
-        <OrderStep statusTxt="开始配送"/>
-        <OrderStep statusTxt="已送达"/>
+        <OrderStep statusTxt="已出发" bgColor={this._validStepColor(order.time_start_ship)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}/>
+        <OrderStep statusTxt="已送达" bgColor={this._validStepColor(order.time_arrived)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}/>
       </View>
-      <View style={[styles.stepCircle, {backgroundColor: colors.main_color, left: (screen.width/8-5)}]}/>
-      <View style={[styles.stepCircle, {backgroundColor: colors.main_color, left: (screen.width/8*3-5)}]}/>
-      <View style={[styles.stepCircle, {backgroundColor: '#ccc', left: (screen.width/8*5-5)}]}/>
-      <View style={[styles.stepCircle, {backgroundColor: '#ccc', left: (screen.width/8*7-5)}]}/>
+      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.orderTime), left: (screen.width/8-5)}]}/>
+      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_ready), left: (screen.width/8*3-5)}]}/>
+      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_start_ship), left: (screen.width/8*5-5)}]}/>
+      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_arrived), left: (screen.width/8*7-5)}]}/>
     </View>
   }
 }
@@ -67,14 +72,11 @@ class OrderStep extends PureComponent {
 
   render() {
 
-    const {statusTxt, workerNames, timeAtStr, loggerName, invalid} = this.props;
-    const bgColor = invalid || !timeAtStr ? '#ccc' : colors.main_color;
-
-    console.log(`${statusTxt}, ${workerNames}, ${timeAtStr}, ${loggerName}, ${bgColor}`);
+    const {statusTxt, workerNames, timeAtStr, loggerName, invalid, bgColor} = this.props;
 
     return <View style={{flexDirection: 'column', flex: 1, alignItems:'center'}}>
       <View style={{backgroundColor: bgColor , height: pxToDp(4), width: '100%', marginBottom: pxToDp(18)}}/>
-      <Text style={[styles.stepText]}>{statusTxt}</Text>
+      <Text style={[styles.stepText, {color: bgColor}]}>{statusTxt}</Text>
       { !!workerNames &&
       <Text style={styles.stepText}>{workerNames}</Text>}
       { !!timeAtStr &&

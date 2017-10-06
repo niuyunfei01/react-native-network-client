@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan  
- * @flow
- */
-
 import Moment from 'moment';
 
 export function urlByAppendingParams(url: string, params: Object) {
@@ -36,6 +28,9 @@ export function orderExpectTime(dt) {
 }
 
 export function shortTimeDesc(datetime) {
+
+  if (!datetime) return '';
+
   const dtMoment = Moment(datetime);
   const nowMoment = Moment();
 
