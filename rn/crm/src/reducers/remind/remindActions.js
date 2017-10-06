@@ -1,20 +1,23 @@
 'use strict';
 
 import * as types from './ActionTypes';
-import {ToastShort} from '../../utils/ToastUtils';
+import {ToastShort} from '../../util/ToastUtils';
+import * as RemindServices from '../../services/remind';
 
-export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, count, after) {
-    if (count == undefined) {
-        count = 10;
-    }
+export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status) {
     return dispatch => {
         dispatch(fetchRemindList(isRefreshing, loading, isLoadMore));
-        //TODO add url
-        return request(host.BASE_URL + host.DOMAINS[typeId] + '?count=' + count + '&after=' + after)
-            .then((remindList) => {
-                dispatch(receiveRemindList(remindList.data, typeId, remindList.data.after));
-            })
-            .catch((error) => {
+        return RemindServices.FetchRemindList(token, typeId, status, page)
+            .then(response => response.json())
+            .then((response) => {
+                if (response.ok) {
+                    let result = response.obj;
+                    dispatch(receiveRemindList(result.list, typeId, result.curr_page, result.total_page));
+                } else {
+                    dispatch(receiveRemindList([], typeId));
+                    ToastShort(error.message);
+                }
+            }).catch((error) => {
                 dispatch(receiveRemindList([], typeId));
                 ToastShort(error.message);
             })
@@ -33,11 +36,12 @@ function fetchRemindList(isRefreshing, loading, isLoadMore) {
     }
 }
 
-function receiveRemindList(remindData, typeId, after) {
+function receiveRemindList(remindList, typeId, currPage, totalPage) {
     return {
         type: types.RECEIVE_REMIND_LIST,
-        remindData: remindData,
+        remindList: remindList,
         typeId: typeId,
-        after: after
+        currPage: currPage,
+        totalPage: totalPage
     }
 }
