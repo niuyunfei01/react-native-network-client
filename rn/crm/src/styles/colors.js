@@ -7,7 +7,9 @@ export default {
     color333: '#333333',
     color666: '#666',
     color999: '#999',
+    color777: '#999',
     white: '#ffffff',
     mobile_color: '#407c49',
     back_color: '#e5e6e7',
+    title_color: '#111111',
 };

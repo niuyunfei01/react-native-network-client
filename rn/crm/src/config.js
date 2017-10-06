@@ -10,6 +10,7 @@ export default {
 
     ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
 
+    ROUTE_WEB: 'Web',
     ROUTE_LOGIN: 'Login',
     ROUTE_ORDER: 'Order',
     ROUTE_ALERT: 'Alert',

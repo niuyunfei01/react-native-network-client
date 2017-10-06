@@ -10,10 +10,12 @@ import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { screen, system } from '../../common'
-import {shortOrderDay, orderOrderTimeShort, orderExpectTime} from '../../common/tool'
 import {bindActionCreators} from "redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from '../../config'
+import PropTypes from 'prop-types';
+import OrderStatusCell from './OrderStatusCell'
+import CallBtn from './CallBtn'
 
 /**
  * The actions we need
@@ -64,18 +66,22 @@ class OrderScene extends PureComponent {
         </View>),
     });
 
-    constructor(props: Object) {
-        super(props);
+  constructor(props: Object) {
+    super(props);
 
-        this.state = {
-            isFetching: false,
-            orderId: 0,
-            isEditing: false,
-            itemsHided: true,
-        }
-
-        this._onLogin = this._onLogin.bind(this)
+    this.state = {
+      isFetching: false,
+      orderId: 0,
+      isEditing: false,
+      itemsHided: true,
+      shipHided: true,
+      gotoEditPoi: false,
     }
+
+    this._onLogin = this._onLogin.bind(this)
+    this.toMap = this.toMap.bind(this)
+    this.goToSetMap = this.goToSetMap.bind(this)
+  }
 
     componentWillMount() {
 
@@ -108,6 +114,22 @@ class OrderScene extends PureComponent {
             }><Text style={{textAlign: 'center'}}>下拉刷新</Text></ScrollView>
             :(
             <View style={[styles.container, {flex: 1}]}>
+                <Dialog onRequestClose={()=>{}}
+                  visible={this.state.gotoEditPoi}
+                  buttons={[
+                    {
+                      type: 'warn',
+                      label: '去设置',
+                      onPress: this.goToSetMap,
+                    },
+                    {
+                      type: 'default',
+                      label: '取消',
+                      onPress: () => this.setState({gotoEditPoi: false}),
+                    }
+                  ]}
+                ><Text>没有经纬度信息</Text></Dialog>
+
                 {/*<View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />*/}
                 <ScrollView
                     refreshControl={
@@ -143,6 +165,25 @@ class OrderScene extends PureComponent {
         this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.orderId}})
     }
 
+    goToSetMap() {
+      console.log('Nothing to do....')
+      this.setState({gotoEditPoi: false})
+    }
+
+    toMap() {
+      const order = this.props.order;
+        const validPoi = order.loc_lng && order.loc_lat;
+      if (validPoi) {
+        const uri = `https://uri.amap.com/marker?position=${order.loc_lng},${order.loc_lat}`
+        this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri})
+      } else {
+        //a page to set the location for this url!!
+        this.setState({
+          gotoEditPoi: true
+        });
+      }
+    }
+
     renderHeader() {
         let info = {};
         const {order } = this.props.order;
@@ -155,7 +196,10 @@ class OrderScene extends PureComponent {
                 this.props.global.currentUser)
         }
 
-        return (<View style={styles.topContainer}>
+          const validPoi = order.loc_lng && order.loc_lat;
+        const navImgSource = validPoi ? require('../../img/Order/navi.png') : require('../../img/Order/navi_pressed.png')
+
+          return (<View style={styles.topContainer}>
                 <View style={{backgroundColor: '#fff'}}>
                     <View style={[styles.row, {height: pxToDp(40), alignItems:'center'}]}>
                         <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
@@ -170,12 +214,12 @@ class OrderScene extends PureComponent {
                         <TouchableOpacity style={{width: pxToDp(96), height: pxToDp(42), backgroundColor: colors.main_color, borderRadius: 1, justifyContent: 'center', alignItems: 'center'}}>
                         <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{flexDirection: 'row', marginLeft: pxToDp(14)}}>
-                            <Text style={{fontSize: pxToDp(32), color: colors.mobile_color}}>{order.mobile}</Text>
-                            <CallImg/>
-                        </TouchableOpacity>
+                        <CallBtn label={order.mobile}/>
                         <View style={{flex: 1}}/>
-                        <Image style={styles.icon} source={require('../../img/Order/navi.png')}/>
+                      <TouchableOpacity onPress={this.toMap}>
+                        <Image style={styles.icon} source={navImgSource}/>
+                      </TouchableOpacity>
+
                     </View>
                     {(order.user_remark && order.store_remark) &&
                     <Separator style={{backgroundColor: colors.color999}}/>}
@@ -190,40 +234,15 @@ class OrderScene extends PureComponent {
 
                 </View>
 
-                <View style={{marginTop: pxToDp(20), backgroundColor:'#f0f9ef'}}>
-                    <View style={styles.row}>
-                        <Text>{shortOrderDay(order.orderTime)}#{order.dayId}</Text>
-                        <View style={{flex: 1}}/>
-                        <Text>{order.store_name}</Text>
-                        <CallImg/>
-                    </View>
-                    <View style={styles.row}>
-                        <Text>订单号：{order.id}</Text>
-                        <View style={{flex: 1}}/>
-                        <Text>期望送达 {orderExpectTime(order.expectTime)}</Text>
-                    </View>
-                    <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
-                        <Text>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
-                        <View style={{flex: 1}}/>
-                        <Text>{orderOrderTimeShort(order.orderTime)}下单</Text>
-                    </View>
-                    <View style={{height: pxToDp(170), backgroundColor: colors.white, flexDirection: 'row',
-                        justifyContent:'space-around'}}>
-                        <OrderStep bgColor={colors.main_color}/>
-                        <OrderStep bgColor={colors.main_color}/>
-                        <OrderStep bgColor={'#ccc'}/>
-                        <OrderStep bgColor={'#ccc'}/>
-                    </View>
-                    <View style={[styles.stepCircle, {backgroundColor: colors.main_color, left: (screen.width/8-5)}]}/>
-                    <View style={[styles.stepCircle, {backgroundColor: colors.main_color, left: (screen.width/8*3-5)}]}/>
-                    <View style={[styles.stepCircle, {backgroundColor: '#ccc', left: (screen.width/8*5-5)}]}/>
-                    <View style={[styles.stepCircle, {backgroundColor: '#ccc', left: (screen.width/8*7-5)}]}/>
-                </View>
+                <OrderStatusCell order={order}/>
 
                 <View style={{marginTop: pxToDp(20), backgroundColor: colors.white}}>
-                    <View style={styles.row}>
-                        <Text>商品明细</Text>
-                        <Text>{(order.items||{}).length}种商品</Text>
+                    <View style={[styles.row, {marginRight: 0, alignItems: 'center', borderBottomColor: colors.color999, borderBottomWidth: screen.onePixel,
+                      paddingBottom: pxToDp(16), paddingTop: pxToDp(16), marginTop: 0}]}>
+                      <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+                        <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>商品明细</Text>
+                        <Text style={{color: colors.color999, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>{(order.items||{}).length}种商品</Text>
+                      </View>
                         <View style={{flex: 1}}/>
 
                         {this.state.isEditing ?
@@ -237,89 +256,100 @@ class OrderScene extends PureComponent {
                                     this.setState({itemsHided: false});
                                     console.log("after click pull_down", this.state)
                                 }
-                            }/>
-                            : <ImageBtn source = {require('../../img/Order/pull_up.png')} onPress={()=>{
+                            } imageStyle={styles.pullImg}/>
+                            : <ImageBtn source = {require('../../img/Order/pull_up.png')} imageStyle={styles.pullImg} onPress={()=>{
                                 this.setState({itemsHided : true});
                             console.log("after click pull_up", this.state)}}/>
                         }
                     </View>
                     {!this.state.itemsHided && (order.items||{}).map((item, idx) => {
-                        return (<View key={idx}><View style={styles.row}>
+                        return (<View key={idx} style={[styles.row, {marginTop: 0, paddingTop: pxToDp(14), paddingBottom: pxToDp(14), borderBottomColor: colors.color999, borderBottomWidth: screen.onePixel}]}>
                             <View style={{flex: 1}}>
-                                <Text>{item.product_name}</Text>
+                                <Text style={{fontSize: pxToDp(26), color: colors.color333, marginBottom: pxToDp(14)}}>{item.product_name}</Text>
                                 <View style={{flexDirection: 'row'}}>
-                                <Text>{item.price}</Text>
-                                <Text style={{marginLeft: 30}}>{item.price * item.num}</Text>
+                                  <Text style={{color: '#f44140'}}>{item.price}</Text>
+                                  <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {item.price * item.num}</Text>
                                 </View>
                             </View>
-                            <Text style={{alignSelf: 'flex-end'}}>X{item.num}</Text>
+                            <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>
                         </View>
-                            <Separator/>
-                        </View>);
+                        );
                     })}
 
-                    <View style={styles.row}>
+                    <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
                         <View style={styles.moneyLeft}>
-                        <Text style={{flex: 1}}>商品总额</Text>
-                        <Text style={{textDecorationLine: 'line-through'}}>
+                        <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
+                        <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
                             {numeral(order.total_goods_price/100).format('0.00')}
                         </Text>
                         </View>
                         <View style={{flex: 1}}/>
-                        <Text>
+                        <Text style={styles.moneyListNum}>
                             {numeral(order.total_goods_price/100).format('0.00')}
                         </Text>
                     </View>
-                    <View style={styles.row}>
-                        <Text style={{width: pxToDp(480)}}>配送费</Text>
+                    <View style={[styles.row, styles.moneyRow]}>
+                        <Text style={[styles.moneyListTitle, {width: pxToDp(480)}]}>配送费</Text>
                         <View style={{flex: 1}}/>
-                        <Text>{numeral(order.deliver_fee/100).format('0.00')}</Text>
+                        <Text style={styles.moneyListNum}>{numeral(order.deliver_fee/100).format('0.00')}</Text>
                     </View>
-                    <View style={styles.row}>
+                    <View style={[styles.row, styles.moneyRow]}>
                         <View style={styles.moneyLeft}>
-                            <Text>优惠</Text>
+                            <Text style={styles.moneyListTitle}>优惠</Text>
                             <TouchableOpacity><Icon name='question-circle-o'/></TouchableOpacity>
                         </View>
                         <View style={{flex: 1}}/>
-                        <Text>{numeral(order.self_activity_fee/100).format('0.00')}</Text>
+                        <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee/100).format('0.00')}</Text>
                     </View>
-                    <View style={styles.row}>
+                    <View style={[styles.row, styles.moneyRow]}>
                         <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-                            <Text>用户已付</Text>
-                            <Text style={{fontSize: pxToDp(12), flex: 1}}>含平台扣费、优惠等</Text>
-                            <Text>微信支付</Text>
+                            <Text style={styles.moneyListTitle}>用户已付</Text>
+                            <Text style={{fontSize: pxToDp(14), flex: 1}}>含平台扣费、优惠等</Text>
+                            <Text style={styles.moneyListSub}>微信支付</Text>
                         </View>
                         <View style={{flex: 1}}/>
-                        <Text>
+                        <Text style={styles.moneyListNum}>
                             {numeral(order.orderMoney/100).format('0.00')}
                         </Text>
                     </View>
                     {order.addition_to_pay !== 0 &&
-                    <View style={styles.row}>
+                    <View style={[styles.row, styles.moneyRow]}>
                         <View style={styles.moneyLeft}>
                             <Text style={{flex: 1}}>需加收/退款</Text>
-                            <Text>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>
+                            <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>
                         </View>
                         <View style={{flex: 1}}/>
-                        <Text>
+                        <Text style={styles.moneyListNum}>
                             {numeral(order.additional_to_pay/100).format('+0.00')}
                         </Text>
                     </View>
                     }
                 </View>
+
+              <View style={{marginTop: pxToDp(20), backgroundColor: colors.white, }}>
+                <View style={[styles.row, {marginRight: 0, alignItems: 'center',
+                  paddingBottom: pxToDp(16), paddingTop: pxToDp(16), marginTop: 0, marginBottom: pxToDp(12)}]}>
+                  <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+                  <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
+                  <Text style={{color: colors.color999, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>运费金额</Text>
+                  </View>
+                  <Text>￥7.80</Text>
+                  <View style={{flex: 1}}/>
+
+                  {this.state.shipHided ?
+                    <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={styles.pullImg} onPress={
+                      ()=> {
+                        this.setState({shipHided: false});
+                      }
+                    }/>
+                    : <ImageBtn source = {require('../../img/Order/pull_up.png')} imageStyle={styles.pullImg} onPress={()=>{
+                      this.setState({shipHided: true});
+                    }}/>
+                  }
+                </View>
+              </View>
             </View>
         )
-    }
-}
-
-class CallImg extends PureComponent {
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return <Image source={require('../../img/Public/call.png')} style={styles.callIcon}/>;
     }
 }
 
@@ -338,23 +368,6 @@ class Remark extends  PureComponent {
     }
 }
 
-class OrderStep extends PureComponent {
-
-    constructor(props) {
-        super(props)
-    }
-
-    render() {
-        return <View style={{flexDirection: 'column', flex: 1, alignItems:'center'}}>
-            <View style={{backgroundColor: this.props.bgColor , height: pxToDp(4), width: '100%', marginBottom: pxToDp(18)}}/>
-
-            <Text style={[styles.stepText]}>打包中</Text>
-            <Text style={styles.stepText}>刘子墨分拣</Text>
-            <Text style={styles.stepText}>27分钟前</Text>
-        </View>;
-    }
-}
-
 class ImageBtn extends PureComponent {
 
     constructor(props) {
@@ -363,15 +376,14 @@ class ImageBtn extends PureComponent {
 
     render() {
 
-        const {source, onPress} = this.props
+        const {source, onPress, imageStyle} = this.props
 
         return <TouchableOpacity onPress={onPress}>
-            <Image source={source} style={[styles.btn4text,{alignSelf: 'center', marginLeft: pxToDp(20)}]}/>
+            <Image source={source} style={[styles.btn4text,{alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
         </TouchableOpacity>
     }
 }
 
-// define your styles
 const styles = StyleSheet.create({
     container: {
         backgroundColor: colors.back_color,
@@ -381,15 +393,14 @@ const styles = StyleSheet.create({
         height: pxToDp(56),
         alignItems: 'flex-end'
     },
-    callIcon: {
-        width: pxToDp(20),
-        height: pxToDp(28),
-        marginLeft: pxToDp(6)
-    },
     btn4text: {
         width: pxToDp(152),
         height: pxToDp(40)
     },
+  pullImg: {
+    width: pxToDp(90),
+    height: pxToDp(72)
+  },
     banner: {
         width: screen.width,
         height: screen.width * 0.5
@@ -416,6 +427,19 @@ const styles = StyleSheet.create({
         width: pxToDp(480),
         flexDirection: 'row',
     },
+  moneyRow: {marginTop: 0, marginBottom: pxToDp(12), alignItems: 'center'},
+  moneyListTitle: {
+    fontSize: pxToDp(26),
+    color: colors.color333,
+  },
+  moneyListSub: {
+    fontSize: pxToDp(26),
+    color: colors.main_color,
+  },
+  moneyListNum: {
+    fontSize: pxToDp(22),
+    color: colors.color777,
+  },
     buyButton: {
         backgroundColor: '#fc9e28',
         width: 94,

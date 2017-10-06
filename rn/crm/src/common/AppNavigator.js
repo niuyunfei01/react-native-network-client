@@ -14,7 +14,7 @@ import GoodsScene from '../scene/Goods/GoodsScene'
 import WebScene from '../widget/WebScene'
 import ApplyScene from "../scene/Apply/ApplyScene";
 import * as native from "./native";
-import TestWeuiScene from "../scene/TestWeui/TestWeui";
+import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 
 const Tab = TabNavigator(
     {
