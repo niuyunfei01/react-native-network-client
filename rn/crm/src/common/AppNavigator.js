@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {NativeModules} from 'react-native';
-import {addNavigationHelpers, NavigationActions, StackNavigator, TabNavigator, TabBarBottom} from 'react-navigation';
+import { NativeModules } from 'react-native';
+import { addNavigationHelpers, NavigationActions, StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation';
 
 import color from '../widget/color'
 import TabBarItem from '../widget/TabBarItem'
 
-import RemindScene from '../scene/Remind/RemindScene'
+import AlertScene from '../scene/Alert/AlertScene'
 import MineScene from '../scene/Mine/MineScene'
 import OrderScene from '../scene/Order/OrderScene'
 import LoginScene from '../scene/Login/LoginScene'
@@ -18,11 +18,11 @@ import TestWeuiScene from "../scene/TestWeui/TestWeui";
 
 const Tab = TabNavigator(
     {
-        Remind: {
-            screen: RemindScene,
-            navigationOptions: ({navigation}) => ({
+        Alert: {
+            screen: AlertScene,
+            navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '提醒',
-                tabBarIcon: ({focused, tintColor}) => (
+                tabBarIcon: ({ focused, tintColor }) => (
                     <TabBarItem
                         tintColor={tintColor}
                         focused={focused}
@@ -35,9 +35,9 @@ const Tab = TabNavigator(
 
         Orders: {
             screen: OrderScene,
-            navigationOptions: ({navigation}) => ({
+            navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '订单',
-                tabBarIcon: ({focused, tintColor}) => (
+                tabBarIcon: ({ focused, tintColor }) => (
                     <TabBarItem
                         tintColor={tintColor}
                         focused={focused}
@@ -54,9 +54,9 @@ const Tab = TabNavigator(
 
         Goods: {
             screen: GoodsScene,
-            navigationOptions: ({navigation}) => ({
+            navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '商品',
-                tabBarIcon: ({focused, tintColor}) => (
+                tabBarIcon: ({ focused, tintColor }) => (
                     <TabBarItem
                         tintColor={tintColor}
                         focused={focused}
@@ -74,9 +74,9 @@ const Tab = TabNavigator(
 
         Mine: {
             screen: MineScene,
-            navigationOptions: ({navigation}) => ({
+            navigationOptions: ({ navigation }) => ({
                 tabBarLabel: '我的',
-                tabBarIcon: ({focused, tintColor}) => (
+                tabBarIcon: ({ focused, tintColor }) => (
                     <TabBarItem
                         tintColor={tintColor}
                         focused={focused}
@@ -96,9 +96,10 @@ const Tab = TabNavigator(
         tabBarOptions: {
             activeTintColor: color.theme,
             inactiveTintColor: '#99579797',
-            style: {backgroundColor: '#ffffff'},
+            style: { backgroundColor: '#ffffff' },
         },
     }
+
 );
 
 class Navigator extends Component {
@@ -134,7 +135,7 @@ class Navigator extends Component {
                     path: 'order/:orderId',
                 },
                 Web: {screen: WebScene},
-                Home: {screen: RemindScene},
+                Home: {screen: AlertScene},
                 Login: {
                     screen: LoginScene,
                     path: 'Login/:next/:nextParams'
