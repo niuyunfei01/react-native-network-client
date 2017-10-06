@@ -2,13 +2,22 @@
  * Copyright (c) 2017-present, Liu Jinyong
  * All rights reserved.
  *
- * https://github.com/huanxsd/MeiTuan 
+ * https://github.com/huanxsd/MeiTuan
  * @flow
  */
 
 //import liraries
-import React, { PureComponent, Component } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, Touchable, TouchableOpacity, RefreshControl, FlatList} from 'react-native';
+import React, {PureComponent, Component} from 'react'
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableOpacity,
+    InteractionManager,
+    FlatList,
+    StatusBar
+} from 'react-native';
 import {connect} from "react-redux";
 import pxToDp from '../../util/pxToDp';
 import LoadingView from '../../widget/LoadingView';
@@ -17,15 +26,12 @@ import * as alertActions from '../../reducers/alert/alertActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
 import {bindActionCreators} from "redux";
+
 let ScrollableTabView = require('react-native-scrollable-tab-view');
 import ModalDropdown from 'react-native-modal-dropdown';
 import Config from '../../config'
 
-/**
- * ## Redux boilerplate
- */
-
-function mapStateToProps ({alert, global}) {
+function mapStateToProps({alert, global}) {
     return {
         type: alert.type,
         status: alert.status,
@@ -34,9 +40,9 @@ function mapStateToProps ({alert, global}) {
     }
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...alertActions,...globalActions }, dispatch)
+        actions: bindActionCreators({...alertActions, ...globalActions}, dispatch)
     }
 }
 
@@ -47,10 +53,10 @@ const TASK_TYPE_OTHER = 3;//其他事项
 
 // 用于循环导航栏的初始数据
 const tab_nav = new Map([
-    ['refund_type' , '待退款'],
-    ['remind_type' , '催单/异常'],
-    ['complain_type' , '售后单'],
-    ['other_type' , '其他'],
+    ['refund_type', '待退款'],
+    ['remind_type', '催单/异常'],
+    ['complain_type', '售后单'],
+    ['other_type', '其他'],
 ]);
 
 // 定义服务器定义的返回数据类型
@@ -65,11 +71,11 @@ const group_type_key = new Map([
 let global_alert_type = TASK_TYPE_REFUND;
 
 // 存储分类列表
-const global_type_data =  new Map([
-    [TASK_TYPE_REFUND , []],
-    [TASK_TYPE_REMIND , []],
-    [TASK_TYPE_COMPLAIN , []],
-    [TASK_TYPE_OTHER , []],
+const global_type_data = new Map([
+    [TASK_TYPE_REFUND, []],
+    [TASK_TYPE_REMIND, []],
+    [TASK_TYPE_COMPLAIN, []],
+    [TASK_TYPE_OTHER, []],
 ]);
 
 function get_type_data(type) {
@@ -102,13 +108,13 @@ const global_group_num = new Map();
 // create a component
 class AlertScene extends PureComponent {
 
-    static navigationOptions = { title: 'Welcome', header: null };
+    static navigationOptions = {title: 'Alert', header: null};
 
     constructor(props) {
         super(props);
         this.state = {
-            isProcessing : false,
-            idUpdating : false,
+            isProcessing: false,
+            idUpdating: false,
             type: TASK_TYPE_REFUND,
         };
         this.loadData = this.loadData.bind(this);
@@ -120,47 +126,66 @@ class AlertScene extends PureComponent {
     }
 
     componentWillMount() {
-        this.loadData();
+        let self = this;
+        InteractionManager.runAfterInteractions(() => {
+            self.loadData();
+        });
     }
 
-    _onRowClick (route, params) {
-        this.props.navigation.navigate(route, params);
+    _onRowClick(route, params) {
+        let self = this;
+        InteractionManager.runAfterInteractions(() => {
+            self.props.navigation.navigate(route, params);
+        });
     }
 
-    // 加载或刷新数据
-    loadData(page = 1, status = 0){
-        // let search_type = type ? type : this.state.type;
+    _onTabChange(obj) {
+        let tab_bar = obj.i;
+        if (tab_bar === 0) {
+            global_alert_type = TASK_TYPE_REFUND;//用户申请退款
+        } else if (tab_bar === 1) {
+            global_alert_type = TASK_TYPE_REMIND;//催单
+        } else if (tab_bar === 2) {
+            global_alert_type = TASK_TYPE_COMPLAIN;//待处理评价
+        } else if (tab_bar === 3) {
+            global_alert_type = TASK_TYPE_OTHER;//其他事项
+        }
+        if (this.state.type !== global_alert_type) {
+            this.setState({
+                type: global_alert_type,
+            });
+            let self = this;
+            InteractionManager.runAfterInteractions(() => {
+                self.loadData();
+            });
+        }
+    }
+
+    loadData(page = 1, status = 0) {
         this.setState({
             isProcessing: true,
         });
         let less_than_id = parseInt(page) === 1 ? 0 : get_less_than_id(global_alert_type);
         let self_ = this;
         let type_list = get_type_list(global_alert_type);
-        console.log('global_alert_type => ', global_alert_type);
-        if(this.state.type !== global_alert_type && type_list !== undefined && type_list.length > 0){
+        if (this.state.type !== global_alert_type && type_list !== undefined && type_list.length > 0) {
             self_.setState({
                 type: global_alert_type,
                 isProcessing: false,
             });
         } else {
-            this.props.actions.FetchAlert(this.props.accessToken, global_alert_type, status, page, less_than_id, ((result)=>{
-                // console.log('fetch =====>', result);
-                if(result.ok){
+            this.props.actions.FetchAlert(this.props.accessToken, global_alert_type, status, page, less_than_id, ((result) => {
+                if (result.ok) {
                     let {curr_page, total_page, total_num, next_less_than_id, list} = result.obj;
-
                     let list_pages = get_list_pages(global_alert_type);
-                    console.log('curr_page ->', curr_page);
-                    if(list_pages === undefined || parseInt(curr_page) === 1){
+                    if (list_pages === undefined || parseInt(curr_page) === 1) {
                         list_pages = [];
-                    } else if (parseInt(curr_page) > 1 && list_pages.indexOf(curr_page) === -1){//不存在
+                    } else if (parseInt(curr_page) > 1 && list_pages.indexOf(curr_page) === -1) {//不存在
                         let list_data = get_type_list(global_alert_type);
                         list_data.push.apply(list_data, list);
                         list = list_data;
                     }
-                    // if(list_pages.indexOf(curr_page) === -1){
-                    // }
-                        list_pages.push(curr_page);
-                    console.log('list_pages ->', list_pages);
+                    list_pages.push(curr_page);
                     let type_data = {
                         curr_page: curr_page,
                         total_page: total_page,
@@ -169,13 +194,11 @@ class AlertScene extends PureComponent {
                         less_than_id: next_less_than_id,
                     };
                     global_type_data.set(global_alert_type, type_data);
-
-                    for(let v of group_type_key) {
-                        let tab_key = v[1];//refund_type, remind_type...
+                    for (let v of group_type_key) {
+                        let tab_key = v[1];
                         let g_num = total_num[tab_key];
                         global_group_num.set(tab_key, g_num);
                     }
-
                     self_.setState({
                         type: global_alert_type,
                         isProcessing: false,
@@ -185,31 +208,28 @@ class AlertScene extends PureComponent {
                         type: global_alert_type,
                         isProcessing: false,
                     });
-                    console.log("error result => ", result);
                 }
             }));
         }
     }
 
     // 设置任务状态
-    setTaskStatus(task_id, status, row_index){
-        if(this.state.idUpdating){
+    setTaskStatus(task_id, status, row_index) {
+        if (this.state.idUpdating) {
             return false;
         }
         this.setState({
             idUpdating: true,
         });
         let self_ = this;
-        this.props.actions.setTaskNoticeStatus(this.props.accessToken, task_id, status,(result) => {
-            console.log('update_result =====>', result);
-            alert(result.desc);
-            if(result.ok){
+        this.props.actions.setTaskNoticeStatus(this.props.accessToken, task_id, status, (result) => {
+            if (result.ok) {
                 let type_data = get_type_data(global_alert_type);
                 type_data.list.splice(row_index, 1);
-                if(status === Config.TASK_STATUS_DONE){
+                if (status === Config.TASK_STATUS_DONE) {
                     let tab_key = group_type_key.get(global_alert_type);
                     let type_num = global_group_num.get(tab_key);
-                    let new_type_num = type_num > 0 ? type_num-1 : 0;
+                    let new_type_num = type_num > 0 ? type_num - 1 : 0;
                     global_group_num.set(tab_key, new_type_num);
                 }
             }
@@ -219,62 +239,37 @@ class AlertScene extends PureComponent {
         });
     }
 
-    render() {
+    renderContent() {
         let {isProcessing} = this.state;
+        return (<AlertList callbackLoadData={this.loadData} onPress={(route, params) => this._onRowClick(route, params)}
+                           setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
+                           isProcessing={isProcessing}/>);
+    }
+
+    render() {
         let AlertLists = [];
         let group_num_key = 0;
-        for(let tab of tab_nav) {
+        for (let tab of tab_nav) {
             let tab_key = tab[0];
             let tab_name = tab[1];
             let type_num = global_group_num.get(tab_key);
             AlertLists.push(
-                <AlertList
-                    key={group_num_key}
-                    tabLabel={type_num > 0 ? tab_name+"("+type_num+")" : tab_name}
-                    callbackLoadData={this.loadData}
-                    onPress={(route, params)=>this._onRowClick(route, params)}
-                    setTaskStatus={(task_id, status, row_index) => this.setTaskStatus(task_id, status, row_index)}
-                    isProcessing={isProcessing}
-                />
+                <View style={{flex: 1}} key={group_num_key}
+                      tabLabel={type_num > 0 ? tab_name + "(" + type_num + ")" : tab_name}>
+                    {this.renderContent()}
+                </View>
             );
             group_num_key++;
         }
-
-        if(AlertLists.length === 0){
-            return (
-                <LoadingView isLoading={true} tip='加载中...'/>
-            );
+        if (AlertLists.length === 0) {
+            return (<LoadingView isLoading={true} tip='加载中...'/>);
         }
-
         return (
             <ScrollableTabView
                 tabBarActiveTextColor={"#333"}
                 tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
-                tabBarTextStyle={{fontSize: pxToDp(26)}} onChangeTab={(obj) => {
-                    let tab_bar = obj.i;
-                    if (tab_bar === 0) {
-                        global_alert_type = TASK_TYPE_REFUND;//用户申请退款
-                    } else if (tab_bar === 1) {
-                        global_alert_type = TASK_TYPE_REMIND;//催单
-                    } else if (tab_bar === 2) {
-                        global_alert_type = TASK_TYPE_COMPLAIN;//待处理评价
-                    } else if (tab_bar === 3) {
-                        global_alert_type = TASK_TYPE_OTHER;//其他事项
-                    }
-
-                    if (this.state.type !== global_alert_type) {
-                        this.setState({
-                            type: global_alert_type,
-                        });
-                        this.loadData();
-                    } else {
-                        this.setState({
-                            type: global_alert_type,
-                        });
-                    }
-                }}
-                // locked={true}
-            >
+                tabBarTextStyle={{fontSize: pxToDp(26)}}
+                onChangeTab={(obj) => this._onTabChange(obj)}>
                 {AlertLists}
             </ScrollableTabView>
         );
@@ -298,8 +293,8 @@ class AlertList extends PureComponent {
     _onRefresh() {
         let {isRefreshing} = this.state;
         let {isProcessing} = this.props;
-        if(isRefreshing || isProcessing){
-            if(isRefreshing && !isProcessing){
+        if (isRefreshing || isProcessing) {
+            if (isRefreshing && !isProcessing) {
                 let type_list = get_type_list(global_alert_type);
                 this.setState({
                     isRefreshing: false,
@@ -316,13 +311,13 @@ class AlertList extends PureComponent {
 
     _onScroll() {
         let curr_page = get_curr_page(global_alert_type);
-        let next_page = parseInt(curr_page)+1;
+        let next_page = parseInt(curr_page) + 1;
         let total_page = get_total_page(global_alert_type);
         let list_pages = get_list_pages(global_alert_type);
         let {loadMore} = this.state;
         let {isProcessing} = this.props;
-        if(loadMore || isProcessing || curr_page >= total_page || list_pages.indexOf(next_page) !== -1){
-            if(loadMore && !isProcessing){
+        if (loadMore || isProcessing || curr_page >= total_page || list_pages.indexOf(next_page) !== -1) {
+            if (loadMore && !isProcessing) {
                 let type_list = get_type_list(global_alert_type);
                 this.setState({
                     loadMore: false,
@@ -331,45 +326,20 @@ class AlertList extends PureComponent {
             }
         } else {
             this.setState({
-                loadMore:true
+                loadMore: true
             });
             this.props.callbackLoadData(next_page);
         }
     }
 
-    /*_onScroll(event) {
-        let curr_page = get_curr_page(global_alert_type);
-        let total_page = get_total_page(global_alert_type);
-        let {loadMore, list_pages} = this.state;
-        let {isProcessing} = this.props;
-        let next_page = parseInt(curr_page)+1;
-        if(loadMore || isProcessing || curr_page >= total_page || list_pages.indexOf(next_page) !== -1){
-            if(loadMore && !isProcessing){
-                this.setState({
-                    loadMore: false,
-                });
-            }
-            return;
-        }
-        let y = event.nativeEvent.contentOffset.y;
-        let height = event.nativeEvent.layoutMeasurement.height;
-        let contentHeight = event.nativeEvent.contentSize.height;
-        if(y+height>=contentHeight-10){
-            this.setState({
-                loadMore:true
-            });
 
-            this.props.callbackLoadData(next_page);
-        }
-    }*/
-
-    componentWillReceiveProps(){
+    componentWillReceiveProps() {
         let {isRefreshing} = this.state;
         let {isProcessing} = this.props;
-        if(isRefreshing || isProcessing){
-            if(isRefreshing && !isProcessing){
+        if (isRefreshing || isProcessing) {
+            if (isRefreshing && !isProcessing) {
                 let type_list = get_type_list(global_alert_type);
-                if(type_list !== undefined && type_list !== false){
+                if (type_list !== undefined && type_list !== false) {
                     this.setState({
                         isRefreshing: false,
                         list_data: type_list,
@@ -378,20 +348,20 @@ class AlertList extends PureComponent {
             }
         } else {
             let type_list = get_type_list(global_alert_type);
-            if(type_list !== undefined && type_list !== false){
+            if (type_list !== undefined && type_list !== false) {
                 this.setState({
-                    list_data : type_list,
+                    list_data: type_list,
                 });
             }
         }
     }
 
-    _onSelectOperate(_row_index, task_id, status){
+    _onSelectOperate(_row_index, task_id, status) {
         const {setTaskStatus} = this.props;
         setTaskStatus(task_id, status, _row_index);
     }
 
-    renderItem({item,index}) {
+    renderItem({item, index}) {
         const {onPress} = this.props;
         let _this_onSelectOperate = this._onSelectOperate;
         return (
@@ -406,15 +376,11 @@ class AlertList extends PureComponent {
     }
 
     render() {
-        // let type_list = get_type_list(global_alert_type);
         let type_list = this.state.list_data;
-
-        if(type_list === undefined || type_list === false){
+        if (type_list === undefined || type_list === false) {
             return (
                 <LoadingView isLoading={true} tip='加载中...'/>
             );
-        } else if (type_list.length === 0) {
-            //返回没有订单的图片
         }
         type_list = type_list.map(function (row) {
             row.key = row.id;
@@ -422,68 +388,19 @@ class AlertList extends PureComponent {
         });
         return (
             <FlatList
-                data = {type_list}
+                data={type_list}
                 renderItem={this.renderItem}
-                onEndReached={()=>{
-                     // 到达底部，加载更多列表项
+                onEndReached={() => {
+                    // 到达底部，加载更多列表项
                     this._onScroll();
                 }}
                 onEndReachedThreshold={0.4}
                 onRefresh={this._onRefresh}
                 refreshing={this.state.isRefreshing}
-                getItemLayout={(data, index) => (
-                    {length: pxToDp(250), offset: pxToDp(250) * index, index}
-                )}
+                getItemLayout={(data, index) => ({length: pxToDp(250), offset: pxToDp(250) * index, index})}
             />
         )
     }
-
-    /*render() {
-        let {loadMore, isRefreshing} = this.state;
-        let type_list = get_type_list(global_alert_type);
-        // console.log('type_list => ', type_list);
-
-        if(type_list === undefined || type_list === false){
-            return (
-                <LoadingView isLoading={true} tip='加载中...'/>
-            );
-        } else if (type_list.length === 0) {
-            //返回没有订单的图片
-        }
-
-        const {isProcessing, onPress} = this.props;
-        let _this_onSelectOperate = this._onSelectOperate;
-        let alert_row = type_list.map(function (row, index) {
-            return (
-                <AlertRow
-                    alert_detail={row}
-                    key={index}
-                    row_index={index}
-                    onPress={onPress}
-                    _this_onSelectOperate={(_row_index, task_id, status) => _this_onSelectOperate(_row_index, task_id, status)}
-                />
-            );
-        });
-        return (
-            <ScrollView refreshControl={
-                <RefreshControl
-                    refreshing={isRefreshing}
-                    onRefresh={this._onRefresh}
-                    tintColor={'gray'}
-                />}
-                onScroll={this._onScroll}
-                scrollEventThrottle={50}
-            >
-                {alert_row}
-
-                {isProcessing || loadMore ?
-                    <View style={{height: pxToDp(20), marginBottom: pxToDp(20)}}>
-                        <Text style={{textAlign: 'center', textAlignVertical: 'center', fontWeight: 'bold', }}>加载中...</Text>
-                    </View>
-                    : null}
-            </ScrollView>
-        );
-    }*/
 }
 
 class AlertRow extends Component {
@@ -497,11 +414,9 @@ class AlertRow extends Component {
         super(props);
     }
 
-    _onPressSelect(key, task_id){
+    _onPressSelect(key, task_id) {
         let {_this_onSelectOperate, row_index} = this.props;
-        console.log('_onPressSelect =====>', key, task_id);
-        if(parseInt(key) === 0){//暂停提示
-            alert(task_id+'暂停提示; index: '+row_index);
+        if (parseInt(key) === 0) {//暂停提示
         } else {//强制关闭
             let status = Config.TASK_STATUS_DONE;
             _this_onSelectOperate(row_index, task_id, status);
@@ -511,25 +426,24 @@ class AlertRow extends Component {
 
     render() {
         const {onPress} = this.props;
-
         let row = this.props.alert_detail;
-        if(row){
-            // {"order_id":"653848","remark":"饿了么 望京 南湖西园 用户 赵佳玮 的 59 号订单 催单了, 请尽快处理","delegation_to":"830885","created_by":"0","deleted":"0","created":"2017-09-06 17:47:11","modified":"2017-09-06 17:47:11","remind_id":"532151529","orderTime":"2017-09-06 16:59:40","store_id":"望京","dayId":"59","orderStatus":"已送达","orderDate":"0906","delegation_to_user":"吴冬梅","noticeDate":"09\/06","noticeTime":"17:47","expect_end_time":"18:17","quick":false}]}}
+        if (row) {
             return (
-                <TouchableOpacity style={top_styles.container} onPress={() => onPress(Config.ROUTE_ORDER, {orderId: row.order_id})} activeOpacity={0.9}>
+                <TouchableOpacity style={top_styles.container}
+                                  onPress={() => onPress(Config.ROUTE_ORDER, {orderId: row.order_id})}
+                                  activeOpacity={0.9}>
                     <View style={[top_styles.order_box]}>
                         <View style={top_styles.box_top}>
                             <View style={[top_styles.order_head]}>
-                                {row.quick ? <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')} /> : null}
+                                {row.quick ? <Image style={[top_styles.icon_ji]}
+                                                    source={require('../../img/Alert/quick.png')}/> : null}
                                 <View>
                                     <Text style={top_styles.o_index_text}>{row.orderDate}#{row.dayId}</Text>
                                 </View>
                                 <View>
                                     <Text style={top_styles.o_store_name_text}>{row.store_id}</Text>
                                 </View>
-                                <TouchableOpacity
-                                    style={[top_styles.icon_dropDown]}
-                                >
+                                <TouchableOpacity style={[top_styles.icon_dropDown]}>
                                     <ModalDropdown
                                         options={['暂停提示', '强制关闭']}
                                         defaultValue={''}
@@ -537,11 +451,9 @@ class AlertRow extends Component {
                                         dropdownStyle={top_styles.drop_listStyle}
                                         dropdownTextStyle={top_styles.drop_textStyle}
                                         dropdownTextHighlightStyle={top_styles.drop_optionStyle}
-                                        onSelect={(event) => this._onPressSelect(event, row.id)}
-                                    >
-                                        <Image
-                                            style={[top_styles.icon_img_dropDown]}
-                                            source={require('../../img/Alert/drop-down.png')} />
+                                        onSelect={(event) => this._onPressSelect(event, row.id)}>
+                                        <Image style={[top_styles.icon_img_dropDown]}
+                                               source={require('../../img/Alert/drop-down.png')}/>
                                     </ModalDropdown>
                                 </TouchableOpacity>
                             </View>
@@ -550,7 +462,6 @@ class AlertRow extends Component {
                                     <Text style={top_styles.o_content}>
                                         {row.remark}
                                     </Text>
-
                                 </Text>
                                 <View style={[top_styles.ship_status]}>
                                     <Text style={[top_styles.ship_status_text]}>{row.orderStatus}</Text>
@@ -564,7 +475,7 @@ class AlertRow extends Component {
                             <View>
                                 <Text style={bottom_styles.time_start}>{row.noticeTime}生成</Text>
                             </View>
-                            <Image style={[bottom_styles.icon_clock]}  source={require('../../img/Alert/clock.png')} />
+                            <Image style={[bottom_styles.icon_clock]} source={require('../../img/Alert/clock.png')}/>
                             <View>
                                 <Text style={bottom_styles.time_end}>{row.expect_end_time}</Text>
                             </View>
@@ -586,8 +497,8 @@ class AlertRow extends Component {
 }
 
 const top_styles = StyleSheet.create({
-    container:{
-        backgroundColor:'#f2f2f2',
+    container: {
+        backgroundColor: '#f2f2f2',
     },
     order_box: {
         backgroundColor: '#fff',
@@ -647,6 +558,7 @@ const top_styles = StyleSheet.create({
     drop_listStyle: {//下拉列表的样式
         width: pxToDp(150),
         height: pxToDp(141),
+        marginTop: -StatusBar.currentHeight,
         backgroundColor: '#5f6660',
     },
     drop_textStyle: {//下拉选项文本的样式
@@ -667,9 +579,7 @@ const top_styles = StyleSheet.create({
         backgroundColor: '#939195',
     },
 
-    order_body: {
-        // backgroundColor: 'green',
-    },
+    order_body: {},
     order_body_text: {
         fontSize: pxToDp(30),
         color: '#333',
@@ -688,12 +598,12 @@ const top_styles = StyleSheet.create({
 });
 
 const bottom_styles = StyleSheet.create({
-    container:{
+    container: {
         height: pxToDp(70),
         borderTopWidth: 1,
         borderTopColor: '#999',
         paddingHorizontal: pxToDp(20),
-        flexDirection:'row',
+        flexDirection: 'row',
     },
 
     time_date: {
@@ -736,6 +646,4 @@ const bottom_styles = StyleSheet.create({
     },
 });
 
-//make this component available to the app
-// export default AlertScene;
 export default connect(mapStateToProps, mapDispatchToProps)(AlertScene)
