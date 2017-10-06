@@ -1,0 +1,4 @@
+'use strict';
+
+export const FETCH_REMIND_LIST = 'FETCH_REMIND_LIST';
+export const RECEIVE_REMIND_LIST = 'RECEIVE_REMIND_LIST';
