@@ -56,6 +56,9 @@ class RemindScene extends PureComponent {
 
     constructor(props) {
         super(props);
+        this.state = {
+            dataSource: []
+        };
         this.renderItem = this.renderItem.bind(this);
         this.renderFooter = this.renderFooter.bind(this);
         this.onScroll = this.onScroll.bind(this);
@@ -133,19 +136,20 @@ class RemindScene extends PureComponent {
     }
 
     renderItem(remind) {
+        let {item, index} = remind;
         return (
             <TouchableOpacity style={top_styles.container} onPress={() => {
             }} activeOpacity={0.9}>
                 <View style={[top_styles.order_box]}>
                     <View style={top_styles.box_top}>
                         <View style={[top_styles.order_head]}>
-                            {remind.quick ? <Image style={[top_styles.icon_ji]}
-                                                   source={require('../../img/Alert/quick.png')}/> : null}
+                            {item.quick ? <Image style={[top_styles.icon_ji]}
+                                                 source={require('../../img/Alert/quick.png')}/> : null}
                             <View>
-                                <Text style={top_styles.o_index_text}>{remind.orderDate}#{remind.dayId}</Text>
+                                <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
                             </View>
                             <View>
-                                <Text style={top_styles.o_store_name_text}>{remind.store_id}</Text>
+                                <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
                             </View>
                             <TouchableOpacity style={[top_styles.icon_dropDown]}>
                                 <Image style={[top_styles.icon_img_dropDown]}
@@ -155,28 +159,28 @@ class RemindScene extends PureComponent {
                         <View style={[top_styles.order_body]}>
                             <Text style={[top_styles.order_body_text]}>
                                 <Text style={top_styles.o_content}>
-                                    {remind.remark}
+                                    {item.remark}
                                 </Text>
                             </Text>
                             <View style={[top_styles.ship_status]}>
-                                <Text style={[top_styles.ship_status_text]}>{remind.orderStatus}</Text>
+                                <Text style={[top_styles.ship_status_text]}>{item.orderStatus}</Text>
                             </View>
                         </View>
                     </View>
                     <View style={bottom_styles.container}>
                         <View style={bottom_styles.time_date}>
-                            <Text style={bottom_styles.time_date_text}>{remind.noticeDate}</Text>
+                            <Text style={bottom_styles.time_date_text}>{item.noticeDate}</Text>
                         </View>
                         <View>
-                            <Text style={bottom_styles.time_start}>{remind.noticeTime}生成</Text>
+                            <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
                         </View>
                         <Image style={[bottom_styles.icon_clock]} source={require('../../img/Alert/clock.png')}/>
                         <View>
-                            <Text style={bottom_styles.time_end}>{remind.expect_end_time}</Text>
+                            <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
                         </View>
                         <View style={bottom_styles.operator}>
                             <Text style={bottom_styles.operator_text}>
-                                处理人：{remind.delegation_to_user}
+                                处理人：{item.delegation_to_user}
                             </Text>
                         </View>
                     </View>
@@ -215,10 +219,11 @@ class RemindScene extends PureComponent {
         }
         return (
             <FlatList
+                extraData={this.state.dataSource}
                 data={dataSource}
                 renderItem={this.renderItem}
                 onEndReached={this.onEndReached.bind(this, typeId)}
-                onEndReachedThreshold={10}
+                onEndReachedThreshold={0.4}
                 onRefresh={this.onRefresh.bind(this, typeId)}
                 refreshing={remind.isRefreshing}
                 ListFooterComponent={this.renderFooter}
@@ -239,7 +244,7 @@ class RemindScene extends PureComponent {
                     key={typeId}
                     tabLabel={Alias.CATEGORIES[typeId]}
                     style={{flex: 1}}>
-                    {this.renderContent(remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId)}
+                    {this.renderContent(this.state.dataSource = remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId)}
                 </View>);
         });
         return (
