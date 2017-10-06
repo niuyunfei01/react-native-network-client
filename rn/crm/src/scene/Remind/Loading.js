@@ -1,6 +1,8 @@
 'use strict';
 
-import React from 'react-native';
+import ReactNative from 'react-native';
+import React from 'react'
+
 const {
     Platform,
     StyleSheet,
@@ -9,8 +11,8 @@ const {
     Text,
     Modal,
     ActivityIndicatorIOS,
-    ProgressBarAndroid
-} = React;
+    ActivityIndicator
+} = ReactNative;
 
 import Portal from 'react-native/Libraries/Portal/Portal.js';
 
@@ -70,7 +72,7 @@ class Loading extends React.Component {
         if (Platform.OS === 'android') {
             return (
                 <View style={styles.loading}>
-                    <ProgressBarAndroid
+                    <ActivityIndicator
                         styleAttr={styleAttr}
                         color={this.props.color}
                     />
@@ -89,7 +91,7 @@ class Loading extends React.Component {
     }
 
     renderSpinner() {
-        if (!this.props.visible){
+        if (!this.props.visible) {
             return (
                 <View key={'spinner'}/>
             );

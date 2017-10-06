@@ -7,55 +7,47 @@
  */
 
 //import liraries
-import React, {PureComponent} from 'react'
+import React from 'react'
+import ReactNative from 'react-native'
 
 const {
     StyleSheet,
-    ListView,
+    FlatList,
     RefreshControl,
     ScrollView,
     Text,
     TouchableOpacity,
-    PropTypes,
     InteractionManager,
-    ProgressBarAndroid,
+    ActivityIndicator,
     Image,
     View
-} = React;
+} = ReactNative;
+
+const {PureComponent} = React;
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from './LoadingView';
-import CustomTabBar from './CustomTabBar';
-import {ToastShort} from '../../utils/ToastUtils';
+import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 
-import * as remindActions from '../../reducers/remind/remindActions'
+import {fetchRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
-/**
- * ## Redux boilerplate
- */
 function mapStateToProps(state) {
-    const {remind, global} = state
+    const {remind, global} = state;
     return {remind: remind, global: global}
 }
 
 function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({...remindActions, ...globalActions}, dispatch)
-    }
+    return {dispatch, ...bindActionCreators({fetchRemind, ...globalActions}, dispatch)}
 }
 
-const propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    remind: PropTypes.object.isRequired
-};
 
-var canLoadMore;
-var _typeIds = new Array();
-var loadMoreTime = 0;
+let canLoadMore;
+let _typeIds = [5, 4, 1, 3];
+let loadMoreTime = 0;
 
 // create a component
 class RemindScene extends PureComponent {
@@ -64,11 +56,6 @@ class RemindScene extends PureComponent {
 
     constructor(props) {
         super(props);
-        this.state = {
-            dataSource: new ListView.DataSource({
-                rowHasChanged: (row1, row2) => row1 !== row2,
-            })
-        };
         this.renderItem = this.renderItem.bind(this);
         this.renderFooter = this.renderFooter.bind(this);
         this.onScroll = this.onScroll.bind(this);
@@ -77,10 +64,10 @@ class RemindScene extends PureComponent {
 
     componentDidMount() {
         const {dispatch} = this.props;
+        let token = this._getToken();
         InteractionManager.runAfterInteractions(() => {
-            _typeIds = [5, 4, 1, 3];
             _typeIds.forEach((typeId) => {
-                dispatch(fetchRemind(false, true, typeId));
+                dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
             });
         });
 
@@ -97,8 +84,14 @@ class RemindScene extends PureComponent {
 
     onRefresh(typeId) {
         const {dispatch} = this.props;
+        let token = this._getToken();
         canLoadMore = false;
-        dispatch(fetchRemind(true, false, typeId));
+        dispatch(fetchRemind(true, false, typeId, false, 1, token, 0));
+    }
+
+    _getToken() {
+        const {global} = this.props;
+        return global['accessToken']
     }
 
     onPress() {
@@ -117,9 +110,10 @@ class RemindScene extends PureComponent {
     onEndReached(typeId) {
         let time = Date.parse(new Date()) / 1000;
         const {remind} = this.props;
+        let token = this._getToken();
         if (canLoadMore && time - loadMoreTime > 1) {
             const {dispatch} = this.props;
-            dispatch(fetchRemind(false, false, typeId, true, 25, remind.remindAfter[typeId]));
+            dispatch(fetchRemind(false, false, typeId, true, remind.currPage + 1, token, 0));
             canLoadMore = false;
             loadMoreTime = Date.parse(new Date()) / 1000;
         }
@@ -127,25 +121,26 @@ class RemindScene extends PureComponent {
 
     renderFooter() {
         const {remind} = this.props;
-        if (remind.isLoadMore) {
-            return (
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <ProgressBarAndroid styleAttr='Inverse' color='#3e9ce9'/>
-                    <Text style={{textAlign: 'center', fontSize: 16}}>
-                        加载中…
-                    </Text>
-                </View>
-            );
-        }
+        if (!remind.isLoadMore) return null;
+        return (
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
+                <Text style={{textAlign: 'center', fontSize: 16}}>
+                    加载中…
+                </Text>
+            </View>
+        );
     }
 
-    renderItem(remind, sectionID, rowID) {
+    renderItem(remind) {
         return (
-            <TouchableOpacity style={top_styles.container} onPress={() => {}} activeOpacity={0.9}>
+            <TouchableOpacity style={top_styles.container} onPress={() => {
+            }} activeOpacity={0.9}>
                 <View style={[top_styles.order_box]}>
                     <View style={top_styles.box_top}>
                         <View style={[top_styles.order_head]}>
-                            {remind.quick ? <Image style={[top_styles.icon_ji]} source={require('../../img/Alert/quick.png')}/> : null}
+                            {remind.quick ? <Image style={[top_styles.icon_ji]}
+                                                   source={require('../../img/Alert/quick.png')}/> : null}
                             <View>
                                 <Text style={top_styles.o_index_text}>{remind.orderDate}#{remind.dayId}</Text>
                             </View>
@@ -153,7 +148,8 @@ class RemindScene extends PureComponent {
                                 <Text style={top_styles.o_store_name_text}>{remind.store_id}</Text>
                             </View>
                             <TouchableOpacity style={[top_styles.icon_dropDown]}>
-                                <Image style={[top_styles.icon_img_dropDown]} source={require('../../img/Alert/drop-down.png')}/>
+                                <Image style={[top_styles.icon_img_dropDown]}
+                                       source={require('../../img/Alert/drop-down.png')}/>
                             </TouchableOpacity>
                         </View>
                         <View style={[top_styles.order_body]}>
@@ -208,9 +204,7 @@ class RemindScene extends PureComponent {
                             onRefresh={this.onRefresh.bind(this, typeId)}
                             title="Loading..."
                             colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
-                        />
-                    }
-                >
+                        />}>
                     <View style={{alignItems: 'center'}}>
                         <Text style={{fontSize: 16}}>
                             正在加载...
@@ -220,53 +214,57 @@ class RemindScene extends PureComponent {
             );
         }
         return (
-            <ListView
-                initialListSize={1}
-                dataSource={dataSource}
-                renderRow={this.renderItem}
-                style={styles.listView}
+            <FlatList
+                data={dataSource}
+                renderItem={this.renderItem}
                 onEndReached={this.onEndReached.bind(this, typeId)}
                 onEndReachedThreshold={10}
-                onScroll={this.onScroll}
-                renderFooter={this.renderFooter}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={reddit.isRefreshing}
-                        onRefresh={this.onRefresh.bind(this, typeId)}
-                        title="Loading..."
-                        colors={['#ff0000', '#ff0000', '#ff0000', '#ff0000']}
-                    />
-                }
+                onRefresh={this.onRefresh.bind(this, typeId)}
+                refreshing={remind.isRefreshing}
+                ListFooterComponent={this.renderFooter}
+                keyExtractor={(item, index) => item['id']}
+                getItemLayout={(data, index) => (
+                    {length: pxToDp(250), offset: pxToDp(250) * index, index}
+                )}
             />
         );
     }
 
     render() {
         const {remind} = this.props;
-        var lists = [];
+        let lists = [];
         _typeIds.forEach((typeId) => {
             lists.push(
                 <View
                     key={typeId}
                     tabLabel={Alias.CATEGORIES[typeId]}
-                    style={{flex: 1}}
-                >
-                    {this.renderContent(this.state.dataSource.cloneWithRows(remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId]), typeId)}
+                    style={{flex: 1}}>
+                    {this.renderContent(remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId)}
                 </View>);
         });
         return (
             <ScrollableTabView
-                renderTabBar={() => <CustomTabBar/>}
-                tabBarBackgroundColor="#fcfcfc"
-                tabBarUnderlineColor="#FF0000"
-                tabBarActiveTextColor="#FF0000"
-                tabBarInactiveTextColor="#aaaaaa">
+                renderTabBar={() => <ScrollableTabBar/>}
+                tabBarActiveTextColor={"#333"}
+                tabBarTextStyle={{fontSize: pxToDp(26)}}>
                 {lists}
             </ScrollableTabView>
         );
     }
 
 }
+
+const styles = StyleSheet.create({
+    listView: {
+        backgroundColor: '#eeeeec'
+    },
+    no_data: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 100
+    }
+});
 
 const top_styles = StyleSheet.create({
     container: {
@@ -418,8 +416,5 @@ const bottom_styles = StyleSheet.create({
         textAlignVertical: 'center',
     },
 });
-
-
-RemindScene.propTypes = propTypes;
 
 export default connect(mapStateToProps, mapDispatchToProps)(RemindScene)
