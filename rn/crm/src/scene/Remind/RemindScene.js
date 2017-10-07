@@ -20,7 +20,8 @@ const {
     InteractionManager,
     ActivityIndicator,
     Image,
-    View
+    View,
+    StatusBar
 } = ReactNative;
 
 const {PureComponent} = React;
@@ -32,7 +33,8 @@ import LoadingView from './LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 
-import {fetchRemind} from '../../reducers/remind/remindActions'
+import ModalDropdown from 'react-native-modal-dropdown';
+import {fetchRemind, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
 import Config from '../../config'
@@ -43,7 +45,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return {dispatch, ...bindActionCreators({fetchRemind, ...globalActions}, dispatch)}
+    return {dispatch, ...bindActionCreators({fetchRemind, updateRemind, ...globalActions}, dispatch)}
 }
 
 
@@ -105,6 +107,22 @@ class RemindScene extends PureComponent {
         });
     }
 
+    onPressDropdown(key, id, type) {
+        const {remind} = this.props;
+        if (remind.doingUpdate) {
+            ToastShort("操作太快了！");
+            return false;
+        }
+        const {dispatch} = this.props;
+        let token = this._getToken();
+        if (parseInt(key) === 0) {
+            //暂停提示
+        } else {
+            //强制关闭
+            dispatch(updateRemind(id, type, Config.TASK_STATUS_DONE, token))
+        }
+    }
+
     onEndReached(typeId) {
         let time = Date.parse(new Date()) / 1000;
         const {remind} = this.props;
@@ -140,55 +158,65 @@ class RemindScene extends PureComponent {
     renderItem(remind) {
         let {item, index} = remind;
         return (
-            <TouchableOpacity style={top_styles.container}
-                              onPress={() => this.onPress(Config.ROUTE_ORDER, {orderId: item.order_id})}
-                              activeOpacity={0.9}>
-                <View style={[top_styles.order_box]}>
-                    <View style={top_styles.box_top}>
-                        <View style={[top_styles.order_head]}>
-                            {item.quick ? <Image style={[top_styles.icon_ji]}
-                                                 source={require('../../img/Alert/quick.png')}/> : null}
-                            <View>
-                                <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
+            <View style={top_styles.container}>
+                <TouchableOpacity onPress={() => this.onPress(Config.ROUTE_ORDER, {orderId: item.order_id})}
+                                  activeOpacity={0.9}>
+                    <View style={[top_styles.order_box]}>
+                        <View style={top_styles.box_top}>
+                            <View style={[top_styles.order_head]}>
+                                {item.quick ? <Image style={[top_styles.icon_ji]}
+                                                     source={require('../../img/Alert/quick.png')}/> : null}
+                                <View>
+                                    <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
+                                </View>
+                                <View>
+                                    <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
+                                </View>
+                                <TouchableOpacity style={[top_styles.icon_dropDown]}>
+                                    <ModalDropdown
+                                        options={['暂停提示', '强制关闭']}
+                                        defaultValue={''}
+                                        style={top_styles.drop_style}
+                                        dropdownStyle={top_styles.drop_listStyle}
+                                        dropdownTextStyle={top_styles.drop_textStyle}
+                                        dropdownTextHighlightStyle={top_styles.drop_optionStyle}
+                                        onSelect={(event) => this.onPressDropdown(event, item.id, item.type)}>
+                                        <Image style={[top_styles.icon_img_dropDown]}
+                                               source={require('../../img/Alert/drop-down.png')}/>
+                                    </ModalDropdown>
+                                </TouchableOpacity>
                             </View>
-                            <View>
-                                <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
-                            </View>
-                            <TouchableOpacity style={[top_styles.icon_dropDown]}>
-                                <Image style={[top_styles.icon_img_dropDown]}
-                                       source={require('../../img/Alert/drop-down.png')}/>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={[top_styles.order_body]}>
-                            <Text style={[top_styles.order_body_text]}>
-                                <Text style={top_styles.o_content}>
-                                    {item.remark}
+                            <View style={[top_styles.order_body]}>
+                                <Text style={[top_styles.order_body_text]}>
+                                    <Text style={top_styles.o_content}>
+                                        {item.remark}
+                                    </Text>
                                 </Text>
-                            </Text>
-                            <View style={[top_styles.ship_status]}>
-                                <Text style={[top_styles.ship_status_text]}>{item.orderStatus}</Text>
+                                <View style={[top_styles.ship_status]}>
+                                    <Text style={[top_styles.ship_status_text]}>{item.orderStatus}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={bottom_styles.container}>
+                            <View style={bottom_styles.time_date}>
+                                <Text style={bottom_styles.time_date_text}>{item.noticeDate}</Text>
+                            </View>
+                            <View>
+                                <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
+                            </View>
+                            <Image style={[bottom_styles.icon_clock]} source={require('../../img/Alert/clock.png')}/>
+                            <View>
+                                <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
+                            </View>
+                            <View style={bottom_styles.operator}>
+                                <Text style={bottom_styles.operator_text}>
+                                    处理人：{item.delegation_to_user}
+                                </Text>
                             </View>
                         </View>
                     </View>
-                    <View style={bottom_styles.container}>
-                        <View style={bottom_styles.time_date}>
-                            <Text style={bottom_styles.time_date_text}>{item.noticeDate}</Text>
-                        </View>
-                        <View>
-                            <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
-                        </View>
-                        <Image style={[bottom_styles.icon_clock]} source={require('../../img/Alert/clock.png')}/>
-                        <View>
-                            <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
-                        </View>
-                        <View style={bottom_styles.operator}>
-                            <Text style={bottom_styles.operator_text}>
-                                处理人：{item.delegation_to_user}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </View>
         );
     }
 
@@ -231,7 +259,7 @@ class RemindScene extends PureComponent {
                     viewAreaCoveragePercentThreshold: 100,
                     waitForInteraction: true,
                 }}
-                onEndReachedThreshold={pxToDp(250)}
+                onEndReachedThreshold={0}
                 renderItem={this.renderItem}
                 onEndReached={this.onEndReached.bind(this, typeId)}
                 onRefresh={this.onRefresh.bind(this, typeId)}
@@ -273,6 +301,7 @@ class RemindScene extends PureComponent {
         return (
             <ScrollableTabView
                 initialPage={0}
+                locked={remind.processing}
                 renderTabBar={() => <DefaultTabBar/>}
                 tabBarActiveTextColor={"#333"}
                 tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
@@ -359,6 +388,7 @@ const top_styles = StyleSheet.create({
         width: pxToDp(150),
         height: pxToDp(141),
         backgroundColor: '#5f6660',
+        marginTop: -StatusBar.currentHeight,
     },
     drop_textStyle: {//下拉选项文本的样式
         textAlignVertical: 'center',
