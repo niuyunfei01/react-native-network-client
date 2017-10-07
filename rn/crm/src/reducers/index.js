@@ -13,7 +13,6 @@
 import device from './device/deviceReducer'
 import global from './global/globalReducer'
 import order from './order/orderReducer'
-import alert from './alert/alertReducer'
 import remind from './remind/remindReducer'
 
 import {combineReducers} from 'redux'
@@ -28,7 +27,6 @@ const rootReducer = combineReducers({
     device,
     global,
     order,
-    alert,
     remind
 })
 
