@@ -26,7 +26,7 @@ const {
 const {PureComponent} = React;
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
+import ScrollableTabView, {DefaultTabBar,} from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from './LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
@@ -34,6 +34,8 @@ import pxToDp from '../../util/pxToDp';
 
 import {fetchRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
+
+import Config from '../../config'
 
 function mapStateToProps(state) {
     const {remind, global} = state;
@@ -61,7 +63,6 @@ class RemindScene extends PureComponent {
         };
         this.renderItem = this.renderItem.bind(this);
         this.renderFooter = this.renderFooter.bind(this);
-        this.onScroll = this.onScroll.bind(this);
         canLoadMore = false;
     }
 
@@ -88,8 +89,8 @@ class RemindScene extends PureComponent {
     onRefresh(typeId) {
         const {dispatch} = this.props;
         let token = this._getToken();
-        canLoadMore = false;
         dispatch(fetchRemind(true, false, typeId, false, 1, token, 0));
+        canLoadMore = true;
     }
 
     _getToken() {
@@ -97,27 +98,28 @@ class RemindScene extends PureComponent {
         return global['accessToken']
     }
 
-    onPress() {
+    onPress(route, params) {
+        let self = this;
         InteractionManager.runAfterInteractions(() => {
-            //TODO redirect order detail view
+            self.props.navigation.navigate(route, params);
         });
-    }
-
-
-    onScroll() {
-        if (!canLoadMore) {
-            canLoadMore = true;
-        }
     }
 
     onEndReached(typeId) {
         let time = Date.parse(new Date()) / 1000;
         const {remind} = this.props;
         let token = this._getToken();
+        let pageNum = remind.currPage[typeId];
+        let totalPage = remind.totalPage[typeId];
+        if (pageNum + 1 > totalPage) {
+            canLoadMore = false;
+            ToastShort('没有更多数据了');
+        } else {
+            canLoadMore = true;
+        }
         if (canLoadMore && time - loadMoreTime > 1) {
             const {dispatch} = this.props;
-            dispatch(fetchRemind(false, false, typeId, true, remind.currPage + 1, token, 0));
-            canLoadMore = false;
+            dispatch(fetchRemind(false, false, typeId, true, pageNum + 1, token, 0));
             loadMoreTime = Date.parse(new Date()) / 1000;
         }
     }
@@ -138,8 +140,9 @@ class RemindScene extends PureComponent {
     renderItem(remind) {
         let {item, index} = remind;
         return (
-            <TouchableOpacity style={top_styles.container} onPress={() => {
-            }} activeOpacity={0.9}>
+            <TouchableOpacity style={top_styles.container}
+                              onPress={() => this.onPress(Config.ROUTE_ORDER, {orderId: item.order_id})}
+                              activeOpacity={0.9}>
                 <View style={[top_styles.order_box]}>
                     <View style={top_styles.box_top}>
                         <View style={[top_styles.order_head]}>
@@ -221,19 +224,38 @@ class RemindScene extends PureComponent {
             <FlatList
                 extraData={this.state.dataSource}
                 data={dataSource}
+                legacyImplementation={false}
+                directionalLockEnabled={true}
+                viewabilityConfig={{
+                    minimumViewTime: 3000,
+                    viewAreaCoveragePercentThreshold: 100,
+                    waitForInteraction: true,
+                }}
                 renderItem={this.renderItem}
                 onEndReached={this.onEndReached.bind(this, typeId)}
-                onEndReachedThreshold={0.4}
                 onRefresh={this.onRefresh.bind(this, typeId)}
                 refreshing={remind.isRefreshing}
                 ListFooterComponent={this.renderFooter}
-                keyExtractor={(item, index) => item['id']}
-                getItemLayout={(data, index) => (
-                    {length: pxToDp(250), offset: pxToDp(250) * index, index}
-                )}
+                keyExtractor={this._keyExtractor}
+                shouldItemUpdate={this._shouldItemUpdate}
+                getItemLayout={this._getItemLayout}
+                initialNumToRender={5}
             />
         );
     }
+
+    _shouldItemUpdate = (prev, next) => {
+        return prev.item !== next.item;
+    }
+
+    _getItemLayout = (data, index) => {
+        return {length: pxToDp(250), offset: pxToDp(250) * index, index}
+    }
+
+    _keyExtractor = (item) => {
+        return item.id.toString();
+    }
+
 
     render() {
         const {remind} = this.props;
@@ -249,6 +271,8 @@ class RemindScene extends PureComponent {
         });
         return (
             <ScrollableTabView
+                initialPage={0}
+                renderTabBar={() => <DefaultTabBar/>}
                 tabBarActiveTextColor={"#333"}
                 tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
                 tabBarTextStyle={{fontSize: pxToDp(26)}}>

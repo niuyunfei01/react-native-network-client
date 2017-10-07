@@ -10,15 +10,15 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
         return RemindServices.FetchRemindList(token, typeId, status, page)
             .then(response => response.json())
             .then((response) => {
+                let result = response.obj;
                 if (response.ok) {
-                    let result = response.obj;
                     dispatch(receiveRemindList(result.list, typeId, result.curr_page, result.total_page));
                 } else {
-                    dispatch(receiveRemindList([], typeId));
+                    dispatch(receiveRemindList([], typeId, 1, 1));
                     ToastShort(error.message);
                 }
             }).catch((error) => {
-                dispatch(receiveRemindList([], typeId));
+                dispatch(receiveRemindList([], typeId, 1, 1));
                 ToastShort(error.message);
             })
     }
