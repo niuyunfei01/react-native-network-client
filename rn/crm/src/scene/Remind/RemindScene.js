@@ -165,7 +165,7 @@ class RemindScene extends PureComponent {
                         <View style={top_styles.box_top}>
                             <View style={[top_styles.order_head]}>
                                 {item.quick ? <Image style={[top_styles.icon_ji]}
-                                                     source={require('../../img/Alert/quick.png')}/> : null}
+                                                     source={require('../../img/Remind/quick.png')}/> : null}
                                 <View>
                                     <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
                                 </View>
@@ -182,7 +182,7 @@ class RemindScene extends PureComponent {
                                         dropdownTextHighlightStyle={top_styles.drop_optionStyle}
                                         onSelect={(event) => this.onPressDropdown(event, item.id, item.type)}>
                                         <Image style={[top_styles.icon_img_dropDown]}
-                                               source={require('../../img/Alert/drop-down.png')}/>
+                                               source={require('../../img/Remind/drop-down.png')}/>
                                     </ModalDropdown>
                                 </TouchableOpacity>
                             </View>
@@ -204,7 +204,7 @@ class RemindScene extends PureComponent {
                             <View>
                                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
                             </View>
-                            <Image style={[bottom_styles.icon_clock]} source={require('../../img/Alert/clock.png')}/>
+                            <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>
                             <View>
                                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
                             </View>
