@@ -16,6 +16,7 @@ const initialState = {
     processing: false,
     updateId: '',
     updateTypeId: '',
+    remindNum: {}
 };
 
 export default function remind(state = initialState, action) {

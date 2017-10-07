@@ -25,19 +25,24 @@ const {
 } = ReactNative;
 
 const {PureComponent} = React;
+
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import ScrollableTabView, {DefaultTabBar,} from 'react-native-scrollable-tab-view';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from './LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
-
 import ModalDropdown from 'react-native-modal-dropdown';
 import {fetchRemind, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
+import RNButton from '../../widget/RNButton';
+
 import Config from '../../config'
+
+const BadgeTabBar = require('./BadgeTabBar');
+
 
 function mapStateToProps(state) {
     const {remind, global} = state;
@@ -50,8 +55,14 @@ function mapDispatchToProps(dispatch) {
 
 
 let canLoadMore;
-let _typeIds = [5, 4, 1, 3];
 let loadMoreTime = 0;
+const _typeIds = [5, 4, 1, 3];
+const _typeAliasMap = {
+    remind_type: 4,
+    complain_type: 1,
+    other_type: 3,
+    refund_type: 5
+};
 
 // create a component
 class RemindScene extends PureComponent {
@@ -140,6 +151,39 @@ class RemindScene extends PureComponent {
             dispatch(fetchRemind(false, false, typeId, true, pageNum + 1, token, 0));
             loadMoreTime = Date.parse(new Date()) / 1000;
         }
+    }
+
+    renderHead(typeId) {
+        if (typeId != 3) {
+            return null;
+        }
+        let buttons = [];
+        for (var i = 0; i < 6; i++) {
+            buttons[i] = <RNButton
+                containerStyle={{
+                    padding: 10,
+                    height: 45,
+                    overflow: 'hidden',
+                    borderRadius: 4,
+                    backgroundColor: 'white',
+                    textAlign: 'center'
+                }}
+                style={{fontSize: 16, color: 'green'}}>
+                Press me!
+            </RNButton>
+        }
+        return (
+            <View style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignContent: 'space-between',
+                flexWrap: 'wrap'
+            }}>
+                {buttons}
+            </View>
+        );
     }
 
     renderFooter() {
@@ -259,12 +303,13 @@ class RemindScene extends PureComponent {
                     viewAreaCoveragePercentThreshold: 100,
                     waitForInteraction: true,
                 }}
-                onEndReachedThreshold={0.2}
+                onEndReachedThreshold={0.1}
                 renderItem={this.renderItem}
                 onEndReached={this.onEndReached.bind(this, typeId)}
                 onRefresh={this.onRefresh.bind(this, typeId)}
                 refreshing={remind.isRefreshing}
                 ListFooterComponent={this.renderFooter}
+                ListHeaderComponent={this.renderHead.bind(this, typeId)}
                 keyExtractor={this._keyExtractor}
                 shouldItemUpdate={this._shouldItemUpdate}
                 getItemLayout={this._getItemLayout}
@@ -301,8 +346,8 @@ class RemindScene extends PureComponent {
         return (
             <ScrollableTabView
                 initialPage={0}
+                renderTabBar={() => <BadgeTabBar/>}
                 locked={remind.processing}
-                renderTabBar={() => <DefaultTabBar/>}
                 tabBarActiveTextColor={"#333"}
                 tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
                 tabBarTextStyle={{fontSize: pxToDp(26)}}>
