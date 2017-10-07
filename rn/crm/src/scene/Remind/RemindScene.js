@@ -259,7 +259,7 @@ class RemindScene extends PureComponent {
                     viewAreaCoveragePercentThreshold: 100,
                     waitForInteraction: true,
                 }}
-                onEndReachedThreshold={0}
+                onEndReachedThreshold={0.2}
                 renderItem={this.renderItem}
                 onEndReached={this.onEndReached.bind(this, typeId)}
                 onRefresh={this.onRefresh.bind(this, typeId)}
