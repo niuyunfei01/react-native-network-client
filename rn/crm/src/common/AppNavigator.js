@@ -14,6 +14,7 @@ import GoodsScene from '../scene/Goods/GoodsScene'
 import WebScene from '../widget/WebScene'
 import ApplyScene from "../scene/Apply/ApplyScene";
 import * as native from "./native";
+import screen from './screen'
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 
 const Tab = TabNavigator(
@@ -145,6 +146,7 @@ class Navigator extends Component {
             stackNavigatorConfigs
         );
         console.log('go with config:', stackNavigatorConfigs, "props", this.props);
+      console.log("screen:", screen)
         return <CustomNavigator screenProps={screenProps}/>
     }
 }

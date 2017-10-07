@@ -9,6 +9,7 @@ import CallBtn from './CallBtn'
 import colors from "../../styles/colors";
 import _ from 'underscore'
 import moment from 'moment'
+import Cts from '../../Cts'
 
 
 class OrderStatusCell extends PureComponent {
@@ -28,26 +29,29 @@ class OrderStatusCell extends PureComponent {
     const packWorkers = order.pack_workers.split(',').map(function(uid){return (order.workers[uid] || {}).nickname})
     const packLoggerName = Object.assign({}, order.workers[order.pack_done_logger]).nickname;
 
+    const invalidStyle = order.orderStatus == Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
+    console.log("invalidStyle", order.orderStatus == Cts.ORDER_STATUS_INVALID);
+
     return <View style={{marginTop: pxToDp(20), backgroundColor:'#f0f9ef'}}>
       <View style={styles.row}>
-        <Text>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
+        <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: '200'}]}>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
         <View style={{flex: 1}}/>
 
         <CallBtn label={order.store_name}/>
 
       </View>
       <View style={styles.row}>
-        <Text>订单号：{order.id}</Text>
+        <Text style={[invalidStyle, {color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
         <View style={{flex: 1}}/>
-        <Text>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
+        <Text style={[invalidStyle, ]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
-        <Text>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
+        <Text style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
         <View style={{flex: 1}}/>
-        <Text>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
+        <Text style={[invalidStyle, ]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
       </View>
 
-      <View style={{height: pxToDp(170), backgroundColor: colors.white, flexDirection: 'row',
+      <View style={{ backgroundColor: colors.white, flexDirection: 'row',
         justifyContent:'space-around'}}>
         <OrderStep statusTxt="已收单" bgColor={this._validStepColor(order.orderTime)} timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
         <OrderStep statusTxt="已分拣" bgColor={this._validStepColor(order.time_ready)} workerNames={packWorkers} loggerName={packLoggerName}
@@ -81,6 +85,8 @@ class OrderStep extends PureComponent {
       <Text style={styles.stepText}>{workerNames}</Text>}
       { !!timeAtStr &&
       <Text style={styles.stepText}>{timeAtStr}</Text>}
+      { !!loggerName &&
+      <Text style={styles.stepText}>(by {loggerName})</Text>}
     </View>;
   }
 }
@@ -108,7 +114,11 @@ const styles = StyleSheet.create({
     height:pxToDp(20),
     position: 'absolute',
     top: pxToDp(178),
-  }
+  },
+  stepText: {
+    textAlign: 'center',
+    color: colors.color999,
+  },
 });
 
 export default OrderStatusCell;

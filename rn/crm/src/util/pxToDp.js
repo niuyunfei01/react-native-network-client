@@ -6,7 +6,7 @@ const deviceWidthDp = Dimensions.get('window').width;
 const uiWidthPx = 720;
 
 function pxToDp(uiElementPx) {
-    return uiElementPx *  deviceWidthDp / uiWidthPx;
+  return uiElementPx * deviceWidthDp / uiWidthPx;
 }
 
 export default pxToDp;

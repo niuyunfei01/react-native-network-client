@@ -30,6 +30,7 @@ import {bindActionCreators} from "redux";
 let ScrollableTabView = require('react-native-scrollable-tab-view');
 import ModalDropdown from 'react-native-modal-dropdown';
 import Config from '../../config'
+import Cts from '../../Cts'
 
 function mapStateToProps({alert, global}) {
     return {
@@ -226,7 +227,7 @@ class AlertScene extends PureComponent {
             if (result.ok) {
                 let type_data = get_type_data(global_alert_type);
                 type_data.list.splice(row_index, 1);
-                if (status === Config.TASK_STATUS_DONE) {
+                if (status === Cts.TASK_STATUS_DONE) {
                     let tab_key = group_type_key.get(global_alert_type);
                     let type_num = global_group_num.get(tab_key);
                     let new_type_num = type_num > 0 ? type_num - 1 : 0;
@@ -418,7 +419,7 @@ class AlertRow extends Component {
         let {_this_onSelectOperate, row_index} = this.props;
         if (parseInt(key) === 0) {//暂停提示
         } else {//强制关闭
-            let status = Config.TASK_STATUS_DONE;
+            let status = Cts.TASK_STATUS_DONE;
             _this_onSelectOperate(row_index, task_id, status);
         }
         return false;

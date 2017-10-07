@@ -71,47 +71,80 @@ class OrderScene extends PureComponent {
 
     this.state = {
       isFetching: false,
-      orderId: 0,
       isEditing: false,
       itemsHided: true,
       shipHided: true,
       gotoEditPoi: false,
     }
 
+    this.orderId = 0;
+
     this._onLogin = this._onLogin.bind(this)
     this.toMap = this.toMap.bind(this)
     this.goToSetMap = this.goToSetMap.bind(this)
+    this.onHeaderRefresh = this.onHeaderRefresh.bind(this)
   }
 
-    componentWillMount() {
-
-        const orderId = (this.props.navigation.state.params||{}).orderId;
-
-        console.log("params orderId:", orderId)
-
-        if (!this.props.order || !this.props.order.id || this.props.order.id !== orderId) {
-            this.props.actions.getOrder(this.props.global.accessToken, orderId, (ok, data) => {
-                this.setState({
-                    isFetching: false,
-                })
-            })
-            this.setState({orderId: orderId, isFetching: true});
-        }
+  onHeaderRefresh() {
+    if (!this.state.isFetching) {
+      this.setState({isFetching: true});
+      this.props.actions.getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
+        this.setState({
+          isFetching: false,
+        })
+      })
     }
+  }
+
+  _onLogin() {
+    this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.orderId}})
+  }
+
+  goToSetMap() {
+    console.log('Nothing to do....')
+    this.setState({gotoEditPoi: false})
+  }
+
+  toMap() {
+    const {order} = this.props.order;
+    const validPoi = order.gd_lng && order.gd_lat;
+    if (validPoi) {
+      const uri = `https://uri.amap.com/marker?position=${order.gd_lng},${order.gd_lat}`
+      this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri})
+    } else {
+      //a page to set the location for this url!!
+      this.setState({
+        gotoEditPoi: true
+      });
+    }
+  }
+
+  componentWillMount() {
+
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    this.orderId = orderId;
+    console.log("componentWillMount: params orderId:", orderId)
+    const order = this.props.order.order;
+    if (!order || !order.id || order.id !== orderId) {
+      this.onHeaderRefresh()
+    }
+  }
 
     render() {
         const {order } = this.props.order;
 
         console.log(this.state);
 
-        return (!order || order.id !== this.state.orderId) ?
-            <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}} refreshControl={
-                <RefreshControl
-                    refreshing={this.state.isFetching}
-                    onRefresh={() => this.onHeaderRefresh}
-                    tintColor='gray'
-                />
-            }><Text style={{textAlign: 'center'}}>下拉刷新</Text></ScrollView>
+        let refreshControl = <RefreshControl
+          refreshing={this.state.isFetching}
+          onRefresh={this.onHeaderRefresh}
+          tintColor='gray'
+        />;
+
+        return (!order || order.id !== this.orderId) ?
+            <ScrollView contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
+                        refreshControl={refreshControl}>
+              <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text></ScrollView>
             :(
             <View style={[styles.container, {flex: 1}]}>
                 <Dialog onRequestClose={()=>{}}
@@ -129,59 +162,29 @@ class OrderScene extends PureComponent {
                     }
                   ]}
                 ><Text>没有经纬度信息</Text></Dialog>
-
-                {/*<View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />*/}
                 <ScrollView
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.isFetching}
-                            onRefresh={() => this.onHeaderRefresh}
-                            tintColor='gray'
-                        />
-                    }>
+                    refreshControl={ refreshControl }>
                     {this.renderHeader()}
-                    <SpacingView />
-                    {this.renderGoods()}
                 </ScrollView>
-                <View style={{flexDirection: 'row', justifyContent: 'space-around', }}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-around',
+                  paddingTop: pxToDp(10),
+                  paddingRight: pxToDp(10),
+                  paddingLeft: pxToDp(10),
+                  paddingBottom: pxToDp(10),
+                  backgroundColor: '#fff',
+                  marginLeft: pxToDp(20), marginRight: pxToDp(20),
+                  borderRadius: 4,
+                  borderWidth: 1,
+                  borderColor: '#ddd',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 4, height: 4 },
+                  shadowOpacity: 0.8,
+                  shadowRadius: 4,}}>
                     <Button>联系配送</Button>
                     <Button type={'primary'}>提醒送达</Button>
                 </View>
             </View>
         );
-    }
-
-    renderGoods() {
-
-    }
-
-    onHeaderRefresh() {
-        //this.requestData()
-
-        this.props.actions.getOrder(this.props.global.accessToken, this.state.orderId)
-    }
-
-    _onLogin() {
-        this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams:{orderId: this.state.orderId}})
-    }
-
-    goToSetMap() {
-      console.log('Nothing to do....')
-      this.setState({gotoEditPoi: false})
-    }
-
-    toMap() {
-      const order = this.props.order;
-        const validPoi = order.loc_lng && order.loc_lat;
-      if (validPoi) {
-        const uri = `https://uri.amap.com/marker?position=${order.loc_lng},${order.loc_lat}`
-        this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri})
-      } else {
-        //a page to set the location for this url!!
-        this.setState({
-          gotoEditPoi: true
-        });
-      }
     }
 
     renderHeader() {
@@ -199,7 +202,7 @@ class OrderScene extends PureComponent {
           const validPoi = order.loc_lng && order.loc_lat;
         const navImgSource = validPoi ? require('../../img/Order/navi.png') : require('../../img/Order/navi_pressed.png')
 
-          return (<View style={styles.topContainer}>
+          return (<View>
                 <View style={{backgroundColor: '#fff'}}>
                     <View style={[styles.row, {height: pxToDp(40), alignItems:'center'}]}>
                         <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
@@ -309,14 +312,15 @@ class OrderScene extends PureComponent {
                         </View>
                         <View style={{flex: 1}}/>
                         <Text style={styles.moneyListNum}>
-                            {numeral(order.orderMoney/100).format('0.00')}
+                            {numeral(order.orderMoney).format('0.00')}
                         </Text>
                     </View>
                     {order.addition_to_pay !== 0 &&
                     <View style={[styles.row, styles.moneyRow]}>
                         <View style={styles.moneyLeft}>
                             <Text style={{flex: 1}}>需加收/退款</Text>
-                            <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>
+                            {(order.additional_to_pay != 0) &&
+                            <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
                         </View>
                         <View style={{flex: 1}}/>
                         <Text style={styles.moneyListNum}>
@@ -419,9 +423,6 @@ const styles = StyleSheet.create({
     },
     remarkTextBody: {
         marginLeft: pxToDp(6), marginRight: pxToDp(140)
-    },
-    stepText: {
-        textAlign: 'center'
     },
     moneyLeft: {
         width: pxToDp(480),
