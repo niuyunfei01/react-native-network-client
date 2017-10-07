@@ -35,6 +35,8 @@ import pxToDp from '../../util/pxToDp';
 import {fetchRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
+import Config from '../../config'
+
 function mapStateToProps(state) {
     const {remind, global} = state;
     return {remind: remind, global: global}
@@ -96,9 +98,10 @@ class RemindScene extends PureComponent {
         return global['accessToken']
     }
 
-    onPress() {
+    onPress(route, params) {
+        let self = this;
         InteractionManager.runAfterInteractions(() => {
-            //TODO redirect order detail view
+            self.props.navigation.navigate(route, params);
         });
     }
 
@@ -137,8 +140,9 @@ class RemindScene extends PureComponent {
     renderItem(remind) {
         let {item, index} = remind;
         return (
-            <TouchableOpacity style={top_styles.container} onPress={() => {
-            }} activeOpacity={0.9}>
+            <TouchableOpacity style={top_styles.container}
+                              onPress={() => this.onPress(Config.ROUTE_ORDER, {orderId: item.order_id})}
+                              activeOpacity={0.9}>
                 <View style={[top_styles.order_box]}>
                     <View style={top_styles.box_top}>
                         <View style={[top_styles.order_head]}>
