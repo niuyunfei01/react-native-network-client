@@ -77,9 +77,11 @@ const BadgeTabBar = React.createClass({
             BadgeElement={
                 <Text style={{color: '#FFFFFF'}}>1</Text>
             }
-
+            MainViewStyle={
+                [styles.flexOne]
+            }
             IconBadgeStyle={
-                {width: 20, height: 15, top: 2, right: -10}
+                {width: 20, height: 15, top: 2, right: 1}
             }
         />;
     },
@@ -125,6 +127,7 @@ const styles = StyleSheet.create({
         height: 50,
         flexDirection: 'row',
         justifyContent: 'space-around',
+        alignItems: 'center',
         borderWidth: 1,
         borderTopWidth: 0,
         borderLeftWidth: 0,

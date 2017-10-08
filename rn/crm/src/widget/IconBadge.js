@@ -42,7 +42,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#FF0000'
     },
-    MainView: {}
+    MainView: {
+
+    }
 });
 
 export default IconBadge;
