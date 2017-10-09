@@ -26,8 +26,9 @@ const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
 import Config from '../../config'
 import * as native from "../../common/native";
+import Toast from "../../weui/Toast/Toast";
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     alignSelf: 'stretch',
@@ -203,9 +204,10 @@ class LoginScene extends PureComponent {
   render() {
     return ( <Image style={[styles.backgroundImage,{backgroundColor: colors.white}]} source={require('../../img/Login/login_bg.png')}>
       <View style={styles.container}>
+        <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
+        }}>正在登录...</Toast>
         <ScrollView horizontal={false} width={width} height={height}>
           <View style={{marginTop: 100}}>
-            <ActivityIndicator animating={this.state.doingSign}/>
             <View>
               <FormInput onChangeText={(mobile) => {
                 this.setState({mobile})

@@ -30,7 +30,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
-import LoadingView from './LoadingView';
+import LoadingView from '../../widget/LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';

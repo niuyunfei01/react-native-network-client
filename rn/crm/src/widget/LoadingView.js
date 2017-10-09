@@ -1,31 +1,47 @@
 'use strict';
-import React, { Component } from 'react';
 
-import {
-    StyleSheet,
+import ReactNative from 'react-native';
+import React from 'react';
+
+const {
+    ActivityIndicator,
+    ActivityIndicatorIOS,
+    Platform,
     Text,
-    View,
-    Image,
-    TouchableHighlight,
-    ActivityIndicator
-} from 'react-native';
+    StyleSheet,
+    View
+} = ReactNative;
 
-import CommonStyles from '../styles/common';
-import Colors from '../styles/colors';
-
-export default class LoadingView extends Component {
-    constructor (props) {
-        super(props)
-    }
-
+class LoadingView extends React.Component {
     render() {
-        return (
-            <View style={[CommonStyles.container,CommonStyles.flexVCenter,CommonStyles.flexHCenter]}>
-                <View style={this.props.style}>
-                    <ActivityIndicator animating={this.props.isLoading} size='large' color={Colors.toolbarbg}/>
-                    <Text style={[CommonStyles.font20,CommonStyles.marginTop10,{color:this.props.tipColor?this.props.tipColor:'#666'}]}>{this.props.tip?this.props.tip:''}</Text>
+        if (Platform.OS === 'android') {
+            return (
+                <View style={styles.loading}>
+                    <ActivityIndicator styleAttr='LargeInverse' color='#3e9ce9'/>
+                    <Text style={styles.loadingText}>加载中...</Text>
                 </View>
-            </View>
-        );
+            );
+        } else {
+            return (
+                <View style={styles.loading}>
+                    <ActivityIndicatorIOS size='large'/>
+                    <Text style={styles.loadingText}>加载中...</Text>
+                </View>
+            );
+        }
     }
 }
+
+let styles = StyleSheet.create({
+    loading: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    loadingText: {
+        marginTop: 10,
+        textAlign: 'center'
+    }
+});
+
+export default LoadingView;
