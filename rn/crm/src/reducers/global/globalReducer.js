@@ -41,6 +41,7 @@ export default function globalReducer (state = initialState, action) {
           } else return state;
 
       case SESSION_TOKEN_SUCCESS:
+          console.log("login token payload:", action.payload)
           return {...state,
               accessToken: action.payload.access_token,
               refreshToken: action.payload.refresh_token,

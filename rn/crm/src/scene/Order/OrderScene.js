@@ -192,7 +192,7 @@ class OrderScene extends PureComponent {
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
-        { this.state.errorHints &&
+        { !!this.state.errorHints &&
         <Text style={{textAlign: 'center'}}>{this.state.errorHints}</Text>}
         <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text></ScrollView>
       : (
