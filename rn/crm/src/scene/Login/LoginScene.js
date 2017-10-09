@@ -201,7 +201,7 @@ class LoginScene extends PureComponent {
   }
 
   render() {
-    return ( <Image style={styles.backgroundImage} source={require('../../img/Login/login_bg.png')}>
+    return ( <Image style={[styles.backgroundImage,{backgroundColor: colors.white}]} source={require('../../img/Login/login_bg.png')}>
       <View style={styles.container}>
         <ScrollView horizontal={false} width={width} height={height}>
           <View style={{marginTop: 100}}>
