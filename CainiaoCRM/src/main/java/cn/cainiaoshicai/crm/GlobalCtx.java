@@ -33,6 +33,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.i18n.reactnativei18n.ReactNativeI18n;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -261,6 +263,8 @@ public class GlobalCtx extends Application {
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())
+                .addPackage(new VectorIconsPackage())
+                .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)

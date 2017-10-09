@@ -89,6 +89,7 @@ class OrderScene extends PureComponent {
       shipHided: true,
       gotoEditPoi: false,
       showOptionMenu: false,
+      errorHints: ''
     }
 
     this.orderId = 0;
@@ -141,9 +142,14 @@ class OrderScene extends PureComponent {
     if (!this.state.isFetching) {
       this.setState({isFetching: true});
       this.props.actions.getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
-        this.setState({
+
+        let state = {
           isFetching: false,
-        })
+        };
+
+        if (!ok)  {state.errorHints = data};
+
+        this.setState(state)
       })
     }
   }
@@ -186,6 +192,8 @@ class OrderScene extends PureComponent {
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
+        { this.state.errorHints &&
+        <Text style={{textAlign: 'center'}}>{this.state.errorHints}</Text>}
         <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text></ScrollView>
       : (
         <View style={[styles.container, {flex: 1}]}>
@@ -391,7 +399,7 @@ class OrderScene extends PureComponent {
           <View style={[styles.row, styles.moneyRow]}>
             <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
               <Text style={styles.moneyListTitle}>用户已付</Text>
-              <Text style={{fontSize: pxToDp(14), flex: 1}}>含平台扣费、优惠等</Text>
+              <Text style={{fontSize: pxToDp(22), flex: 1}}>含平台扣费、优惠等</Text>
               <Text style={styles.moneyListSub}>微信支付</Text>
             </View>
             <View style={{flex: 1}}/>
@@ -402,7 +410,7 @@ class OrderScene extends PureComponent {
           {order.addition_to_pay !== 0 &&
           <View style={[styles.row, styles.moneyRow]}>
             <View style={styles.moneyLeft}>
-              <Text style={{flex: 1}}>需加收/退款</Text>
+              <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
               {(order.additional_to_pay != 0) &&
               <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
             </View>
