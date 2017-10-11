@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component, PropTypes} from 'react'
 import {
   Modal,
   View,
@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import $V from '../variable'
 
-const { width, height } = Dimensions.get('window')
+const {width, height} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   actionsheet: {
@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
   },
   actionsheetAction: {
     marginTop: 6,
+    marginBottom: 20,
     backgroundColor: '#fff',
   },
   actionsheetCell: {
@@ -71,7 +72,7 @@ class ActionSheet extends Component {
   componentWillReceiveProps(nextProp) {
     if (this.props.visible !== nextProp.visible) {
       if (nextProp.visible) {
-        this.setState({ visible: true })
+        this.setState({visible: true})
         Animated.timing(
           this.state.fadeAnim,
           {
@@ -88,14 +89,14 @@ class ActionSheet extends Component {
             duration: this.props.duration || 300,
             easing: Easing.easeOut
           }
-        ).start(() => this.setState({ visible: false }))
+        ).start(() => this.setState({visible: false}))
       }
     }
   }
 
   handleLayout() {
     this.refs.actionsheet.measure((x, y, w, h) => {
-      this.setState({ height: h })
+      this.setState({height: h})
     })
   }
 
@@ -162,14 +163,14 @@ class ActionSheet extends Component {
         onShow={onShow}
         onRequestClose={onRequestClose}
       >
-        <View style={{ width, height }}>
+        <View style={{width, height}}>
           <Animated.View
-            style={[{ width, height, backgroundColor: 'rgba(0,0,0,.6)' }, wrapperStyle, {
+            style={[{width, height, backgroundColor: 'rgba(0,0,0,.6)'}, wrapperStyle, {
               opacity: this.state.fadeAnim
             }]}
           >
             <Text
-              style={{ width, height }}
+              style={{width, height}}
               onPress={onRequestClose}
             />
           </Animated.View>
@@ -177,7 +178,8 @@ class ActionSheet extends Component {
             style={[styles.actionsheet, style, {
               transform: [{
                 translateY: this.state.fadeAnim.interpolate({
-                  inputRange: [0, 1], outputRange: [this.state.height, 0] })
+                  inputRange: [0, 1], outputRange: [this.state.height, 0]
+                })
               }]
             }]}
           >

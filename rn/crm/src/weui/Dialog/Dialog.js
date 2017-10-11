@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component, PropTypes} from 'react'
 import {
   Modal,
   View,
@@ -98,7 +98,7 @@ class Dialog extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.visible !== this.props.visible) {
       if (nextProps.visible) {
-        this.setState({ visible: true })
+        this.setState({visible: true})
         Animated.timing(
           this.state.fadeAnim,
           {
@@ -115,7 +115,7 @@ class Dialog extends Component {
             duration: this.props.duration || 200,
             easing: Easing.easeOut,
           }
-        ).start(() => this.setState({ visible: false }))
+        ).start(() => this.setState({visible: false}))
       }
     }
   }
@@ -176,9 +176,9 @@ class Dialog extends Component {
       >
         <TouchableWithoutFeedback onPress={onRequestClose}>
           <Animated.View
-            style={[styles.dialogWrapper, wrapperStyle, { opacity: this.state.fadeAnim }]}
+            style={[styles.dialogWrapper, wrapperStyle, {opacity: this.state.fadeAnim}]}
           >
-            <Animated.View style={{ opacity: this.state.fadeAnim }}>
+            <Animated.View style={{opacity: this.state.fadeAnim}}>
               <View style={[styles.dialog, style]}>
                 <View style={[styles.dialogHeader, headerStyle]}>
                   <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
