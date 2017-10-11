@@ -46,7 +46,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const hasRemark = (order) => (!!order.user_remark) || (!!order.store_remark)
+const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
 
 class OrderScene extends PureComponent {
 
@@ -192,9 +192,12 @@ class OrderScene extends PureComponent {
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
+        <View>
         { !!this.state.errorHints &&
         <Text style={{textAlign: 'center'}}>{this.state.errorHints}</Text>}
-        <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text></ScrollView>
+        <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text>
+        </View>
+      </ScrollView>
       : (
         <View style={[styles.container, {flex: 1}]}>
 
@@ -294,15 +297,18 @@ class OrderScene extends PureComponent {
               <Image style={styles.icon} source={navImgSource}/>
             </TouchableOpacity>
           </View>
-          {(order.user_remark && order.store_remark) &&
-          <Separator style={{backgroundColor: colors.color999}}/>}
 
-          {hasRemark(order) &&
-          <View style={[styles.row, {marginBottom: pxToDp(14), flexDirection: 'column'}]}>
+          {hasRemarkOrTax(order) &&
+          <View style={[styles.row, {marginBottom: pxToDp(14), marginTop: 0, flexDirection: 'column'}]}>
+            <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
             {!!order.user_remark &&
             <Remark label="客户备注" remark={order.user_remark}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
+            {!!order.invoice &&
+            <Remark label="发票抬头" remark={order.invoice}/>}
+            {!!order.taxer_id &&
+            <Remark label="税号" remark={order.taxer_id}/>}
           </View>}
 
         </View>
