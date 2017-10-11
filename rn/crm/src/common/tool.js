@@ -36,7 +36,7 @@ export function shortTimeDesc(datetime) {
 
   const dSeconds = nowMoment.unix() - dtMoment.unix();
   const dYear = nowMoment.year() - dtMoment.year();
-  
+
   if (dSeconds >= 0 && dSeconds < 60) {
     if (dSeconds < 10) {
       return '刚刚';
@@ -47,11 +47,11 @@ export function shortTimeDesc(datetime) {
     return Math.floor(dSeconds/60) + "分钟前";
     
   } else if (dYear === 0) {
-    const dDay = 0;
+    const dDay = nowMoment.dayOfYear() - dtMoment.dayOfYear();
     if (dDay <= 0 && dDay >= -1) {
       return (dDay === 0 ? '今天' : '明天') + dtMoment.format('HH:mm');
     } else {
-      return dtMoment.format("M月D日 HH:mm");
+      return dtMoment.format("M/D HH:mm");
     }
   } else {
     return dtMoment.format("YY/M/D H:i");

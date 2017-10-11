@@ -16,6 +16,7 @@ import Config from '../../config'
 import PropTypes from 'prop-types';
 import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
+import CommonStyle from '../../common/CommonStyles'
 
 /**
  * The actions we need
@@ -56,10 +57,11 @@ class OrderScene extends PureComponent {
     return {
       headerTitle: '订单详情',
       headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
-      headerTitleStyle: {color: '#111111',},
+      headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
       headerRight: (<View style={{flexDirection: 'row'}}>
         <NavigationItem
-          icon={require('../../img/Order/print.png')}
+          iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
+          icon={require('../../img/Order/print_.png')}
           onPress={() => {
 
           }}
@@ -233,16 +235,18 @@ class OrderScene extends PureComponent {
             paddingBottom: pxToDp(10),
             backgroundColor: '#fff',
             marginLeft: pxToDp(20), marginRight: pxToDp(20),
+            
             borderRadius: 4,
             borderWidth: 1,
             borderColor: '#ddd',
             shadowColor: '#000',
-            shadowOffset: {width: 4, height: 4},
-            shadowOpacity: 0.8,
+
+            shadowOffset: {width: -4, height: -4},
+            shadowOpacity: 0.75,
             shadowRadius: 4,
           }}>
-            <Button>联系配送</Button>
-            <Button type={'primary'}>提醒送达</Button>
+            <Button style={[styles.bottomBtn, {marginRight: pxToDp(5),}]} type={'primary'}>联系配送</Button>
+            <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}>提醒送达</Button>
           </View>
         </View>
       );
@@ -261,15 +265,15 @@ class OrderScene extends PureComponent {
     }
 
     const validPoi = order.loc_lng && order.loc_lat;
-    const navImgSource = validPoi ? require('../../img/Order/navi.png') : require('../../img/Order/navi_pressed.png')
+    const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png')
 
     return (<View>
-        <View style={{backgroundColor: '#fff'}}>
+        <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
             <View style={{flex: 1}}/>
-            <Image style={styles.icon} source={require('../../img/Order/talk.png')}/>
+            <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]} source={require('../../img/Order/message_.png')}/>
           </View>
           <Text style={[styles.row, {
             fontSize: pxToDp(30),
@@ -294,7 +298,7 @@ class OrderScene extends PureComponent {
             <CallBtn label={order.mobile}/>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={this.toMap}>
-              <Image style={styles.icon} source={navImgSource}/>
+              <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
             </TouchableOpacity>
           </View>
 
@@ -315,7 +319,7 @@ class OrderScene extends PureComponent {
 
         <OrderStatusCell order={order}/>
 
-        <View style={{marginTop: pxToDp(20), backgroundColor: colors.white}}>
+        <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
             marginRight: 0,
             alignItems: 'center',
@@ -395,9 +399,9 @@ class OrderScene extends PureComponent {
             <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')}</Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>
-            <View style={styles.moneyLeft}>
+            <View style={[styles.moneyLeft,{alignItems: 'center'}]} >
               <Text style={styles.moneyListTitle}>优惠</Text>
-              <TouchableOpacity><Icon name='question-circle-o'/></TouchableOpacity>
+              <TouchableOpacity style={{marginLeft: 5}}><Icon name='question-circle-o'/></TouchableOpacity>
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
@@ -405,7 +409,7 @@ class OrderScene extends PureComponent {
           <View style={[styles.row, styles.moneyRow]}>
             <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
               <Text style={styles.moneyListTitle}>用户已付</Text>
-              <Text style={{fontSize: pxToDp(22), flex: 1}}>含平台扣费、优惠等</Text>
+              <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
               <Text style={styles.moneyListSub}>微信支付</Text>
             </View>
             <View style={{flex: 1}}/>
@@ -417,6 +421,12 @@ class OrderScene extends PureComponent {
           <View style={[styles.row, styles.moneyRow]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
+              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent:'center'}]}>
+                <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
+                <Text>收款码</Text>
+                <Icon name='qrcode'/>
+                </Text>
+              </TouchableOpacity>
               {(order.additional_to_pay != 0) &&
               <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
             </View>
@@ -428,7 +438,7 @@ class OrderScene extends PureComponent {
           }
         </View>
 
-        <View style={{marginTop: pxToDp(20), backgroundColor: colors.white,}}>
+        <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
             marginRight: 0, alignItems: 'center',
             paddingBottom: pxToDp(16), paddingTop: pxToDp(16), marginTop: 0, marginBottom: pxToDp(12)
@@ -536,7 +546,7 @@ const top_styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.back_color,
+    backgroundColor: 'transparent',
   },
   icon: {
     width: pxToDp(74),
@@ -584,7 +594,7 @@ const styles = StyleSheet.create({
     color: colors.main_color,
   },
   moneyListNum: {
-    fontSize: pxToDp(22),
+    fontSize: pxToDp(26),
     color: colors.color777,
   },
   buyButton: {
@@ -607,13 +617,12 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     backgroundColor: 'white'
   },
-
-  stepCircle: {
-    borderRadius: pxToDp(10),
-    width: pxToDp(20),
-    height: pxToDp(20),
-    position: 'absolute',
-    top: pxToDp(178),
+  bottomBtn: {
+    height: pxToDp(70), flex: 1, alignItems: 'center', justifyContent: 'center'
+  },
+  block: {
+    marginTop: pxToDp(10),
+    backgroundColor: colors.white,
   }
 });
 
