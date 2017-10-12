@@ -326,15 +326,15 @@ class RemindScene extends PureComponent {
 
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
-  }
+  };
 
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
-  }
+  };
 
   _keyExtractor = (item) => {
     return item.id.toString();
-  }
+  };
 
   render() {
     const {remind} = this.props;

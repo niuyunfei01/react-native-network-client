@@ -90,7 +90,7 @@ const Tab = TabNavigator(
         },
     },
     {
-        initialRouteName: 'Mine',
+        // initialRouteName: 'Mine',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,

@@ -9,11 +9,10 @@
 //import liraries
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, StatusBar, Image, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
-import { Heading1, Heading2, Paragraph } from '../../widget/Text'
-import { screen, system, tool } from '../../common'
-import { color, DetailCell, NavigationItem, SpacingView } from '../../widget'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Button from 'react-native-vector-icons/Entypo';
 
 // create a component
 class MyScene extends PureComponent {
@@ -35,7 +34,7 @@ class MyScene extends PureComponent {
 
         setTimeout(() => {
             this.setState({ isRefreshing: false })
-        }, 2000);
+        }, 1000);
     }
 
     renderHeader() {
@@ -43,12 +42,15 @@ class MyScene extends PureComponent {
             <View style={header_styles.container}>
                 <View style={[header_styles.main_box]}>
                     <Text style={header_styles.shop_name}>我是店名</Text>
-                    <Text style={header_styles.change_shop}>切换门店</Text>
+                    <TouchableOpacity style={{flexDirection: 'row'}} >
+                        <Icon name='exchange' style={header_styles.change_shop} />
+                        <Text style={header_styles.change_shop}> 切换门店</Text>
+                    </TouchableOpacity>
                 </View>
-                <View style={[header_styles.icon_box]}>
-                    <Image style={[header_styles.icon_open]} source={require('../../img/Mine/avatar.png')} />
+                <TouchableOpacity style={[header_styles.icon_box]}>
+                    <Image style={[header_styles.icon_open]} source={require('../../img/My/open_.png')} />
                     <Text style={header_styles.open_text}>营业中</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={[header_styles.sales_box]}>
                     <Text style={[header_styles.sale_text]}>进入成功交易订单: 50</Text>
                     <Text style={[header_styles.sales_money, header_styles.sale_text]}>营业额: ¥ 3800.00</Text>
@@ -63,45 +65,22 @@ class MyScene extends PureComponent {
                 <View>
                     <Image style={[worker_styles.icon_head]} source={require('../../img/Mine/avatar.png')} />
                 </View>
-                <View style={[worker_styles.main_box]}>
+                <View style={[worker_styles.worker_box]}>
+                    {/*姓名需截取取多四个字*/}
                     <Text style={worker_styles.worker_name}>我是姓名</Text>
-                    <Text style={worker_styles.job}>我是职位</Text>
+                    <Text style={worker_styles.job}>职位</Text>
                 </View>
-                <View style={[worker_styles.main_box]}>
-                    <Text style={worker_styles.order_num}>10000</Text>
+                <View style={[worker_styles.order_box]}>
+                    <Text style={worker_styles.order_num}>666</Text>
                     <Text style={[worker_styles.tips_text]}>完成订单数</Text>
                 </View>
-                <View style={[worker_styles.main_box]}>
-                    <Text style={worker_styles.order_num}>100</Text>
+                <View style={[worker_styles.question_box]}>
+                    <Text style={worker_styles.order_num}>88</Text>
                     <Text style={[worker_styles.tips_text]}>问题订单</Text>
                 </View>
-            </View>
-        )
-    }
-
-    renderBlock () {
-        return (
-            <View style={[block_styles.container]}>
-                <View style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </View>
-                <View style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </View>
-                <View style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </View>
-                <View style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </View>
-                <View style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </View>
+                <TouchableOpacity style={[worker_styles.chevron_right]}>
+                    <Button name='chevron-thin-right' style={worker_styles.right_btn} />
+                </TouchableOpacity>
             </View>
         )
     }
@@ -122,14 +101,46 @@ class MyScene extends PureComponent {
             </ScrollView>
         );
     }
-}
 
-class blockItem extends PureComponent {
-    render() {
+    renderBlock () {
         return (
-            <View>
-                <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                <Text style={[block_styles.block_name]}>预留功能</Text>
+            <View style={[block_styles.container]}>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -157,17 +168,12 @@ const header_styles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: pxToDp(30),
         lineHeight: pxToDp(36),
-        // borderWidth: pxToDp(1),
-        // borderColor: colors.color999,
-        // paddingVertical: pxToDp(30),
     },
     change_shop: {
         color: colors.main_color,
         fontSize: pxToDp(34),
         fontWeight: 'bold',
         lineHeight: pxToDp(34),
-        // borderWidth: pxToDp(1),
-        // borderColor: colors.color999,
     },
     icon_box: {
         position: 'absolute',
@@ -210,46 +216,69 @@ const worker_styles = StyleSheet.create({
         borderTopWidth: pxToDp(1),
         borderBottomWidth: pxToDp(1),
         borderColor: colors.color999,
-        // paddingHorizontal: pxToDp(30),
         backgroundColor: colors.white,
-        marginBottom: pxToDp(14),
+        marginBottom: pxToDp(7),
+        height: pxToDp(140),
         flexDirection: 'row',
     },
-    main_box: {
-        borderWidth: pxToDp(1),
-        borderColor: 'red',
+    worker_box: {
+        marginLeft: pxToDp(5),
+        width: pxToDp(130),
     },
     worker_name: {
         color: colors.title_color,
         fontSize: pxToDp(30),
         lineHeight: pxToDp(30),
         fontWeight: 'bold',
-        marginVertical: pxToDp(30),
+        marginTop: pxToDp(30),
     },
     job: {
         color: '#555',
         fontSize: pxToDp(30),
         lineHeight: pxToDp(30),
         fontWeight: 'bold',
+        marginTop: pxToDp(25),
     },
     icon_head: {
         marginHorizontal: pxToDp(30),
-        marginVertical: pxToDp(30),
+        marginVertical: pxToDp(25),
         width: pxToDp(90),
         height: pxToDp(90),
+        borderRadius: pxToDp(50),
+    },
+    order_box: {
+        marginLeft: pxToDp(30),
+        justifyContent: 'center',
+    },
+    question_box: {
+        marginLeft: pxToDp(60),
+        justifyContent: 'center',
     },
     order_num: {
         color: colors.title_color,
         fontSize: pxToDp(40),
         lineHeight: pxToDp(40),
         fontWeight: 'bold',
+        textAlign: 'center',
     },
     tips_text: {
         color: colors.color999,
         fontSize: pxToDp(24),
         lineHeight: pxToDp(24),
+        textAlign: 'center',
+        marginTop: pxToDp(16),
     },
-
+    chevron_right: {
+        position: 'absolute',
+        right: pxToDp(30),
+        top: pxToDp(50),
+    },
+    right_btn: {
+        fontSize: pxToDp(40),
+        textAlign: 'center',
+        width: pxToDp(50),
+        height: pxToDp(50),
+    },
 });
 
 const block_styles = StyleSheet.create({
@@ -258,13 +287,8 @@ const block_styles = StyleSheet.create({
         marginBottom: pxToDp(7),
         flexDirection: 'row',
         flexWrap: 'wrap',
-
-        // borderWidth: pxToDp(1),
-        // borderColor: 'red',
     },
     block_box: {
-        // borderWidth: pxToDp(1),
-        // borderColor: 'red',
         width: pxToDp(210),
         height: pxToDp(156),
         backgroundColor: colors.white,
@@ -279,7 +303,7 @@ const block_styles = StyleSheet.create({
         height: pxToDp(90),
     },
     block_name: {
-        color: colors.color999,
+        color: colors.color333,
         fontSize: pxToDp(24),
         lineHeight: pxToDp(24),
         textAlign: 'center',
