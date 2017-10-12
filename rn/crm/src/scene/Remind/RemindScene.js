@@ -265,7 +265,7 @@ class RemindScene extends PureComponent {
   renderItem(remind) {
     let {item, index} = remind;
     return (
-      <RemindItem item={item} index={index} onPressDropdown={this.onPressDropdown.bind(this)}
+      <RemindItem item={item} index={index} key={index} onPressDropdown={this.onPressDropdown.bind(this)}
                   onPress={this.onPress.bind(this)}/>
     );
   }
@@ -326,15 +326,15 @@ class RemindScene extends PureComponent {
 
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
-  }
+  };
 
   _getItemLayout = (data, index) => {
     return {length: pxToDp(250), offset: pxToDp(250) * index, index}
-  }
+  };
 
   _keyExtractor = (item) => {
     return item.id.toString();
-  }
+  };
 
   render() {
     const {remind} = this.props;
@@ -443,7 +443,7 @@ class RemindItem extends React.PureComponent {
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
-                {item.quick ? <Image style={[top_styles.icon_ji]}
+                {item.quick == 1 ? <Image style={[top_styles.icon_ji]}
                                      source={require('../../img/Remind/quick.png')}/> : null}
                 <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
@@ -486,7 +486,7 @@ class RemindItem extends React.PureComponent {
               <View>
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
-              <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>
+              {item.expect_end_time != '' ? <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/> : null}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
               </View>

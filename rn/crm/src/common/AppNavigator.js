@@ -6,7 +6,8 @@ import color from '../widget/color'
 import TabBarItem from '../widget/TabBarItem'
 
 import RemindScene from '../scene/Remind/RemindScene'
-import MineScene from '../scene/Mine/MineScene'
+//import MineScene from '../scene/Mine/MineScene'
+import MyScene from '../scene/Mine/MyScene';
 import OrderScene from '../scene/Order/OrderScene'
 import LoginScene from '../scene/Login/LoginScene'
 import GoodsScene from '../scene/Goods/GoodsScene'
@@ -74,7 +75,7 @@ const Tab = TabNavigator(
 
 
         Mine: {
-            screen: MineScene,
+            screen: MyScene,
             navigationOptions: ({navigation}) => ({
                 tabBarLabel: '我的',
                 tabBarIcon: ({focused, tintColor}) => (
@@ -89,6 +90,7 @@ const Tab = TabNavigator(
         },
     },
     {
+        // initialRouteName: 'Mine',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,
