@@ -1,5 +1,8 @@
 package cn.cainiaoshicai.crm.domain;
 
+import android.os.Bundle;
+import android.text.TextUtils;
+
 import java.util.List;
 
 /**
@@ -14,6 +17,7 @@ public class Vendor {
     private String contact_name;
     private String version;
     private int service_uid;
+    private String support_tel = "010-80747218";
     private List<Long> service_mgr;
     private List<Long> store_mgr;
     private List<Long> store_vice_mgr;
@@ -99,5 +103,27 @@ public class Vendor {
 
     public boolean isStoreViceMgr(long currUid) {
         return this.store_vice_mgr != null && this.store_vice_mgr.contains(currUid);
+    }
+
+    public String getSupport_tel() {
+        return support_tel;
+    }
+
+    public void setSupport_tel(String support_tel) {
+        this.support_tel = support_tel;
+    }
+
+    public Bundle toBundle() {
+        Bundle b = new Bundle();
+        b.putString("id", String.valueOf(id));
+        b.putString("creator", String.valueOf(creator));
+        b.putString("brand_name", brand_name);
+        b.putString("contact_name", contact_name);
+        b.putString("version", version);
+        b.putString("service_uid", String.valueOf(service_uid));
+        b.putString("service_mgr", TextUtils.join(",", this.service_mgr.toArray()));
+        b.putString("support_tel", this.support_tel);
+
+        return b;
     }
 }

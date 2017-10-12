@@ -19,7 +19,15 @@ import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
+import java.util.Collection;
+import java.util.HashMap;
+
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Vendor;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.UserBean;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 
 
 public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
@@ -51,8 +59,50 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 toRoute = "Order";
             }
         }
+
+        AccountBean ab = GlobalCtx.app().getAccountBean();
+        if (ab != null) {
+            UserBean user = ab.getInfo();
+
+            Bundle userB = new Bundle();
+            userB.putString("cover_image", user.getCover_image());
+            userB.putString("remark", user.getRemark());
+            userB.putString("sex", user.getSex());
+            userB.putString("mobilephone", user.getMobilephone());
+            userB.putString("id", user.getId());
+            userB.putString("screen_name", user.getScreen_name());
+            userB.putString("name", user.getName());
+            userB.putString("province", user.getProvince());
+            userB.putString("city", user.getCity());
+            userB.putString("location", user.getLocation());
+            userB.putString("description", user.getDescription());
+            userB.putString("prefer_store", String.valueOf(user.getPrefer_store()));
+
+            init.putBundle("userProfile", userB);
+        }
+
+
+        Collection<Store> stores = GlobalCtx.app().listStores();
+
+        Bundle storesB = new Bundle();
+
+        if (stores != null) {
+            for(Store s : stores) {
+                storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
+            }
+        }
+        init.putBundle("canReadStores", storesB);
+
+        Bundle storesV = new Bundle();
+        Vendor vendor = GlobalCtx.app().getVendor();
+        if (vendor != null){
+            storesV.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
+        }
+        init.putBundle("canReadVendors", storesV);
+
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
+        init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));
         init.putString("_action", toRoute);
         if (!TextUtils.isEmpty(nextRoute)) {
             init.putString("_next_action", nextRoute);

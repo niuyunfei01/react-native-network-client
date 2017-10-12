@@ -52,10 +52,10 @@ getOrder(sessionToken, orderId, callback) {
         const ok = json && json.id === orderId;
         callback(ok, ok ? json : "返回数据错误")
       }).catch((error) => {
-      dispatch(getOrderFailure(error))
-      console.log('getOrder error:', error)
-      callback(false, "网络错误, 请稍后重试")
-    });
+        dispatch(getOrderFailure(error))
+        console.log('getOrder error:', error)
+        callback(false, "网络错误, 请稍后重试")
+      });
   }
 }
 

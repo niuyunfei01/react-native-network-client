@@ -9,6 +9,9 @@ export default keyMirror({
   SESSION_TOKEN_FAILURE: null,
   LOGIN_PROFILE_SUCCESS: null,
 
+  SET_CURR_STORE: null,
+  UPDATE_CFG: null,
+
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
 

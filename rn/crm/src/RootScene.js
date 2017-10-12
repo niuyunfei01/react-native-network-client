@@ -16,7 +16,7 @@ import {Provider} from 'react-redux'
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
-import {setAccessToken} from './reducers/global/globalActions'
+import {setAccessToken, setCurrentStore, setUserProfile, updateCfg} from './reducers/global/globalActions'
 
 import configureStore from "./common/configureStore";
 import AppNavigator from './common/AppNavigator'
@@ -72,18 +72,21 @@ class RootScene extends PureComponent {
 
     }
 
-    componentWillMount() {
-        const launchProps = this.props.launchProps;
+  componentWillMount() {
+    const launchProps = this.props.launchProps;
 
-        this.store = configureStore(function(store){
-            const accessToken = launchProps['access_token'];
-            if (accessToken) {
-                store.dispatch(setAccessToken({access_token: accessToken}));
-                store.dispatch(setPlatform('android'))
-            }
-            this.setState({rehydrated: true});
-        }.bind(this));
-    }
+    this.store = configureStore(function (store) {
+      const {access_token, currStoreId, userProfile, canReadStores, canReadVendors } = launchProps;
+      if (access_token) {
+        store.dispatch(setAccessToken({access_token}));
+        store.dispatch(setPlatform('android'))
+        store.dispatch(setUserProfile(userProfile))
+        store.dispatch(setCurrentStore(currStoreId))
+        store.dispatch(updateCfg({canReadStores, canReadVendors}))
+      }
+      this.setState({rehydrated: true});
+    }.bind(this));
+  }
 
     render() {
 

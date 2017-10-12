@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.domain;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 
 /**
@@ -12,6 +13,8 @@ public class Store {
     private String tel;
     private float location_long;
     private float location_lat;
+    private String loc_lng;
+    private String loc_lat;
     private boolean shipCapable;
     private int type;
     private String vendor;
@@ -72,5 +75,18 @@ public class Store {
     public String namePrefixVendor() {
         String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
         return vendorName + this.getName();
+    }
+
+    public Bundle toBundle() {
+        Bundle b = new Bundle();
+        b.putString("name", name);
+        b.putString("loc_lng", loc_lng);
+        b.putString("loc_lat", loc_lat);
+        b.putString("mobile", mobile);
+        b.putString("tel", tel);
+        b.putString("vendor", vendor);
+        b.putBoolean("shipCapable", shipCapable);
+        b.putString("id", String.valueOf(id));
+        return b;
     }
 }
