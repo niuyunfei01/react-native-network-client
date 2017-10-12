@@ -77,7 +77,8 @@ class RemindScene extends PureComponent {
       dataSource: [],
       showStopRemindDialog: false,
       showDelayRemindDialog: false,
-      opRemind: {}
+      opRemind: {},
+      localState: {}
     };
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
@@ -118,9 +119,23 @@ class RemindScene extends PureComponent {
 
   onPress(route, params) {
     let self = this;
-    InteractionManager.runAfterInteractions(() => {
-      self.props.navigation.navigate(route, params);
-    });
+    let orderId = self.state.localState.orderId;
+    if (!orderId) {
+      InteractionManager.runAfterInteractions(() => {
+        self.setState({
+          localState: {
+            orderId: orderId
+          }
+        });
+        self.props.navigation.navigate(route, params);
+      }, () => {
+        self.setState({
+          localState: {
+            orderId: ''
+          }
+        });
+      });
+    }
   }
 
   onPressDropdown(key, id, type) {
@@ -423,9 +438,8 @@ class RemindItem extends React.PureComponent {
   render() {
     let {item, index, onPressDropdown, onPress} = this.props;
     return (
-      <View style={top_styles.container}>
-        <TouchableOpacity onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})}
-                          activeOpacity={0.9}>
+      <TouchableOpacity onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})} activeOpacity={0.6}>
+        <View style={top_styles.container}>
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
@@ -483,8 +497,8 @@ class RemindItem extends React.PureComponent {
               </View>
             </View>
           </View>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
     );
   }
 }

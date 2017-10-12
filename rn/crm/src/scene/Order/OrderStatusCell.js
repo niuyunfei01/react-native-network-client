@@ -10,6 +10,7 @@ import colors from "../../styles/colors";
 import _ from 'underscore'
 import moment from 'moment'
 import Cts from '../../Cts'
+import Styles from '../../common/CommonStyles'
 
 
 class OrderStatusCell extends PureComponent {
@@ -32,9 +33,9 @@ class OrderStatusCell extends PureComponent {
     const invalidStyle = order.orderStatus == Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
     console.log("invalidStyle", order.orderStatus == Cts.ORDER_STATUS_INVALID);
 
-    return <View style={{marginTop: pxToDp(20), backgroundColor:'#f0f9ef'}}>
+    return <View style={[Styles.topBottomLine, {marginTop: pxToDp(10), backgroundColor:'#f0f9ef'}]}>
       <View style={styles.row}>
-        <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: '200'}]}>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
+        <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: 'bold'}]}>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
         <View style={{flex: 1}}/>
 
         <CallBtn label={order.store_name}/>
@@ -43,12 +44,12 @@ class OrderStatusCell extends PureComponent {
       <View style={styles.row}>
         <Text style={[invalidStyle, {color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
         <View style={{flex: 1}}/>
-        <Text style={[invalidStyle, ]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
+        <Text style={[invalidStyle, {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
         <Text style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
         <View style={{flex: 1}}/>
-        <Text style={[invalidStyle, ]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
+        <Text style={[invalidStyle, {color: colors.color666}]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
       </View>
 
       <View style={{ backgroundColor: colors.white, flexDirection: 'row',
@@ -80,7 +81,7 @@ class OrderStep extends PureComponent {
 
     return <View style={{flexDirection: 'column', flex: 1, alignItems:'center'}}>
       <View style={{backgroundColor: bgColor , height: pxToDp(4), width: '100%', marginBottom: pxToDp(18)}}/>
-      <Text style={[styles.stepText, {color: bgColor}]}>{statusTxt}</Text>
+      <Text style={[styles.stepText, {color: bgColor, fontSize: pxToDp(26)}]}>{statusTxt}</Text>
       { !!workerNames &&
       <Text style={styles.stepText}>{workerNames}</Text>}
       { !!timeAtStr &&
@@ -113,11 +114,12 @@ const styles = StyleSheet.create({
     width:pxToDp(20),
     height:pxToDp(20),
     position: 'absolute',
-    top: pxToDp(178),
+    top: pxToDp(188),
   },
   stepText: {
     textAlign: 'center',
     color: colors.color999,
+    fontSize: pxToDp(24)
   },
 });
 
