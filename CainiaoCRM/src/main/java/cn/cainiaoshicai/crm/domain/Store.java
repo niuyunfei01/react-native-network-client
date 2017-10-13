@@ -16,6 +16,8 @@ public class Store {
     private String loc_lng;
     private String loc_lat;
     private boolean shipCapable;
+    private String cloudPrinter;
+    private boolean cloudPrinterWorking;
     private int type;
     private String vendor;
 
@@ -72,6 +74,22 @@ public class Store {
         this.vendor = vendor;
     }
 
+    public String getCloudPrinter() {
+        return cloudPrinter;
+    }
+
+    public void setCloudPrinter(String cloudPrinter) {
+        this.cloudPrinter = cloudPrinter;
+    }
+
+    public boolean isCloudPrinterWorking() {
+        return cloudPrinterWorking;
+    }
+
+    public void setCloudPrinterWorking(boolean cloudPrinterWorking) {
+        this.cloudPrinterWorking = cloudPrinterWorking;
+    }
+
     public String namePrefixVendor() {
         String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
         return vendorName + this.getName();
@@ -85,7 +103,9 @@ public class Store {
         b.putString("mobile", mobile);
         b.putString("tel", tel);
         b.putString("vendor", vendor);
+        b.putString("cloudPrinter", this.cloudPrinter);
         b.putBoolean("shipCapable", shipCapable);
+        b.putBoolean("cloudPrinterWorking", cloudPrinterWorking);
         b.putString("id", String.valueOf(id));
         return b;
     }

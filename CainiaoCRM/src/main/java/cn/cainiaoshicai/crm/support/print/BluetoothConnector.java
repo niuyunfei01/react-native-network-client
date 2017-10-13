@@ -54,6 +54,11 @@ public class BluetoothConnector {
                 success = bluetoothSocket.isConnected();
                 break;
             } catch (IOException e) {
+
+                if (bluetoothSocket != null) {
+                    bluetoothSocket.close();
+                }
+
                 //try the fallback
                 try {
                     bluetoothSocket = new FallbackBluetoothSocket(bluetoothSocket.getUnderlyingSocket());
@@ -63,6 +68,9 @@ public class BluetoothConnector {
                     break;  
                 } catch (Exception e1) {
                     Log.w("BT", "Fallback failed. Cancelling.", e1);
+                    if (bluetoothSocket != null) {
+                        bluetoothSocket.close();
+                    }
                     CrashReportHelper.handleUncaughtException(null, e1);
                 }
             }

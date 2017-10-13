@@ -4,13 +4,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
+
 /**
  * User: qii
  * Date: 12-11-28
  */
 public class SettingHelper {
 
-    private static boolean USE_PREVIEW_HOST = false;
+    private static final String USE_PREVIEW_HOST = "use_preview_host";
     private static SharedPreferences.Editor editor = null;
     private static SharedPreferences sharedPreferences = null;
 
@@ -81,10 +83,10 @@ public class SettingHelper {
     }
 
     public static void setUserPreviewHost(boolean isChecked) {
-        SettingHelper.USE_PREVIEW_HOST = isChecked;
+        setEditor(GlobalCtx.app(), USE_PREVIEW_HOST, isChecked ? "1" : "0");
     }
 
     public static boolean usePreviewHost() {
-        return USE_PREVIEW_HOST;
+        return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_PREVIEW_HOST, "0"));
     }
 }

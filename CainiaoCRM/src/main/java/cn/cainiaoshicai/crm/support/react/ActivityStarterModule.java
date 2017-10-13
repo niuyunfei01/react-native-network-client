@@ -1,8 +1,10 @@
 package cn.cainiaoshicai.crm.support.react;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
@@ -14,6 +16,9 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableNativeArray;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 
@@ -21,10 +26,22 @@ import javax.annotation.Nonnull;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.print.BasePrinter;
+import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 
 /**
@@ -115,6 +132,37 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             callback.invoke(activity.getClass().getSimpleName());
+        }
+    }
+
+    @ReactMethod
+    void printBtPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        final Order o = gson.fromJson(orderJson, new TypeToken<Order>() {
+        }.getType());
+
+        ReactApplicationContext ctx = this.getReactApplicationContext();
+
+        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+        if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
+            Intent intent = new Intent(ctx, SettingsPrintActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ctx.startActivity(intent, new Bundle());
+            callback.invoke(false, "打印机未连接");
+        } else {
+            new MyAsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    OrderPrinter._print(o, false, new BasePrinter.PrintCallback() {
+                        @Override
+                        public void run(boolean result, String desc) {
+                            callback.invoke(result, desc);
+                        }
+                    });
+                    return null;
+                }
+            }.executeOnNormal();
         }
     }
 

@@ -280,7 +280,7 @@ public class OrderPrinter {
      * @param isAutoPrint
      * @param printedCallback
      */
-    private static void _print(final Order order, final boolean isAutoPrint, final BasePrinter.PrintCallback printedCallback) {
+    public static void _print(final Order order, final boolean isAutoPrint, final BasePrinter.PrintCallback printedCallback) {
 
         if (order == null || order.getId() <=0 ) {
             AppLogger.e("order is null, skip print!");

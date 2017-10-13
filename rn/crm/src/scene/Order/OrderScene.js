@@ -9,7 +9,7 @@
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
-import { screen, system } from '../../common'
+import { screen, system, native } from '../../common'
 import {bindActionCreators} from "redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from '../../config'
@@ -30,6 +30,7 @@ import {Button, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
 import {ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import ModalDropdown from 'react-native-modal-dropdown';
+import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 const numeral = require('numeral')
 
@@ -61,9 +62,7 @@ class OrderScene extends PureComponent {
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
-          onPress={() => {
-
-          }}
+          onPress={() => {params.onPrint()}}
         />
         <ModalDropdown
           options={['暂停提示', '强制关闭', '修改地址']}
@@ -100,10 +99,11 @@ class OrderScene extends PureComponent {
     this.goToSetMap = this.goToSetMap.bind(this)
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this)
     this.onToggleMenuOption = this.onToggleMenuOption.bind(this)
+    this.onPrint = this.onPrint.bind(this)
   }
 
   componentDidMount() {
-    this.props.navigation.setParams({onToggleMenuOption: this.onToggleMenuOption});
+    this.props.navigation.setParams({onToggleMenuOption: this.onToggleMenuOption, onPrint: this.onPrint});
   }
 
   componentWillMount() {
@@ -114,6 +114,23 @@ class OrderScene extends PureComponent {
     const order = this.props.order.order;
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
+    }
+  }
+
+  onPrint() {
+
+    const stores = this.props.global.canReadStores;
+    const order = this.props.order.order;
+
+
+    const store = stores[order.store_id];
+
+    console.log('print on stores', store, "order:", order.id)
+
+    if (store && store.cloudPrinter) {
+      this.setState({showPrinterChooser: true})
+    } else {
+      this._doBluetoothPrint()
     }
   }
 
@@ -156,6 +173,31 @@ class OrderScene extends PureComponent {
         this.setState(state)
       })
     }
+  }
+
+  _hidePrinterChooser () {
+    console.log('_hidePrinterChooser');
+  }
+  
+  _cloudPrinterSN () {
+    const stores = this.props.global.canReadStores;
+    const order = this.props.order.order;
+
+    const store = stores[order.id];
+    const printerName = (store && store.cloudPrinter) ? store.cloudPrinter : '未知';
+    return `云打印(${printerName})`;
+  }
+
+  _doCloudPrint() {
+    console.log('_doCloudPrint')
+  }
+
+  _doBluetoothPrint() {
+    console.log('_doBluetoothPrint')
+    const order = this.props.order.order;
+    native.printBtPrinter(order, (ok, msg) => {
+      console.log("printer result:", ok, msg)
+    })
   }
 
   _onLogin() {
@@ -208,12 +250,31 @@ class OrderScene extends PureComponent {
           {this.state.showOptionMenu &&
           <TouchableOpacity style={[top_styles.icon_dropDown]}>
           </TouchableOpacity>}
-
-          <Dialog onRequestClose={() => {
-          }}
+          <ActionSheet
+            visible={this.state.showPrinterChooser}
+            onRequestClose={() => this._hidePrinterChooser()}
+            menus={[
+              {
+                type: 'default',
+                label: this._cloudPrinterSN(),
+                onPress: this._doCloudPrint.bind(this),
+              }, {
+                type: 'default',
+                label: '蓝牙打印',
+                onPress: this._doBluetoothPrint.bind(this),
+              }
+            ]}
+            actions={[
+              {
+                type: 'default',
+                label: '取消',
+                onPress: this._hidePrinterChooser.bind(this),
+              }
+            ]}
+          />
+          <Dialog onRequestClose={() => {}}
                   visible={this.state.gotoEditPoi}
-                  buttons={[
-                    {
+                  buttons={[{
                       type: 'warn',
                       label: '去设置',
                       onPress: this.goToSetMap,
