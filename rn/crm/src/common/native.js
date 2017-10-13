@@ -19,9 +19,15 @@ export async function toGoods() {
     NativeModules.ActivityStarter.navigateToGoods());
 }
 
-export async function setCurrStoreId(storeId) {
+/**
+ *
+ * @param storeId
+ * @param callback (ok, msg) => {}
+ * @returns {Promise.<void>}
+ */
+export async function setCurrStoreId(storeId, callback = function(){}) {
   await (NativeModules.ActivityStarter &&
-    NativeModules.ActivityStarter.setCurrStoreId(storeId));
+    NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
 }
 
 export async function logout() {
