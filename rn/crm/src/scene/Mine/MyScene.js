@@ -14,6 +14,22 @@ import pxToDp from "../../util/pxToDp";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-vector-icons/Entypo';
 import Config from '../../config';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from '../../reducers/global/globalActions';
+import * as mineActions from '../../reducers/mine/mineActions';
+import {Dialog, ActionSheet} from "../../weui/index";
+import * as native from "../../common/native";
+import {ToastShort} from '../../util/ToastUtils';
+
+function mapStateToProps(state) {
+    const {worker_info, global} = state;
+    return {worker_info: worker_info, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+    return {...bindActionCreators({...mineActions, ...globalActions}, dispatch)}
+}
 
 // create a component
 class MyScene extends PureComponent {
@@ -21,13 +37,89 @@ class MyScene extends PureComponent {
 
     constructor(props: Object) {
         super(props);
+        const {
+            currentUser,
+            currStoreId,
+            accessToken,
+            currentUserProfile,
+            canReadStores,
+            canReadVendors,
+        } = this.props.global;
+
+        const {
+            prefer_store,
+            screen_name,
+            mobilephone,
+            sex,
+            cover_image,
+        } = this.props.global.currentUserProfile;
+
+        let self_ = this;
+        let storeActionSheet = [];
+        for(let idx in canReadStores){
+            if (canReadStores.hasOwnProperty(idx)) {
+                let store = canReadStores[idx];
+                // console.log(idx," ==>",store);
+                let item = {
+                    type: 'default',
+                    label: store.name,
+                    onPress: () => self_._doChangeStore(store.id),
+                };
+                storeActionSheet.push(item);
+            }
+        }
 
         this.state = {
-            isRefreshing: false
+            isRefreshing: false,
+            currStoreId: currStoreId,
+            canReadStores: canReadStores,
+            prefer_store: prefer_store,
+            screen_name: screen_name,
+            mobile_phone: mobilephone,
+            currStoreName: canReadStores[currStoreId]['name'],
+            cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
+            canReadVendors: canReadVendors,
+
+            showChangeStoreDialog: false,
+            storeActionSheet: storeActionSheet,
         };
+
+        this._doChangeStore = this._doChangeStore.bind(this);
+        this._hideStoreDialog = this._hideStoreDialog.bind(this);
     }
 
     componentWillMount() {
+    }
+
+    componentWillReceiveProps() {
+        const {
+            currentUser,
+            currStoreId,
+            accessToken,
+            currentUserProfile,
+            canReadStores,
+            canReadVendors,
+        } = this.props.global;
+
+        const {
+            prefer_store,
+            screen_name,
+            mobilephone,
+            sex,
+            cover_image,
+        } = this.props.global.currentUserProfile;
+
+        this.setState({
+            currStoreId: currStoreId,
+            canReadStores: canReadStores,
+            prefer_store: prefer_store,
+            screen_name: screen_name,//员工姓名
+            mobile_phone: mobilephone,
+            currStoreName: canReadStores[currStoreId]['name'],
+            cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
+            canReadVendors: canReadVendors,
+        });
+        // console.log('state => ', this.state);
     }
 
     onHeaderRefresh() {
@@ -38,12 +130,38 @@ class MyScene extends PureComponent {
         }, 1000);
     }
 
+    onPressChangeStore() {
+        // this._showStoreDialog();
+        this.setState({
+            showChangeStoreDialog: true,
+        });
+    }
+
+    _doChangeStore(store_id) {
+        console.log('store_id -----------> ', store_id);
+        // native.setCurrStoreId(store_id, function (ok, msg) {
+        //     if(!ok){
+        //         ToastShort(msg);
+        //     }
+        //     this._hideStoreDialog();
+        // });
+    }
+
+    _hideStoreDialog() {
+        this.setState({
+            showChangeStoreDialog: false,
+        });
+    }
+
     renderHeader() {
         return (
             <View style={header_styles.container}>
                 <View style={[header_styles.main_box]}>
-                    <Text style={header_styles.shop_name}>我是店名</Text>
-                    <TouchableOpacity style={{flexDirection: 'row'}} >
+                    <Text style={header_styles.shop_name}>{this.state.currStoreName}</Text>
+                    <TouchableOpacity
+                        style={{flexDirection: 'row'}}
+                        onPress={this.onPressChangeStore.bind(this)}
+                    >
                         <Icon name='exchange' style={header_styles.change_shop} />
                         <Text style={header_styles.change_shop}> 切换门店</Text>
                     </TouchableOpacity>
@@ -52,32 +170,45 @@ class MyScene extends PureComponent {
                     <Image style={[header_styles.icon_open]} source={require('../../img/My/open_.png')} />
                     <Text style={header_styles.open_text}>营业中</Text>
                 </View>
-                <View style={[header_styles.sales_box]}>
-                    <Text style={[header_styles.sale_text]}>今日成功交易订单: 50</Text>
-                    <Text style={[header_styles.sales_money, header_styles.sale_text]}>营业额: ¥ 3800.00</Text>
-                </View>
             </View>
         )
     }
 
+    /*renderWorker() {
+        return (
+            <View style={worker_styles.container}>
+                <View>
+                    <Image style={[worker_styles.icon_head]} source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/Mine/avatar.png')} />
+                </View>
+                <View style={[worker_styles.worker_box]}>
+                    <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
+                </View>
+                <View style={[worker_styles.sales_box]}>
+                    <Text style={[worker_styles.sale_text]}>今日订单: 500</Text>
+                    <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥3800.00</Text>
+                </View>
+                <TouchableOpacity style={[worker_styles.chevron_right]}>
+                    <Button name='chevron-thin-right' style={worker_styles.right_btn} />
+                </TouchableOpacity>
+            </View>
+        )
+    }*/
     renderWorker() {
         return (
             <View style={worker_styles.container}>
                 <View>
-                    <Image style={[worker_styles.icon_head]} source={require('../../img/Mine/avatar.png')} />
+                    <Image style={[worker_styles.icon_head]} source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/Mine/avatar.png')} />
                 </View>
                 <View style={[worker_styles.worker_box]}>
-                    {/*姓名需截取取多四个字*/}
-                    <Text style={worker_styles.worker_name}>我是姓名</Text>
-                    <Text style={worker_styles.job}>职位</Text>
+                    <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
                 </View>
                 <View style={[worker_styles.order_box]}>
-                    <Text style={worker_styles.order_num}>666</Text>
-                    <Text style={[worker_styles.tips_text]}>完成订单数</Text>
+                    <Text style={worker_styles.order_num}>12</Text>
+                    <Text style={[worker_styles.tips_text]}>出勤天数</Text>
                 </View>
                 <View style={[worker_styles.question_box]}>
-                    <Text style={worker_styles.order_num}>88</Text>
-                    <Text style={[worker_styles.tips_text]}>问题订单</Text>
+                    <Text style={worker_styles.order_num}>3</Text>
+                    <Text style={[worker_styles.tips_text]}>30天投诉</Text>
                 </View>
                 <TouchableOpacity style={[worker_styles.chevron_right]}>
                     <Button name='chevron-thin-right' style={worker_styles.right_btn} />
@@ -99,24 +230,40 @@ class MyScene extends PureComponent {
                 {this.renderHeader()}
                 {this.renderWorker()}
                 {this.renderBlock()}
+                <ActionSheet
+                    visible={this.state.showChangeStoreDialog}
+                    onRequestClose={() => this._hideStoreDialog()}
+                    menus={this.state.storeActionSheet}
+                    actions={[
+                        {
+                            type: 'default',
+                            label: '取消',
+                            onPress: this._hideStoreDialog,
+                        }
+                    ]}
+                    style={{height: '40%'}}
+                />
             </ScrollView>
         );
     }
 
+    onPress(route) {
+        let self = this;
+        InteractionManager.runAfterInteractions(() => {
+            self.props.navigation.navigate(route);
+        });
+    }
+
     renderBlock () {
-        const { navigate } = this.props.navigation;
         return (
             <View style={[block_styles.container]}>
                 <TouchableOpacity
                     style={[block_styles.block_box]}
-                    onPress={
-                        () => navigate(Config.ROUTE_WORKER)
-                    }
+                    onPress={() => this.onPress(Config.ROUTE_WORKER)}
                 >
                     <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
                     <Text style={[block_styles.block_name]}>预留功能</Text>
                 </TouchableOpacity>
-
 
                 <TouchableOpacity style={[block_styles.block_box]}>
                     <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
@@ -188,20 +335,6 @@ const header_styles = StyleSheet.create({
     close_text: {
         color: '#999',
     },
-    sales_box: {
-        height: pxToDp(70),
-        borderTopWidth: pxToDp(1),
-        borderTopColor: '#555',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    sale_text: {
-        fontSize: pxToDp(30),
-    },
-    sales_money: {
-        position: 'absolute',
-        right: pxToDp(30),
-    },
 });
 
 const worker_styles = StyleSheet.create({
@@ -214,24 +347,6 @@ const worker_styles = StyleSheet.create({
         height: pxToDp(140),
         flexDirection: 'row',
     },
-    worker_box: {
-        marginLeft: pxToDp(5),
-        width: pxToDp(130),
-    },
-    worker_name: {
-        color: colors.title_color,
-        fontSize: pxToDp(30),
-        lineHeight: pxToDp(30),
-        fontWeight: 'bold',
-        marginTop: pxToDp(30),
-    },
-    job: {
-        color: '#555',
-        fontSize: pxToDp(30),
-        lineHeight: pxToDp(30),
-        fontWeight: 'bold',
-        marginTop: pxToDp(25),
-    },
     icon_head: {
         marginHorizontal: pxToDp(30),
         marginVertical: pxToDp(25),
@@ -239,8 +354,17 @@ const worker_styles = StyleSheet.create({
         height: pxToDp(90),
         borderRadius: pxToDp(50),
     },
+    worker_box: {
+        width: pxToDp(130),
+        justifyContent: 'center',
+    },
+    worker_name: {
+        color: colors.title_color,
+        fontSize: pxToDp(30),
+        fontWeight: 'bold',
+    },
     order_box: {
-        marginLeft: pxToDp(30),
+        marginLeft: pxToDp(35),
         justifyContent: 'center',
     },
     question_box: {
@@ -271,6 +395,19 @@ const worker_styles = StyleSheet.create({
         textAlign: 'center',
         width: pxToDp(50),
         height: pxToDp(50),
+        color: colors.main_color,
+    },
+    sales_box: {
+        marginLeft: pxToDp(35),
+        marginTop: pxToDp(30),
+    },
+    sale_text: {
+        fontSize: pxToDp(30),
+        lineHeight: pxToDp(30),
+        color: '#555',
+    },
+    sales_money: {
+        marginTop: pxToDp(24),
     },
 });
 
@@ -306,4 +443,5 @@ const block_styles = StyleSheet.create({
 
 
 //make this component available to the app
-export default MyScene;
+// export default MyScene;
+export default connect(mapStateToProps, mapDispatchToProps)(MyScene)
