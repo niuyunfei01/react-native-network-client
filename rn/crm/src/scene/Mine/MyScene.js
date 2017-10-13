@@ -20,7 +20,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import * as mineActions from '../../reducers/mine/mineActions';
 import {Dialog, ActionSheet} from "../../weui/index";
 import * as native from "../../common/native";
-import {ToastShort} from '../../util/ToastUtils';
+import {ToastLong, ToastShort} from '../../util/ToastUtils';
 
 function mapStateToProps(state) {
     const {worker_info, global} = state;
@@ -54,7 +54,7 @@ class MyScene extends PureComponent {
             cover_image,
         } = this.props.global.currentUserProfile;
 
-        let self_ = this;
+        let _this = this;
         let storeActionSheet = [];
         for(let idx in canReadStores){
             if (canReadStores.hasOwnProperty(idx)) {
@@ -63,7 +63,7 @@ class MyScene extends PureComponent {
                 let item = {
                     type: 'default',
                     label: store.name,
-                    onPress: () => self_._doChangeStore(store.id),
+                    onPress: () => _this._doChangeStore(store.id),
                 };
                 storeActionSheet.push(item);
             }
@@ -111,11 +111,11 @@ class MyScene extends PureComponent {
 
         this.setState({
             currStoreId: currStoreId,
+            currStoreName: canReadStores[currStoreId]['name'],
             canReadStores: canReadStores,
             prefer_store: prefer_store,
             screen_name: screen_name,//员工姓名
             mobile_phone: mobilephone,
-            currStoreName: canReadStores[currStoreId]['name'],
             cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
             canReadVendors: canReadVendors,
         });
@@ -131,7 +131,6 @@ class MyScene extends PureComponent {
     }
 
     onPressChangeStore() {
-        // this._showStoreDialog();
         this.setState({
             showChangeStoreDialog: true,
         });
@@ -139,12 +138,20 @@ class MyScene extends PureComponent {
 
     _doChangeStore(store_id) {
         console.log('store_id -----------> ', store_id);
-        // native.setCurrStoreId(store_id, function (ok, msg) {
-        //     if(!ok){
-        //         ToastShort(msg);
-        //     }
-        //     this._hideStoreDialog();
-        // });
+        let {canReadStores} = this.state;
+        let _this = this;
+        native.setCurrStoreId(store_id, function (ok, msg) {
+            console.log('setCurrStoreId => ', ok, msg);
+            if(ok){
+                _this.setState({
+                    currStoreId: store_id,
+                    currStoreName: canReadStores[store_id]['name'],
+                });
+            }else{
+                ToastShort(msg);
+            }
+        });
+        this._hideStoreDialog();
     }
 
     _hideStoreDialog() {
