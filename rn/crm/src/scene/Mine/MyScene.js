@@ -8,11 +8,12 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, StatusBar, Image, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl, InteractionManager } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-vector-icons/Entypo';
+import Config from '../../config';
 
 // create a component
 class MyScene extends PureComponent {
@@ -23,7 +24,7 @@ class MyScene extends PureComponent {
 
         this.state = {
             isRefreshing: false
-        }
+        };
     }
 
     componentWillMount() {
@@ -47,12 +48,12 @@ class MyScene extends PureComponent {
                         <Text style={header_styles.change_shop}> 切换门店</Text>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={[header_styles.icon_box]}>
+                <View style={[header_styles.icon_box]}>
                     <Image style={[header_styles.icon_open]} source={require('../../img/My/open_.png')} />
                     <Text style={header_styles.open_text}>营业中</Text>
-                </TouchableOpacity>
+                </View>
                 <View style={[header_styles.sales_box]}>
-                    <Text style={[header_styles.sale_text]}>进入成功交易订单: 50</Text>
+                    <Text style={[header_styles.sale_text]}>今日成功交易订单: 50</Text>
                     <Text style={[header_styles.sales_money, header_styles.sale_text]}>营业额: ¥ 3800.00</Text>
                 </View>
             </View>
@@ -103,28 +104,20 @@ class MyScene extends PureComponent {
     }
 
     renderBlock () {
+        const { navigate } = this.props.navigation;
         return (
             <View style={[block_styles.container]}>
-                <TouchableOpacity style={[block_styles.block_box]}>
+                <TouchableOpacity
+                    style={[block_styles.block_box]}
+                    onPress={
+                        () => navigate(Config.ROUTE_WORKER)
+                    }
+                >
                     <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
                     <Text style={[block_styles.block_name]}>预留功能</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[block_styles.block_box]}>
-                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
-                </TouchableOpacity>
+
+
                 <TouchableOpacity style={[block_styles.block_box]}>
                     <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
                     <Text style={[block_styles.block_name]}>预留功能</Text>
