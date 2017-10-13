@@ -17,6 +17,7 @@ import ApplyScene from "../scene/Apply/ApplyScene";
 import * as native from "./native";
 import screen from './screen'
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
+import WorkerScene from "../scene/Worker/WorkerScene";
 
 const Tab = TabNavigator(
     {
@@ -90,7 +91,7 @@ const Tab = TabNavigator(
         },
     },
     {
-        // initialRouteName: 'Mine',
+        initialRouteName: 'Mine',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,
@@ -143,7 +144,8 @@ class Navigator extends Component {
                     path: 'Login/:next/:nextParams'
                 },
                 Apply: {screen: ApplyScene},
-                TestWeui: {screen: TestWeuiScene}
+                TestWeui: {screen: TestWeuiScene},
+                Worker: {screen: WorkerScene},
             },
             stackNavigatorConfigs
         );
