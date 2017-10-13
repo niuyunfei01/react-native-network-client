@@ -21,6 +21,7 @@ import * as mineActions from '../../reducers/mine/mineActions';
 import {Dialog, ActionSheet} from "../../weui/index";
 import * as native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
+import {fetchUserCount} from "../../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
     const {worker_info, global} = state;
@@ -28,7 +29,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return {...bindActionCreators({...mineActions, ...globalActions}, dispatch)}
+    return {
+        actions: bindActionCreators({...mineActions, ...globalActions}, dispatch)
+    }
 }
 
 // create a component
@@ -88,7 +91,17 @@ class MyScene extends PureComponent {
         this._hideStoreDialog = this._hideStoreDialog.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        const {dispatch} = this.props;
+        const {
+            currentUser,
+            accessToken,
+        } = this.props.global;
+        this.props.actions.fetchUserCount(currentUser, accessToken, (resp) => {
+            console.log('resp => ', resp);
+        });
+        // InteractionManager.runAfterInteractions(() => {
+        // });
     }
 
     componentWillReceiveProps() {
@@ -137,7 +150,7 @@ class MyScene extends PureComponent {
     }
 
     _doChangeStore(store_id) {
-        console.log('store_id -----------> ', store_id);
+        console.log('store_id -----> ', store_id);
         let {canReadStores} = this.state;
         let _this = this;
         native.setCurrStoreId(store_id, function (ok, msg) {
