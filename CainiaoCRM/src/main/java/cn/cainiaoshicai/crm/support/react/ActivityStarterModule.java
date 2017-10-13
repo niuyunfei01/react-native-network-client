@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
@@ -63,10 +64,31 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback){
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
-            callback.invoke(true, GlobalCtx.app().getCurrentAccountId(), "ok");
+            AccountBean ab = GlobalCtx.app().getAccountBean();
+            if (ab != null) {
+                callback.invoke(true, "ok", ab.getInfo());
+            } else {
+                callback.invoke(false, "Account is null", null);
+            }
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
-            callback.invoke(false, 0, "exception:" + e.getMessage());
+            callback.invoke(false, "exception:" + e.getMessage(), null);
+        }
+    }
+
+    @ReactMethod
+    void setCurrStoreId(@Nonnull String currId, @Nonnull Callback callback){
+        try {
+            long selectedStoreId = Long.parseLong(currId);
+            if (selectedStoreId > 0) {
+                SettingUtility.setListenerStores(selectedStoreId);
+                callback.invoke(true, "ok", null);
+            } else {
+                callback.invoke(false, "Account is null", null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            callback.invoke(false, "exception:" + e.getMessage(), null);
         }
     }
 

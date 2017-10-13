@@ -19,7 +19,9 @@ import DeviceInfo from 'react-native-device-info';
 const {
   LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
-  LOGOUT_SUCCESS
+  LOGOUT_SUCCESS,
+  SET_CURR_STORE,
+  UPDATE_CFG
 } = require('../../common/constants').default
 
 function getDeviceUUID() {
@@ -35,6 +37,27 @@ export function setAccessToken(oauthToken) {
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: oauthToken
+  }
+}
+
+export function setUserProfile(profile) {
+  return {
+    type: LOGIN_PROFILE_SUCCESS,
+    payload: profile
+  }
+}
+
+export function setCurrentStore(currStoreId) {
+  return {
+    type: SET_CURR_STORE,
+    payload: currStoreId
+  }
+}
+
+export function updateCfg(cfg) {
+  return {
+    type: UPDATE_CFG,
+    payload: cfg
   }
 }
 
@@ -58,9 +81,9 @@ export function signIn(mobile, password, callback) {
         if (access_token) {
           dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}})
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
-          native.updateAfterTokenGot(access_token, expire, (ok, msg, user) => {
+          native.updateAfterTokenGot(access_token, expire, (ok, msg, profile) => {
             if (ok) {
-              dispatch({type: LOGIN_PROFILE_SUCCESS, payload: user})
+              dispatch({type: LOGIN_PROFILE_SUCCESS, payload: profile})
             } else {
               console.log('updateAfterTokenGot error:', msg)
             }

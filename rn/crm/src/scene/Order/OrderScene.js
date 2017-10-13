@@ -35,7 +35,6 @@ const numeral = require('numeral')
 
 function mapStateToProps(state) {
   return {
-    isFetching: state.isFetching,
     order: state.order,
     global: state.global,
   }
@@ -141,6 +140,9 @@ class OrderScene extends PureComponent {
   }
 
   onHeaderRefresh() {
+
+    console.log(this.props.global)
+    
     if (!this.state.isFetching) {
       this.setState({isFetching: true});
       this.props.actions.getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
