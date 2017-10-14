@@ -14,7 +14,7 @@ import GoodsScene from '../scene/Goods/GoodsScene'
 
 import WebScene from '../widget/WebScene'
 import ApplyScene from "../scene/Apply/ApplyScene";
-import * as native from "./native";
+import native from "./native";
 import screen from './screen'
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerScene from "../scene/Worker/WorkerScene";
