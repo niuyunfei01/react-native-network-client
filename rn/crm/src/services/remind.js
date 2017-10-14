@@ -20,3 +20,9 @@ export function FetchRemindCount(token) {
   let params = 'access_token=' + token;
   return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(path, params));
 }
+
+export function DelayRemind(id, minutes, token) {
+  let path = 'api/set_task_delay/' + id + '/' + minutes + '.json';
+  let params = 'access_token=' + token;
+  return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(path, params));
+}

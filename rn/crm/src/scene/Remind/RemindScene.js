@@ -34,7 +34,7 @@ import LoadingView from '../../widget/LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
-import {fetchRemind, updateRemind, fetchRemindCount} from '../../reducers/remind/remindActions'
+import {fetchRemind, updateRemind, fetchRemindCount, delayRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
 import RNButton from '../../widget/RNButton';
@@ -52,7 +52,14 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({fetchRemind, updateRemind, fetchRemindCount, ...globalActions}, dispatch)}
+  return {
+    dispatch, ...bindActionCreators({
+      fetchRemind,
+      updateRemind,
+      fetchRemindCount,
+      delayRemind, ...globalActions
+    }, dispatch)
+  }
 }
 
 
@@ -198,7 +205,11 @@ class RemindScene extends PureComponent {
     this._hideStopRemindDialog();
   }
 
-  _doDelayRemind(time) {
+  _doDelayRemind(minutes) {
+    let {type, id} = this.state.opRemind;
+    const {dispatch} = this.props;
+    let token = this._getToken();
+    dispatch(delayRemind(id, type, minutes, token));
     this._hideDelayRemindDialog();
   }
 
@@ -225,22 +236,25 @@ class RemindScene extends PureComponent {
     if (typeId != 3) {
       return null;
     }
-    //todo dynamic show
-    let buttons = Array(6).fill().map(i => <RNButton
-      containerStyle={{
-        height: 30,
-        width: 48,
-        overflow: 'hidden',
-        borderRadius: 15,
-        backgroundColor: '#e6e6e6',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderColor: '#999',
-        borderWidth: 1
-      }}
-      style={{fontSize: 10, color: '#999'}}>
-      修改
-    </RNButton>);
+    let buttons = [];
+    for (let i = 0; i < 6; i++) {
+      buttons.push(<RNButton
+        key={i}
+        containerStyle={{
+          height: 30,
+          width: 48,
+          overflow: 'hidden',
+          borderRadius: 15,
+          backgroundColor: '#e6e6e6',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderColor: '#999',
+          borderWidth: 1
+        }}
+        style={{fontSize: 10, color: '#999'}}>
+        修改
+      </RNButton>)
+    }
     return (
       <View style={{
         flex: 1,

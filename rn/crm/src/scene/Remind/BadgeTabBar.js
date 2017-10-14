@@ -68,7 +68,7 @@ const BadgeTabBar = React.createClass({
     let label = total == 0 ? name : name + "(" + total + ")";
     return <ButtonAndroid
       style={styles.flexOne}
-      key={utils.guid()}
+      key={indexKey}
       accessible={true}
       accessibilityLabel={name}
       accessibilityTraits='button'

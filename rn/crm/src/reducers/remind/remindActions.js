@@ -54,9 +54,44 @@ export function updateRemind(id, typeId, status, token) {
         let {ok, desc} = json;
         dispatch(updateSuccessRemindStatus(id, typeId, ok, desc));
       }).catch((error) => {
-        //TODO
+        dispatch(updateSuccessRemindStatus(id, typeId, false, 'error'));
         ToastLong('更新任务失败，请重试');
       })
+  }
+}
+
+export function delayRemind(id, typeId, minutes, token) {
+  return dispatch => {
+    dispatch(doDelayRemind(id, typeId, minutes))
+    return RemindServices.DelayRemind(id, minutes, token)
+      .then(response => response.json())
+      .then(json => {
+        let {ok, desc} = json;
+        dispatch(delayRemindSuccess(id, typeId, ok, desc));
+      })
+      .catch((error) => {
+        dispatch(delayRemindSuccess(id, typeId, false, 'error'));
+        ToastLong('更新任务失败，请重试');
+      })
+  }
+}
+
+function doDelayRemind(id, typeId, minutes) {
+  return {
+    type: types.DELAY_REMIND,
+    id: id,
+    typeId: typeId,
+    minutes: minutes
+  }
+}
+
+function delayRemindSuccess(id, typeId, ok, desc) {
+  return {
+    type: types.DELAY_REMIND_SUCCESS,
+    id: id,
+    typeId: typeId,
+    ok: ok,
+    desc: desc
   }
 }
 
