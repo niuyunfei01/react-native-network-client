@@ -59,6 +59,7 @@ function mapDispatchToProps(dispatch) {
 let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [5, 4, 1, 3];
+const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
 const _typeAliasMap = {
   remind_type: 4,
   complain_type: 1,
@@ -339,10 +340,11 @@ class RemindScene extends PureComponent {
   render() {
     const {remind} = this.props;
     let lists = [];
-    _typeIds.forEach((typeId) => {
+    _typeIds.forEach((typeId, index) => {
+      let key = typeId + "-" + _typeAlias[index]
       lists.push(
         <View
-          key={typeId}
+          key={key}
           tabLabel={Alias.CATEGORIES[typeId]}
           style={{flex: 1}}>
           {this.renderContent(this.state.dataSource = remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId)}
@@ -444,7 +446,7 @@ class RemindItem extends React.PureComponent {
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
                 {item.quick == 1 ? <Image style={[top_styles.icon_ji]}
-                                     source={require('../../img/Remind/quick.png')}/> : null}
+                                          source={require('../../img/Remind/quick.png')}/> : null}
                 <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
                 </View>
@@ -486,7 +488,8 @@ class RemindItem extends React.PureComponent {
               <View>
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
-              {item.expect_end_time != '' ? <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/> : null}
+              {item.expect_end_time != '' ?
+                <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/> : null}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
               </View>

@@ -62,7 +62,7 @@ const BadgeTabBar = React.createClass({
       MainElement={
         <ButtonAndroid
           style={styles.flexOne}
-          key={name}
+          key={name + "-" + page}
           accessible={true}
           accessibilityLabel={name}
           accessibilityTraits='button'
