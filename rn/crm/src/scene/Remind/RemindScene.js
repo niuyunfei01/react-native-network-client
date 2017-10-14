@@ -34,7 +34,7 @@ import LoadingView from '../../widget/LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
-import {fetchRemind, updateRemind} from '../../reducers/remind/remindActions'
+import {fetchRemind, updateRemind, fetchRemindCount} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
 import RNButton from '../../widget/RNButton';
@@ -52,7 +52,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({fetchRemind, updateRemind, ...globalActions}, dispatch)}
+  return {dispatch, ...bindActionCreators({fetchRemind, updateRemind, fetchRemindCount, ...globalActions}, dispatch)}
 }
 
 
@@ -90,6 +90,7 @@ class RemindScene extends PureComponent {
     const {dispatch} = this.props;
     let token = this._getToken();
     InteractionManager.runAfterInteractions(() => {
+      dispatch(fetchRemindCount(token))
       _typeIds.forEach((typeId) => {
         dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
       });
@@ -339,6 +340,7 @@ class RemindScene extends PureComponent {
 
   render() {
     const {remind} = this.props;
+    const remindCount = remind.remindCount;
     let lists = [];
     _typeIds.forEach((typeId, index) => {
       let key = typeId + "-" + _typeAlias[index]
@@ -354,7 +356,7 @@ class RemindScene extends PureComponent {
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar/>}
+          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeAlias}/>}
           locked={remind.processing}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}

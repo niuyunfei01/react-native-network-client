@@ -24,6 +24,25 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
   }
 }
 
+export function fetchRemindCount(token) {
+  return dispatch => {
+    dispatch(fetchRemindCount());
+    return RemindServices.FetchRemindCount(token)
+      .then(response => response.json())
+      .then((response) => {
+        let result = response.obj;
+        if (response.ok) {
+          dispatch(receiveRemindCount(result))
+        } else {
+          dispatch(receiveRemindList({}))
+        }
+      }).catch((error) => {
+        ToastShort(error.message);
+        dispatch(receiveRemindList({}))
+      })
+  }
+}
+
 export function updateRemind(id, typeId, status, token) {
   return dispatch => {
     dispatch(updateRemindStatus(id, typeId, status));
@@ -71,6 +90,12 @@ function fetchRemindList(isRefreshing, loading, isLoadMore) {
   }
 }
 
+function fetchRemindCount() {
+  return {
+    type: types.FETCH_REMIND_COUNT
+  }
+}
+
 function receiveRemindList(remindList, typeId, currPage, totalPage) {
   return {
     type: types.RECEIVE_REMIND_LIST,
@@ -78,5 +103,12 @@ function receiveRemindList(remindList, typeId, currPage, totalPage) {
     typeId: typeId,
     currPage: currPage,
     totalPage: totalPage
+  }
+}
+
+function receiveRemindCount(remindCount) {
+  return {
+    type: types.RECEIVE_REMIND_COUNT,
+    result: remindCount
   }
 }
