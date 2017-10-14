@@ -13,7 +13,6 @@ export function fetchUserCount(u_id, token, callback) {
         FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
             .then(resp => resp.json())
             .then(resp => {
-                console.log(resp);
                 if (resp.ok) {
                     dispatch(receiveUserCount(resp.obj));
                 } else {

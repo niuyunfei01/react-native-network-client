@@ -23,6 +23,7 @@ import * as native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {fetchUserCount} from "../../reducers/mine/mineActions";
 
+
 function mapStateToProps(state) {
     const {worker_info, global} = state;
     return {worker_info: worker_info, global: global}
@@ -65,7 +66,7 @@ class MyScene extends PureComponent {
                 // console.log(idx," ==>",store);
                 let item = {
                     type: 'default',
-                    label: store.name,
+                    label: store.vendor+':'+store.name,
                     onPress: () => _this._doChangeStore(store.id),
                 };
                 storeActionSheet.push(item);
@@ -85,23 +86,35 @@ class MyScene extends PureComponent {
 
             showChangeStoreDialog: false,
             storeActionSheet: storeActionSheet,
+
+            sign_count: 0,
+            bad_cases_of: 0,
         };
 
         this._doChangeStore = this._doChangeStore.bind(this);
         this._hideStoreDialog = this._hideStoreDialog.bind(this);
     }
 
-    componentDidMount() {
-        const {dispatch} = this.props;
+    componentWillMount() {
         const {
             currentUser,
             accessToken,
         } = this.props.global;
-        this.props.actions.fetchUserCount(currentUser, accessToken, (resp) => {
-            console.log('resp => ', resp);
+        let _this = this;
+        InteractionManager.runAfterInteractions(() => {
+            this.props.actions.fetchUserCount(currentUser, accessToken, (resp) => {
+                console.log('resp => ', resp);
+                if(resp.ok){
+                    let {sign_count, bad_cases_of} = resp.obj;
+                    _this.setState({
+                        sign_count: sign_count,
+                        bad_cases_of: bad_cases_of,
+                    });
+                } else {
+
+                }
+            });
         });
-        // InteractionManager.runAfterInteractions(() => {
-        // });
     }
 
     componentWillReceiveProps() {
@@ -150,7 +163,6 @@ class MyScene extends PureComponent {
     }
 
     _doChangeStore(store_id) {
-        console.log('store_id -----> ', store_id);
         let {canReadStores} = this.state;
         let _this = this;
         native.setCurrStoreId(store_id, function (ok, msg) {
@@ -223,11 +235,11 @@ class MyScene extends PureComponent {
                     <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
                 </View>
                 <View style={[worker_styles.order_box]}>
-                    <Text style={worker_styles.order_num}>12</Text>
+                    <Text style={worker_styles.order_num}>{this.state.sign_count}</Text>
                     <Text style={[worker_styles.tips_text]}>出勤天数</Text>
                 </View>
                 <View style={[worker_styles.question_box]}>
-                    <Text style={worker_styles.order_num}>3</Text>
+                    <Text style={worker_styles.order_num}>{this.state.bad_cases_of}</Text>
                     <Text style={[worker_styles.tips_text]}>30天投诉</Text>
                 </View>
                 <TouchableOpacity style={[worker_styles.chevron_right]}>
@@ -261,7 +273,7 @@ class MyScene extends PureComponent {
                             onPress: this._hideStoreDialog,
                         }
                     ]}
-                    style={{height: '40%'}}
+                    // style={{height: '40%'}}
                 />
             </ScrollView>
         );
