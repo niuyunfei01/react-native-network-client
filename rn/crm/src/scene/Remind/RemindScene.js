@@ -86,11 +86,17 @@ class RemindScene extends PureComponent {
     canLoadMore = false;
   }
 
+  componentWillMount() {
+    const {dispatch} = this.props;
+    let token = this._getToken();
+    console.log('remind view will mount')
+    dispatch(fetchRemindCount(token));
+  }
+
   componentDidMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
     InteractionManager.runAfterInteractions(() => {
-      dispatch(fetchRemindCount(token))
       _typeIds.forEach((typeId) => {
         dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
       });

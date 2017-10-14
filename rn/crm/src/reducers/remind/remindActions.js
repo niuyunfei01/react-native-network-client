@@ -15,7 +15,7 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
           dispatch(receiveRemindList(result.list, typeId, result.curr_page, result.total_page));
         } else {
           dispatch(receiveRemindList([], typeId, 1, 1));
-          ToastShort(error.message);
+          ToastShort(response.reason);
         }
       }).catch((error) => {
         dispatch(receiveRemindList([], typeId, 1, 1));
@@ -30,15 +30,17 @@ export function fetchRemindCount(token) {
     return RemindServices.FetchRemindCount(token)
       .then(response => response.json())
       .then((response) => {
+        console.log("get remind count " + JSON.stringify(response));
         let result = response.obj;
         if (response.ok) {
           dispatch(receiveRemindCount(result))
         } else {
-          dispatch(receiveRemindList({}))
+          ToastShort(response.reason);
+          dispatch(receiveRemindCount({}))
         }
       }).catch((error) => {
         ToastShort(error.message);
-        dispatch(receiveRemindList({}))
+        dispatch(receiveRemindCount({}))
       })
   }
 }

@@ -53,7 +53,7 @@ export default function remind(state = initialState, action) {
         remindList: removeRemind(state, action)
       });
     case types.FETCH_REMIND_COUNT:
-      return Object.assign({}, state, {});
+      return state;
     case types.RECEIVE_REMIND_COUNT:
       return Object.assign({}, state, {remindCount: action.result});
     default:
