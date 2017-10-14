@@ -8,167 +8,484 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, StatusBar, Image, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl, InteractionManager } from 'react-native';
+import colors from "../../styles/colors";
+import pxToDp from "../../util/pxToDp";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Button from 'react-native-vector-icons/Entypo';
+import Config from '../../config';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from '../../reducers/global/globalActions';
+import * as mineActions from '../../reducers/mine/mineActions';
+import {ActionSheet} from "../../weui/index";
+import native from "../../common/native";
+import {ToastLong, ToastShort} from '../../util/ToastUtils';
 
-import { Heading1, Heading2, Paragraph } from '../../widget/Text'
-import { screen, system, tool } from '../../common'
-import { color, DetailCell, NavigationItem, SpacingView } from '../../widget'
+
+function mapStateToProps(state) {
+    const {worker_info, global} = state;
+    return {worker_info: worker_info, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({...mineActions, ...globalActions}, dispatch)
+    }
+}
 
 // create a component
 class MineScene extends PureComponent {
-
-    static navigationOptions = ({ navigation }) => ({
-        headerRight: (
-            <View style={{ flexDirection: 'row' }}>
-                <NavigationItem
-                    icon={require('../../img/Mine/icon_navigationItem_set_white_2x.png')}
-                    onPress={() => {
-                        navigation.navigate('Apply')
-                    }}
-                />
-                <NavigationItem
-                    icon={require('../../img/Home/icon_navigationItem_message_white_2x.png')}
-                    onPress={() => {
-                        navigation.navigate('TestWeui')
-                    }}
-                />
-            </View>
-        ),
-        headerStyle: { backgroundColor: color.theme },
-    })
-
-    state: {
-        isRefreshing: boolean
-    }
+    static navigationOptions = {title: 'My', header: null};
 
     constructor(props: Object) {
-        super(props)
+        super(props);
+        const {
+            currentUser,
+            currStoreId,
+            accessToken,
+            currentUserProfile,
+            canReadStores,
+            canReadVendors,
+        } = this.props.global;
+
+        let _this = this;
+        let storeActionSheet = [];
+        for(let idx in canReadStores){
+            if (canReadStores.hasOwnProperty(idx)) {
+                let store = canReadStores[idx];
+                // console.log(idx," ==>",store);
+                let item = {
+                    type: 'default',
+                    label: store.vendor+':'+store.name,
+                    onPress: () => _this._doChangeStore(store.id),
+                };
+                storeActionSheet.push(item);
+            }
+        }
+
+        let prefer_store = '';
+        let screen_name = '';
+        let mobilephone = '';
+        let cover_image = '';
+        if(currentUserProfile !== null){
+            prefer_store = currentUserProfile.prefer_store;
+            screen_name = currentUserProfile.screen_name;
+            mobilephone = currentUserProfile.mobilephone;
+            cover_image = currentUserProfile.cover_image;
+        }
 
         this.state = {
-            isRefreshing: false
-        }
+            isRefreshing: false,
+            currentUser: currentUser,
+            currStoreId: currStoreId,
+            canReadStores: canReadStores,
+            prefer_store: prefer_store,
+            screen_name: screen_name,
+            mobile_phone: mobilephone,
+            currStoreName: canReadStores[currStoreId]['name'],
+            cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
+            canReadVendors: canReadVendors,
+
+            showChangeStoreDialog: false,
+            storeActionSheet: storeActionSheet,
+
+            sign_count: 0,
+            bad_cases_of: 0,
+        };
+
+        this._doChangeStore = this._doChangeStore.bind(this);
+        this._hideStoreDialog = this._hideStoreDialog.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        const {
+            currentUser,
+            accessToken,
+        } = this.props.global;
+        let _this = this;
+        InteractionManager.runAfterInteractions(() => {
+            this.props.actions.fetchUserCount(currentUser, accessToken, (resp) => {
+                console.log('resp => ', resp);
+                if(resp.ok){
+                    let {sign_count, bad_cases_of} = resp.obj;
+                    _this.setState({
+                        sign_count: sign_count,
+                        bad_cases_of: bad_cases_of,
+                    });
+                }
+            });
+        });
+    }
 
+    componentWillReceiveProps() {
+        const {
+            currentUser,
+            currStoreId,
+            accessToken,
+            currentUserProfile,
+            canReadStores,
+            canReadVendors,
+        } = this.props.global;
+
+        const {
+            prefer_store,
+            screen_name,
+            mobilephone,
+            sex,
+            cover_image,
+        } = currentUserProfile;
+
+        this.setState({
+            currStoreId: currStoreId,
+            currentUser: currentUser,
+            currStoreName: canReadStores[currStoreId]['name'],
+            canReadStores: canReadStores,
+            prefer_store: prefer_store,
+            screen_name: screen_name,//员工姓名
+            mobile_phone: mobilephone,
+            cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
+            canReadVendors: canReadVendors,
+        });
+        // console.log('state => ', this.state);
     }
 
     onHeaderRefresh() {
-        this.setState({ isRefreshing: true })
+        this.setState({ isRefreshing: true });
 
         setTimeout(() => {
             this.setState({ isRefreshing: false })
-        }, 2000);
+        }, 1000);
     }
 
+    onPressChangeStore() {
+        this.setState({
+            showChangeStoreDialog: true,
+        });
+    }
 
-    renderCells() {
-        let cells = []
-        let dataList = this.getDataList()
-        for (let i = 0; i < dataList.length; i++) {
-            let sublist = dataList[i]
-            for (let j = 0; j < sublist.length; j++) {
-                let data = sublist[j]
-                let cell = <DetailCell image={data.image} title={data.title} subtitle={data.subtitle} key={data.title} />
-                cells.push(cell)
+    _doChangeStore(store_id) {
+        let {canReadStores} = this.state;
+        let _this = this;
+        native.setCurrStoreId(store_id, function (ok, msg) {
+            console.log('setCurrStoreId => ', ok, msg);
+            if(ok){
+                _this.setState({
+                    currStoreId: store_id,
+                    currStoreName: canReadStores[store_id]['name'],
+                });
+            }else{
+                ToastShort(msg);
             }
-            cells.push(<SpacingView key={i} />)
-        }
+        });
+        this._hideStoreDialog();
+    }
 
-        return (
-            <View style={{ flex: 1 }}>
-                {cells}
-            </View>
-        )
+    _hideStoreDialog() {
+        this.setState({
+            showChangeStoreDialog: false,
+        });
     }
 
     renderHeader() {
         return (
-            <View style={styles.header}>
-                <View style={styles.userContainer}>
-                    <Image style={styles.avatar} source={require('../../img/Mine/avatar.png')} />
-                    <View>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Heading1 style={{ color: 'white' }}>素敌</Heading1>
-                            <Image style={{ marginLeft: 4 }} source={require('../../img/Mine/beauty_technician_v15_2x.png')} />
-                        </View>
-                        <Paragraph style={{ color: 'white', marginTop: 4 }}>个人信息 ></Paragraph>
-                    </View>
+            <View style={header_styles.container}>
+                <View style={[header_styles.main_box]}>
+                    <Text style={header_styles.shop_name}>{this.state.currStoreName}</Text>
+                    <TouchableOpacity
+                        style={{flexDirection: 'row'}}
+                        onPress={this.onPressChangeStore.bind(this)}
+                    >
+                        <Icon name='exchange' style={header_styles.change_shop} />
+                        <Text style={header_styles.change_shop}> 切换门店</Text>
+                    </TouchableOpacity>
                 </View>
+                <View style={[header_styles.icon_box]}>
+                    <Image style={[header_styles.icon_open]} source={require('../../img/My/open_.png')} />
+                    <Text style={header_styles.open_text}>营业中</Text>
+                </View>
+            </View>
+        )
+    }
+
+    /*renderWorker() {
+        return (
+            <View style={worker_styles.container}>
+                <View>
+                    <Image style={[worker_styles.icon_head]} source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/Mine/avatar.png')} />
+                </View>
+                <View style={[worker_styles.worker_box]}>
+                    <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
+                </View>
+                <View style={[worker_styles.sales_box]}>
+                    <Text style={[worker_styles.sale_text]}>今日订单: 500</Text>
+                    <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥3800.00</Text>
+                </View>
+                <TouchableOpacity style={[worker_styles.chevron_right]}>
+                    <Button name='chevron-thin-right' style={worker_styles.right_btn} />
+                </TouchableOpacity>
+            </View>
+        )
+    }*/
+    renderWorker() {
+        return (
+            <View style={worker_styles.container}>
+                <View>
+                    <Image style={[worker_styles.icon_head]} source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/Mine/avatar.png')} />
+                </View>
+                <View style={[worker_styles.worker_box]}>
+                    <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
+                </View>
+                <View style={[worker_styles.order_box]}>
+                    <Text style={worker_styles.order_num}>{this.state.sign_count}</Text>
+                    <Text style={[worker_styles.tips_text]}>出勤天数</Text>
+                </View>
+                <View style={[worker_styles.question_box]}>
+                    <Text style={worker_styles.order_num}>{this.state.bad_cases_of}</Text>
+                    <Text style={[worker_styles.tips_text]}>30天投诉</Text>
+                </View>
+                <TouchableOpacity
+                    style={[worker_styles.chevron_right]}
+                    onPress={() => this.onPress(Config.ROUTE_USER, {
+                        type: 'mine',
+                        sign_count: this.state.sign_count,
+                        bad_cases_of: this.state.bad_cases_of,
+                        mobile: this.state.mobile_phone,
+                        cover_image: this.state.cover_image,
+                        currentUser: this.state.currentUser,
+                    })}
+                >
+                    <Button name='chevron-thin-right' style={worker_styles.right_btn} />
+                </TouchableOpacity>
             </View>
         )
     }
 
     render() {
         return (
-            <View style={{ flex: 1, backgroundColor: color.background }}>
-                <View style={{ position: 'absolute', width: screen.width, height: screen.height / 2, backgroundColor: color.theme }} />
-                <ScrollView
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.isRefreshing}
-                            onRefresh={() => this.onHeaderRefresh()}
-                            tintColor='gray'
-                        />
-                    }>
-                    {this.renderHeader()}
-                    <SpacingView />
-                    {this.renderCells()}
-                </ScrollView>
-            </View>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this.onHeaderRefresh()}
+                        tintColor='gray'
+                    />
+                }
+                style={{backgroundColor: '#f2f2f2'}}
+            >
+                {this.renderHeader()}
+                {this.renderWorker()}
+                {this.renderBlock()}
+                <ActionSheet
+                    visible={this.state.showChangeStoreDialog}
+                    onRequestClose={() => this._hideStoreDialog()}
+                    menus={this.state.storeActionSheet}
+                    actions={[
+                        {
+                            type: 'default',
+                            label: '取消',
+                            onPress: this._hideStoreDialog,
+                        }
+                    ]}
+                    // style={{height: '40%'}}
+                />
+            </ScrollView>
         );
     }
 
-    getDataList() {
-        return (
-            [
-                [
-                    { title: '我的钱包', subtitle: '办信用卡', image: require('../../img/Mine/icon_mine_wallet_2x.png') },
-                    { title: '余额', subtitle: '￥95872385', image: require('../../img/Mine/icon_mine_balance_2x.png') },
-                    { title: '抵用券', subtitle: '63', image: require('../../img/Mine/icon_mine_voucher_2x.png') },
-                    { title: '会员卡', subtitle: '2', image: require('../../img/Mine/icon_mine_membercard_2x.png') }
-                ],
-                [
-                    { title: '好友去哪', image: require('../../img/Mine/icon_mine_friends_2x.png') },
-                    { title: '我的评价', image: require('../../img/Mine/icon_mine_comment_2x.png') },
-                    { title: '我的收藏', image: require('../../img/Mine/icon_mine_collection_2x.png') },
-                    { title: '会员中心', subtitle: 'v15', image: require('../../img/Mine/icon_mine_membercenter_2x.png') },
-                    { title: '积分商城', subtitle: '好礼已上线', image: require('../../img/Mine/icon_mine_member_2x.png') }
-                ],
-                [
-                    { title: '客服中心', image: require('../../img/Mine/icon_mine_customerService_2x.png') },
-                    { title: '关于美团', subtitle: '我要合作', image: require('../../img/Mine/icon_mine_aboutmeituan_2x.png') },
-                ]
-            ]
-        )
+    onPress(route, params = {}) {
+        let self = this;
+        InteractionManager.runAfterInteractions(() => {
+            self.props.navigation.navigate(route, params);
+        });
     }
 
+    renderBlock () {
+        return (
+            <View style={[block_styles.container]}>
+                <TouchableOpacity
+                    style={[block_styles.block_box]}
+                    onPress={() => this.onPress(Config.ROUTE_WORKER)}
+                >
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>员工管理</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[block_styles.block_box]}>
+                    <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
+                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    }
 }
 
 // define your styles
-const styles = StyleSheet.create({
-    header: {
-        backgroundColor: color.theme,
-        paddingBottom: 20
+const header_styles = StyleSheet.create({
+    container: {
+        borderTopWidth: pxToDp(1),
+        borderBottomWidth: pxToDp(1),
+        borderColor: colors.color999,
+        paddingLeft: pxToDp(30),
+        backgroundColor: colors.white,
+        marginBottom: pxToDp(14),
     },
-    icon: {
-        width: 27,
-        height: 27,
+    main_box: {
+        marginRight: pxToDp(134),
+        height: pxToDp(170),
     },
-    userContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        margin: 10,
+    shop_name: {
+        color: colors.title_color,
+        fontSize: pxToDp(36),
+        fontWeight: 'bold',
+        marginVertical: pxToDp(30),
+        lineHeight: pxToDp(36),
     },
-    avatar: {
-        width: 50,
-        height: 50,
-        marginRight: 10,
-        borderRadius: 25,
-        borderWidth: 2,
-        borderColor: '#51D3C6'
-    }
+    change_shop: {
+        color: colors.main_color,
+        fontSize: pxToDp(34),
+        fontWeight: 'bold',
+        lineHeight: pxToDp(35),
+    },
+    icon_box: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+    },
+    icon_open: {
+        marginHorizontal: pxToDp(30),
+        marginTop: pxToDp(35),
+        marginBottom: pxToDp(5),
+        width: pxToDp(70),
+        height: pxToDp(74),
+    },
+    open_text: {
+        color: colors.main_color,
+        fontSize: pxToDp(20),
+        textAlign: 'center',
+    },
+    close_text: {
+        color: '#999',
+    },
 });
 
+const worker_styles = StyleSheet.create({
+    container: {
+        borderTopWidth: pxToDp(1),
+        borderBottomWidth: pxToDp(1),
+        borderColor: colors.color999,
+        backgroundColor: colors.white,
+        marginBottom: pxToDp(7),
+        height: pxToDp(140),
+        flexDirection: 'row',
+    },
+    icon_head: {
+        marginHorizontal: pxToDp(30),
+        marginVertical: pxToDp(25),
+        width: pxToDp(90),
+        height: pxToDp(90),
+        borderRadius: pxToDp(50),
+    },
+    worker_box: {
+        width: pxToDp(130),
+        justifyContent: 'center',
+    },
+    worker_name: {
+        color: colors.title_color,
+        fontSize: pxToDp(30),
+        fontWeight: 'bold',
+    },
+    order_box: {
+        marginLeft: pxToDp(35),
+        justifyContent: 'center',
+    },
+    question_box: {
+        marginLeft: pxToDp(60),
+        justifyContent: 'center',
+    },
+    order_num: {
+        color: colors.title_color,
+        fontSize: pxToDp(40),
+        lineHeight: pxToDp(40),
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    tips_text: {
+        color: colors.color999,
+        fontSize: pxToDp(24),
+        lineHeight: pxToDp(24),
+        textAlign: 'center',
+        marginTop: pxToDp(16),
+    },
+    chevron_right: {
+        position: 'absolute',
+        right: pxToDp(30),
+        top: pxToDp(50),
+    },
+    right_btn: {
+        fontSize: pxToDp(40),
+        textAlign: 'center',
+        width: pxToDp(50),
+        height: pxToDp(50),
+        color: colors.main_color,
+    },
+    sales_box: {
+        marginLeft: pxToDp(35),
+        marginTop: pxToDp(30),
+    },
+    sale_text: {
+        fontSize: pxToDp(30),
+        lineHeight: pxToDp(30),
+        color: '#555',
+    },
+    sales_money: {
+        marginTop: pxToDp(24),
+    },
+});
+
+const block_styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: pxToDp(23),
+        marginBottom: pxToDp(7),
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    block_box: {
+        width: pxToDp(210),
+        height: pxToDp(156),
+        backgroundColor: colors.white,
+        borderRadius: pxToDp(10),
+        margin: pxToDp(7),
+    },
+    block_img: {
+        marginHorizontal: pxToDp(60),
+        marginTop: pxToDp(20),
+        marginBottom: pxToDp(10),
+        width: pxToDp(90),
+        height: pxToDp(90),
+    },
+    block_name: {
+        color: colors.color333,
+        fontSize: pxToDp(24),
+        lineHeight: pxToDp(24),
+        textAlign: 'center',
+    },
+
+});
+
+
 //make this component available to the app
-export default MineScene;
+// export default MineScene;
+export default connect(mapStateToProps, mapDispatchToProps)(MineScene)

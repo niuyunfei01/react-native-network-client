@@ -19,4 +19,5 @@ export default {
   ROUTE_ALERT: 'Alert',
   ROUTE_ORDERS: 'Orders',
   ROUTE_WORKER: 'Worker',
+  ROUTE_USER: 'User',
 };
