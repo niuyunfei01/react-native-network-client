@@ -18,10 +18,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import * as mineActions from '../../reducers/mine/mineActions';
-import {Dialog, ActionSheet} from "../../weui/index";
+import {ActionSheet} from "../../weui/index";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {fetchUserCount} from "../../reducers/mine/mineActions";
 
 
 function mapStateToProps(state) {
@@ -95,7 +94,7 @@ class MyScene extends PureComponent {
         this._hideStoreDialog = this._hideStoreDialog.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         const {
             currentUser,
             accessToken,
@@ -110,8 +109,6 @@ class MyScene extends PureComponent {
                         sign_count: sign_count,
                         bad_cases_of: bad_cases_of,
                     });
-                } else {
-
                 }
             });
         });
@@ -258,7 +255,9 @@ class MyScene extends PureComponent {
                         onRefresh={() => this.onHeaderRefresh()}
                         tintColor='gray'
                     />
-                }>
+                }
+                style={{backgroundColor: '#f2f2f2'}}
+            >
                 {this.renderHeader()}
                 {this.renderWorker()}
                 {this.renderBlock()}
@@ -294,7 +293,7 @@ class MyScene extends PureComponent {
                     onPress={() => this.onPress(Config.ROUTE_WORKER)}
                 >
                     <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
-                    <Text style={[block_styles.block_name]}>预留功能</Text>
+                    <Text style={[block_styles.block_name]}>员工管理</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={[block_styles.block_box]}>
