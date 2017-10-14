@@ -23,9 +23,11 @@ const initialState = {
   accessToken: '',
   refreshToken: '',
   expireTs: 0,
+  config: {},
   currentUserProfile: {},
   canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
-  canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得
+  canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
+  remindTags:null
 }
 
 /**
@@ -76,6 +78,7 @@ export default function globalReducer (state = initialState, action) {
         ...state,
         canReadStores: action.payload.canReadStores,
         canReadVendors: action.payload.canReadVendors,
+        config: action.payload.config,
       } : state;
   }
   return state

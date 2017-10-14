@@ -76,13 +76,16 @@ class RootScene extends PureComponent {
     const launchProps = this.props.launchProps;
 
     this.store = configureStore(function (store) {
-      const {access_token, currStoreId, userProfile, canReadStores, canReadVendors } = launchProps;
+      const {access_token, currStoreId, userProfile, canReadStores, canReadVendors, configStr } = launchProps;
+
+      let config = configStr ? JSON.parse(configStr) : {};
+
       if (access_token) {
         store.dispatch(setAccessToken({access_token}));
         store.dispatch(setPlatform('android'))
         store.dispatch(setUserProfile(userProfile))
         store.dispatch(setCurrentStore(currStoreId))
-        store.dispatch(updateCfg({canReadStores, canReadVendors}))
+        store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
       }
       this.setState({rehydrated: true});
     }.bind(this));
