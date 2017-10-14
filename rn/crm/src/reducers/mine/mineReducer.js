@@ -13,7 +13,7 @@ const initialState = {
     bad_cases_of : 0,
 };
 
-export default function mineReducer (state = initialState, action) {
+export default function mine(state = initialState, action) {
     switch (action.type) {
         case GET_USER_COUNT:
             return {...state,

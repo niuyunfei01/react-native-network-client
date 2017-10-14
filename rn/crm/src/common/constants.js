@@ -61,5 +61,5 @@ export default keyMirror({
     REGISTER: null,
 
     GET_USER_COUNT: null,
-
+    GET_WORKER: null,
 })

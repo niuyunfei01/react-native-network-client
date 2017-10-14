@@ -77,28 +77,34 @@ class MineScene extends PureComponent {
 
         this.state = {
             isRefreshing: false,
+            showChangeStoreDialog: false,
+            storeActionSheet: storeActionSheet,
+            sign_count: 0,
+            bad_cases_of: 0,
+
             currentUser: currentUser,
-            currStoreId: currStoreId,
             canReadStores: canReadStores,
             prefer_store: prefer_store,
             screen_name: screen_name,
             mobile_phone: mobilephone,
+            currStoreId: currStoreId,
             currStoreName: canReadStores[currStoreId]['name'],
+            currVendorId: canReadStores[currStoreId]['vendor_id'],
+            currVendorName: canReadStores[currStoreId]['vendor'],
             cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
             canReadVendors: canReadVendors,
-
-            showChangeStoreDialog: false,
-            storeActionSheet: storeActionSheet,
-
-            sign_count: 0,
-            bad_cases_of: 0,
         };
 
         this._doChangeStore = this._doChangeStore.bind(this);
         this._hideStoreDialog = this._hideStoreDialog.bind(this);
+
+        this.onSearchData();
     }
 
-    componentDidMount() {
+    componentWillMount() {
+    }
+
+    onSearchData(){
         const {
             currentUser,
             accessToken,
@@ -106,7 +112,6 @@ class MineScene extends PureComponent {
         let _this = this;
         InteractionManager.runAfterInteractions(() => {
             this.props.actions.fetchUserCount(currentUser, accessToken, (resp) => {
-                console.log('resp => ', resp);
                 if(resp.ok){
                     let {sign_count, bad_cases_of} = resp.obj;
                     _this.setState({
@@ -114,6 +119,7 @@ class MineScene extends PureComponent {
                         bad_cases_of: bad_cases_of,
                     });
                 }
+                _this.setState({ isRefreshing: false })
             });
         });
     }
@@ -137,13 +143,15 @@ class MineScene extends PureComponent {
         } = currentUserProfile;
 
         this.setState({
-            currStoreId: currStoreId,
             currentUser: currentUser,
-            currStoreName: canReadStores[currStoreId]['name'],
             canReadStores: canReadStores,
             prefer_store: prefer_store,
-            screen_name: screen_name,//员工姓名
+            screen_name: screen_name,
             mobile_phone: mobilephone,
+            currStoreId: currStoreId,
+            currStoreName: canReadStores[currStoreId]['name'],
+            currVendorId: canReadStores[currStoreId]['vendor_id'],
+            currVendorName: canReadStores[currStoreId]['vendor'],
             cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
             canReadVendors: canReadVendors,
         });
@@ -153,9 +161,7 @@ class MineScene extends PureComponent {
     onHeaderRefresh() {
         this.setState({ isRefreshing: true });
 
-        setTimeout(() => {
-            this.setState({ isRefreshing: false })
-        }, 1000);
+        this.onSearchData();
     }
 
     onPressChangeStore() {
@@ -253,6 +259,8 @@ class MineScene extends PureComponent {
                         mobile: this.state.mobile_phone,
                         cover_image: this.state.cover_image,
                         currentUser: this.state.currentUser,
+                        currVendorId: this.state.currVendorId,
+                        currVendorName: this.state.currVendorName,
                     })}
                 >
                     <Button name='chevron-thin-right' style={worker_styles.right_btn} />
@@ -305,7 +313,12 @@ class MineScene extends PureComponent {
             <View style={[block_styles.container]}>
                 <TouchableOpacity
                     style={[block_styles.block_box]}
-                    onPress={() => this.onPress(Config.ROUTE_WORKER)}
+                    onPress={() => this.onPress(Config.ROUTE_WORKER, {
+                        type: 'worker',
+                        currentUser: this.state.currentUser,
+                        currVendorId: this.state.currVendorId,
+                        currVendorName: this.state.currVendorName,
+                    })}
                 >
                     <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')} />
                     <Text style={[block_styles.block_name]}>员工管理</Text>

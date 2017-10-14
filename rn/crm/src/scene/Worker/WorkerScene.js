@@ -19,6 +19,21 @@ import {Cells,
     CellFooter,
 } from "../../weui/index";
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from '../../reducers/global/globalActions';
+import * as mineActions from '../../reducers/mine/mineActions';
+
+function mapStateToProps(state) {
+    const {worker_info, global} = state;
+    return {worker_info: worker_info, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({...mineActions, ...globalActions}, dispatch)
+    }
+}
 
 // create a component
 class WorkerScene extends PureComponent {
@@ -38,13 +53,37 @@ class WorkerScene extends PureComponent {
 
     constructor(props: Object) {
         super(props);
+        const {
+            currentUser,
+            currStoreId,
+            canReadStores,
+            accessToken,
+        } = this.props.global;
 
         this.state = {
-            isRefreshing: false
+            isRefreshing: false,
+            accessToken: accessToken,
+            currentUser: currentUser,
+            currVendorId: canReadStores[currStoreId]['vendor_id'],
+            currVendorName: canReadStores[currStoreId]['vendor'],
         }
     }
 
     componentWillMount() {
+    }
+
+    onSearchWorkers(){
+        const {
+            currVendorId,
+            accessToken,
+        } = this.state;
+        let _this = this;
+        InteractionManager.runAfterInteractions(() => {
+            this.props.actions.fetchWorkers(currVendorId, accessToken, (resp) => {
+                console.log('resp => ', resp);
+                _this.setState({ isRefreshing: false })
+            });
+        });
     }
 
     onHeaderRefresh() {
@@ -180,4 +219,5 @@ const styles = StyleSheet.create({
 
 
 //make this component available to the app
-export default WorkerScene;
+// export default WorkerScene;
+export default connect(mapStateToProps, mapDispatchToProps)(WorkerScene)
