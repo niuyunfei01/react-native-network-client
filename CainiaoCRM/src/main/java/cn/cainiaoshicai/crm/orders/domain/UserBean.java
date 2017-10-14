@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders.domain;
 
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -185,5 +186,24 @@ public class UserBean implements Parcelable {
 
     public void setPrefer_store(long prefer_store) {
         this.prefer_store = prefer_store;
+    }
+
+    public Bundle toBundle() {
+
+        Bundle userB = new Bundle();
+        userB.putString("cover_image", getCover_image());
+        userB.putString("remark", getRemark());
+        userB.putString("sex", this.getSex());
+        userB.putString("mobilephone", this.getMobilephone());
+        userB.putString("id", this.getId());
+        userB.putString("screen_name", this.getScreen_name());
+        userB.putString("name", this.getName());
+        userB.putString("province", this.getProvince());
+        userB.putString("city", this.getCity());
+        userB.putString("location", this.getLocation());
+        userB.putString("description", this.getDescription());
+        userB.putString("prefer_store", String.valueOf(this.getPrefer_store()));
+
+        return userB;
     }
 }

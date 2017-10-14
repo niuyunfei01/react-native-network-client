@@ -16,6 +16,7 @@ import {FormInput} from 'react-native-elements'
 import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
+import { NavigationActions } from 'react-navigation'
 
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
@@ -118,6 +119,8 @@ class LoginScene extends PureComponent {
 
   componentWillMount() {
     this.props.actions.logout();
+    const params = (this.props.navigation.state.params || {});
+    // this._resetNavStack(Config.ROUTE_LOGIN, params)
   }
 
   componentWillUnmount() {
@@ -190,11 +193,24 @@ class LoginScene extends PureComponent {
         } else {
           this.props.navigation.navigate(this.next || Config.ROUTE_ALERT, this.nextParams)
         }
+
+        self._resetNavStack(Config.ROUTE_ALERT);
+        
       } else {
         ToastAndroid.show("登录失败，请输入正确的" + name, ToastAndroid.LONG)
         return false;
       }
     })
+  }
+
+  _resetNavStack(routeName, params = {}) {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({routeName: routeName, params: params})]
+    });
+    this.props.navigation.dispatch(resetAction)
+
+    console.log('_resetNavStack ' + routeName)
   }
 
   doneReqSign() {

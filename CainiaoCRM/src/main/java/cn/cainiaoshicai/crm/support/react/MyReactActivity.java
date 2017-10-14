@@ -61,26 +61,9 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         }
 
         AccountBean ab = GlobalCtx.app().getAccountBean();
-        if (ab != null) {
-            UserBean user = ab.getInfo();
-
-            Bundle userB = new Bundle();
-            userB.putString("cover_image", user.getCover_image());
-            userB.putString("remark", user.getRemark());
-            userB.putString("sex", user.getSex());
-            userB.putString("mobilephone", user.getMobilephone());
-            userB.putString("id", user.getId());
-            userB.putString("screen_name", user.getScreen_name());
-            userB.putString("name", user.getName());
-            userB.putString("province", user.getProvince());
-            userB.putString("city", user.getCity());
-            userB.putString("location", user.getLocation());
-            userB.putString("description", user.getDescription());
-            userB.putString("prefer_store", String.valueOf(user.getPrefer_store()));
-
-            init.putBundle("userProfile", userB);
+        if (ab != null && ab.getInfo() != null) {
+            init.putBundle("userProfile", ab.getInfo().toBundle());
         }
-
 
         Collection<Store> stores = GlobalCtx.app().listStores();
 

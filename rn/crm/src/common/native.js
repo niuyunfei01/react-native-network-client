@@ -40,6 +40,11 @@ export default {
       NativeModules.ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
   },
 
+  dialNumber: async function(phone) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.dialNumber(phone))
+  },
+
   reportException: async function (msg, stack, currentExceptionID, isFatal) {
     console.log("error:", msg)
     console.log("stack:", stack)

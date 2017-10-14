@@ -32,6 +32,9 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 
 public class LoginActivity extends AbstractActionBarActivity {
 
@@ -68,6 +71,7 @@ public class LoginActivity extends AbstractActionBarActivity {
             Intent loginIntent = new Intent(this, MyReactActivity.class);
             loginIntent.putExtra("_action", "Login");
             loginIntent.putExtra("_next_action", "Orders");
+            loginIntent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
             startActivity(loginIntent);
         }
 
