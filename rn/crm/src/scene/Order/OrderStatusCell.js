@@ -27,7 +27,8 @@ class OrderStatusCell extends PureComponent {
 
     const {order, onPressCall} = this.props;
 
-    const packWorkers = order.pack_workers.split(',').map(function(uid){return (order.workers[uid] || {}).nickname})
+    const packWorkersStr = order.pack_workers  ? order.pack_workers : '';
+    const packWorkers = packWorkersStr.split(',').map(function(uid){return (order.workers[uid] || {}).nickname})
     const packLoggerName = Object.assign({}, order.workers[order.pack_done_logger]).nickname;
 
     const invalidStyle = order.orderStatus == Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
