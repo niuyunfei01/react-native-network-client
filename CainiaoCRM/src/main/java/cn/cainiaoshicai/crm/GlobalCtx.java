@@ -142,6 +142,7 @@ public class GlobalCtx extends Application {
     //private SpeechSynthesizer mTts;
 
     private ReactInstanceManager mReactInstanceManager;
+    private Config configByServer;
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -338,6 +339,8 @@ public class GlobalCtx extends Application {
                             return;
                         }
 
+                        ctx.configByServer = config;
+
                         if (config.getShip_workers() != null) {
                             ctx.ship_workers = config.getShip_workers();
                         }
@@ -461,6 +464,10 @@ public class GlobalCtx extends Application {
         }
 
         return storeWorkers.isEmpty() ? getWorkers() : storeWorkers;
+    }
+
+    public Config getConfigByServer() {
+        return configByServer;
     }
 
     public String[] getDelayReasons() {
