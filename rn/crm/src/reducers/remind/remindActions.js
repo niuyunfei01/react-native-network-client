@@ -26,7 +26,7 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
 
 export function fetchRemindCount(token) {
   return dispatch => {
-    dispatch(fetchRemindCount());
+    dispatch(doFetchRemindCount());
     return RemindServices.FetchRemindCount(token)
       .then(response => response.json())
       .then((response) => {
@@ -92,7 +92,7 @@ function fetchRemindList(isRefreshing, loading, isLoadMore) {
   }
 }
 
-function fetchRemindCount() {
+function doFetchRemindCount() {
   return {
     type: types.FETCH_REMIND_COUNT
   }

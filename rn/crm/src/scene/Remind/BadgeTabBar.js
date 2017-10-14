@@ -65,33 +65,34 @@ const BadgeTabBar = React.createClass({
 
     let total = !countData ? 0 : countData['total'];
     let quick = !countData ? 0 : countData['quick'];
-    let label = total == 0 ? name : name + "(" + total + ")"
-    return <IconBadge
-      MainElement={
-        <ButtonAndroid
-          style={styles.flexOne}
-          key={utils.guid()}
-          accessible={true}
-          accessibilityLabel={name}
-          accessibilityTraits='button'
-          onPress={() => onPressHandler(page)}>
+    let label = total == 0 ? name : name + "(" + total + ")";
+    return <ButtonAndroid
+      style={styles.flexOne}
+      key={utils.guid()}
+      accessible={true}
+      accessibilityLabel={name}
+      accessibilityTraits='button'
+      onPress={() => onPressHandler(page)}>
+      <IconBadge
+        MainElement={
           <View style={[styles.tab, this.props.tabStyle,]}>
             <Text style={[{color: textColor, fontWeight,}, textStyle,]}>
               {label}
             </Text>
           </View>
-        </ButtonAndroid>
-      }
-      BadgeElement={
-        <Text style={{color: '#FFFFFF'}}>{quick}</Text>
-      }
-      MainViewStyle={
-        [styles.flexOne]
-      }
-      IconBadgeStyle={
-        {width: 20, height: 15, top: 2, right: 1}
-      }
-    />;
+        }
+        BadgeElement={
+          <Text style={{color: '#FFFFFF'}}>{quick}</Text>
+        }
+        MainViewStyle={
+          [styles.flexOne]
+        }
+        Hidden={quick == 0}
+        IconBadgeStyle={
+          {width: 20, height: 15, top: 2, right: 1}
+        }
+      />
+    </ButtonAndroid>
   },
 
   render() {
