@@ -25,7 +25,7 @@ import {CountDownText} from "../../widget/CounterText";
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
 import Config from '../../config'
-import * as native from "../../common/native";
+import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
 
 const styles = StyleSheet.create({

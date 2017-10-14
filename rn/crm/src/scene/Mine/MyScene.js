@@ -19,7 +19,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import * as mineActions from '../../reducers/mine/mineActions';
 import {Dialog, ActionSheet} from "../../weui/index";
-import * as native from "../../common/native";
+import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {fetchUserCount} from "../../reducers/mine/mineActions";
 
