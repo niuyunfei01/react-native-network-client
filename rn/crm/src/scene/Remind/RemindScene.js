@@ -67,12 +67,7 @@ let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [5, 4, 1, 3];
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
-const _typeAliasMap = {
-  remind_type: 4,
-  complain_type: 1,
-  other_type: 3,
-  refund_type: 5
-};
+
 
 // create a component
 class RemindScene extends PureComponent {

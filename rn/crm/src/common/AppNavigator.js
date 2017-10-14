@@ -91,11 +91,11 @@ const Tab = TabNavigator(
         },
     },
     {
-        initialRouteName: 'Mine',
+        initialRouteName: 'Remind',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,
-        animationEnabled: true,
+        animationEnabled: false,
         lazy: true,
         tabBarOptions: {
             activeTintColor: color.theme,
