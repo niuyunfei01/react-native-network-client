@@ -7,7 +7,7 @@
 
 import Config from '../../config'
 import {serviceSignIn, smsCodeRequest, customerApplyRequest} from '../../services/account'
-import native from "../../common";
+import {native} from "../../common";
 
 import DeviceInfo from 'react-native-device-info';
 
