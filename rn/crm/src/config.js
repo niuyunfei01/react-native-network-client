@@ -16,7 +16,7 @@ export default {
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
-  ROUTE_ALERT: 'Alert',
+  ROUTE_ALERT: 'Tab', //Home for reminds
   ROUTE_ORDERS: 'Orders',
   ROUTE_WORKER: 'Worker',
 };

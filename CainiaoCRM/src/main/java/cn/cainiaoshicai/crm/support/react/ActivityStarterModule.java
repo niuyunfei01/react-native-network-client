@@ -82,8 +82,8 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             AccountBean ab = GlobalCtx.app().getAccountBean();
-            if (ab != null) {
-                callback.invoke(true, "ok", ab.getInfo());
+            if (ab != null && ab.getInfo() != null) {
+                callback.invoke(true, "ok", ab.getInfo().toBundle());
             } else {
                 callback.invoke(false, "Account is null", null);
             }
