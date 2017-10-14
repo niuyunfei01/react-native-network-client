@@ -89,10 +89,12 @@ class OrderScene extends PureComponent {
       shipHided: true,
       gotoEditPoi: false,
       showOptionMenu: false,
+      showCallStore: false,
       errorHints: ''
     }
 
     this.orderId = 0;
+    this.store_contacts = [];
 
     this._onLogin = this._onLogin.bind(this)
     this.toMap = this.toMap.bind(this)
@@ -156,6 +158,15 @@ class OrderScene extends PureComponent {
     }
   }
 
+  _onShowStoreCall() {
+
+    if (!this.store_contacts) {
+
+    }
+    
+    this.setState({showCallStore: true})
+  }
+
   onHeaderRefresh() {
 
     console.log(this.props.global)
@@ -168,8 +179,9 @@ class OrderScene extends PureComponent {
           isFetching: false,
         };
 
-        if (!ok)  {state.errorHints = data};
-
+        if (!ok) {
+          state.errorHints = data
+        }
         this.setState(state)
       })
     }
@@ -358,7 +370,7 @@ class OrderScene extends PureComponent {
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
-            <CallBtn label={order.mobile}/>
+            <CallBtn mobile={order.mobile}/>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={this.toMap}>
               <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
@@ -380,7 +392,7 @@ class OrderScene extends PureComponent {
 
         </View>
 
-        <OrderStatusCell order={order}/>
+        <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
 
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {

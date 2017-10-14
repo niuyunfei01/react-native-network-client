@@ -25,7 +25,7 @@ class OrderStatusCell extends PureComponent {
 
   render() {
 
-    const {order} = this.props;
+    const {order, onPressCall} = this.props;
 
     const packWorkers = order.pack_workers.split(',').map(function(uid){return (order.workers[uid] || {}).nickname})
     const packLoggerName = Object.assign({}, order.workers[order.pack_done_logger]).nickname;
@@ -38,7 +38,7 @@ class OrderStatusCell extends PureComponent {
         <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: 'bold'}]}>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
         <View style={{flex: 1}}/>
 
-        <CallBtn label={order.store_name}/>
+        <CallBtn label={order.store_name} onPress={onPressCall}/>
 
       </View>
       <View style={styles.row}>

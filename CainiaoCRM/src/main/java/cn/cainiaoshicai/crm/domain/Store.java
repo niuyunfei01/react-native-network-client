@@ -102,6 +102,7 @@ public class Store {
         b.putString("loc_lat", loc_lat);
         b.putString("mobile", mobile);
         b.putString("tel", tel);
+        b.putString("vendor_id", String.valueOf(type));
         b.putString("vendor", vendor);
         b.putString("cloudPrinter", this.cloudPrinter);
         b.putBoolean("shipCapable", shipCapable);
