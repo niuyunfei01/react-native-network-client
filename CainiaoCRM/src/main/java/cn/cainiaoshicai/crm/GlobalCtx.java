@@ -12,10 +12,12 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.multidex.BuildConfig;
 import android.support.multidex.MultiDex;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -93,6 +95,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
 public class GlobalCtx extends Application {
@@ -1006,6 +1009,14 @@ public class GlobalCtx extends Application {
                 AppLogger.w("notify sound is disabled!");
                 return true;
             }
+
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            if (tm != null) {
+                if (CALL_STATE_IDLE != tm.getCallState()) {
+                    return true;
+                }
+            }
+
             return false;
         }
 
