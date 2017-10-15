@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { screen, system, native } from '../../common'
@@ -49,7 +49,7 @@ function mapDispatchToProps(dispatch) {
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
 
-class OrderScene extends PureComponent {
+class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
@@ -102,6 +102,7 @@ class OrderScene extends PureComponent {
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this)
     this.onToggleMenuOption = this.onToggleMenuOption.bind(this)
     this.onPrint = this.onPrint.bind(this)
+    this._onShowStoreCall = this._onShowStoreCall.bind(this)
   }
 
   // componentWillReceiveProps(nextProp) {
@@ -139,6 +140,7 @@ class OrderScene extends PureComponent {
     this.orderId = orderId;
     console.log("componentWillMount: params orderId:", orderId)
     const order = this.props.order.order;
+    this.store_contacts = this.props.store.contacts[order.store_id];
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
     }
@@ -182,33 +184,34 @@ class OrderScene extends PureComponent {
 
   _onShowStoreCall() {
 
-    const store_id = this.state.order.store_id;
-    if (!this.state.store.contacts[store_id]) {
+    const store_id = this.props.order.order.store_id;
+    if (!this.store_contacts) {
       this.setState({showContactsLoading: true})
-      getContacts(this.state.global.accessToken, store_id, (ok, msg, contacts) => {
+
+      const {dispatch} = this.props;
+
+      dispatch(getContacts(this.props.global.accessToken, store_id, (ok, msg, contacts) => {
         console.log("getContacts: ok=", ok, "msg", msg);
         this.store_contacts = contacts;
         this.setState({showContactsLoading: false, showCallStore: true})
-      });
+      }));
     } else {
-      this.store_contacts = this.state.store.contacts[store_id];
       this.setState({showCallStore: true})
     }
   }
 
   _contacts2menus() {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
-    return this.store_contacts.map((contact, idx) => {
-      const {sign, mobile, id} = contact;
-      return [
-        {
-          type: 'default',
-          label: (sign? '[上班] ':'') + mobile,
-          onPress: () => {
-            native.dialNumber(mobile)
-          },
+    return (this.store_contacts||[]).map((contact, idx) => {
+      console.log(contact, idx)
+      const {sign, mobile, desc,  id} = contact;
+      return {
+        type: 'default',
+        label:  desc + (sign ? '[上班] ' : ''),
+        onPress: () => {
+          native.dialNumber(mobile)
         }
-      ]
+      }
     });
   }
 
@@ -218,11 +221,11 @@ class OrderScene extends PureComponent {
 
   onHeaderRefresh() {
 
-    console.log(this.props.global)
-    
     if (!this.state.isFetching) {
       this.setState({isFetching: true});
-      getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
+
+      const {dispatch} = this.props;
+      dispatch(getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
 
         let state = {
           isFetching: false,
@@ -232,7 +235,7 @@ class OrderScene extends PureComponent {
           state.errorHints = data
         }
         this.setState(state)
-      })
+      }))
     }
   }
 
