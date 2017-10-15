@@ -513,8 +513,8 @@ class OrderScene extends Component {
                     marginBottom: pxToDp(14)
                   }}>{item.product_name}</Text>
                   <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: '#f44140'}}>{item.price}</Text>
-                    <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {item.price * item.num}</Text>
+                    <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+                    <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
                   </View>
                 </View>
                 <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>
