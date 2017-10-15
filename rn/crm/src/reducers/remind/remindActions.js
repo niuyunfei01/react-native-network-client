@@ -15,11 +15,32 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
           dispatch(receiveRemindList(result.list, typeId, result.curr_page, result.total_page));
         } else {
           dispatch(receiveRemindList([], typeId, 1, 1));
-          ToastShort(error.message);
+          ToastShort(response.reason);
         }
       }).catch((error) => {
         dispatch(receiveRemindList([], typeId, 1, 1));
         ToastShort(error.message);
+      })
+  }
+}
+
+export function fetchRemindCount(token) {
+  return dispatch => {
+    dispatch(doFetchRemindCount());
+    return RemindServices.FetchRemindCount(token)
+      .then(response => response.json())
+      .then((response) => {
+        console.log("get remind count " + JSON.stringify(response));
+        let result = response.obj;
+        if (response.ok) {
+          dispatch(receiveRemindCount(result))
+        } else {
+          ToastShort(response.reason);
+          dispatch(receiveRemindCount({}))
+        }
+      }).catch((error) => {
+        ToastShort(error.message);
+        dispatch(receiveRemindCount({}))
       })
   }
 }
@@ -33,9 +54,44 @@ export function updateRemind(id, typeId, status, token) {
         let {ok, desc} = json;
         dispatch(updateSuccessRemindStatus(id, typeId, ok, desc));
       }).catch((error) => {
-        //TODO
+        dispatch(updateSuccessRemindStatus(id, typeId, false, 'error'));
         ToastLong('更新任务失败，请重试');
       })
+  }
+}
+
+export function delayRemind(id, typeId, minutes, token) {
+  return dispatch => {
+    dispatch(doDelayRemind(id, typeId, minutes))
+    return RemindServices.DelayRemind(id, minutes, token)
+      .then(response => response.json())
+      .then(json => {
+        let {ok, desc} = json;
+        dispatch(delayRemindSuccess(id, typeId, ok, desc));
+      })
+      .catch((error) => {
+        dispatch(delayRemindSuccess(id, typeId, false, 'error'));
+        ToastLong('更新任务失败，请重试');
+      })
+  }
+}
+
+function doDelayRemind(id, typeId, minutes) {
+  return {
+    type: types.DELAY_REMIND,
+    id: id,
+    typeId: typeId,
+    minutes: minutes
+  }
+}
+
+function delayRemindSuccess(id, typeId, ok, desc) {
+  return {
+    type: types.DELAY_REMIND_SUCCESS,
+    id: id,
+    typeId: typeId,
+    ok: ok,
+    desc: desc
   }
 }
 
@@ -71,6 +127,12 @@ function fetchRemindList(isRefreshing, loading, isLoadMore) {
   }
 }
 
+function doFetchRemindCount() {
+  return {
+    type: types.FETCH_REMIND_COUNT
+  }
+}
+
 function receiveRemindList(remindList, typeId, currPage, totalPage) {
   return {
     type: types.RECEIVE_REMIND_LIST,
@@ -78,5 +140,12 @@ function receiveRemindList(remindList, typeId, currPage, totalPage) {
     typeId: typeId,
     currPage: currPage,
     totalPage: totalPage
+  }
+}
+
+function receiveRemindCount(remindCount) {
+  return {
+    type: types.RECEIVE_REMIND_COUNT,
+    result: remindCount
   }
 }

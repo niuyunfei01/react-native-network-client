@@ -2,6 +2,7 @@ const React = require('react');
 const ReactNative = require('react-native');
 
 import IconBadge from '../../widget/IconBadge';
+import utils from '../../util/common'
 
 const {
   StyleSheet,
@@ -40,6 +41,8 @@ const BadgeTabBar = React.createClass({
     tabStyle: View.propTypes.style,
     renderTab: React.PropTypes.func,
     underlineStyle: View.propTypes.style,
+    count: React.PropTypes.object,
+    countIndex: React.PropTypes.array
   },
 
   getDefaultProps() {
@@ -54,36 +57,42 @@ const BadgeTabBar = React.createClass({
   },
 
   renderTab(name, page, isTabActive, onPressHandler) {
-    const {activeTextColor, inactiveTextColor, textStyle,} = this.props;
+    const {activeTextColor, inactiveTextColor, textStyle, count, countIndex} = this.props;
     const textColor = isTabActive ? activeTextColor : inactiveTextColor;
     const fontWeight = isTabActive ? 'bold' : 'normal';
+    let indexKey = countIndex[page];
+    let countData = count[indexKey];
 
-    return <IconBadge
-      MainElement={
-        <ButtonAndroid
-          style={styles.flexOne}
-          key={page}
-          accessible={true}
-          accessibilityLabel={name}
-          accessibilityTraits='button'
-          onPress={() => onPressHandler(page)}>
+    let total = !countData ? 0 : countData['total'];
+    let quick = !countData ? 0 : countData['quick'];
+    let label = total == 0 ? name : name + "(" + total + ")";
+    return <ButtonAndroid
+      style={styles.flexOne}
+      key={indexKey}
+      accessible={true}
+      accessibilityLabel={name}
+      accessibilityTraits='button'
+      onPress={() => onPressHandler(page)}>
+      <IconBadge
+        MainElement={
           <View style={[styles.tab, this.props.tabStyle,]}>
             <Text style={[{color: textColor, fontWeight,}, textStyle,]}>
-              {name}
+              {label}
             </Text>
           </View>
-        </ButtonAndroid>
-      }
-      BadgeElement={
-        <Text style={{color: '#FFFFFF'}}>1</Text>
-      }
-      MainViewStyle={
-        [styles.flexOne]
-      }
-      IconBadgeStyle={
-        {width: 20, height: 15, top: 2, right: 1}
-      }
-    />;
+        }
+        BadgeElement={
+          <Text style={{color: '#FFFFFF'}}>{quick}</Text>
+        }
+        MainViewStyle={
+          [styles.flexOne]
+        }
+        Hidden={quick == 0}
+        IconBadgeStyle={
+          {width: 20, height: 15, top: 2, right: 1}
+        }
+      />
+    </ButtonAndroid>
   },
 
   render() {

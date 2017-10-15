@@ -16,7 +16,7 @@ const initialState = {
   processing: false,
   updateId: '',
   updateTypeId: '',
-  remindNum: {}
+  remindCount: {}
 };
 
 export default function remind(state = initialState, action) {
@@ -37,6 +37,7 @@ export default function remind(state = initialState, action) {
         loading: state.remindList[action.typeId] == undefined || state.remindList[action.typeId].length == 0,
         processing: false
       });
+    case types.DELAY_REMIND:
     case types.UPDATE_REMIND_STATUS:
       return Object.assign({}, state, {
         doingUpdate: true,
@@ -52,6 +53,17 @@ export default function remind(state = initialState, action) {
         processing: false,
         remindList: removeRemind(state, action)
       });
+    case types.DELAY_REMIND_SUCCESS:
+      return Object.assign({}, state, {
+        doingUpdate: false,
+        updateId: action.id,
+        updateTypeId: action.typeId,
+        processing: false
+      });
+    case types.FETCH_REMIND_COUNT:
+      return state;
+    case types.RECEIVE_REMIND_COUNT:
+      return Object.assign({}, state, {remindCount: action.result});
     default:
       return state;
   }

@@ -34,7 +34,7 @@ import LoadingView from '../../widget/LoadingView';
 import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
-import {fetchRemind, updateRemind} from '../../reducers/remind/remindActions'
+import {fetchRemind, updateRemind, fetchRemindCount, delayRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 
 import RNButton from '../../widget/RNButton';
@@ -52,7 +52,14 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({fetchRemind, updateRemind, ...globalActions}, dispatch)}
+  return {
+    dispatch, ...bindActionCreators({
+      fetchRemind,
+      updateRemind,
+      fetchRemindCount,
+      delayRemind, ...globalActions
+    }, dispatch)
+  }
 }
 
 
@@ -60,12 +67,7 @@ let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [5, 4, 1, 3];
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
-const _typeAliasMap = {
-  remind_type: 4,
-  complain_type: 1,
-  other_type: 3,
-  refund_type: 5
-};
+
 
 // create a component
 class RemindScene extends PureComponent {
@@ -84,6 +86,13 @@ class RemindScene extends PureComponent {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
+  }
+
+  componentWillMount() {
+    const {dispatch} = this.props;
+    let token = this._getToken();
+    console.log('remind view will mount')
+    dispatch(fetchRemindCount(token));
   }
 
   componentDidMount() {
@@ -191,7 +200,11 @@ class RemindScene extends PureComponent {
     this._hideStopRemindDialog();
   }
 
-  _doDelayRemind(time) {
+  _doDelayRemind(minutes) {
+    let {type, id} = this.state.opRemind;
+    const {dispatch} = this.props;
+    let token = this._getToken();
+    dispatch(delayRemind(id, type, minutes, token));
     this._hideDelayRemindDialog();
   }
 
@@ -218,22 +231,25 @@ class RemindScene extends PureComponent {
     if (typeId != 3) {
       return null;
     }
-    //todo dynamic show
-    let buttons = Array(6).fill().map(i => <RNButton
-      containerStyle={{
-        height: 30,
-        width: 48,
-        overflow: 'hidden',
-        borderRadius: 15,
-        backgroundColor: '#e6e6e6',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderColor: '#999',
-        borderWidth: 1
-      }}
-      style={{fontSize: 10, color: '#999'}}>
-      修改
-    </RNButton>);
+    let buttons = [];
+    for (let i = 0; i < 6; i++) {
+      buttons.push(<RNButton
+        key={i}
+        containerStyle={{
+          height: 30,
+          width: 48,
+          overflow: 'hidden',
+          borderRadius: 15,
+          backgroundColor: '#e6e6e6',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderColor: '#999',
+          borderWidth: 1
+        }}
+        style={{fontSize: 10, color: '#999'}}>
+        修改
+      </RNButton>)
+    }
     return (
       <View style={{
         flex: 1,
@@ -339,6 +355,7 @@ class RemindScene extends PureComponent {
 
   render() {
     const {remind} = this.props;
+    const remindCount = remind.remindCount;
     let lists = [];
     _typeIds.forEach((typeId, index) => {
       let key = typeId + "-" + _typeAlias[index]
@@ -354,7 +371,7 @@ class RemindScene extends PureComponent {
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar/>}
+          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeAlias}/>}
           locked={remind.processing}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
