@@ -40,8 +40,7 @@ export function getOrderFailure(json) {
 
 /**
  */
-export function
-getOrder(sessionToken, orderId, callback) {
+export function getOrder(sessionToken, orderId, callback) {
   return dispatch => {
     dispatch(getOrderRequest())
     const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`
