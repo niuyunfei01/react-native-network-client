@@ -15,6 +15,7 @@ import global from './global/globalReducer'
 import order from './order/orderReducer'
 import remind from './remind/remindReducer'
 import store from './store/storeReducer'
+import mine from './mine/mineReducer'
 
 import {combineReducers} from 'redux'
 
@@ -29,7 +30,8 @@ const rootReducer = combineReducers({
   global,
   order,
   remind,
-  store
-})
+  store,
+  mine
+});
 
 export default rootReducer

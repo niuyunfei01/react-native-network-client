@@ -6,8 +6,7 @@ import color from '../widget/color'
 import TabBarItem from '../widget/TabBarItem'
 
 import RemindScene from '../scene/Remind/RemindScene'
-//import MineScene from '../scene/Mine/MineScene'
-import MyScene from '../scene/Mine/MyScene';
+import MineScene from '../scene/Mine/MineScene';
 import OrderScene from '../scene/Order/OrderScene'
 import LoginScene from '../scene/Login/LoginScene'
 import GoodsScene from '../scene/Goods/GoodsScene'
@@ -18,6 +17,7 @@ import native from "./native";
 import screen from './screen'
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerScene from "../scene/Worker/WorkerScene";
+import UserScene from "../scene/User/UserScene";
 
 const Tab = TabNavigator(
     {
@@ -76,7 +76,7 @@ const Tab = TabNavigator(
 
 
         Mine: {
-            screen: MyScene,
+            screen: MineScene,
             navigationOptions: ({navigation}) => ({
                 tabBarLabel: '我的',
                 tabBarIcon: ({focused, tintColor}) => (
@@ -92,6 +92,7 @@ const Tab = TabNavigator(
     },
     {
         initialRouteName: 'Remind',
+        // initialRouteName: 'Mine',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,
@@ -146,11 +147,12 @@ class Navigator extends Component {
                 Apply: {screen: ApplyScene},
                 TestWeui: {screen: TestWeuiScene},
                 Worker: {screen: WorkerScene},
+                User: {screen: UserScene},
             },
             stackNavigatorConfigs
         );
-        console.log('go with config:', stackNavigatorConfigs, "props", this.props);
-      console.log("screen:", screen)
+        // console.log('go with config:', stackNavigatorConfigs, "props", this.props);
+        // console.log("screen:", screen);
         return <CustomNavigator screenProps={screenProps}/>
     }
 }
