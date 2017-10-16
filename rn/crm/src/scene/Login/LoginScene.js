@@ -270,15 +270,14 @@ class LoginScene extends PureComponent {
               <TouchableOpacity>
                 <Text>比邻鲜使用协议</Text>
               </TouchableOpacity>
-              <Button style={{marginTop: pxToDp(110)}} color={colors.main_color} title="登录"
-                      onPress={this.onLogin}/>
+
+              <Button style={[]} type={'primary'} onPress={this.onLogin}>登录</Button>
 
               <View style={{alignItems: 'center'}}>
-                <TouchableOpacity>
-                  <Text onPress={() => {
-                    this.props.navigation.navigate('Apply')
-                  }}
-                        style={{
+                <TouchableOpacity onPress={() => {
+                  this.props.navigation.navigate('Apply')
+                }}>
+                  <Text style={{
                           color: colors.main_color,
                           fontSize: pxToDp(colors.actionSecondSize),
                           marginTop: pxToDp(50)

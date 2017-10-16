@@ -21,16 +21,15 @@ import CommonStyle from '../../common/CommonStyles'
 /**
  * The actions we need
  */
-import {getOrder} from '../../reducers/order/orderActions'
+import {getOrder, printInCloud} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
 import {ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import ModalDropdown from 'react-native-modal-dropdown';
-import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 const numeral = require('numeral')
 
@@ -139,10 +138,13 @@ class OrderScene extends Component {
     const orderId = (this.props.navigation.state.params || {}).orderId;
     this.orderId = orderId;
     console.log("componentWillMount: params orderId:", orderId)
-    const order = this.props.order.order;
-    this.store_contacts = this.props.store.contacts[order.store_id];
+    const { order } = this.props.order;
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
+    } else {
+      if (order) {
+        this.store_contacts = this.props.store.contacts[order.store_id];
+      }
     }
   }
 
@@ -241,6 +243,7 @@ class OrderScene extends Component {
 
   _hidePrinterChooser () {
     console.log('_hidePrinterChooser');
+    this.setState({showPrinterChooser: false})
   }
   
   _cloudPrinterSN () {
@@ -253,7 +256,17 @@ class OrderScene extends Component {
   }
 
   _doCloudPrint() {
-    console.log('_doCloudPrint')
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    dispatch(printInCloud(accessToken, this.orderId, (ok, msg, data) => {
+      console.log('print done:', ok, msg, data)
+      if (ok) {
+        ToastShort("已发送到打印机");
+      } else {
+        this.setState({errorHints: '打印失败：' + msg})
+      }
+      this._hidePrinterChooser();
+    }))
   }
 
   _doBluetoothPrint() {
@@ -262,6 +275,7 @@ class OrderScene extends Component {
     native.printBtPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
     })
+    this._hidePrinterChooser();
   }
 
   _onLogin() {
@@ -349,6 +363,17 @@ class OrderScene extends Component {
               }
             ]}
           />
+
+          { !!this.state.errorHints &&
+          <Dialog onRequestClose={()=>{}}
+            visible={!!this.state.errorHints}
+            buttons={[{
+              type: 'default',
+              label: '知道了',
+              onPress: () => {this.setState({errorHints: ''})}
+            }]}      
+          ><Text>打印失败: {this.state.errorHints}</Text></Dialog>
+          }
 
           <Dialog onRequestClose={() => {}}
                   visible={this.state.gotoEditPoi}
