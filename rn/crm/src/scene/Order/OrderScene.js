@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { screen, system, native } from '../../common'
@@ -21,8 +21,8 @@ import CommonStyle from '../../common/CommonStyles'
 /**
  * The actions we need
  */
-import * as orderActions from '../../reducers/order/orderActions'
-import * as globalActions from '../../reducers/global/globalActions'
+import {getOrder} from '../../reducers/order/orderActions'
+import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -38,18 +38,18 @@ function mapStateToProps(state) {
   return {
     order: state.order,
     global: state.global,
+    store: state.store,
   }
 }
 
 function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({...orderActions, ...globalActions}, dispatch)
-  }
+  return {dispatch, ...bindActionCreators({getContacts, getOrder}, dispatch)}
 }
+
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
 
-class OrderScene extends PureComponent {
+class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
@@ -102,7 +102,33 @@ class OrderScene extends PureComponent {
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this)
     this.onToggleMenuOption = this.onToggleMenuOption.bind(this)
     this.onPrint = this.onPrint.bind(this)
+    this._onShowStoreCall = this._onShowStoreCall.bind(this)
   }
+
+  // componentWillReceiveProps(nextProp) {
+  //   if (this.props.visible !== nextProp.visible) {
+  //     if (nextProp.visible) {
+  //       this.setState({visible: true})
+  //       Animated.timing(
+  //         this.state.fadeAnim,
+  //         {
+  //           toValue: 1,
+  //           duration: this.props.duration || 300,
+  //           easing: Easing.easeOut
+  //         }
+  //       ).start()
+  //     } else {
+  //       Animated.timing(
+  //         this.state.fadeAnim,
+  //         {
+  //           toValue: 0,
+  //           duration: this.props.duration || 300,
+  //           easing: Easing.easeOut
+  //         }
+  //       ).start(() => this.setState({visible: false}))
+  //     }
+  //   }
+  // }
 
   componentDidMount() {
     this.props.navigation.setParams({onToggleMenuOption: this.onToggleMenuOption, onPrint: this.onPrint});
@@ -114,6 +140,7 @@ class OrderScene extends PureComponent {
     this.orderId = orderId;
     console.log("componentWillMount: params orderId:", orderId)
     const order = this.props.order.order;
+    this.store_contacts = this.props.store.contacts[order.store_id];
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
     }
@@ -124,10 +151,7 @@ class OrderScene extends PureComponent {
     const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
 
-
     const store = stores[order.store_id];
-
-    console.log('print on stores', store, "order:", order.id)
 
     if (store && store.cloudPrinter) {
       this.setState({showPrinterChooser: true})
@@ -160,20 +184,48 @@ class OrderScene extends PureComponent {
 
   _onShowStoreCall() {
 
+    const store_id = this.props.order.order.store_id;
     if (!this.store_contacts) {
+      this.setState({showContactsLoading: true})
 
+      const {dispatch} = this.props;
+
+      dispatch(getContacts(this.props.global.accessToken, store_id, (ok, msg, contacts) => {
+        console.log("getContacts: ok=", ok, "msg", msg);
+        this.store_contacts = contacts;
+        this.setState({showContactsLoading: false, showCallStore: true})
+      }));
+    } else {
+      this.setState({showCallStore: true})
     }
-    
-    this.setState({showCallStore: true})
+  }
+
+  _contacts2menus() {
+    // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
+    return (this.store_contacts||[]).map((contact, idx) => {
+      console.log(contact, idx)
+      const {sign, mobile, desc,  id} = contact;
+      return {
+        type: 'default',
+        label:  desc + (sign ? '[上班] ' : ''),
+        onPress: () => {
+          native.dialNumber(mobile)
+        }
+      }
+    });
+  }
+
+  _hideCallStore() {
+    this.setState({showCallStore: false});
   }
 
   onHeaderRefresh() {
 
-    console.log(this.props.global)
-    
     if (!this.state.isFetching) {
       this.setState({isFetching: true});
-      this.props.actions.getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
+
+      const {dispatch} = this.props;
+      dispatch(getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
 
         let state = {
           isFetching: false,
@@ -183,7 +235,7 @@ class OrderScene extends PureComponent {
           state.errorHints = data
         }
         this.setState(state)
-      })
+      }))
     }
   }
 
@@ -284,6 +336,20 @@ class OrderScene extends PureComponent {
               }
             ]}
           />
+
+          <ActionSheet
+            visible={this.state.showCallStore}
+            onRequestClose={()=>{console.log('call_store_contacts action_sheet closed!')}}
+            menus={this._contacts2menus()}
+            actions={[
+              {
+                type: 'default',
+                label: '取消',
+                onPress: this._hideCallStore.bind(this),
+              }
+            ]}
+          />
+
           <Dialog onRequestClose={() => {}}
                   visible={this.state.gotoEditPoi}
                   buttons={[{
