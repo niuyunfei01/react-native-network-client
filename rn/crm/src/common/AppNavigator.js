@@ -92,6 +92,7 @@ const Tab = TabNavigator(
     },
     {
         initialRouteName: 'Remind',
+        // initialRouteName: 'Mine',
         tabBarComponent: TabBarBottom,
         tabBarPosition: 'bottom',
         swipeEnabled: false,

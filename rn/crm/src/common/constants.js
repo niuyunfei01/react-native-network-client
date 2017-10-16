@@ -63,7 +63,7 @@ export default keyMirror({
     GET_USER_COUNT: null,
 
     GET_WORKER: null,
-    
+
     GET_CONTACT_REQUEST: null,
     GET_CONTACT_SUCCESS: null,
     GET_CONTACT_FAILURE: null,
