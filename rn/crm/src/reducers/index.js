@@ -4,7 +4,7 @@
  * This class combines all the reducers into one
  *
  */
-'use strict'
+'use strict';
 /**
  * ## Imports
  *
@@ -16,6 +16,7 @@ import order from './order/orderReducer'
 import remind from './remind/remindReducer'
 import store from './store/storeReducer'
 import mine from './mine/mineReducer'
+import worker from './worker/workerReducer'
 
 import {combineReducers} from 'redux'
 
@@ -31,7 +32,8 @@ const rootReducer = combineReducers({
   order,
   remind,
   store,
-  mine
+  mine,
+  worker,
 });
 
 export default rootReducer

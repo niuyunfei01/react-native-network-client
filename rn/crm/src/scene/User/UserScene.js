@@ -27,6 +27,8 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Config from "../../config";
 
 
 function mapStateToProps(state) {
@@ -56,9 +58,33 @@ class UserScene extends PureComponent {
         </View>
       ),
       headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
-      headerRight: '',
+      headerRight: (//给场景权限
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_USER_ADD, {
+                  type: 'edit',
+                  user_id: params.currentUser,
+                  user_name: params.screen_name,
+                  mobile: params.mobile,
+                });
+              });
+            }}
+          >
+            <Icon name='pencil-square-o' style={styles.btn_edit}/>
+          </TouchableOpacity>
+        </View>
+      ),
     }
   };
+
+  onPress(route, params = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params);
+    });
+  }
 
   constructor(props: Object) {
     super(props);
@@ -254,6 +280,13 @@ const styles = StyleSheet.create({
     marginHorizontal: pxToDp(30),
     marginTop: pxToDp(65),
     backgroundColor: '#6db06f',
+  },
+  btn_edit: {
+    fontSize: pxToDp(40),
+    width: pxToDp(42),
+    height: pxToDp(36),
+    color: colors.color666,
+    marginRight: pxToDp(30),
   },
 });
 

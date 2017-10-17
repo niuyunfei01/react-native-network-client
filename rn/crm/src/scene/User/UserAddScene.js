@@ -1,0 +1,318 @@
+//import liraries
+import React, {PureComponent} from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+  InteractionManager
+} from 'react-native';
+import colors from "../../styles/colors";
+import pxToDp from "../../util/pxToDp";
+import {
+  Cells,
+  CellsTitle,
+  Cell,
+  CellHeader,
+  CellBody,
+  CellFooter,
+  Button,
+  ButtonArea,
+  Input,
+  Label,
+  Icon,
+  Toast,
+} from "../../weui/index";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from '../../reducers/global/globalActions';
+import {ToastShort} from "../../util/ToastUtils";
+import {getVendorStores, saveVendorUser} from "../../reducers/worker/workerActions";
+import Config from "../../config";
+import {NavigationActions} from 'react-navigation';
+
+function mapStateToProps(state) {
+  const {worker, global} = state;
+  return {worker: worker, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      ...globalActions
+    }, dispatch)
+  }
+}
+
+// create a component
+class UserAddScene extends PureComponent {
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    const page_type = (params || {}).type;
+    let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
+
+    return {
+      headerTitle: (
+        <View>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{pageTitle}</Text>
+        </View>
+      ),
+      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
+      headerRight: '',
+    }
+  };
+
+  constructor(props: Object) {
+    super(props);
+
+    const {
+      accessToken,
+      currentUser,
+      canReadStores,
+      currStoreId,
+    } = this.props.global;
+
+    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorName = canReadStores[currStoreId]['vendor'];
+
+    const {worker} = this.props;
+    let vendor_stores = (worker === undefined || worker.vendor_stores[currVendorId] === undefined) ? [] : worker.vendor_stores[currVendorId];
+
+    let stores = [{name: '访问所有门店', value: 0}];
+    let v_store = vendor_stores.map((store) => {
+      return {name: store.name, value: parseInt(store.id)};
+    });
+
+    const {type, user_id, mobile, user_name} = (this.props.navigation.state.params || {});
+    let route_back = type === 'edit' ? Config.ROUTE_USER : Config.ROUTE_WORKER;
+
+    this.state = {
+      type: type,
+      isRefreshing: false,
+      onSubmitting: false,
+      accessToken: accessToken,
+      currentUser: currentUser,
+      currVendorId: currVendorId,
+      currVendorName: currVendorName,
+      stores: stores.concat(v_store),
+      route_back: route_back,
+
+      user_id: user_id === undefined ? 0 : user_id,
+      mobile: mobile === undefined ? '' : mobile,
+      user_name: user_name === undefined ? '' : user_name,
+      store_id: -1,
+    };
+
+    this.onUserAdd = this.onUserAdd.bind(this);
+    if (vendor_stores.length === 0) {
+      this.getVendorStore();
+    }
+  }
+
+  getVendorStore() {
+    const {dispatch} = this.props;
+    let token = this.state.accessToken;
+    let vendor_id = this.state.currVendorId;
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(getVendorStores(vendor_id, token, (resp) => {
+        if (resp.ok) {
+          let vendor_stores = resp.obj;
+          let stores = [{name: '访问所有门店', value: 0}];
+          let v_store = vendor_stores.map((store) => {
+            return {name: store.name, value: parseInt(store.id)};
+          });
+          _this.setState({
+            stores: stores.concat(v_store),
+          });
+          if (_this.state.isRefreshing) {
+            ToastShort('刷新门店列表完成');
+          }
+        }
+        _this.setState({isRefreshing: false});
+      }));
+    });
+  }
+
+  onHeaderRefresh() {
+    this.setState({isRefreshing: true});
+    this.getVendorStore();
+  }
+
+  render() {
+    return (
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }
+        style={{backgroundColor: '#f2f2f2'}}
+      >
+        <CellsTitle style={styles.cell_title}>基本信息</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell style={[styles.cell_row, {borderColor: colors.color999, borderBottomWidth: pxToDp(1),}]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>手机号</Label>
+            </CellHeader>
+            <CellBody>
+              <Input
+                onChangeText={(mobile) => this.setState({mobile})}
+                value={this.state.mobile}
+                style={[styles.cell_input]}
+                placeholder="请输入手机号"
+                maxLength={11} // 可输入的最大长度
+                keyboardType='numeric' //默认弹出的键盘
+                underlineColorAndroid='transparent' //取消安卓下划线
+              />
+            </CellBody>
+          </Cell>
+          <Cell style={[styles.cell_row]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>姓名</Label>
+            </CellHeader>
+            <CellBody>
+              <Input
+                onChangeText={(user_name) => this.setState({user_name})}
+                value={this.state.user_name}
+                style={[styles.cell_input]}
+                placeholder="请输入姓名"
+                underlineColorAndroid='transparent' //取消安卓下划线
+              />
+            </CellBody>
+          </Cell>
+        </Cells>
+
+        <CellsTitle style={styles.cell_title}>限制只能访问某门店</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          {this.state.stores.map((option, idx) =>
+            <Cell
+              key={idx}
+              onPress={() => this.onChooseStore(option.value)}
+              style={[styles.cell_row, styles.border_bottom_line]}
+            >
+              <CellBody>
+                <Text style={styles.cell_body}>{option.name || option.value}</Text>
+              </CellBody>
+              <CellFooter>
+                {this.state.store_id === option.value ? (
+                  <Icon name="success_no_circle" style={{fontSize: 16,}}/>
+                ) : null}
+              </CellFooter>
+            </Cell>
+          )}
+        </Cells>
+        <Button onPress={this.onUserAdd} type='primary' style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}</Button>
+        <Toast
+          icon="loading"
+          show={this.state.onSubmitting}
+          onRequestClose={() => {
+          }}
+        >提交中</Toast>
+      </ScrollView>
+    );
+  }
+
+  onChooseStore(store_id) {
+    this.setState({store_id});
+  }
+
+  onUserAdd() {
+    if (this.state.onSubmitting) {
+      return false;
+    }
+    const {dispatch} = this.props;
+    let {accessToken, currVendorId, user_id, mobile, user_name, store_id, route_back} = this.state;
+    if (isNaN(mobile) || mobile.length !== 11) {
+      ToastShort('手机号码格式有误');
+      return false;
+    } else if (user_name === '') {
+      ToastShort('请输入用户名');
+      return false;
+    } else if (store_id < 0) {
+      ToastShort('请选择可访问门店');
+      return false;
+    }
+
+    let data = {
+      _v_id: currVendorId,
+      user_name: user_name,
+      mobile: mobile,
+      limit_store: store_id,
+      user_id: user_id,
+    };
+    console.log('save_data -> ', data);
+    let _this = this;
+    // this.setState({onSubmitting: true});
+    // InteractionManager.runAfterInteractions(() => {
+    //   dispatch(saveVendorUser(data, accessToken, (resp) => {
+    //     if (resp.ok) {
+    //       ToastShort('添加员工成功');
+    //     }
+    //     _this.setState({
+    //       onSubmitting: false,
+    //     });
+        setTimeout(function () {
+          const backAction = NavigationActions.back({
+            routeName: route_back,
+          });
+          _this.props.navigation.dispatch(backAction);
+        }, 2000);
+    //
+    //   }));
+    // });
+  }
+}
+
+// define your styles
+const styles = StyleSheet.create({
+  cell_title: {
+    marginBottom: pxToDp(5),
+    paddingLeft: pxToDp(30),
+  },
+  cell_box: {
+    marginTop: 0,
+    paddingLeft: pxToDp(20),
+    borderTopWidth: pxToDp(1),
+    borderBottomWidth: pxToDp(1),
+    borderColor: colors.color999,
+  },
+  cell_row: {
+    height: pxToDp(70),
+    justifyContent: 'center',
+  },
+  cell_label: {
+    width: pxToDp(170),
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  cell_body: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  border: {
+    borderWidth: pxToDp(1),
+    borderColor: '#000',
+  },
+  btn_submit: {
+    margin: pxToDp(30),
+    backgroundColor: '#6db06f',
+  },
+  border_bottom_line: {
+    borderColor: colors.color999,
+    borderBottomWidth: pxToDp(1),
+  },
+});
+
+
+//make this component available to the app
+// export default UserScene;
+export default connect(mapStateToProps, mapDispatchToProps)(UserAddScene)
+

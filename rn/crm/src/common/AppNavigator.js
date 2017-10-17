@@ -18,6 +18,7 @@ import screen from './screen'
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerScene from "../scene/Worker/WorkerScene";
 import UserScene from "../scene/User/UserScene";
+import UserAddScene from "../scene/User/UserAddScene";
 
 const Tab = TabNavigator(
     {
@@ -148,6 +149,7 @@ class Navigator extends Component {
                 TestWeui: {screen: TestWeuiScene},
                 Worker: {screen: WorkerScene},
                 User: {screen: UserScene},
+                UserAdd: {screen: UserAddScene},
             },
             stackNavigatorConfigs
         );

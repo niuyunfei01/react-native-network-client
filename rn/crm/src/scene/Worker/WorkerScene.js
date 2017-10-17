@@ -80,7 +80,9 @@ class WorkerScene extends PureComponent {
       forbidden: mine.forbidden,
     };
 
-    this.onSearchWorkers();
+    if(this.state.normal === undefined || this.state.forbidden === undefined){
+      this.onSearchWorkers();
+    }
   }
 
   componentWillMount() {
@@ -154,6 +156,9 @@ class WorkerScene extends PureComponent {
 
   renderList() {
     let {normal, forbidden} = this.state;
+    if(normal === undefined || forbidden === undefined){
+      return null;
+    }
     let _this = this;
     let normal_workers = Array.from(normal).map((user) => {
       return _this.renderUser(user);
@@ -198,7 +203,11 @@ class WorkerScene extends PureComponent {
                 <Text style={[styles.worker_name]}>新增员工</Text>
               </CellBody>
               <CellFooter>
-                <Button name='chevron-right' style={styles.right_btn}/>
+                <TouchableOpacity
+                  onPress={() => this.onPress(Config.ROUTE_USER_ADD)}
+                >
+                  <Button name='chevron-right' style={styles.right_btn}/>
+                </TouchableOpacity>
               </CellFooter>
             </Cell>
           </Cells>
@@ -208,14 +217,6 @@ class WorkerScene extends PureComponent {
     );
   }
 
-}
-
-class User extends PureComponent {
-
-
-  render() {
-
-  }
 }
 
 

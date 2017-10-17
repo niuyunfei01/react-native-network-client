@@ -5,7 +5,6 @@ const {
   GET_WORKER,
 } = require('../../common/constants').default;
 
-
 /**
  * ## Initial State
  */

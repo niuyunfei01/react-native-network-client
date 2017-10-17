@@ -20,4 +20,5 @@ export default {
   ROUTE_ORDERS: 'Orders',
   ROUTE_WORKER: 'Worker',
   ROUTE_USER: 'User',
+  ROUTE_USER_ADD: 'UserAdd',
 };
