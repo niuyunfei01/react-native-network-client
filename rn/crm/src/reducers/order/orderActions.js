@@ -14,7 +14,9 @@ const {
 
   ORDER_UPDATE_REQUEST,
   ORDER_UPDATE_SUCCESS,
-  ORDER_UPDATE_FAILURE
+  ORDER_UPDATE_FAILURE,
+
+  ORDER_PRINTED_CLOUD
 
 } = require('../../common/constants').default
 
@@ -35,6 +37,30 @@ export function getOrderFailure(json) {
   return {
     type: GET_ORDER_FAILURE,
     payload: json
+  }
+}
+
+export function msgPrintInCloudDone(json) {
+  return {
+    type: ORDER_PRINTED_CLOUD,
+    payload: json,
+  }
+}
+
+export function printInCloud(sessionToken, orderId, callback) {
+  return dispatch => {
+    const url = `api/print_in_cloud/${orderId}.json?access_token=${sessionToken}`
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(res => res.json())
+      .then(json => {
+        if (json.ok) {
+          dispatch(msgPrintInCloudDone({orderId, printTimes: json.obj}))
+        }
+        callback(json.ok, json.reason, json.obj)
+      }).catch((error) => {
+      console.log('print_order error:', error)
+      callback(false, "打印失败, 请检查网络稍后重试")
+    });
   }
 }
 

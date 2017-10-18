@@ -52,9 +52,12 @@ export default keyMirror({
   GET_ORDER_SUCCESS: null,
   GET_ORDER_FAILURE: null,
 
+
   ORDER_UPDATE_REQUEST: null,
   ORDER_UPDATE_SUCCESS: null,
   ORDER_UPDATE_FAILURE: null,
+  ORDER_PRINTED_CLOUD: null,
+
 
   FORGOT_PASSWORD: null,
   LOGIN: null,

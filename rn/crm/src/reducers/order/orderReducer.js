@@ -11,17 +11,17 @@
  */
 const {
 
-    GET_ORDER_REQUEST,
-    GET_ORDER_SUCCESS,
-    GET_ORDER_FAILURE,
+  ORDER_PRINTED_CLOUD,
+  GET_ORDER_SUCCESS,
+  GET_ORDER_FAILURE,
 
-    ORDER_UPDATE_REQUEST,
-    ORDER_UPDATE_SUCCESS,
-    ORDER_UPDATE_FAILURE,
+  ORDER_UPDATE_REQUEST,
+  ORDER_UPDATE_SUCCESS,
+  ORDER_UPDATE_FAILURE,
 
-    LOGOUT_SUCCESS,
+  LOGOUT_SUCCESS,
 
-    SET_STATE
+  SET_STATE
 } = require('../../common/constants').default
 
 import {REHYDRATE} from 'redux-persist/constants'
@@ -31,11 +31,11 @@ import {REHYDRATE} from 'redux-persist/constants'
  *
  */
 const initialState = {
-    isFetching: false,
-    error:'',
-    order: {},
-    order_id: 0,
-    currentUser: null,
+  isFetching: false,
+  error: '',
+  order: {},
+  order_id: 0,
+  currentUser: null,
 }
 
 /**
@@ -43,61 +43,66 @@ const initialState = {
  * @param {Object} state - initialState
  * @param {Object} action - type and payload
  */
-export default function orderReducer (state = initialState, action) {
-    let nextProfileState = null
+export default function orderReducer(state = initialState, action) {
+  let nextProfileState = null
 
-    switch (action.type) {
-        /**
-         * ### Request starts
-         * set the form to fetching and clear any errors
-         */
-        case GET_ORDER_REQUEST:
-        case ORDER_UPDATE_REQUEST:
-            return state;
+  switch (action.type) {
 
-        /**
-         * ### Request end successfully
-         * set the form to fetching as done
-         */
-        case ORDER_UPDATE_SUCCESS:
-            return state;
+    case ORDER_PRINTED_CLOUD:
+      if (action.payload.orderId === state.order.id) {
+        state.order.print_times = action.payload.printTimes;
+        return {
+          ...state,
+          order: state.order
+        }
+      } else {
+        return state;
+      }
 
-        /**
-         * ### Request ends successfully
-         *
-         * the fetching is done, set the UI fields and the originalProfile
-         *
-         * Validate the data to make sure it's all good and someone didn't
-         * mung it up through some other mechanism
-         */
-        case GET_ORDER_SUCCESS:
-            console.log('get_order_success: order_id', action.payload.id)
-            return {...state,
-                order: action.payload,
-                order_id: action.payload.id,
-            };
-
-        /**
-         * User logged out, so reset form fields and original profile.
-         *
-         */
-        case LOGOUT_SUCCESS:
-            return {...state, order: null, order_id: 0};
-
-        /**
-         * ### Request fails
-         * we're done fetching and the error needs to be displayed to the user
-         */
-        case GET_ORDER_FAILURE:
-        case ORDER_UPDATE_FAILURE:
-            return {...state, error: action.payload};
-
-        // case REHYDRATE:
-        //     return  { ...state, ...action.payload }
-
-    }// switch
     /**
-     * # Default
+     * ### Request end successfully
+     * set the form to fetching as done
      */
-    return state
+    case ORDER_UPDATE_SUCCESS:
+      return state;
+
+    /**
+     * ### Request ends successfully
+     *
+     * the fetching is done, set the UI fields and the originalProfile
+     *
+     * Validate the data to make sure it's all good and someone didn't
+     * mung it up through some other mechanism
+     */
+    case GET_ORDER_SUCCESS:
+      console.log('get_order_success: order_id', action.payload.id)
+      return {
+        ...state,
+        order: action.payload,
+        order_id: action.payload.id,
+      };
+
+    /**
+     * User logged out, so reset form fields and original profile.
+     *
+     */
+    case LOGOUT_SUCCESS:
+      return {...state, order: null, order_id: 0};
+
+    /**
+     * ### Request fails
+     * we're done fetching and the error needs to be displayed to the user
+     */
+    case GET_ORDER_FAILURE:
+    case ORDER_UPDATE_FAILURE:
+      return {...state, error: action.payload};
+
+    // case REHYDRATE:
+    //     return  { ...state, ...action.payload }
+
+  }// switch
+  /**
+   * # Default
+   */
+  return state
 }
