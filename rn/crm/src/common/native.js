@@ -40,6 +40,11 @@ export default {
       NativeModules.ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
   },
 
+  ordersByMobileTimes: async function(phone, times) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))
+  },
+
   dialNumber: async function(phone) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.dialNumber(phone))

@@ -56,6 +56,8 @@ export default keyMirror({
     ORDER_UPDATE_SUCCESS: null,
     ORDER_UPDATE_FAILURE: null,
   ORDER_PRINTED_CLOUD: null,
+  ORDER_ADD_ITEM: null,
+  ORDER_EDIT_ITEM: null,
 
     FORGOT_PASSWORD: null,
     LOGIN: null,

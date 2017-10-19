@@ -19,6 +19,8 @@ const {
   ORDER_UPDATE_SUCCESS,
   ORDER_UPDATE_FAILURE,
 
+  ORDER_EDIT_ITEM,
+
   LOGOUT_SUCCESS,
 
   SET_STATE
@@ -58,6 +60,24 @@ export default function orderReducer(state = initialState, action) {
       } else {
         return state;
       }
+
+    case ORDER_EDIT_ITEM:
+      const {order} = state;
+      if (!order.edits) {
+        order.edits = {
+          edit: {},
+          add: {}
+        };
+      }
+
+      const item = action.item;
+      if (item.id) {
+        order.edits.edit[item.id] = item;
+      } else {
+        order.edits.add[item.product_id] = item;
+      }
+
+      return {...state, order};
 
     /**
      * ### Request end successfully
