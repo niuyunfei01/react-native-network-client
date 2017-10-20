@@ -29,6 +29,7 @@ import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import {NavigationActions} from 'react-navigation';
+import LoadingView from "../../widget/LoadingView";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -175,7 +176,7 @@ class WorkerScene extends PureComponent {
   renderList() {
     let {normal, forbidden} = this.state;
     if(normal === undefined || forbidden === undefined){
-      return null;
+      return <LoadingView/>;
     }
     let _this = this;
     let normal_workers = Array.from(normal).map((user) => {
@@ -214,7 +215,6 @@ class WorkerScene extends PureComponent {
   }
 
   render() {
-    // console.log('this_key -> ', this.props.navigation.state);
     return (
       <ScrollView
         refreshControl={
