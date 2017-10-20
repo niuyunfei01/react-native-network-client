@@ -10,7 +10,7 @@ import React, { PureComponent, Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import InputNumber from 'rc-input-number';
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
-import { screen, system, native } from '../../common'
+import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from '../../config'
@@ -22,7 +22,7 @@ import CommonStyle from '../../common/CommonStyles'
 /**
  * The actions we need
  */
-import {getOrder, printInCloud, orderEditItem} from '../../reducers/order/orderActions'
+import {getOrder, printInCloud} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
@@ -45,7 +45,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder, orderEditItem, printInCloud}, dispatch)}
+  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud}, dispatch)}
 }
 
 
@@ -99,7 +99,9 @@ class OrderScene extends Component {
       gotoEditPoi: false,
       showOptionMenu: false,
       showCallStore: false,
-      errorHints: ''
+      errorHints: '',
+      itemsAdded: {},
+      itemsEdited: {},
     };
 
     this.orderId = 0;
@@ -280,18 +282,49 @@ class OrderScene extends Component {
 
   _doAddItem(item) {
     console.log('doAddItem', item)
-    // orderAddItem(item);
-    const {order} = this.props.order;
-    if (item.product_id && order.edits.add[item.product_id]) {
-      ToastShort(`商品[${item['product_name']}]已更新`)
-    } else {
-      orderEditItem(item)
-    }
+    if (item.product_id && this.state.itemsAdded[item.product_id]) {
+      let msg;
+      if (item.num > 0) {
+        msg = `商品[${item['product_name']}]已更新`;
+      } else {
+        msg = `商品[${item['product_name']}]已撤销`
+      }
+      ToastShort(msg)
+    } 
+    this._recordEdition(item)
   }
 
   _onItemRowNumberChanged (item, newNum) {
-    item.num = newNum;
-    orderEditItem(item);
+
+    console.log('accept a item:', item, 'to new', newNum)
+    this._recordEdition({...item, num: newNum});
+  }
+
+  _recordEdition(item) {
+    if (item.id) {
+      this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
+    } else {
+      this.setState({itemsAdded: {...this.state.itemsAdded, [item.product_id]: item}});
+    }
+  }
+
+  _totalEditCents() {
+    const {order} = this.props.order;
+    const totalAdd = tool.objectReduce(this.state.itemsAdded, (item1, item2) => item1.num * item1.normal_price + item2.num * item2.normal_price)
+    tool.objectMap(this.state.itemsEdited, (item, idx) => {
+      const base = order.items[item.id].num;
+      if (item.num >= base) {
+        return (item.num - base) * item.normal_price;
+      } else {
+        //退款金额： [(退款菜品现价 + 餐盒费)/(全部菜品现价总和 + 餐盒费)] * (最终支付价格 - 配送费)
+        //退款规则：
+        return (item.num - base) * item.normal_price;
+      }
+    })
+    const totalEdit = tool.objectReduce(this.state.itemsEdited, (item1, item2) => {
+      
+      return item1.num * item1.normal_price + item2.num * item2.normal_price
+    })
   }
 
   goToSetMap() {
@@ -443,6 +476,9 @@ class OrderScene extends Component {
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
+    const totalMoneyEdit = -10; //this._totalEditCents();
+
+    const _items = order.items || {};
     return (<View>
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
@@ -511,7 +547,7 @@ class OrderScene extends Component {
                 color: colors.color999,
                 fontSize: pxToDp(24),
                 marginLeft: pxToDp(20)
-              }}>{(order.items || {}).length}种商品</Text>
+              }}>{_items.length}种商品</Text>
             </View>
             <View style={{flex: 1}}/>
 
@@ -544,19 +580,26 @@ class OrderScene extends Component {
               }}/>)
             }
           </View>
-          {!this.state.itemsHided && (order.items || {}).map((item, idx) => {
-            return (<ItemRow key={idx} item={item} edits={order.edits ? order.edits.edit : {}} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+          {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
+            return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
-          {!this.state.itemsHided && order.edits && (order.edits.add || {}).map((item, idx) => {
+          {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
             return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
-              <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
-                {numeral(order.total_goods_price / 100).format('0.00')}
+
+              {totalMoneyEdit !== 0 &&
+              <View><Text
+                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
+                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
               </Text>
+                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
+                  {numeral(order.total_goods_price / 100).format('0.00')}
+                </Text></View>}
+              
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
@@ -569,7 +612,7 @@ class OrderScene extends Component {
             <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')}</Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>
-            <View style={[styles.moneyLeft,{alignItems: 'center'}]} >
+            <View style={[styles.moneyLeft,{alignItems: 'center'}]}>
               <Text style={styles.moneyListTitle}>优惠</Text>
               <TouchableOpacity style={{marginLeft: 5}}><Icon name='question-circle-o'/></TouchableOpacity>
             </View>
@@ -647,6 +690,7 @@ class ItemRow extends PureComponent {
       idx, item, isAdd, edited, onInputNumberChange = () => {}, isEditing = false
     } = this.props;
 
+    const showEditAdded = isEditing && !isAdd && edited && edited.num > item.num;
     return <View key={idx} style={[styles.row, {
       marginTop: 0,
       paddingTop: pxToDp(14),
@@ -665,21 +709,21 @@ class ItemRow extends PureComponent {
           <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
         </View>
       </View>
-      {isEditing && !isAdd && edited && edited.num > item.num &&
-      <Text>已加{edited.num - item.num}</Text>}
+      {showEditAdded &&
+      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{edited.num - item.num}</Text>}
       {isEditing && !isAdd && edited && edited.num < item.num &&
-      <Text>已减{item.num - edited.num}</Text>}
+      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{item.num - edited.num}</Text>}
       {isEditing && isAdd && <Text>加货</Text>}
       {!isEditing &&
       <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
       {isEditing &&
-        <View style={top_styles.stepper}>
+        <View style={[top_styles.stepper, {marginLeft: 10}]}>
           <InputNumber
             styles={inputNumberStyles}
             min={0}
             defaultValue={parseInt(item.num)}
-            style={{ backgroundColor: 'white', paddingHorizontal: 10, width: 120 }}
-            onChange={(v)=>{console.log("editedNum", v); /*onInputNumberChange(item, v)*/}}
+            style={{ backgroundColor: 'white', width: 86 }}
+            onChange={(v)=>{console.log("editedNum", v); onInputNumberChange(item, v)}}
             keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
           />
         </View>}
@@ -854,10 +898,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   stepper: {
-    height: 44,
-    marginTop: 100,
-    paddingHorizontal: 10,
+    // height: 44,
+    // marginTop: 100,
   },
+  editStatus: {
+    color: colors.white,
+    fontSize: pxToDp(22),
+    borderRadius: pxToDp(5),
+    alignSelf: 'center',
+    paddingLeft:5,
+    paddingRight: 5,
+    paddingTop: 2,
+    paddingBottom: 2
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderScene)

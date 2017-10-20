@@ -1,4 +1,6 @@
 import { StyleSheet } from 'react-native';
+import colors from "../../styles/colors";
+import pxToDp from "../../util/pxToDp";
 
 export default StyleSheet.create({
   container: {
@@ -15,17 +17,15 @@ export default StyleSheet.create({
     color: '#222',
   },
   stepWrap: {
-    width: 28,
-    height: 28,
-    borderWidth: 1,
-    borderColor: '#d9d9d9',
+    width: pxToDp(50),
+    height: pxToDp(50),
     borderRadius: 6,
-    backgroundColor: 'white',
+    backgroundColor: colors.main_color,
   },
   stepText: {
     textAlign: 'center',
-    fontSize: 20,
-    color: '#999',
+    fontSize: pxToDp(38),
+    color: colors.white,
     backgroundColor: 'transparent',
   },
   stepDisabled: {

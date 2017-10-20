@@ -15,6 +15,14 @@ export function urlByAppendingParams(url: string, params: Object) {
     return result;
 }
 
+export function objectMap(obj, fn) {
+  return Object.keys(obj).map((idx) => fn(obj[idx], idx))
+}
+
+export function objectReduce(obj, fn) {
+  return Object.keys(obj).reduce((idx1, idx2) => fn(obj[idx1], obj[idx2]))
+}
+
 export function shortOrderDay(dt) {
     return Moment(dt).format('MMDD')
 }
@@ -56,4 +64,14 @@ export function shortTimeDesc(datetime) {
   } else {
     return dtMoment.format("YY/M/D H:i");
   }
+}
+
+export default {
+  urlByAppendingParams,
+  objectMap,
+  objectReduce,
+  shortTimeDesc,
+  shortOrderDay,
+  orderOrderTimeShort,
+  orderExpectTime,
 }
