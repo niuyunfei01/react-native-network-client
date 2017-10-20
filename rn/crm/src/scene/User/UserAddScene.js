@@ -30,13 +30,14 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {ToastShort} from "../../util/ToastUtils";
-import {getVendorStores, saveVendorUser} from "../../reducers/worker/workerActions";
+import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
+import Cts from "../../Cts";
 import {NavigationActions} from 'react-navigation';
 
 function mapStateToProps(state) {
-  const {worker, global} = state;
-  return {worker: worker, global: global}
+  const {mine, global} = state;
+  return {mine: mine, global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -70,7 +71,6 @@ class UserAddScene extends PureComponent {
 
     const {
       accessToken,
-      currentUser,
       canReadStores,
       currStoreId,
     } = this.props.global;
@@ -78,23 +78,23 @@ class UserAddScene extends PureComponent {
     let currVendorId = canReadStores[currStoreId]['vendor_id'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
 
-    const {worker} = this.props;
-    let vendor_stores = (worker === undefined || worker.vendor_stores[currVendorId] === undefined) ? [] : worker.vendor_stores[currVendorId];
+    const {mine} = this.props;
+    let vendor_stores = (mine === undefined || mine.vendor_stores[currVendorId] === undefined) ? [] : mine.vendor_stores[currVendorId];
 
     let stores = [{name: '访问所有门店', value: 0}];
     let v_store = vendor_stores.map((store) => {
       return {name: store.name, value: parseInt(store.id)};
     });
 
-    const {type, user_id, mobile, user_name} = (this.props.navigation.state.params || {});
-    let route_back = type === 'edit' ? Config.ROUTE_USER : Config.ROUTE_WORKER;
+    const {type, user_id, mobile, user_name, user_status, store_id, worker_id} = (this.props.navigation.state.params || {});
+    let route_back = Config.ROUTE_WORKER;
+    console.log('this.props.navigation.state.params -> ', this.props.navigation.state.params);
 
     this.state = {
       type: type,
       isRefreshing: false,
       onSubmitting: false,
       accessToken: accessToken,
-      currentUser: currentUser,
       currVendorId: currVendorId,
       currVendorName: currVendorName,
       stores: stores.concat(v_store),
@@ -103,9 +103,10 @@ class UserAddScene extends PureComponent {
       user_id: user_id === undefined ? 0 : user_id,
       mobile: mobile === undefined ? '' : mobile,
       user_name: user_name === undefined ? '' : user_name,
-      store_id: -1,
+      user_status: user_status === undefined ? Cts.WORKER_STATUS_OK : user_status,
+      store_id: store_id === undefined ? -1 : store_id,
+      worker_id: worker_id,
     };
-
     this.onUserAdd = this.onUserAdd.bind(this);
     if (vendor_stores.length === 0) {
       this.getVendorStore();
@@ -119,6 +120,7 @@ class UserAddScene extends PureComponent {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       dispatch(getVendorStores(vendor_id, token, (resp) => {
+        console.log(resp);
         if (resp.ok) {
           let vendor_stores = resp.obj;
           let stores = [{name: '访问所有门店', value: 0}];
@@ -227,45 +229,57 @@ class UserAddScene extends PureComponent {
       return false;
     }
     const {dispatch} = this.props;
-    let {accessToken, currVendorId, user_id, mobile, user_name, store_id, route_back} = this.state;
+    let {type, accessToken, currVendorId, user_id, mobile, user_name, store_id, user_status, route_back, worker_id} = this.state;
     if (isNaN(mobile) || mobile.length !== 11) {
       ToastShort('手机号码格式有误');
       return false;
     } else if (user_name === '') {
       ToastShort('请输入用户名');
       return false;
-    } else if (store_id < 0) {
+    } else if (!(store_id >= 0)) {
       ToastShort('请选择可访问门店');
       return false;
     }
 
     let data = {
       _v_id: currVendorId,
+      worker_id: worker_id,
       user_name: user_name,
       mobile: mobile,
       limit_store: store_id,
       user_id: user_id,
+      user_status: user_status,
     };
     console.log('save_data -> ', data);
     let _this = this;
-    // this.setState({onSubmitting: true});
-    // InteractionManager.runAfterInteractions(() => {
-    //   dispatch(saveVendorUser(data, accessToken, (resp) => {
-    //     if (resp.ok) {
-    //       ToastShort('添加员工成功');
-    //     }
-    //     _this.setState({
-    //       onSubmitting: false,
-    //     });
-        setTimeout(function () {
-          const backAction = NavigationActions.back({
-            routeName: route_back,
-          });
-          _this.props.navigation.dispatch(backAction);
-        }, 2000);
-    //
-    //   }));
-    // });
+    this.setState({onSubmitting: true});
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(saveVendorUser(data, accessToken, (resp) => {
+        console.log('save_resp -> ', resp);
+        _this.setState({
+          onSubmitting: false,
+        });
+
+        if (resp.ok) {
+          let msg = type === 'add' ? '添加员工成功' : '操作成功';
+          ToastShort(msg);
+
+          setTimeout(function () {
+            // const backAction = NavigationActions.back();
+            const backAction = NavigationActions.reset({
+              index: 1,
+              actions: [
+                NavigationActions.navigate({routeName: Config.ROUTE_Mine}),
+                NavigationActions.navigate({routeName: Config.ROUTE_WORKER})
+              ]
+            });
+            _this.props.navigation.dispatch(backAction);
+          }, 1000);
+        }else{
+          ToastShort(resp.desc);
+        }
+      }));
+    });
   }
 }
 

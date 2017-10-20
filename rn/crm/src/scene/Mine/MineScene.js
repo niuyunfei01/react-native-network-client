@@ -15,6 +15,7 @@ import pxToDp from "../../util/pxToDp";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-vector-icons/Entypo';
 import Config from '../../config';
+import Cts from '../../Cts';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -22,6 +23,7 @@ import {ActionSheet} from "../../weui/index";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {fetchWorkers, fetchUserCount} from "../../reducers/mine/mineActions";
+import {setCurrentStore} from "../../reducers/global/globalActions";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -78,7 +80,6 @@ class MineScene extends PureComponent {
     }
 
     const {mine} = this.props;
-
     this.state = {
       isRefreshing: false,
       showChangeStoreDialog: false,
@@ -102,7 +103,9 @@ class MineScene extends PureComponent {
     this._doChangeStore = this._doChangeStore.bind(this);
     this._hideStoreDialog = this._hideStoreDialog.bind(this);
 
-    this.onGetUserCount();
+    if(this.state.sign_count === undefined || this.state.bad_cases_of === undefined){
+      this.onGetUserCount();
+    }
   }
 
   componentWillMount() {
@@ -178,13 +181,17 @@ class MineScene extends PureComponent {
 
   _doChangeStore(store_id) {
     let {canReadStores} = this.state;
+    const {dispatch} = this.props;
     let _this = this;
     native.setCurrStoreId(store_id, function (ok, msg) {
-      console.log('setCurrStoreId => ', ok, msg);
+      console.log('setCurrStoreId => ', store_id, ok, msg);
       if (ok) {
+        dispatch(setCurrentStore(store_id));
         _this.setState({
           currStoreId: store_id,
           currStoreName: canReadStores[store_id]['name'],
+          currVendorId: canReadStores[store_id]['vendor_id'],
+          currVendorName: canReadStores[store_id]['vendor'],
         });
       } else {
         ToastShort(msg);
@@ -261,10 +268,12 @@ class MineScene extends PureComponent {
           style={[worker_styles.chevron_right]}
           onPress={() => this.onPress(Config.ROUTE_USER, {
             type: 'mine',
-            mobile: this.state.mobile_phone,
-            screen_name: this.state.screen_name,
-            cover_image: this.state.cover_image,
             currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+            // mobile: this.state.mobile_phone,
+            // screen_name: this.state.screen_name,
+            // cover_image: this.state.cover_image,
+            // user_status: Cts.WORKER_STATUS_OK,
           })}
         >
           <Button name='chevron-thin-right' style={worker_styles.right_btn}/>

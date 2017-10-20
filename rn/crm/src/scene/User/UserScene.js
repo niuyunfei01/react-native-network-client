@@ -21,14 +21,17 @@ import {
   CellFooter,
   Button,
   ButtonArea,
+  Toast,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
+import {fetchUserCount, fetchWorkers, editWorkerStatus} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
+import Cts from "../../Cts";
+import {NavigationActions} from 'react-navigation';
 
 
 function mapStateToProps(state) {
@@ -58,7 +61,7 @@ class UserScene extends PureComponent {
         </View>
       ),
       headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
-      headerRight: (//给场景权限
+      headerRight: (params.type === 'mine' ? null : (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             onPress={() => {
@@ -66,8 +69,11 @@ class UserScene extends PureComponent {
                 navigation.navigate(Config.ROUTE_USER_ADD, {
                   type: 'edit',
                   user_id: params.currentUser,
-                  user_name: params.screen_name,
+                  user_name: params.user_name,
                   mobile: params.mobile,
+                  user_status: params.user_status,
+                  store_id: params.store_id,
+                  worker_id: params.worker_id,
                 });
               });
             }}
@@ -75,41 +81,40 @@ class UserScene extends PureComponent {
             <Icon name='pencil-square-o' style={styles.btn_edit}/>
           </TouchableOpacity>
         </View>
-      ),
+      )),
     }
   };
-
-  onPress(route, params = {}) {
-    let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
-    });
-  }
 
   constructor(props: Object) {
     super(props);
 
     let {
       type,
-      cover_image,
-      mobile,
       currentUser,//个人页的当前用户ID必须是传入进来的
-      screen_name,
-      user_status,
+      navigation_key,
+      currVendorId,
     } = this.props.navigation.state.params || {};
 
     const {mine} = this.props;
-
+    let {
+      id, nickname, nameRemark, mobilephone, image, //user 表数据
+      worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
+    } = mine.user_list[currVendorId][currentUser];
     this.state = {
       isRefreshing: false,
+      onSubmitting: false,
       type: type,
       sign_count: mine.sign_count[currentUser] === undefined ? 0 : mine.sign_count[currentUser],
       bad_cases_of: mine.bad_cases_of[currentUser] === undefined ? 0 : mine.bad_cases_of[currentUser],
-      mobile: mobile,
-      cover_image: cover_image,
-      screen_name: screen_name,
-      currentUser: currentUser,
-      user_status: user_status,
+      mobile: mobilephone,
+      cover_image: image,
+      screen_name: nickname,
+      currentUser: user_id,
+      currVendorId: currVendorId,
+      user_status: parseInt(status),
+      worker_id: worker_id,
+
+      last_nav_key: navigation_key,
     };
 
     if (mine.sign_count[currentUser] === undefined || mine.sign_count[currentUser] === undefined) {
@@ -129,7 +134,6 @@ class UserScene extends PureComponent {
       dispatch(fetchUserCount(currentUser, accessToken, (resp) => {
         if (resp.ok) {
           let {sign_count, bad_cases_of} = resp.obj;
-          console.log('resp -> ', resp.obj);
           _this.setState({
             sign_count: sign_count,
             bad_cases_of: bad_cases_of,
@@ -189,13 +193,70 @@ class UserScene extends PureComponent {
         </View>
         {type === 'mine' ?
           (<Button type='warn' style={styles.btn_logout}>退出登录</Button>) :
-          (user_status === '禁用' ?
-              <Button type='primary' style={styles.btn_allow}>取消禁用</Button> :
-              <Button type='warn' style={styles.btn_logout}>禁用</Button>
+          (user_status === Cts.WORKER_STATUS_OK ?
+              <Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)}
+                      style={styles.btn_logout}>禁用</Button> :
+              <Button type='primary' onPress={() => this.onPress(Cts.WORKER_STATUS_OK)}
+                      style={styles.btn_allow}>取消禁用</Button>
           )
         }
+
+        <Toast
+          icon="loading"
+          show={this.state.onSubmitting}
+          onRequestClose={() => {
+          }}
+        >提交中</Toast>
       </ScrollView>
     );
+  }
+
+  onPress(user_status) {
+    if (this.state.onSubmitting) {
+      return false;
+    }
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId, worker_id, last_nav_key} = this.state;
+
+    let data = {
+      _v_id: currVendorId,
+      worker_id: worker_id,
+      user_status: user_status,
+    };
+    console.log('save_data -> ', data);
+    let _this = this;
+    this.setState({onSubmitting: true});
+
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(editWorkerStatus(data, accessToken, (resp) => {
+        console.log('save_status_resp -> ', resp);
+        _this.setState({
+          onSubmitting: false,
+        });
+
+        if (resp.ok) {
+          let msg = '操作成功';
+          ToastShort(msg);
+          _this.setState({
+            user_status: user_status,
+          });
+          const setParamsAction = NavigationActions.setParams({
+            params: { shouldRefresh: true},
+            key: last_nav_key,
+          });
+          this.props.navigation.dispatch(setParamsAction);
+          const setSelfParamsAction = NavigationActions.setParams({
+            params: { user_status: user_status},
+            key: this.props.navigation.state.key,
+          });
+          this.props.navigation.dispatch(setSelfParamsAction);
+
+        } else {
+          ToastShort(resp.desc);
+        }
+      }));
+    });
   }
 }
 

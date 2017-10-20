@@ -150,6 +150,7 @@ class Navigator extends Component {
                 Worker: {screen: WorkerScene},
                 User: {screen: UserScene},
                 UserAdd: {screen: UserAddScene},
+                Mine: {screen: MineScene},
             },
             stackNavigatorConfigs
         );

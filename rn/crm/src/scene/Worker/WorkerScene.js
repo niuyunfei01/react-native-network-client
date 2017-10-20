@@ -28,6 +28,7 @@ import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
+import {NavigationActions} from 'react-navigation';
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -69,23 +70,33 @@ class WorkerScene extends PureComponent {
       accessToken,
     } = this.props.global;
 
+    console.log('currStoreId -> ', currStoreId);
+    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorName = canReadStores[currStoreId]['vendor'];
+
     const {mine} = this.props;
+
     this.state = {
       isRefreshing: false,
       accessToken: accessToken,
       currentUser: currentUser,
-      currVendorId: canReadStores[currStoreId]['vendor_id'],
-      currVendorName: canReadStores[currStoreId]['vendor'],
-      normal: mine.normal,
-      forbidden: mine.forbidden,
+      currVendorId: currVendorId,
+      currVendorName: currVendorName,
+      normal: mine.normal[currVendorId],
+      forbidden: mine.forbidden[currVendorId],
     };
 
-    if(this.state.normal === undefined || this.state.forbidden === undefined){
+    if(this.props.navigation.state.params === undefined ||
+      this.state.normal === undefined ||
+      this.state.forbidden === undefined){
       this.onSearchWorkers();
     }
   }
 
   componentWillMount() {
+  }
+
+  componentDidMount() {
   }
 
   onSearchWorkers() {
@@ -140,11 +151,16 @@ class WorkerScene extends PureComponent {
           <TouchableOpacity
             onPress={() => this.onPress(Config.ROUTE_USER, {
               type: 'worker',
+              currentUser: user.id,
+              worker_id: user.worker_id,
+              navigation_key: this.props.navigation.state.key,
+              store_id: parseInt(user.store_id),
+              currVendorId: this.state.currVendorId,
+
               mobile: user.mobilephone,
               cover_image: user.image,
-              currentUser: user.id,
-              screen_name: user.nickname,
-              user_status: user.status,
+              user_name: user.nickname,
+              user_status: parseInt(user.status),
             })}
           >
             <Button name='chevron-right' style={styles.right_btn}/>
@@ -166,6 +182,7 @@ class WorkerScene extends PureComponent {
     let forbidden_workers = Array.from(forbidden).map((user) => {
       return _this.renderUser(user);
     });
+
     return (
       <View>
         <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
@@ -180,7 +197,22 @@ class WorkerScene extends PureComponent {
     );
   }
 
+  componentDidUpdate(){
+    let {key, params} = this.props.navigation.state;
+    let {shouldRefresh} = (params || {});
+    if(shouldRefresh === true){
+      console.log(' Refresh worker list -> ', this.props.navigation.state);
+      this.onSearchWorkers();
+      const setParamsAction = NavigationActions.setParams({
+        params: { shouldRefresh: false},
+        key: key,
+      });
+      this.props.navigation.dispatch(setParamsAction);
+    }
+  }
+
   render() {
+    // console.log('this_key -> ', this.props.navigation.state);
     return (
       <ScrollView
         refreshControl={
@@ -204,7 +236,9 @@ class WorkerScene extends PureComponent {
               </CellBody>
               <CellFooter>
                 <TouchableOpacity
-                  onPress={() => this.onPress(Config.ROUTE_USER_ADD)}
+                  onPress={() => this.onPress(Config.ROUTE_USER_ADD, {
+                    type: 'add',
+                  })}
                 >
                   <Button name='chevron-right' style={styles.right_btn}/>
                 </TouchableOpacity>
