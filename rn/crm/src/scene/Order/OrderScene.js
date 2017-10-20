@@ -7,7 +7,8 @@
  */
 
 import React, { PureComponent, Component } from 'react'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
+import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
+import InputNumber from 'rc-input-number';
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { screen, system, native } from '../../common'
 import {bindActionCreators} from "redux";
@@ -21,7 +22,7 @@ import CommonStyle from '../../common/CommonStyles'
 /**
  * The actions we need
  */
-import {getOrder, printInCloud} from '../../reducers/order/orderActions'
+import {getOrder, printInCloud, orderEditItem} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
@@ -30,6 +31,8 @@ import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog} from "../../weui/in
 import {ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import ModalDropdown from 'react-native-modal-dropdown';
+import Cts from '../../Cts'
+import inputNumberStyles from './inputNumberStyles';
 
 const numeral = require('numeral')
 
@@ -42,11 +45,18 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder}, dispatch)}
+  return {dispatch, ...bindActionCreators({getContacts, getOrder, orderEditItem, printInCloud}, dispatch)}
 }
 
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
+const supportEditGoods = (orderStatus) => {
+  orderStatus = parseInt(orderStatus)
+  return orderStatus === Cts.ORDER_STATUS_TO_SHIP ||
+    orderStatus === Cts.ORDER_STATUS_TO_READY ||
+    orderStatus === Cts.ORDER_STATUS_SHIPPING
+}
+
 
 class OrderScene extends Component {
 
@@ -90,44 +100,22 @@ class OrderScene extends Component {
       showOptionMenu: false,
       showCallStore: false,
       errorHints: ''
-    }
+    };
 
     this.orderId = 0;
     this.store_contacts = [];
 
-    this._onLogin = this._onLogin.bind(this)
-    this.toMap = this.toMap.bind(this)
-    this.goToSetMap = this.goToSetMap.bind(this)
-    this.onHeaderRefresh = this.onHeaderRefresh.bind(this)
-    this.onToggleMenuOption = this.onToggleMenuOption.bind(this)
-    this.onPrint = this.onPrint.bind(this)
-    this._onShowStoreCall = this._onShowStoreCall.bind(this)
+    this._onLogin = this._onLogin.bind(this);
+    this.toMap = this.toMap.bind(this);
+    this.goToSetMap = this.goToSetMap.bind(this);
+    this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
+    this.onToggleMenuOption = this.onToggleMenuOption.bind(this);
+    this.onPrint = this.onPrint.bind(this);
+    this._onShowStoreCall = this._onShowStoreCall.bind(this);
+    this._doSaveItemsCancel = this._doSaveItemsCancel.bind(this);
+    this._doSaveItemsEdit = this._doSaveItemsEdit.bind(this);
+    this._onItemRowNumberChanged = this._onItemRowNumberChanged.bind(this)
   }
-
-  // componentWillReceiveProps(nextProp) {
-  //   if (this.props.visible !== nextProp.visible) {
-  //     if (nextProp.visible) {
-  //       this.setState({visible: true})
-  //       Animated.timing(
-  //         this.state.fadeAnim,
-  //         {
-  //           toValue: 1,
-  //           duration: this.props.duration || 300,
-  //           easing: Easing.easeOut
-  //         }
-  //       ).start()
-  //     } else {
-  //       Animated.timing(
-  //         this.state.fadeAnim,
-  //         {
-  //           toValue: 0,
-  //           duration: this.props.duration || 300,
-  //           easing: Easing.easeOut
-  //         }
-  //       ).start(() => this.setState({visible: false}))
-  //     }
-  //   }
-  // }
 
   componentDidMount() {
     this.props.navigation.setParams({onToggleMenuOption: this.onToggleMenuOption, onPrint: this.onPrint});
@@ -137,7 +125,7 @@ class OrderScene extends Component {
 
     const orderId = (this.props.navigation.state.params || {}).orderId;
     this.orderId = orderId;
-    console.log("componentWillMount: params orderId:", orderId)
+    console.log("componentWillMount: params orderId:", orderId);
     const { order } = this.props.order;
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
@@ -282,8 +270,31 @@ class OrderScene extends Component {
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId: this.orderId}})
   }
 
+  _doSaveItemsEdit () {
+    console.log("doSaveItemsEdit")
+  }
+
+  _doSaveItemsCancel () {
+    this.setState({isEditing: false})
+  }
+
+  _doAddItem(item) {
+    console.log('doAddItem', item)
+    // orderAddItem(item);
+    const {order} = this.props.order;
+    if (item.product_id && order.edits.add[item.product_id]) {
+      ToastShort(`商品[${item['product_name']}]已更新`)
+    } else {
+      orderEditItem(item)
+    }
+  }
+
+  _onItemRowNumberChanged (item, newNum) {
+    item.num = newNum;
+    orderEditItem(item);
+  }
+
   goToSetMap() {
-    console.log('Nothing to do....')
     this.setState({gotoEditPoi: false})
   }
 
@@ -419,19 +430,18 @@ class OrderScene extends Component {
   }
 
   renderHeader() {
-    let info = {};
     const {order} = this.props.order;
 
-    let onButtonPress = () => {
-      this.props.actions.updateOrder(
-        this.props.order.id,
-        this.props.profile.form.fields.username,
-        this.props.profile.form.fields.email,
-        this.props.global.currentUser)
-    }
+    // let onButtonPress = () => {
+    //   this.props.actions.updateOrder(
+    //     this.props.order.id,
+    //     this.props.profile.form.fields.username,
+    //     this.props.profile.form.fields.email,
+    //     this.props.global.currentUser)
+    // }
 
     const validPoi = order.loc_lng && order.loc_lat;
-    const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png')
+    const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
     return (<View>
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
@@ -458,7 +468,7 @@ class OrderScene extends Component {
               borderRadius: 1,
               justifyContent: 'center',
               alignItems: 'center'
-            }}>
+            }} onPress={() => {native.ordersByMobileTimes(order.mobile, order.order_times)}}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
             <CallBtn mobile={order.mobile}/>
@@ -505,12 +515,23 @@ class OrderScene extends Component {
             </View>
             <View style={{flex: 1}}/>
 
-            {this.state.isEditing ?
-              <ImageBtn source={require('../../img/Order/items_edit.png')}/>
-              : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>
+            {this.state.isEditing &&
+            <ImageBtn source={require('../../img/Order/edit_add_item.png')} onPress={ () => {this.props.navigation.navigate('ProductAutocomplete')} } />
+              && 
+            <ImageBtn source={require('../../img/Order/save_edit.png')} onPress={this._doSaveItemsEdit} />
+              &&
+              <Icon.Button name="close" onPress={this._doSaveItemsCancel}>
+                <Text>取消</Text>
+              </Icon.Button>
             }
 
-            {this.state.itemsHided ?
+            {!this.state.isEditing && (
+              supportEditGoods(order.orderStatus) ?
+              <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={()=> {this.setState({isEditing: true, itemsHided: false})}}/>
+              : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>)
+            }
+
+            {!this.state.isEditing && (this.state.itemsHided ?
               <ImageBtn source={require('../../img/Order/pull_down.png')} onPress={
                 () => {
                   this.setState({itemsHided: false});
@@ -520,31 +541,14 @@ class OrderScene extends Component {
               : <ImageBtn source={require('../../img/Order/pull_up.png')} imageStyle={styles.pullImg} onPress={() => {
                 this.setState({itemsHided: true});
                 console.log("after click pull_up", this.state)
-              }}/>
+              }}/>)
             }
           </View>
           {!this.state.itemsHided && (order.items || {}).map((item, idx) => {
-            return (<View key={idx} style={[styles.row, {
-                marginTop: 0,
-                paddingTop: pxToDp(14),
-                paddingBottom: pxToDp(14),
-                borderBottomColor: colors.color999,
-                borderBottomWidth: screen.onePixel
-              }]}>
-                <View style={{flex: 1}}>
-                  <Text style={{
-                    fontSize: pxToDp(26),
-                    color: colors.color333,
-                    marginBottom: pxToDp(14)
-                  }}>{item.product_name}</Text>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
-                    <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
-                  </View>
-                </View>
-                <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>
-              </View>
-            );
+            return (<ItemRow key={idx} item={item} edits={order.edits ? order.edits.edit : {}} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+          })}
+          {!this.state.itemsHided && order.edits && (order.edits.add || {}).map((item, idx) => {
+            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
@@ -633,6 +637,65 @@ class OrderScene extends Component {
   }
 }
 
+class ItemRow extends PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const {
+      idx, item, isAdd, edited, onInputNumberChange = () => {}, isEditing = false
+    } = this.props;
+
+    return <View key={idx} style={[styles.row, {
+      marginTop: 0,
+      paddingTop: pxToDp(14),
+      paddingBottom: pxToDp(14),
+      borderBottomColor: colors.color999,
+      borderBottomWidth: screen.onePixel
+    }]}>
+      <View style={{flex: 1}}>
+        <Text style={{
+          fontSize: pxToDp(26),
+          color: colors.color333,
+          marginBottom: pxToDp(14)
+        }}>{item.product_name}</Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+          <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
+        </View>
+      </View>
+      {isEditing && !isAdd && edited && edited.num > item.num &&
+      <Text>已加{edited.num - item.num}</Text>}
+      {isEditing && !isAdd && edited && edited.num < item.num &&
+      <Text>已减{item.num - edited.num}</Text>}
+      {isEditing && isAdd && <Text>加货</Text>}
+      {!isEditing &&
+      <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
+      {isEditing &&
+        <View style={top_styles.stepper}>
+          <InputNumber
+            styles={inputNumberStyles}
+            min={0}
+            defaultValue={parseInt(item.num)}
+            style={{ backgroundColor: 'white', paddingHorizontal: 10, width: 120 }}
+            onChange={(v)=>{console.log("editedNum", v); /*onInputNumberChange(item, v)*/}}
+            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+          />
+        </View>}
+    </View>
+  }
+}
+
+ItemRow.PropTypes = {
+  item: PropTypes.object.isRequired,
+  idx: PropTypes.number.isRequired,
+  isEditing: PropTypes.bool,
+  isAdd: PropTypes.bool,
+  edits: PropTypes.object,
+  onInputNumberChange: PropTypes.func,
+};
+
 class Remark extends PureComponent {
 
   constructor(props) {
@@ -656,7 +719,7 @@ class ImageBtn extends PureComponent {
 
   render() {
 
-    const {source, onPress, imageStyle} = this.props
+    const {source, onPress, imageStyle} = this.props;
 
     return <TouchableOpacity onPress={onPress}>
       <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
@@ -789,7 +852,12 @@ const styles = StyleSheet.create({
   block: {
     marginTop: pxToDp(10),
     backgroundColor: colors.white,
-  }
+  },
+  stepper: {
+    height: 44,
+    marginTop: 100,
+    paddingHorizontal: 10,
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderScene)

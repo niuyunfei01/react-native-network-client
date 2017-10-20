@@ -102,6 +102,7 @@ class MineScene extends PureComponent {
 
     this._doChangeStore = this._doChangeStore.bind(this);
     this._hideStoreDialog = this._hideStoreDialog.bind(this);
+    this._gotoOldRemind = this._gotoOldRemind.bind(this);
 
     if(this.state.sign_count === undefined || this.state.bad_cases_of === undefined){
       this.onGetUserCount();
@@ -204,6 +205,11 @@ class MineScene extends PureComponent {
     this.setState({
       showChangeStoreDialog: false,
     });
+  }
+
+  _gotoOldRemind() {
+    const url = `${Config.ServiceUrl}stores/quick_task_list.html?access_token=${this.props.global.accessToken}`;
+    this.props.navigation.navigate(Config.ROUTE_WEB, {url: url});
   }
 
   renderHeader() {
@@ -337,9 +343,9 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>员工管理</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={this._gotoOldRemind}>
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')}/>
-          <Text style={[block_styles.block_name]}>预留功能</Text>
+          <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[block_styles.block_box]}>
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')}/>

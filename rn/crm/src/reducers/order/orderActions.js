@@ -16,7 +16,9 @@ const {
   ORDER_UPDATE_SUCCESS,
   ORDER_UPDATE_FAILURE,
 
-  ORDER_PRINTED_CLOUD
+  ORDER_PRINTED_CLOUD,
+  ORDRE_ADD_ITEM,
+  ORDER_EDIT_ITEM,
 
 } = require('../../common/constants').default
 
@@ -62,6 +64,15 @@ export function printInCloud(sessionToken, orderId, callback) {
       callback(false, "打印失败, 请检查网络稍后重试")
     });
   }
+}
+
+export function orderEditItem(item) {
+  return dispatch => {
+    dispatch({
+      type: ORDER_EDIT_ITEM,
+      item,
+    })
+  };
 }
 
 /**
