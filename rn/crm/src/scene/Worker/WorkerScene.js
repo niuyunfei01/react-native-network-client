@@ -149,19 +149,21 @@ class WorkerScene extends PureComponent {
         </CellBody>
         <CellFooter>
           <TouchableOpacity
-            onPress={() => this.onPress(Config.ROUTE_USER, {
-              type: 'worker',
-              currentUser: user.id,
-              worker_id: user.worker_id,
-              navigation_key: this.props.navigation.state.key,
-              store_id: parseInt(user.store_id),
-              currVendorId: this.state.currVendorId,
+            onPress={() => {
+              this.onPress(Config.ROUTE_USER, {
+                type: 'worker',
+                currentUser: user.id,
+                worker_id: user.worker_id,
+                navigation_key: this.props.navigation.state.key,
+                store_id: parseInt(user.store_id),
+                currVendorId: this.state.currVendorId,
 
-              mobile: user.mobilephone,
-              cover_image: user.image,
-              user_name: user.nickname,
-              user_status: parseInt(user.status),
-            })}
+                mobile: user.mobilephone,
+                cover_image: user.image,
+                user_name: user.nickname,
+                user_status: parseInt(user.status),
+              })
+            }}
           >
             <Button name='chevron-right' style={styles.right_btn}/>
           </TouchableOpacity>
@@ -236,9 +238,11 @@ class WorkerScene extends PureComponent {
               </CellBody>
               <CellFooter>
                 <TouchableOpacity
-                  onPress={() => this.onPress(Config.ROUTE_USER_ADD, {
-                    type: 'add',
-                  })}
+                  onPress={() => {
+                    this.onPress(Config.ROUTE_USER_ADD, {
+                      type: 'add',
+                    })
+                  }}
                 >
                   <Button name='chevron-right' style={styles.right_btn}/>
                 </TouchableOpacity>
