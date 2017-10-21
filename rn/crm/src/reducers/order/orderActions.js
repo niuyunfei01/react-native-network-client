@@ -81,17 +81,43 @@ export function getOrder(sessionToken, orderId, callback) {
   return dispatch => {
     dispatch(getOrderRequest())
     const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(res => res.json())
-      .then(json => {
+    getWithTpl(url, (json) => {
         dispatch(getOrderSuccess(json))
         const ok = json && json.id === orderId;
         callback(ok, ok ? json : "返回数据错误")
-      }).catch((error) => {
+      }, (error) => {
         dispatch(getOrderFailure(error))
         console.log('getOrder error:', error)
         callback(false, "网络错误, 请稍后重试")
-      });
+      }
+    )
+  }
+}
+
+function getWithTpl(url, okFn, failFn) {
+  FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+    .then(res => res.json())
+    .then(json => {
+      okFn(json)
+    }).catch((error) => {
+      failFn(error)
+  });
+}
+
+export function getRemindForOrderPage(token, orderId, callback) {
+  return dispatch => {
+    getWithTpl(`api/list_notice_of_order/${orderId}?access_token=${token}`,
+      (json) => {
+        if (json.ok) {
+          callback(true, json.obj)
+        } else {
+          callback(false, "数据获取失败");
+        }
+      },
+      (error) => {
+        callback(false, "网络错误：" + error)
+      }
+    )
   }
 }
 

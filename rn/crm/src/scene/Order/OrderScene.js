@@ -22,7 +22,7 @@ import CommonStyle from '../../common/CommonStyles'
 /**
  * The actions we need
  */
-import {getOrder, printInCloud} from '../../reducers/order/orderActions'
+import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
@@ -45,7 +45,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud}, dispatch)}
+  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud, getRemindForOrderPage}, dispatch)}
 }
 
 
@@ -102,6 +102,7 @@ class OrderScene extends Component {
       errorHints: '',
       itemsAdded: {},
       itemsEdited: {},
+      reminds: {},
     };
 
     this.orderId = 0;
@@ -213,11 +214,22 @@ class OrderScene extends Component {
 
   onHeaderRefresh() {
 
+    const sessionToken = this.props.global.accessToken;
+    const {dispatch} = this.props;
+
+    dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
+      if (ok) {
+        this.setState({reminds: data})
+        console.log(data)
+      } else {
+        this.setState({errorHints: '获取提醒列表失败'})
+      }
+    }));
+
     if (!this.state.isFetching) {
       this.setState({isFetching: true});
 
-      const {dispatch} = this.props;
-      dispatch(getOrder(this.props.global.accessToken, this.orderId, (ok, data) => {
+      dispatch(getOrder(sessionToken, this.orderId, (ok, data) => {
 
         let state = {
           isFetching: false,
