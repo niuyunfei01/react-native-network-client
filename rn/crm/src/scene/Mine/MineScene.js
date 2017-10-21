@@ -82,6 +82,7 @@ class MineScene extends PureComponent {
     const {mine} = this.props;
     this.state = {
       isRefreshing: false,
+      onNavigating: false,
       storeActionSheet: storeActionSheet,
       sign_count: mine.sign_count[currentUser],
       bad_cases_of: mine.bad_cases_of[currentUser],
@@ -255,17 +256,8 @@ class MineScene extends PureComponent {
   }*/
   renderWorker() {
     return (
-      <TouchableOpacity
+      <View
         style={worker_styles.container}
-        onPress={() => this.onPress(Config.ROUTE_USER, {
-          type: 'mine',
-          currentUser: this.state.currentUser,
-          currVendorId: this.state.currVendorId,
-          // mobile: this.state.mobile_phone,
-          // screen_name: this.state.screen_name,
-          // cover_image: this.state.cover_image,
-          // user_status: Cts.WORKER_STATUS_OK,
-        })}
       >
         <View>
           <Image style={[worker_styles.icon_head]}
@@ -282,10 +274,21 @@ class MineScene extends PureComponent {
           <Text style={worker_styles.order_num}>{this.state.bad_cases_of}</Text>
           <Text style={[worker_styles.tips_text]}>30天投诉</Text>
         </View>
-        <View style={[worker_styles.chevron_right]}>
+        <TouchableOpacity
+          style={[worker_styles.chevron_right]}
+          onPress={() => this.onPress(Config.ROUTE_USER, {
+            type: 'mine',
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+            // mobile: this.state.mobile_phone,
+            // screen_name: this.state.screen_name,
+            // cover_image: this.state.cover_image,
+            // user_status: Cts.WORKER_STATUS_OK,
+          })}
+        >
           <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -311,6 +314,13 @@ class MineScene extends PureComponent {
   }
 
   onPress(route, params = {}) {
+    // let {onNavigating} = this.state;
+    // console.log('onNavigating -> ', onNavigating);
+    // if (onNavigating === true) {
+    //   return false;
+    // }
+    // _this.setState({onNavigating: true});
+
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
@@ -456,7 +466,7 @@ const header_styles = StyleSheet.create({
     marginHorizontal: pxToDp(30),
     marginTop: pxToDp(35),
     marginBottom: pxToDp(5),
-    width: pxToDp(70),
+    width: pxToDp(80),
     height: pxToDp(74),
   },
   open_text: {
@@ -519,14 +529,16 @@ const worker_styles = StyleSheet.create({
   },
   chevron_right: {
     position: 'absolute',
-    right: pxToDp(30),
-    top: pxToDp(50),
+    // right: pxToDp(30),
+    // top: pxToDp(50),
+    right: pxToDp(0),
+    justifyContent: 'center',
+    width: pxToDp(90),
+    height: pxToDp(140),
   },
   right_btn: {
     fontSize: pxToDp(40),
     textAlign: 'center',
-    width: pxToDp(50),
-    height: pxToDp(50),
     color: colors.main_color,
   },
   sales_box: {
