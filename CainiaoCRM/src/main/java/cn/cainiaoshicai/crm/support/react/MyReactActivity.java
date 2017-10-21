@@ -87,7 +87,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         init.putBundle("canReadVendors", storesV);
 
         Config config = GlobalCtx.app().getConfigByServer();
-        init.putString("config", DaoHelper.gson().toJson(config));
+        init.putString("configStr", DaoHelper.gson().toJson(config));
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
         init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));

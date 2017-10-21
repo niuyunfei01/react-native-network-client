@@ -1,6 +1,7 @@
 'use strict'
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
+import {getWithTpl} from '../../util/common'
 
 /**
  * ## Imports
@@ -92,16 +93,6 @@ export function getOrder(sessionToken, orderId, callback) {
       }
     )
   }
-}
-
-function getWithTpl(url, okFn, failFn) {
-  FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-    .then(res => res.json())
-    .then(json => {
-      okFn(json)
-    }).catch((error) => {
-      failFn(error)
-  });
 }
 
 export function getRemindForOrderPage(token, orderId, callback) {
