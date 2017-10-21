@@ -366,7 +366,10 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/kehu_.png')}/>
           <Text style={[block_styles.block_name]}>客户管理</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_SETTING)}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/shezhi_.png')}/>
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>

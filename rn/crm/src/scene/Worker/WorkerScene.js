@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   right_btn: {
     fontSize: pxToDp(30),
-    textAlign: 'center',
+    textAlign: 'right',
     width: pxToDp(60),
     height: pxToDp(60),
     color: colors.color999,
