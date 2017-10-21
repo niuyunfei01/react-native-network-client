@@ -4,7 +4,7 @@
  * This class combines all the reducers into one
  *
  */
-'use strict'
+'use strict';
 /**
  * ## Imports
  *
@@ -31,7 +31,7 @@ const rootReducer = combineReducers({
   order,
   remind,
   store,
-  mine
+  mine,
 });
 
 export default rootReducer

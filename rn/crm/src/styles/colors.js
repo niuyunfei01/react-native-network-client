@@ -12,6 +12,7 @@ export default {
   mobile_color: '#407c49',
   back_color: '#e5e6e7',
   title_color: '#111111',
+  main_back: '#f2f2f2',
   editStatusAdd: '#db5d5d',
   editStatusDeduct: '#3a97ff',
 };
