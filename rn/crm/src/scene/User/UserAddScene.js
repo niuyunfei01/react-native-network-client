@@ -70,7 +70,6 @@ class UserAddScene extends PureComponent {
     super(props);
 
     const {
-      accessToken,
       canReadStores,
       currStoreId,
     } = this.props.global;
@@ -86,19 +85,19 @@ class UserAddScene extends PureComponent {
       return {name: store.name, value: parseInt(store.id)};
     });
 
-    const {type, user_id, mobile, user_name, user_status, store_id, worker_id} = (this.props.navigation.state.params || {});
+    const {type, user_id, mobile, user_name, user_status, store_id, worker_nav_key, user_info_key, worker_id} = (this.props.navigation.state.params || {});
     let route_back = Config.ROUTE_WORKER;
-    console.log('this.props.navigation.state.params -> ', this.props.navigation.state.params);
 
     this.state = {
       type: type,
       isRefreshing: false,
       onSubmitting: false,
-      accessToken: accessToken,
       currVendorId: currVendorId,
       currVendorName: currVendorName,
       stores: stores.concat(v_store),
       route_back: route_back,
+      worker_nav_key: worker_nav_key,
+      user_info_key: user_info_key,
 
       user_id: user_id === undefined ? 0 : user_id,
       mobile: mobile === undefined ? '' : mobile,
@@ -115,11 +114,11 @@ class UserAddScene extends PureComponent {
 
   getVendorStore() {
     const {dispatch} = this.props;
-    let token = this.state.accessToken;
+    const {accessToken} = this.props.global;
     let vendor_id = this.state.currVendorId;
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
-      dispatch(getVendorStores(vendor_id, token, (resp) => {
+      dispatch(getVendorStores(vendor_id, accessToken, (resp) => {
         console.log(resp);
         if (resp.ok) {
           let vendor_stores = resp.obj;
@@ -209,7 +208,8 @@ class UserAddScene extends PureComponent {
             </Cell>
           )}
         </Cells>
-        <Button onPress={this.onUserAdd} type='primary' style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}</Button>
+        <Button onPress={() => this.onUserAdd()} type='primary'
+                style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}</Button>
         <Toast
           icon="loading"
           show={this.state.onSubmitting}
@@ -229,7 +229,7 @@ class UserAddScene extends PureComponent {
       return false;
     }
     const {dispatch} = this.props;
-    let {type, accessToken, currVendorId, user_id, mobile, user_name, store_id, user_status, route_back, worker_id} = this.state;
+    let {type, currVendorId, user_id, mobile, user_name, store_id, user_status, worker_nav_key, user_info_key, worker_id} = this.state;
     if (isNaN(mobile) || mobile.length !== 11) {
       ToastShort('手机号码格式有误');
       return false;
@@ -241,6 +241,7 @@ class UserAddScene extends PureComponent {
       return false;
     }
 
+    const {accessToken} = this.props.global;
     let data = {
       _v_id: currVendorId,
       worker_id: worker_id,
@@ -264,18 +265,34 @@ class UserAddScene extends PureComponent {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';
           ToastShort(msg);
 
-          setTimeout(function () {
-            // const backAction = NavigationActions.back();
-            const backAction = NavigationActions.reset({
-              index: 1,
-              actions: [
-                NavigationActions.navigate({routeName: Config.ROUTE_Mine}),
-                NavigationActions.navigate({routeName: Config.ROUTE_WORKER})
-              ]
-            });
-            _this.props.navigation.dispatch(backAction);
-          }, 1000);
-        }else{
+          // const backAction = NavigationActions.back();
+          // const backAction = NavigationActions.reset({
+          //   index: 1,
+          //   actions: [
+          //     NavigationActions.navigate({routeName: Config.ROUTE_Mine}),
+          //     NavigationActions.navigate({routeName: Config.ROUTE_WORKER})
+          //   ]
+          // });
+          // _this.props.navigation.dispatch(backAction);
+          const setWorkerAction = NavigationActions.setParams({
+            params: { shouldRefresh: true},
+            key: worker_nav_key,
+          });
+          this.props.navigation.dispatch(setWorkerAction);
+          const setUserAction = NavigationActions.setParams({
+            params: {
+              shouldRefresh: true,
+              user_name: user_name,
+              mobile: mobile,
+              store_id: store_id,
+            },
+            key: user_info_key,
+          });
+          this.props.navigation.dispatch(setUserAction);
+
+          const setSelfParamsAction = NavigationActions.back();
+          this.props.navigation.dispatch(setSelfParamsAction);
+        } else {
           ToastShort(resp.desc);
         }
       }));

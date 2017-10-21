@@ -68,7 +68,6 @@ class WorkerScene extends PureComponent {
       currentUser,
       currStoreId,
       canReadStores,
-      accessToken,
     } = this.props.global;
 
     console.log('currStoreId -> ', currStoreId);
@@ -79,7 +78,6 @@ class WorkerScene extends PureComponent {
 
     this.state = {
       isRefreshing: false,
-      accessToken: accessToken,
       currentUser: currentUser,
       currVendorId: currVendorId,
       currVendorName: currVendorName,
@@ -102,11 +100,11 @@ class WorkerScene extends PureComponent {
 
   onSearchWorkers() {
     const {dispatch} = this.props;
-    let token = this.state.accessToken;
+    const {accessToken} = this.props.global;
     let vendor_id = this.state.currVendorId;
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
-      dispatch(fetchWorkers(vendor_id, token, (resp) => {
+      dispatch(fetchWorkers(vendor_id, accessToken, (resp) => {
         if (resp.ok) {
           let {normal, forbidden} = resp.obj;
           _this.setState({
@@ -301,10 +299,10 @@ const styles = StyleSheet.create({
   right_btn: {
     fontSize: pxToDp(30),
     textAlign: 'center',
-    width: pxToDp(50),
-    height: pxToDp(50),
+    width: pxToDp(60),
+    height: pxToDp(60),
     color: colors.color999,
-    paddingTop: pxToDp(10),
+    paddingTop: pxToDp(15),
   },
 });
 

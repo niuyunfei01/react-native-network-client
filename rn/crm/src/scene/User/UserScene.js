@@ -25,13 +25,13 @@ import {
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers, editWorkerStatus} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
 import {NavigationActions} from 'react-navigation';
+import {logout} from "../../reducers/global/globalActions";
 
 
 function mapStateToProps(state) {
@@ -44,7 +44,7 @@ function mapDispatchToProps(dispatch) {
     dispatch, ...bindActionCreators({
       fetchUserCount,
       fetchWorkers,
-      ...globalActions
+      logout,
     }, dispatch)
   }
 }
@@ -52,7 +52,7 @@ function mapDispatchToProps(dispatch) {
 // create a component
 class UserScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+    const {params = {}, key} = navigation.state;
 
     return {
       headerTitle: (
@@ -74,6 +74,8 @@ class UserScene extends PureComponent {
                   user_status: params.user_status,
                   store_id: params.store_id,
                   worker_id: params.worker_id,
+                  worker_nav_key: params.navigation_key,
+                  user_info_key: key,
                 });
               });
             }}
@@ -99,7 +101,7 @@ class UserScene extends PureComponent {
     let {
       id, nickname, nameRemark, mobilephone, image, //user 表数据
       worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
-    } = mine.user_list[currVendorId][currentUser];
+    } = (mine.user_list || {})[currVendorId][currentUser];
     this.state = {
       isRefreshing: false,
       onSubmitting: false,
@@ -192,7 +194,8 @@ class UserScene extends PureComponent {
           </View>
         </View>
         {type === 'mine' ?
-          (<Button type='warn' style={styles.btn_logout}>退出登录</Button>) :
+          (<Button type='warn' onPress={() => logout()}
+                   style={styles.btn_logout}>退出登录</Button>) :
           (user_status === Cts.WORKER_STATUS_OK ?
               <Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)}
                       style={styles.btn_logout}>禁用</Button> :
@@ -209,6 +212,25 @@ class UserScene extends PureComponent {
         >提交中</Toast>
       </ScrollView>
     );
+  }
+
+  componentDidUpdate() {
+    let {key, params} = this.props.navigation.state;
+    let {shouldRefresh, user_name, mobile, store_id} = (params || {});
+
+    if (shouldRefresh === true) {
+      console.log(' Refresh User list -> ', this.props.navigation.state);
+      this.setState({
+        screen_name: user_name,
+        mobile: mobile,
+        store_id: store_id,
+      });
+      const setParamsAction = NavigationActions.setParams({
+        params: {shouldRefresh: false},
+        key: key,
+      });
+      this.props.navigation.dispatch(setParamsAction);
+    }
   }
 
   onPress(user_status) {
@@ -242,12 +264,12 @@ class UserScene extends PureComponent {
             user_status: user_status,
           });
           const setParamsAction = NavigationActions.setParams({
-            params: { shouldRefresh: true},
+            params: {shouldRefresh: true},
             key: last_nav_key,
           });
           this.props.navigation.dispatch(setParamsAction);
           const setSelfParamsAction = NavigationActions.setParams({
-            params: { user_status: user_status},
+            params: {user_status: user_status},
             key: this.props.navigation.state.key,
           });
           this.props.navigation.dispatch(setSelfParamsAction);

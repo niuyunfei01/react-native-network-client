@@ -63,7 +63,7 @@ export function updateCfg(cfg) {
 
 export function logout() {
   return dispatch => {
-    dispatch({type: LOGOUT_SUCCESS})
+    dispatch({type: LOGOUT_SUCCESS});
     native.logout()
   }
 }

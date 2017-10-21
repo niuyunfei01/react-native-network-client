@@ -20,13 +20,11 @@ import Cts from '../../Cts';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ActionSheet} from "../../weui/index";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {fetchWorkers, fetchUserCount} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import ModalSelector from 'react-native-modal-selector';
-import LoadingView from "../../widget/LoadingView";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -58,10 +56,10 @@ class MineScene extends PureComponent {
     } = this.props.global;
 
     let storeActionSheet = [];
-    let sortStores = Object.values(canReadStores).sort(function(a, b){
+    let sortStores = Object.values(canReadStores).sort(function (a, b) {
       return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
     });
-    storeActionSheet.push({ key: -999, section: true, label: '选择门店' },);
+    storeActionSheet.push({key: -999, section: true, label: '选择门店'},);
     for (let store of sortStores) {
       let item = {
         key: store.id,
@@ -104,7 +102,7 @@ class MineScene extends PureComponent {
     this._doChangeStore = this._doChangeStore.bind(this);
     this._goToOldRemind = this._goToOldRemind.bind(this);
 
-    if(this.state.sign_count === undefined || this.state.bad_cases_of === undefined){
+    if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
     }
   }
@@ -127,7 +125,7 @@ class MineScene extends PureComponent {
             sign_count: sign_count,
             bad_cases_of: bad_cases_of,
           });
-          if(_this.state.isRefreshing){
+          if (_this.state.isRefreshing) {
             ToastShort('刷新完成');
           }
         }
@@ -205,7 +203,9 @@ class MineScene extends PureComponent {
         <View style={[header_styles.main_box]}>
           <Text style={header_styles.shop_name}>{this.state.currStoreName}</Text>
           <ModalSelector
-            onChange={(option)=>{this._doChangeStore(option.key)}}
+            onChange={(option) => {
+              this._doChangeStore(option.key)
+            }}
             data={this.state.storeActionSheet}
             //initValue="切换门店"
             cancelText="取消"
@@ -255,7 +255,18 @@ class MineScene extends PureComponent {
   }*/
   renderWorker() {
     return (
-      <View style={worker_styles.container}>
+      <TouchableOpacity
+        style={worker_styles.container}
+        onPress={() => this.onPress(Config.ROUTE_USER, {
+          type: 'mine',
+          currentUser: this.state.currentUser,
+          currVendorId: this.state.currVendorId,
+          // mobile: this.state.mobile_phone,
+          // screen_name: this.state.screen_name,
+          // cover_image: this.state.cover_image,
+          // user_status: Cts.WORKER_STATUS_OK,
+        })}
+      >
         <View>
           <Image style={[worker_styles.icon_head]}
                  source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
@@ -271,21 +282,10 @@ class MineScene extends PureComponent {
           <Text style={worker_styles.order_num}>{this.state.bad_cases_of}</Text>
           <Text style={[worker_styles.tips_text]}>30天投诉</Text>
         </View>
-        <TouchableOpacity
-          style={[worker_styles.chevron_right]}
-          onPress={() => this.onPress(Config.ROUTE_USER, {
-            type: 'mine',
-            currentUser: this.state.currentUser,
-            currVendorId: this.state.currVendorId,
-            // mobile: this.state.mobile_phone,
-            // screen_name: this.state.screen_name,
-            // cover_image: this.state.cover_image,
-            // user_status: Cts.WORKER_STATUS_OK,
-          })}
-        >
-          <Button name='chevron-thin-right' style={worker_styles.right_btn}/>
-        </TouchableOpacity>
-      </View>
+        <View style={[worker_styles.chevron_right]}>
+          <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
+        </View>
+      </TouchableOpacity>
     )
   }
 
