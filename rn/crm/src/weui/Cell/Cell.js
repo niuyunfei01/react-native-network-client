@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     },
 })
 const Cell = (props) => {
-    const {access, vcode, error, first, children, style, ...others} = props
+    const {access, vcode, error, first, children, style,customStyle, ...others} = props
     const childrenWithProps = React.Children.map(children, (child) => {
         if (access && child.type.name === 'CellFooter') {
             return React.cloneElement(child, {access: true})
@@ -43,7 +43,8 @@ const Cell = (props) => {
                 style={[
                     styles.cell,
                     first ? styles.firstCell : null,
-                    vcode ? styles.vcodeCell : null
+                    vcode ? styles.vcodeCell : null,
+                    customStyle ? customStyle : null,
                 ]}
             >{childrenWithProps}</View>
         </TouchableHighlight>
@@ -56,6 +57,7 @@ Cell.propTypes = {
     error: PropTypes.bool,
     children: PropTypes.node,
     style: View.propTypes.style,
+    customStyle: View.propTypes.style,
     others: PropTypes.object,
 }
 

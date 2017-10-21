@@ -22,4 +22,5 @@ export default {
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_Mine: 'Mine',
+  ROUTE_SETTING: 'Setting',
 };

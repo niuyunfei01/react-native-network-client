@@ -20,6 +20,7 @@ import WorkerScene from "../scene/Worker/WorkerScene";
 import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete";
+import SettingScene from "../scene/Setting/SettingScene";
 
 const Tab = TabNavigator(
   {
@@ -79,6 +80,7 @@ const Tab = TabNavigator(
 
     Mine: {
       screen: MineScene,
+      // screen: SettingScene,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: '我的',
         tabBarIcon: ({focused, tintColor}) => (
@@ -152,7 +154,8 @@ class Navigator extends Component {
         User: {screen: UserScene},
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
-        ProductAutocomplete: {screen: ProductAutocomplete}
+        ProductAutocomplete: {screen: ProductAutocomplete},
+        Setting: {screen: SettingScene},
       },
       stackNavigatorConfigs
     );

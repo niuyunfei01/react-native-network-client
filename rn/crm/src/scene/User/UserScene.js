@@ -102,7 +102,7 @@ class UserScene extends PureComponent {
     let {
       id, nickname, nameRemark, mobilephone, image, //user 表数据
       worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
-    } = (mine.user_list || {})[currVendorId][currentUser];
+    } = ((mine.user_list || {})[currVendorId] || {})[currentUser];
     this.state = {
       isRefreshing: false,
       onSubmitting: false,
