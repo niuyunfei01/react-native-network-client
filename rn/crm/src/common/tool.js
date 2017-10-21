@@ -1,4 +1,5 @@
 import Moment from 'moment';
+import {NavigationActions} from "react-navigation";
 
 export function urlByAppendingParams(url: string, params: Object) {
     let result = url
@@ -66,6 +67,17 @@ export function shortTimeDesc(datetime) {
   }
 }
 
+
+export function resetNavStack(navigation, routeName, params = {}) {
+  const resetAction = NavigationActions.reset({
+    index: 0,
+    actions: [NavigationActions.navigate({routeName: routeName, params: params})]
+  });
+  navigation.dispatch(resetAction)
+
+  console.log('_resetNavStack ' + routeName)
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -74,4 +86,5 @@ export default {
   shortOrderDay,
   orderOrderTimeShort,
   orderExpectTime,
+  resetNavStack,
 }

@@ -220,7 +220,6 @@ class OrderScene extends Component {
     dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
       if (ok) {
         this.setState({reminds: data})
-        console.log(data)
       } else {
         this.setState({errorHints: '获取提醒列表失败'})
       }
@@ -492,6 +491,15 @@ class OrderScene extends Component {
 
     const _items = order.items || {};
     return (<View>
+        {tool.objectMap(this.state.reminds, (remind, idx) => {
+
+          const cfg = this.props.global.confg;
+
+          return <View><Text>{cfg.task_types[remind].name}</Text>
+            <Text>{remind.status}</Text>
+            <Text>{remind.created}</Text>
+          </View>;
+        })}
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>

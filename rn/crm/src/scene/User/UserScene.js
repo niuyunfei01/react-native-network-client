@@ -30,6 +30,7 @@ import {ToastShort} from "../../util/ToastUtils";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
+import {tool} from "../../common";
 import {NavigationActions} from 'react-navigation';
 import {logout} from "../../reducers/global/globalActions";
 
@@ -122,9 +123,17 @@ class UserScene extends PureComponent {
     if (mine.sign_count[currentUser] === undefined || mine.sign_count[currentUser] === undefined) {
       this.onGetUserCount();
     }
+
+    this._onLogout = this._onLogout.bind(this)
   }
 
   componentWillMount() {
+  }
+
+  _onLogout() {
+    logout();
+    this.props.navigation.navigate(Config.ROUTE_LOGIN);
+    tool.resetNavStack(this.props.navigation, Config.ROUTE_LOGIN)
   }
 
   onGetUserCount() {
@@ -194,7 +203,7 @@ class UserScene extends PureComponent {
           </View>
         </View>
         {type === 'mine' ?
-          (<Button type='warn' onPress={() => logout()}
+          (<Button type='warn' onPress={this._onLogout}
                    style={styles.btn_logout}>退出登录</Button>) :
           (user_status === Cts.WORKER_STATUS_OK ?
               <Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)}

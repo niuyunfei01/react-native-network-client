@@ -7,7 +7,6 @@ import {
   Text,
   ImageBackground,
   Image,
-  Button,
   ToastAndroid,
   NativeModules,
   ActivityIndicator
@@ -16,7 +15,6 @@ import {FormInput} from 'react-native-elements'
 import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
-import { NavigationActions } from 'react-navigation'
 
 import * as globalActions from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
@@ -28,6 +26,8 @@ const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 import Config from '../../config'
 import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
+import tool from "../../common/tool";
+import {Button} from "../../weui";
 
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -194,23 +194,13 @@ class LoginScene extends PureComponent {
           this.props.navigation.navigate(this.next || Config.ROUTE_ALERT, this.nextParams)
         }
 
-        self._resetNavStack(Config.ROUTE_ALERT);
+        tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
         
       } else {
         ToastAndroid.show("登录失败，请输入正确的" + name, ToastAndroid.LONG)
         return false;
       }
     })
-  }
-
-  _resetNavStack(routeName, params = {}) {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [NavigationActions.navigate({routeName: routeName, params: params})]
-    });
-    this.props.navigation.dispatch(resetAction)
-
-    console.log('_resetNavStack ' + routeName)
   }
 
   doneReqSign() {

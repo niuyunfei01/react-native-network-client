@@ -69,8 +69,9 @@ export default function globalReducer (state = initialState, action) {
         ...state,
         currentUser: '',
         currStoreId: 0,
-        currentUserProfile: null,
-        accessToken: ''
+        currentUserProfile: {},
+        accessToken: '',
+        refreshToken: '',
       };
       
     case UPDATE_CFG:
