@@ -157,7 +157,7 @@ class UserAddScene extends PureComponent {
       >
         <CellsTitle style={styles.cell_title}>基本信息</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell>
+          <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
               <Label style={[styles.cell_label]}>手机号</Label>
             </CellHeader>
@@ -173,7 +173,7 @@ class UserAddScene extends PureComponent {
               />
             </CellBody>
           </Cell>
-          <Cell style={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
               <Label style={[styles.cell_label]}>姓名</Label>
             </CellHeader>
@@ -195,8 +195,8 @@ class UserAddScene extends PureComponent {
             <Cell
               key={idx}
               onPress={() => this.onChooseStore(option.value)}
-              customStyle = {{paddingTop: 7, paddingBottom: 7}}
-              style={[styles.cell_row]}>
+              // customStyle = {{paddingTop: 7, paddingBottom: 7}}
+              customStyle={[styles.cell_row]}>
               <CellBody>
                 <Text style={styles.cell_body}>{option.name || option.value}</Text>
               </CellBody>
@@ -304,14 +304,18 @@ class UserAddScene extends PureComponent {
 const styles = StyleSheet.create({
   cell_title: {
     marginBottom: pxToDp(5),
-    paddingLeft: pxToDp(30),
+    fontSize: pxToDp(26),
+    color: colors.color999,
   },
   cell_box: {
     marginTop: 0,
-    //paddingLeft: pxToDp(20),
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     borderColor: colors.color999,
+  },
+  cell_row: {
+    height: pxToDp(70),
+    justifyContent: 'center',
   },
   cell_input: {
     //需要覆盖完整这4个元素
@@ -330,10 +334,6 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(30),
     fontWeight: 'bold',
     color: colors.color333,
-  },
-  border: {
-    borderWidth: pxToDp(1),
-    borderColor: '#000',
   },
   btn_submit: {
     margin: pxToDp(30),

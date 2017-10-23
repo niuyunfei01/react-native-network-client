@@ -102,7 +102,7 @@ class SettingScene extends PureComponent {
       >
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>自动打印</Text>
             </CellBody>
@@ -115,7 +115,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]} customStyle={styles.marginLeft}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>惠普打印机</Text>
             </CellBody>
@@ -135,7 +135,7 @@ class SettingScene extends PureComponent {
 
         <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row]} customStyle={styles.marginLeft}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>添加云打印机</Text>
             </CellBody>
@@ -155,7 +155,7 @@ class SettingScene extends PureComponent {
 
         <CellsTitle style={styles.cell_title}>提醒</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>语音播报</Text>
             </CellBody>
@@ -168,7 +168,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>导航栏提醒</Text>
             </CellBody>
@@ -181,7 +181,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>新消息震动</Text>
             </CellBody>
@@ -199,7 +199,7 @@ class SettingScene extends PureComponent {
 
         <CellsTitle style={styles.cell_title}>通知筛选</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>新订单</Text>
             </CellBody>
@@ -212,7 +212,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>配送订单</Text>
             </CellBody>
@@ -225,7 +225,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]} customStyle={[styles.marginLeft, styles.paddingRight]}>
+          <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>订单异常</Text>
             </CellBody>
@@ -247,7 +247,6 @@ class SettingScene extends PureComponent {
 
 }
 
-
 // define your styles
 const styles = StyleSheet.create({
   cell_title: {
@@ -257,7 +256,6 @@ const styles = StyleSheet.create({
   },
   cell_box: {
     marginTop: 0,
-    paddingLeft: pxToDp(20),
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     borderColor: colors.color999,
@@ -265,16 +263,7 @@ const styles = StyleSheet.create({
   cell_row: {
     height: pxToDp(70),
     justifyContent: 'center',
-  },
-  cell_row_bottom: {
-    borderColor: colors.color999,
-    borderBottomWidth: pxToDp(1),
-  },
-  marginLeft: {
-    marginLeft: 0,
-  },
-  paddingRight: {
-    paddingRight: 0,
+    paddingRight: pxToDp(10),
   },
   cell_body_text: {
     fontSize: pxToDp(30),
