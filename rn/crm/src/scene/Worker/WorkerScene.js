@@ -135,7 +135,7 @@ class WorkerScene extends PureComponent {
 
   renderUser(user) {
     return (
-      <Cell style={[styles.worker_box]} key={user.id}>
+      <Cell style={[styles.worker_box]} customStyle={{borderTopWidth: 0}} key={user.id}>
         <CellHeader>
           <Image
             style={[styles.worker_img]}
