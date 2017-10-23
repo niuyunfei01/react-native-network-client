@@ -136,7 +136,7 @@ class UrgeShipScene extends Component {
         style={{marginTop: 2}}
         options={reasonOpts}
         onChange={this._onReasonSelected}
-        cellTextStyle={{fontWeight:'bold', color: colors.color333, fontSize: 15}}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
         value={this.state.reason_key}
       />
 

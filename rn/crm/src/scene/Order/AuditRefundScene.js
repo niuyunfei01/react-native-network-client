@@ -146,7 +146,7 @@ class AuditRefundScene extends Component {
         style={{marginTop: 2}}
         options={[{label: '同意退款', value: 'yes'}, {label: '拒绝退款', value: 'no'}]}
         onChange={this._onActionSelected}
-        cellTextStyle={{fontWeight:'bold', color: colors.color333, fontSize: 15}}
+        cellTextStyle={[CommonStyle.cellTextH45, {fontWeight: 'bold', color: colors.color333,}]}
         value={this.state.selected_action}
       />
 
@@ -159,7 +159,7 @@ class AuditRefundScene extends Component {
           style={{marginTop: 2}}
           options={reasonOpts}
           onChange={this._onActionSelected}
-          cellTextStyle={{fontWeight: 'bold', color: colors.color333, fontSize: 15}}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
           value={this.state.reason_key}
         />
 
