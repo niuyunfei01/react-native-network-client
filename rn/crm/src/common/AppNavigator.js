@@ -23,6 +23,8 @@ import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete";
 import SettingScene from "../scene/Setting/SettingScene";
+import CloudPrinterScene from "../scene/Setting/CloudPrinterScene";
+import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 import AuditRefundScene from "../scene/Order/AuditRefundScene";
 
 const Tab = TabNavigator(
@@ -157,7 +159,9 @@ class Navigator extends Component {
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
-        Setting: {screen: SettingScene},
+        [Config.ROUTE_SETTING]: {screen: SettingScene},
+        [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
+        [Config.ROUTE_PRINTER_CONNECT]: {screen: PrinterConnectScene},
         [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene}
 
