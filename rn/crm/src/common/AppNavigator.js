@@ -21,6 +21,8 @@ import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete";
 import SettingScene from "../scene/Setting/SettingScene";
+import CloudPrinterScene from "../scene/Setting/CloudPrinterScene";
+import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 
 const Tab = TabNavigator(
   {
@@ -156,6 +158,8 @@ class Navigator extends Component {
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
         Setting: {screen: SettingScene},
+        CloudPrinter: {screen: CloudPrinterScene},
+        PrinterConnect: {screen: PrinterConnectScene},
       },
       stackNavigatorConfigs
     );

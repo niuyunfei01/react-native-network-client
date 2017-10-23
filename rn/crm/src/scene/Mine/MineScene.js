@@ -352,12 +352,14 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_WORKER, {
-            type: 'worker',
-            currentUser: this.state.currentUser,
-            currVendorId: this.state.currVendorId,
-            currVendorName: this.state.currVendorName,
-          })}
+          onPress={() => {
+            this.onPress(Config.ROUTE_WORKER, {
+              type: 'worker',
+              currentUser: this.state.currentUser,
+              currVendorId: this.state.currVendorId,
+              currVendorName: this.state.currVendorName,
+            })
+          }}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/yuangong_.png')}/>
           <Text style={[block_styles.block_name]}>员工管理</Text>
@@ -600,5 +602,4 @@ const block_styles = StyleSheet.create({
 
 
 //make this component available to the app
-// export default MineScene;
 export default connect(mapStateToProps, mapDispatchToProps)(MineScene)

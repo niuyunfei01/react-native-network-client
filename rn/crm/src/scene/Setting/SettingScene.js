@@ -29,8 +29,6 @@ import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
-import {NavigationActions} from 'react-navigation';
-import LoadingView from "../../widget/LoadingView";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -104,8 +102,7 @@ class SettingScene extends PureComponent {
       >
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row]}  customStyle={[styles.customStyle, {paddingRight: 0,
-          }]}>
+          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>自动打印</Text>
             </CellBody>
@@ -118,16 +115,19 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row]} customStyle={styles.marginLeft}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>惠普打印机</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity
+                style={[styles.right_box]}
                 onPress={() => {
+                  this.onPress(Config.ROUTE_PRINTER_CONNECT);
                 }}
               >
-                <Button name='chevron-right' style={styles.right_btn}/>
+                <Text style={[styles.printer_status, styles.printer_status_ok]}>正常</Text>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
           </Cell>
@@ -135,16 +135,19 @@ class SettingScene extends PureComponent {
 
         <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row]} customStyle={styles.marginLeft}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>添加云打印机</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity
+                style={[styles.right_box]}
                 onPress={() => {
+                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
                 }}
               >
-                <Button name='chevron-right' style={styles.right_btn}/>
+                <Text style={[styles.printer_status, styles.printer_status_error]}>异常</Text>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
           </Cell>
@@ -152,7 +155,7 @@ class SettingScene extends PureComponent {
 
         <CellsTitle style={styles.cell_title}>提醒</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>语音播报</Text>
             </CellBody>
@@ -165,7 +168,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>导航栏提醒</Text>
             </CellBody>
@@ -178,7 +181,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>新消息震动</Text>
             </CellBody>
@@ -196,7 +199,7 @@ class SettingScene extends PureComponent {
 
         <CellsTitle style={styles.cell_title}>通知筛选</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>新订单</Text>
             </CellBody>
@@ -209,7 +212,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row, styles.cell_row_bottom]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>配送订单</Text>
             </CellBody>
@@ -222,7 +225,7 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell style={[styles.cell_row]}  customStyle={styles.customStyle}>
+          <Cell style={[styles.cell_row]} customStyle={[styles.marginLeft, styles.paddingRight]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>订单异常</Text>
             </CellBody>
@@ -249,6 +252,8 @@ class SettingScene extends PureComponent {
 const styles = StyleSheet.create({
   cell_title: {
     marginBottom: pxToDp(5),
+    fontSize: pxToDp(26),
+    color: colors.color999,
   },
   cell_box: {
     marginTop: 0,
@@ -260,26 +265,46 @@ const styles = StyleSheet.create({
   cell_row: {
     height: pxToDp(70),
     justifyContent: 'center',
+  },
+  cell_row_bottom: {
     borderColor: colors.color999,
     borderBottomWidth: pxToDp(1),
   },
-  customStyle: {
+  marginLeft: {
     marginLeft: 0,
+  },
+  paddingRight: {
+    paddingRight: 0,
   },
   cell_body_text: {
     fontSize: pxToDp(30),
     fontWeight: 'bold',
     color: colors.color333,
   },
-
-
-  border: {
-    borderWidth: pxToDp(1),
-    borderColor: '#000',
+  printer_status: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color999,
+  },
+  printer_status_ok: {
+    color: colors.main_color,
+  },
+  printer_status_error: {
+    color: '#f44040',
+  },
+  right_box: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    height: pxToDp(60),
+    paddingTop: pxToDp(10),
+  },
+  right_btn: {
+    fontSize: pxToDp(25),
+    paddingTop: pxToDp(8),
+    marginLeft: pxToDp(10),
   },
 });
 
 
 //make this component available to the app
-// export default WorkerScene;
 export default connect(mapStateToProps, mapDispatchToProps)(SettingScene)

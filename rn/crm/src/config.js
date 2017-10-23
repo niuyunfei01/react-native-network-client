@@ -23,4 +23,6 @@ export default {
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_Mine: 'Mine',
   ROUTE_SETTING: 'Setting',
+  ROUTE_CLOUD_PRINTER: 'CloudPrinter',
+  ROUTE_PRINTER_CONNECT: 'PrinterConnect',
 };
