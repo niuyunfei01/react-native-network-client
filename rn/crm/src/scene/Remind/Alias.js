@@ -1,5 +1,8 @@
 'use strict';
 
 export const CATEGORIES = {
-  5: "待退款", 4: "催单/异常", 1: "售后单", 3: "其他"
+  100: "退款", 101: "配送", 102: "售后", 103: "其他"
 };
+export const SUB_CATEGORIES = {
+  0: "任务", 3: "未归类"
+}

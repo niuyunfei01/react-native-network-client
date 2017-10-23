@@ -1,17 +1,19 @@
 'use strict';
 
 import * as types from './ActionTypes';
-
 import * as lodash from 'lodash'
 
+
+const DATA_TYPE_IDS = [100, 101, 102, 3, 0];
+
 const initialState = {
-  isRefreshing: false,
-  loading: false,
-  isLoadMore: false,
-  noMore: false,
+  isRefreshing: {100: false, 101: false, 102: false, 3: false, 0: false},
+  loading: {100: false, 101: false, 102: false, 3: false, 0: false},
+  isLoadMore: {100: false, 101: false, 102: false, 3: false, 0: false},
+  noMore: {100: false, 101: false, 102: false, 3: false, 0: false},
   remindList: {},
-  currPage: {5: 1, 4: 1, 1: 1, 3: 1},
-  totalPage: {5: 0, 4: 0, 1: 0, 3: 0},
+  currPage: {},
+  totalPage: {},
   doingUpdate: false,
   processing: false,
   updateId: '',
@@ -22,21 +24,19 @@ const initialState = {
 export default function remind(state = initialState, action) {
   switch (action.type) {
     case types.FETCH_REMIND_LIST:
-      return Object.assign({}, state, {
-        isRefreshing: action.isRefreshing,
-        loading: action.loading,
-        isLoadMore: action.isLoadMore,
-        processing: true
-      });
+      let diff = {
+        loading: state.loading,
+        isLoadMore: state.isLoadMore,
+        isRefreshing: state.isRefreshing
+      };
+      diff.loading[action.typeId] = action.loading;
+      diff.isLoadMore[action.typeId] = action.isLoadMore;
+      diff.isRefreshing[action.typeId] = action.isRefreshing;
+      return Object.assign({}, state, diff);
     case types.RECEIVE_REMIND_LIST:
-      return Object.assign({}, state, {
-        isRefreshing: false,
-        isLoadMore: false,
-        noMore: action.remindList.length == 0,
-        remindList: state.isLoadMore ? loadMore(state, action) : combine(state, action),
-        loading: state.remindList[action.typeId] == undefined || state.remindList[action.typeId].length == 0,
-        processing: false
-      });
+      let typeId = action.typeId;
+      let isLoadMore = state.isLoadMore[typeId];
+      return isLoadMore ? Object.assign({}, state, loadMore(state, action)) : Object.assign({}, state, combine(state, action));
     case types.DELAY_REMIND:
     case types.UPDATE_REMIND_STATUS:
       return Object.assign({}, state, {
@@ -80,15 +80,41 @@ function removeRemind(state, action) {
 }
 
 function combine(state, action) {
-  state.remindList[action.typeId] = action.remindList;
-  state.currPage[action.typeId] = parseInt(action.currPage);
-  state.totalPage[action.typeId] = parseInt(action.totalPage);
-  return state.remindList;
+  let diff = {
+    isRefreshing: state.isRefreshing,
+    loading: state.isLoading,
+    isLoadMore: state.isLoadMore,
+    noMore: state.no_data,
+    remindList: state.remindList,
+    currPage: state.currPage,
+    totalPage: state.totalPage,
+  };
+  diff.remindList[action.typeId] = action.remindList;
+  diff.currPage[action.typeId] = parseInt(action.currPage);
+  diff.totalPage[action.typeId] = parseInt(action.totalPage);
+  diff.loading[action.typeId] = false;
+  diff.isLoadMore[action.typeId] = false;
+  diff.noMore[action.typeId] = action.currPage + 1 > action.totalPage;
+  diff.isRefreshing[action.typeId] = false;
+  return diff;
 }
 
 function loadMore(state, action) {
-  state.remindList[action.typeId] = lodash.uniqBy(state.remindList[action.typeId].concat(action.remindList), 'id');
-  state.currPage[action.typeId] = parseInt(action.currPage);
-  state.totalPage[action.typeId] = parseInt(action.totalPage);
-  return state.remindList;
+  let diff = {
+    isRefreshing: state.isRefreshing,
+    loading: state.isLoading,
+    isLoadMore: state.isLoadMore,
+    noMore: state.no_data,
+    remindList: state.remindList,
+    currPage: state.currPage,
+    totalPage: state.totalPage,
+  };
+  diff.remindList[action.typeId] = lodash.uniqBy(state.remindList[action.typeId].concat(action.remindList), 'id');
+  diff.currPage[action.typeId] = parseInt(action.currPage);
+  diff.totalPage[action.typeId] = parseInt(action.totalPage);
+  diff.noMore[action.typeId] = action.currPage + 1 > action.totalPage;
+  diff.isLoadMore[action.typeId] = false;
+  diff.loading[action.typeId] = false;
+  diff.isRefreshing[action.typeId] = false;
+  return diff;
 }
