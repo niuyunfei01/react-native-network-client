@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   cell_box: {
     marginTop: 0,
-    paddingLeft: pxToDp(20),
+    //paddingLeft: pxToDp(20),
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     borderColor: colors.color999,
