@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import {NativeModules} from 'react-native';
 import {addNavigationHelpers, NavigationActions, StackNavigator, TabNavigator, TabBarBottom} from 'react-navigation';
 
+import Config from '../config';
 import color from '../widget/color'
 import TabBarItem from '../widget/TabBarItem'
 
 import RemindScene from '../scene/Remind/RemindScene'
 import MineScene from '../scene/Mine/MineScene';
-import OrderScene from '../scene/Order/OrderScene'
+import OrderScene from '../scene/Order/OrderScene';
+import UrgeShipScene from '../scene/Order/UrgeShipScene';
 import LoginScene from '../scene/Login/LoginScene'
 import GoodsScene from '../scene/Goods/GoodsScene'
 
@@ -76,7 +78,6 @@ const Tab = TabNavigator(
         }
       }),
     },
-
 
     Mine: {
       screen: MineScene,
@@ -156,6 +157,8 @@ class Navigator extends Component {
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
         Setting: {screen: SettingScene},
+        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene}
+
       },
       stackNavigatorConfigs
     );

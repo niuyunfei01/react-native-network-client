@@ -23,4 +23,5 @@ export default {
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_Mine: 'Mine',
   ROUTE_SETTING: 'Setting',
+  ROUTE_ORDER_URGE: 'UrgeOrder',
 };

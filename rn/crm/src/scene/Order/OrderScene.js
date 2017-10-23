@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
 import React, { PureComponent, Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import InputNumber from 'rc-input-number';
@@ -19,9 +11,6 @@ import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-/**
- * The actions we need
- */
 import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
@@ -118,6 +107,7 @@ class OrderScene extends Component {
     this._doSaveItemsCancel = this._doSaveItemsCancel.bind(this);
     this._doSaveItemsEdit = this._doSaveItemsEdit.bind(this);
     this._onItemRowNumberChanged = this._onItemRowNumberChanged.bind(this)
+    this._doProcessRemind = this._doProcessRemind.bind(this)
   }
 
   componentDidMount() {
@@ -356,6 +346,11 @@ class OrderScene extends Component {
     }
   }
 
+  _doProcessRemind(remind) {
+    const {order} = this.props.order;
+    this.props.navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+  }
+
   render() {
     const {order} = this.props.order;
 
@@ -507,7 +502,8 @@ class OrderScene extends Component {
             <View style={{flex: 1}}></View>
             {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 && <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
             {status === Cts.TASK_STATUS_WAITING &&
-             <TouchableOpacity style={{backgroundColor: '#ea7575', width:pxToDp(90), height: pxToDp(50), alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}} onPress={()=>{}}>
+             <TouchableOpacity style={{backgroundColor: '#ea7575', width:pxToDp(90), height: pxToDp(50), alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}}
+                               onPress={(remind)=>{this._doProcessRemind(remind)}}>
                 <Text style={{color: colors.white,}}>处理</Text>
               </TouchableOpacity>
             }

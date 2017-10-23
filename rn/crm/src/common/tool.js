@@ -17,7 +17,7 @@ export function urlByAppendingParams(url: string, params: Object) {
 }
 
 export function objectMap(obj, fn) {
-  return Object.keys(obj).map((idx) => fn(obj[idx], idx))
+  return Object.keys(obj).map((key) => fn(obj[key], key))
 }
 
 export function objectReduce(obj, fn) {
