@@ -17,7 +17,7 @@ export function urlByAppendingParams(url: string, params: Object) {
 }
 
 export function objectMap(obj, fn) {
-  return Object.keys(obj).map((idx) => fn(obj[idx], idx))
+  return Object.keys(obj).map((key) => fn(obj[key], key))
 }
 
 export function objectReduce(obj, fn) {
@@ -36,12 +36,22 @@ export function orderExpectTime(dt) {
     return Moment(dt).format('M/DD HH:mm')
 }
 
+export function shortTimestampDesc(timestamp) {
+
+  return _shortTimeDesc(Moment(timestamp))
+}
+
 export function shortTimeDesc(datetime) {
 
   if (!datetime) return '';
 
-  const dtMoment = Moment(datetime);
+  return _shortTimeDesc(Moment(datetime))
+}
+
+function _shortTimeDesc(dtMoment) {
   const nowMoment = Moment();
+
+  console.log(dtMoment);
 
   const dSeconds = nowMoment.unix() - dtMoment.unix();
   const dYear = nowMoment.year() - dtMoment.year();
@@ -54,7 +64,7 @@ export function shortTimeDesc(datetime) {
     }
   } else if (dSeconds >= 0 && dSeconds < 3600) {
     return Math.floor(dSeconds/60) + "分钟前";
-    
+
   } else if (dYear === 0) {
     const dDay = nowMoment.dayOfYear() - dtMoment.dayOfYear();
     if (dDay <= 0 && dDay >= -1) {
@@ -66,7 +76,6 @@ export function shortTimeDesc(datetime) {
     return dtMoment.format("YY/M/D H:i");
   }
 }
-
 
 export function resetNavStack(navigation, routeName, params = {}) {
   const resetAction = NavigationActions.reset({
@@ -83,6 +92,7 @@ export default {
   objectMap,
   objectReduce,
   shortTimeDesc,
+  shortTimestampDesc,
   shortOrderDay,
   orderOrderTimeShort,
   orderExpectTime,

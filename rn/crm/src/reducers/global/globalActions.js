@@ -3,11 +3,13 @@
  *
  * Actions that are global in nature
  */
+
 'use strict'
 
 import Config from '../../config'
 import {serviceSignIn, smsCodeRequest, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
+import {getWithTpl, postWithTpl} from '../../util/common'
 
 import DeviceInfo from 'react-native-device-info';
 
@@ -68,6 +70,25 @@ export function logout() {
   }
 }
 
+export function getCommonConfig(token, formData = [], callback) {
+  return dispatch => {
+    const url = `api/common_config2?access_token=${token}`
+    return postWithTpl(url, formData, (json) => {
+      if (json.ok) {
+        dispatch({type: UPDATE_CFG, payload: {config: json.obj}})
+        callback(true)
+      } else {
+        console.log('获取服务器端参数失败：', json)
+        callback(false)
+      }
+    }, (error) => {
+      console.log('获取服务器端配置错误：', error)
+      callback(false)
+    })
+  }
+}
+
+
 export function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
@@ -89,7 +110,7 @@ export function signIn(mobile, password, callback) {
             }
           });
 
-          callback(true)
+          callback(true, 'ok', access_token)
         } else {
           //fixme: 需要给出明确提示
           callback(false, "登录失败，请检查验证码是否正确")

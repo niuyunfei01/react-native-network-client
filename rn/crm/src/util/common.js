@@ -1,4 +1,26 @@
 'use strict';
+import FetchEx from "./fetchEx";
+import Config from "../config";
+
+export function getWithTpl(url, okFn, failFn) {
+  FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
+    .then(res => res.json())
+    .then(json => {
+      okFn(json)
+    }).catch((error) => {
+    failFn(error)
+  });
+}
+
+export function postWithTpl(url, formData, okFn, failFn) {
+  FetchEx.timeout(Config.FetchTimeout, FetchEx.post(url, formData))
+    .then(res => res.json())
+    .then(json => {
+      okFn(json)
+    }).catch((error) => {
+    failFn(error)
+  });
+}
 
 export default {
   focusNextInput(context, ref) {
@@ -31,5 +53,7 @@ export default {
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
       s4() + '-' + s4() + s4() + s4();
-  }
+  },
+  getWithTpl,
+  postWithTpl
 };

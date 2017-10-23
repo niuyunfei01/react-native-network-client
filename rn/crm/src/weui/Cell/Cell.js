@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         paddingTop: V.weuiCellGapV,
         paddingBottom: V.weuiCellGapV,
         paddingRight: V.weuiCellGapH,
-        borderTopWidth: 0,
+        borderTopWidth: 0.5,
         borderColor: V.weuiCellBorderColor,
     },
     firstCell: {
@@ -36,7 +36,7 @@ const Cell = (props) => {
             return React.cloneElement(child, {error: true})
         }
         return child
-    })
+    });
     return (
         <TouchableHighlight style={style} underlayColor={V.itemActiveColor} {...others} >
             <View
@@ -49,7 +49,7 @@ const Cell = (props) => {
             >{childrenWithProps}</View>
         </TouchableHighlight>
     )
-}
+};
 Cell.propTypes = {
     first: PropTypes.bool,
     access: PropTypes.bool,

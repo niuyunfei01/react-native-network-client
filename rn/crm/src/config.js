@@ -25,4 +25,5 @@ export default {
   ROUTE_SETTING: 'Setting',
   ROUTE_CLOUD_PRINTER: 'CloudPrinter',
   ROUTE_PRINTER_CONNECT: 'PrinterConnect',
+  ROUTE_ORDER_URGE: 'UrgeOrder',
 };

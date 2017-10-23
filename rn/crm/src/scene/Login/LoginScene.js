@@ -16,7 +16,7 @@ import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
-import * as globalActions from '../../reducers/global/globalActions'
+import {getCommonConfig, logout, requestSmsCode, signIn} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
@@ -71,9 +71,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({...globalActions}, dispatch)
-  }
+  return {dispatch, ...bindActionCreators({getCommonConfig, logout, signIn, requestSmsCode}, dispatch)}
 }
 
 class LoginScene extends PureComponent {
@@ -118,7 +116,10 @@ class LoginScene extends PureComponent {
   }
 
   componentWillMount() {
-    this.props.actions.logout();
+    
+    const {dispatch} = this.props;
+    dispatch(logout());
+    
     const params = (this.props.navigation.state.params || {});
     // this._resetNavStack(Config.ROUTE_LOGIN, params)
   }
@@ -130,11 +131,13 @@ class LoginScene extends PureComponent {
   onRequestSmsCode() {
     if (this.state.mobile) {
       this.setState({canAskReqSmsCode: true});
-      //this.counterText.start();
-      this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
+
+      const {dispatch} = this.props;
+
+      dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         ToastAndroid.showWithGravity(success ? "短信验证码已发送" : "短信验证码发送失败",
           success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER)
-      });
+      }));
     } else {
       ToastAndroid.showWithGravity("请输入您的手机号", ToastAndroid.SHORT, ToastAndroid.CENTER)
     }
@@ -165,42 +168,50 @@ class LoginScene extends PureComponent {
           ToastAndroid.show('请输入短信验证码', ToastAndroid.LONG);
           return false;
         }
-        this.signIn(this.state.mobile, this.state.verifyCode, "短信验证码");
+        this._signIn(this.state.mobile, this.state.verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
         if (!this.state.password) {
           ToastAndroid.show("请输入登录密码", ToastAndroid.LONG)
           return false;
         }
-        this.signIn(this.state.mobile, this.state.password, "帐号和密码");
+        this._signIn(this.state.mobile, this.state.password, "帐号和密码");
         break;
       default:
         ToastAndroid.show("error to log in!", ToastAndroid.LONG);
     }
   }
 
-  signIn(mobile, password, name) {
-
+  _signIn(mobile, password, name) {
     this.setState({doingSign: true});
 
-    const self = this;
-    this.props.actions.signIn(mobile, password, (ok, msg) => {
-      self.doneReqSign()
+    const {dispatch} = this.props;
+    dispatch(signIn(mobile, password, (ok, msg, token) => {
+      console.log('sign in result:', ok, token)
       if (ok) {
-        console.log('login done with ok, next:', this.next, "params", this.nextParams)
-        if (Config.ROUTE_ORDERS === this.next || !this.next) {
-          native.toOrders();
-        } else {
-          this.props.navigation.navigate(this.next || Config.ROUTE_ALERT, this.nextParams)
-        }
 
-        tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
-        
+        const fd = new FormData();
+        fd.append("_sid", this.props.global ? this.props.global.currStoreId : 0);
+        dispatch(getCommonConfig(token, fd, (ok) => {
+
+          this.doneReqSign()
+          
+          console.log('login done with ok, next:', this.next, "params", this.nextParams)
+          if (Config.ROUTE_ORDERS === this.next || !this.next) {
+            native.toOrders();
+          } else {
+            this.props.navigation.navigate(this.next || Config.ROUTE_ALERT, this.nextParams)
+          }
+
+          tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
+
+        }));
       } else {
+        this.doneReqSign()
         ToastAndroid.show("登录失败，请输入正确的" + name, ToastAndroid.LONG)
         return false;
       }
-    })
+    }))
   }
 
   doneReqSign() {

@@ -75,11 +75,12 @@ export default function globalReducer (state = initialState, action) {
       };
       
     case UPDATE_CFG:
+
       return action.payload ? {
         ...state,
-        canReadStores: action.payload.canReadStores,
-        canReadVendors: action.payload.canReadVendors,
-        config: action.payload.config,
+        canReadStores: action.payload.canReadStores || state.canReadStores,
+        canReadVendors: action.payload.canReadVendors || state.canReadVendors,
+        config: action.payload.config || state.config,
       } : state;
   }
   return state

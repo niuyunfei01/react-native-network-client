@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
 import React, { PureComponent, Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
 import InputNumber from 'rc-input-number';
@@ -19,9 +11,6 @@ import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-/**
- * The actions we need
- */
 import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
@@ -118,6 +107,7 @@ class OrderScene extends Component {
     this._doSaveItemsCancel = this._doSaveItemsCancel.bind(this);
     this._doSaveItemsEdit = this._doSaveItemsEdit.bind(this);
     this._onItemRowNumberChanged = this._onItemRowNumberChanged.bind(this)
+    this._doProcessRemind = this._doProcessRemind.bind(this)
   }
 
   componentDidMount() {
@@ -356,6 +346,11 @@ class OrderScene extends Component {
     }
   }
 
+  _doProcessRemind(remind) {
+    const {order} = this.props.order;
+    this.props.navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+  }
+
   render() {
     const {order} = this.props.order;
 
@@ -490,15 +485,35 @@ class OrderScene extends Component {
     const totalMoneyEdit = -10; //this._totalEditCents();
 
     const _items = order.items || {};
+    const remindNicks = this.state.reminds.nicknames || {};
+
     return (<View>
-        {tool.objectMap(this.state.reminds, (remind, idx) => {
+        {(this.state.reminds.reminds || []).map((remind, idx) => {
+          const task_types = this.props.global.config.task_types;
+          console.log("current remind:", remind, idx, task_types);
 
-          const cfg = this.props.global.confg;
+          const taskType = task_types['' + remind.type];
+          const status = parseInt(remind.status);
+          return <View key={remind.id} style={{borderBottomWidth: screen.onePixel, borderBottomColor: colors.color999}}>
+            <View style={{backgroundColor: status === Cts.TASK_STATUS_WAITING  ? '#edd9d9': '#f0f9ef', flexDirection: 'row', height: pxToDp(70), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), alignItems: 'center'}}>
+              <Text>{taskType ? taskType.name : '待办'}</Text>
+            <Text style={{marginLeft: pxToDp(20), }}>{tool.shortTimeDesc(remind.created)}</Text>
 
-          return <View><Text>{cfg.task_types[remind].name}</Text>
-            <Text>{remind.status}</Text>
-            <Text>{remind.created}</Text>
-          </View>;
+            <View style={{flex: 1}}></View>
+            {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 && <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
+            {status === Cts.TASK_STATUS_WAITING &&
+             <TouchableOpacity style={{backgroundColor: '#ea7575', width:pxToDp(90), height: pxToDp(50), alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}}
+                               onPress={(remind)=>{this._doProcessRemind(remind)}}>
+                <Text style={{color: colors.white,}}>处理</Text>
+              </TouchableOpacity>
+            }
+
+            {status === Cts.TASK_STATUS_DONE && <View>
+              <Text>{remind.resolved_at}完成</Text>
+              {remind.resolved_by &&
+              <Text>{remindNicks['' + remind.resolved_by]}</Text>}
+            </View>}
+          </View></View>;
         })}
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>

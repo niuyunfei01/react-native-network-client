@@ -35,6 +35,7 @@ import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
+import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -85,7 +86,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             AccountBean ab = GlobalCtx.app().getAccountBean();
             if (ab != null && ab.getInfo() != null) {
-                callback.invoke(true, "ok", ab.getInfo().toBundle());
+                callback.invoke(true, "ok", DaoHelper.gson().toJson(ab.getInfo()));
             } else {
                 callback.invoke(false, "Account is null", null);
             }
