@@ -7,6 +7,7 @@ import Picker from './Picker'
 import Uploader from './Uploader'
 import Label from './Label'
 import Select from './Select'
+import Agreement from './Agreement'
 
 export {
   TextArea,
@@ -18,4 +19,5 @@ export {
   Uploader,
   Label,
   Select,
+  Agreement
 }

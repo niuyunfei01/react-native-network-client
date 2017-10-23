@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.domain;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 
 /**
@@ -12,7 +13,11 @@ public class Store {
     private String tel;
     private float location_long;
     private float location_lat;
+    private String loc_lng;
+    private String loc_lat;
     private boolean shipCapable;
+    private String cloudPrinter;
+    private boolean cloudPrinterWorking;
     private int type;
     private String vendor;
 
@@ -69,8 +74,40 @@ public class Store {
         this.vendor = vendor;
     }
 
+    public String getCloudPrinter() {
+        return cloudPrinter;
+    }
+
+    public void setCloudPrinter(String cloudPrinter) {
+        this.cloudPrinter = cloudPrinter;
+    }
+
+    public boolean isCloudPrinterWorking() {
+        return cloudPrinterWorking;
+    }
+
+    public void setCloudPrinterWorking(boolean cloudPrinterWorking) {
+        this.cloudPrinterWorking = cloudPrinterWorking;
+    }
+
     public String namePrefixVendor() {
         String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
         return vendorName + this.getName();
+    }
+
+    public Bundle toBundle() {
+        Bundle b = new Bundle();
+        b.putString("name", name);
+        b.putString("loc_lng", loc_lng);
+        b.putString("loc_lat", loc_lat);
+        b.putString("mobile", mobile);
+        b.putString("tel", tel);
+        b.putString("vendor_id", String.valueOf(type));
+        b.putString("vendor", vendor);
+        b.putString("cloudPrinter", this.cloudPrinter);
+        b.putBoolean("shipCapable", shipCapable);
+        b.putBoolean("cloudPrinterWorking", cloudPrinterWorking);
+        b.putString("id", String.valueOf(id));
+        return b;
     }
 }

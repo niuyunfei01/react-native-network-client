@@ -12,10 +12,12 @@ import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.multidex.BuildConfig;
 import android.support.multidex.MultiDex;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -33,6 +35,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.i18n.reactnativei18n.ReactNativeI18n;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -91,6 +95,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
 public class GlobalCtx extends Application {
@@ -137,6 +142,7 @@ public class GlobalCtx extends Application {
     //private SpeechSynthesizer mTts;
 
     private ReactInstanceManager mReactInstanceManager;
+    private Config configByServer;
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -261,6 +267,8 @@ public class GlobalCtx extends Application {
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())
+                .addPackage(new VectorIconsPackage())
+                .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
@@ -330,6 +338,8 @@ public class GlobalCtx extends Application {
                                 && lastHash.equals(b.getObj().getLastHash())) {
                             return;
                         }
+
+                        ctx.configByServer = config;
 
                         if (config.getShip_workers() != null) {
                             ctx.ship_workers = config.getShip_workers();
@@ -454,6 +464,10 @@ public class GlobalCtx extends Application {
         }
 
         return storeWorkers.isEmpty() ? getWorkers() : storeWorkers;
+    }
+
+    public Config getConfigByServer() {
+        return configByServer;
     }
 
     public String[] getDelayReasons() {
@@ -1002,6 +1016,14 @@ public class GlobalCtx extends Application {
                 AppLogger.w("notify sound is disabled!");
                 return true;
             }
+
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            if (tm != null) {
+                if (CALL_STATE_IDLE != tm.getCallState()) {
+                    return true;
+                }
+            }
+
             return false;
         }
 

@@ -1,8 +1,8 @@
 export default {
   weuiBtnDefaultGap: 15,
-  weuiBtnHeight: 42,
+  weuiBtnHeight: 35, //42=>35
   weuiBtnMiniHeight: 1.9,
-  weuiBtnFontSize: 18,
+  weuiBtnFontSize: 16, //18=>16
   weuiBtnFontColor: '#FFFFFF',
   weuiBtnDisabledFontColor: 'rgba(255,255,255,.6)',
   weuiBtnActiveFontColor: 'rgba(255,255,255,.4)',

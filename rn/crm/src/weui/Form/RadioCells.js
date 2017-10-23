@@ -22,15 +22,17 @@ const RadioCells = (props) => {
     options,
     onChange,
     style,
+    cellStyle,
+    cellTextStyle,
     ...others
   } = props
 
   return (
     <Cells style={style} {...others}>
       {options.map((option, idx) =>
-        <Cell key={idx} onPress={() => onChange(option.value)}>
+        <Cell style={cellStyle} key={idx} onPress={() => onChange(option.value)}>
           <CellBody>
-            <CellText>{option.label || option.value}</CellText>
+            <CellText style={cellTextStyle}>{option.label || option.value}</CellText>
           </CellBody>
           {value === option.value ? (
             <Icon name="success_no_circle" style={styles.radio} />
@@ -46,6 +48,8 @@ RadioCells.propTypes = {
   onChange: PropTypes.func,
   options: PropTypes.array.isRequired,
   style: Icon.propTypes.style,
+  cellTextStyle: Icon.propTypes.style,
+  cellStyle: Icon.propTypes.style,
 }
 
 export default RadioCells

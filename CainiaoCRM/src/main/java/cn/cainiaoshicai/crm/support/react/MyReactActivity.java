@@ -16,10 +16,21 @@ import android.view.WindowInsets;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.google.gson.Gson;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
+import java.util.Collection;
+import java.util.HashMap;
+
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.domain.Config;
+import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Vendor;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.UserBean;
+import cn.cainiaoshicai.crm.support.DaoHelper;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 
 
 public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
@@ -51,8 +62,35 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 toRoute = "Order";
             }
         }
+
+        AccountBean ab = GlobalCtx.app().getAccountBean();
+        if (ab != null && ab.getInfo() != null) {
+            init.putBundle("userProfile", ab.getInfo().toBundle());
+        }
+
+        Collection<Store> stores = GlobalCtx.app().listStores();
+
+        Bundle storesB = new Bundle();
+
+        if (stores != null) {
+            for(Store s : stores) {
+                storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
+            }
+        }
+        init.putBundle("canReadStores", storesB);
+
+        Bundle storesV = new Bundle();
+        Vendor vendor = GlobalCtx.app().getVendor();
+        if (vendor != null){
+            storesV.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
+        }
+        init.putBundle("canReadVendors", storesV);
+
+        Config config = GlobalCtx.app().getConfigByServer();
+        init.putString("configStr", DaoHelper.gson().toJson(config));
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
+        init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));
         init.putString("_action", toRoute);
         if (!TextUtils.isEmpty(nextRoute)) {
             init.putString("_next_action", nextRoute);

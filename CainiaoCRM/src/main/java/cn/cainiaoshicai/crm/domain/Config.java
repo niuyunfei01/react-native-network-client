@@ -21,6 +21,7 @@ public class Config {
     private String[] coupons;
     private boolean cloudPrint = false;
     private String lastHash;
+    private SortedMap<Integer, TaskType> task_types;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
@@ -90,5 +91,18 @@ public class Config {
 
     public void setCloudPrint(boolean cloudPrint) {
         this.cloudPrint = cloudPrint;
+    }
+
+    public SortedMap<Integer, TaskType> getTask_types() {
+        return task_types;
+    }
+
+    public void setTask_types(SortedMap<Integer, TaskType> task_types) {
+        this.task_types = task_types;
+    }
+
+    private class TaskType {
+        public String name;
+        public int sort;
     }
 }

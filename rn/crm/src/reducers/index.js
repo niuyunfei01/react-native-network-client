@@ -4,7 +4,7 @@
  * This class combines all the reducers into one
  *
  */
-'use strict'
+'use strict';
 /**
  * ## Imports
  *
@@ -13,8 +13,9 @@
 import device from './device/deviceReducer'
 import global from './global/globalReducer'
 import order from './order/orderReducer'
-import alert from './alert/alertReducer'
 import remind from './remind/remindReducer'
+import store from './store/storeReducer'
+import mine from './mine/mineReducer'
 
 import {combineReducers} from 'redux'
 
@@ -25,11 +26,12 @@ import {combineReducers} from 'redux'
  * EVERY TIME there is a basic action
  */
 const rootReducer = combineReducers({
-    device,
-    global,
-    order,
-    alert,
-    remind
-})
+  device,
+  global,
+  order,
+  remind,
+  store,
+  mine,
+});
 
 export default rootReducer

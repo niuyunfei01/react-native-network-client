@@ -190,6 +190,11 @@ public class MainActivity extends AbstractActionBarActivity {
 
     private void resetPrinterStatusBar() {
 
+        if (null == GlobalCtx.app().getAccountBean()) {
+            Utility.showExpiredTokenDialogOrNotification();
+            return;
+        }
+
         long storeId = SettingUtility.getListenerStore();
         if (storeId < 1) {
             Utility.tellSelectStore("请选择工作门店", new StoreSelectedListener() {
@@ -213,37 +218,41 @@ public class MainActivity extends AbstractActionBarActivity {
             params = (RelativeLayout.LayoutParams) signInTxt.getLayoutParams();
         }
         if (app.fnEnabledTmpBuy()) {
-            tmpBuy.setVisibility(View.VISIBLE);
             if (params != null) {
                 params.removeRule(RelativeLayout.ALIGN_PARENT_END);
                 signInTxt.setLayoutParams(params);
             }
 
-            tmpBuy.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+            if (tmpBuy != null) {
+                tmpBuy.setVisibility(View.VISIBLE);
+                tmpBuy.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
 
-                    long storeId = SettingUtility.getListenerStore();
-                    if (storeId < 1) {
-                        Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
-                            @Override
-                            public void done(long selectedId) {
-                                SettingUtility.setListenerStores(selectedId);
-                                resetPrinterStatusBar();
-                            }
-                        }, MainActivity.this);
-                        return;
+                        long storeId = SettingUtility.getListenerStore();
+                        if (storeId < 1) {
+                            Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
+                                @Override
+                                public void done(long selectedId) {
+                                    SettingUtility.setListenerStores(selectedId);
+                                    resetPrinterStatusBar();
+                                }
+                            }, MainActivity.this);
+                            return;
+                        }
+
+                        String token = app.token();
+                        intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token=" + token,
+                                URLHelper.getStoresPrefix(), storeId));
+                        startActivity(intent);
                     }
-
-                    String token = app.token();
-                    intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token=" + token,
-                            URLHelper.getStoresPrefix(), storeId));
-                    startActivity(intent);
-                }
-            });
+                });
+            }
         } else {
-            tmpBuy.setVisibility(View.GONE);
+            if (tmpBuy != null) {
+                tmpBuy.setVisibility(View.GONE);
+            }
 
             if (signInTxt != null) {
                 params.addRule(RelativeLayout.ALIGN_PARENT_END);

@@ -93,7 +93,7 @@ public class DaoHelper {
         return gson().fromJson(json, type);
     }
 
-    private static Gson gson() {
+    public static Gson gson() {
         GsonBuilder g = new GsonBuilder();
 //        g.registerTypeAdapter(new TypeToken<ResultBean>(){}.getType(), new ResultBeanSerializer());
         return g.setDateFormat("yyyy-MM-dd HH:mm:ss").create();

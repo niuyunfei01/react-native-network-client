@@ -9,6 +9,9 @@ export default keyMirror({
   SESSION_TOKEN_FAILURE: null,
   LOGIN_PROFILE_SUCCESS: null,
 
+  SET_CURR_STORE: null,
+  UPDATE_CFG: null,
+
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
 
@@ -45,19 +48,30 @@ export default keyMirror({
   PROFILE_UPDATE_SUCCESS: null,
   PROFILE_UPDATE_FAILURE: null,
 
-    GET_ORDER_REQUEST: null,
-    GET_ORDER_SUCCESS: null,
-    GET_ORDER_FAILURE: null,
+  GET_ORDER_REQUEST: null,
+  GET_ORDER_SUCCESS: null,
+  GET_ORDER_FAILURE: null,
 
-    ORDER_UPDATE_REQUEST: null,
-    ORDER_UPDATE_SUCCESS: null,
-    ORDER_UPDATE_FAILURE: null,
+
+  ORDER_UPDATE_REQUEST: null,
+  ORDER_UPDATE_SUCCESS: null,
+  ORDER_UPDATE_FAILURE: null,
+  ORDER_PRINTED_CLOUD: null,
+  ORDER_ADD_ITEM: null,
+  ORDER_EDIT_ITEM: null,
+
 
   FORGOT_PASSWORD: null,
   LOGIN: null,
   REGISTER: null,
 
-    REQUEST_ALERT: null,
-    RECEIVE_ALERT: null,
+  GET_USER_COUNT: null,
+  GET_WORKER: null,
+  GET_VENDOR_STORES: null,
+  RESET_WORKER: null,
+
+  GET_CONTACT_REQUEST: null,
+  GET_CONTACT_SUCCESS: null,
+  GET_CONTACT_FAILURE: null,
 
 })

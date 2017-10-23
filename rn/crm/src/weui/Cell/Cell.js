@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         paddingTop: V.weuiCellGapV,
         paddingBottom: V.weuiCellGapV,
         paddingRight: V.weuiCellGapH,
-        borderTopWidth: 0,
+        borderTopWidth: 0.5,
         borderColor: V.weuiCellBorderColor,
     },
     firstCell: {
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     },
 })
 const Cell = (props) => {
-    const {access, vcode, error, first, children, style, ...others} = props
+    const {access, vcode, error, first, children, style,customStyle, ...others} = props
     const childrenWithProps = React.Children.map(children, (child) => {
         if (access && child.type.name === 'CellFooter') {
             return React.cloneElement(child, {access: true})
@@ -36,19 +36,20 @@ const Cell = (props) => {
             return React.cloneElement(child, {error: true})
         }
         return child
-    })
+    });
     return (
         <TouchableHighlight style={style} underlayColor={V.itemActiveColor} {...others} >
             <View
                 style={[
                     styles.cell,
                     first ? styles.firstCell : null,
-                    vcode ? styles.vcodeCell : null
+                    vcode ? styles.vcodeCell : null,
+                    customStyle ? customStyle : null,
                 ]}
             >{childrenWithProps}</View>
         </TouchableHighlight>
     )
-}
+};
 Cell.propTypes = {
     first: PropTypes.bool,
     access: PropTypes.bool,
@@ -56,6 +57,7 @@ Cell.propTypes = {
     error: PropTypes.bool,
     children: PropTypes.node,
     style: View.propTypes.style,
+    customStyle: View.propTypes.style,
     others: PropTypes.object,
 }
 

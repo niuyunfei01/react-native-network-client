@@ -1,0 +1,31 @@
+'use strict';
+
+/**
+ * 业务相关的常量
+ */
+
+export default {
+
+  TASK_STATUS_WAITING: 0,//未处理
+  TASK_STATUS_DONE: 1,//已处理
+  TASK_STATUS_CONFIRMED: 2,//已确认
+
+  ORDER_STATUS_TO_READY: 1,
+  ORDER_STATUS_TO_SHIP: 2,
+  ORDER_STATUS_SHIPPING: 3,
+  ORDER_STATUS_ARRIVED: 4,
+  ORDER_STATUS_INVALID: 5,
+
+  VERSION_DIRECT: 'direct',
+
+  TASK_TYPE_COMPLAIN: 1,//待处理评价
+  TASK_TYPE_REFUND: 2,//客服待处理退款
+  TASK_TYPE_OTHER_IMP: 3,//其他事项
+  TASK_TYPE_OTHER: 0,
+  TASK_TYPE_REMIND: 4,//催单
+  TASK_TYPE_REFUND_BY_USER: 5,//用户申请退款
+  TASK_TYPE_DELIVERY_FAILED: 6,//京东配送员申请取消配送
+
+  WORKER_STATUS_OK: 1,//员工启用状态
+  WORKER_STATUS_DISABLED: 0,//员工禁用状态
+}

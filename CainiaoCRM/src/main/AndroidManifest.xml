@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="279"
-    android:versionName="2.2.2">
+    android:versionCode="280"
+    android:versionName="2.3.1">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
     <permission
@@ -238,12 +238,6 @@
         <!-- Required  . Enable it you can userTalkStatus statistics data with channel -->
         <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
         <meta-data android:name="JPUSH_APPKEY" android:value="30073ab80a50534d39c84d3c" />
-        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <!--  </>值来自开发者平台取得的AppKey-->
     </application>
 
 </manifest>
