@@ -79,6 +79,9 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
+    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVersion = (canReadVendors[currVendorId] || {})['version'];
+
     const {mine} = this.props;
     this.state = {
       isRefreshing: false,
@@ -88,20 +91,20 @@ class MineScene extends PureComponent {
       bad_cases_of: mine.bad_cases_of[currentUser],
 
       currentUser: currentUser,
-      canReadStores: canReadStores,
       prefer_store: prefer_store,
       screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
       currStoreName: canReadStores[currStoreId]['name'],
-      currVendorId: canReadStores[currStoreId]['vendor_id'],
+      currVendorId: currVendorId,
+      currVersion: currVersion,
       currVendorName: canReadStores[currStoreId]['vendor'],
       cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
       canReadVendors: canReadVendors,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
-    this._goToOldRemind = this._goToOldRemind.bind(this);
+    this.onPress = this.onPress.bind(this);
 
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
@@ -141,6 +144,7 @@ class MineScene extends PureComponent {
       currStoreId,
       currentUserProfile,
       canReadStores,
+      canReadVendors,
     } = this.props.global;
 
     const {
@@ -151,17 +155,20 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {mine} = this.props;
+    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVersion = (canReadVendors[currVendorId] || {})['version'];
+
     this.setState({
       sign_count: mine.sign_count[currentUser],
       bad_cases_of: mine.bad_cases_of[currentUser],
       currentUser: currentUser,
-      canReadStores: canReadStores,
       prefer_store: prefer_store,
       screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
       currStoreName: canReadStores[currStoreId]['name'],
-      currVendorId: canReadStores[currStoreId]['vendor_id'],
+      currVendorId: currVendorId,
+      currVersion: currVersion,
       currVendorName: canReadStores[currStoreId]['vendor'],
       cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
     });
@@ -174,28 +181,29 @@ class MineScene extends PureComponent {
   }
 
   _doChangeStore(store_id) {
-    let {canReadStores} = this.state;
     const {dispatch} = this.props;
+    const {
+      canReadStores,
+      canReadVendors,
+    } = this.props.global;
     let _this = this;
     native.setCurrStoreId(store_id, function (ok, msg) {
       console.log('setCurrStoreId => ', store_id, ok, msg);
       if (ok) {
+        let currVendorId = canReadStores[store_id]['vendor_id'];
+        let currVersion = (canReadVendors[currVendorId] || {})['version'];
         dispatch(setCurrentStore(store_id));
         _this.setState({
           currStoreId: store_id,
           currStoreName: canReadStores[store_id]['name'],
-          currVendorId: canReadStores[store_id]['vendor_id'],
+          currVendorId: currVendorId,
+          currVersion: currVersion,
           currVendorName: canReadStores[store_id]['vendor'],
         });
       } else {
         ToastShort(msg);
       }
     });
-  }
-
-  _goToOldRemind() {
-    const url = `${Config.ServiceUrl}stores/quick_task_list.html?access_token=${this.props.global.accessToken}`;
-    this.props.navigation.navigate(Config.ROUTE_WEB, {url: url});
   }
 
   renderHeader() {
@@ -293,6 +301,7 @@ class MineScene extends PureComponent {
   }
 
   render() {
+    let {currVersion} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -308,7 +317,7 @@ class MineScene extends PureComponent {
         {this.renderWorker()}
         {this.renderStoreBlock()}
         {this.renderVersionBlock()}
-        {this.renderDirectBlock()}
+        {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
       </ScrollView>
     );
   }
@@ -328,6 +337,8 @@ class MineScene extends PureComponent {
   }
 
   renderStoreBlock() {
+    let token = `?access_token=${this.props.global.accessToken}`;
+    let {currVendorId} = this.state;
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity style={[block_styles.block_box]}>
@@ -338,7 +349,9 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/pingjia_.png')}/>
           <Text style={[block_styles.block_name]}>评价</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          this.onPress(Config.ROUTE_STORE)
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/dianpu_.png')}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
@@ -346,7 +359,10 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/xiaoshou_.png')}/>
           <Text style={[block_styles.block_name]}>销售分析</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}stores/working_status.html${token}&&_v_id=${currVendorId}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/kaoqin_.png')}/>
           <Text style={[block_styles.block_name]}>考勤记录</Text>
         </TouchableOpacity>
@@ -375,10 +391,7 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/shezhi_.png')}/>
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={this._goToOldRemind}>
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')}/>
-          <Text style={[block_styles.block_name]}>老的提醒</Text>
-        </TouchableOpacity>
+        <View style={[block_styles.block_box]}/>
       </View>
     )
   }
@@ -390,7 +403,6 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/huiyuan_.png')}/>
           <Text style={[block_styles.block_name]}>会员信息</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={[block_styles.block_box]}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
@@ -409,26 +421,45 @@ class MineScene extends PureComponent {
   }
 
   renderDirectBlock() {
+    let token = `?access_token=${this.props.global.accessToken}`;
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}stores/provide_req_all.html${token}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/diaohuo_.png')}/>
           <Text style={[block_styles.block_name]}>调货单</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}stores/prod_loss.html${token}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/baosun_.png')}/>
           <Text style={[block_styles.block_name]}>报损</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}stores/orders_buy_combined.html${token}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/caigou_.png')}/>
           <Text style={[block_styles.block_name]}>门店采购</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}expenses/show_expenses.html${token}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/baoxiao_.png')}/>
           <Text style={[block_styles.block_name]}>报销</Text>
         </TouchableOpacity>
-        <View style={[block_styles.empty_box]}/>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')}/>
+          <Text style={[block_styles.block_name]}>老的提醒</Text>
+        </TouchableOpacity>
+        <View style={[block_styles.block_box]}/>
       </View>
     )
   }
