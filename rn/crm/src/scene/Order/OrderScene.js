@@ -348,13 +348,20 @@ class OrderScene extends Component {
 
   _doProcessRemind(remind) {
     const {order} = this.props.order;
-    this.props.navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+    const remindType = parseInt(remind.type);
+    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER) {
+      this.props.navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+    } else if (remindType === Cts.TASK_TYPE_REMIND) {
+      this.props.navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+    } else {
+      this.setState({errorHints: '暂不支持的处理类型：' + remind})
+    }
+
+    console.log(remind)
   }
 
   render() {
     const {order} = this.props.order;
-
-    console.log(this.state);
 
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}
@@ -490,20 +497,20 @@ class OrderScene extends Component {
     return (<View>
         {(this.state.reminds.reminds || []).map((remind, idx) => {
           const task_types = this.props.global.config.task_types;
-          console.log("current remind:", remind, idx, task_types);
 
           const taskType = task_types['' + remind.type];
           const status = parseInt(remind.status);
           return <View key={remind.id} style={{borderBottomWidth: screen.onePixel, borderBottomColor: colors.color999}}>
-            <View style={{backgroundColor: status === Cts.TASK_STATUS_WAITING  ? '#edd9d9': '#f0f9ef', flexDirection: 'row', height: pxToDp(70), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), alignItems: 'center'}}>
+            <View style={{backgroundColor: status === Cts.TASK_STATUS_WAITING  ? '#edd9d9': '#f0f9ef', flexDirection: 'row',
+              height: pxToDp(70), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), alignItems: 'center'}}>
               <Text>{taskType ? taskType.name : '待办'}</Text>
             <Text style={{marginLeft: pxToDp(20), }}>{tool.shortTimeDesc(remind.created)}</Text>
 
-            <View style={{flex: 1}}></View>
+            <View style={{flex: 1}}/>
             {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 && <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
             {status === Cts.TASK_STATUS_WAITING &&
              <TouchableOpacity style={{backgroundColor: '#ea7575', width:pxToDp(90), height: pxToDp(50), alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}}
-                               onPress={(remind)=>{this._doProcessRemind(remind)}}>
+                               onPress={()=>{this._doProcessRemind(remind)}}>
                 <Text style={{color: colors.white,}}>处理</Text>
               </TouchableOpacity>
             }

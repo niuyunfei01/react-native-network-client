@@ -5,7 +5,7 @@ import {
     Cells, CellsTitle, CellsTips, Cell, CellHeader, CellBody, CellFooter, CellText,
 } from './Cell'
 import {
-    TextArea, Input, Switch, RadioCells, CheckboxCells, Picker, Uploader, Label, Select,
+    TextArea, Input, Switch, RadioCells, CheckboxCells, Picker, Uploader, Label, Select, Agreement
 } from './Form'
 import {Icon} from './Icon'
 import {Toast} from './Toast'
@@ -29,7 +29,7 @@ export {
     Button, ButtonArea,
     Grids, Grid, GridIcon, GridLabel,
     Cells, CellsTitle, CellsTips, Cell, CellHeader, CellBody, CellFooter, CellText,
-    TextArea, Input, Switch, RadioCells, CheckboxCells, Picker, Uploader, Label, Select,
+    TextArea, Input, Switch, RadioCells, CheckboxCells, Picker, Uploader, Label, Select, Agreement,
     Icon,
     Toast,
     Msg,

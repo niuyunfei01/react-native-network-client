@@ -24,4 +24,5 @@ export default {
   ROUTE_Mine: 'Mine',
   ROUTE_SETTING: 'Setting',
   ROUTE_ORDER_URGE: 'UrgeOrder',
+  ROUTE_REFUND_AUDIT: 'AuditRefund',
 };

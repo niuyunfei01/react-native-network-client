@@ -23,6 +23,7 @@ import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete";
 import SettingScene from "../scene/Setting/SettingScene";
+import AuditRefundScene from "../scene/Order/AuditRefundScene";
 
 const Tab = TabNavigator(
   {
@@ -157,7 +158,8 @@ class Navigator extends Component {
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
         Setting: {screen: SettingScene},
-        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene}
+        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
+        [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene}
 
       },
       stackNavigatorConfigs
