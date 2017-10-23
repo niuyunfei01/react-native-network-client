@@ -6,7 +6,7 @@ import * as RemindServices from '../../services/remind';
 
 export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status) {
   return dispatch => {
-    dispatch(fetchRemindList(isRefreshing, loading, isLoadMore));
+    dispatch(fetchRemindList(isRefreshing, loading, isLoadMore, typeId));
     return RemindServices.FetchRemindList(token, typeId, status, page)
       .then(response => response.json())
       .then((response) => {
@@ -115,7 +115,7 @@ function updateRemindStatus(id, typeId, status) {
   }
 }
 
-function fetchRemindList(isRefreshing, loading, isLoadMore) {
+function fetchRemindList(isRefreshing, loading, isLoadMore, typeId) {
   if (isLoadMore == undefined) {
     isLoadMore = false;
   }
@@ -123,7 +123,8 @@ function fetchRemindList(isRefreshing, loading, isLoadMore) {
     type: types.FETCH_REMIND_LIST,
     isRefreshing: isRefreshing,
     loading: loading,
-    isLoadMore: isLoadMore
+    isLoadMore: isLoadMore,
+    typeId: typeId
   }
 }
 

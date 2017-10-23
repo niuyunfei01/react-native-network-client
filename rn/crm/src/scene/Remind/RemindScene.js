@@ -31,7 +31,7 @@ import {bindActionCreators} from "redux";
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from '../../widget/LoadingView';
-import {ToastShort} from '../../util/ToastUtils';
+import {ToastShort, ToastLong} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {fetchRemind, updateRemind, fetchRemindCount, delayRemind} from '../../reducers/remind/remindActions'
@@ -44,7 +44,8 @@ import Config from '../../config'
 const BadgeTabBar = require('./BadgeTabBar');
 
 import {Dialog, ActionSheet} from "../../weui/index";
-
+import IconBadge from '../../widget/IconBadge';
+import colors from "../../styles/colors";
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -65,9 +66,11 @@ function mapDispatchToProps(dispatch) {
 
 let canLoadMore;
 let loadMoreTime = 0;
-const _typeIds = [5, 4, 1, 3];
+const _typeIds = [100, 101, 102, 103];
+const _fetchDataTypeIds = [100, 101, 102, 3, 0];
+const _otherSubTypeIds = [0, 3];
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
-
+const _otherTypeTag = 103;
 
 // create a component
 class RemindScene extends PureComponent {
@@ -81,7 +84,8 @@ class RemindScene extends PureComponent {
       showStopRemindDialog: false,
       showDelayRemindDialog: false,
       opRemind: {},
-      localState: {}
+      localState: {},
+      otherTypeActive: 3
     };
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
@@ -91,28 +95,27 @@ class RemindScene extends PureComponent {
   componentWillMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
-    console.log('remind view will mount')
     dispatch(fetchRemindCount(token));
+    dispatch(fetchRemind(false, true, _fetchDataTypeIds[0], false, 1, token, 0));
   }
 
   componentDidMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
-    InteractionManager.runAfterInteractions(() => {
-      _typeIds.forEach((typeId) => {
-        dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
-      });
+    let array = _fetchDataTypeIds.slice(1);
+    array.forEach((typeId) => {
+      dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
     });
-
   }
 
   componentWillReceiveProps(nextProps) {
     const {remind} = this.props;
-    if (remind.isLoadMore && !nextProps.remind.isLoadMore && !nextProps.remind.isRefreshing) {
-      if (nextProps.remind.noMore) {
-        ToastShort('没有更多数据了');
-      }
-    }
+    // get typeId
+    // if (remind.isLoadMore && !nextProps.remind.isLoadMore && !nextProps.remind.isRefreshing) {
+    //   if (nextProps.remind.noMore) {
+    //     ToastShort('没有更多数据了');
+    //   }
+    // }
   }
 
   onRefresh(typeId) {
@@ -138,13 +141,15 @@ class RemindScene extends PureComponent {
           }
         });
         self.props.navigation.navigate(route, params);
-      }, () => {
-        self.setState({
-          localState: {
-            orderId: ''
-          }
-        });
-      });
+      }).done(
+        () => {
+          self.setState({
+            localState: {
+              orderId: ''
+            }
+          });
+        }
+      );
     }
   }
 
@@ -213,12 +218,10 @@ class RemindScene extends PureComponent {
     const {remind} = this.props;
     let token = this._getToken();
     let pageNum = remind.currPage[typeId];
-    let totalPage = remind.totalPage[typeId];
-    if (pageNum + 1 > totalPage) {
-      canLoadMore = false;
+    canLoadMore = true;
+    if (remind.noMore[typeId]) {
       ToastShort('没有更多数据了');
-    } else {
-      canLoadMore = true;
+      canLoadMore = false;
     }
     if (canLoadMore && time - loadMoreTime > 1) {
       const {dispatch} = this.props;
@@ -227,48 +230,57 @@ class RemindScene extends PureComponent {
     }
   }
 
+  pressSubButton(type) {
+    this.setState({
+      otherTypeActive: type
+    });
+  }
+
+  __getBadgeButton(key, name, quick) {
+    quick = quick ? quick : 0;
+    let activeType = this.state.otherTypeActive;
+    let self = this;
+    return <IconBadge
+      key={key}
+      MainElement={
+        <RNButton
+          onPress={(key) => self.pressSubButton(key)}
+          containerStyle={activeType == key ? styles.subButtonActiveContainerStyle : styles.subButtonContainerStyle}
+          style={activeType == key ? styles.subButtonActiveStyle : styles.subButtonStyle}>
+          {name}
+        </RNButton>
+      }
+      BadgeElement={
+        <Text style={{color: '#FFFFFF'}}>{quick}</Text>
+      }
+      MainViewStyle={{marginHorizontal: pxToDp(10)}}
+      Hidden={quick == 0}
+      IconBadgeStyle={styles.iconBadgeStyle}
+      MainProps={{key: key}}
+    />;
+  }
+
   renderHead(typeId) {
-    if (typeId != 3) {
+    let self = this;
+    if (typeId != _otherTypeTag) {
       return null;
     }
     let buttons = [];
-    for (let i = 0; i < 6; i++) {
-      buttons.push(<RNButton
-        key={i}
-        containerStyle={{
-          height: 30,
-          width: 48,
-          overflow: 'hidden',
-          borderRadius: 15,
-          backgroundColor: '#e6e6e6',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderColor: '#999',
-          borderWidth: 1
-        }}
-        style={{fontSize: 10, color: '#999'}}>
-        修改
-      </RNButton>)
-    }
+    const {remind} = this.props;
+    let quickNum = remind.quickNum;
+    _otherSubTypeIds.forEach((typeId) => {
+      buttons.push(self.__getBadgeButton(typeId, Alias.SUB_CATEGORIES[typeId], quickNum[typeId]));
+    });
     return (
-      <View style={{
-        flex: 1,
-        height: 40,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        alignContent: 'space-between',
-        flexWrap: 'nowrap',
-        backgroundColor: 'white'
-      }}>
+      <View style={styles.listHeadStyle}>
         {buttons}
       </View>
     );
   }
 
-  renderFooter() {
+  renderFooter(typeId) {
     const {remind} = this.props;
-    if (!remind.isLoadMore) return null;
+    if (!remind.isLoadMore[typeId]) return null;
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
@@ -287,13 +299,16 @@ class RemindScene extends PureComponent {
     );
   }
 
-  renderContent(dataSource, typeId) {
+  renderContent(dataSource, typeId, tagTypeId) {
     const {remind} = this.props;
-    if (remind.loading) {
+    if (remind.loading[typeId]) {
       return <LoadingView/>;
     }
-    let isEmpty = remind.remindList[typeId] == undefined || remind.remindList[typeId].length == 0;
-    if (isEmpty) {
+    let isLoading = remind.remindList[typeId] == undefined;
+    let isEmpty = isLoading ? false : remind.remindList[typeId].length == 0;
+    if (isLoading || isEmpty) {
+      let title = isLoading ? "Loading..." : "";
+      let tip = isLoading ? "正在加载..." : "";
       return (
         <ScrollView
           automaticallyAdjustContentInsets={false}
@@ -302,14 +317,14 @@ class RemindScene extends PureComponent {
           style={{flex: 1}}
           refreshControl={
             <RefreshControl
-              refreshing={remind.isRefreshing}
+              refreshing={remind.isRefreshing[typeId]}
               onRefresh={this.onRefresh.bind(this, typeId)}
-              title="Loading..."
+              title={title}
               colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
             />}>
           <View style={{alignItems: 'center'}}>
             <Text style={{fontSize: 16}}>
-              正在加载...
+              {tip}
             </Text>
           </View>
         </ScrollView>
@@ -330,8 +345,8 @@ class RemindScene extends PureComponent {
         renderItem={this.renderItem}
         onEndReached={this.onEndReached.bind(this, typeId)}
         onRefresh={this.onRefresh.bind(this, typeId)}
-        refreshing={remind.isRefreshing}
-        ListFooterComponent={this.renderFooter}
+        refreshing={remind.isRefreshing[typeId]}
+        ListFooterComponent={this.renderFooter.bind(this, typeId)}
         ListHeaderComponent={this.renderHead.bind(this, typeId)}
         keyExtractor={this._keyExtractor}
         shouldItemUpdate={this._shouldItemUpdate}
@@ -355,23 +370,30 @@ class RemindScene extends PureComponent {
 
   render() {
     const {remind} = this.props;
-    const remindCount = remind.remindCount;
+    const tagNum = remind.tagNum;
+    const self = this;
     let lists = [];
     _typeIds.forEach((typeId, index) => {
-      let key = typeId + "-" + _typeAlias[index]
+      let key = typeId + "-" + _typeAlias[index];
+      let label = Alias.CATEGORIES[typeId];
+      let tabTagId = typeId;
+      //other type
+      if (typeId == _otherTypeTag) {
+        typeId = self.state.otherTypeActive;
+      }
       lists.push(
         <View
           key={key}
-          tabLabel={Alias.CATEGORIES[typeId]}
+          tabLabel={label}
           style={{flex: 1}}>
-          {this.renderContent(this.state.dataSource = remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId)}
+          {this.renderContent(this.state.dataSource = remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId, tabTagId)}
         </View>);
     });
     return (
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeAlias}/>}
+          renderTabBar={() => <BadgeTabBar count={tagNum} countIndex={_typeIds}/>}
           locked={remind.processing}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
@@ -535,6 +557,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: 100
+  },
+  subButtonContainerStyle: {
+    height: 30,
+    width: 48,
+    overflow: 'hidden',
+    borderRadius: 15,
+    backgroundColor: '#e6e6e6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#999',
+    borderWidth: 1
+  },
+  subButtonActiveContainerStyle: {
+    height: 30,
+    width: 48,
+    overflow: 'hidden',
+    borderRadius: 15,
+    backgroundColor: colors.main_color,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: colors.main_color,
+    borderWidth: 1
+  },
+  subButtonStyle: {
+    fontSize: 10,
+    color: '#999'
+  },
+  subButtonActiveStyle: {
+    fontSize: 10,
+    color: 'white'
+  },
+  listHeadStyle: {
+    flex: 1,
+    height: 46,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    alignContent: 'space-between',
+    flexWrap: 'nowrap',
+    backgroundColor: 'white'
+  },
+  iconBadgeStyle: {
+    width: 20,
+    height: 15,
+    top: 0,
+    right: -5
   }
 });
 
