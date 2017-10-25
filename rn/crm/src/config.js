@@ -13,6 +13,8 @@ export default {
 
   ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
 
+  LOC_PICKER: 'loc_picker',
+
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
@@ -27,4 +29,5 @@ export default {
   ROUTE_PRINTER_CONNECT: 'PrinterConnect',
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
+  ROUTE_ORDER_EDIT: 'OrderEdit',
 };

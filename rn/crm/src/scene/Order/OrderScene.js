@@ -167,8 +167,9 @@ class OrderScene extends Component {
 
   _onShowStoreCall() {
 
+    console.log(this.store_contacts);
     const store_id = this.props.order.order.store_id;
-    if (!this.store_contacts) {
+    if (!this.store_contacts || this.store_contacts.length === 0) {
       this.setState({showContactsLoading: true})
 
       const {dispatch} = this.props;
@@ -335,6 +336,9 @@ class OrderScene extends Component {
   toMap() {
     const {order} = this.props.order;
     const validPoi = order.gd_lng && order.gd_lat;
+
+    //http://m.amap.com/navi/?start=parameter1&amp;dest=parameter2&amp;destName=parameter3&amp;naviBy=parameter4&amp;key=parameter5   
+
     if (validPoi) {
       const uri = `https://uri.amap.com/marker?position=${order.gd_lng},${order.gd_lat}`
       this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri})
@@ -526,6 +530,8 @@ class OrderScene extends Component {
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
+            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={() => {this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})} }>
+              <Icon name='edit' size={20} color={colors.main_color}/></TouchableOpacity>
             <View style={{flex: 1}}/>
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]} source={require('../../img/Order/message_.png')}/>
           </View>
@@ -594,8 +600,6 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
 
             {this.state.isEditing &&
-            <ImageBtn source={require('../../img/Order/edit_add_item.png')} onPress={ () => {this.props.navigation.navigate('ProductAutocomplete')} } />
-              && 
             <ImageBtn source={require('../../img/Order/save_edit.png')} onPress={this._doSaveItemsEdit} />
               &&
               <Icon.Button name="close" onPress={this._doSaveItemsCancel}>
@@ -628,6 +632,8 @@ class OrderScene extends Component {
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
             return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
+
+          <ImageBtn source={require('../../img/Order/edit_add_item.png')} onPress={ () => {this.props.navigation.navigate('ProductAutocomplete')} } />
 
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
