@@ -85,11 +85,13 @@ class WorkerScene extends PureComponent {
       forbidden: mine.forbidden[currVendorId],
     };
 
-    if(this.props.navigation.state.params === undefined ||
+    if (this.props.navigation.state.params === undefined ||
       this.state.normal === undefined ||
-      this.state.forbidden === undefined){
+      this.state.forbidden === undefined) {
       this.onSearchWorkers();
     }
+
+    this.onPress = this.onPress.bind(this);
   }
 
   componentWillMount() {
@@ -127,6 +129,7 @@ class WorkerScene extends PureComponent {
   }
 
   onPress(route, params = {}) {
+    console.log('onPress -> ', route, params);
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
@@ -135,14 +138,14 @@ class WorkerScene extends PureComponent {
 
   renderUser(user) {
     return (
-      <Cell style={[styles.worker_box]} customStyle={{borderTopWidth: 0}} key={user.id}>
+      <Cell customStyle={[styles.cell_row]} key={user.id}>
         <CellHeader>
           <Image
             style={[styles.worker_img]}
             source={user.image !== '' ? {uri: user.image} : require('../../img/My/touxiang50x50_.png')}
           />
         </CellHeader>
-        <CellBody style={[styles.worker_info]}>
+        <CellBody>
           <Text style={[styles.worker_name]}>{user.nickname}({user.id})</Text>
           <Text style={[styles.worker_tel]}>{user.mobilephone}</Text>
         </CellBody>
@@ -173,7 +176,7 @@ class WorkerScene extends PureComponent {
 
   renderList() {
     let {normal, forbidden} = this.state;
-    if(normal === undefined || forbidden === undefined){
+    if (normal === undefined || forbidden === undefined) {
       return <LoadingView/>;
     }
     let _this = this;
@@ -187,25 +190,25 @@ class WorkerScene extends PureComponent {
     return (
       <View>
         <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
-        <Cells style={[styles.cells, styles.border_top]}>
+        <Cells style={[styles.cells]}>
           {normal_workers}
         </Cells>
         <CellsTitle style={styles.cell_title}>禁用员工列表</CellsTitle>
-        <Cells style={[styles.cells, styles.border_top]}>
+        <Cells style={[styles.cells]}>
           {forbidden_workers}
         </Cells>
       </View>
     );
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
     let {shouldRefresh} = (params || {});
-    if(shouldRefresh === true){
+    if (shouldRefresh === true) {
       console.log(' Refresh worker list -> ', this.props.navigation.state);
       this.onSearchWorkers();
       const setParamsAction = NavigationActions.setParams({
-        params: { shouldRefresh: false},
+        params: {shouldRefresh: false},
         key: key,
       });
       this.props.navigation.dispatch(setParamsAction);
@@ -222,16 +225,16 @@ class WorkerScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: '#f2f2f2'}}
+        style={{backgroundColor: colors.main_back}}
       >
         <View>
           <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>
-          <Cells style={[styles.cells, styles.border_top]}>
-            <Cell style={[styles.worker_box, {justifyContent: 'center'}]}>
+          <Cells style={[styles.cells]}>
+            <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
                 <Icon name="person-add" style={[styles.add_user_icon]}/>
               </CellHeader>
-              <CellBody style={[styles.worker_info]}>
+              <CellBody>
                 <Text style={[styles.worker_name]}>新增员工</Text>
               </CellBody>
               <CellFooter>
@@ -252,7 +255,6 @@ class WorkerScene extends PureComponent {
       </ScrollView>
     );
   }
-
 }
 
 
@@ -260,19 +262,22 @@ class WorkerScene extends PureComponent {
 const styles = StyleSheet.create({
   cell_title: {
     marginBottom: pxToDp(5),
-    paddingLeft: pxToDp(30),
+    fontSize: pxToDp(26),
+    color: colors.color999,
   },
   cells: {
     marginTop: 0,
-  },
-  border_top: {
+    paddingLeft: 0,
     borderTopWidth: pxToDp(1),
-    borderTopColor: colors.color999,
-  },
-  worker_box: {
-    borderColor: colors.color999,
     borderBottomWidth: pxToDp(1),
+    borderColor: colors.color999,
+  },
+  cell_row: {
     height: pxToDp(90),
+    justifyContent: 'center',
+    marginLeft: 0,
+    paddingLeft: pxToDp(30),
+    paddingRight: 0,
   },
   worker_img: {
     width: pxToDp(50),
@@ -280,7 +285,6 @@ const styles = StyleSheet.create({
     marginVertical: pxToDp(20),
     borderRadius: 50,
   },
-  worker_info: {},
   worker_name: {
     fontSize: pxToDp(28),
     fontWeight: 'bold',
@@ -298,11 +302,11 @@ const styles = StyleSheet.create({
   },
   right_btn: {
     fontSize: pxToDp(30),
-    textAlign: 'right',
-    width: pxToDp(60),
-    height: pxToDp(60),
+    textAlign: 'center',
+    width: pxToDp(90),
+    height: pxToDp(70),
     color: colors.color999,
-    paddingTop: pxToDp(15),
+    paddingTop: pxToDp(20),
   },
 });
 

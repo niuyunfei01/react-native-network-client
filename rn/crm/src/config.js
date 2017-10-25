@@ -30,4 +30,5 @@ export default {
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
+  ROUTE_STORE: 'Store',
 };

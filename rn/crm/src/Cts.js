@@ -16,6 +16,8 @@ export default {
   ORDER_STATUS_ARRIVED: 4,
   ORDER_STATUS_INVALID: 5,
 
+  VERSION_DIRECT: 'direct',
+
   TASK_TYPE_COMPLAIN: 1,//待处理评价
   TASK_TYPE_REFUND: 2,//客服待处理退款
   TASK_TYPE_OTHER_IMP: 3,//其他事项
