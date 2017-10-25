@@ -78,7 +78,7 @@ class UserAddScene extends PureComponent {
     let currVendorName = canReadStores[currStoreId]['vendor'];
 
     const {mine} = this.props;
-    let vendor_stores = (mine === undefined || mine.vendor_stores[currVendorId] === undefined) ? [] : mine.vendor_stores[currVendorId];
+    let vendor_stores = (mine === undefined || mine.vendor_stores[currVendorId] === undefined) ? [] : Object.values(mine.vendor_stores[currVendorId]);
 
     let stores = [{name: '访问所有门店', value: 0}];
     let v_store = vendor_stores.map((store) => {
@@ -107,7 +107,8 @@ class UserAddScene extends PureComponent {
       worker_id: worker_id,
     };
     this.onUserAdd = this.onUserAdd.bind(this);
-    if (vendor_stores.length === 0) {
+    console.log('vendor_stores.length -> ', vendor_stores.length);
+    if (vendor_stores.length === 0 || vendor_stores.length === undefined) {
       this.getVendorStore();
     }
   }
@@ -119,9 +120,9 @@ class UserAddScene extends PureComponent {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       dispatch(getVendorStores(vendor_id, accessToken, (resp) => {
-        console.log(resp);
+        console.log('resp -> ', resp);
         if (resp.ok) {
-          let vendor_stores = resp.obj;
+          let vendor_stores = Object.values(resp.obj);
           let stores = [{name: '访问所有门店', value: 0}];
           let v_store = vendor_stores.map((store) => {
             return {name: store.name, value: parseInt(store.id)};
@@ -153,7 +154,7 @@ class UserAddScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: '#f2f2f2'}}
+        style={{backgroundColor: colors.main_back}}
       >
         <CellsTitle style={styles.cell_title}>基本信息</CellsTitle>
         <Cells style={[styles.cell_box]}>

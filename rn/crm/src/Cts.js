@@ -28,4 +28,7 @@ export default {
 
   WORKER_STATUS_OK: 1,//员工启用状态
   WORKER_STATUS_DISABLED: 0,//员工禁用状态
+
+  SHIP_AUTO: 0, //不自动
+  SHIP_AUTO_FN_DD: 64, //自动排单
 }

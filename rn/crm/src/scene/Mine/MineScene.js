@@ -350,7 +350,11 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>评价</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          this.onPress(Config.ROUTE_STORE)
+          this.onPress(Config.ROUTE_STORE, {
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+            currVendorName: this.state.currVendorName,
+          })
         }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/dianpu_.png')}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
