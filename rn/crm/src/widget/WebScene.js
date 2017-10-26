@@ -63,7 +63,7 @@ class WebScene extends PureComponent {
       if (action === Config.LOC_PICKER) {
         let {center,} = this.props.navigation.state.params;
         const key = '608d75903d29ad471362f8c58c550daf';
-        url = `https://www.cainiaoshicai.cn/amap.html?key=${key}&center=${center}`;
+        url = `https://www.cainiaoshicai.cn/amap.php?key=${key}&center=${center}`;
       }
       this.setState({source: {uri: url}})
     })
