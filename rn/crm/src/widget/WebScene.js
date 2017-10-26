@@ -62,14 +62,10 @@ class WebScene extends PureComponent {
 
       if (action === Config.LOC_PICKER) {
         let {center,} = this.props.navigation.state.params;
-        /** Don't work for postMessage back */
-        // url = (Platform.OS === 'ios' ? './' : 'file:///android_asset/') + 'amap.html';
-        url = 'https://www.cainiaoshicai.cn/amap.html';
-        this.setState({source: {uri: url}})
-        // this.setState({source: require('./amap.html')})
-      } else {
-        this.setState({source: {uri: url}})
+        const key = '608d75903d29ad471362f8c58c550daf';
+        url = `https://www.cainiaoshicai.cn/amap.php?key=${key}&center=${center}`;
       }
+      this.setState({source: {uri: url}})
     })
   };
 
@@ -96,9 +92,6 @@ class WebScene extends PureComponent {
     if (e.nativeEvent.title.length > 0) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
     }
-    const key = '608d75903d29ad471362f8c58c550daf';
-    const {center} = this.props.navigation.state.params;
-    this.postMessage({action: 'set_params', key: key, center: center})
   }
 }
 

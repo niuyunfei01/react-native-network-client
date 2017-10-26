@@ -51,8 +51,6 @@ export function shortTimeDesc(datetime) {
 function _shortTimeDesc(dtMoment) {
   const nowMoment = Moment();
 
-  console.log(dtMoment);
-
   const dSeconds = nowMoment.unix() - dtMoment.unix();
   const dYear = nowMoment.year() - dtMoment.year();
 
