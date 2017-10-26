@@ -6,9 +6,8 @@
  * @flow
  */
 
-//import liraries
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, WebView, InteractionManager} from 'react-native'
+import {View, Text, StyleSheet, WebView, InteractionManager, Platform} from 'react-native'
 import Config from "../config";
 
 // create a component
@@ -63,8 +62,11 @@ class WebScene extends PureComponent {
 
       if (action === Config.LOC_PICKER) {
         let {center,} = this.props.navigation.state.params;
-        url = 'amap.html';
-        this.setState({source: require('../assets/amap.html')})
+        /** Don't work for postMessage back */
+        // url = (Platform.OS === 'ios' ? './' : 'file:///android_asset/') + 'amap.html';
+        url = 'https://www.cainiaoshicai.cn/amap.html';
+        this.setState({source: {uri: url}})
+        // this.setState({source: require('./amap.html')})
       } else {
         this.setState({source: {uri: url}})
       }
