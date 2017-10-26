@@ -26,6 +26,7 @@ import SettingScene from "../scene/Setting/SettingScene";
 import CloudPrinterScene from "../scene/Setting/CloudPrinterScene";
 import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 import AuditRefundScene from "../scene/Order/AuditRefundScene";
+import OrderEditScene from "../scene/Order/OrderEditScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 
@@ -166,6 +167,7 @@ class Navigator extends Component {
         [Config.ROUTE_PRINTER_CONNECT]: {screen: PrinterConnectScene},
         [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
+        [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
 

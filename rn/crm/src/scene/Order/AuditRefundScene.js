@@ -58,12 +58,14 @@ class AuditRefundScene extends Component {
       remind: {},
       reasons: {},
       refund_yuan: '',
-      customer_talked: false,
       selected_action: '',
       custom: '',
     };
 
+    this.refundMoney = '1.11';
+
     this._onActionSelected = this._onActionSelected.bind(this);
+    this._onReasonSelected = this._onReasonSelected.bind(this);
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._refundYuanChanged = this._refundYuanChanged.bind(this);
@@ -103,6 +105,10 @@ class AuditRefundScene extends Component {
     return !(this.state.reason_key && (this.state.reason_key !== 'custom' || this.state.custom));
   }
 
+  _refundEquals() {
+    return this.state.refund_yuan === this.refundMoney;
+  }
+
   _refundYuanChanged(v) {
     this.setState({refund_yuan: v});
   }
@@ -116,11 +122,11 @@ class AuditRefundScene extends Component {
   }
 
   _shouldDisabledAgreeBtn() {
-    return this.state.refund_yuan !== '1.11';
+    return this.state.refund_yuan !== this.refundMoney;
   }
 
   _shouldDisableRefuseBtn() {
-    return this.state.customer_talked !== true || !this.state.reason_key || (this.state.reason_key === 'custom' && this.state.custom === '');
+    return !this.state.reason_key || (this.state.reason_key === 'custom' && this.state.custom === '');
   }
 
   render() {
@@ -141,7 +147,7 @@ class AuditRefundScene extends Component {
           ><Text>{this.state.errorHints}</Text></Dialog>
           }
 
-      <CellsTitle style={styles.cellsTitle}>拒绝还是同意？</CellsTitle>
+      <CellsTitle style={CommonStyle.cellsTitle35}>拒绝还是同意？</CellsTitle>
       <RadioCells
         style={{marginTop: 2}}
         options={[{label: '同意退款', value: 'yes'}, {label: '拒绝退款', value: 'no'}]}
@@ -151,25 +157,23 @@ class AuditRefundScene extends Component {
       />
 
       {this.state.selected_action === 'no' && <View>
-        <Agreement value={this.state.customer_talked} textStyle={{color: '#f44040'}} onChange={(v) => {
-          this.setState({customer_talked: v})
-        }}>请务必先与客户沟通清楚</Agreement>
-        <CellsTitle style={styles.cellsTitle}>请选择拒绝理由</CellsTitle>
+        <CellsTitle style={CommonStyle.cellsTitle35}>拒绝理由</CellsTitle>
         <RadioCells
           style={{marginTop: 2}}
           options={reasonOpts}
-          onChange={this._onActionSelected}
+          onChange={this._onReasonSelected}
           cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
           value={this.state.reason_key}
         />
 
         {this._checkShowCustomTextArea() && <View>
+          <CellsTitle>请填写拒绝原因</CellsTitle>
           <Cells style={{marginTop: 2}}>
             <Cell>
               <CellBody>
             <TextArea
               maxLength={20}
-              placeholder="您的拒绝原因"
+              placeholder="请输入"
               onChange={(v) => {
                 this.setState({custom: v})
               }}
@@ -178,14 +182,17 @@ class AuditRefundScene extends Component {
             />
               </CellBody>
             </Cell>
-          </Cells>
-        </View>}
+          </Cells></View>}
+        <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 15}}>
+          <Text style={{color:'#f44040'}}>拒绝前，请保证已与客户沟通过</Text>
+        </View>
+
       </View>}
 
       {this.state.selected_action === 'yes' && <View>
-        <CellsTitle style={styles.cellsTitle}>请确认退款金额</CellsTitle>
+        <CellsTitle style={CommonStyle.cellsTitle35}>请确认退款金额</CellsTitle>
         <Cells>
-          <Cell error>
+          <Cell error={!this._refundEquals()}>
             <CellHeader><Label>退款金额</Label></CellHeader>
             <CellBody>
               <Input
@@ -226,9 +233,6 @@ const styles = StyleSheet.create({
   border_top: {
     borderTopWidth: pxToDp(1),
     borderTopColor: colors.color999,
-  },
-  cellsTitle: {
-    fontSize: 13, marginBottom: 0, marginTop: 20
   },
   cells: {
     marginTop: 0,
