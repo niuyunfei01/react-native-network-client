@@ -64,10 +64,16 @@ class StoreScene extends PureComponent {
   constructor(props: Object) {
     super(props);
 
+    const {
+      currStoreId,
+      canReadStores,
+    } = this.props.global;
+    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorName = canReadStores[currStoreId]['vendor'];
+
+    // const {currentUser} = (this.props.navigation.state.params || {});
+
     const {mine} = this.props;
-
-    const {currentUser, currVendorId, currVendorName} = (this.props.navigation.state.params || {});
-
     let vendor_stores = Object.values(mine.vendor_stores[currVendorId]);
     let user_list = mine.user_list[currVendorId];
 
@@ -85,7 +91,7 @@ class StoreScene extends PureComponent {
     if (Array.from(vendor_stores).length === 0 || vendor_stores === undefined) {
       this.getVendorStore();
     }
-    if (Array.from(Object.values(user_list)) === 0 || user_list === undefined) {
+    if (user_list === undefined || Array.from(Object.values(user_list)) === 0 || user_list === undefined) {
       this.onSearchWorkers();
     }
   }

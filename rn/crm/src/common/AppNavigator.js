@@ -86,7 +86,7 @@ const Tab = TabNavigator(
 
     Mine: {
       screen: MineScene,
-      // screen: StoreAddScene,
+      // screen: StoreScene,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: '我的',
         tabBarIcon: ({focused, tintColor}) => (

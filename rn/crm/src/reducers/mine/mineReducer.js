@@ -60,7 +60,6 @@ function user_list(state, action) {
 }
 
 function vendor_stores(state, action) {
-  console.log('reducer => ', state, action);
   state.vendor_stores[action._v_id] = action.store_list;
   return state.vendor_stores;
 }

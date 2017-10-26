@@ -29,13 +29,14 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Entypo from 'react-native-vector-icons/Entypo';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Cts from "../../Cts";
 import ModalSelector from "react-native-modal-selector";
 import selector from "../../styles/selector";
+import DateTimePicker from 'react-native-modal-datetime-picker';
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -79,38 +80,45 @@ class StoreAddScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
+    const {
+      currStoreId,
+      canReadStores,
+    } = this.props.global;
+    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorName = canReadStores[currStoreId]['vendor'];
 
     const {
-      type, currVendorId = 1,
-      store_info = {
-        id: '1',
-        shop_no: '1',
-        area_id: '110114006',
-        alias: '回龙观',
-        name: '回龙观店',
-        district: '昌平区',
-        type: '1',
-        owner_name: '竹春浩',
-        owner_nation_id: '18910275329',
-        location_long: '116.371235',
-        location_lat: '40.08773',
-        deleted: '0',
-        tel: '01080747218',
-        mobile: '18518167012',
-        dada_address: '龙锦市场北门对面金利全写字楼底商菜鸟食材',
-        owner_id: '848022',
-        open_end: '19:00:00',
-        open_start: '09:00:00',
-        vice_mgr: '830880',
-        call_not_print: '5',
-        ship_way: '64',
-        printer_cfg: '{"feie_sn":["217501104"]}',
-        auto_add_tips: '1',
-        bd_shop_id: 'L1709140027'
-      }
+      type,
+      store_info,
     } = (this.props.navigation.state.params || {});
 
-    let {id, shop_no, area_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, can_remark_address, child_area_id, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips, bd_shop_id} = store_info;
+    let {
+      id = 0, //store_id
+      shop_no,
+      area_id = '',
+      alias = '',
+      name = '',
+      district = '',
+      owner_name = '',
+      owner_nation_id = '',
+      location_long = '',
+      location_lat = '',
+      deleted = 0,
+      can_remark_address,
+      child_area_id,
+      tel = '',
+      mobile = '',
+      dada_address = '',
+      owner_id = '',
+      open_end = '19:00:00',
+      open_start = '09:00:00',
+      vice_mgr = '',
+      call_not_print = '0',
+      ship_way = Cts.SHIP_AUTO,
+      printer_cfg,
+      auto_add_tips,
+      bd_shop_id,
+    } = (store_info || {});
 
     const {mine} = this.props;
     let user_list = mine.user_list[currVendorId];
@@ -130,8 +138,12 @@ class StoreAddScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       type: type,
+      onSubmitting: false,
       user_list: user_list,
       userActionSheet: userActionSheet,
+
+      isStartVisible: false,
+      isEndVisible: false,
 
       currVendorId: currVendorId,//type
       store_id: id > 0 ? id : 0,
@@ -153,12 +165,11 @@ class StoreAddScene extends PureComponent {
       vice_mgr: vice_mgr,//店副ID
       call_not_print: call_not_print,//未打印通知
       ship_way: ship_way,//配送方式
-      printer_cfg: printer_cfg,//打印机配置
-      auto_add_tips: auto_add_tips,//达达自动加小费
     };
-
+    // console.log('this.state -> ', this.state);
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
+    this.onStoreAdd = this.onStoreAdd.bind(this);
   }
 
   onHeaderRefresh() {
@@ -188,6 +199,39 @@ class StoreAddScene extends PureComponent {
       });
     }
   }
+
+  _hideDateTimePicker = () => this.setState({
+    isStartVisible: false,
+    isEndVisible: false,
+  });
+
+  _handleDatePicked = (date, type) => {
+    console.log('params -> ', date, type);
+    let Hours = date.getHours();
+    let Minutes = date.getMinutes();
+    Hours = Hours<10 ? '0'+Hours : Hours;
+    Minutes = Minutes<10 ? '0'+Minutes : Minutes;
+    console.log('Hours -> ', Hours);
+    console.log('Minutes -> ', Minutes);
+    let confirm_time = `${Hours}:${Minutes}:00`;
+    if(type === 'start'){
+      let end_hour = this.state.open_end.split(':')[0];
+      if(Hours > end_hour){
+        ToastLong('开始营业时间不能大于结束营业时间');
+      } else {
+        this.setState({open_start: confirm_time});
+      }
+    } else {
+      let start_hour = this.state.open_start.split(':')[0];
+      if(start_hour > Hours){
+        ToastLong('结束营业时间不能小于开始营业时间');
+      } else {
+        this.setState({open_end: confirm_time});
+      }
+    }
+
+    this._hideDateTimePicker();
+  };
 
   render() {
     let {id, area_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips, user_list} = this.state;
@@ -273,7 +317,7 @@ class StoreAddScene extends PureComponent {
                 style={{flexDirection: 'row', marginTop: pxToDp(6)}}
                 onPress={()=>{
                   if(location_long && location_lat){
-                    let uri = `https://uri.amap.com/marker?position=${location_long},${location_lat}`
+                    let uri = `https://uri.amap.com/marker?position=${location_long},${location_lat}`;
                     this.onPress(Config.ROUTE_WEB, {url: uri});
                   } else {
                     ToastShort('错误的经纬度信息');
@@ -281,7 +325,9 @@ class StoreAddScene extends PureComponent {
                 }}
               >
                 <MIcon name='map-marker-outline' style={styles.map_icon}/>
-                <Text style={[styles.body_text]}>{location_long}, {location_lat}</Text>
+                <Text style={[styles.body_text]}>
+                  {location_long !== '' && location_lat !== '' ? location_long+','+location_lat : '点击选择地址'}
+                </Text>
               </TouchableOpacity>
             </CellBody>
           </Cell>
@@ -328,7 +374,7 @@ class StoreAddScene extends PureComponent {
                 cancelStyle={selector.cancelStyle}
                 cancelTextStyle={selector.cancelTextStyle}
               >
-                <Text style={styles.body_text}>{owner_name}</Text>
+                <Text style={styles.body_text}>{owner_id > 0 ? owner_name : '点击选择店长'}</Text>
               </ModalSelector>
             </CellBody>
           </Cell>
@@ -370,7 +416,7 @@ class StoreAddScene extends PureComponent {
                 cancelStyle={selector.cancelStyle}
                 cancelTextStyle={selector.cancelTextStyle}
               >
-                <Text style={styles.body_text}>{vice_mgr_name}</Text>
+                <Text style={styles.body_text}>{vice_mgr > 0 ? vice_mgr_name : '点击选择店助'}</Text>
               </ModalSelector>
             </CellBody>
           </Cell>
@@ -383,9 +429,16 @@ class StoreAddScene extends PureComponent {
               <Label style={[styles.cell_label]}>开始营业</Label>
             </CellHeader>
             <CellBody>
-              <TouchableOpacity>
-                <Text style={styles.cell_label}>{open_start}</Text>
+              <TouchableOpacity onPress={() => {this.setState({isStartVisible: true})}}>
+                <Text style={styles.body_text}>{open_start}</Text>
               </TouchableOpacity>
+              <DateTimePicker
+                date={new Date(`1970-01-01 ${open_start}`)}
+                mode='time'
+                isVisible={this.state.isStartVisible}
+                onConfirm={(date) => {this._handleDatePicked(date, 'start')}}
+                onCancel={this._hideDateTimePicker}
+              />
             </CellBody>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -393,9 +446,16 @@ class StoreAddScene extends PureComponent {
               <Label style={[styles.cell_label]}>结束营业</Label>
             </CellHeader>
             <CellBody>
-              <TouchableOpacity>
-                <Text style={[styles.cell_label]}>{open_end}</Text>
+              <TouchableOpacity onPress={() => {this.setState({isEndVisible: true})}}>
+                <Text style={styles.body_text}>{open_end}</Text>
               </TouchableOpacity>
+              <DateTimePicker
+                date={new Date(`1970-01-01 ${open_end}`)}
+                mode='time'
+                isVisible={this.state.isEndVisible}
+                onConfirm={(date) => {this._handleDatePicked(date, 'end')}}
+                onCancel={this._hideDateTimePicker}
+              />
             </CellBody>
           </Cell>
         </Cells>
@@ -450,7 +510,9 @@ class StoreAddScene extends PureComponent {
 
         <Button
           onPress={() => {
-          }} type='primary'
+            this.onStoreAdd();
+          }}
+          type='primary'
           style={styles.btn_submit}
         >
           {this.state.type === 'edit' ? '确认修改' : '保存'}
@@ -464,6 +526,19 @@ class StoreAddScene extends PureComponent {
 
       </ScrollView>
     );
+  }
+
+  onStoreAdd(){
+    if (this.state.onSubmitting) {
+      return false;
+    }
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {id, area_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted,  tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips} = this.state;
+
+    console.log('this.state ----> ' , this.state);
+
+    this.setState({onSubmitting: true});
   }
 
 }
