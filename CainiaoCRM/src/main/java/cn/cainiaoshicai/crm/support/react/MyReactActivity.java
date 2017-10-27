@@ -95,7 +95,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 }
             }
         }
-        if (!found){
+        if (!found && currV != null){
             vendors.putBundle(String.valueOf(currV.getId()), currV.toBundle());
         }
 
