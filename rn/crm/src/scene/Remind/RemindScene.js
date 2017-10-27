@@ -226,6 +226,13 @@ class RemindScene extends PureComponent {
     });
   }
 
+  pressToDoneRemind(route, params = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params);
+    });
+  }
+
   __getBadgeButton(key, name, quick) {
     quick = quick ? quick : 0;
     let activeType = this.state.otherTypeActive;
@@ -404,6 +411,30 @@ class RemindScene extends PureComponent {
           tabBarTextStyle={{fontSize: pxToDp(26)}}>
           {lists}
         </ScrollableTabView>
+        <View style={{
+          position: 'absolute',
+          bottom: 20,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <RNButton
+            activeOpacity={0.7}
+            onPress={() => {
+              this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
+                type: 'DoneRemind',
+                title: '已处理工单'
+              })
+            }}
+            containerStyle={styles.stickyButtonContainer}
+            style={{
+              fontSize: 16,
+              color: '#999'
+            }}>
+            已处理工单
+          </RNButton>
+        </View>
         <Dialog onRequestClose={() => this._hideStopRemindDialog()}
                 visible={this.state.showStopRemindDialog}
                 title="不在提醒"
@@ -607,6 +638,22 @@ const styles = StyleSheet.create({
     height: 15,
     top: 0,
     right: -5
+  },
+  stickyButtonContainer: {
+    overflow: 'hidden',
+    borderRadius: 20,
+    backgroundColor: '#e6e6e6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#999',
+    borderWidth: 1,
+    height: 35,
+    width: 256,
+    flex: 1,
+    shadowOpacity: 0.75,
+    shadowRadius: 5,
+    shadowColor: 'black',
+    shadowOffset: {height: 0, width: 0},
   }
 });
 
