@@ -79,14 +79,28 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         }
         init.putBundle("canReadStores", storesB);
 
-        Bundle storesV = new Bundle();
-        Vendor vendor = GlobalCtx.app().getVendor();
-        if (vendor != null){
-            storesV.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
-        }
-        init.putBundle("canReadVendors", storesV);
 
         Config config = GlobalCtx.app().getConfigByServer();
+
+        Bundle vendors = new Bundle();
+        boolean found = false;
+        Vendor currV = GlobalCtx.app().getVendor();
+        if (config != null && config.getCan_read_vendors() != null) {
+            for(Vendor vendor : config.getCan_read_vendors()) {
+                if (vendor != null){
+                    vendors.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
+                    if (currV.getId() == vendor.getId()) {
+                        found = true;
+                    }
+                }
+            }
+        }
+        if (!found){
+            vendors.putBundle(String.valueOf(currV.getId()), currV.toBundle());
+        }
+
+        init.putBundle("canReadVendors", vendors);
+
         init.putString("configStr", DaoHelper.gson().toJson(config));
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());

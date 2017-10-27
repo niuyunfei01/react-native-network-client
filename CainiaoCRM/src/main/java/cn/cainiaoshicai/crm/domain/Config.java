@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.domain;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.SortedMap;
 
@@ -22,6 +23,7 @@ public class Config {
     private boolean cloudPrint = false;
     private String lastHash;
     private SortedMap<Integer, TaskType> task_types;
+    private Vendor[] can_read_vendors;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
@@ -99,6 +101,14 @@ public class Config {
 
     public void setTask_types(SortedMap<Integer, TaskType> task_types) {
         this.task_types = task_types;
+    }
+
+    public Vendor[] getCan_read_vendors() {
+        return can_read_vendors;
+    }
+
+    public void setCan_read_vendors(Vendor[] can_read_vendors) {
+        this.can_read_vendors = can_read_vendors;
     }
 
     private class TaskType {

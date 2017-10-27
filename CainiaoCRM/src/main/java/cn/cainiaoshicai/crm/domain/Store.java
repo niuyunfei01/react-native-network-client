@@ -20,6 +20,12 @@ public class Store {
     private boolean cloudPrinterWorking;
     private int type;
     private String vendor;
+    private int vice_mgr;
+    private int owner_id;
+    private String open_end;
+    private String open_start;
+    private int call_not_print;
+    private int ship_way;
 
     public Store() {
     }
@@ -90,6 +96,54 @@ public class Store {
         this.cloudPrinterWorking = cloudPrinterWorking;
     }
 
+    public int getVice_mgr() {
+        return vice_mgr;
+    }
+
+    public void setVice_mgr(int vice_mgr) {
+        this.vice_mgr = vice_mgr;
+    }
+
+    public int getOwner_id() {
+        return owner_id;
+    }
+
+    public void setOwner_id(int owner_id) {
+        this.owner_id = owner_id;
+    }
+
+    public String getOpen_end() {
+        return open_end;
+    }
+
+    public void setOpen_end(String open_end) {
+        this.open_end = open_end;
+    }
+
+    public String getOpen_start() {
+        return open_start;
+    }
+
+    public void setOpen_start(String open_start) {
+        this.open_start = open_start;
+    }
+
+    public int getCall_not_print() {
+        return call_not_print;
+    }
+
+    public void setCall_not_print(int call_not_print) {
+        this.call_not_print = call_not_print;
+    }
+
+    public int getShip_way() {
+        return ship_way;
+    }
+
+    public void setShip_way(int ship_way) {
+        this.ship_way = ship_way;
+    }
+
     public String namePrefixVendor() {
         String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
         return vendorName + this.getName();
@@ -104,6 +158,11 @@ public class Store {
         b.putString("tel", tel);
         b.putString("vendor_id", String.valueOf(type));
         b.putString("vendor", vendor);
+        b.putString("owner_id", String.valueOf(owner_id));
+        b.putString("vice_mgr", String.valueOf(vice_mgr));
+        b.putString("ship_way", String.valueOf(ship_way));
+        b.putString("open_start", open_start);
+        b.putString("open_end", open_end);
         b.putString("cloudPrinter", this.cloudPrinter);
         b.putBoolean("shipCapable", shipCapable);
         b.putBoolean("cloudPrinterWorking", cloudPrinterWorking);

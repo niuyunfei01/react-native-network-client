@@ -79,7 +79,7 @@ export default function globalReducer (state = initialState, action) {
       return action.payload ? {
         ...state,
         canReadStores: action.payload.canReadStores || state.canReadStores,
-        canReadVendors: action.payload.canReadVendors || state.canReadVendors,
+        canReadVendors: action.payload.canReadVendors || action.payload.can_read_vendors || state.canReadVendors,
         config: action.payload.config || state.config,
       } : state;
   }
