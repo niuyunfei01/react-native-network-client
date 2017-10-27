@@ -220,6 +220,7 @@ class RemindScene extends PureComponent {
   }
 
   pressSubButton(type) {
+    console.info("press sub button type ", type)
     this.setState({
       otherTypeActive: type
     });
@@ -233,7 +234,7 @@ class RemindScene extends PureComponent {
       key={key}
       MainElement={
         <RNButton
-          onPress={(key) => self.pressSubButton(key)}
+          onPress={() => self.pressSubButton(key)}
           containerStyle={activeType == key ? styles.subButtonActiveContainerStyle : styles.subButtonContainerStyle}
           style={activeType == key ? styles.subButtonActiveStyle : styles.subButtonStyle}>
           {name}
@@ -320,6 +321,7 @@ class RemindScene extends PureComponent {
         </ScrollView>
       );
     }
+
     return (
       <FlatList
         extraData={this.state.dataSource}
@@ -341,6 +343,18 @@ class RemindScene extends PureComponent {
         keyExtractor={this._keyExtractor}
         shouldItemUpdate={this._shouldItemUpdate}
         getItemLayout={this._getItemLayout}
+        ListEmptyComponent={() =>
+          <View style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            flexDirection: 'row',
+            height: pxToDp(600)
+          }}>
+            <Text style={{fontSize: 18}}>
+              没有数据...
+            </Text>
+          </View>}
         initialNumToRender={5}
       />
     );
