@@ -26,6 +26,3 @@ export function DelayRemind(id, minutes, token) {
   let params = 'access_token=' + token;
   return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(path, params));
 }
-
-export function FetchDoneRemind(token, page) {
-}

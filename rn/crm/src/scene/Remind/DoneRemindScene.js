@@ -1,19 +1,20 @@
-import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, ScrollView} from 'react-native'
+import React, {PureComponent, PropTypes} from 'react'
+import {View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native'
 import {List, SearchBar, ListItem} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
-import Text from "../../weui/Text/index";
-import {top_styles, bottom_styles} from "./RemindStyle"
 import Config from '../../config'
-import {FetchDoneRemind} from '../../services/remind'
 import colors from "../../styles/colors";
 import * as globalActions from '../../reducers/global/globalActions'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Cts from '../../Cts'
+import AppConfig from '../../config'
+import top_styles from './TopStyles'
+import bottom_styles from './BottomStyles'
 
 function mapStateToProps(state) {
-  return {global} = state;
+  let {global} = state;
   return {global: global};
 }
 
@@ -32,7 +33,7 @@ class DoneRemindScene extends PureComponent {
     return {
       headerTitle: (
         <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{params.tag}</Text>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{params.title}</Text>
         </View>
       ),
       headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
@@ -40,7 +41,7 @@ class DoneRemindScene extends PureComponent {
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity onPress={() => {
           }}>
-            <Icon name='fa-ellipsis-h' style={{
+            <Icon name='ellipsis-h' style={{
               fontSize: pxToDp(40),
               width: pxToDp(42),
               height: pxToDp(36),
@@ -72,20 +73,24 @@ class DoneRemindScene extends PureComponent {
 
   makeRemoteRequest = () => {
     const {global} = this.props;
-    const {page, seed} = this.state;
+    const {page} = this.state;
     this.setState({loading: true});
     const token = global['accessToken'];
-    FetchDoneRemind(token, page).then(res => res.json())
+    const _this = this;
+    const url = AppConfig.ServiceUrl + 'api/list_notice/-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token;
+    fetch(url)
+      .then(res => res.json())
       .then(res => {
-        this.setState({
-          data: page === 1 ? res.results : [...this.state.dataSource, ...res.results],
-          error: res.error || null,
+        _this.setState({
+          dataSource: page === 1 ? res.obj.list : [..._this.state.dataSource, ...res.obj.list],
+          error: res.ok ? null : res.reason,
           loading: false,
           refreshing: false
         });
-      }).catch(error => {
-      this.setState({error, loading: false});
-    });
+      })
+      .catch(error => {
+        _this.setState({error: error, loading: false});
+      });
   };
 
   _shouldItemUpdate = (prev, next) => {
@@ -117,9 +122,7 @@ class DoneRemindScene extends PureComponent {
 
   renderItem(remind) {
     let {item, index} = remind;
-    return (
-      <Item item={item} index={index} key={index} onPress={this.onPress.bind(this)}/>
-    );
+    return (<Item item={item} index={index} key={index} onPress={this.onPress}/>);
   }
 
   onRefresh() {
@@ -153,7 +156,7 @@ class DoneRemindScene extends PureComponent {
         <SearchBar placeholder="请输入搜索内容" lightTheme round/>
         <FlatList
           extraData={this.state.dataSource}
-          data={dataSource}
+          data={this.state.dataSource}
           legacyImplementation={false}
           directionalLockEnabled={true}
           viewabilityConfig={{
@@ -163,13 +166,25 @@ class DoneRemindScene extends PureComponent {
           }}
           onEndReachedThreshold={0.1}
           renderItem={this.renderItem}
-          onEndReached={this.onEndReached}
-          onRefresh={this.onRefresh}
+          onEndReached={this.onEndReached.bind(this)}
+          onRefresh={this.onRefresh.bind(this)}
           refreshing={this.state.refreshing}
-          ListFooterComponent={this.renderFooter}
+          ListFooterComponent={this.renderFooter.bind(this)}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              flexDirection: 'row',
+              height: pxToDp(600)
+            }}>
+              <Text style={{fontSize: 18}}>
+                没有数据...
+              </Text>
+            </View>}
           initialNumToRender={5}
         />
       </List>
@@ -189,9 +204,9 @@ class Item extends PureComponent {
   }
 
   render() {
-    let {item, index, onPress} = this.props;
+    let {item, onPress} = this.props;
     return (
-      <ListItem onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})} activeOpacity={0.6}>
+      <TouchableOpacity onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})} activeOpacity={0.6}>
         <View style={top_styles.container}>
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
@@ -233,7 +248,7 @@ class Item extends PureComponent {
             </View>
           </View>
         </View>
-      </ListItem>
+      </TouchableOpacity>
     );
   }
 }
