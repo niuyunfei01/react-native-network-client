@@ -56,7 +56,6 @@ class MineScene extends PureComponent {
       canReadVendors,
     } = this.props.global;
 
-
     let storeActionSheet = [];
     let sortStores = Object.values(canReadStores).sort(function (a, b) {
       return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
@@ -112,9 +111,6 @@ class MineScene extends PureComponent {
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
     }
-  }
-
-  componentWillMount() {
   }
 
   onGetUserCount() {
@@ -243,26 +239,36 @@ class MineScene extends PureComponent {
     )
   }
 
-  /*renderWorker() {
-      return (
-          <View style={worker_styles.container}>
-              <View>
-                  <Image style={[worker_styles.icon_head]} source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/Mine/avatar.png')} />
-              </View>
-              <View style={[worker_styles.worker_box]}>
-                  <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
-              </View>
-              <View style={[worker_styles.sales_box]}>
-                  <Text style={[worker_styles.sale_text]}>今日订单: 500</Text>
-                  <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥3800.00</Text>
-              </View>
-              <TouchableOpacity style={[worker_styles.chevron_right]}>
-                  <Button name='chevron-thin-right' style={worker_styles.right_btn} />
-              </TouchableOpacity>
-          </View>
-      )
-  }*/
   renderWorker() {
+    return (
+      <View style={worker_styles.container}>
+        <View>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+        </View>
+        <View style={[worker_styles.worker_box]}>
+          <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
+        </View>
+        <View style={[worker_styles.sales_box]}>
+          <Text style={[worker_styles.sale_text]}>今日订单: 500</Text>
+          <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥3800.00</Text>
+        </View>
+        <TouchableOpacity
+          style={[worker_styles.chevron_right]}
+          onPress={() => this.onPress(Config.ROUTE_USER, {
+            type: 'mine',
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+          })}
+        >
+          <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  /*renderWorker() {
     return (
       <View
         style={worker_styles.container}
@@ -294,7 +300,7 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
       </View>
     )
-  }
+  }*/
 
   render() {
     let {currVersion} = this.state;
@@ -456,7 +462,7 @@ class MineScene extends PureComponent {
           let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
           this.onPress(Config.ROUTE_WEB, {url: url});
         }}>
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
         <View style={[block_styles.block_box]}/>

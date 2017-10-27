@@ -45,8 +45,9 @@ export function vendor(global) {
   let currVendorId = canReadStores[currStoreId]['vendor_id'];
   let currVendorName = canReadStores[currStoreId]['vendor'];
   let currVersion = (canReadVendors[currVendorId] || {})['version'];
-  console.log('currVendorId -> ', currVendorId);
-  console.log(canReadVendors[currVendorId]);
+  // console.log('currVendorId -> ', currVendorId);
+  // console.log('currStore -> ', canReadStores[currStoreId]);
+  // console.log('currVendor -> ', canReadVendors[currVendorId]);
   return {
     currVendorId: currVendorId,
     currVendorName: currVendorName,

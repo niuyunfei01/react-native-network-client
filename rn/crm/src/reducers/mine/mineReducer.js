@@ -4,6 +4,7 @@ const {
   GET_USER_COUNT,
   GET_WORKER,
   GET_VENDOR_STORES,
+  GET_STORE_TURNOVER,
 } = require('../../common/constants').default;
 import Cts from "../../Cts";
 
@@ -37,6 +38,12 @@ export default function mine(state = initialState, action) {
         ...state,
         vendor_stores: vendor_stores(state, action),
       };
+    case GET_STORE_TURNOVER:
+      return {
+        ...state,
+        order_num: order_num(state, action),
+        turnover: turnover(state, action),
+      };
     default:
       return state;
   }
@@ -64,7 +71,15 @@ function vendor_stores(state, action) {
   return state.vendor_stores;
 }
 
+function order_num(state, action) {
+  state.order_num[action.store_id] = action.order_num;
+  return state.order_num;
+}
 
+function turnover(state, action) {
+  state.turnover[action.store_id] = action.turnover;
+  return state.turnover;
+}
 
 
 

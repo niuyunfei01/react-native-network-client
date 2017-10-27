@@ -8,6 +8,7 @@ const {
   GET_USER_COUNT,
   GET_WORKER,
   GET_VENDOR_STORES,
+  GET_STORE_TURNOVER
 } = require('../../common/constants').default;
 
 export function fetchUserCount(u_id, token, callback) {
@@ -194,6 +195,36 @@ export function saveOfflineStore(data, token, callback) {
   }
 }
 
+export function getStoreTurnover(store_id, token, callback) {
+  return dispatch => {
+    const url = `api/get_store_turnover/${store_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let {order_num, turnover} = resp.obj;
+          dispatch(receiveStoreTurnover(store_id, order_num, turnover));
+        } else {
+          dispatch(receiveStoreTurnover(store_id));
+          ToastShort(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        dispatch(receiveStoreTurnover(store_id));
+        ToastShort(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
 
+function receiveStoreTurnover(store_id, order_num = 0, turnover = 0) {
+  return {
+    type: GET_STORE_TURNOVER,
+    store_id: store_id,
+    order_num: order_num,
+    turnover: turnover,
+  }
+}
 
 
