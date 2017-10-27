@@ -96,16 +96,12 @@ class RemindScene extends PureComponent {
     const {dispatch} = this.props;
     let token = this._getToken();
     dispatch(fetchRemindCount(token));
-    dispatch(fetchRemind(false, true, _fetchDataTypeIds[0], false, 1, token, 0));
+    _fetchDataTypeIds.forEach((typeId) => {
+      dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
+    });
   }
 
   componentDidMount() {
-    const {dispatch} = this.props;
-    let token = this._getToken();
-    let array = _fetchDataTypeIds.slice(1);
-    array.forEach((typeId) => {
-      dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
-    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -297,10 +293,10 @@ class RemindScene extends PureComponent {
     if (remind.loading[typeId]) {
       return <LoadingView/>;
     }
-    let refresh = !!remind.isRefreshing[typeId] ? true : false;
-    if (refresh) {
-      let title = "加载中...";
-      let tip = "正在加载...";
+    let loading = remind.remindList[typeId] == undefined ? true : false;
+    if (loading) {
+      const {dispatch} = this.props;
+      let token = this._getToken();
       return (
         <ScrollView
           automaticallyAdjustContentInsets={false}
@@ -309,15 +305,16 @@ class RemindScene extends PureComponent {
           style={{flex: 1}}
           refreshControl={
             <RefreshControl
-              refreshing={refresh}
+              refreshing={loading}
               onRefresh={() => {
+                dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
               }}
-              title={title}
+              title={"加载中..."}
               colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
             />}>
           <View style={{alignItems: 'center'}}>
             <Text style={{fontSize: 16}}>
-              {tip}
+              正在加载...
             </Text>
           </View>
         </ScrollView>
@@ -338,7 +335,7 @@ class RemindScene extends PureComponent {
         renderItem={this.renderItem}
         onEndReached={this.onEndReached.bind(this, typeId)}
         onRefresh={this.onRefresh.bind(this, typeId)}
-        refreshing={remind.isRefreshing[typeId]}
+        refreshing={!!remind.isRefreshing[typeId]}
         ListFooterComponent={this.renderFooter.bind(this, typeId)}
         ListHeaderComponent={this.renderHead.bind(this, tagTypeId)}
         keyExtractor={this._keyExtractor}
