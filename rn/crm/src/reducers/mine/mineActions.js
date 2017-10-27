@@ -7,7 +7,6 @@ import Cts from "../../Cts";
 const {
   GET_USER_COUNT,
   GET_WORKER,
-  RESET_WORKER,
   GET_VENDOR_STORES,
 } = require('../../common/constants').default;
 
@@ -50,23 +49,21 @@ export function fetchWorkers(_v_id, token, callback) {
       .then(resp => resp.json())
       .then(resp => {
         if (resp.ok) {
-          let list = resp.obj;
-          dispatch(receiveWorker(_v_id, list));
-
+          let user_list = resp.obj;
           let normal = [];
           let forbidden = [];
-          for (let idx in list) {
-            if (list.hasOwnProperty(idx)) {
-              let worker = list[idx];
-              if (parseInt(worker.status) === Cts.WORKER_STATUS_OK) {
-                normal.push(worker);
-              } else {
-                forbidden.push(worker);
-              }
+          for (let worker of Object.values(user_list)){
+            if (parseInt(worker.status) === Cts.WORKER_STATUS_OK) {
+              normal.push(worker);
+            } else {
+              forbidden.push(worker);
             }
           }
+          resp.obj = {};
           resp.obj.normal = normal;
           resp.obj.forbidden = forbidden;
+          resp.obj.user_list = user_list;
+          dispatch(receiveWorker(_v_id, resp.obj));
         } else {
           dispatch(receiveWorker(_v_id, {}));
           ToastShort(resp.desc);
@@ -81,11 +78,13 @@ export function fetchWorkers(_v_id, token, callback) {
   }
 }
 
-function receiveWorker(_v_id, workers) {
+function receiveWorker(_v_id, {user_list, normal, forbidden}) {
   return {
     type: GET_WORKER,
     _v_id: _v_id,
-    workers: workers,
+    user_list: user_list,
+    normal: normal,
+    forbidden: forbidden,
   }
 }
 
@@ -168,14 +167,33 @@ export function saveVendorUser(data, token, callback) {
   }
 }
 
-// export function ResetWorker(_v_id, user_id, user_status) {
-//   return {
-//     type: RESET_WORKER,
-//     _v_id: _v_id,
-//     user_id: user_id,
-//     user_status: user_status
-//   }
-// }
+export function saveOfflineStore(data, token, callback) {
+  return dispatch => {
+    const url = `stores/save_stores.json`;
+    let data_arr = [];
+    data_arr.push(`access_token=${token}`);
+    for (let key in data) {
+      if (data.hasOwnProperty(key)) {
+        let val = data[key];
+        data_arr.push(`${key}=${val}`);
+      }
+    }
+    let params = data_arr.join('&&');
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url, params))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (!resp.ok) {
+          ToastShort(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        ToastShort(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
 
 
 
