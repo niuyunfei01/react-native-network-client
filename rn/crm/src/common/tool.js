@@ -51,14 +51,14 @@ export function vendor(global) {
   let currVersion = currVendor['version'];
   // console.log('currVendorId -> ', currVendorId);
   // console.log('currStore -> ', currStore);
-  console.log('currVendor -> ', currVendor);
+  // console.log('currVendor -> ', currVendor);
 
   let mgr_ids = [];
   let owner_id = currStore['owner_id'];
   let vice_mgr = currStore['vice_mgr'];
   let service_uid = currVendor['service_uid'];
   let service_mgr = currVendor['service_mgr'];
-  console.log('ids -> ', owner_id, vice_mgr, service_uid, service_mgr);
+  // console.log('ids -> ', owner_id, vice_mgr, service_uid, service_mgr);
   if(owner_id !== '' && owner_id !== undefined && owner_id > 0){
     mgr_ids.push(owner_id);
   }
@@ -73,7 +73,7 @@ export function vendor(global) {
   }
 
   let manager = ','+mgr_ids.join(',')+',';
-  console.log('manager -> ', manager);
+  // console.log('manager -> ', manager);
   let is_mgr = manager.indexOf(','+currentUser+',') !== -1;
   return {
     currVendorId: currVendorId,

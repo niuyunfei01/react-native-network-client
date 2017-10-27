@@ -309,8 +309,9 @@ class MineScene extends PureComponent {
         style={worker_styles.container}
       >
         <View>
-          <Image style={[worker_styles.icon_head]}
-                 source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
         </View>
         <View style={[worker_styles.worker_box]}>
           <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>

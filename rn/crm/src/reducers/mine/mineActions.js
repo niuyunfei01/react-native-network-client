@@ -228,3 +228,24 @@ function receiveStoreTurnover(store_id, order_num = 0, turnover = 0) {
 }
 
 
+export function copyStoreGoods(store_id, force, token, callback) {
+  return dispatch => {
+    const url = `stores/store_copy_goods/${store_id}/${force}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if(!resp.ok){
+          ToastLong(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        ToastShort(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+
+
+
