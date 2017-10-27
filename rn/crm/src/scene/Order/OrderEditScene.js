@@ -5,38 +5,24 @@ import { color, NavigationItem, RefreshListView, RefreshState, Separator, Spacin
 import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
 import Config from '../../config'
-import PropTypes from 'prop-types';
-import OrderStatusCell from './OrderStatusCell'
-import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
-import {getContacts} from '../../reducers/store/storeActions'
+import {saveOrderBaisc} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, Agreement, Switch, ActionSheet, TextArea, RadioCells, ButtonArea,Icon, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellBody, CellsTips} from "../../weui/index";
-import {ToastShort} from "../../util/ToastUtils";
-import {StatusBar} from "react-native";
-import ModalDropdown from 'react-native-modal-dropdown';
-import Cts from '../../Cts'
-import inputNumberStyles from './inputNumberStyles';
+import {Button, Switch, TextArea, ButtonArea, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellFooter, CellBody, CellsTips} from "../../weui/index";
 import S from '../../stylekit'
-import CellFooter from "../../weui/Cell/CellFooter";
 import IconEvilIcons from 'react-native-vector-icons/EvilIcons';
-
-const numeral = require('numeral')
 
 function mapStateToProps(state) {
   return {
-    order: state.order,
     global: state.global,
-    store: state.store,
   }
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud, getRemindForOrderPage}, dispatch)}
+  return {dispatch, ...bindActionCreators({saveOrderBaisc }, dispatch)}
 }
 
 class OrderEditScene extends Component {
@@ -56,16 +42,25 @@ class OrderEditScene extends Component {
     super(props);
 
     this.state = {
-      order: {},
       autoSaveUserBackup: true,
       backupPhone: '',
       detailAddr: '',
       storeRemark: '',
+      taxInvoice: '',
+      taxId: '',
+      loc_data: '',
       onSubmitting: false,
       errorHints: '',
     };
 
-    this.refundMoney = '1.11';
+    this.editFields = [
+      {key: 'backupPhone', val: (order) => order.phone_backup},
+      {key: 'detailAddr', val: (order) => order.detailAddr},
+      {key: 'storeRemark', val: (order) => order.store_remark},
+      {key: 'taxInvoice', val: (order) => order.invoice},
+      {key: 'taxId', val: (order) => order.taxId},
+      {key: 'loc_data', val: (order) => `${order.loc_lng},${order.loc_lat}`},
+    ];
 
     this._onChangeBackupPhone = this._onChangeBackupPhone.bind(this);
     this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
@@ -73,62 +68,90 @@ class OrderEditScene extends Component {
     this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
     this._doSaveEdit = this._doSaveEdit.bind(this);
     this._toSetLocation = this._toSetLocation.bind(this);
+    this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
+    this._onChangeTaxId = this._onChangeTaxId.bind(this);
   }
 
   componentWillMount() {
-    const {order, remind} = (this.props.navigation.state.params || {});
-    const reasons = {
-      'hasOut': '已送出',
-      'inCooking': '正在烹饪',
-      'weather': '天气原因',
-      'shortHand': '人手不齐',
-      'custom': '自定义回复'
+    const {order} = (this.props.navigation.state.params || {});
+    const init = {
+      autoSaveUserBackup: true,
+      loc_name: order.street_block,
     };
-    this.setState({order, remind, reasons})
+    this.editFields.map((edit) => {
+      init[edit.key] = edit.val(order);
+    });
+
+    this.setState(init)
   }
 
-  _onChangeBackupPhone(v) {
-    this.setState({refund_yuan: v});
+  _onChangeBackupPhone(backupPhone) {
+    const {order} = this.props.navigation.state.params;
+    if (order.mobile === backupPhone) {
+      this.setState({errorHints: '备用电话不能与订单电话相同'});
+      return;
+    }
+    this.setState({backupPhone});
   }
 
-  _onChangeAutoSaveBackup(v) {
-    this.setState({});
+  _onChangeAutoSaveBackup(autoSaveUserBackup) {
+    this.setState({autoSaveUserBackup});
   }
 
   _toSetLocation() {
     const {order} = this.props.order;
-    const { state, navigate } = this.props.navigation;
-    const params = {action: Config.LOC_PICKER,
-      center: `${order.loc_lng},${order.loc_lat}`,
+    const {state, navigate} = this.props.navigation;
+    const params = {
+      action: Config.LOC_PICKER,
+      center: this.state.loc_data,
       actionBeforeBack: (location) => {
+        console.log('update to new location:', location);
         this.setState({
           loc_name: location.name,
           loc_data: location.location,
-          loc_address: location.address,
         });
       }
     };
     navigate(Config.ROUTE_WEB, params);
   }
 
-  _onChangeDetailAddr() {
-    console.log('agree refund ...')
+  _onChangeDetailAddr(detailAddr) {
+    this.setState({detailAddr});
+  }
+
+  _onChangeTaxId(taxId) {
+    this.setState({taxId});
+  }
+
+  _onChangeTaxInvoice(taxInvoice) {
+    this.setState({taxInvoice});
   }
 
   _doSaveEdit() {
-    console.log('refuse refund ...')
+    this.setState({onSubmitting: true});
+    const {dispatch, global} = this.props;
+    const {order} = this.props.navigation.state.params;
+    
+    const editions = [];
+
+    const changes = this.editFields.filter((edit) => this.state[edit.key] !== edit.val(order))
+      .map((edit) => {
+        return {key: edit.key, value: this.state[edit.key]}
+      });
+
+    dispatch(saveOrderBaisc(global.accessToken, order.id, changes, (ok, msg) => {
+      console.log('results', ok, msg);
+      this.setState({onSubmitting: false});
+    }));
   }
 
   _shouldDisabledSaveBtn() {
-    return true;
+    const {order} = this.props.navigation.state.params;
+
+    return !this.editFields.filter((edit) => this.state[edit.key] !== edit.val(order));
   }
 
   render() {
-    const {order} = this.props.order;
-    const reasonOpts = tool.objectMap(this.state.reasons, (reason, key) => {
-      return {label: reason, value: key}
-    });
-
     return <ScrollView style={[styles.container, {flex: 1}]}>
           { !!this.state.errorHints &&
           <Dialog onRequestClose={()=>{}}
@@ -166,7 +189,7 @@ class OrderEditScene extends Component {
         <Cell onPress={this._toSetLocation}><CellHeader><Label style={CommonStyle.cellTextH35}>收货地址</Label></CellHeader>
           <CellBody style={{flexDirection: 'row', flex: 1}}>
             <IconEvilIcons name="location" size={26}/>
-            <Text style={{fontSize: 15}}>{this.state.loc_name || '点击选择'}</Text>
+            <Text style={{fontSize: 15}}>{this.state.loc_name || this.state.loc_data}</Text>
           </CellBody>
           <CellFooter access/>
         </Cell>
@@ -187,7 +210,7 @@ class OrderEditScene extends Component {
         <Cell>
           <CellBody>
             <TextArea
-              maxLength={20}
+              maxLength={60}
               placeholder=""
               onChange={(v) => {
                 this.setState({storeRemark: v})
@@ -204,8 +227,8 @@ class OrderEditScene extends Component {
         <Cell><CellHeader><Label style={CommonStyle.cellTextH35}>发票抬头</Label></CellHeader>
           <CellBody><Input
             placeholder=""
-            value={this.state.detailAddr}
-            onChangeText={this._onChangeDetailAddr}
+            value={this.state.taxInvoice}
+            onChangeText={this._onChangeTaxInvoice}
             underlineColorAndroid={'transparent'}
             style={CommonStyle.inputH35}
           />
@@ -214,8 +237,8 @@ class OrderEditScene extends Component {
         <Cell><CellHeader><Label style={CommonStyle.cellTextH35}>税     号</Label></CellHeader>
           <CellBody><Input
             placeholder="个人可不填"
-            value={this.state.detailAddr}
-            onChangeText={this._onChangeDetailAddr}
+            value={this.state.taxId}
+            onChangeText={this._onChangeTaxId}
             underlineColorAndroid={'transparent'}
             style={CommonStyle.inputH35}
           />

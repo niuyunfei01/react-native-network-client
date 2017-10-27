@@ -337,11 +337,11 @@ class OrderScene extends Component {
     const {order} = this.props.order;
     const validPoi = order.gd_lng && order.gd_lat;
 
-    //http://m.amap.com/navi/?start=parameter1&amp;dest=parameter2&amp;destName=parameter3&amp;naviBy=parameter4&amp;key=parameter5   
-
     if (validPoi) {
-      const uri = `https://uri.amap.com/marker?position=${order.gd_lng},${order.gd_lat}`
+      const store = this.props.global.canReadStores[order.store_id] || {};
+      const uri = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
       this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri})
+      console.log(uri)
     } else {
       //a page to set the location for this url!!
       this.setState({
@@ -500,7 +500,7 @@ class OrderScene extends Component {
 
     return (<View>
         {(this.state.reminds.reminds || []).map((remind, idx) => {
-          const task_types = this.props.global.config.task_types;
+          const task_types = this.props.global.config.task_types || {};
 
           const taskType = task_types['' + remind.type];
           const status = parseInt(remind.status);
@@ -557,7 +557,7 @@ class OrderScene extends Component {
             </TouchableOpacity>
             <CallBtn mobile={order.mobile}/>
             <View style={{flex: 1}}/>
-            <TouchableOpacity onPress={this.toMap}>
+            <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
               <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
             </TouchableOpacity>
           </View>
