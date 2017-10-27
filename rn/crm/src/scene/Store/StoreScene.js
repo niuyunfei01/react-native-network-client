@@ -25,10 +25,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
+import {fetchWorkers, getVendorStores} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
+import * as tool from "../../common/tool";
+import LoadingView from "../../widget/LoadingView";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -38,7 +40,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchUserCount,
+      getVendorStores,
       fetchWorkers,
       ...globalActions
     }, dispatch)
@@ -64,20 +66,78 @@ class StoreScene extends PureComponent {
   constructor(props: Object) {
     super(props);
 
+    let {currVendorId, currVendorName} = tool.vendor(this.props.global);
+
+    const {vendor_stores, user_list} = this.props.mine;
+    let curr_stores = tool.curr_vendor(vendor_stores, currVendorId);
+    let curr_user_list = tool.curr_vendor(user_list, currVendorId);
+
     this.state = {
       isRefreshing: false,
-    }
-  }
 
-  componentWillMount() {
+      currVendorId: currVendorId,
+      currVendorName: currVendorName,
+
+      curr_stores: Object.values(curr_stores),
+      curr_user_list: curr_user_list,
+    };
+
+    this.getVendorStore = this.getVendorStore.bind(this);
+    this.onSearchWorkers = this.onSearchWorkers.bind(this);
   }
 
   componentDidMount() {
+    let {curr_stores, curr_user_list} = this.state;
+    if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
+      this.getVendorStore();
+      this.onSearchWorkers();
+    }
+  }
+
+  getVendorStore() {
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
+    let _this = this;
+    dispatch(getVendorStores(currVendorId, accessToken, (resp) => {
+      console.log('store resp -> ', resp.ok, resp.desc);
+      if (resp.ok) {
+        let curr_stores = resp.obj;
+        _this.setState({
+          isRefreshing: false,
+          curr_stores: Object.values(curr_stores),
+        });
+        if (_this.state.isRefreshing) {
+          ToastShort('刷新门店列表完成');
+        }
+      }
+    }));
+  }
+
+  onSearchWorkers() {
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
+    let _this = this;
+    dispatch(fetchWorkers(currVendorId, accessToken, (resp) => {
+      console.log('user resp -> ', resp.ok, resp.desc);
+      if (resp.ok) {
+        let {user_list} = resp.obj;
+        _this.setState({
+          isRefreshing: false,
+          curr_user_list: user_list,
+        });
+        if (_this.state.isRefreshing) {
+          ToastShort('刷新员工完成');
+        }
+      }
+    }));
   }
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
-    this.setState({isRefreshing: false});
+    this.getVendorStore();
+    this.onSearchWorkers();
   }
 
   onPress(route, params = {}) {
@@ -87,7 +147,68 @@ class StoreScene extends PureComponent {
     });
   }
 
+  renderStores() {
+    let {curr_stores, curr_user_list, currVendorId} = this.state;
+    if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
+      return <LoadingView/>;
+    }
+
+    let _this = this;
+    return curr_stores.map(function (store, idx) {
+      let {nickname} = (curr_user_list[store.owner_id] || {});
+      let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
+      return (
+        <Cells style={[styles.cells]} key={idx}>
+          <Cell customStyle={[styles.cell_content, styles.cell_height]}>
+            <CellBody style={styles.cell_body}>
+              <Text style={[styles.store_name]}>{store.name}</Text>
+              <Text style={[styles.open_time]}>{store.open_start}-{store.open_end}</Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity
+                onPress={() => {
+                  _this.onPress(Config.ROUTE_STORE_ADD, {
+                    btn_type: 'edit',
+                    currVendorId: currVendorId,
+                    store_info: store,
+                    actionBeforeBack: (resp) => {
+                      console.log('edit resp =====> ', resp);
+                      if (resp.shouldRefresh) {
+                        console.log('edit getVendorStore');
+                        _this.getVendorStore();
+                      }
+                    }
+                  })
+                }}
+                style={styles.cell_right}
+              >
+                <Text style={styles.edit_text}>详情/修改</Text>
+                <Button name='chevron-thin-right' style={styles.right_btn}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.cell_content]}>
+            <CellBody>
+              <Text style={[styles.address]}>{store.dada_address}</Text>
+              <View style={styles.store_footer}>
+                <Image
+                  style={[styles.call_img]}
+                  source={require('../../img/Store/call_.png')}
+                />
+                {nickname === undefined ? null : <Text style={styles.owner_name}>店长: {nickname}</Text>}
+                {vice_mgr_name === undefined ? null : <Text style={styles.owner_name}>店助: {vice_mgr_name}</Text>}
+                <Text style={styles.remind_time}>催单间隔: {store.call_not_print}分钟</Text>
+              </View>
+            </CellBody>
+          </Cell>
+        </Cells>
+      );
+    });
+  }
+
   render() {
+    let _this = this;
+    let {currVendorName} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -100,8 +221,37 @@ class StoreScene extends PureComponent {
         style={{backgroundColor: colors.main_back}}
       >
         <CellsTitle style={[styles.cell_title]}>新增门店</CellsTitle>
-        <Cells style={[styles.cell_box]}>
+        <Cells style={[styles.cells]}>
+          <Cell
+            customStyle={[styles.cell_content, styles.cell_height]}
+            onPress={() => {
+              this.onPress(Config.ROUTE_STORE_ADD, {
+                btn_type: 'add',
+                actionBeforeBack: (resp) => {
+                  console.log('add resp =====> ', resp);
+                  if (resp.shouldRefresh) {
+                    console.log('add getVendorStore');
+                    _this.getVendorStore();
+                  }
+                }
+              })
+            }}
+          >
+            <CellHeader>
+              <Image
+                style={[styles.add_img]}
+                source={require('../../img/Store/xinzeng_.png')}
+              />
+            </CellHeader>
+            <CellBody>
+              <Text style={[styles.add_store]}>新增门店</Text>
+            </CellBody>
+            <CellFooter/>
+          </Cell>
         </Cells>
+
+        <CellsTitle style={[styles.cell_title]}>{currVendorName} 门店列表</CellsTitle>
+        {this.renderStores()}
 
       </ScrollView>
     );
@@ -113,58 +263,107 @@ class StoreScene extends PureComponent {
 // define your styles
 const styles = StyleSheet.create({
   cell_title: {
-    marginBottom: pxToDp(5),
+    marginBottom: pxToDp(10),
     fontSize: pxToDp(26),
     color: colors.color999,
   },
-  cell_box: {
+  cells: {
+    marginBottom: pxToDp(10),
     marginTop: 0,
-    paddingLeft: pxToDp(20),
+    paddingLeft: pxToDp(30),
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
     borderColor: colors.color999,
   },
-  cell_row: {
-    height: pxToDp(70),
+  cell_body: {
+    flexDirection: 'row',
+  },
+  cell_height: {
+    height: pxToDp(90),
+  },
+  cell_content: {
     justifyContent: 'center',
-  },
-  cell_row_bottom: {
-    borderColor: colors.color999,
-    borderBottomWidth: pxToDp(1),
-  },
-  marginLeft: {
     marginLeft: 0,
-  },
-  paddingRight: {
     paddingRight: 0,
+
+    // borderColor: 'green',
+    // borderWidth: pxToDp(1),
   },
-  cell_body_text: {
+  add_img: {
+    width: pxToDp(50),
+    height: pxToDp(50),
+    marginVertical: pxToDp(20),
+  },
+  add_store: {
     fontSize: pxToDp(30),
     fontWeight: 'bold',
     color: colors.color333,
   },
-  printer_status: {
-    fontSize: pxToDp(30),
+  store_name: {
+    fontSize: pxToDp(34),
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  open_time: {
+    marginLeft: pxToDp(12),
+    fontSize: pxToDp(26),
+    lineHeight: pxToDp(26),
     fontWeight: 'bold',
     color: colors.color999,
+    alignSelf: 'center',
   },
-  printer_status_ok: {
-    color: colors.main_color,
-  },
-  printer_status_error: {
-    color: '#f44040',
-  },
-  right_box: {
+  cell_right: {
     flexDirection: 'row',
     justifyContent: 'center',
-    height: pxToDp(60),
-    paddingTop: pxToDp(10),
+  },
+  edit_text: {
+    color: colors.main_color,
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    paddingTop: pxToDp(14),
   },
   right_btn: {
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(8),
-    marginLeft: pxToDp(10),
+    color: colors.main_color,
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    height: pxToDp(70),
+    marginRight: pxToDp(30),
+    marginLeft: pxToDp(5),
+    paddingTop: pxToDp(20),
   },
+  address: {
+    marginTop: pxToDp(20),
+    marginRight: pxToDp(30),
+    fontSize: pxToDp(30),
+    color: colors.color666,
+    lineHeight: pxToDp(35),
+  },
+  store_footer: {
+    marginTop: pxToDp(30),
+    marginBottom: pxToDp(20),
+    flexDirection: 'row',
+    marginRight: pxToDp(30),
+  },
+  call_img: {
+    width: pxToDp(40),
+    height: pxToDp(40),
+  },
+  owner_name: {
+    marginHorizontal: pxToDp(15),
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color333,
+    alignSelf: 'flex-end',
+  },
+  remind_time: {
+    fontSize: pxToDp(26),
+    color: colors.color999,
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+
+  },
+
 });
 
 

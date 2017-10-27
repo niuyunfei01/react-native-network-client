@@ -32,7 +32,6 @@ class OrderStatusCell extends PureComponent {
     const packLoggerName = Object.assign({}, order.workers[order.pack_done_logger]).nickname;
 
     const invalidStyle = order.orderStatus == Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
-    console.log("invalidStyle", order.orderStatus == Cts.ORDER_STATUS_INVALID);
 
     return <View style={[Styles.topBottomLine, {marginTop: pxToDp(10), backgroundColor:'#f0f9ef'}]}>
       <View style={styles.row}>

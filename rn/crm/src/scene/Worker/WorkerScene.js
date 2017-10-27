@@ -230,7 +230,14 @@ class WorkerScene extends PureComponent {
         <View>
           <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>
           <Cells style={[styles.cells]}>
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell
+              customStyle={[styles.cell_row]}
+              onPress={() => {
+                this.onPress(Config.ROUTE_USER_ADD, {
+                  type: 'add',
+                })
+              }}
+            >
               <CellHeader>
                 <Icon name="person-add" style={[styles.add_user_icon]}/>
               </CellHeader>
@@ -238,15 +245,7 @@ class WorkerScene extends PureComponent {
                 <Text style={[styles.worker_name]}>新增员工</Text>
               </CellBody>
               <CellFooter>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.onPress(Config.ROUTE_USER_ADD, {
-                      type: 'add',
-                    })
-                  }}
-                >
-                  <Button name='chevron-right' style={styles.right_btn}/>
-                </TouchableOpacity>
+                <Button name='chevron-right' style={styles.right_btn}/>
               </CellFooter>
             </Cell>
           </Cells>
