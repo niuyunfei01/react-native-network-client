@@ -25,6 +25,7 @@ import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {fetchWorkers, fetchUserCount} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import ModalSelector from 'react-native-modal-selector';
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -55,17 +56,20 @@ class MineScene extends PureComponent {
       canReadVendors,
     } = this.props.global;
 
+
     let storeActionSheet = [];
     let sortStores = Object.values(canReadStores).sort(function (a, b) {
       return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
     });
     storeActionSheet.push({key: -999, section: true, label: '选择门店'},);
     for (let store of sortStores) {
-      let item = {
-        key: store.id,
-        label: store.vendor === null ? store.name : (store.vendor + ':' + store.name),
-      };
-      storeActionSheet.push(item);
+      if (store.id > 0) {
+        let item = {
+          key: store.id,
+          label: store.vendor === null ? store.name : (store.vendor + ':' + store.name),
+        };
+        storeActionSheet.push(item);
+      }
     }
 
     let prefer_store = '';
@@ -79,8 +83,7 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
-    let currVersion = (canReadVendors[currVendorId] || {})['version'];
+    let {currVendorId, currVersion} = tool.vendor(this.props.global);
 
     const {mine} = this.props;
     this.state = {
@@ -155,9 +158,7 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {mine} = this.props;
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
-    let currVersion = (canReadVendors[currVendorId] || {})['version'];
-
+    let {currVendorId, currVersion} = tool.vendor(this.props.global);
     this.setState({
       sign_count: mine.sign_count[currentUser],
       bad_cases_of: mine.bad_cases_of[currentUser],
@@ -190,9 +191,8 @@ class MineScene extends PureComponent {
     native.setCurrStoreId(store_id, function (ok, msg) {
       console.log('setCurrStoreId => ', store_id, ok, msg);
       if (ok) {
-        let currVendorId = canReadStores[store_id]['vendor_id'];
-        let currVersion = (canReadVendors[currVendorId] || {})['version'];
         dispatch(setCurrentStore(store_id));
+        let {currVendorId, currVersion} = tool.vendor(_this.props.global);
         _this.setState({
           currStoreId: store_id,
           currStoreName: canReadStores[store_id]['name'],
@@ -288,10 +288,6 @@ class MineScene extends PureComponent {
             type: 'mine',
             currentUser: this.state.currentUser,
             currVendorId: this.state.currVendorId,
-            // mobile: this.state.mobile_phone,
-            // screen_name: this.state.screen_name,
-            // cover_image: this.state.cover_image,
-            // user_status: Cts.WORKER_STATUS_OK,
           })}
         >
           <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>

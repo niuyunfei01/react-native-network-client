@@ -258,9 +258,7 @@ class UserAddScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       dispatch(saveVendorUser(data, accessToken, (resp) => {
         console.log('save_resp -> ', resp);
-        _this.setState({
-          onSubmitting: false,
-        });
+        _this.setState({onSubmitting: false});
 
         if (resp.ok) {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';

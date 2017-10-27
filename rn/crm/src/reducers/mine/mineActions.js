@@ -167,6 +167,33 @@ export function saveVendorUser(data, token, callback) {
   }
 }
 
+export function saveOfflineStore(data, token, callback) {
+  return dispatch => {
+    const url = `stores/save_stores.json`;
+    let data_arr = [];
+    data_arr.push(`access_token=${token}`);
+    for (let key in data) {
+      if (data.hasOwnProperty(key)) {
+        let val = data[key];
+        data_arr.push(`${key}=${val}`);
+      }
+    }
+    let params = data_arr.join('&&');
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url, params))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (!resp.ok) {
+          ToastShort(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        ToastShort(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
 
 
 
