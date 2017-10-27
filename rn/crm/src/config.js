@@ -6,6 +6,7 @@
 export default {
   'AppName': 'Crm',
   'ServiceUrl': 'https://preview.cainiaoshicai.cn/',
+  MAP_WAY_URL: 'https://www.cainiaoshicai.cn/util/amap_way',
   FetchTimeout: 10000,
 
   GRANT_TYP_PASSWORD: "password",
