@@ -32,9 +32,11 @@ export default function remind(state = initialState, action) {
         isLoadMore: state.isLoadMore,
         isRefreshing: state.isRefreshing
       };
-      diff.loading[action.typeId] = action.loading;
-      diff.isLoadMore[action.typeId] = action.isLoadMore;
-      diff.isRefreshing[action.typeId] = action.isRefreshing;
+
+      _setWithPreventCheck(diff, 'loading', action.typeId, action.loading);
+      _setWithPreventCheck(diff, 'isLoadMore', action.typeId, action.isLoadMore);
+      _setWithPreventCheck(diff, 'isRefreshing', action.typeId, action.isRefreshing);
+
       return Object.assign({}, state, diff);
     case types.RECEIVE_REMIND_LIST:
       let typeId = action.typeId;
@@ -87,6 +89,16 @@ export default function remind(state = initialState, action) {
   }
 }
 
+function _setWithPreventCheck(diff, key, typeId, value) {
+
+  console.log('_setWithPreventCheck', key, typeId, value)
+
+  if (diff[key] === false) {
+    diff[key] = {};
+  }
+  diff[key][typeId] = value;
+}
+
 function removeRemind(state, action) {
   let typeId = action.typeId;
   let id = action.id;
@@ -101,10 +113,12 @@ function combine(state, action) {
   state.remindList[action.typeId] = action.remindList;
   state.currPage[action.typeId] = parseInt(action.currPage);
   state.totalPage[action.typeId] = parseInt(action.totalPage);
-  state.loading[action.typeId] = false;
-  state.isLoadMore[action.typeId] = false;
-  state.noMore[action.typeId] = false;
-  state.isRefreshing[action.typeId] = false;
+
+  _setWithPreventCheck(state, 'loading', action.typeId, false);
+  _setWithPreventCheck(state, 'isLoadMore', action.typeId, false);
+  _setWithPreventCheck(state, 'noMore', action.typeId, false);
+  _setWithPreventCheck(state, 'isRefreshing', action.typeId, false);
+
   return {
     remindList: state.remindList,
     currPage: state.currPage,
@@ -120,10 +134,12 @@ function loadMore(state, action) {
   state.remindList[action.typeId] = lodash.uniqBy(state.remindList[action.typeId].concat(action.remindList), 'id');
   state.currPage[action.typeId] = parseInt(action.currPage);
   state.totalPage[action.typeId] = parseInt(action.totalPage);
-  state.noMore[action.typeId] = action.remindList.length == 0;
-  state.isLoadMore[action.typeId] = false;
-  state.loading[action.typeId] = false;
-  state.isRefreshing[action.typeId] = false;
+
+  _setWithPreventCheck(state, 'loading', action.typeId, false);
+  _setWithPreventCheck(state, 'isLoadMore', action.typeId, false);
+  _setWithPreventCheck(state, 'noMore', action.typeId, action.remindList.length == 0);
+  _setWithPreventCheck(state, 'isRefreshing', action.typeId, false);
+
   return {
     remindList: state.remindList,
     currPage: state.currPage,
