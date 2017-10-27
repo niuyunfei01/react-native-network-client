@@ -18,6 +18,8 @@ const initialState = {
   forbidden: {},
   vendor_stores: {},
   user_list: {},
+  order_num: {},
+  turnover: {},
 };
 
 export default function mine(state = initialState, action) {

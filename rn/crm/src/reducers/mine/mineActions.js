@@ -195,7 +195,7 @@ export function saveOfflineStore(data, token, callback) {
   }
 }
 
-export function getStoreTurnover(store_id, token, callback) {
+export function fetchStoreTurnover(store_id, token, callback) {
   return dispatch => {
     const url = `api/get_store_turnover/${store_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
