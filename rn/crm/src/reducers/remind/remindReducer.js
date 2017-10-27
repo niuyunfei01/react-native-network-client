@@ -18,13 +18,16 @@ const initialState = {
   processing: false,
   updateId: '',
   updateTypeId: '',
-  remindCount: {}
+  remindCount: {},
+  groupNum: {},
+  quickNum: {}
 };
 
 export default function remind(state = initialState, action) {
+  let diff = {};
   switch (action.type) {
     case types.FETCH_REMIND_LIST:
-      let diff = {
+      diff = {
         loading: state.loading,
         isLoadMore: state.isLoadMore,
         isRefreshing: state.isRefreshing
@@ -35,8 +38,19 @@ export default function remind(state = initialState, action) {
       return Object.assign({}, state, diff);
     case types.RECEIVE_REMIND_LIST:
       let typeId = action.typeId;
-      let isLoadMore = state.isLoadMore[typeId];
-      return isLoadMore ? Object.assign({}, state, loadMore(state, action)) : Object.assign({}, state, combine(state, action));
+      let loadMoreFlag = state.isLoadMore[typeId];
+      let change = loadMoreFlag ? loadMore(state, action) : combine(state, action);
+      let {remindList, currPage, totalPage, loading, isLoadMore, noMore, isRefreshing} = change;
+      return Object.assign({}, state, {
+        isRefreshing: isRefreshing,
+        isLoadMore: isLoadMore,
+        noMore: noMore,
+        remindList: remindList,
+        loading: loading,
+        currPage: currPage,
+        totalPage: totalPage,
+        processing: false
+      });
     case types.DELAY_REMIND:
     case types.UPDATE_REMIND_STATUS:
       return Object.assign({}, state, {
@@ -63,7 +77,11 @@ export default function remind(state = initialState, action) {
     case types.FETCH_REMIND_COUNT:
       return state;
     case types.RECEIVE_REMIND_COUNT:
-      return Object.assign({}, state, {remindCount: action.result});
+      return Object.assign({}, state, {
+        remindCount: action.result,
+        groupNum: action.groupNum,
+        quickNum: action.quickNum
+      });
     default:
       return state;
   }
@@ -80,41 +98,39 @@ function removeRemind(state, action) {
 }
 
 function combine(state, action) {
-  let diff = {
-    isRefreshing: state.isRefreshing,
-    loading: state.isLoading,
-    isLoadMore: state.isLoadMore,
-    noMore: state.no_data,
+  state.remindList[action.typeId] = action.remindList;
+  state.currPage[action.typeId] = parseInt(action.currPage);
+  state.totalPage[action.typeId] = parseInt(action.totalPage);
+  state.loading[action.typeId] = false;
+  state.isLoadMore[action.typeId] = false;
+  state.noMore[action.typeId] = false;
+  state.isRefreshing[action.typeId] = false;
+  return {
     remindList: state.remindList,
     currPage: state.currPage,
     totalPage: state.totalPage,
-  };
-  diff.remindList[action.typeId] = action.remindList;
-  diff.currPage[action.typeId] = parseInt(action.currPage);
-  diff.totalPage[action.typeId] = parseInt(action.totalPage);
-  diff.loading[action.typeId] = false;
-  diff.isLoadMore[action.typeId] = false;
-  diff.noMore[action.typeId] = action.currPage + 1 > action.totalPage;
-  diff.isRefreshing[action.typeId] = false;
-  return diff;
+    loading: state.loading,
+    isLoadMore: state.isLoadMore,
+    noMore: state.noMore,
+    isRefreshing: state.isRefreshing
+  }
 }
 
 function loadMore(state, action) {
-  let diff = {
-    isRefreshing: state.isRefreshing,
-    loading: state.isLoading,
-    isLoadMore: state.isLoadMore,
-    noMore: state.no_data,
+  state.remindList[action.typeId] = lodash.uniqBy(state.remindList[action.typeId].concat(action.remindList), 'id');
+  state.currPage[action.typeId] = parseInt(action.currPage);
+  state.totalPage[action.typeId] = parseInt(action.totalPage);
+  state.noMore[action.typeId] = action.remindList.length == 0;
+  state.isLoadMore[action.typeId] = false;
+  state.loading[action.typeId] = false;
+  state.isRefreshing[action.typeId] = false;
+  return {
     remindList: state.remindList,
     currPage: state.currPage,
     totalPage: state.totalPage,
-  };
-  diff.remindList[action.typeId] = lodash.uniqBy(state.remindList[action.typeId].concat(action.remindList), 'id');
-  diff.currPage[action.typeId] = parseInt(action.currPage);
-  diff.totalPage[action.typeId] = parseInt(action.totalPage);
-  diff.noMore[action.typeId] = action.currPage + 1 > action.totalPage;
-  diff.isLoadMore[action.typeId] = false;
-  diff.loading[action.typeId] = false;
-  diff.isRefreshing[action.typeId] = false;
-  return diff;
+    loading: state.loading,
+    isLoadMore: state.isLoadMore,
+    noMore: state.noMore,
+    isRefreshing: state.isRefreshing
+  }
 }

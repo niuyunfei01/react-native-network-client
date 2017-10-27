@@ -68,7 +68,7 @@ let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [100, 101, 102, 103];
 const _fetchDataTypeIds = [100, 101, 102, 3, 0];
-const _otherSubTypeIds = [0, 3];
+const _otherSubTypeIds = [3, 0];
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
 const _otherTypeTag = 103;
 
@@ -109,13 +109,6 @@ class RemindScene extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {remind} = this.props;
-    // get typeId
-    // if (remind.isLoadMore && !nextProps.remind.isLoadMore && !nextProps.remind.isRefreshing) {
-    //   if (nextProps.remind.noMore) {
-    //     ToastShort('没有更多数据了');
-    //   }
-    // }
   }
 
   onRefresh(typeId) {
@@ -304,11 +297,10 @@ class RemindScene extends PureComponent {
     if (remind.loading[typeId]) {
       return <LoadingView/>;
     }
-    let isLoading = remind.remindList[typeId] == undefined;
-    let isEmpty = isLoading ? false : remind.remindList[typeId].length == 0;
-    if (isLoading || isEmpty) {
-      let title = isLoading ? "Loading..." : "";
-      let tip = isLoading ? "正在加载..." : "";
+    let refresh = !!remind.isRefreshing[typeId] ? true : false;
+    if (refresh) {
+      let title = "加载中...";
+      let tip = "正在加载...";
       return (
         <ScrollView
           automaticallyAdjustContentInsets={false}
@@ -317,8 +309,9 @@ class RemindScene extends PureComponent {
           style={{flex: 1}}
           refreshControl={
             <RefreshControl
-              refreshing={remind.isRefreshing[typeId]}
-              onRefresh={this.onRefresh.bind(this, typeId)}
+              refreshing={refresh}
+              onRefresh={() => {
+              }}
               title={title}
               colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
             />}>
@@ -347,7 +340,7 @@ class RemindScene extends PureComponent {
         onRefresh={this.onRefresh.bind(this, typeId)}
         refreshing={remind.isRefreshing[typeId]}
         ListFooterComponent={this.renderFooter.bind(this, typeId)}
-        ListHeaderComponent={this.renderHead.bind(this, typeId)}
+        ListHeaderComponent={this.renderHead.bind(this, tagTypeId)}
         keyExtractor={this._keyExtractor}
         shouldItemUpdate={this._shouldItemUpdate}
         getItemLayout={this._getItemLayout}
