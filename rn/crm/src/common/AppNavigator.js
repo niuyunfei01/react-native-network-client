@@ -28,6 +28,7 @@ import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 import AuditRefundScene from "../scene/Order/AuditRefundScene";
 import OrderEditScene from "../scene/Order/OrderEditScene";
 import StoreScene from "../scene/Store/StoreScene";
+import StoreAddScene from "../scene/Store/StoreAddScene";
 
 const Tab = TabNavigator(
   {
@@ -86,7 +87,7 @@ const Tab = TabNavigator(
 
     Mine: {
       screen: MineScene,
-      // screen: SettingScene,
+      // screen: StoreScene,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: '我的',
         tabBarIcon: ({focused, tintColor}) => (
@@ -168,6 +169,7 @@ class Navigator extends Component {
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
         [Config.ROUTE_STORE]: {screen: StoreScene},
+        [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
 
       },
       stackNavigatorConfigs

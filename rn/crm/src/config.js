@@ -32,4 +32,5 @@ export default {
   ROUTE_REFUND_AUDIT: 'AuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_STORE: 'Store',
+  ROUTE_STORE_ADD: 'StoreAdd',
 };

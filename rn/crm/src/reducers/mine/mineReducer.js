@@ -3,7 +3,6 @@
 const {
   GET_USER_COUNT,
   GET_WORKER,
-  RESET_WORKER,
   GET_VENDOR_STORES,
 } = require('../../common/constants').default;
 import Cts from "../../Cts";
@@ -31,12 +30,11 @@ export default function mine(state = initialState, action) {
     case GET_WORKER:
       return {
         ...state,
-        user_list: worker_list(state, action),
+        user_list: user_list(state, action),
       };
-    // case RESET_WORKER:
-    //   return reset_worker(state, action);
     case GET_VENDOR_STORES:
       return {
+        ...state,
         vendor_stores: vendor_stores(state, action),
       };
     default:
@@ -54,34 +52,10 @@ function bad_cases_of(state, action) {
   return state.bad_cases_of;
 }
 
-function worker_list(state, action) {
-  const user_map = {};
-  let normal = [];
-  let forbidden = [];
-  // for(let worker of action.workers) {
-  //   user_map[worker.id] = worker;
-  //   if(parseInt(worker.status) === Cts.WORKER_STATUS_OK){
-  //     normal.push(worker);
-  //   } else {
-  //     forbidden.push(worker);
-  //   }
-  // }
-  let workers = action.workers;
-  for (let idx in workers) {
-    if (workers.hasOwnProperty(idx)) {
-      let worker = workers[idx];
-      user_map[worker.id] = worker;
-      if (parseInt(worker.status) === Cts.WORKER_STATUS_OK) {
-        normal.push(worker);
-      } else {
-        forbidden.push(worker);
-      }
-    }
-  }
-
-  state.user_list[action._v_id] = user_map;
-  state.normal[action._v_id] = normal;
-  state.forbidden[action._v_id] = forbidden;
+function user_list(state, action) {
+  state.user_list[action._v_id] = action.user_list;
+  state.normal[action._v_id] = action.normal;
+  state.forbidden[action._v_id] = action.forbidden;
   return state.user_list;
 }
 
@@ -90,23 +64,6 @@ function vendor_stores(state, action) {
   return state.vendor_stores;
 }
 
-// function reset_worker(state, action) {
-//   let {_v_id, user_id, user_status} = action;
-//   state.user_list[_v_id][user_id].status = user_status;
-//
-//   let normal = [];
-//   let forbidden = [];
-//   for(let worker of action.user_list) {
-//     if(parseInt(worker.status) === Cts.WORKER_STATUS_OK){
-//       normal.push(worker);
-//     } else {
-//       forbidden.push(worker);
-//     }
-//   }
-//   state.normal[action._v_id] = normal;
-//   state.forbidden[action._v_id] = forbidden;
-//   return state;
-// }
 
 
 
