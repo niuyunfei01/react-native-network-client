@@ -79,16 +79,17 @@ export function orderEditItem(item) {
 /**
  */
 export function getOrder(sessionToken, orderId, callback) {
+  callback = callback || function(){};
   return dispatch => {
-    dispatch(getOrderRequest())
-    const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`
+    dispatch(getOrderRequest());
+    const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`;
     getWithTpl(url, (json) => {
-        dispatch(getOrderSuccess(json))
+        dispatch(getOrderSuccess(json));
         const ok = json && json.id === orderId;
         callback(ok, ok ? json : "返回数据错误")
       }, (error) => {
-        dispatch(getOrderFailure(error))
-        console.log('getOrder error:', error)
+        dispatch(getOrderFailure(error));
+        console.log('getOrder error:', error);
         callback(false, "网络错误, 请稍后重试")
       }
     )
@@ -103,7 +104,7 @@ export function saveOrderBaisc(token, orderId, changes, callback) {
     jsonWithTpl(url, changes, (json) => {
         callback(json.ok, json.reason)
       }, (error) => {
-        console.log('error:', error)
+        console.log('error:', error);
         callback(false, "网络错误, 请稍后重试")
       }
     )

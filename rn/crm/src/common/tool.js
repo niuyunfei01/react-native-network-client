@@ -84,6 +84,11 @@ export function vendor(global) {
   };
 }
 
+export function store(store_id, global) {
+  const {canReadStores} = global;
+  return canReadStores[store_id];
+}
+
 export function length(obj) {
   if (obj === undefined) {
     return 0;
@@ -164,4 +169,5 @@ export default {
   orderOrderTimeShort,
   orderExpectTime,
   resetNavStack,
+  store,
 }

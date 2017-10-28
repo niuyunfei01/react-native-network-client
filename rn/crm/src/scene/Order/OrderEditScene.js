@@ -4,12 +4,12 @@ import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListVie
 import Config from '../../config'
 import CommonStyle from '../../common/CommonStyles'
 
-import {saveOrderBaisc} from '../../reducers/order/orderActions'
+import {saveOrderBaisc, getOrder} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
+import {tool} from '../../common';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, Switch, TextArea, ButtonArea, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellFooter, CellBody, CellsTips} from "../../weui/index";
-import S from '../../stylekit'
 import IconEvilIcons from 'react-native-vector-icons/EvilIcons';
 import NavigationItem from "../../widget/NavigationItem";
 
@@ -20,20 +20,21 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({saveOrderBaisc }, dispatch)}
+  return {dispatch, ...bindActionCreators({saveOrderBaisc, getOrder }, dispatch)}
 }
 
 class OrderEditScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-
+    // disabled={this._shouldDisabledSaveBtn()}
     return {
       headerTitle: '修改订单信息',
       headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
       headerRight: <NavigationItem
-          titleStyle={{width: pxToDp(43), height: pxToDp(23), }}
+          containerStyle = {{width: pxToDp(96), height: pxToDp(46), backgroundColor: colors.main_color, flex: 0, marginRight: 8}}
+          titleStyle={{color: colors.white, fontSize: 14, fontWeight: 'bold', margin: 0}}
           title="保存"
           onPress={() => {params.save()}}
         />
@@ -52,6 +53,7 @@ class OrderEditScene extends Component {
       taxId: '',
       loc_data: '',
       onSubmitting: false,
+      onSendingConfirm: false,
       errorHints: '',
     };
 
@@ -72,6 +74,9 @@ class OrderEditScene extends Component {
     this._toSetLocation = this._toSetLocation.bind(this);
     this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
     this._onChangeTaxId = this._onChangeTaxId.bind(this);
+    this._doSendRemind = this._doSendRemind.bind(this);
+    this._back = this._back.bind(this);
+    this._storeLoc = this._storeLoc.bind(this);
   }
 
   componentDidMount() {
@@ -91,6 +96,12 @@ class OrderEditScene extends Component {
     this.setState(init)
   }
 
+  _storeLoc() {
+    const {order} = (this.props.navigation.state.params || {});
+    const store = tool.store(order.store_id, this.props.global);
+    return store ? `${store.loc_lng},${store.loc_lat}` : '0,0';
+  }
+
   _onChangeBackupPhone(backupPhone) {
     const {order} = this.props.navigation.state.params;
     if (order.mobile === backupPhone) {
@@ -108,7 +119,7 @@ class OrderEditScene extends Component {
     const {state, navigate} = this.props.navigation;
     const params = {
       action: Config.LOC_PICKER,
-      center: this.state.loc_data,
+      center: this.state.loc_data === '0,0' || !this.state.loc_data ? this._storeLoc() : this.state.loc_data,
       actionBeforeBack: (location) => {
         console.log('update to new location:', location);
         this.setState({
@@ -143,16 +154,35 @@ class OrderEditScene extends Component {
         return previous;
       }, {});
 
-    dispatch(saveOrderBaisc(global.accessToken, order.id, changes, (ok, msg) => {
+    const token = global.accessToken;
+    dispatch(saveOrderBaisc(token, order.id, changes, (ok, msg) => {
       console.log('results', ok, msg);
+
+      if (ok) {
+        this.setState({onSendingConfirm: true});
+        dispatch(getOrder(token, order.id));
+      }
+
       this.setState({onSubmitting: false});
     }));
+  }
+
+  _back() {
+    this.setState({onSendingConfirm: false});
+    const {navigation} = this.props;
+    navigation.goBack();
+  }
+
+  _doSendRemind() {
+    //addNewTask()
+    this.setState({onSendingConfirm: false})
   }
 
   _shouldDisabledSaveBtn() {
     const {order} = this.props.navigation.state.params;
 
-    return !this.editFields.filter((edit) => this.state[edit.key] !== edit.val(order));
+    const ts = this.editFields.filter((edit) => this.state[edit.key] !== edit.val(order));
+    return ts.length === 0;
   }
 
   render() {
@@ -167,6 +197,19 @@ class OrderEditScene extends Component {
             }]}
           ><Text>{this.state.errorHints}</Text></Dialog>
           }
+
+      <Dialog onRequestClose={()=>{}}
+              visible={this.state.onSendingConfirm}
+              buttons={[{
+                type: 'default',
+                label: '不发送',
+                onPress: this._back
+              }, {
+                type: 'primary',
+                label: '发送提醒',
+                onPress: this._doSendRemind
+              }]}
+      ><Text>语音循环提示门店，直到门店确认看到修改信息为止</Text></Dialog>
 
       <CellsTitle style={CommonStyle.cellsTitle35}>备用手机号</CellsTitle>
       <Cells style={CommonStyle.cells35}>
@@ -183,7 +226,7 @@ class OrderEditScene extends Component {
             />
           </CellBody></Cell>
         <Cell>
-          <CellHeader><Label style={CommonStyle.cellTextH35}>保存到客户资料</Label></CellHeader>
+          <CellHeader><Label style={[CommonStyle.cellTextH35, {fontSize: 12}]}>保存到客户</Label></CellHeader>
           <Switch onChange={this._onChangeAutoSaveBackup} value={this.state.autoSaveUserBackup}/>
         </Cell>
       </Cells>
@@ -250,9 +293,9 @@ class OrderEditScene extends Component {
         </Cell>
       </Cells>
 
-      <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._shouldDisabledSaveBtn()} onPress={this._doSaveEdit} style={[S.mlr15]}>保存</Button>
-      </ButtonArea>
+      {/*<ButtonArea style={{marginTop: 35}}>*/}
+        {/*<Button type="primary" disabled={this._shouldDisabledSaveBtn()} onPress={this._doSaveEdit} style={[S.mlr15]}>保存</Button>*/}
+      {/*</ButtonArea>*/}
 
       <Toast
         icon="loading"

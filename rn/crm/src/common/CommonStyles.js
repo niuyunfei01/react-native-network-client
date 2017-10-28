@@ -27,6 +27,7 @@ const Styles = StyleSheet.create({
   },
 
   cellTextH35: {
+    width: 70,
     fontSize: 15,
     marginTop: (35 - 20.5) / 2,
     marginBottom: (35 - 20.5) / 2

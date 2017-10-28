@@ -19,7 +19,7 @@ class NavigationItem extends PureComponent {
         let title = this.props.title &&
             <Text style={[styles.title, this.props.titleStyle]}>{this.props.title}</Text>
         return (
-            <TouchableOpacity style={styles.container} onPress={this.props.onPress}>
+            <TouchableOpacity style={[styles.container, this.props.containerStyle]} onPress={this.props.onPress}>
                 {icon}
                 {title}
             </TouchableOpacity>

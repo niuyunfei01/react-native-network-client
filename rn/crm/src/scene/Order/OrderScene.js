@@ -330,7 +330,10 @@ class OrderScene extends Component {
   }
 
   goToSetMap() {
-    this.setState({gotoEditPoi: false})
+    this.setState({gotoEditPoi: false});
+
+    const {order} = this.props.order;
+    this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
   }
 
   toMap() {
