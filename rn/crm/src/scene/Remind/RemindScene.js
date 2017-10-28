@@ -381,7 +381,7 @@ class RemindScene extends PureComponent {
 
   render() {
     const {remind} = this.props;
-    const tagNum = remind.tagNum;
+    const remindCount = remind.remindCount;
     const self = this;
     let lists = [];
     _typeIds.forEach((typeId, index) => {
@@ -404,7 +404,7 @@ class RemindScene extends PureComponent {
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar count={tagNum} countIndex={_typeIds}/>}
+          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeIds}/>}
           locked={remind.processing}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
