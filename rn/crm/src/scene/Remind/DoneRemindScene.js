@@ -79,6 +79,7 @@ class DoneRemindScene extends PureComponent {
     const token = global['accessToken'];
     const _this = this;
     const url = AppConfig.ServiceUrl + 'api/list_notice/-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search;
+    console.log("fetch done remind ", url)
     fetch(url)
       .then(res => res.json())
       .then(res => {
@@ -173,8 +174,11 @@ class DoneRemindScene extends PureComponent {
     return (
       <List style={styles.wrapper}>
         <SearchBar placeholder="请输入搜索内容" lightTheme round
-                   ref={search => this.state.search = search}
-                   onChangeText={this.onRefresh.bind(this)}/>
+                   ref={search => this.search = search}
+                   onChangeText={(search) => {
+                     this.setState({search: search});
+                     this.onRefresh();
+                   }}/>
         <FlatList
           extraData={this.state.dataSource}
           data={this.state.dataSource}
