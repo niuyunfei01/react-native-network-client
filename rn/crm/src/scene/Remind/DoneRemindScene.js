@@ -12,6 +12,9 @@ import Cts from '../../Cts'
 import AppConfig from '../../config'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
+import {Icon as WeuiIcon,} from "../../weui/index";
+import ModalSelector from 'react-native-modal-selector';
+import selector from "../../styles/selector";
 
 function mapStateToProps(state) {
   let {global} = state;
@@ -28,8 +31,7 @@ function mapDispatchToProps(dispatch) {
 class DoneRemindScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
-    const {params = {}, key} = navigation.state;
-
+    const {params, key} = navigation.state;
     return {
       headerTitle: (
         <View>
@@ -39,8 +41,22 @@ class DoneRemindScene extends PureComponent {
       headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: (
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity onPress={() => {
-          }}>
+          <ModalSelector
+            onChange={(option) => {
+              params.setFilter(option.key);
+            }}
+            data={params.filterData}
+            cancelText="取消"
+            selectStyle={selector.selectStyle}
+            selectTextStyle={selector.selectTextStyle}
+            overlayStyle={selector.overlayStyle}
+            sectionStyle={selector.sectionStyle}
+            sectionTextStyle={selector.sectionTextStyle}
+            optionContainerStyle={selector.optionContainerStyle}
+            optionStyle={selector.optionStyle}
+            optionTextStyle={selector.optionTextStyle}
+            cancelStyle={selector.cancelStyle}
+            cancelTextStyle={selector.cancelTextStyle}>
             <Icon name='ellipsis-h' style={{
               fontSize: pxToDp(40),
               width: pxToDp(42),
@@ -48,7 +64,7 @@ class DoneRemindScene extends PureComponent {
               color: colors.color666,
               marginRight: pxToDp(30),
             }}/>
-          </TouchableOpacity>
+          </ModalSelector>
         </View>),
     }
   };
@@ -57,6 +73,7 @@ class DoneRemindScene extends PureComponent {
     super(props);
     this.state = {
       dataSource: [],
+      filterData: [{key: 1, label: '近一个月'}, {key: 2, label: '近三个月'}, {key: 0, label: '全部'}],
       loading: false,
       page: 1,
       seed: 1,
@@ -71,14 +88,23 @@ class DoneRemindScene extends PureComponent {
     this.makeRemoteRequest();
   }
 
+  componentDidMount() {
+    this.props.navigation.setParams({filterData: this.state.filterData, setFilter: this.setFilter.bind(this)});
+  }
+
+  setFilter(val) {
+    this.setState({filter: val});
+    this.onRefresh();
+  }
+
   makeRemoteRequest = () => {
     const {global} = this.props;
     const {page, filter, search} = this.state;
     this.setState({loading: true});
     const token = global['accessToken'];
     const _this = this;
-    const url = AppConfig.ServiceUrl + 'api/list_notice/-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search;
-    console.log("fetch done remind ", url)
+    const url = AppConfig.ServiceUrl + 'api/list_notice/-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search + '&time_range=' + filter;
+    console.info("fetch remind url ", url);
     fetch(url)
       .then(res => res.json())
       .then(res => {
@@ -123,7 +149,7 @@ class DoneRemindScene extends PureComponent {
 
   renderItem(remind) {
     let {item, index} = remind;
-    return (<Item item={item} index={index} key={index} onPress={this.onPress}/>);
+    return (<Item item={item} index={index} key={index} onPress={this.onPress.bind(this)}/>);
   }
 
   onRefresh() {
@@ -141,6 +167,7 @@ class DoneRemindScene extends PureComponent {
 
   renderFooter() {
     if (!this.state.loading) return null;
+    if (this.state.refreshing) return null;
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
@@ -189,7 +216,7 @@ class DoneRemindScene extends PureComponent {
             waitForInteraction: true,
           }}
           onEndReachedThreshold={0.1}
-          renderItem={this.renderItem}
+          renderItem={this.renderItem.bind(this)}
           onEndReached={this.onEndReached.bind(this)}
           onRefresh={this.onRefresh.bind(this)}
           refreshing={this.state.refreshing}
@@ -230,7 +257,7 @@ class Item extends PureComponent {
                 <View>
                   <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
                 </View>
-                <View><Text>送达</Text></View>
+                <View style={top_styles.tag_right}><Text>送达</Text></View>
               </View>
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>
@@ -248,16 +275,18 @@ class Item extends PureComponent {
                 <Text style={bottom_styles.time_date_text}>{item.noticeDate}</Text>
               </View>
               <View>
-                <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
+                <Text style={bottom_styles.time_start}>{item.noticeTime}</Text>
               </View>
-              <View>
-                <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
-              </View>
-              <View style={bottom_styles.operator}>
+              {!!item.resolved_at && <View style={{marginLeft: pxToDp(20)}}>
+                <Text style={bottom_styles.time_date_text}>{item.resolved_at}解决</Text>
+              </View>}
+              {!!item.resolved_at && <WeuiIcon name="success_no_circle" style={{fontSize: 16}}/>}
+              {!!item.resolved_by && <View style={bottom_styles.operator}>
                 <Text style={bottom_styles.operator_text}>
-                  处理人：{item.delegation_to_user}
+                  处理人：{item.resolved_by}
                 </Text>
               </View>
+              }
             </View>
           </View>
         </View>

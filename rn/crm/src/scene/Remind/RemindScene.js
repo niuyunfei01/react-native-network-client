@@ -36,13 +36,10 @@ import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {fetchRemind, updateRemind, fetchRemindCount, delayRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
-
 import RNButton from '../../widget/RNButton';
-
 import Config from '../../config'
-
+import Cts from '../../Cts'
 const BadgeTabBar = require('./BadgeTabBar');
-
 import {Dialog, ActionSheet} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";
@@ -82,6 +79,7 @@ class RemindScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      canSwitch: true,
       dataSource: [],
       showStopRemindDialog: false,
       showDelayRemindDialog: false,
@@ -109,6 +107,9 @@ class RemindScene extends PureComponent {
   componentWillReceiveProps(nextProps) {
   }
 
+  componentWillUnmount() {
+  }
+
   onRefresh(typeId) {
     const {dispatch} = this.props;
     let token = this._getToken();
@@ -123,24 +124,13 @@ class RemindScene extends PureComponent {
 
   onPress(route, params) {
     let self = this;
-    let orderId = self.state.localState.orderId;
-    if (!orderId) {
+    let {canSwitch} = self.state;
+    if (canSwitch) {
+      self.setState({canSwitch: false});
       InteractionManager.runAfterInteractions(() => {
-        self.setState({
-          localState: {
-            orderId: orderId
-          }
-        });
         self.props.navigation.navigate(route, params);
-      }).done(
-        () => {
-          self.setState({
-            localState: {
-              orderId: ''
-            }
-          });
-        }
-      );
+      });
+      this.__resetState();
     }
   }
 
@@ -158,6 +148,12 @@ class RemindScene extends PureComponent {
       this._showStopRemindDialog(type, id);
 
     }
+  }
+
+  __resetState() {
+    setTimeout(() => {
+      this.setState({canSwitch: true})
+    }, 2500)
   }
 
   _hideDelayRemindDialog() {
@@ -192,7 +188,7 @@ class RemindScene extends PureComponent {
     let {type, id} = this.state.opRemind;
     const {dispatch} = this.props;
     let token = this._getToken();
-    dispatch(updateRemind(id, type, Config.TASK_STATUS_DONE, token))
+    dispatch(updateRemind(id, type, Cts.TASK_STATUS_DONE, token))
     this._hideStopRemindDialog();
   }
 
@@ -222,7 +218,6 @@ class RemindScene extends PureComponent {
   }
 
   pressSubButton(type) {
-    console.info("press sub button type ", type)
     this.setState({
       otherTypeActive: type
     });
@@ -230,9 +225,14 @@ class RemindScene extends PureComponent {
 
   pressToDoneRemind(route, params = {}) {
     let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
-    });
+    let {canSwitch} = _this.state;
+    if (canSwitch) {
+      _this.setState({canSwitch: false});
+      InteractionManager.runAfterInteractions(() => {
+        _this.props.navigation.navigate(route, params);
+      });
+      this.__resetState();
+    }
   }
 
   __getBadgeButton(key, name, quick) {
