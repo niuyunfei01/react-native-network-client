@@ -29,6 +29,7 @@ import AuditRefundScene from "../scene/Order/AuditRefundScene";
 import OrderEditScene from "../scene/Order/OrderEditScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
+import DoneRemindScene from '../scene/Remind/DoneRemindScene';
 
 const Tab = TabNavigator(
   {
@@ -170,6 +171,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
+        [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene}
 
       },
       stackNavigatorConfigs

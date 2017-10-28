@@ -22,7 +22,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {fetchWorkers, fetchUserCount} from "../../reducers/mine/mineActions";
+import {fetchWorkers, fetchUserCount, fetchStoreTurnover} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import ModalSelector from 'react-native-modal-selector';
 import * as tool from "../../common/tool";
@@ -37,6 +37,7 @@ function mapDispatchToProps(dispatch) {
     dispatch, ...bindActionCreators({
       fetchUserCount,
       fetchWorkers,
+      fetchStoreTurnover,
       ...globalActions
     }, dispatch)
   }
@@ -53,9 +54,7 @@ class MineScene extends PureComponent {
       currStoreId,
       currentUserProfile,
       canReadStores,
-      canReadVendors,
     } = this.props.global;
-
 
     let storeActionSheet = [];
     let sortStores = Object.values(canReadStores).sort(function (a, b) {
@@ -83,15 +82,18 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currVendorId, currVersion} = tool.vendor(this.props.global);
+    let {currVendorId, currVersion, currManager, is_mgr} = tool.vendor(this.props.global);
 
-    const {mine} = this.props;
+    const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     this.state = {
       isRefreshing: false,
       onNavigating: false,
       storeActionSheet: storeActionSheet,
-      sign_count: mine.sign_count[currentUser],
-      bad_cases_of: mine.bad_cases_of[currentUser],
+
+      sign_count: sign_count[currentUser],
+      bad_cases_of: bad_cases_of[currentUser],
+      order_num: order_num[currStoreId],
+      turnover: turnover[currStoreId],
 
       currentUser: currentUser,
       prefer_store: prefer_store,
@@ -101,20 +103,23 @@ class MineScene extends PureComponent {
       currStoreName: canReadStores[currStoreId]['name'],
       currVendorId: currVendorId,
       currVersion: currVersion,
+      currManager: currManager,
+      is_mgr: is_mgr,
       currVendorName: canReadStores[currStoreId]['vendor'],
       cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
-      canReadVendors: canReadVendors,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
     this.onPress = this.onPress.bind(this);
+    this.onGetUserCount = this.onGetUserCount.bind(this);
+    this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
 
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
     }
-  }
-
-  componentWillMount() {
+    if (this.state.turnover === undefined || this.state.turnover === undefined) {
+      this.onGetStoreTurnover();
+    }
   }
 
   onGetUserCount() {
@@ -141,13 +146,34 @@ class MineScene extends PureComponent {
     });
   }
 
+  onGetStoreTurnover() {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {currStoreId} = this.state;
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(fetchStoreTurnover(currStoreId, accessToken, (resp) => {
+        if (resp.ok) {
+          let {order_num, turnover} = resp.obj;
+          _this.setState({
+            order_num: order_num,
+            turnover: turnover,
+          });
+          if (_this.state.isRefreshing) {
+            ToastShort('刷新完成');
+          }
+        }
+        _this.setState({isRefreshing: false});
+      }));
+    });
+  }
+
   componentWillReceiveProps() {
     const {
       currentUser,
       currStoreId,
       currentUserProfile,
       canReadStores,
-      canReadVendors,
     } = this.props.global;
 
     const {
@@ -157,11 +183,14 @@ class MineScene extends PureComponent {
       cover_image,
     } = currentUserProfile;
 
-    const {mine} = this.props;
-    let {currVendorId, currVersion} = tool.vendor(this.props.global);
+    const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+    let {currVendorId, currVersion, currManager, is_mgr} = tool.vendor(this.props.global);
     this.setState({
-      sign_count: mine.sign_count[currentUser],
-      bad_cases_of: mine.bad_cases_of[currentUser],
+      sign_count: sign_count[currentUser],
+      bad_cases_of: bad_cases_of[currentUser],
+      order_num: order_num[currStoreId],
+      turnover: turnover[currStoreId],
+
       currentUser: currentUser,
       prefer_store: prefer_store,
       screen_name: screen_name,
@@ -170,6 +199,8 @@ class MineScene extends PureComponent {
       currStoreName: canReadStores[currStoreId]['name'],
       currVendorId: currVendorId,
       currVersion: currVersion,
+      currManager: currManager,
+      is_mgr: is_mgr,
       currVendorName: canReadStores[currStoreId]['vendor'],
       cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
     });
@@ -179,14 +210,12 @@ class MineScene extends PureComponent {
     this.setState({isRefreshing: true});
 
     this.onGetUserCount();
+    this.onGetStoreTurnover();
   }
 
   _doChangeStore(store_id) {
     const {dispatch} = this.props;
-    const {
-      canReadStores,
-      canReadVendors,
-    } = this.props.global;
+    const {canReadStores} = this.props.global;
     let _this = this;
     native.setCurrStoreId(store_id, function (ok, msg) {
       console.log('setCurrStoreId => ', store_id, ok, msg);
@@ -200,6 +229,7 @@ class MineScene extends PureComponent {
           currVersion: currVersion,
           currVendorName: canReadStores[store_id]['vendor'],
         });
+        _this.onGetStoreTurnover();
       } else {
         ToastShort(msg);
       }
@@ -243,33 +273,45 @@ class MineScene extends PureComponent {
     )
   }
 
-  /*renderWorker() {
-      return (
-          <View style={worker_styles.container}>
-              <View>
-                  <Image style={[worker_styles.icon_head]} source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/Mine/avatar.png')} />
-              </View>
-              <View style={[worker_styles.worker_box]}>
-                  <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0,4)}</Text>
-              </View>
-              <View style={[worker_styles.sales_box]}>
-                  <Text style={[worker_styles.sale_text]}>今日订单: 500</Text>
-                  <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥3800.00</Text>
-              </View>
-              <TouchableOpacity style={[worker_styles.chevron_right]}>
-                  <Button name='chevron-thin-right' style={worker_styles.right_btn} />
-              </TouchableOpacity>
-          </View>
-      )
-  }*/
+  renderManager() {
+    let {order_num, turnover} = this.state;
+    return (
+      <View style={worker_styles.container}>
+        <View>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+        </View>
+        <View style={[worker_styles.worker_box]}>
+          <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
+        </View>
+        <View style={[worker_styles.sales_box]}>
+          <Text style={[worker_styles.sale_text]}>今日订单: {order_num}</Text>
+          <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥{turnover}</Text>
+        </View>
+        <TouchableOpacity
+          style={[worker_styles.chevron_right]}
+          onPress={() => this.onPress(Config.ROUTE_USER, {
+            type: 'mine',
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+          })}
+        >
+          <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
   renderWorker() {
     return (
       <View
         style={worker_styles.container}
       >
         <View>
-          <Image style={[worker_styles.icon_head]}
-                 source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+          <Image
+            style={[worker_styles.icon_head]}
+            source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
         </View>
         <View style={[worker_styles.worker_box]}>
           <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
@@ -297,7 +339,7 @@ class MineScene extends PureComponent {
   }
 
   render() {
-    let {currVersion} = this.state;
+    let {currVersion, is_mgr} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -310,7 +352,7 @@ class MineScene extends PureComponent {
         style={{backgroundColor: colors.main_back}}
       >
         {this.renderHeader()}
-        {this.renderWorker()}
+        {is_mgr ? this.renderManager() : this.renderWorker()}
         {this.renderStoreBlock()}
         {this.renderVersionBlock()}
         {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
@@ -456,7 +498,7 @@ class MineScene extends PureComponent {
           let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
           this.onPress(Config.ROUTE_WEB, {url: url});
         }}>
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/avatar.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
         <View style={[block_styles.block_box]}/>

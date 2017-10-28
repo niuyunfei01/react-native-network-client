@@ -33,4 +33,5 @@ export default {
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
+  ROUTE_DONE_REMIND: 'DoneRemind',
 };

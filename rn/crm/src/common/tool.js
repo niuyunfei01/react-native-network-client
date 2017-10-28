@@ -38,19 +38,49 @@ export function orderExpectTime(dt) {
 
 export function vendor(global) {
   const {
+    currentUser,
     currStoreId,
     canReadStores,
     canReadVendors,
   } = global;
-  let currVendorId = canReadStores[currStoreId]['vendor_id'];
-  let currVendorName = canReadStores[currStoreId]['vendor'];
-  let currVersion = (canReadVendors[currVendorId] || {})['version'];
-  console.log('currVendorId -> ', currVendorId);
-  console.log(canReadVendors[currVendorId]);
+  let currStore = canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
+  let currVendorId = currStore['vendor_id'];
+  let currVendorName = currStore['vendor'];
+
+  let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
+  let currVersion = currVendor['version'];
+  // console.log('currVendorId -> ', currVendorId);
+  // console.log('currStore -> ', currStore);
+  // console.log('currVendor -> ', currVendor);
+
+  let mgr_ids = [];
+  let owner_id = currStore['owner_id'];
+  let vice_mgr = currStore['vice_mgr'];
+  let service_uid = currVendor['service_uid'];
+  let service_mgr = currVendor['service_mgr'];
+  // console.log('ids -> ', owner_id, vice_mgr, service_uid, service_mgr);
+  if(owner_id !== '' && owner_id !== undefined && owner_id > 0){
+    mgr_ids.push(owner_id);
+  }
+  if(vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0){
+    mgr_ids.push(vice_mgr);
+  }
+  if(service_uid !== '' && service_uid !== undefined && service_uid > 0){
+    mgr_ids.push(service_uid);
+  }
+  if(service_mgr !== '' && service_mgr !== undefined){//可能有多个 -> '811488,822472'
+    mgr_ids.push(service_mgr);
+  }
+
+  let manager = ','+mgr_ids.join(',')+',';
+  // console.log('manager -> ', manager);
+  let is_mgr = manager.indexOf(','+currentUser+',') !== -1;
   return {
     currVendorId: currVendorId,
     currVendorName: currVendorName,
     currVersion: currVersion,
+    currManager: manager,
+    is_mgr: is_mgr,
   };
 }
 

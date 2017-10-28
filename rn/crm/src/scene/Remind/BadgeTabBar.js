@@ -61,7 +61,7 @@ const BadgeTabBar = React.createClass({
     const textColor = isTabActive ? activeTextColor : inactiveTextColor;
     const fontWeight = isTabActive ? 'bold' : 'normal';
     let indexKey = countIndex[page];
-    let countData = count[indexKey];
+    let countData = count ? count[indexKey] : 0;
 
     let total = !countData ? 0 : countData['total'];
     let quick = !countData ? 0 : countData['quick'];

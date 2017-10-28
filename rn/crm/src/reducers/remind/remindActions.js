@@ -6,7 +6,7 @@ import * as RemindServices from '../../services/remind';
 
 export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status) {
   return dispatch => {
-    dispatch(fetchRemindList(isRefreshing, loading, isLoadMore));
+    dispatch(fetchRemindList(isRefreshing, loading, isLoadMore, typeId));
     return RemindServices.FetchRemindList(token, typeId, status, page)
       .then(response => response.json())
       .then((response) => {
@@ -30,17 +30,19 @@ export function fetchRemindCount(token) {
     return RemindServices.FetchRemindCount(token)
       .then(response => response.json())
       .then((response) => {
-        console.log("get remind count " + JSON.stringify(response));
-        let result = response.obj;
+        let boday = response.obj;
         if (response.ok) {
-          dispatch(receiveRemindCount(result))
+          let result = boday.result;
+          let groupNum = boday.group_type_num;
+          let quickNum = boday.quick_type_num;
+          dispatch(receiveRemindCount(result, groupNum, quickNum))
         } else {
           ToastShort(response.reason);
-          dispatch(receiveRemindCount({}))
+          dispatch(receiveRemindCount({}, {}, {}))
         }
       }).catch((error) => {
         ToastShort(error.message);
-        dispatch(receiveRemindCount({}))
+        dispatch(receiveRemindCount({}, {}, {}))
       })
   }
 }
@@ -115,7 +117,7 @@ function updateRemindStatus(id, typeId, status) {
   }
 }
 
-function fetchRemindList(isRefreshing, loading, isLoadMore) {
+function fetchRemindList(isRefreshing, loading, isLoadMore, typeId) {
   if (isLoadMore == undefined) {
     isLoadMore = false;
   }
@@ -123,7 +125,8 @@ function fetchRemindList(isRefreshing, loading, isLoadMore) {
     type: types.FETCH_REMIND_LIST,
     isRefreshing: isRefreshing,
     loading: loading,
-    isLoadMore: isLoadMore
+    isLoadMore: isLoadMore,
+    typeId: typeId
   }
 }
 
@@ -143,9 +146,11 @@ function receiveRemindList(remindList, typeId, currPage, totalPage) {
   }
 }
 
-function receiveRemindCount(remindCount) {
+function receiveRemindCount(remindCount, groupNum, quickNum) {
   return {
     type: types.RECEIVE_REMIND_COUNT,
-    result: remindCount
+    result: remindCount,
+    groupNum: groupNum,
+    quickNum: quickNum
   }
 }
