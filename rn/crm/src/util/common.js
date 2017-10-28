@@ -12,6 +12,23 @@ export function getWithTpl(url, okFn, failFn) {
   });
 }
 
+/**
+ *
+ * @param url
+ * @param data object (will be json.stringify)
+ * @param okFn
+ * @param failFn
+ */
+export function jsonWithTpl(url, data, okFn, failFn) {
+  FetchEx.timeout(Config.FetchTimeout, FetchEx.postJSON(url, data))
+    .then(res => res.json())
+    .then(json => {
+      okFn(json)
+    }).catch((error) => {
+    failFn(error)
+  });
+}
+
 export function postWithTpl(url, formData, okFn, failFn) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.post(url, formData))
     .then(res => res.json())

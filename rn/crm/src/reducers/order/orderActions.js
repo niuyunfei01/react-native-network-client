@@ -1,7 +1,7 @@
 'use strict'
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {getWithTpl} from '../../util/common'
+import {getWithTpl, jsonWithTpl} from '../../util/common'
 
 /**
  * ## Imports
@@ -97,17 +97,13 @@ export function getOrder(sessionToken, orderId, callback) {
 
 /**
  */
-export function saveOrderBaisc(sessionToken, orderId, changes, callback) {
+export function saveOrderBaisc(token, orderId, changes, callback) {
   return dispatch => {
-    dispatch(getOrderRequest())
-    const url = `api/order_edit_basic/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`
-    getWithTpl(url, (json) => {
-        dispatch(getOrderSuccess(json))
-        const ok = json && json.id === orderId;
-        callback(ok, ok ? json : "返回数据错误")
+    const url = `api/order_chg_basic/${orderId}.json?access_token=${token}`
+    jsonWithTpl(url, changes, (json) => {
+        callback(json.ok, json.reason)
       }, (error) => {
-        dispatch(getOrderFailure(error))
-        console.log('getOrder error:', error)
+        console.log('error:', error)
         callback(false, "网络错误, 请稍后重试")
       }
     )

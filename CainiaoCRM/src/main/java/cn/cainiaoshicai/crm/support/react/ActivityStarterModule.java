@@ -85,6 +85,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             AccountBean ab = GlobalCtx.app().getAccountBean();
+
+            AppLogger.i("updateAfterTokenGot " + (ab == null ? "null" : ab.getInfo()));
+
             if (ab != null && ab.getInfo() != null) {
                 callback.invoke(true, "ok", DaoHelper.gson().toJson(ab.getInfo()));
             } else {
@@ -92,7 +95,8 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             }
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
-            callback.invoke(false, "exception:" + e.getMessage(), null);
+            String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
+            callback.invoke(false, reason, null);
         }
     }
 
@@ -114,6 +118,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToOrders() {
+        AppLogger.i("navigate to orders");
         Activity activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, MainActivity.class);

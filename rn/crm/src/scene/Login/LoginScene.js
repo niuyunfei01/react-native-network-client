@@ -208,7 +208,7 @@ class LoginScene extends PureComponent {
         }));
       } else {
         this.doneReqSign()
-        ToastAndroid.show("登录失败，请输入正确的" + name, ToastAndroid.LONG)
+        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG)
         return false;
       }
     }))
