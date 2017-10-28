@@ -1,6 +1,6 @@
 import React, {PureComponent, PropTypes} from 'react'
 import {View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native'
-import {List, SearchBar, ListItem} from "react-native-elements";
+import {List, SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
@@ -12,6 +12,7 @@ import Cts from '../../Cts'
 import AppConfig from '../../config'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
+import LoadingView from '../../widget/LoadingView';
 
 function mapStateToProps(state) {
   let {global} = state;
@@ -73,11 +74,11 @@ class DoneRemindScene extends PureComponent {
 
   makeRemoteRequest = () => {
     const {global} = this.props;
-    const {page} = this.state;
+    const {page, filter, search} = this.state;
     this.setState({loading: true});
     const token = global['accessToken'];
     const _this = this;
-    const url = AppConfig.ServiceUrl + 'api/list_notice/-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token;
+    const url = AppConfig.ServiceUrl + 'api/list_notice/-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search;
     fetch(url)
       .then(res => res.json())
       .then(res => {
@@ -150,10 +151,30 @@ class DoneRemindScene extends PureComponent {
     );
   }
 
+  renderEmpty() {
+    if (this.state.loading) {
+      return null;
+    } else {
+      return (<View style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        height: pxToDp(600)
+      }}>
+        <Text style={{fontSize: 18}}>
+          没有数据...
+        </Text>
+      </View>);
+    }
+  }
+
   render() {
     return (
       <List style={styles.wrapper}>
-        <SearchBar placeholder="请输入搜索内容" lightTheme round/>
+        <SearchBar placeholder="请输入搜索内容" lightTheme round
+                   ref={search => this.state.search = search}
+                   onChangeText={this.onRefresh.bind(this)}/>
         <FlatList
           extraData={this.state.dataSource}
           data={this.state.dataSource}
@@ -173,18 +194,7 @@ class DoneRemindScene extends PureComponent {
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
-          ListEmptyComponent={() =>
-            <View style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              flexDirection: 'row',
-              height: pxToDp(600)
-            }}>
-              <Text style={{fontSize: 18}}>
-                没有数据...
-              </Text>
-            </View>}
+          ListEmptyComponent={this.renderEmpty.bind(this)}
           initialNumToRender={5}
         />
       </List>
