@@ -12,7 +12,6 @@ import Cts from '../../Cts'
 import AppConfig from '../../config'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
-import LoadingView from '../../widget/LoadingView';
 
 function mapStateToProps(state) {
   let {global} = state;
