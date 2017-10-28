@@ -9,23 +9,13 @@ const {
   Text,
   View,
   Animated,
-  TouchableNativeFeedback,
   TouchableOpacity
 } = ReactNative;
 
-const ButtonIOS = (props) => {
+const Button = (props) => {
   return <TouchableOpacity {...props}>
     {props.children}
   </TouchableOpacity>;
-};
-
-const ButtonAndroid = (props) => {
-  return <TouchableNativeFeedback
-    delayPressIn={0}
-    background={TouchableNativeFeedback.SelectableBackground()}
-    {...props}>
-    {props.children}
-  </TouchableNativeFeedback>;
 };
 
 
@@ -66,7 +56,7 @@ const BadgeTabBar = React.createClass({
     let total = !countData ? 0 : countData['total'];
     let quick = !countData ? 0 : countData['quick'];
     let label = total == 0 ? name : name + "(" + total + ")";
-    return <ButtonAndroid
+    return <Button
       style={styles.flexOne}
       key={indexKey}
       accessible={true}
@@ -92,7 +82,7 @@ const BadgeTabBar = React.createClass({
           {width: 20, height: 15, top: 2, right: 1}
         }
       />
-    </ButtonAndroid>
+    </Button>
   },
 
   render() {

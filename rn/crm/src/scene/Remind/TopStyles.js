@@ -52,6 +52,10 @@ export default StyleSheet.create({
     right: 0,
     // backgroundColor: 'green',
   },
+  tag_right:{
+    position: 'absolute',
+    right: 0,
+  },
   icon_img_dropDown: {
     width: pxToDp(88),
     height: pxToDp(55),
