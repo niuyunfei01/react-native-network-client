@@ -2,6 +2,7 @@
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
 import {getWithTpl, jsonWithTpl} from '../../util/common'
+import Cts from "../../Cts";
 
 /**
  * ## Imports
@@ -102,7 +103,21 @@ export function saveOrderBaisc(token, orderId, changes, callback) {
   return dispatch => {
     const url = `api/order_chg_basic/${orderId}.json?access_token=${token}`
     jsonWithTpl(url, changes, (json) => {
-        callback(json.ok, json.reason)
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+export function orderAuditRefund(token, id, task_id, is_agree, reason, callback) {
+  return dispatch => {
+    const url = `api/order_audit_refund/${id}.json?access_token=${token}`;
+    const agree_code = is_agree ? Cts.REFUND_AUDIT_AGREE : Cts.REFUND_AUDIT_REFUSE;
+    jsonWithTpl(url, {agree_code, reason, task_id}, (json) => {
+        callback(json.ok, json.reason, json.obj)
       }, (error) => {
         console.log('error:', error);
         callback(false, "网络错误, 请稍后重试")

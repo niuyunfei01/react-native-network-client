@@ -190,9 +190,8 @@ class LoginScene extends PureComponent {
       console.log('sign in result:', ok, token)
       if (ok) {
 
-        const fd = new FormData();
-        fd.append("_sid", this.props.global ? this.props.global.currStoreId : 0);
-        dispatch(getCommonConfig(token, fd, (ok) => {
+        const sid = this.props.global ? this.props.global.currStoreId : 0;
+        dispatch(getCommonConfig(token, {_sid: sid}, (ok) => {
 
           this.doneReqSign()
           

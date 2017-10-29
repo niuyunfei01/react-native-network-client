@@ -4,7 +4,7 @@ import InputNumber from 'rc-input-number';
 import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
 import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icons from 'react-native-vector-icons/FontAwesome';
 import Config from '../../config'
 import PropTypes from 'prop-types';
 import OrderStatusCell from './OrderStatusCell'
@@ -12,18 +12,20 @@ import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
 import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
-import {getContacts} from '../../reducers/store/storeActions'
+import {getContacts} from '../../reducers/store/storeActions';
+import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog} from "../../weui/index";
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
 import {ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import ModalDropdown from 'react-native-modal-dropdown';
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
+import S from '../../stylekit'
 
-const numeral = require('numeral')
+const numeral = require('numeral');
 
 function mapStateToProps(state) {
   return {
@@ -34,7 +36,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud, getRemindForOrderPage}, dispatch)}
+  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud, getRemindForOrderPage, markTaskDone}, dispatch)}
 }
 
 
@@ -44,7 +46,7 @@ const supportEditGoods = (orderStatus) => {
   return orderStatus === Cts.ORDER_STATUS_TO_SHIP ||
     orderStatus === Cts.ORDER_STATUS_TO_READY ||
     orderStatus === Cts.ORDER_STATUS_SHIPPING
-}
+};
 
 
 class OrderScene extends Component {
@@ -88,6 +90,7 @@ class OrderScene extends Component {
       gotoEditPoi: false,
       showOptionMenu: false,
       showCallStore: false,
+      onProcessed: false,
       errorHints: '',
       itemsAdded: {},
       itemsEdited: {},
@@ -131,10 +134,9 @@ class OrderScene extends Component {
 
   onPrint() {
 
-    const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
 
-    const store = stores[order.store_id];
+    const store = tool.store(order.store_id, this.props.global);
 
     if (store && store.cloudPrinter) {
       this.setState({showPrinterChooser: true})
@@ -170,7 +172,7 @@ class OrderScene extends Component {
     console.log(this.store_contacts);
     const store_id = this.props.order.order.store_id;
     if (!this.store_contacts || this.store_contacts.length === 0) {
-      this.setState({showContactsLoading: true})
+      this.setState({showContactsLoading: true});
 
       const {dispatch} = this.props;
 
@@ -187,7 +189,7 @@ class OrderScene extends Component {
   _contacts2menus() {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
     return (this.store_contacts||[]).map((contact, idx) => {
-      console.log(contact, idx)
+      console.log(contact, idx);
       const {sign, mobile, desc,  id} = contact;
       return {
         type: 'default',
@@ -209,6 +211,7 @@ class OrderScene extends Component {
     const {dispatch} = this.props;
 
     dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
+      console.log(ok, data)
       if (ok) {
         this.setState({reminds: data})
       } else {
@@ -234,7 +237,6 @@ class OrderScene extends Component {
   }
 
   _hidePrinterChooser () {
-    console.log('_hidePrinterChooser');
     this.setState({showPrinterChooser: false})
   }
   
@@ -266,7 +268,7 @@ class OrderScene extends Component {
     const order = this.props.order.order;
     native.printBtPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
-    })
+    });
     this._hidePrinterChooser();
   }
 
@@ -283,7 +285,7 @@ class OrderScene extends Component {
   }
 
   _doAddItem(item) {
-    console.log('doAddItem', item)
+    console.log('doAddItem', item);
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
       let msg;
       if (item.num > 0) {
@@ -298,7 +300,7 @@ class OrderScene extends Component {
 
   _onItemRowNumberChanged (item, newNum) {
 
-    console.log('accept a item:', item, 'to new', newNum)
+    console.log('accept a item:', item, 'to new', newNum);
     this._recordEdition({...item, num: newNum});
   }
 
@@ -322,7 +324,7 @@ class OrderScene extends Component {
         //退款规则：
         return (item.num - base) * item.normal_price;
       }
-    })
+    });
     const totalEdit = tool.objectReduce(this.state.itemsEdited, (item1, item2) => {
       
       return item1.num * item1.normal_price + item2.num * item2.normal_price
@@ -355,16 +357,32 @@ class OrderScene extends Component {
 
   _doProcessRemind(remind) {
     const {order} = this.props.order;
+    const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
     if (remindType === Cts.TASK_TYPE_REFUND_BY_USER) {
-      this.props.navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+      navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
-      this.props.navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+      navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+    } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
+
+      this.setState({onSubmitting: true});
+      const token = global.accessToken;
+      dispatch(markTaskDone(token, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
+        const state = {onSubmitting: false};
+        if (ok) {
+          state.onProcessed = true;
+          setTimeout(() => {
+            remind.status = Cts.TASK_STATUS_DONE;
+            this.setState({onProcessed: false});
+          }, 2000);
+        } else {
+          state.errorHints = msg;
+        }
+        this.setState(state);
+      }));
     } else {
       this.setState({errorHints: '暂不支持的处理类型：' + remind})
     }
-
-    console.log(remind)
   }
 
   render() {
@@ -428,17 +446,6 @@ class OrderScene extends Component {
             ]}
           />
 
-          { !!this.state.errorHints &&
-          <Dialog onRequestClose={()=>{}}
-            visible={!!this.state.errorHints}
-            buttons={[{
-              type: 'default',
-              label: '知道了',
-              onPress: () => {this.setState({errorHints: ''})}
-            }]}      
-          ><Text>打印失败: {this.state.errorHints}</Text></Dialog>
-          }
-
           <Dialog onRequestClose={() => {}}
                   visible={this.state.gotoEditPoi}
                   buttons={[{
@@ -478,6 +485,31 @@ class OrderScene extends Component {
             <Button style={[styles.bottomBtn, {marginRight: pxToDp(5),}]} type={'primary'}>联系配送</Button>
             <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}>提醒送达</Button>
           </View>
+
+          <Dialog onRequestClose={()=>{}}
+                  visible={!!this.state.errorHints}
+                  buttons={[{
+                    type: 'default',
+                    label: '知道了',
+                    onPress: () => {this.setState({errorHints: ''})}
+                  }]}
+          ><Text>{this.state.errorHints}</Text></Dialog>
+
+          <Toast
+            icon="loading"
+            show={this.state.onSubmitting}
+            onRequestClose={() => {
+            }}
+          >提交中</Toast>
+
+          <Toast
+            icon="success"
+            show={this.state.onProcessed}
+            onRequestClose={() => {
+              this.setState({onProcessed: false})
+            }}
+          >已处理</Toast>
+
         </View>
       );
   }
@@ -500,41 +532,16 @@ class OrderScene extends Component {
 
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
+    const task_types = this.props.global.config.task_types || {};
 
     return (<View>
-        {(this.state.reminds.reminds || []).map((remind, idx) => {
-          const task_types = this.props.global.config.task_types || {};
-
-          const taskType = task_types['' + remind.type];
-          const status = parseInt(remind.status);
-          return <View key={remind.id} style={{borderBottomWidth: screen.onePixel, borderBottomColor: colors.color999}}>
-            <View style={{backgroundColor: status === Cts.TASK_STATUS_WAITING  ? '#edd9d9': '#f0f9ef', flexDirection: 'row',
-              height: pxToDp(70), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), alignItems: 'center'}}>
-              <Text>{taskType ? taskType.name : '待办'}</Text>
-            <Text style={{marginLeft: pxToDp(20), }}>{tool.shortTimeDesc(remind.created)}</Text>
-
-            <View style={{flex: 1}}/>
-            {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 && <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
-            {status === Cts.TASK_STATUS_WAITING &&
-             <TouchableOpacity style={{backgroundColor: '#ea7575', width:pxToDp(90), height: pxToDp(50), alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}}
-                               onPress={()=>{this._doProcessRemind(remind)}}>
-                <Text style={{color: colors.white,}}>处理</Text>
-              </TouchableOpacity>
-            }
-
-            {status === Cts.TASK_STATUS_DONE && <View>
-              <Text>{remind.resolved_at}完成</Text>
-              {remind.resolved_by &&
-              <Text>{remindNicks['' + remind.resolved_by]}</Text>}
-            </View>}
-          </View></View>;
-        })}
+        <OrderReminds task_types={task_types} reminds={this.state.reminds.reminds} remindNicks={remindNicks} processRemind={this._doProcessRemind}/>
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
             <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={() => {this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})} }>
-              <Icon name='edit' size={20} color={colors.main_color}/></TouchableOpacity>
+              <Icons name='edit' size={20} color={colors.main_color}/></TouchableOpacity>
             <View style={{flex: 1}}/>
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]} source={require('../../img/Order/message_.png')}/>
           </View>
@@ -605,9 +612,9 @@ class OrderScene extends Component {
             {this.state.isEditing &&
             <ImageBtn source={require('../../img/Order/save_edit.png')} onPress={this._doSaveItemsEdit} />
               &&
-              <Icon.Button name="close" onPress={this._doSaveItemsCancel}>
+              <Icons.Button name="close" onPress={this._doSaveItemsCancel}>
                 <Text>取消</Text>
-              </Icon.Button>
+              </Icons.Button>
             }
 
             {!this.state.isEditing && (
@@ -665,7 +672,7 @@ class OrderScene extends Component {
           <View style={[styles.row, styles.moneyRow]}>
             <View style={[styles.moneyLeft,{alignItems: 'center'}]}>
               <Text style={styles.moneyListTitle}>优惠</Text>
-              <TouchableOpacity style={{marginLeft: 5}}><Icon name='question-circle-o'/></TouchableOpacity>
+              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'/></TouchableOpacity>
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
@@ -688,7 +695,7 @@ class OrderScene extends Component {
               <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent:'center'}]}>
                 <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
                 <Text>收款码</Text>
-                <Icon name='qrcode'/>
+                <Icons name='qrcode'/>
                 </Text>
               </TouchableOpacity>
               {(order.additional_to_pay != 0) &&
@@ -728,6 +735,52 @@ class OrderScene extends Component {
         </View>
       </View>
     )
+  }
+}
+
+class OrderReminds extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
+  render() {
+
+    const {reminds, task_types, remindNicks, processRemind} = this.props;
+
+    return <View>{(reminds || []).map((remind, idx) => {
+      const type = parseInt(remind.type);
+      const taskType = task_types['' + type];
+      const status = parseInt(remind.status);
+      const quick = parseInt(remind.quick);
+
+      return <View key={remind.id} style={{borderBottomWidth: screen.onePixel, borderBottomColor: colors.color999,
+        backgroundColor: quick !== Cts.TASK_QUICK_NO ? '#edd9d9': '#f0f9ef', paddingLeft: pxToDp(30), paddingRight: pxToDp(30)}}>
+        <View style={{flexDirection: 'row',
+          height: pxToDp(70), alignItems: 'center'}}>
+          <Text>{taskType ? taskType.name : '待办'}</Text>
+          <Text style={{marginLeft: pxToDp(20), }}>{tool.shortTimeDesc(remind.created)}</Text>
+
+          <View style={{flex: 1}}/>
+          {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 && <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
+          {status === Cts.TASK_STATUS_WAITING &&
+          <TouchableOpacity style={{backgroundColor: '#ea7575', height: pxToDp(50), paddingLeft: 5, paddingRight: 5, alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}}
+                            onPress={()=>{processRemind(remind)}}>
+            <Text style={{color: colors.white,}}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'}</Text>
+          </TouchableOpacity>
+          }
+
+          {status === Cts.TASK_STATUS_DONE && <View style={{flexDirection: 'row'}}>
+            <Text>{tool.shortTimeDesc(remind.resolved_at)}</Text>
+            {remind.resolved_by &&
+            <Text style={[S.mr5, S.ml5]}>{remindNicks['' + remind.resolved_by]}</Text>}
+            <Icon name='success_no_circle' size={16}/>
+          </View>}
+        </View>
+        {type === Cts.TASK_TYPE_ORDER_CHANGE && <View style={{borderTopWidth: screen.onePixel, borderTopColor: '#ccc', paddingTop: 10, paddingBottom: 10}}>
+          <Text style={{fontSize: 12, color: '#808080'}}>{remind.taskDesc}</Text>
+        </View>}
+      </View>;
+    })}</View>
   }
 }
 

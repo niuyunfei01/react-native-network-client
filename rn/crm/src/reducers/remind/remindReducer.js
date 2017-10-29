@@ -84,6 +84,9 @@ export default function remind(state = initialState, action) {
         groupNum: action.groupNum,
         quickNum: action.quickNum
       });
+    case types.NEW_REMIND_CREATED:
+      //可能的话，需要更新相应的提醒列表
+      return state;
     default:
       return state;
   }

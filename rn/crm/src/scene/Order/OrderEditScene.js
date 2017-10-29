@@ -5,6 +5,7 @@ import Config from '../../config'
 import CommonStyle from '../../common/CommonStyles'
 
 import {saveOrderBaisc, getOrder} from '../../reducers/order/orderActions'
+import {createTaskByOrder} from '../../reducers/remind/remindActions'
 import {connect} from "react-redux";
 import {tool} from '../../common';
 import colors from "../../styles/colors";
@@ -12,6 +13,8 @@ import pxToDp from "../../util/pxToDp";
 import {Button, Switch, TextArea, ButtonArea, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellFooter, CellBody, CellsTips} from "../../weui/index";
 import IconEvilIcons from 'react-native-vector-icons/EvilIcons';
 import NavigationItem from "../../widget/NavigationItem";
+import Cts from "../../Cts";
+import _ from 'underscore';
 
 function mapStateToProps(state) {
   return {
@@ -20,7 +23,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({saveOrderBaisc, getOrder }, dispatch)}
+  return {dispatch, ...bindActionCreators({saveOrderBaisc, getOrder, createTaskByOrder }, dispatch)}
 }
 
 class OrderEditScene extends Component {
@@ -52,31 +55,35 @@ class OrderEditScene extends Component {
       taxInvoice: '',
       taxId: '',
       loc_data: '',
+      editLogId: '',
       onSubmitting: false,
       onSendingConfirm: false,
+      onSubmittingConfirm: false,
+      confirmSent: false,
       errorHints: '',
     };
 
     this.editFields = [
-      {key: 'backupPhone', val: (order) => order.phone_backup},
-      {key: 'detailAddr', val: (order) => order.address},
-      {key: 'storeRemark', val: (order) => order.store_remark},
-      {key: 'taxInvoice', val: (order) => order.invoice},
-      {key: 'taxId', val: (order) => order.taxer_id},
-      {key: 'loc_data', val: (order) => `${order.loc_lng},${order.loc_lat}`},
+      {key: 'backupPhone', val: (order) => order.phone_backup, label: '备用电话'},
+      {key: 'detailAddr', val: (order) => order.address, label: '送货地址'},
+      {key: 'storeRemark', val: (order) => order.store_remark, label: '商家备注'},
+      {key: 'taxInvoice', val: (order) => order.invoice, label: '发票抬头'},
+      {key: 'taxId', val: (order) => order.taxer_id, label: '纳税人识别号'},
+      {key: 'loc_data', val: (order) => `${order.loc_lng},${order.loc_lat}`, label: '经纬度座标'},
     ];
 
     this._onChangeBackupPhone = this._onChangeBackupPhone.bind(this);
+    this._onChangeAutoSaveBackup = this._onChangeAutoSaveBackup.bind(this);
     this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
     this._shouldDisabledSaveBtn = this._shouldDisabledSaveBtn.bind(this);
-    this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
     this._doSaveEdit = this._doSaveEdit.bind(this);
     this._toSetLocation = this._toSetLocation.bind(this);
-    this._onChangeDetailAddr = this._onChangeDetailAddr.bind(this);
+    this._onChangeTaxInvoice = this._onChangeTaxInvoice.bind(this);
     this._onChangeTaxId = this._onChangeTaxId.bind(this);
     this._doSendRemind = this._doSendRemind.bind(this);
     this._back = this._back.bind(this);
     this._storeLoc = this._storeLoc.bind(this);
+    this._buildNotifyRemark = this._buildNotifyRemark.bind(this);
   }
 
   componentDidMount() {
@@ -143,28 +150,50 @@ class OrderEditScene extends Component {
     this.setState({taxInvoice});
   }
 
+  _buildNotifyRemark() {
+    const {order} = this.props.navigation.state.params;
+
+    const changes = this.editFields.filter((edit) => this.state[edit.key] !== edit.val(order))
+      .map((edit) => {
+        return edit.label;
+      });
+
+    return changes ? `修改了${changes.join(',')}` : '没有修改';
+  }
+
   _doSaveEdit() {
-    this.setState({onSubmitting: true});
     const {dispatch, global} = this.props;
     const {order} = this.props.navigation.state.params;
-    
+
     const changes = this.editFields.filter((edit) => this.state[edit.key] !== edit.val(order))
       .reduce((previous, edit) => {
         previous[edit.key] = this.state[edit.key];
         return previous;
       }, {});
 
-    const token = global.accessToken;
-    dispatch(saveOrderBaisc(token, order.id, changes, (ok, msg) => {
-      console.log('results', ok, msg);
+    console.log('changes', changes);
 
-      if (ok) {
-        this.setState({onSendingConfirm: true});
-        dispatch(getOrder(token, order.id));
-      }
+    if (!_.isEmpty(changes)) {
+      
+      this.setState({onSubmitting: true});
+      const token = global.accessToken;
+      dispatch(saveOrderBaisc(token, order.id, changes, (ok, msg, respData) => {
+        console.log('results', ok, msg);
 
-      this.setState({onSubmitting: false});
-    }));
+        if (ok) {
+          const stateUpdating = {onSendingConfirm: true, onSubmitting: false};
+          if (respData.log_id) {
+            stateUpdating.editLogId = respData.log_id;
+          }
+          this.setState(stateUpdating);
+          dispatch(getOrder(token, order.id));
+        } else {
+          this.setState({onSubmitting: false, errorHints: '保存失败:'+msg});
+        }
+      }));
+    } else {
+      this.setState({errorHints: '没有修改需要保存'})
+    }
   }
 
   _back() {
@@ -174,8 +203,33 @@ class OrderEditScene extends Component {
   }
 
   _doSendRemind() {
-    //addNewTask()
-    this.setState({onSendingConfirm: false})
+    const {dispatch, global} = this.props;
+    const {order} = this.props.navigation.state.params;
+    this.setState({onSendingConfirm: false, onSubmittingConfirm: true});
+
+    const remark = this._buildNotifyRemark();
+
+    dispatch(createTaskByOrder(global.accessToken, order.id, Cts.TASK_TYPE_ORDER_CHANGE, remark, '', Cts.TASK_SERIOUS,
+      this.state.editLogId, (ok, msg) => {
+      if (ok) {
+        this.setState({
+          onSubmittingConfirm: false,
+          confirmSent: true,
+        });
+        setTimeout(() => {
+          this.setState({confirmSent: false});
+          this._back();
+        }, 2000);
+      } else {
+        this.setState({
+          errorHints: '发送通知时发生错误：' + msg + ', 请使用其他方式通知门店',
+          onSubmittingConfirm: false,
+        });
+        this._errorHintsCallback = () => {
+          this._back();
+        };
+      }
+    }));
   }
 
   _shouldDisabledSaveBtn() {
@@ -187,8 +241,7 @@ class OrderEditScene extends Component {
 
   render() {
     return <ScrollView style={[styles.container, {flex: 1}]}>
-          { !!this.state.errorHints &&
-          <Dialog onRequestClose={()=>{}}
+          <Dialog onRequestClose={()=>{ if(this._errorHintsCallback) this._errorHintsCallback();}}
             visible={!!this.state.errorHints}
             buttons={[{
               type: 'default',
@@ -196,7 +249,6 @@ class OrderEditScene extends Component {
               onPress: () => {this.setState({errorHints: ''})}
             }]}
           ><Text>{this.state.errorHints}</Text></Dialog>
-          }
 
       <Dialog onRequestClose={()=>{}}
               visible={this.state.onSendingConfirm}
@@ -214,7 +266,7 @@ class OrderEditScene extends Component {
       <CellsTitle style={CommonStyle.cellsTitle35}>备用手机号</CellsTitle>
       <Cells style={CommonStyle.cells35}>
         <Cell>
-          <CellHeader><Label style={CommonStyle.cellTextH35}>手机号</Label></CellHeader>
+          <CellHeader><Label style={CommonStyle.cellTextH35W70}>手机号</Label></CellHeader>
           <CellBody>
             <Input
               placeholder="仅支持大陆手机号"
@@ -226,27 +278,27 @@ class OrderEditScene extends Component {
             />
           </CellBody></Cell>
         <Cell>
-          <CellHeader><Label style={[CommonStyle.cellTextH35, {fontSize: 12}]}>保存到客户</Label></CellHeader>
+          <CellHeader><Label style={[CommonStyle.cellTextH35W70, {fontSize: 12}]}>保存到客户</Label></CellHeader>
           <Switch onChange={this._onChangeAutoSaveBackup} value={this.state.autoSaveUserBackup}/>
         </Cell>
       </Cells>
 
       <CellsTitle style={CommonStyle.cellsTitle35}>地址</CellsTitle>
       <Cells style={CommonStyle.cells35}>
-        <Cell onPress={this._toSetLocation}><CellHeader><Label style={CommonStyle.cellTextH35}>导航座标</Label></CellHeader>
+        <Cell onPress={this._toSetLocation}><CellHeader><Label style={CommonStyle.cellTextH35W70}>导航座标</Label></CellHeader>
           <CellBody style={{flexDirection: 'row', flex: 1}}>
             <IconEvilIcons name="location" size={26}/>
             <Text style={{fontSize: 15}}>{this.state.loc_name || this.state.loc_data}</Text>
           </CellBody>
           <CellFooter access/>
         </Cell>
-        <Cell><CellHeader><Label style={CommonStyle.cellTextH35}>文字地址</Label></CellHeader>
+        <Cell><CellHeader><Label style={CommonStyle.cellTextH35W70}>文字地址</Label></CellHeader>
           <CellBody><Input
             placeholder="例：黄庄南里 16号楼2单元1102"
             value={this.state.detailAddr}
             onChangeText={this._onChangeDetailAddr}
             underlineColorAndroid={'transparent'}
-            style={CommonStyle.inputH35}
+            style={[CommonStyle.inputH35, {fontSize: 12}]}
           />
           </CellBody>
         </Cell>
@@ -271,7 +323,7 @@ class OrderEditScene extends Component {
 
       <CellsTitle style={CommonStyle.cellsTitle35}>发票</CellsTitle>
       <Cells style={CommonStyle.cells35}>
-        <Cell><CellHeader><Label style={CommonStyle.cellTextH35}>发票抬头</Label></CellHeader>
+        <Cell><CellHeader><Label style={CommonStyle.cellTextH35W70}>发票抬头</Label></CellHeader>
           <CellBody><Input
             placeholder=""
             value={this.state.taxInvoice}
@@ -281,7 +333,7 @@ class OrderEditScene extends Component {
           />
           </CellBody>
         </Cell>
-        <Cell><CellHeader><Label style={CommonStyle.cellTextH35}>税     号</Label></CellHeader>
+        <Cell><CellHeader><Label style={CommonStyle.cellTextH35W70}>税     号</Label></CellHeader>
           <CellBody><Input
             placeholder="个人可不填"
             value={this.state.taxId}
@@ -303,6 +355,21 @@ class OrderEditScene extends Component {
         onRequestClose={() => {
         }}
       >提交中</Toast>
+
+      <Toast
+        icon="loading"
+        show={this.state.onSubmittingConfirm}
+        onRequestClose={() => {
+        }}
+      >正在发送订单修改通知</Toast>
+
+      <Toast
+        icon="success"
+        show={this.state.confirmSent}
+        onRequestClose={() => {
+        }}
+      >发送成功</Toast>
+      
     </ScrollView>
   }
 }

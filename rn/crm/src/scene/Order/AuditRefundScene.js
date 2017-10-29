@@ -1,40 +1,32 @@
-import React, { PureComponent, Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
-import InputNumber from 'rc-input-number';
-import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
+import React, { Component } from 'react'
+import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native'
 import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
-import Config from '../../config'
-import PropTypes from 'prop-types';
-import OrderStatusCell from './OrderStatusCell'
-import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
-import {getContacts} from '../../reducers/store/storeActions'
+import {orderAuditRefund} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, Agreement, ActionSheet, TextArea, RadioCells, ButtonArea,Icon, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellBody, CellsTips} from "../../weui/index";
-import {ToastShort} from "../../util/ToastUtils";
-import {StatusBar} from "react-native";
-import ModalDropdown from 'react-native-modal-dropdown';
-import Cts from '../../Cts'
-import inputNumberStyles from './inputNumberStyles';
+import {Button, TextArea, RadioCells, ButtonArea, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellBody, CellsTips} from "../../weui/index";
 import S from '../../stylekit'
 
-const numeral = require('numeral')
+const numeral = require('numeral');
+
+const reasons = {
+  custom_talked_ok: '已与用户协商一致',
+  custom: '自定义回复'
+};
+
 
 function mapStateToProps(state) {
   return {
-    order: state.order,
     global: state.global,
-    store: state.store,
   }
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud, getRemindForOrderPage}, dispatch)}
+  return {dispatch, ...bindActionCreators({orderAuditRefund}, dispatch)}
 }
 
 class AuditRefundScene extends Component {
@@ -56,9 +48,9 @@ class AuditRefundScene extends Component {
     this.state = {
       order: {},
       remind: {},
-      reasons: {},
       refund_yuan: '',
       selected_action: '',
+      reason_key:'',
       custom: '',
     };
 
@@ -73,20 +65,9 @@ class AuditRefundScene extends Component {
     this._doRefuseRefund = this._doRefuseRefund.bind(this);
   }
 
-  componentDidMount() {
-
-  }
-
   componentWillMount() {
     const {order, remind} = (this.props.navigation.state.params || {});
-    const reasons = {
-      'hasOut': '已送出',
-      'inCooking': '正在烹饪',
-      'weather': '天气原因',
-      'shortHand': '人手不齐',
-      'custom': '自定义回复'
-    };
-    this.setState({order, remind, reasons})
+    this.setState({order, remind})
   }
 
   _onReasonSelected(key) {
@@ -114,11 +95,36 @@ class AuditRefundScene extends Component {
   }
 
   _doAgreeRefund() {
-    console.log('agree refund ...')
+    this.__tpl_action(true, () => {
+      this.setState({onSuccessAgreed: true});
+    })
+  }
+
+  _goBack() {
+    const {navigation} = this.props;
+    navigation.goBack();
   }
 
   _doRefuseRefund() {
-    console.log('refuse refund ...')
+    this.__tpl_action(false, () => {
+      this.setState({onSuccessRefused: true});
+    })
+  }
+
+  __tpl_action(agreeOrRefuse, doneCall) {
+    const {remind} = (this.props.navigation.state.params || {});
+    const {dispatch, global} = this.props;
+
+    this.setState({onSubmitting: true});
+    const reason = this.state.reason_key === 'custom' ? this.state.custom : reasons[this.state.reason_key];
+    dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason, (ok, msg, data) => {
+      if (ok) {
+        this.setState({onSubmitting: false});
+        doneCall();
+      } else {
+        this.setState({onSubmitting: false, errorHints: '提交失败：' + msg});
+      }
+    }));
   }
 
   _shouldDisabledAgreeBtn() {
@@ -130,8 +136,9 @@ class AuditRefundScene extends Component {
   }
 
   render() {
-    const {order} = this.props.order;
-    const reasonOpts = tool.objectMap(this.state.reasons, (reason, key) => {
+
+    const {order} = (this.props.navigation.state.params || {});
+    const reasonOpts = tool.objectMap(reasons, (reason, key) => {
       return {label: reason, value: key}
     });
 
@@ -224,6 +231,22 @@ class AuditRefundScene extends Component {
         onRequestClose={() => {
         }}
       >提交中</Toast>
+      <Dialog onRequestClose={()=>{}}
+              visible={this.state.onSuccessRefused}
+              buttons={[{
+                type: 'default',
+                label: '知道了',
+                onPress: () => {this._goBack(); this.setState({onSuccessRefused: false});}
+              }]}
+      ><Text>已拒绝用户的退款申请</Text></Dialog>
+      <Dialog onRequestClose={()=>{}}
+              visible={this.state.onSuccessAgreed}
+              buttons={[{
+                type: 'default',
+                label: '知道了',
+                onPress: () => {this._goBack(); this.setState({onSuccessAgreed: false});}
+              }]}
+      ><Text>已通过用户的退款申请</Text></Dialog>
     </ScrollView>
   }
 }

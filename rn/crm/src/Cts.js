@@ -25,10 +25,20 @@ export default {
   TASK_TYPE_REMIND: 4,//催单
   TASK_TYPE_REFUND_BY_USER: 5,//用户申请退款
   TASK_TYPE_DELIVERY_FAILED: 6,//京东配送员申请取消配送
+  TASK_TYPE_ORDER_CHANGE: 7, //订单修改
+
+  //任务紧急程度
+  TASK_QUICK_NO: 0,
+  TASK_QUICK: 1, //一般紧急
+  TASK_EMERGENCY: 2,  //中等紧急
+  TASK_SERIOUS: 3, //非常紧急
 
   WORKER_STATUS_OK: 1,//员工启用状态
   WORKER_STATUS_DISABLED: 0,//员工禁用状态
 
   SHIP_AUTO: 0, //不自动
   SHIP_AUTO_FN_DD: 64, //自动排单
+
+  REFUND_AUDIT_AGREE: 1, //同意退款
+  REFUND_AUDIT_REFUSE: 0, //拒绝退款
 }
