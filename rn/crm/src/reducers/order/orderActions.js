@@ -126,6 +126,32 @@ export function orderAuditRefund(token, id, task_id, is_agree, reason, callback)
   }
 }
 
+export function orderAuditUrging(token, id, task_id, reply_type, custom, callback) {
+  return dispatch => {
+    const url = `api/order_audit_urging/${id}.json?access_token=${token}`;
+    jsonWithTpl(url, {reply_type, custom, task_id}, (json) => {
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+export function orderUrgingReplyReasons(token, id, task_id, callback) {
+  return dispatch => {
+    const url = `api/order_urging_replies/${id}.json?access_token=${token}`;
+    jsonWithTpl(url, {task_id}, (json) => {
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
 export function getRemindForOrderPage(token, orderId, callback) {
   return dispatch => {
     getWithTpl(`api/list_notice_of_order/${orderId}?access_token=${token}`,
