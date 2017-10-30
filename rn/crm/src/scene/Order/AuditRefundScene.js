@@ -71,7 +71,7 @@ class AuditRefundScene extends Component {
   }
 
   _onReasonSelected(key) {
-    this.setState({reason_key: key})
+    this.setState({reason_idx: key})
   }
 
   _onActionSelected(action) {
