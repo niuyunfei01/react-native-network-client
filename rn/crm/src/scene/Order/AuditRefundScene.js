@@ -83,11 +83,11 @@ class AuditRefundScene extends Component {
   }
 
   _checkShowCustomTextArea() {
-    return this.state.reason_key === 'custom';
+    return this.state.reason_idx === 'custom';
   }
 
   _checkDisableSubmit() {
-    return !(this.state.reason_key && (this.state.reason_key !== 'custom' || this.state.custom));
+    return !(this.state.reason_idx && (this.state.reason_idx !== 'custom' || this.state.custom));
   }
 
   _refundEquals() {
@@ -120,7 +120,7 @@ class AuditRefundScene extends Component {
     const {dispatch, global} = this.props;
 
     this.setState({onSubmitting: true});
-    const reason = this.state.reason_key === 'custom' ? this.state.custom : reasons[this.state.reason_key];
+    const reason = this.state.reason_idx === 'custom' ? this.state.custom : reasons[this.state.reason_idx];
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason, (ok, msg, data) => {
       if (ok) {
         this.setState({onSubmitting: false});
@@ -136,7 +136,7 @@ class AuditRefundScene extends Component {
   }
 
   _shouldDisableRefuseBtn() {
-    return !this.state.reason_key || (this.state.reason_key === 'custom' && this.state.custom === '');
+    return !this.state.reason_idx || (this.state.reason_idx === 'custom' && this.state.custom === '');
   }
 
   render() {
@@ -174,7 +174,7 @@ class AuditRefundScene extends Component {
           options={reasonOpts}
           onChange={this._onReasonSelected}
           cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.reason_key}
+          value={this.state.reason_idx}
         />
 
         {this._checkShowCustomTextArea() && <View>
