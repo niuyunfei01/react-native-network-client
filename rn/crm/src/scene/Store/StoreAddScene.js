@@ -1,31 +1,9 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from 'react-native';
+import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Button,
-  ButtonArea,
-  Input,
-  Label,
-  Icon,
-  Toast,
-} from "../../weui/index";
+import {Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Button, ButtonArea, Input, Label, Icon, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -74,12 +52,9 @@ class StoreAddScene extends PureComponent {
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{title}</Text>
         </View>
       ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: (params.btn_type === 'add' ? null : (
         <ModalSelector
           onChange={(option) => {
-            // ToastLong(option.key + option.label);
-            // let force = '';
             if (option.label === '初始化商品') {
               params.goToReset();
             } else if (option.label === '复制商品') {

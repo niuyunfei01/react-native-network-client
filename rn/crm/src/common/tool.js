@@ -36,6 +36,10 @@ export function orderExpectTime(dt) {
   return Moment(dt).format('M/DD HH:mm')
 }
 
+export function fullDate(dt) {
+  return Moment(dt).format('YYYY-MM-DD HH:mm:ss')
+}
+
 export function vendor(global) {
   const {
     currentUser,
@@ -166,6 +170,7 @@ export default {
   shortTimeDesc,
   shortTimestampDesc,
   shortOrderDay,
+  fullDate,
   orderOrderTimeShort,
   orderExpectTime,
   resetNavStack,

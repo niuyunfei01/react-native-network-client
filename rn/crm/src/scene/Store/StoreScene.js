@@ -19,9 +19,8 @@ import {
   CellHeader,
   CellBody,
   CellFooter,
-  Switch
+  ActionSheet,
 } from "../../weui/index";
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -31,6 +30,8 @@ import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import * as tool from "../../common/tool";
 import LoadingView from "../../widget/LoadingView";
+import CallBtn from "../Order/CallBtn";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -58,7 +59,6 @@ class StoreScene extends PureComponent {
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>店铺管理</Text>
         </View>
       ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: '',
     }
   };
@@ -74,6 +74,8 @@ class StoreScene extends PureComponent {
 
     this.state = {
       isRefreshing: false,
+      showCallStore: false,
+      storeTel: [],
 
       currVendorId: currVendorId,
       currVendorName: currVendorName,
@@ -154,9 +156,11 @@ class StoreScene extends PureComponent {
     }
 
     let _this = this;
+    console.log(curr_stores);
     return curr_stores.map(function (store, idx) {
       let {nickname} = (curr_user_list[store.owner_id] || {});
       let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
+      let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
       return (
         <Cells style={[styles.cells]} key={idx}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
@@ -191,10 +195,21 @@ class StoreScene extends PureComponent {
             <CellBody>
               <Text style={[styles.address]}>{store.dada_address}</Text>
               <View style={styles.store_footer}>
-                <Image
-                  style={[styles.call_img]}
-                  source={require('../../img/Store/call_.png')}
-                />
+                <TouchableOpacity onPress={() => {
+                  let storeTel = [{tel: store.tel, desc: '门店'}, {tel: store.mobile, desc: nickname}];
+                  if (vice_mgr_name !== undefined && vice_mgr_tel !== undefined) {
+                    storeTel.push({tel: vice_mgr_tel, desc: vice_mgr_name});
+                  }
+                  _this.setState({
+                    showCallStore: true,
+                    storeTel: storeTel,
+                  })
+                }}>
+                  <Image
+                    style={[styles.call_img]}
+                    source={require('../../img/Store/call_.png')}
+                  />
+                </TouchableOpacity>
                 {nickname === undefined ? null : <Text style={styles.owner_name}>店长: {nickname}</Text>}
                 {vice_mgr_name === undefined ? null : <Text style={styles.owner_name}>店助: {vice_mgr_name}</Text>}
                 <Text style={styles.remind_time}>催单间隔: {store.call_not_print}分钟</Text>
@@ -203,6 +218,18 @@ class StoreScene extends PureComponent {
           </Cell>
         </Cells>
       );
+    });
+  }
+
+  callStoreMenus() {
+    return (this.state.storeTel).map((store) => {
+      return {
+        type: 'default',
+        label: store.desc + ': ' + store.tel,
+        onPress: () => {
+          native.dialNumber(store.tel)
+        }
+      }
     });
   }
 
@@ -253,6 +280,22 @@ class StoreScene extends PureComponent {
         <CellsTitle style={[styles.cell_title]}>{currVendorName} 门店列表</CellsTitle>
         {this.renderStores()}
 
+        <ActionSheet
+          visible={this.state.showCallStore}
+          onRequestClose={() => {
+            console.log('call_store_contacts action_sheet closed!')
+          }}
+          menus={this.callStoreMenus()}
+          actions={[
+            {
+              type: 'default',
+              label: '取消',
+              onPress: () => {
+                this.setState({showCallStore: false})
+              },
+            }
+          ]}
+        />
       </ScrollView>
     );
   }

@@ -43,7 +43,6 @@ class TestWeuiScene extends PureComponent {
                 }}>Test WeUi</Text>
             </View>
         ),
-        headerStyle: {backgroundColor: '#59b26a'},
         headerRight: (<View/>),
         headerLeft: (<View/>),
     })

@@ -94,7 +94,7 @@ export default function remind(state = initialState, action) {
 
 function _setWithPreventCheck(diff, key, typeId, value) {
 
-  console.log('_setWithPreventCheck', key, typeId, value)
+  // console.log('_setWithPreventCheck', key, typeId, value)
 
   if (diff[key] === false) {
     diff[key] = {};

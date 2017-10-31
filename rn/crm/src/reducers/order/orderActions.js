@@ -3,6 +3,7 @@ import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
 import {getWithTpl, jsonWithTpl} from '../../util/common'
 import Cts from "../../Cts";
+import {ToastShort} from "../../util/ToastUtils";
 
 /**
  * ## Imports
@@ -22,7 +23,7 @@ const {
   ORDRE_ADD_ITEM,
   ORDER_EDIT_ITEM,
 
-} = require('../../common/constants').default
+} = require('../../common/constants').default;
 
 export function getOrderRequest() {
   return {
@@ -186,3 +187,43 @@ export function updateOrder(userId, username, email, sessionToken) {
       })
   }
 }
+
+
+export function saveOrderDelayShip(data, token, callback) {
+  return dispatch => {
+    const url = `api/order_delay_ship.json`;
+    let data_arr = [];
+    data_arr.push(`access_token=${token}`);
+    for (let key in data) {
+      if (data.hasOwnProperty(key)) {
+        let val = data[key];
+        data_arr.push(`${key}=${val}`);
+      }
+    }
+    let params = data_arr.join('&&');
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url, params))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (!resp.ok) {
+          ToastShort(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        ToastShort(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

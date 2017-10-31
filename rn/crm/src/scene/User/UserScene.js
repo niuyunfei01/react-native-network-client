@@ -61,7 +61,6 @@ class UserScene extends PureComponent {
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>个人详情</Text>
         </View>
       ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: (params.type === 'mine' ? null : (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity

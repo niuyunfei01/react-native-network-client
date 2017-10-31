@@ -43,9 +43,13 @@ class UrgeShipScene extends Component {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: '催单',
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
-      headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
+      // headerTitle: '催单',
+      // headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
+      headerTitle: (
+        <View>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>催单</Text>
+        </View>
+      ),
       headerRight: '',
     }
   };

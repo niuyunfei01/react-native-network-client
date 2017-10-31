@@ -30,6 +30,9 @@ import OrderEditScene from "../scene/Order/OrderEditScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import DoneRemindScene from '../scene/Remind/DoneRemindScene';
+import pxToDp from "../util/pxToDp";
+import colors from "../styles/colors";
+import NavigationItem from "../widget/NavigationItem";
 
 const Tab = TabNavigator(
   {
@@ -128,7 +131,8 @@ class Navigator extends Component {
     const {initialRouteName, screenProps, initialRouteParams} = this.props;
     let stackNavigatorConfigs = {
       navigationOptions: {
-        // headerStyle: { backgroundColor: color.theme }
+        headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78), borderColor: '#999', borderBottomWidth: pxToDp(1) },
+        headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
         headerBackTitle: null,
         headerTintColor: '#333333',
         showIcon: true,
