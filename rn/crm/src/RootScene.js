@@ -2,7 +2,7 @@
  * Copyright (c) 2017-present, Liu Jinyong
  * All rights reserved.
  *
- * https://github.com/huanxsd/MeiTuan  
+ * https://github.com/huanxsd/MeiTuan
  * @flow
  */
 
@@ -25,13 +25,21 @@ import Caught from './common/Caught'
 import Config from './config'
 
 import SplashScreen from 'react-native-splash-screen'
+import PlaySound from './util/playSound'
+import Sound from 'react-native-sound'
 
 const lightContentScenes = ['Home', 'Mine']
+
 
 
 //global exception handlers
 const caught = new Caught;
 
+const audioInfo = {
+  title: 'bell',
+  url: 'tip.wav',
+  basePath: Sound.MAIN_BUNDLE,
+}
 
 function getCurrentRouteName(navigationState) {
     if (!navigationState) {
@@ -69,7 +77,8 @@ class RootScene extends PureComponent {
     }
 
     componentDidMount() {
-
+      let sound = PlaySound(audioInfo, this);
+      sound.play();
     }
 
   componentWillMount() {
