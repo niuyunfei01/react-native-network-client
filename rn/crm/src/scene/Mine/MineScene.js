@@ -376,17 +376,29 @@ class MineScene extends PureComponent {
 
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
-    let {currVendorId} = this.state;
+    let {currVendorId, currVersion, is_mgr} = this.state;
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          if (is_mgr) {
+            let url = `${Config.ServiceUrl}stores/worker_stats.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          } else {
+            ToastLong('您没有查看业绩的权限');
+          }
+        }}>
           <Image style={[block_styles.block_img]} source={require('../../img/My/yeji_.png')}/>
           <Text style={[block_styles.block_name]}>业绩</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
-          <Image style={[block_styles.block_img]} source={require('../../img/My/pingjia_.png')}/>
-          <Text style={[block_styles.block_name]}>评价</Text>
-        </TouchableOpacity>
+        {currVersion === Cts.VERSION_DIRECT && (
+          <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+            let url = `${Config.ServiceUrl}stores/show_waimai_evaluations.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}>
+            <Image style={[block_styles.block_img]} source={require('../../img/My/pingjia_.png')}/>
+            <Text style={[block_styles.block_name]}>评价</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
           this.onPress(Config.ROUTE_STORE, {
             currentUser: this.state.currentUser,
@@ -397,10 +409,16 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/dianpu_.png')}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
-          <Image style={[block_styles.block_img]} source={require('../../img/My/xiaoshou_.png')}/>
-          <Text style={[block_styles.block_name]}>销售分析</Text>
-        </TouchableOpacity>
+        {currVersion === Cts.VERSION_DIRECT && (
+          <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+            let url = `${Config.ServiceUrl}stores/sales_ana.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}>
+            <Image style={[block_styles.block_img]} source={require('../../img/My/xiaoshou_.png')}/>
+            <Text style={[block_styles.block_name]}>销售分析</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
           let url = `${Config.ServiceUrl}stores/working_status.html${token}&&_v_id=${currVendorId}`;
           this.onPress(Config.ROUTE_WEB, {url: url});
@@ -422,10 +440,12 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/yuangong_.png')}/>
           <Text style={[block_styles.block_name]}>员工管理</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
-          <Image style={[block_styles.block_img]} source={require('../../img/My/kehu_.png')}/>
-          <Text style={[block_styles.block_name]}>客户管理</Text>
-        </TouchableOpacity>
+        {currVersion === Cts.VERSION_DIRECT && (
+          <TouchableOpacity style={[block_styles.block_box]}>
+            <Image style={[block_styles.block_img]} source={require('../../img/My/kehu_.png')}/>
+            <Text style={[block_styles.block_name]}>客户管理</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_SETTING)}
@@ -625,11 +645,11 @@ const worker_styles = StyleSheet.create({
   },
   sale_text: {
     fontSize: pxToDp(30),
-    lineHeight: pxToDp(30),
+    lineHeight: pxToDp(35),
     color: '#555',
   },
   sales_money: {
-    marginTop: pxToDp(24),
+    marginTop: pxToDp(20),
   },
 });
 

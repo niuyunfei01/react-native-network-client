@@ -40,7 +40,6 @@ class CloudPrinterScene extends PureComponent {
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>云打印机</Text>
         </View>
       ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: '',
     }
   };

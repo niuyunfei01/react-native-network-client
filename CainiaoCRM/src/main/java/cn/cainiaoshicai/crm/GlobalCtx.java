@@ -37,6 +37,7 @@ import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.i18n.reactnativei18n.ReactNativeI18n;
+import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -270,6 +271,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
+                .addPackage(new RNSoundPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

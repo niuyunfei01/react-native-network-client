@@ -1,8 +1,19 @@
-import React, { PureComponent, Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, InteractionManager, RefreshControl } from 'react-native'
+import React, {PureComponent, Component} from 'react'
+import {
+  Platform,
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ListView,
+  Image,
+  InteractionManager,
+  RefreshControl
+} from 'react-native'
 import InputNumber from 'rc-input-number';
-import { color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView } from '../../widget'
-import { screen, system, tool, native } from '../../common'
+import {color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView} from '../../widget'
+import {screen, system, tool, native} from '../../common'
 import {bindActionCreators} from "redux";
 import Icons from 'react-native-vector-icons/FontAwesome';
 import Config from '../../config'
@@ -11,7 +22,7 @@ import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-import {getOrder, printInCloud, getRemindForOrderPage} from '../../reducers/order/orderActions'
+import {getOrder, printInCloud, getRemindForOrderPage, saveOrderDelayShip} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
@@ -23,7 +34,11 @@ import {StatusBar} from "react-native";
 import ModalDropdown from 'react-native-modal-dropdown';
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
-import S from '../../stylekit'
+import S from '../../stylekit';
+import ModalSelector from "react-native-modal-selector";
+import selector from "../../styles/selector";
+import Entypo from "react-native-vector-icons/Entypo";
+import DateTimePicker from 'react-native-modal-datetime-picker';
 
 const numeral = require('numeral');
 
@@ -36,7 +51,15 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({getContacts, getOrder, printInCloud, getRemindForOrderPage, markTaskDone}, dispatch)}
+  return {
+    dispatch, ...bindActionCreators({
+      getContacts,
+      getOrder,
+      printInCloud,
+      getRemindForOrderPage,
+      markTaskDone
+    }, dispatch)
+  }
 }
 
 
@@ -53,28 +76,58 @@ class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    let ActionSheet = [
+      {key: -999, section: true, label: '操作'},
+      {key: 1, label: '修改地址'},
+      {key: 2, label: '修改配送时间'},
+    ];
 
     return {
-      headerTitle: '订单详情',
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
-      headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
-      headerRight: (<View style={{flexDirection: 'row'}}>
+      // headerTitle: '订单详情',
+      // headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
+      headerTitle: (
+        <View>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>订单详情</Text>
+        </View>
+      ),
+      headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
-          onPress={() => {params.onPrint()}}
+          onPress={() => {
+            params.onPrint()
+          }}
         />
-        <ModalDropdown
+        {/*<ModalDropdown
           options={['暂停提示', '强制关闭', '修改地址']}
           defaultValue={''}
           style={top_styles.drop_style}
           dropdownStyle={top_styles.drop_listStyle}
           dropdownTextStyle={top_styles.drop_textStyle}
           dropdownTextHighlightStyle={top_styles.drop_optionStyle}
-          onSelect={(event) => this.onMenuOptionSelected(event, item.id, item.type)}>
+          onSelect={(event) => params.onMenuOptionSelected(event)}>
           <Image style={[top_styles.icon_img_dropDown]}
                  source={require('../../img/Public/menu.png')}/>
-        </ModalDropdown>
+        </ModalDropdown>*/}
+        <ModalSelector
+          onChange={(option) => {
+            params.onMenuOptionSelected(option)
+          }}
+          data={ActionSheet}
+          cancelText="取消"
+          selectStyle={selector.selectStyle}
+          selectTextStyle={selector.selectTextStyle}
+          overlayStyle={selector.overlayStyle}
+          sectionStyle={selector.sectionStyle}
+          sectionTextStyle={selector.sectionTextStyle}
+          optionContainerStyle={selector.optionContainerStyle}
+          optionStyle={selector.optionStyle}
+          optionTextStyle={selector.optionTextStyle}
+          cancelStyle={selector.cancelStyle}
+          cancelTextStyle={selector.cancelTextStyle}
+        >
+          <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
+        </ModalSelector>
       </View>),
     }
   };
@@ -85,6 +138,8 @@ class OrderScene extends Component {
     this.state = {
       isFetching: false,
       isEditing: false,
+      doingUpdate: false,
+      isEndVisible: false,
       itemsHided: true,
       shipHided: true,
       gotoEditPoi: false,
@@ -109,12 +164,14 @@ class OrderScene extends Component {
     this._onShowStoreCall = this._onShowStoreCall.bind(this);
     this._doSaveItemsCancel = this._doSaveItemsCancel.bind(this);
     this._doSaveItemsEdit = this._doSaveItemsEdit.bind(this);
-    this._onItemRowNumberChanged = this._onItemRowNumberChanged.bind(this)
-    this._doProcessRemind = this._doProcessRemind.bind(this)
+    this._onItemRowNumberChanged = this._onItemRowNumberChanged.bind(this);
+    this._doProcessRemind = this._doProcessRemind.bind(this);
+    this.onMenuOptionSelected = this.onMenuOptionSelected.bind(this);
+    this.onSaveDelayShip = this.onSaveDelayShip.bind(this);
   }
 
   componentDidMount() {
-    this.props.navigation.setParams({onToggleMenuOption: this.onToggleMenuOption, onPrint: this.onPrint});
+    this.props.navigation.setParams({onMenuOptionSelected: this.onMenuOptionSelected, onPrint: this.onPrint});
   }
 
   componentWillMount() {
@@ -122,7 +179,7 @@ class OrderScene extends Component {
     const orderId = (this.props.navigation.state.params || {}).orderId;
     this.orderId = orderId;
     console.log("componentWillMount: params orderId:", orderId);
-    const { order } = this.props.order;
+    const {order} = this.props.order;
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
     } else {
@@ -151,20 +208,54 @@ class OrderScene extends Component {
     })
   }
 
-  onMenuOptionSelected(key, id, type) {
-    const {remind} = this.props;
-    if (remind.doingUpdate) {
+  onMenuOptionSelected(option) {
+    console.log('option -> ', option);
+    const {doingUpdate} = this.state;
+    if (doingUpdate) {
       ToastShort("操作太快了！");
       return false;
     }
+    this.setState({doingUpdate: true});
     const {dispatch} = this.props;
-    let token = this._getToken();
-    if (parseInt(key) === 0) {
-      //暂停提示
+    const {accessToken} = this.props.global;
+    if (option.key === 1) {//修改地址
+    } else if (option.key === 2) {//修改配送时间
+      this.setState({
+        isEndVisible: true,
+      });
     } else {
-      //强制关闭
-      dispatch(updateRemind(id, type, Config.TASK_STATUS_DONE, token))
+      ToastShort('未知的操作');
     }
+  }
+
+  onSaveDelayShip(date){
+    // let Hours = date.getHours();
+    // let Minutes = date.getMinutes();
+    let expect_time = tool.fullDate(date);
+    const {order} = this.props.order;
+
+    let wm_id = order.id;
+    let send_data = {
+      wm_id: wm_id,
+      expect_time: expect_time,
+    };
+    console.log('send_data => ', send_data);
+    const {accessToken} = this.props.global;
+    let _this = this;
+    const {dispatch} = this.props;
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(saveOrderDelayShip(send_data, accessToken, (resp) => {
+        console.log('delay_ship resp -> ', resp);
+        _this.setState({
+          isEndVisible: false,
+          doingUpdate: false,
+        });
+        if (resp.ok) {
+          ToastShort('操作成功');
+          this.onHeaderRefresh();
+        }
+      }));
+    });
   }
 
   _onShowStoreCall() {
@@ -188,12 +279,12 @@ class OrderScene extends Component {
 
   _contacts2menus() {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
-    return (this.store_contacts||[]).map((contact, idx) => {
+    return (this.store_contacts || []).map((contact, idx) => {
       console.log(contact, idx);
-      const {sign, mobile, desc,  id} = contact;
+      const {sign, mobile, desc, id} = contact;
       return {
         type: 'default',
-        label:  desc + (sign ? '[上班] ' : ''),
+        label: desc + (sign ? '[上班] ' : ''),
         onPress: () => {
           native.dialNumber(mobile)
         }
@@ -236,11 +327,11 @@ class OrderScene extends Component {
     }
   }
 
-  _hidePrinterChooser () {
+  _hidePrinterChooser() {
     this.setState({showPrinterChooser: false})
   }
-  
-  _cloudPrinterSN () {
+
+  _cloudPrinterSN() {
     const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
 
@@ -276,11 +367,11 @@ class OrderScene extends Component {
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId: this.orderId}})
   }
 
-  _doSaveItemsEdit () {
+  _doSaveItemsEdit() {
     console.log("doSaveItemsEdit")
   }
 
-  _doSaveItemsCancel () {
+  _doSaveItemsCancel() {
     this.setState({isEditing: false})
   }
 
@@ -294,11 +385,11 @@ class OrderScene extends Component {
         msg = `商品[${item['product_name']}]已撤销`
       }
       ToastShort(msg)
-    } 
+    }
     this._recordEdition(item)
   }
 
-  _onItemRowNumberChanged (item, newNum) {
+  _onItemRowNumberChanged(item, newNum) {
 
     console.log('accept a item:', item, 'to new', newNum);
     this._recordEdition({...item, num: newNum});
@@ -326,7 +417,7 @@ class OrderScene extends Component {
       }
     });
     const totalEdit = tool.objectReduce(this.state.itemsEdited, (item1, item2) => {
-      
+
       return item1.num * item1.normal_price + item2.num * item2.normal_price
     })
   }
@@ -387,7 +478,6 @@ class OrderScene extends Component {
 
   render() {
     const {order} = this.props.order;
-
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}
       onRefresh={this.onHeaderRefresh}
@@ -399,9 +489,9 @@ class OrderScene extends Component {
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
         <View>
-        { !!this.state.errorHints &&
-        <Text style={{textAlign: 'center'}}>{this.state.errorHints}</Text>}
-        <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text>
+          {!!this.state.errorHints &&
+          <Text style={{textAlign: 'center'}}>{this.state.errorHints}</Text>}
+          <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text>
         </View>
       </ScrollView>
       : (
@@ -435,7 +525,9 @@ class OrderScene extends Component {
 
           <ActionSheet
             visible={this.state.showCallStore}
-            onRequestClose={()=>{console.log('call_store_contacts action_sheet closed!')}}
+            onRequestClose={() => {
+              console.log('call_store_contacts action_sheet closed!')
+            }}
             menus={this._contacts2menus()}
             actions={[
               {
@@ -446,13 +538,14 @@ class OrderScene extends Component {
             ]}
           />
 
-          <Dialog onRequestClose={() => {}}
+          <Dialog onRequestClose={() => {
+          }}
                   visible={this.state.gotoEditPoi}
                   buttons={[{
-                      type: 'warn',
-                      label: '去设置',
-                      onPress: this.goToSetMap,
-                    },
+                    type: 'warn',
+                    label: '去设置',
+                    onPress: this.goToSetMap,
+                  },
                     {
                       type: 'default',
                       label: '取消',
@@ -472,7 +565,7 @@ class OrderScene extends Component {
             paddingBottom: pxToDp(10),
             backgroundColor: '#fff',
             marginLeft: pxToDp(20), marginRight: pxToDp(20),
-            
+
             borderRadius: 4,
             borderWidth: 1,
             borderColor: '#ddd',
@@ -486,12 +579,15 @@ class OrderScene extends Component {
             <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}>提醒送达</Button>
           </View>
 
-          <Dialog onRequestClose={()=>{}}
+          <Dialog onRequestClose={() => {
+          }}
                   visible={!!this.state.errorHints}
                   buttons={[{
                     type: 'default',
                     label: '知道了',
-                    onPress: () => {this.setState({errorHints: ''})}
+                    onPress: () => {
+                      this.setState({errorHints: ''})
+                    }
                   }]}
           ><Text>{this.state.errorHints}</Text></Dialog>
 
@@ -510,6 +606,20 @@ class OrderScene extends Component {
             }}
           >已处理</Toast>
 
+          <DateTimePicker
+            date={new Date(order.expectTime)}
+            mode='datetime'
+            isVisible={this.state.isEndVisible}
+            onConfirm={(date) => {
+              this.onSaveDelayShip(date)
+            }}
+            onCancel={() => {
+              this.setState({
+                isEndVisible: false,
+                doingUpdate: false,
+              });
+            }}
+          />
         </View>
       );
   }
@@ -535,15 +645,19 @@ class OrderScene extends Component {
     const task_types = this.props.global.config.task_types || {};
 
     return (<View>
-        <OrderReminds task_types={task_types} reminds={this.state.reminds.reminds} remindNicks={remindNicks} processRemind={this._doProcessRemind}/>
+        <OrderReminds task_types={task_types} reminds={this.state.reminds.reminds} remindNicks={remindNicks}
+                      processRemind={this._doProcessRemind}/>
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
-            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={() => {this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})} }>
+            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
+            }}>
               <Icons name='edit' size={20} color={colors.main_color}/></TouchableOpacity>
             <View style={{flex: 1}}/>
-            <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]} source={require('../../img/Order/message_.png')}/>
+            <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
+                   source={require('../../img/Order/message_.png')}/>
           </View>
           <Text style={[styles.row, {
             fontSize: pxToDp(30),
@@ -562,7 +676,9 @@ class OrderScene extends Component {
               borderRadius: 1,
               justifyContent: 'center',
               alignItems: 'center'
-            }} onPress={() => {native.ordersByMobileTimes(order.mobile, order.order_times)}}>
+            }} onPress={() => {
+              native.ordersByMobileTimes(order.mobile, order.order_times)
+            }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
             <CallBtn mobile={order.mobile}/>
@@ -610,17 +726,19 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
 
             {this.state.isEditing &&
-            <ImageBtn source={require('../../img/Order/save_edit.png')} onPress={this._doSaveItemsEdit} />
-              &&
-              <Icons.Button name="close" onPress={this._doSaveItemsCancel}>
-                <Text>取消</Text>
-              </Icons.Button>
+            <ImageBtn source={require('../../img/Order/save_edit.png')} onPress={this._doSaveItemsEdit}/>
+            &&
+            <Icons.Button name="close" onPress={this._doSaveItemsCancel}>
+              <Text>取消</Text>
+            </Icons.Button>
             }
 
             {!this.state.isEditing && (
               supportEditGoods(order.orderStatus) ?
-              <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={()=> {this.setState({isEditing: true, itemsHided: false})}}/>
-              : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>)
+                <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={() => {
+                  this.setState({isEditing: true, itemsHided: false})
+                }}/>
+                : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>)
             }
 
             {!this.state.isEditing && (this.state.itemsHided ?
@@ -637,13 +755,17 @@ class OrderScene extends Component {
             }
           </View>
           {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
-            return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+            return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx}
+                             isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
-            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing}
+                             onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
-          <ImageBtn source={require('../../img/Order/edit_add_item.png')} onPress={ () => {this.props.navigation.navigate('ProductAutocomplete')} } />
+          <ImageBtn source={require('../../img/Order/edit_add_item.png')} onPress={() => {
+            this.props.navigation.navigate('ProductAutocomplete')
+          }}/>
 
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
@@ -657,7 +779,7 @@ class OrderScene extends Component {
                 <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
                   {numeral(order.total_goods_price / 100).format('0.00')}
                 </Text></View>}
-              
+
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
@@ -670,7 +792,7 @@ class OrderScene extends Component {
             <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')}</Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>
-            <View style={[styles.moneyLeft,{alignItems: 'center'}]}>
+            <View style={[styles.moneyLeft, {alignItems: 'center'}]}>
               <Text style={styles.moneyListTitle}>优惠</Text>
               <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'/></TouchableOpacity>
             </View>
@@ -692,10 +814,10 @@ class OrderScene extends Component {
           <View style={[styles.row, styles.moneyRow]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
-              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent:'center'}]}>
+              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
                 <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
-                <Text>收款码</Text>
-                <Icons name='qrcode'/>
+                  <Text>收款码</Text>
+                  <Icons name='qrcode'/>
                 </Text>
               </TouchableOpacity>
               {(order.additional_to_pay != 0) &&
@@ -753,18 +875,37 @@ class OrderReminds extends PureComponent {
       const status = parseInt(remind.status);
       const quick = parseInt(remind.quick);
 
-      return <View key={remind.id} style={{borderBottomWidth: screen.onePixel, borderBottomColor: colors.color999,
-        backgroundColor: quick !== Cts.TASK_QUICK_NO ? '#edd9d9': '#f0f9ef', paddingLeft: pxToDp(30), paddingRight: pxToDp(30)}}>
-        <View style={{flexDirection: 'row',
-          height: pxToDp(70), alignItems: 'center'}}>
+      return <View key={remind.id} style={{
+        borderBottomWidth: screen.onePixel,
+        borderBottomColor: colors.color999,
+        backgroundColor: quick !== Cts.TASK_QUICK_NO ? '#edd9d9' : '#f0f9ef',
+        paddingLeft: pxToDp(30),
+        paddingRight: pxToDp(30)
+      }}>
+        <View style={{
+          flexDirection: 'row',
+          height: pxToDp(70), alignItems: 'center'
+        }}>
           <Text>{taskType ? taskType.name : '待办'}</Text>
-          <Text style={{marginLeft: pxToDp(20), }}>{tool.shortTimeDesc(remind.created)}</Text>
+          <Text style={{marginLeft: pxToDp(20),}}>{tool.shortTimeDesc(remind.created)}</Text>
 
           <View style={{flex: 1}}/>
-          {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 && <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
+          {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
+          <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
           {status === Cts.TASK_STATUS_WAITING &&
-          <TouchableOpacity style={{backgroundColor: '#ea7575', height: pxToDp(50), paddingLeft: 5, paddingRight: 5, alignItems: 'center', justifyContent: 'center', borderRadius: 4, marginLeft: pxToDp(40)}}
-                            onPress={()=>{processRemind(remind)}}>
+          <TouchableOpacity style={{
+            backgroundColor: '#ea7575',
+            height: pxToDp(50),
+            paddingLeft: 5,
+            paddingRight: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 4,
+            marginLeft: pxToDp(40)
+          }}
+                            onPress={() => {
+                              processRemind(remind)
+                            }}>
             <Text style={{color: colors.white,}}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'}</Text>
           </TouchableOpacity>
           }
@@ -776,7 +917,8 @@ class OrderReminds extends PureComponent {
             <Icon name='success_no_circle' size={16}/>
           </View>}
         </View>
-        {type === Cts.TASK_TYPE_ORDER_CHANGE && <View style={{borderTopWidth: screen.onePixel, borderTopColor: '#ccc', paddingTop: 10, paddingBottom: 10}}>
+        {type === Cts.TASK_TYPE_ORDER_CHANGE &&
+        <View style={{borderTopWidth: screen.onePixel, borderTopColor: '#ccc', paddingTop: 10, paddingBottom: 10}}>
           <Text style={{fontSize: 12, color: '#808080'}}>{remind.taskDesc}</Text>
         </View>}
       </View>;
@@ -791,7 +933,8 @@ class ItemRow extends PureComponent {
 
   render() {
     const {
-      idx, item, isAdd, edited, onInputNumberChange = () => {}, isEditing = false
+      idx, item, isAdd, edited, onInputNumberChange = () => {
+      }, isEditing = false
     } = this.props;
 
     const showEditAdded = isEditing && !isAdd && edited && edited.num > item.num;
@@ -821,16 +964,19 @@ class ItemRow extends PureComponent {
       {!isEditing &&
       <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
       {isEditing &&
-        <View style={[top_styles.stepper, {marginLeft: 10}]}>
-          <InputNumber
-            styles={inputNumberStyles}
-            min={0}
-            defaultValue={parseInt(item.num)}
-            style={{ backgroundColor: 'white', width: 86 }}
-            onChange={(v)=>{console.log("editedNum", v); onInputNumberChange(item, v)}}
-            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-          />
-        </View>}
+      <View style={[top_styles.stepper, {marginLeft: 10}]}>
+        <InputNumber
+          styles={inputNumberStyles}
+          min={0}
+          defaultValue={parseInt(item.num)}
+          style={{backgroundColor: 'white', width: 86}}
+          onChange={(v) => {
+            console.log("editedNum", v);
+            onInputNumberChange(item, v)
+          }}
+          keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+        />
+      </View>}
     </View>
   }
 }
@@ -891,14 +1037,14 @@ const top_styles = StyleSheet.create({
   drop_style: {
     // width: pxToDp(88),
     // height: pxToDp(55),
-    flex:1,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   drop_listStyle: {//下拉列表的样式
     width: pxToDp(150),
-    height: pxToDp(141),
+    // height: pxToDp(141),
     backgroundColor: '#5f6660',
     marginTop: -StatusBar.currentHeight,
   },
@@ -924,6 +1070,15 @@ const top_styles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
+  },
+  btn_select: {
+    marginRight: pxToDp(20),
+    height: pxToDp(60),
+    width: pxToDp(60),
+    fontSize: pxToDp(40),
+    color: colors.color666,
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
   icon: {
     width: pxToDp(74),
@@ -1010,7 +1165,7 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(22),
     borderRadius: pxToDp(5),
     alignSelf: 'center',
-    paddingLeft:5,
+    paddingLeft: 5,
     paddingRight: 5,
     paddingTop: 2,
     paddingBottom: 2

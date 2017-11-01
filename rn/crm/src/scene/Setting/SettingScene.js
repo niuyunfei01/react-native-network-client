@@ -56,7 +56,6 @@ class SettingScene extends PureComponent {
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>设置</Text>
         </View>
       ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: '',
     }
   };

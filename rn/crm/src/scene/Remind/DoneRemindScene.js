@@ -38,7 +38,6 @@ class DoneRemindScene extends PureComponent {
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{params.title}</Text>
         </View>
       ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
       headerRight: (
         <View style={{flexDirection: 'row'}}>
           <ModalSelector

@@ -14,7 +14,7 @@ import Config from "../config";
 class WebScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => ({
-    headerStyle: {backgroundColor: 'white'},
+    //headerStyle: {backgroundColor: 'white'},
     title: navigation.state.params.title,
     header: null,
   });
