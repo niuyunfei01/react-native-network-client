@@ -58,6 +58,7 @@ dependencies {
     compile project(':react-native-vector-icons')
     compile project(':react-native-i18n')
     compile project(':react-native-splash-screen')
+    compile project(':react-native-sound')
 
     releaseCompile 'ch.acra:acra:4.9.2'
 }
