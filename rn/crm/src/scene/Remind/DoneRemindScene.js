@@ -43,6 +43,7 @@ class DoneRemindScene extends PureComponent {
             onChange={(option) => {
               params.setFilter(option.key);
             }}
+            skin='customer'
             data={params.filterData}
           >
             <Icon name='ellipsis-h' style={{
