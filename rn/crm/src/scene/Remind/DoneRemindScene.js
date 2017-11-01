@@ -13,8 +13,7 @@ import AppConfig from '../../config'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
-import ModalSelector from 'react-native-modal-selector';
-import selector from "../../styles/selector";
+import ModalSelector from "../../widget/ModalSelector/index";
 
 function mapStateToProps(state) {
   let {global} = state;
@@ -45,17 +44,7 @@ class DoneRemindScene extends PureComponent {
               params.setFilter(option.key);
             }}
             data={params.filterData}
-            cancelText="取消"
-            selectStyle={selector.selectStyle}
-            selectTextStyle={selector.selectTextStyle}
-            overlayStyle={selector.overlayStyle}
-            sectionStyle={selector.sectionStyle}
-            sectionTextStyle={selector.sectionTextStyle}
-            optionContainerStyle={selector.optionContainerStyle}
-            optionStyle={selector.optionStyle}
-            optionTextStyle={selector.optionTextStyle}
-            cancelStyle={selector.cancelStyle}
-            cancelTextStyle={selector.cancelTextStyle}>
+          >
             <Icon name='ellipsis-h' style={{
               fontSize: pxToDp(40),
               width: pxToDp(42),
