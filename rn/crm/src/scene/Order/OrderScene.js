@@ -35,10 +35,9 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
-import ModalSelector from "react-native-modal-selector";
-import selector from "../../styles/selector";
 import Entypo from "react-native-vector-icons/Entypo";
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import ModalSelector from "../../widget/ModalSelector/index";
 
 const numeral = require('numeral');
 
@@ -113,18 +112,8 @@ class OrderScene extends Component {
           onChange={(option) => {
             params.onMenuOptionSelected(option)
           }}
+          skin='customer'
           data={ActionSheet}
-          cancelText="取消"
-          selectStyle={selector.selectStyle}
-          selectTextStyle={selector.selectTextStyle}
-          overlayStyle={selector.overlayStyle}
-          sectionStyle={selector.sectionStyle}
-          sectionTextStyle={selector.sectionTextStyle}
-          optionContainerStyle={selector.optionContainerStyle}
-          optionStyle={selector.optionStyle}
-          optionTextStyle={selector.optionTextStyle}
-          cancelStyle={selector.cancelStyle}
-          cancelTextStyle={selector.cancelTextStyle}
         >
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>

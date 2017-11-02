@@ -11,7 +11,6 @@ import {
   InteractionManager,
 } from 'react-native';
 import colors from "../../styles/colors";
-import selector from "../../styles/selector";
 import pxToDp from "../../util/pxToDp";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-vector-icons/Entypo';
@@ -24,8 +23,9 @@ import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {fetchWorkers, fetchUserCount, fetchStoreTurnover} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
-import ModalSelector from 'react-native-modal-selector';
 import * as tool from "../../common/tool";
+import ModalSelector from "../../widget/ModalSelector/index";
+
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -43,7 +43,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-// create a component
 class MineScene extends PureComponent {
   static navigationOptions = {title: 'Mine', header: null};
 
@@ -56,11 +55,10 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = [];
+    let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
     let sortStores = Object.values(canReadStores).sort(function (a, b) {
       return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
     });
-    storeActionSheet.push({key: -999, section: true, label: '选择门店'},);
     for (let store of sortStores) {
       if (store.id > 0) {
         let item = {
@@ -237,6 +235,7 @@ class MineScene extends PureComponent {
   }
 
   renderHeader() {
+    let {currStoreId} = this.state;
     return (
       <View style={header_styles.container}>
         <View style={[header_styles.main_box]}>
@@ -245,19 +244,9 @@ class MineScene extends PureComponent {
             onChange={(option) => {
               this._doChangeStore(option.key)
             }}
+            skin='customer'
+            defaultKey={currStoreId}
             data={this.state.storeActionSheet}
-            //initValue="切换门店"
-            cancelText="取消"
-            selectStyle={selector.selectStyle}
-            selectTextStyle={selector.selectTextStyle}
-            overlayStyle={selector.overlayStyle}
-            sectionStyle={selector.sectionStyle}
-            sectionTextStyle={selector.sectionTextStyle}
-            optionContainerStyle={selector.optionContainerStyle}
-            optionStyle={selector.optionStyle}
-            optionTextStyle={selector.optionTextStyle}
-            cancelStyle={selector.cancelStyle}
-            cancelTextStyle={selector.cancelTextStyle}
           >
             <View style={{flexDirection: 'row'}}>
               <Icon name='exchange' style={header_styles.change_shop}/>

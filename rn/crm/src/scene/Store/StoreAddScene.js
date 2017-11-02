@@ -12,12 +12,11 @@ import Config from "../../config";
 import Entypo from 'react-native-vector-icons/Entypo';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Cts from "../../Cts";
-import ModalSelector from "react-native-modal-selector";
-import selector from "../../styles/selector";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import {saveOfflineStore, copyStoreGoods} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
 import Dialog from "../../weui/Dialog/Dialog";
+import ModalSelector from "../../widget/ModalSelector/index";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -62,17 +61,7 @@ class StoreAddScene extends PureComponent {
             }
           }}
           data={ActionSheet}
-          cancelText="取消"
-          selectStyle={selector.selectStyle}
-          selectTextStyle={selector.selectTextStyle}
-          overlayStyle={selector.overlayStyle}
-          sectionStyle={selector.sectionStyle}
-          sectionTextStyle={selector.sectionTextStyle}
-          optionContainerStyle={selector.optionContainerStyle}
-          optionStyle={selector.optionStyle}
-          optionTextStyle={selector.optionTextStyle}
-          cancelStyle={selector.cancelStyle}
-          cancelTextStyle={selector.cancelTextStyle}
+          skin='customer'
         >
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
@@ -389,17 +378,8 @@ class StoreAddScene extends PureComponent {
                   this.onCheckUser('owner', option.key)
                 }}
                 data={this.state.userActionSheet}
-                cancelText="取消"
-                selectStyle={selector.selectStyle}
-                selectTextStyle={selector.selectTextStyle}
-                overlayStyle={selector.overlayStyle}
-                sectionStyle={selector.sectionStyle}
-                sectionTextStyle={selector.sectionTextStyle}
-                optionContainerStyle={selector.optionContainerStyle}
-                optionStyle={selector.optionStyle}
-                optionTextStyle={selector.optionTextStyle}
-                cancelStyle={selector.cancelStyle}
-                cancelTextStyle={selector.cancelTextStyle}
+                skin='customer'
+                defaultKey={owner_id}
               >
                 <Text style={styles.body_text}>{owner_id > 0 ? owner_name : '点击选择店长'}</Text>
               </ModalSelector>
@@ -431,17 +411,8 @@ class StoreAddScene extends PureComponent {
                   this.onCheckUser('vice_mgr', option.key)
                 }}
                 data={this.state.userActionSheet}
-                cancelText="取消"
-                selectStyle={selector.selectStyle}
-                selectTextStyle={selector.selectTextStyle}
-                overlayStyle={selector.overlayStyle}
-                sectionStyle={selector.sectionStyle}
-                sectionTextStyle={selector.sectionTextStyle}
-                optionContainerStyle={selector.optionContainerStyle}
-                optionStyle={selector.optionStyle}
-                optionTextStyle={selector.optionTextStyle}
-                cancelStyle={selector.cancelStyle}
-                cancelTextStyle={selector.cancelTextStyle}
+                skin='customer'
+                defaultKey={vice_mgr}
               >
                 <Text style={styles.body_text}>{vice_mgr > 0 ? vice_mgr_name : '点击选择店助'}</Text>
               </ModalSelector>
