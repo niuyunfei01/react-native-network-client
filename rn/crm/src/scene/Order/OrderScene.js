@@ -65,7 +65,7 @@ function mapDispatchToProps(dispatch) {
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
 const supportEditGoods = (orderStatus) => {
-  orderStatus = parseInt(orderStatus)
+  orderStatus = parseInt(orderStatus);
   return orderStatus === Cts.ORDER_STATUS_TO_SHIP ||
     orderStatus === Cts.ORDER_STATUS_TO_READY ||
     orderStatus === Cts.ORDER_STATUS_SHIPPING
@@ -168,6 +168,7 @@ class OrderScene extends Component {
     this._doProcessRemind = this._doProcessRemind.bind(this);
     this.onMenuOptionSelected = this.onMenuOptionSelected.bind(this);
     this.onSaveDelayShip = this.onSaveDelayShip.bind(this);
+    this._openAddGood = this._openAddGood.bind(this);
   }
 
   componentDidMount() {
@@ -216,7 +217,7 @@ class OrderScene extends Component {
       return false;
     }
     this.setState({doingUpdate: true});
-    const {dispatch} = this.props;
+    // const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     if (option.key === 1) {//修改地址
     } else if (option.key === 2) {//修改配送时间
@@ -375,6 +376,11 @@ class OrderScene extends Component {
     this.setState({isEditing: false})
   }
 
+  _openAddGood  () {
+    const {navigation, dispatch} = this.props;
+    navigation.navigate('ProductAutocomplete')
+  }
+
   _doAddItem(item) {
     console.log('doAddItem', item);
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
@@ -436,7 +442,7 @@ class OrderScene extends Component {
     if (validPoi) {
       const store = this.props.global.canReadStores[order.store_id] || {};
       const uri = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
-      this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri})
+      this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
       console.log(uri)
     } else {
       //a page to set the location for this url!!
@@ -725,13 +731,10 @@ class OrderScene extends Component {
             </View>
             <View style={{flex: 1}}/>
 
-            {this.state.isEditing &&
-            <ImageBtn source={require('../../img/Order/save_edit.png')} onPress={this._doSaveItemsEdit}/>
-            &&
-            <Icons.Button name="close" onPress={this._doSaveItemsCancel}>
-              <Text>取消</Text>
-            </Icons.Button>
-            }
+            {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
+            <ImageBtn source={require('../../img/Order/good/queren_.png')} imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
+              <ImageBtn source={require('../../img/Order/good/quxiao_.png')} imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
+            </View>}
 
             {!this.state.isEditing && (
               supportEditGoods(order.orderStatus) ?
@@ -763,9 +766,12 @@ class OrderScene extends Component {
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
-          <ImageBtn source={require('../../img/Order/edit_add_item.png')} onPress={() => {
-            this.props.navigation.navigate('ProductAutocomplete')
-          }}/>
+          {!this.state.itemsHided &&
+          <View style={[styles.row, {height: pxToDp(100), alignItems: 'center', justifyContent: 'center', marginTop: 0, borderBottomColor: colors.color999,
+            borderBottomWidth: screen.onePixel}]}>
+            <ImageBtn source={require('../../img/Order/good/jiahuo_.png')}
+                      imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
+          </View>}
 
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
@@ -971,7 +977,6 @@ class ItemRow extends PureComponent {
           defaultValue={parseInt(item.num)}
           style={{backgroundColor: 'white', width: 86}}
           onChange={(v) => {
-            console.log("editedNum", v);
             onInputNumberChange(item, v)
           }}
           keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
@@ -1013,9 +1018,9 @@ class ImageBtn extends PureComponent {
 
   render() {
 
-    const {source, onPress, imageStyle} = this.props;
+    const {source, onPress, imageStyle, ...others} = this.props;
 
-    return <TouchableOpacity onPress={onPress}>
+    return <TouchableOpacity onPress={onPress} others>
       <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
     </TouchableOpacity>
   }
