@@ -128,12 +128,9 @@ class UserAddScene extends PureComponent {
           });
           _this.setState({
             stores: stores.concat(v_store),
+            isRefreshing: false,
           });
-          if (_this.state.isRefreshing) {
-            ToastShort('刷新门店列表完成');
-          }
         }
-        _this.setState({isRefreshing: false});
       }));
     });
   }

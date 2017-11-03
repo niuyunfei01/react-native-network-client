@@ -111,6 +111,7 @@ class MineScene extends PureComponent {
     this.onPress = this.onPress.bind(this);
     this.onGetUserCount = this.onGetUserCount.bind(this);
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
+    this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
 
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
@@ -129,17 +130,15 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchUserCount(currentUser, accessToken, (resp) => {
+        console.log(resp);
         if (resp.ok) {
           let {sign_count, bad_cases_of} = resp.obj;
           _this.setState({
             sign_count: sign_count,
             bad_cases_of: bad_cases_of,
+            isRefreshing: false,
           });
-          if (_this.state.isRefreshing) {
-            ToastShort('刷新完成');
-          }
         }
-        _this.setState({isRefreshing: false});
       }));
     });
   }
@@ -149,19 +148,18 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     let {currStoreId} = this.state;
     let _this = this;
+
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchStoreTurnover(currStoreId, accessToken, (resp) => {
+        console.log(resp);
         if (resp.ok) {
           let {order_num, turnover} = resp.obj;
           _this.setState({
             order_num: order_num,
             turnover: turnover,
+            isRefreshing: false,
           });
-          if (_this.state.isRefreshing) {
-            ToastShort('刷新完成');
-          }
         }
-        _this.setState({isRefreshing: false});
       }));
     });
   }
@@ -206,9 +204,12 @@ class MineScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
-
-    this.onGetUserCount();
-    this.onGetStoreTurnover();
+    let {is_mgr} = this.state;
+    if (is_mgr) {
+      this.onGetStoreTurnover();
+    } else {
+      this.onGetUserCount();
+    }
   }
 
   _doChangeStore(store_id) {
