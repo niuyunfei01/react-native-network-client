@@ -117,6 +117,7 @@ class RemindScene extends PureComponent {
     const {dispatch} = this.props;
     let token = this._getToken();
     let {store_id, vendor_id} = this._getStoreAndVendorId();
+    dispatch(fetchRemindCount(vendor_id,store_id,token));
     dispatch(fetchRemind(true, false, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     canLoadMore = true;
   }
@@ -218,7 +219,6 @@ class RemindScene extends PureComponent {
     let pageNum = remind.currPage[typeId];
     canLoadMore = true;
     if (remind.noMore[typeId]) {
-      ToastShort('没有更多数据了');
       canLoadMore = false;
     }
     if (canLoadMore && time - loadMoreTime > 1) {
@@ -355,7 +355,7 @@ class RemindScene extends PureComponent {
           viewAreaCoveragePercentThreshold: 100,
           waitForInteraction: true,
         }}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={10}
         renderItem={this.renderItem}
         onEndReached={this.onEndReached.bind(this, typeId)}
         onRefresh={this.onRefresh.bind(this, typeId)}
