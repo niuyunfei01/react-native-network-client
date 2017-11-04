@@ -14,8 +14,8 @@ public class ActivityBleManager extends ReactContextBaseJavaModule {
     public String getName() {
         return "ActivityBleManager";
     }
-    
-    void getDeviceList(){
+
+    void getDeviceList() {
 
     }
 }

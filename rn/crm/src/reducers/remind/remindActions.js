@@ -6,10 +6,10 @@ import * as RemindServices from '../../services/remind';
 import {getWithTpl, postWithTpl} from "../../util/common";
 import _ from 'underscore';
 
-export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status) {
+export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status, vendor_id, store_id) {
   return dispatch => {
     dispatch(fetchRemindList(isRefreshing, loading, isLoadMore, typeId));
-    return RemindServices.FetchRemindList(token, typeId, status, page)
+    return RemindServices.FetchRemindList(token, vendor_id, store_id, typeId, status, page)
       .then(response => response.json())
       .then((response) => {
         let result = response.obj;
@@ -26,10 +26,10 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
   }
 }
 
-export function fetchRemindCount(token) {
+export function fetchRemindCount(vendor_id, store_id, token) {
   return dispatch => {
     dispatch(doFetchRemindCount());
-    return RemindServices.FetchRemindCount(token)
+    return RemindServices.FetchRemindCount(vendor_id, store_id, token)
       .then(response => response.json())
       .then((response) => {
         let boday = response.obj;
@@ -120,7 +120,7 @@ export function createTaskByOrder(token, orderId, task_type, remark, expectDoneD
       params.data = _.isArray(data) || _.isObject(data) ? JSON.stringify(data) : data;
     }
     postWithTpl(url, params, (json) => {
-      if(json.ok) {
+      if (json.ok) {
         dispatch({
           type: types.NEW_REMIND_CREATED,
           typeId: task_type,
