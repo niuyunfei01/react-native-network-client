@@ -41,4 +41,14 @@ export default {
 
   REFUND_AUDIT_AGREE: 1, //同意退款
   REFUND_AUDIT_REFUSE: 0, //拒绝退款
+
+
+  WM_PLAT_ID_BD: 1,
+  WM_PLAT_ID_WX: 2,
+  WM_PLAT_ID_MT: 3,
+  WM_PLAT_ID_ELE: 4,
+  WM_PLAT_ID_APP: 5,
+  WM_PLAT_ID_JD: 6,
+  WM_PLAT_UNKNOWN: -1,
+
 }

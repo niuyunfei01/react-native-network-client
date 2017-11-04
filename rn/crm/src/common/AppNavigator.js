@@ -33,6 +33,7 @@ import DoneRemindScene from '../scene/Remind/DoneRemindScene';
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import NavigationItem from "../widget/NavigationItem";
+import TakeOutScene from "../scene/Store/TakeOutScene";
 
 const Tab = TabNavigator(
   {
@@ -91,7 +92,7 @@ const Tab = TabNavigator(
 
     Mine: {
       screen: MineScene,
-      // screen: StoreScene,
+      // screen: TakeOutScene,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: '我的',
         tabBarIcon: ({focused, tintColor}) => (
@@ -175,7 +176,8 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
-        [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene}
+        [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
+        [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
 
       },
       stackNavigatorConfigs

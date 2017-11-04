@@ -25,11 +25,12 @@ import {fetchWorkers, fetchUserCount, fetchStoreTurnover} from "../../reducers/m
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import ModalSelector from "../../widget/ModalSelector/index";
+import {fetchUserInfo} from "../../reducers/user/userActions";
 
 
 function mapStateToProps(state) {
-  const {mine, global} = state;
-  return {mine: mine, global: global}
+  const {mine, user, global} = state;
+  return {mine: mine, user: user, global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -38,6 +39,7 @@ function mapDispatchToProps(dispatch) {
       fetchUserCount,
       fetchWorkers,
       fetchStoreTurnover,
+      fetchUserInfo,
       ...globalActions
     }, dispatch)
   }
@@ -80,7 +82,7 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currVendorId, currVersion, currManager, is_mgr} = tool.vendor(this.props.global);
+    let {currVendorId, currVersion, currManager, is_mgr, service_uid} = tool.vendor(this.props.global);
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     this.state = {
@@ -112,6 +114,7 @@ class MineScene extends PureComponent {
     this.onGetUserCount = this.onGetUserCount.bind(this);
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
+    this.onGetUserInfo = this.onGetUserInfo.bind(this);
 
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
@@ -119,6 +122,22 @@ class MineScene extends PureComponent {
     if (this.state.turnover === undefined || this.state.turnover === undefined) {
       this.onGetStoreTurnover();
     }
+
+
+    let server_info = tool.server_info(this.props);
+    if(tool.length(server_info) === 0){
+      this.onGetUserInfo(service_uid);
+    }
+  }
+
+  onGetUserInfo(uid) {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(fetchUserInfo(uid, accessToken, (resp) => {
+        console.log('resp => ', resp);
+      }));
+    });
   }
 
   onGetUserCount() {
@@ -255,10 +274,13 @@ class MineScene extends PureComponent {
             </View>
           </ModalSelector>
         </View>
-        <View style={[header_styles.icon_box]}>
+        <TouchableOpacity
+          style={[header_styles.icon_box]}
+          onPress={() => this.onPress(Config.ROUTE_TAKE_OUT)}
+        >
           <Image style={[header_styles.icon_open]} source={require('../../img/My/open_.png')}/>
           <Text style={header_styles.open_text}>营业中</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -351,13 +373,6 @@ class MineScene extends PureComponent {
   }
 
   onPress(route, params = {}) {
-    // let {onNavigating} = this.state;
-    // console.log('onNavigating -> ', onNavigating);
-    // if (onNavigating === true) {
-    //   return false;
-    // }
-    // _this.setState({onNavigating: true});
-
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
@@ -449,6 +464,8 @@ class MineScene extends PureComponent {
   }
 
   renderVersionBlock() {
+    let server_info = tool.server_info(this.props);
+
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity style={[block_styles.block_box]}>
@@ -459,7 +476,12 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            native.dialNumber(server_info.mobilephone);
+          }}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/fuwu_.png')}/>
           <Text style={[block_styles.block_name]}>联系服务经理</Text>
         </TouchableOpacity>
@@ -474,6 +496,7 @@ class MineScene extends PureComponent {
 
   renderDirectBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
+    let {currStoreId} = this.state;
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
@@ -505,13 +528,19 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>报销</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          let url = `${Config.ServiceUrl}stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
+          this.onPress(Config.ROUTE_WEB, {url: url});
+        }}>
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>微信付款记录</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
           let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
           this.onPress(Config.ROUTE_WEB, {url: url});
         }}>
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
-        <View style={[block_styles.block_box]}/>
       </View>
     )
   }
@@ -677,7 +706,7 @@ const block_styles = StyleSheet.create({
   block_name: {
     color: colors.color666,
     fontSize: pxToDp(26),
-    lineHeight: pxToDp(26),
+    lineHeight: pxToDp(28),
     textAlign: 'center',
   },
 

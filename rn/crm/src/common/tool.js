@@ -1,5 +1,6 @@
 import Moment from 'moment';
 import {NavigationActions} from "react-navigation";
+import Cts from "../Cts";
 
 export function urlByAppendingParams(url: string, params: Object) {
   let result = url
@@ -53,40 +54,57 @@ export function vendor(global) {
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
-  // console.log('currVendorId -> ', currVendorId);
-  // console.log('currStore -> ', currStore);
-  // console.log('currVendor -> ', currVendor);
 
   let mgr_ids = [];
+  let service_ids = [];
   let owner_id = currStore['owner_id'];
   let vice_mgr = currStore['vice_mgr'];
   let service_uid = currVendor['service_uid'];
   let service_mgr = currVendor['service_mgr'];
   // console.log('ids -> ', owner_id, vice_mgr, service_uid, service_mgr);
-  if(owner_id !== '' && owner_id !== undefined && owner_id > 0){
+  if (owner_id !== '' && owner_id !== undefined && owner_id > 0) {
     mgr_ids.push(owner_id);
   }
-  if(vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0){
+  if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
     mgr_ids.push(vice_mgr);
   }
-  if(service_uid !== '' && service_uid !== undefined && service_uid > 0){
+  if (service_uid !== '' && service_uid !== undefined && service_uid > 0) {
     mgr_ids.push(service_uid);
+    service_ids.push(service_uid);
   }
-  if(service_mgr !== '' && service_mgr !== undefined){//可能有多个 -> '811488,822472'
+  if (service_mgr !== '' && service_mgr !== undefined) {//可能有多个 -> '811488,822472'
     mgr_ids.push(service_mgr);
+    service_ids.push(service_mgr);
   }
 
-  let manager = ','+mgr_ids.join(',')+',';
-  // console.log('manager -> ', manager);
-  let is_mgr = manager.indexOf(','+currentUser+',') !== -1;
+  let manager = ',' + mgr_ids.join(',') + ',';
+  let is_mgr = manager.indexOf(',' + currentUser + ',') !== -1;
+  // console.log('manager -> ', manager, is_mgr);
+
+  let service_manager = ',' + mgr_ids.join(',') + ',';
+  let is_service_mgr = service_manager.indexOf(',' + currentUser + ',') !== -1;
+  // console.log('service_manager -> ', service_manager, is_service_mgr);
+
   return {
     currVendorId: currVendorId,
     currVendorName: currVendorName,
     currVersion: currVersion,
     currManager: manager,
     is_mgr: is_mgr,
+    is_service_mgr: is_service_mgr,
+    service_uid: service_uid,
   };
 }
+
+export function server_info({global, user}) {
+  if(user === undefined){
+    return {};
+  }
+  let {service_uid} = vendor(global);
+  let {user_info} = user;
+  return user_info[service_uid] === undefined ? {} : user_info[service_uid];
+}
+
 
 export function store(store_id, global) {
   const {canReadStores} = global;
@@ -161,6 +179,23 @@ export function resetNavStack(navigation, routeName, params = {}) {
   navigation.dispatch(resetAction)
 
   console.log('_resetNavStack ' + routeName)
+}
+
+export function platforms_map() {
+  let map = {};
+  map[Cts.WM_PLAT_ID_BD] = '百度';
+  map[Cts.WM_PLAT_ID_MT] = '美团';
+  map[Cts.WM_PLAT_ID_ELE] = '饿了么';
+  map[Cts.WM_PLAT_ID_JD] = '京东';
+  map[Cts.WM_PLAT_ID_WX] = '微信';
+  map[Cts.WM_PLAT_ID_APP] = 'App';
+  map[Cts.WM_PLAT_UNKNOWN] = '未知';
+  return map;
+}
+
+export function get_platform_name(platformId) {
+  let map = platforms_map();
+  return map[platformId] === undefined ? platformId : map[platformId];
 }
 
 export default {
