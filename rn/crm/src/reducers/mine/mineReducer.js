@@ -5,6 +5,7 @@ const {
   GET_WORKER,
   GET_VENDOR_STORES,
   GET_STORE_TURNOVER,
+  GET_WM_STORES,
 } = require('../../common/constants').default;
 import Cts from "../../Cts";
 
@@ -20,6 +21,7 @@ const initialState = {
   user_list: {},
   order_num: {},
   turnover: {},
+  wm_list: {},
 };
 
 export default function mine(state = initialState, action) {
@@ -45,6 +47,11 @@ export default function mine(state = initialState, action) {
         ...state,
         order_num: order_num(state, action),
         turnover: turnover(state, action),
+      };
+    case GET_WM_STORES:
+      return {
+        ...state,
+        wm_list: wm_list(state, action),
       };
     default:
       return state;
@@ -81,6 +88,11 @@ function order_num(state, action) {
 function turnover(state, action) {
   state.turnover[action.store_id] = action.turnover;
   return state.turnover;
+}
+
+function wm_list(state, action) {
+  state.wm_list[action.store_id] = action.wm_list;
+  return state.wm_list;
 }
 
 

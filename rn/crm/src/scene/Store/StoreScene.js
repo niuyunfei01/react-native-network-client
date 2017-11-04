@@ -109,9 +109,6 @@ class StoreScene extends PureComponent {
           isRefreshing: false,
           curr_stores: Object.values(curr_stores),
         });
-        if (_this.state.isRefreshing) {
-          ToastShort('刷新门店列表完成');
-        }
       }
     }));
   }

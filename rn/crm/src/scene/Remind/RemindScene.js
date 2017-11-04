@@ -39,12 +39,14 @@ import * as globalActions from '../../reducers/global/globalActions'
 import RNButton from '../../widget/RNButton';
 import Config from '../../config'
 import Cts from '../../Cts'
+
 const BadgeTabBar = require('./BadgeTabBar');
 import {Dialog, ActionSheet} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -95,9 +97,10 @@ class RemindScene extends PureComponent {
   componentWillMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
-    dispatch(fetchRemindCount(token));
+    let {store_id, vendor_id} = this._getStoreAndVendorId();
+    dispatch(fetchRemindCount(vendor_id,store_id,token));
     _fetchDataTypeIds.forEach((typeId) => {
-      dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
+      dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     });
   }
 
@@ -113,7 +116,9 @@ class RemindScene extends PureComponent {
   onRefresh(typeId) {
     const {dispatch} = this.props;
     let token = this._getToken();
-    dispatch(fetchRemind(true, false, typeId, false, 1, token, 0));
+    let {store_id, vendor_id} = this._getStoreAndVendorId();
+    dispatch(fetchRemindCount(vendor_id,store_id,token));
+    dispatch(fetchRemind(true, false, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     canLoadMore = true;
   }
 
@@ -121,6 +126,13 @@ class RemindScene extends PureComponent {
     const {global} = this.props;
     return global['accessToken']
   }
+
+  _getStoreAndVendorId() {
+    let {currVendorId} = tool.vendor(this.props.global);
+    let {currStoreId} = this.props.global;
+    return {'store_id': currStoreId, 'vendor_id': currVendorId}
+  }
+
 
   onPress(route, params) {
     let self = this;
@@ -207,12 +219,12 @@ class RemindScene extends PureComponent {
     let pageNum = remind.currPage[typeId];
     canLoadMore = true;
     if (remind.noMore[typeId]) {
-      ToastShort('没有更多数据了');
       canLoadMore = false;
     }
     if (canLoadMore && time - loadMoreTime > 1) {
       const {dispatch} = this.props;
-      dispatch(fetchRemind(false, false, typeId, true, pageNum + 1, token, 0));
+      let {store_id, vendor_id} = this._getStoreAndVendorId();
+      dispatch(fetchRemind(false, false, typeId, true, pageNum + 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
       loadMoreTime = Date.parse(new Date()) / 1000;
     }
   }
@@ -304,6 +316,7 @@ class RemindScene extends PureComponent {
       return <LoadingView/>;
     }
     let loading = remind.remindList[typeId] == undefined ? true : false;
+    let {store_id, vendor_id} = this._getStoreAndVendorId();
     if (loading) {
       const {dispatch} = this.props;
       let token = this._getToken();
@@ -317,7 +330,7 @@ class RemindScene extends PureComponent {
             <RefreshControl
               refreshing={loading}
               onRefresh={() => {
-                dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
+                dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
               }}
               title={"加载中..."}
               colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
@@ -342,7 +355,7 @@ class RemindScene extends PureComponent {
           viewAreaCoveragePercentThreshold: 100,
           waitForInteraction: true,
         }}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={10}
         renderItem={this.renderItem}
         onEndReached={this.onEndReached.bind(this, typeId)}
         onRefresh={this.onRefresh.bind(this, typeId)}

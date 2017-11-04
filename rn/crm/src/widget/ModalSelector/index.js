@@ -25,7 +25,7 @@ const propTypes = {
   data: PropTypes.array,
   onChange: PropTypes.func,
   skin: PropTypes.string,//['default', 'customer']
-  defaultKey: PropTypes.string,//默认选项的key
+  defaultKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),//默认选项的key
   defaultSelectStyle: ViewPropTypes.style,//默认选项的样式
   defaultTextStyle: Text.propTypes.style,//默认选项的文本样式
   checkMark: PropTypes.bool,//默认选项的对号(默认开启)

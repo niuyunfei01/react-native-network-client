@@ -69,10 +69,13 @@ export default keyMirror({
   GET_WORKER: null,
   GET_VENDOR_STORES: null,
   GET_STORE_TURNOVER: null,
+  GET_WM_STORES: null,
 
   GET_CONTACT_REQUEST: null,
   GET_CONTACT_SUCCESS: null,
   GET_CONTACT_FAILURE: null,
+
+  GET_USER_INFO: null,
 
   GET_NAME_PRICES: null,
 

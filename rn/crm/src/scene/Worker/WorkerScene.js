@@ -112,12 +112,9 @@ class WorkerScene extends PureComponent {
           _this.setState({
             normal: normal,
             forbidden: forbidden,
+            isRefreshing: false,
           });
-          if (_this.state.isRefreshing) {
-            ToastShort('刷新完成');
-          }
         }
-        _this.setState({isRefreshing: false});
       }));
     });
   }
