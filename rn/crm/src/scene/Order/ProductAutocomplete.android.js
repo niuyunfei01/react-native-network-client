@@ -44,7 +44,7 @@ class ProductAutocomplete extends Component {
       return [];
     }
 
-    const { films } = this.state;
+    const { films }  = this.state;
     const regex = new RegExp(`${query.trim()}`, 'i');
     return films.filter(film => film.title.search(regex) >= 0);
   }
