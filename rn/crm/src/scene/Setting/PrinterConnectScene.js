@@ -71,7 +71,7 @@ class PrinterConnectScene extends PureComponent {
       scanning: false,
       peripherals: new Map(),
       appState: ''
-    }
+    };
 
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);

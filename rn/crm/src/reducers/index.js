@@ -16,6 +16,7 @@ import order from './order/orderReducer'
 import remind from './remind/remindReducer'
 import store from './store/storeReducer'
 import mine from './mine/mineReducer'
+import product from './product/productReducer'
 
 import {combineReducers} from 'redux'
 
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   remind,
   store,
   mine,
+  product,
 });
 
 export default rootReducer

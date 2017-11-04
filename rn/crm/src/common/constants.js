@@ -74,4 +74,6 @@ export default keyMirror({
   GET_CONTACT_SUCCESS: null,
   GET_CONTACT_FAILURE: null,
 
+  GET_NAME_PRICES: null,
+
 })

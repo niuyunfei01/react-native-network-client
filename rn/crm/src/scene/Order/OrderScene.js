@@ -31,7 +31,6 @@ import pxToDp from "../../util/pxToDp";
 import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
 import {ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
-import ModalDropdown from 'react-native-modal-dropdown';
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -60,7 +59,6 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
-
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
 const supportEditGoods = (orderStatus) => {
@@ -367,7 +365,8 @@ class OrderScene extends Component {
 
   _openAddGood  () {
     const {navigation, dispatch} = this.props;
-    navigation.navigate('ProductAutocomplete')
+    const order = this.props.order.order;
+    navigation.navigate('ProductAutocomplete', {esId: order.ext_store_id, platform: order.platform, storeId: order.store_id})
   }
 
   _doAddItem(item) {
@@ -755,7 +754,7 @@ class OrderScene extends Component {
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
-          {!this.state.itemsHided &&
+          {!this.state.itemsHided && this.state.isEditing &&
           <View style={[styles.row, {height: pxToDp(100), alignItems: 'center', justifyContent: 'center', marginTop: 0, borderBottomColor: colors.color999,
             borderBottomWidth: screen.onePixel}]}>
             <ImageBtn source={require('../../img/Order/good/jiahuo_.png')}
@@ -959,7 +958,7 @@ class ItemRow extends PureComponent {
       {!isEditing &&
       <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
       {isEditing &&
-      <View style={[top_styles.stepper, {marginLeft: 10}]}>
+      <View style={[{marginLeft: 10}]}>
         <InputNumber
           styles={inputNumberStyles}
           min={0}
@@ -1149,10 +1148,6 @@ const styles = StyleSheet.create({
   block: {
     marginTop: pxToDp(10),
     backgroundColor: colors.white,
-  },
-  stepper: {
-    // height: 44,
-    // marginTop: 100,
   },
   editStatus: {
     color: colors.white,
