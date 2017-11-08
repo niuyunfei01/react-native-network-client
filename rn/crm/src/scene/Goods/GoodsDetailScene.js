@@ -21,7 +21,7 @@ import * as tool from "../../common/tool";
 import {fetchProductDetail, fetchVendorProduct} from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
-
+import Swiper from 'react-native-swiper';
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -70,7 +70,6 @@ class GoodsDetailScene extends PureComponent {
     this.productId = (this.props.navigation.state.params || {}).productId;
     let product_id = this.productId;
     const {product_detail} = this.props.product;
-    // console.log('product_detail -> ', product_detail);
     if (product_detail[product_id] === undefined) {
       this.getProductDetail();
     } else {
@@ -90,7 +89,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, accessToken, (resp) => {
-          // console.log(resp);
+          // console.log('product_detail -> ', product_detail);
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -133,6 +132,7 @@ class GoodsDetailScene extends PureComponent {
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.getProductDetail();
+    this.getVendorProduct();
   }
 
   render() {
@@ -151,7 +151,7 @@ class GoodsDetailScene extends PureComponent {
         }
         style={{backgroundColor: colors.main_back}}
       >
-        {this.renderImg(product_detail.coverimg)}
+        {this.renderImg(product_detail.mid_list_img, product_detail.coverimg)}
 
         <View style={[styles.goods_view, {marginBottom: 0}]}>
           <Text style={styles.goods_name}>
@@ -252,18 +252,41 @@ class GoodsDetailScene extends PureComponent {
     }
   };
 
-  renderImg = (img_url) => {
-    return (
-      <Image
-        style={[styles.goods_img]}
-        source={{uri: img_url}}
-      />
-    );
+  renderImg = (list_img, cover_img) => {
+    if(tool.length(list_img) > 0){
+      let img_list = list_img.map((img_url, idx) => {
+        return (
+          <Image
+            key={idx}
+            style={[styles.goods_img]}
+            source={{uri: img_url}}
+          />
+        );
+      });
+      return (
+        <Swiper style={styles.wrapper}>
+          {img_list}
+        </Swiper>
+      );
+    } else {
+      return (
+        <View style={styles.wrapper}>
+          <Image
+            style={[styles.goods_img]}
+            source={{uri: cover_img}}
+          />
+        </View>
+      );
+    }
   };
 
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    width: pxToDp(720),
+    height: pxToDp(444),
+  },
   goods_img: {
     width: pxToDp(720),
     height: pxToDp(444),
