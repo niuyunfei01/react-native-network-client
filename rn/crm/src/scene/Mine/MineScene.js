@@ -155,9 +155,9 @@ class MineScene extends PureComponent {
           _this.setState({
             sign_count: sign_count,
             bad_cases_of: bad_cases_of,
-            isRefreshing: false,
           });
         }
+        _this.setState({isRefreshing: false});
       }));
     });
   }
@@ -176,9 +176,9 @@ class MineScene extends PureComponent {
           _this.setState({
             order_num: order_num,
             turnover: turnover,
-            isRefreshing: false,
           });
         }
+        _this.setState({isRefreshing: false});
       }));
     });
   }

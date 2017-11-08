@@ -128,9 +128,9 @@ class UserAddScene extends PureComponent {
           });
           _this.setState({
             stores: stores.concat(v_store),
-            isRefreshing: false,
           });
         }
+        _this.setState({isRefreshing: false});
       }));
     });
   }

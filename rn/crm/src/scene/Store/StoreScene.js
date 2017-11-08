@@ -106,10 +106,10 @@ class StoreScene extends PureComponent {
       if (resp.ok) {
         let curr_stores = resp.obj;
         _this.setState({
-          isRefreshing: false,
           curr_stores: Object.values(curr_stores),
         });
       }
+      _this.setState({isRefreshing: false});
     }));
   }
 
@@ -123,13 +123,13 @@ class StoreScene extends PureComponent {
       if (resp.ok) {
         let {user_list} = resp.obj;
         _this.setState({
-          isRefreshing: false,
           curr_user_list: user_list,
         });
         if (_this.state.isRefreshing) {
           ToastShort('刷新员工完成');
         }
       }
+      _this.setState({isRefreshing: false});
     }));
   }
 
