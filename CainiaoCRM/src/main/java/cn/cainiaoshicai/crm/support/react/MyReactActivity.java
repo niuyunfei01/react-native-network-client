@@ -63,6 +63,14 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
             }
         }
 
+        Integer productId = intent.getIntExtra("product_id", 0);
+        if (productId > 0) {
+            _action_params.putString("productId", String.valueOf(productId));
+            if (TextUtils.isEmpty(toRoute)) {
+                toRoute = "GoodsDetail";
+            }
+        }
+
         AccountBean ab = GlobalCtx.app().getAccountBean();
         if (ab != null && ab.getInfo() != null) {
             init.putBundle("userProfile", ab.getInfo().toBundle());
