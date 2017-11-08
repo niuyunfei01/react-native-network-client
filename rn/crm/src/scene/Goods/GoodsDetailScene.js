@@ -8,7 +8,7 @@
 
 //import liraries
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl, InteractionManager,} from 'react-native';
+import {View, Text, StyleSheet, Image, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, InteractionManager,} from 'react-native';
 import {Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Input, Label, Icon, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -22,6 +22,7 @@ import {fetchProductDetail, fetchVendorProduct} from "../../reducers/product/pro
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
+
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -58,12 +59,14 @@ class GoodsDetailScene extends PureComponent {
 
     this.state = {
       isRefreshing: false,
+      full_screen: false,
       product_detail: {},
       store_product: {},
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
     this.getVendorProduct = this.getVendorProduct.bind(this);
+    this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
   }
 
   componentWillMount() {
@@ -136,10 +139,15 @@ class GoodsDetailScene extends PureComponent {
   }
 
   render() {
-    let {product_detail} = this.state;
+    let {full_screen, product_detail} = this.state;
     if (!(tool.length(product_detail) > 0)) {
       return <LoadingView/>;
     }
+
+    if(full_screen){
+      return this.renderImg(product_detail.list_img, product_detail.source_img);
+    }
+
     return (
       <ScrollView
         refreshControl={
@@ -253,34 +261,66 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderImg = (list_img, cover_img) => {
+    let {full_screen} = this.state;
+    let wrapper = full_screen ? full_styles.wrapper : styles.wrapper;
+    let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
+
     if(tool.length(list_img) > 0){
+      let _this = this;
       let img_list = list_img.map((img_url, idx) => {
         return (
-          <Image
+          <TouchableHighlight
             key={idx}
-            style={[styles.goods_img]}
+            onPress={_this.onToggleFullScreen}
+          >
+          <Image
+            style={goods_img}
             source={{uri: img_url}}
           />
+          </TouchableHighlight>
         );
       });
       return (
-        <Swiper style={styles.wrapper}>
+        <Swiper style={wrapper}>
           {img_list}
         </Swiper>
       );
     } else {
       return (
-        <View style={styles.wrapper}>
+        <TouchableHighlight
+          style={wrapper}
+          onPress={this.onToggleFullScreen}
+        >
           <Image
-            style={[styles.goods_img]}
+            style={[goods_img]}
             source={{uri: cover_img}}
           />
-        </View>
+        </TouchableHighlight>
       );
     }
   };
 
+  onToggleFullScreen(){
+    let {full_screen} = this.state;
+    this.setState({
+      full_screen: !full_screen,
+    });
+  }
 }
+
+const full_styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+  },
+  goods_img: {
+    width: '100%',
+    height: '100%',
+    resizeMode: Image.resizeMode.contain,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.main_back,
+  },
+});
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -290,7 +330,8 @@ const styles = StyleSheet.create({
   goods_img: {
     width: pxToDp(720),
     height: pxToDp(444),
-    backgroundColor: '#999',
+    resizeMode: Image.resizeMode.contain,
+    backgroundColor: colors.main_back,
     marginBottom: pxToDp(15),
   },
   goods_view: {
