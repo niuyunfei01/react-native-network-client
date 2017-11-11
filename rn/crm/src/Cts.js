@@ -51,4 +51,8 @@ export default {
   WM_PLAT_ID_JD: 6,
   WM_PLAT_UNKNOWN: -1,
 
+  STORE_PROD_ON_SALE: 1,
+  STORE_PROD_OFF_SALE: 3,
+  STORE_PROD_SOLD_OUT: 2,
+
 }

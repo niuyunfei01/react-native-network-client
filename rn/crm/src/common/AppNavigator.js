@@ -34,6 +34,7 @@ import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import NavigationItem from "../widget/NavigationItem";
 import TakeOutScene from "../scene/Store/TakeOutScene";
+import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
 
 const Tab = TabNavigator(
   {
@@ -92,7 +93,6 @@ const Tab = TabNavigator(
 
     Mine: {
       screen: MineScene,
-      // screen: TakeOutScene,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: '我的',
         tabBarIcon: ({focused, tintColor}) => (
@@ -116,7 +116,7 @@ const Tab = TabNavigator(
     lazy: true,
     tabBarOptions: {
       activeTintColor: color.theme,
-      inactiveTintColor: '#99579797',
+      inactiveTintColor: '#666',
       style: {backgroundColor: '#ffffff'},
     },
   }
@@ -178,6 +178,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
+        [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
 
       },
       stackNavigatorConfigs

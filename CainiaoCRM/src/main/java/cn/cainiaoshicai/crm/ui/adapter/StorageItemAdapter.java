@@ -2,6 +2,8 @@ package cn.cainiaoshicai.crm.ui.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import java.util.List;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
@@ -114,6 +117,23 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day()/5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
+        holder.goodIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context ctx = v.getContext();
+                if (ctx  == null) {
+                    return;
+                }
+
+                Intent openGoodsDetail = new Intent(ctx, MyReactActivity.class);
+                openGoodsDetail.putExtra("product_id", item.getProduct_id());
+                try {
+                    ctx.startActivity(openGoodsDetail);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         // Trigger the download of the URL asynchronously into the image view.
         String thumbPicUrl = item.getThumbPicUrl();

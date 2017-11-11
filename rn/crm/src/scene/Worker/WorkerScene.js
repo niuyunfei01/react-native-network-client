@@ -112,9 +112,9 @@ class WorkerScene extends PureComponent {
           _this.setState({
             normal: normal,
             forbidden: forbidden,
-            isRefreshing: false,
           });
         }
+        _this.setState({isRefreshing: false});
       }));
     });
   }

@@ -79,4 +79,6 @@ export default keyMirror({
 
   GET_NAME_PRICES: null,
 
+  GET_PRODUCT_DETAIL: null,
+
 })

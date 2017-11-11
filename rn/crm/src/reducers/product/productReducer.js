@@ -1,18 +1,17 @@
-'use strict'
+'use strict';
 
 /**
  * ## Actions
  *
  */
 const {
-
   GET_NAME_PRICES,
-
-  SET_STATE
+  GET_PRODUCT_DETAIL,
 } = require('../../common/constants').default;
 
 const initialState = {
   ext_prod_map: {0:{prods:{}, prices:{}}},   /* 产品名列表, 价格列表*/
+  product_detail: {},
 };
 
 /**
@@ -35,11 +34,19 @@ export default function productReducer(state = initialState, action) {
 
         return state;
       }
-
-    // case REHYDRATE:
-    //     return  { ...state, ...action.payload }
-
+    case GET_PRODUCT_DETAIL:
+      return {
+        ...state,
+        product_detail: product_detail(state, action),
+      };
+    default:
+      return state;
   }
-
-  return state
 }
+
+function product_detail(state, action) {
+  state.product_detail[action.product_id] = action.product_detail;
+  return state.product_detail;
+}
+
+

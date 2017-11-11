@@ -135,10 +135,10 @@ class TakeOutScene extends PureComponent {
       if (resp.ok) {
         let wm_list = resp.obj;
         _this.setState({
-          isRefreshing: false,
           wm_list: wm_list,
         });
       }
+      _this.setState({isRefreshing: false});
     }));
   }
 
