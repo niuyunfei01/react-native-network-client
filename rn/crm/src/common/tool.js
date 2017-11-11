@@ -21,8 +21,26 @@ export function objectMap(obj, fn) {
   return Object.keys(obj).map((key) => fn(obj[key], key))
 }
 
+/**
+ *
+ * @param obj
+ * @param fn (item, key) => true/false
+ * @returns {{}}
+ */
+export function objectFilter(obj, fn) {
+  const filterObj = {};
+  Object.keys(obj).filter((key) => fn(obj[key], key)).map((key) => filterObj[key] = obj[key]);
+  return filterObj
+}
+
 export function objectReduce(obj, fn) {
   return Object.keys(obj).reduce((idx1, idx2) => fn(obj[idx1], obj[idx2]))
+}
+
+export function objectSum(obj, fn) {
+  let total = 0;
+  Object.keys(obj).map((key) => total += fn(obj[key]));
+  return total;
 }
 
 export function shortOrderDay(dt) {
@@ -198,6 +216,14 @@ export function get_platform_name(platformId) {
   return map[platformId] === undefined ? platformId : map[platformId];
 }
 
+export function intOf(val) {
+  if (typeof val === 'string') {
+    return parseInt(val);
+  }
+
+  return val;
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -209,5 +235,8 @@ export default {
   orderOrderTimeShort,
   orderExpectTime,
   resetNavStack,
+  objectSum,
+  objectFilter,
   store,
+  intOf
 }

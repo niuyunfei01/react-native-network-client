@@ -349,10 +349,6 @@ class OrderEditScene extends Component {
         </Cell>
       </Cells>
 
-      {/*<ButtonArea style={{marginTop: 35}}>*/}
-        {/*<Button type="primary" disabled={this._shouldDisabledSaveBtn()} onPress={this._doSaveEdit} style={[S.mlr15]}>保存</Button>*/}
-      {/*</ButtonArea>*/}
-
       <Toast
         icon="loading"
         show={this.state.onSubmitting}

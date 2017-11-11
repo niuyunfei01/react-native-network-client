@@ -59,7 +59,7 @@ export default keyMirror({
   ORDER_PRINTED_CLOUD: null,
   ORDER_ADD_ITEM: null,
   ORDER_EDIT_ITEM: null,
-
+  ORDER_INVALIDATED: null,
 
   FORGOT_PASSWORD: null,
   LOGIN: null,

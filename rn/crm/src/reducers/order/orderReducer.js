@@ -20,6 +20,7 @@ const {
   ORDER_UPDATE_FAILURE,
 
   ORDER_EDIT_ITEM,
+  ORDER_INVALIDATED,
 
   LOGOUT_SUCCESS,
 
@@ -56,6 +57,15 @@ export default function orderReducer(state = initialState, action) {
         return {
           ...state,
           order: state.order
+        }
+      } else {
+        return state;
+      }
+
+    case ORDER_INVALIDATED:
+      if (action.order && action.id === action.order.id) {
+        return {
+          ...state, order: {}
         }
       } else {
         return state;

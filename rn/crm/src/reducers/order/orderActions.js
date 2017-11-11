@@ -22,6 +22,7 @@ const {
   ORDER_PRINTED_CLOUD,
   ORDRE_ADD_ITEM,
   ORDER_EDIT_ITEM,
+  ORDER_INVALIDATED,
 
 } = require('../../common/constants').default;
 
@@ -79,6 +80,11 @@ export function orderEditItem(item) {
 }
 
 /**
+ * 
+ * @param sessionToken
+ * @param orderId
+ * @param callback (ok, msg|order) => {}
+ * @returns {function(*)}
  */
 export function getOrder(sessionToken, orderId, callback) {
   callback = callback || function(){};
@@ -105,6 +111,26 @@ export function saveOrderBaisc(token, orderId, changes, callback) {
     const url = `api/order_chg_basic/${orderId}.json?access_token=${token}`
     jsonWithTpl(url, changes, (json) => {
         callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+/**
+ */
+export function saveOrderItems(token, wmId, changes, callback) {
+  return dispatch => {
+    const url = `api/order_chg_goods/${wmId}.json?access_token=${token}`;
+    jsonWithTpl(url, changes, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: wmId});
+          callback(true, json.reason, json.obj);
+        } else {
+          callback(false, json.reason, json.obj);
+        }
       }, (error) => {
         console.log('error:', error);
         callback(false, "网络错误, 请稍后重试")

@@ -20,10 +20,10 @@ class WebScene extends PureComponent {
   });
 
   constructor(props: Object) {
-    super(props)
+    super(props);
     this.state = {
       source: {},
-    }
+    };
 
     this._do_go_back = this._do_go_back.bind(this)
   }
@@ -33,24 +33,24 @@ class WebScene extends PureComponent {
       this.webview.postMessage(JSON.stringify(obj));
       console.log('post----', obj)
     }
-  }
+  };
 
   onMessage = (e) => {
     const msg = e.nativeEvent.data;
     if (typeof msg === 'string') {
       this._do_go_back(msg);
     }
-  }
+  };
 
   _do_go_back(msg) {
-    const data = JSON.parse(msg)
+    const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
       const {goBack, state} = this.props.navigation;
       const params = state.params;
       if (params.actionBeforeBack) {
         params.actionBeforeBack(data)
       }
-      console.log('goback', params)
+      console.log('goback', params);
       goBack()
     }
   }

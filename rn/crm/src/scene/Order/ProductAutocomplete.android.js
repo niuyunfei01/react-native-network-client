@@ -14,6 +14,10 @@ import {getProdPricesList, keyOfProdInfos} from '../../reducers/product/productA
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import colors from "../../styles/colors";
+import NavigationItem from "../../widget/NavigationItem";
+
+const numeral = require('numeral');
 
 function mapStateToProps(state) {
   return {
@@ -31,39 +35,51 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ProductAutocomplete extends Component {
-  static renderFilm(prod) {
-    const { name, pid, price, saleStatus } = prod;
 
-    return (
-      <View>
-        <Text style={styles.titleText}>[{saleStatus}] {name}</Text>
-        <Text style={styles.directorText}>({pid})</Text>
-        <Text style={styles.openingText}>{price}</Text>
-      </View>
-    );
-  }
-
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    return {
+      headerTitle: (
+        <View>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>选择商品</Text>
+        </View>
+      ),
+      headerRight: <NavigationItem
+          title="保存"
+          onPress={() => {
+            params.saving()
+          }}
+          disabled={params.savingDisabled}
+        />,
+    }
+  };
+  
   constructor(props) {
     super(props);
     this.state = {
-      films: [],
       query: '',
+      pid: 0,
       itemNumber: 0,
+      numOfPid: {},
       prodInfos: {},
       loadingInfoError: '',
       loadingProds: false,
     };
-    this._onInputNumberChange = this._onInputNumberChange.bind(this)
+    this._onInputNumberChange = this._onInputNumberChange.bind(this);
+    this._onProdSelected = this._onProdSelected.bind(this);
+    this._hasPid = this._hasPid.bind(this);
+    this._onSaveAndClose = this._onSaveAndClose.bind(this);
   }
 
   componentDidMount() {
+
+    const {dispatch, navigation} = this.props;
 
     const {esId, platform, storeId} = (this.props.navigation.state.params || {});
     const key = keyOfProdInfos(esId, platform, storeId);
     const prodInfos = (this.props.product.prodInfos || {})[key];
     if (!prodInfos) {
       this.setState({loadingProds: true});
-      const {dispatch} = this.props;
       const token = this.props.global.accessToken;
       dispatch(getProdPricesList(token, esId, platform, storeId, (ok, msg, data) => {
         if (ok && data) {
@@ -78,20 +94,56 @@ class ProductAutocomplete extends Component {
     } else {
       this.setState({prodInfos});
     }
+
+    navigation.setParams({saving: this._onSaveAndClose, savingDisabled: true});
   }
 
   findFilm(query) {
-    if (query === '') {
+    if (query === '' || query === '[上架]' || query === '[下架]' || query === '[' || query === ']') {
       return [];
     }
-
     const { prodInfos }  = this.state;
-    const regex = new RegExp(`${query.trim()}`, 'i');
-    return Object.keys(prodInfos).map((k) => prodInfos[k]).filter(prod => prod.name.search(regex) >= 0);
+    try {
+      query = query.replace(/\[上架\]|\[下架\]|\[上架|\[下架|\[上|\[下/, '');
+      const regex = new RegExp(`${query.trim()}`, 'i');
+      return Object.keys(prodInfos).map((k) => prodInfos[k]).filter(prod => prod.name.search(regex) >= 0);
+    }catch (ex) {
+      console.log('ex:', ex);
+      return [];
+    }
+  }
+
+  _hasPid() {
+    const has = this.state.pid !== '' && this.state.pid !== 0 && this.state.pid !== '0';
+    console.log('has', has);
+    return has;
+  }
+
+  _onProdSelected(name, pid, price) {
+    const num = this.state.numOfPid[pid] || 1;
+    this.setState({query: name, itemNumber: num, pid, numOfPid: {...this.state.numOfPid, [pid]: num}});
+
+    const {dispatch, navigation} = this.props;
+    navigation.setParams({savingDisabled: false});
   }
 
   _onInputNumberChange(v) {
-    this.setState({itemNumber: v});
+    this.setState({itemNumber: v, numOfPid: {...this.state.numOfPid, [this.state.pid]: v}});
+
+    const {dispatch, navigation} = this.props;
+    navigation.setParams({savingDisabled: !v});
+  }
+
+  _onSaveAndClose() {
+    const {dispatch, navigation} = this.props;
+    const {goBack, state} = this.props.navigation;
+    const params = state.params;
+    if (params.actionBeforeBack && this.state.pid) {
+      const prod = this.state.prodInfos[this.state.pid];
+      const num = this.state.numOfPid[this.state.pid];
+      params.actionBeforeBack(prod, num);
+    }
+    goBack()
   }
 
   render() {
@@ -99,47 +151,55 @@ class ProductAutocomplete extends Component {
     const { query } = this.state;
     const filteredProds = this.findFilm(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
-
+    console.log(this.state);
+    
     return (
       <View style={styles.container}>
-        <View style={{flexDirection: 'row'}}>
-          <Autocomplete
-            autoCapitalize="none"
-            autoCorrect={false}
-            containerStyle={[styles.autocompleteContainer, {paddingLeft: pxToDp(30)}]}
-            data={filteredProds.length === 1 && comp(query, filteredProds[0].name) ? [] : filteredProds}
-            defaultValue={query}
-            onChangeText={text => this.setState({query: text})}
-            placeholder="Enter Star Wars film title"
-            renderItem={({name, price, pid}) => (
-              <TouchableOpacity onPress={() => this.setState({query: name})}>
-                <Text style={styles.itemText}>
-                  {name} ({price})
-                </Text>
-              </TouchableOpacity>
-            )}
-            underlineColorAndroid={'transparent'}
-          />
-
-          <View style={{flex: 1}}/>
+        <Autocomplete
+          autoCapitalize="none"
+          autoCorrect={false}
+          containerStyle={[styles.autocompleteContainer]}
+          data={filteredProds.length === 1 && comp(query, filteredProds[0].name) ? [] : filteredProds}
+          defaultValue={query}
+          onChangeText={text => this.setState({query: text})}
+          placeholder="输入商品名模糊查找"
+          renderItem={({name, price, pid}) => (
+            <TouchableOpacity onPress={() => this._onProdSelected(name, pid, price)}>
+              <Text style={styles.itemText}>
+                {name} ({price})
+              </Text>
+            </TouchableOpacity>
+          )}
+          underlineColorAndroid={'transparent'}
+        />
+        
+        {this._hasPid() && <View>
+        <View style={{marginTop: pxToDp(120), height: 44,
+          paddingHorizontal: 10,}}>
           <InputNumber
             styles={inputNumberStyles}
             min={0}
-            inputStyle={{width: 50, flex: 0}}
-            onChange={(v) => {this._onInputNumberChange(v)}}
+            value={this.state.itemNumber}
+            inputStyle={{width: 50, flex: 0, height: pxToDp(100)}}
+            onChange={(v) => {
+              this._onInputNumberChange(v)
+            }}
             keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
           />
         </View>
-        <View style={styles.descriptionContainer}>
-          {filteredProds.length > 0 ? (
-            ProductAutocomplete.renderFilm(filteredProds[0])
-          ) : (
-            <Text style={styles.infoText}>
-              输入商品名模糊查找
-            </Text>
-          )}
-        </View>
+        <View style={{flexDirection: 'row', marginTop: pxToDp(80)}}>
+          <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+          <Text style={styles.moneyLabel}>单价</Text>
+          <Text style={styles.moneyText}>{(this.state.prodInfos[this.state.pid]||{}).price}/件</Text>
+          </View>
 
+          <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+            <Text style={[styles.moneyLabel]}>总额</Text>
+            <Text style={[styles.moneyText]}>{numeral((this.state.prodInfos[this.state.pid]||{}).price * (this.state.numOfPid[this.state.pid] || 1)).format('0.00')}元</Text>
+          </View>
+
+        </View>
+        </View>}
 
         <Dialog onRequestClose={() => {}}
                 visible={!!this.state.loadingInfoError}
@@ -173,19 +233,17 @@ const styles = StyleSheet.create({
     flex: 1,
     left: 0,
     position: 'absolute',
-    right: 160,
+    right: pxToDp(30),
     top: 0,
+    paddingLeft: pxToDp(30),
+    paddingTop: pxToDp(20),
     zIndex: 1
   },
+  moneyLabel: {fontSize: pxToDp(30), fontWeight:'bold'},
+  moneyText: {fontSize: pxToDp(40), color: colors.color999},
   itemText: {
     fontSize: 15,
     margin: 2
-  },
-  descriptionContainer: {
-    // `backgroundColor` needs to be set otherwise the
-    // autocomplete input will disappear on text input.
-    backgroundColor: '#F5FCFF',
-    marginTop: 25
   },
   infoText: {
     textAlign: 'center'

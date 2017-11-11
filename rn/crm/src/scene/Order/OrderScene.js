@@ -22,7 +22,7 @@ import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-import {getOrder, printInCloud, getRemindForOrderPage, saveOrderDelayShip} from '../../reducers/order/orderActions'
+import {getOrder, printInCloud, getRemindForOrderPage, saveOrderDelayShip, saveOrderItems} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
@@ -55,10 +55,15 @@ function mapDispatchToProps(dispatch) {
       getOrder,
       printInCloud,
       getRemindForOrderPage,
+      saveOrderItems,
       markTaskDone
     }, dispatch)
   }
 }
+
+const _editNum = function (edited, item) {
+  return edited ? edited.num - (item.origin_num === null ? item.num : item.origin_num) : 0;
+};
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
 const supportEditGoods = (orderStatus) => {
@@ -123,19 +128,30 @@ class OrderScene extends Component {
     super(props);
 
     this.state = {
+      
       isFetching: false,
-      isEditing: false,
+      orderReloading: false,
+
+      errorHints: '',
+
       doingUpdate: false,
+
+
+      //good items editing/display
+      isEditing: false,
       isEndVisible: false,
       itemsHided: true,
+      itemsAdded: {},
+      itemsEdited: {},
+      itemsSaving: false,
+
       shipHided: true,
       gotoEditPoi: false,
       showOptionMenu: false,
       showCallStore: false,
-      onProcessed: false,
-      errorHints: '',
-      itemsAdded: {},
-      itemsEdited: {},
+
+      //remind
+      onProcessed: false, 
       reminds: {},
     };
 
@@ -156,6 +172,7 @@ class OrderScene extends Component {
     this.onMenuOptionSelected = this.onMenuOptionSelected.bind(this);
     this.onSaveDelayShip = this.onSaveDelayShip.bind(this);
     this._openAddGood = this._openAddGood.bind(this);
+    this._totalEditingCents = this._totalEditingCents.bind(this);
   }
 
   componentDidMount() {
@@ -172,9 +189,24 @@ class OrderScene extends Component {
       this.onHeaderRefresh()
     } else {
       if (order) {
+
+        const edits = OrderScene._extract_edited_items(order.items);
+        console.log('edits are:', edits);
+        this.setState({
+          itemsEdited: edits,
+        });
+
         this.store_contacts = this.props.store.contacts[order.store_id];
       }
     }
+  }
+
+  static _extract_edited_items(items) {
+    const edits = {};
+    (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
+      edits[item.id] = item;
+    });
+    return edits;
   }
 
   onPrint() {
@@ -290,7 +322,7 @@ class OrderScene extends Component {
     const {dispatch} = this.props;
 
     dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
-      console.log(ok, data)
+      console.log(ok, data);
       if (ok) {
         this.setState({reminds: data})
       } else {
@@ -309,6 +341,12 @@ class OrderScene extends Component {
 
         if (!ok) {
           state.errorHints = data
+        } else {
+          const edits = OrderScene._extract_edited_items(data.items);
+          console.log('edits are:', edits);
+          this.setState({
+            itemsEdited: edits,
+          });
         }
         this.setState(state)
       }))
@@ -332,7 +370,7 @@ class OrderScene extends Component {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     dispatch(printInCloud(accessToken, this.orderId, (ok, msg, data) => {
-      console.log('print done:', ok, msg, data)
+      console.log('print done:', ok, msg, data);
       if (ok) {
         ToastShort("已发送到打印机");
       } else {
@@ -356,17 +394,60 @@ class OrderScene extends Component {
   }
 
   _doSaveItemsEdit() {
-    console.log("doSaveItemsEdit")
+
+    const {dispatch, order, global} = this.props;
+
+    const items = {
+      ...this.state.itemsAdded,
+      ...this.state.itemsEdited,
+    };
+
+    this.setState({onSubmitting: true});
+    const token = global.accessToken;
+    const wmId = order.order.id;
+    dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
+      console.log('resp', resp);
+      if (ok) {
+        this.setState({
+          itemsAdded: {},
+          itemsEdited: {},
+          isEditing: false,
+          onSubmitting: true,
+        });
+
+        dispatch(getOrder(token, wmId, (ok, data) => {
+          const ps = {
+            onSubmitting: false,
+          };
+          if (!ok) {
+            ps.errorHints = "刷新订单信息失败：" + data;
+          }
+          this.setState(ps);
+        }));
+      } else {
+        this.setState({
+          onSubmitting: false,
+          errorHints: msg
+        });
+      }
+    }));
   }
 
   _doSaveItemsCancel() {
     this.setState({isEditing: false})
   }
 
-  _openAddGood  () {
+  _openAddGood() {
     const {navigation, dispatch} = this.props;
     const order = this.props.order.order;
-    navigation.navigate('ProductAutocomplete', {esId: order.ext_store_id, platform: order.platform, storeId: order.store_id})
+    const params = {
+      esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
+      actionBeforeBack: (prod, num) => {
+        console.log(prod, num);
+        this._doAddItem({product_id: prod.pid, num, name: prod.name, price: prod.price, normal_price: prod.price * 100});
+      },
+    };
+    navigation.navigate('ProductAutocomplete', params);
   }
 
   _doAddItem(item) {
@@ -374,9 +455,9 @@ class OrderScene extends Component {
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
       let msg;
       if (item.num > 0) {
-        msg = `商品[${item['product_name']}]已更新`;
+        msg = `商品[${item['name']}]已更新`;
       } else {
-        msg = `商品[${item['product_name']}]已撤销`
+        msg = `商品[${item['name']}]已撤销`
       }
       ToastShort(msg)
     }
@@ -397,23 +478,34 @@ class OrderScene extends Component {
     }
   }
 
-  _totalEditCents() {
+  _totalEditingCents() {
     const {order} = this.props.order;
-    const totalAdd = tool.objectReduce(this.state.itemsAdded, (item1, item2) => item1.num * item1.normal_price + item2.num * item2.normal_price)
-    tool.objectMap(this.state.itemsEdited, (item, idx) => {
-      const base = order.items[item.id].num;
-      if (item.num >= base) {
-        return (item.num - base) * item.normal_price;
-      } else {
-        //退款金额： [(退款菜品现价 + 餐盒费)/(全部菜品现价总和 + 餐盒费)] * (最终支付价格 - 配送费)
-        //退款规则：
-        return (item.num - base) * item.normal_price;
-      }
-    });
-    const totalEdit = tool.objectReduce(this.state.itemsEdited, (item1, item2) => {
+    const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0  ?
+      tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
+    : 0;
 
-      return item1.num * item1.normal_price + item2.num * item2.normal_price
-    })
+    let totalEdit = 0;
+    if (this.state.itemsEdited) {
+      (order.items || []).map((item) => {
+        const edited = this.state.itemsEdited[item.id];
+        const editNum = _editNum(edited, item);
+        if (editNum !== 0) {
+          totalEdit += editNum * item.normal_price;
+        }
+      });
+    }
+
+    const totalChanged = totalAdd + totalEdit;
+
+    if (totalChanged < 0) {
+      //退款金额： [(退款菜品现价 + 餐盒费)/(全部菜品现价总和 + 餐盒费)] * (最终支付价格 - 配送费)
+      //退款规则：
+
+      return totalChanged;
+    }  else {
+      return totalChanged;
+    }
+
   }
 
   goToSetMap() {
@@ -632,7 +724,10 @@ class OrderScene extends Component {
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
-    const totalMoneyEdit = -10; //this._totalEditCents();
+    const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0 ;
+    const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit)  / 100;
+
+    console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
 
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
@@ -777,7 +872,7 @@ class OrderScene extends Component {
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
-              {numeral(order.total_goods_price / 100).format('0.00')}
+              {this.state.isEditing ? numeral(finalTotal).format('0.00') : order.total_good_price}
             </Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>
@@ -931,7 +1026,11 @@ class ItemRow extends PureComponent {
       }, isEditing = false
     } = this.props;
 
-    const showEditAdded = isEditing && !isAdd && edited && edited.num > item.num;
+    const editNum = _editNum(edited, item);
+
+    const showEditAdded = isEditing && !isAdd && edited && editNum !== 0;
+    const isPromotion = Math.abs(item.price * 100 - item.normal_price) >= 1;
+
     return <View key={idx} style={[styles.row, {
       marginTop: 0,
       paddingTop: pxToDp(14),
@@ -944,26 +1043,43 @@ class ItemRow extends PureComponent {
           fontSize: pxToDp(26),
           color: colors.color333,
           marginBottom: pxToDp(14)
-        }}>{item.product_name}</Text>
+        }}>{item.name}</Text>
         <View style={{flexDirection: 'row'}}>
           <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+          {!isAdd &&
           <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
+          }
         </View>
       </View>
-      {showEditAdded &&
-      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{edited.num - item.num}</Text>}
-      {isEditing && !isAdd && edited && edited.num < item.num &&
-      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{item.num - edited.num}</Text>}
-      {isEditing && isAdd && <Text>加货</Text>}
-      {!isEditing &&
+      {showEditAdded &&<View style={{alignItems: 'flex-end'}}>
+      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>
+      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(editNum * item.normal_price/100).format('0.00')}</Text>
+      </View>
+      }
+      {isEditing && !isAdd && edited && edited.num < item.num && <View style={{alignItems: 'flex-end'}}>
+      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{-editNum}件</Text>
+      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+      </View>
+        }
+      
+      {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>加货{item.num}</Text>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{ numeral(item.num * item.price).format('0.00')}</Text>
+      </View>}
+
+      {isPromotion &&
+        <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
+      }
+      {(!isEditing || isPromotion) && 
       <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
-      {isEditing &&
+
+      {isEditing && !isPromotion &&
       <View style={[{marginLeft: 10}]}>
         <InputNumber
           styles={inputNumberStyles}
           min={0}
-          defaultValue={parseInt(item.num)}
-          style={{backgroundColor: 'white', width: 86}}
+          value={parseInt((edited || item).num)}
+          style={{backgroundColor: 'white', width: 96}}
           onChange={(v) => {
             onInputNumberChange(item, v)
           }}
