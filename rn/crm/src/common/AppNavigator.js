@@ -35,6 +35,7 @@ import colors from "../styles/colors";
 import NavigationItem from "../widget/NavigationItem";
 import TakeOutScene from "../scene/Store/TakeOutScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
+import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 
 const Tab = TabNavigator(
   {
@@ -174,6 +175,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
+        [Config.ROUTE_ORDER_STORE]: {screen: OrderEditStoreScene},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},

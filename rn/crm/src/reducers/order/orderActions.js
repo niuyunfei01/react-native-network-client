@@ -110,6 +110,9 @@ export function saveOrderBaisc(token, orderId, changes, callback) {
   return dispatch => {
     const url = `api/order_chg_basic/${orderId}.json?access_token=${token}`
     jsonWithTpl(url, changes, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: orderId});
+        }
         callback(json.ok, json.reason, json.obj)
       }, (error) => {
         console.log('error:', error);
@@ -125,6 +128,26 @@ export function saveOrderItems(token, wmId, changes, callback) {
   return dispatch => {
     const url = `api/order_chg_goods/${wmId}.json?access_token=${token}`;
     jsonWithTpl(url, changes, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: wmId});
+          callback(true, json.reason, json.obj);
+        } else {
+          callback(false, json.reason, json.obj);
+        }
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+/**
+ */
+export function orderChgStore(token, wmId, store_id, old_store_id, reason, callback) {
+  return dispatch => {
+    const url = `api/order_chg_store/${wmId}/${store_id}/${old_store_id}.json?access_token=${token}&reason=${reason}`;
+    getWithTpl(url, (json) => {
         if (json.ok) {
           dispatch({type: ORDER_INVALIDATED, id: wmId});
           callback(true, json.reason, json.obj);

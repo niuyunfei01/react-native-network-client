@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
-import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
@@ -89,12 +88,12 @@ class UrgeShipScene extends Component {
 
   _checkDisableSubmit() {
     const key = this._getReasonKey();
-    return !(key && (key !== 'custom' || this.state.custom));
+    return !(key && (key !== 'custom' || this.state.why));
   }
 
   _getReasonKey(idx) {
     if (typeof idx === 'undefined') {
-      idx = this.state.reason_idx;
+      idx = this.state.toStoreId;
     }
     return this.state.reasons && idx >= 0 ? this.state.reasons[idx]['key'] : '';
   }
@@ -103,7 +102,7 @@ class UrgeShipScene extends Component {
     const {dispatch, global, navigation} = this.props;
     const {order, remind} = (navigation.state.params || {});
     this.setState({onSubmitting: true});
-    dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
+    dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.toStoreId, this.state.why, (ok, msg, data) => {
       console.log(ok, msg, data);
       this.setState({onSubmitting: false});
       if (ok) {
@@ -139,7 +138,7 @@ class UrgeShipScene extends Component {
 
       <Toast
         icon="loading"
-        show={this.state.onLoadingReasons}
+        show={this.state.onLoadingStores}
         onRequestClose={() => {
         }}
       >正在加载...</Toast>
@@ -150,7 +149,7 @@ class UrgeShipScene extends Component {
         options={reasonOpts}
         onChange={this._onReasonSelected}
         cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.reason_idx}
+        value={this.state.toStoreId}
       />
 
       {this._checkShowCustomTextArea() && <View>
@@ -162,7 +161,7 @@ class UrgeShipScene extends Component {
               maxLength={20}
               placeholder="请输入自定义回复内容"
               onChange={(v)=>{this.setState({custom: v})}}
-              value={this.state.custom}
+              value={this.state.why}
               underlineColorAndroid={'transparent'}
             />
             </CellBody>

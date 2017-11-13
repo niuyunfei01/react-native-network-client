@@ -83,11 +83,11 @@ class AuditRefundScene extends Component {
   }
 
   _checkShowCustomTextArea() {
-    return this.state.reason_idx === 'custom';
+    return this.state.toStoreId === 'custom';
   }
 
   _checkDisableSubmit() {
-    return !(this.state.reason_idx && (this.state.reason_idx !== 'custom' || this.state.custom));
+    return !(this.state.toStoreId && (this.state.toStoreId !== 'custom' || this.state.why));
   }
 
   _refundEquals() {
@@ -120,7 +120,7 @@ class AuditRefundScene extends Component {
     const {dispatch, global} = this.props;
 
     this.setState({onSubmitting: true});
-    const reason = this.state.reason_idx === 'custom' ? this.state.custom : reasons[this.state.reason_idx];
+    const reason = this.state.toStoreId === 'custom' ? this.state.why : reasons[this.state.toStoreId];
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason, (ok, msg, data) => {
       if (ok) {
         this.setState({onSubmitting: false});
@@ -136,7 +136,7 @@ class AuditRefundScene extends Component {
   }
 
   _shouldDisableRefuseBtn() {
-    return !this.state.reason_idx || (this.state.reason_idx === 'custom' && this.state.custom === '');
+    return !this.state.toStoreId || (this.state.toStoreId === 'custom' && this.state.why === '');
   }
 
   render() {
@@ -174,7 +174,7 @@ class AuditRefundScene extends Component {
           options={reasonOpts}
           onChange={this._onReasonSelected}
           cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.reason_idx}
+          value={this.state.toStoreId}
         />
 
         {this._checkShowCustomTextArea() && <View>
@@ -188,7 +188,7 @@ class AuditRefundScene extends Component {
               onChange={(v) => {
                 this.setState({custom: v})
               }}
-              value={this.state.custom}
+              value={this.state.why}
               underlineColorAndroid={'transparent'}
             />
               </CellBody>

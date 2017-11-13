@@ -73,6 +73,9 @@ const supportEditGoods = (orderStatus) => {
     orderStatus === Cts.ORDER_STATUS_SHIPPING
 };
 
+const MENU_EDIT_ADDR = 1;
+const MENU_EDIT_EXPECT_TIME = 2;
+const MENU_EDIT_STORE = 3;
 
 class OrderScene extends Component {
 
@@ -80,8 +83,9 @@ class OrderScene extends Component {
     const {params = {}} = navigation.state;
     let ActionSheet = [
       {key: -999, section: true, label: '操作'},
-      {key: 1, label: '修改地址'},
-      {key: 2, label: '修改配送时间'},
+      {key: MENU_EDIT_ADDR, label: '修改地址'},
+      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
+      {key: MENU_EDIT_STORE, label: '修改门店'},
     ];
 
     return {
@@ -185,13 +189,13 @@ class OrderScene extends Component {
     this.orderId = orderId;
     console.log("componentWillMount: params orderId:", orderId);
     const {order} = this.props.order;
+    console.log("order results:", order);
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
     } else {
       if (order) {
 
         const edits = OrderScene._extract_edited_items(order.items);
-        console.log('edits are:', edits);
         this.setState({
           itemsEdited: edits,
         });
@@ -230,19 +234,22 @@ class OrderScene extends Component {
 
   onMenuOptionSelected(option) {
     console.log('option -> ', option);
-    const {doingUpdate} = this.state;
-    if (doingUpdate) {
-      ToastShort("操作太快了！");
-      return false;
-    }
-    this.setState({doingUpdate: true});
     // const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    if (option.key === 1) {//修改地址
-    } else if (option.key === 2) {//修改配送时间
+    if (option.key === MENU_EDIT_ADDR) {//修改地址
+    } else if (option.key === MENU_EDIT_EXPECT_TIME) {//修改配送时间
+      if (this.state.doingUpdate) {
+        return;
+      }
       this.setState({
+        doingUpdate: true,
         isEndVisible: true,
       });
+    } else if (option.key === MENU_EDIT_STORE) {
+
+      const {navigation, order} = this.props;
+      navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order.order});
+
     } else {
       ToastShort('未知的操作');
     }
@@ -381,7 +388,6 @@ class OrderScene extends Component {
   }
 
   _doBluetoothPrint() {
-    console.log('_doBluetoothPrint')
     const order = this.props.order.order;
     native.printBtPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
@@ -872,7 +878,7 @@ class OrderScene extends Component {
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
-              {this.state.isEditing ? numeral(finalTotal).format('0.00') : order.total_good_price}
+              {numeral(finalTotal).format('0.00')}
             </Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>

@@ -31,6 +31,7 @@ export default {
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
+  ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_DONE_REMIND: 'DoneRemind',

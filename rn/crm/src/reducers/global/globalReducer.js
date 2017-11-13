@@ -15,8 +15,6 @@ const {
 
 } = require('../../common/constants').default
 
-import {REHYDRATE} from 'redux-persist/constants'
-
 const initialState = {
   currentUser: null,
   currStoreId: 0,
@@ -28,7 +26,7 @@ const initialState = {
   canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
   canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
   remindTags:null
-}
+};
 
 /**
  * ## globalReducer function
