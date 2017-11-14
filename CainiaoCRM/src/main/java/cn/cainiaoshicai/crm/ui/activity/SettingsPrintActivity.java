@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.CrashReportHelper;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -70,7 +71,14 @@ public class SettingsPrintActivity extends ListActivity {
 			}
 		});
 
+		GlobalCtx app = GlobalCtx.app();
+		boolean isDirect = app.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(app.getVendor().getVersion());
+
+		findViewById(R.id.label_use_preview).setVisibility(isDirect ? View.VISIBLE : View.GONE);
+
 		final Switch toggleUsePreview = (Switch) findViewById(R.id.toggleUsePreview);
+		toggleUsePreview.setVisibility(isDirect ? View.VISIBLE : View.GONE);
+
 		toggleUsePreview.setChecked(SettingHelper.usePreviewHost());
 		toggleUsePreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
