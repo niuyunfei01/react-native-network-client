@@ -318,7 +318,7 @@ const full_styles = StyleSheet.create({
     resizeMode: Image.resizeMode.contain,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#111',
+    backgroundColor: '#999',
   },
 });
 
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     height: pxToDp(444),
     resizeMode: Image.resizeMode.contain,
     // backgroundColor: colors.main_back,
-    backgroundColor: '#111',
+    backgroundColor: '#999',
     marginBottom: pxToDp(15),
   },
   goods_view: {
