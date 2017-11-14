@@ -355,7 +355,7 @@ class RemindScene extends PureComponent {
           viewAreaCoveragePercentThreshold: 100,
           waitForInteraction: true,
         }}
-        onEndReachedThreshold={10}
+        onEndReachedThreshold={0.5}
         renderItem={this.renderItem}
         onEndReached={this.onEndReached.bind(this, typeId)}
         onRefresh={this.onRefresh.bind(this, typeId)}
@@ -374,7 +374,7 @@ class RemindScene extends PureComponent {
             height: pxToDp(600)
           }}>
             <Text style={{fontSize: 18}}>
-              没有数据...
+              没有需要处理的列表...
             </Text>
           </View>}
         initialNumToRender={5}
@@ -497,7 +497,7 @@ class RemindScene extends PureComponent {
 
 }
 
-const dropDownImg = require("../../img/Remind/drop-down.png");
+const dropDownImg = require("../../img/Order/pull_down.png");
 const dropUpImg = require("../../img/Order/pull_up.png");
 
 class RemindItem extends React.PureComponent {

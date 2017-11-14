@@ -14,6 +14,7 @@ import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
 import ModalSelector from "../../widget/ModalSelector/index";
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   let {global} = state;
@@ -94,7 +95,7 @@ class DoneRemindScene extends PureComponent {
     const _this = this;
     let {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId} = this.props.global;
-    const url = AppConfig.ServiceUrl + 'api/list_notice/' + vendor_id + '/' + store_id + '/' + '-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search + '&time_range=' + filter;
+    const url = AppConfig.ServiceUrl + 'api/list_notice/' + currVendorId + '/' + currStoreId + '/' + '-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search + '&time_range=' + filter;
     fetch(url)
       .then(res => res.json())
       .then(res => {
