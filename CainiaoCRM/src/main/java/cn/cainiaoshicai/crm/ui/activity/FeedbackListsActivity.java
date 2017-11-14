@@ -132,9 +132,9 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
             case R.id.menu_accept:
                 GlobalCtx.app().toTaskListActivity(this);
                 return true;
-            case R.id.menu_search:
-                this.onSearchRequested();
-                return true;
+//            case R.id.menu_search:
+//                this.onSearchRequested();
+//                return true;
             case R.id.menu_mine:
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;

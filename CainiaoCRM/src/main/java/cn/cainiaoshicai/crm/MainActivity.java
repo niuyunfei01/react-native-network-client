@@ -724,14 +724,14 @@ public class MainActivity extends AbstractActionBarActivity {
 //                startActivity(new Intent(getApplicationContext(), RemindersActivity.class));
                 GlobalCtx.app().toTaskListActivity(this);
                 return true;
-            case R.id.menu_search:
-                this.onSearchRequested();
-                return true;
+//            case R.id.menu_search:
+//                this.onSearchRequested();
+//                return true;
             case R.id.menu_mine:
-                startActivity(new Intent(getApplicationContext(), MineActivity.class));
+                GlobalCtx.app().toMineActivity(this);
                 return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+                startActivity(new Intent(this, StoreStorageActivity.class));
                 return true;
 //            case R.id.menu_operation:
 //                startActivity(new Intent(this, DataActivity.class));

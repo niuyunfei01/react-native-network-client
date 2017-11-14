@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.provider.Telephony;
@@ -735,12 +736,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(gog);
     }
 
+    public void toMineActivity(Activity ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Tab");
+        Bundle params = new Bundle();
+        params.putString("initTab", "Mine");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
-//        Intent intent = new Intent(ctx, RemindersActivity.class);
-//        String token = GlobalCtx.app().token();
-//        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
-
         return new Intent(ctx, MyReactActivity.class);
     }
 

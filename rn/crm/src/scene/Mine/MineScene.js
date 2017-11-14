@@ -374,6 +374,12 @@ class MineScene extends PureComponent {
 
   onPress(route, params = {}) {
     let _this = this;
+
+    if (route === Config.ROUTE_SETTING) {
+      native.toSettings();
+      return;
+    }
+
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });

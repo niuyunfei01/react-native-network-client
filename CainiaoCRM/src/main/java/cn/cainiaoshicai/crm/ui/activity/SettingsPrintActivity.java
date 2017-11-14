@@ -62,11 +62,11 @@ public class SettingsPrintActivity extends ListActivity {
         setListAdapter(listAdapter);
 
 		Switch toggleSoundNotify = (Switch) findViewById(R.id.toggleSoundNotify);
-		toggleSoundNotify.setChecked(SettingUtility.isDisableSoundNotify());
+		toggleSoundNotify.setChecked(!SettingUtility.isDisableSoundNotify());
 		toggleSoundNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				SettingUtility.setDisableSoundNotify(isChecked);
+			public void onCheckedChanged(CompoundButton buttonView, boolean reading) {
+				SettingUtility.setDisableSoundNotify(!reading);
 			}
 		});
 

@@ -37,91 +37,88 @@ import TakeOutScene from "../scene/Store/TakeOutScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 
-const Tab = TabNavigator(
-  {
-    Remind: {
-      screen: RemindScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: '提醒',
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require('../img/tabbar/tab_warn.png')}
-            selectedImage={require('../img/tabbar/tab_warn_pre.png')}
-          />
-        )
-      }),
-    },
-
-    Orders: {
-      screen: OrderScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: '订单',
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require('../img/tabbar/tab_list.png')}
-            selectedImage={require('../img/tabbar/tab_list_pre.png')}
-          />
-        ),
-        tabBarOnPress: () => {
-          console.log('do tabBarOnPress');
-          native.toOrders();
-        }
-      }),
-    },
-
-    Goods: {
-      screen: GoodsScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: '商品',
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require('../img/tabbar/tab_goods.png')}
-            selectedImage={require('../img/tabbar/tab_goods_pre.png')}
-          />
-        ),
-        tabBarOnPress: () => {
-          console.log('do navigateToGoods');
-          native.toGoods();
-        }
-      }),
-    },
-
-    Mine: {
-      screen: MineScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: '我的',
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require('../img/tabbar/tab_me.png')}
-            selectedImage={require('../img/tabbar/tab_me_pre.png')}
-          />
-        )
-      }),
-    },
+const tabDef = {
+  Remind: {
+    screen: RemindScene,
+    navigationOptions: ({navigation}) => ({
+      tabBarLabel: '提醒',
+      tabBarIcon: ({focused, tintColor}) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={require('../img/tabbar/tab_warn.png')}
+          selectedImage={require('../img/tabbar/tab_warn_pre.png')}
+        />
+      )
+    }),
   },
-  {
-    initialRouteName: 'Remind',
-    // initialRouteName: 'Mine',
-    tabBarComponent: TabBarBottom,
-    tabBarPosition: 'bottom',
-    swipeEnabled: false,
-    animationEnabled: false,
-    lazy: true,
-    tabBarOptions: {
-      activeTintColor: color.theme,
-      inactiveTintColor: '#666',
-      style: {backgroundColor: '#ffffff'},
-    },
-  }
-);
+
+  Orders: {
+    screen: OrderScene,
+    navigationOptions: ({navigation}) => ({
+      tabBarLabel: '订单',
+      tabBarIcon: ({focused, tintColor}) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={require('../img/tabbar/tab_list.png')}
+          selectedImage={require('../img/tabbar/tab_list_pre.png')}
+        />
+      ),
+      tabBarOnPress: () => {
+        console.log('do tabBarOnPress');
+        native.toOrders();
+      }
+    }),
+  },
+
+  Goods: {
+    screen: GoodsScene,
+    navigationOptions: ({navigation}) => ({
+      tabBarLabel: '商品',
+      tabBarIcon: ({focused, tintColor}) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={require('../img/tabbar/tab_goods.png')}
+          selectedImage={require('../img/tabbar/tab_goods_pre.png')}
+        />
+      ),
+      tabBarOnPress: () => {
+        console.log('do navigateToGoods');
+        native.toGoods();
+      }
+    }),
+  },
+
+  Mine: {
+    screen: MineScene,
+    navigationOptions: ({navigation}) => ({
+      tabBarLabel: '我的',
+      tabBarIcon: ({focused, tintColor}) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={require('../img/tabbar/tab_me.png')}
+          selectedImage={require('../img/tabbar/tab_me_pre.png')}
+        />
+      )
+    }),
+  },
+};
+const tabInit = {
+  initialRouteName: 'Remind',
+  tabBarComponent: TabBarBottom,
+  tabBarPosition: 'bottom',
+  swipeEnabled: false,
+  animationEnabled: false,
+  lazy: true,
+  tabBarOptions: {
+    activeTintColor: color.theme,
+    inactiveTintColor: '#666',
+    style: {backgroundColor: '#ffffff'},
+  },
+};
 
 class Navigator extends Component {
 
@@ -149,9 +146,18 @@ class Navigator extends Component {
       }
     }
 
+    let tabInitN;
+    if (initialRouteName === 'Tab' && (initialRouteParams || {}).initTab) {
+      tabInitN = {...tabInit, initialRouteName: (initialRouteParams || {}).initTab}
+    } else {
+      tabInitN = tabInit;
+    }
+
+    console.log(tabInitN);
+
     const CustomNavigator = StackNavigator(
       {
-        Tab: {screen: Tab},
+        Tab: {screen: TabNavigator(tabDef, tabInitN)},
         Order: {
           screen: OrderScene,
           path: 'order/:orderId',
