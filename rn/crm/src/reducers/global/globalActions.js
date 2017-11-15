@@ -4,12 +4,13 @@
  * Actions that are global in nature
  */
 
+
 'use strict';
 
 import Config from '../../config'
 import {serviceSignIn, smsCodeRequest, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
-import {postWithTpl} from '../../util/common'
+import {getWithTpl, postWithTpl} from '../../util/common'
 
 import DeviceInfo from 'react-native-device-info';
 
@@ -23,6 +24,7 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
+  SET_CURR_PROFILE,
   UPDATE_CFG
 } = require('../../common/constants').default;
 
@@ -88,6 +90,27 @@ export function getCommonConfig(token, formData = [], callback) {
   }
 }
 
+/**
+ *
+ * @param token
+ * @param storeId  current store id
+ * @param callback  (ok, msg, profile) => {}
+ */
+export function upCurrentProfile(token, storeId, callback) {
+  return dispatch => {
+    const url = `api/user_info2.json?access_token=${token}&_sid=${storeId}`;
+    getWithTpl(url, (json) => {
+        if (json.ok && json.obj) {
+          dispatch({type: SET_CURR_PROFILE, profile: json.obj});
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
 
 export function signIn(mobile, password, callback) {
   return dispatch => {
