@@ -45,6 +45,8 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+const customerOpacity = 0.6;
+
 class MineScene extends PureComponent {
   static navigationOptions = {title: 'Mine', header: null};
 
@@ -125,7 +127,7 @@ class MineScene extends PureComponent {
 
 
     let server_info = tool.server_info(this.props);
-    if(tool.length(server_info) === 0){
+    if (tool.length(server_info) === 0) {
       this.onGetUserInfo(service_uid);
     }
   }
@@ -288,30 +290,32 @@ class MineScene extends PureComponent {
   renderManager() {
     let {order_num, turnover} = this.state;
     return (
-      <View style={worker_styles.container}>
-        <View>
-          <Image
-            style={[worker_styles.icon_head]}
-            source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => this.onPress(Config.ROUTE_USER, {
+          type: 'mine',
+          currentUser: this.state.currentUser,
+          currVendorId: this.state.currVendorId,
+        })}
+      >
+        <View style={worker_styles.container}>
+          <View>
+            <Image
+              style={[worker_styles.icon_head]}
+              source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+          </View>
+          <View style={[worker_styles.worker_box]}>
+            <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
+          </View>
+          <View style={[worker_styles.sales_box]}>
+            <Text style={[worker_styles.sale_text]}>今日订单: {order_num}</Text>
+            <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥{turnover}</Text>
+          </View>
+          <View style={[worker_styles.chevron_right]}>
+            <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
+          </View>
         </View>
-        <View style={[worker_styles.worker_box]}>
-          <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
-        </View>
-        <View style={[worker_styles.sales_box]}>
-          <Text style={[worker_styles.sale_text]}>今日订单: {order_num}</Text>
-          <Text style={[worker_styles.sales_money, worker_styles.sale_text]}>营业额: ¥{turnover}</Text>
-        </View>
-        <TouchableOpacity
-          style={[worker_styles.chevron_right]}
-          onPress={() => this.onPress(Config.ROUTE_USER, {
-            type: 'mine',
-            currentUser: this.state.currentUser,
-            currVendorId: this.state.currVendorId,
-          })}
-        >
-          <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     )
   }
 
@@ -384,50 +388,70 @@ class MineScene extends PureComponent {
     let {currVendorId, currVersion, is_mgr} = this.state;
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          if (is_mgr) {
-            let url = `${Config.ServiceUrl}stores/worker_stats.html${token}`;
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          } else {
-            ToastLong('您没有查看业绩的权限');
-          }
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            if (is_mgr) {
+              let url = `${Config.ServiceUrl}stores/worker_stats.html${token}`;
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            } else {
+              ToastLong('您没有查看业绩的权限');
+            }
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/yeji_.png')}/>
           <Text style={[block_styles.block_name]}>业绩</Text>
         </TouchableOpacity>
         {currVersion === Cts.VERSION_DIRECT && (
-          <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-            let url = `${Config.ServiceUrl}stores/show_waimai_evaluations.html${token}`;
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          }}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => {
+              let url = `${Config.ServiceUrl}stores/show_waimai_evaluations.html${token}`;
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            }}
+            activeOpacity={customerOpacity}
+          >
             <Image style={[block_styles.block_img]} source={require('../../img/My/pingjia_.png')}/>
             <Text style={[block_styles.block_name]}>评价</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          this.onPress(Config.ROUTE_STORE, {
-            currentUser: this.state.currentUser,
-            currVendorId: this.state.currVendorId,
-            currVendorName: this.state.currVendorName,
-          })
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            this.onPress(Config.ROUTE_STORE, {
+              currentUser: this.state.currentUser,
+              currVendorId: this.state.currVendorId,
+              currVendorName: this.state.currVendorName,
+            })
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/dianpu_.png')}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
         {currVersion === Cts.VERSION_DIRECT && (
-          <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-            let url = `${Config.ServiceUrl}stores/sales_ana.html${token}`;
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          }}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => {
+              let url = `${Config.ServiceUrl}stores/sales_ana.html${token}`;
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            }}
+            activeOpacity={customerOpacity}
+          >
             <Image style={[block_styles.block_img]} source={require('../../img/My/xiaoshou_.png')}/>
             <Text style={[block_styles.block_name]}>销售分析</Text>
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}stores/working_status.html${token}&&_v_id=${currVendorId}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/working_status.html${token}&&_v_id=${currVendorId}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/kaoqin_.png')}/>
           <Text style={[block_styles.block_name]}>考勤记录</Text>
         </TouchableOpacity>
@@ -441,12 +465,16 @@ class MineScene extends PureComponent {
               currVendorName: this.state.currVendorName,
             })
           }}
+          activeOpacity={customerOpacity}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/yuangong_.png')}/>
           <Text style={[block_styles.block_name]}>员工管理</Text>
         </TouchableOpacity>
         {currVersion === Cts.VERSION_DIRECT && (
-          <TouchableOpacity style={[block_styles.block_box]}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            activeOpacity={customerOpacity}
+          >
             <Image style={[block_styles.block_img]} source={require('../../img/My/kehu_.png')}/>
             <Text style={[block_styles.block_name]}>客户管理</Text>
           </TouchableOpacity>
@@ -454,6 +482,7 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_SETTING)}
+          activeOpacity={customerOpacity}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/shezhi_.png')}/>
           <Text style={[block_styles.block_name]}>设置</Text>
@@ -468,11 +497,17 @@ class MineScene extends PureComponent {
 
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/huiyuan_.png')}/>
           <Text style={[block_styles.block_name]}>会员信息</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
@@ -481,11 +516,15 @@ class MineScene extends PureComponent {
           onPress={() => {
             native.dialNumber(server_info.mobilephone);
           }}
+          activeOpacity={customerOpacity}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/fuwu_.png')}/>
           <Text style={[block_styles.block_name]}>联系服务经理</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/banben_.png')}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
@@ -499,45 +538,69 @@ class MineScene extends PureComponent {
     let {currStoreId} = this.state;
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}stores/provide_req_all.html${token}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/provide_req_all.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/diaohuo_.png')}/>
           <Text style={[block_styles.block_name]}>调货单</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}stores/prod_loss.html${token}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/prod_loss.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/baosun_.png')}/>
           <Text style={[block_styles.block_name]}>报损</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}stores/orders_buy_combined.html${token}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/orders_buy_combined.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/caigou_.png')}/>
           <Text style={[block_styles.block_name]}>门店采购</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}expenses/show_expenses.html${token}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}expenses/show_expenses.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/My/baoxiao_.png')}/>
           <Text style={[block_styles.block_name]}>报销</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>微信付款记录</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-          let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
-          this.onPress(Config.ROUTE_WEB, {url: url});
-        }}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
