@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.media.Image;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -37,6 +38,7 @@ import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -211,6 +213,14 @@ public class MainActivity extends AbstractActionBarActivity {
         final GlobalCtx app = GlobalCtx.app();
         TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
         TextView signInTxt = (TextView) this.findViewById(R.id.head_orders_waiting);
+
+        ImageButton searchBtn = (ImageButton) this.findViewById(R.id.head_order_search);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.onSearchRequested();
+            }
+        });
 
         TextView tmpBuy = (TextView) this.findViewById(R.id.head_orders_schedule);
         RelativeLayout.LayoutParams params = null;

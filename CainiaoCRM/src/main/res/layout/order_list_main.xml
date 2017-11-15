@@ -12,6 +12,16 @@
             android:gravity="start|center_vertical"
             android:layout_width="fill_parent"
             android:layout_height="30dp" />
+        <ImageButton android:id="@+id/head_order_search"
+            android:layout_toStartOf="@+id/head_ship_status"
+            android:src="@drawable/ic_search_black_24dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:contentDescription="@string/action_search" />
         <TextView
             android:id="@+id/head_ship_status"
             android:layout_toStartOf="@+id/head_orders_waiting"
