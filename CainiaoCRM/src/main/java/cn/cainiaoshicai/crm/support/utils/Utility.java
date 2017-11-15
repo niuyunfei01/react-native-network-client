@@ -1263,5 +1263,32 @@ public class Utility {
         });
     }
 
+    @NonNull
+    public static String getVersionCode(Activity act) {
+        String versionDesc = "unknown";
+        try {
+            PackageInfo pInfo;
+            pInfo = act.getPackageManager().getPackageInfo(act.getPackageName(), 0);
+            int verCode = pInfo.versionCode;
+            return String.valueOf(verCode);
+        } catch (PackageManager.NameNotFoundException e) {
+            AppLogger.e("error to read package info:" + e.getMessage(), e);
+        }
+        return versionDesc;
+    }
+
+    @NonNull
+    public static String getVersionName(Activity act) {
+        String versionDesc = "unknown";
+        try {
+            PackageInfo pInfo;
+            pInfo = act.getPackageManager().getPackageInfo(act.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            AppLogger.e("error to read package info:" + e.getMessage(), e);
+        }
+        return versionDesc;
+    }
+
 }
 

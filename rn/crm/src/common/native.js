@@ -1,5 +1,10 @@
 import {NativeModules} from 'react-native'
 
+let _orderSearch = async function (term) {
+  if (NativeModules.ActivityStarter) {
+    await NativeModules.ActivityStarter.searchOrders(term);
+  }
+};
 export default {
 
   updateAfterTokenGot: async function (access_token, expire, callback = function(){}) {
@@ -14,9 +19,39 @@ export default {
     }
   },
 
+  currentVersion: async function(callback) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.currentVersion(callback);
+    }
+  },
+
+  ordersSeriousDelay: async function () {
+    await _orderSearch('to_ship_late_serious:');
+  },
+
+  ordersInvalid: async function () {
+    await _orderSearch('invalid:');
+  },
+
+  ordersSearch: async function (term) {
+    await _orderSearch(term);
+  },
+
   toGoods: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.navigateToGoods());
+  },
+
+  toSettings: async function() {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toSettings();
+    }
+  },
+
+  toUserComments: async function() {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toUserComments();
+    }
   },
 
   /**

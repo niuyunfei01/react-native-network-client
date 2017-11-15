@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.telecom.Call;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
@@ -16,10 +17,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.annotation.Nonnull;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -31,10 +34,12 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 
 /**
  * Expose Java to JavaScript.
@@ -67,6 +72,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
+    }
+
+    void currentVersion(@Nonnull Callback clb) {
+        HashMap<String, String> m = new HashMap<>();
+        Activity act = this.getCurrentActivity();
+        if (act != null) {
+            m.put("version_code", Utility.getVersionCode(act));
+            m.put("version_name", Utility.getVersionName(act));
+        }
+        clb.invoke(DaoHelper.gson().toJson(m));
     }
 
     @ReactMethod
@@ -107,10 +122,27 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToOrders() {
-        AppLogger.i("navigate to orders");
         Activity activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, MainActivity.class);
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toSettings() {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, SettingsPrintActivity.class);
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toUserComments() {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, UserCommentsActivity.class);
             activity.startActivity(intent);
         }
     }
@@ -123,6 +155,22 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             intent.setAction(Intent.ACTION_SEARCH);
             intent.putExtra(SearchManager.QUERY, mobile);
             intent.putExtra("times", times);
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void searchOrders(@Nonnull String term) {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, OrderQueryActivity.class);
+            intent.setAction(Intent.ACTION_SEARCH);
+            intent.putExtra(SearchManager.QUERY, term);
+
+            if ("invalid:".equals(term)) {
+                intent.putExtra("list_type", ListType.INVALID.getValue());
+            }
+
             activity.startActivity(intent);
         }
     }

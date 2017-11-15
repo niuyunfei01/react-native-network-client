@@ -52,7 +52,11 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         Bundle init = new Bundle();
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
-        Bundle _action_params = new Bundle();
+        Bundle _action_params = intent.getBundleExtra("_action_params");
+        if (_action_params == null) {
+            _action_params = new Bundle();
+        }
+
         String nextRoute = intent.getStringExtra("_next_action");
         Long orderId = intent.getLongExtra("order_id", 0);
         if (orderId > 0) {
