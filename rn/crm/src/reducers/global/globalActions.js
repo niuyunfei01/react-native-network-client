@@ -72,10 +72,10 @@ export function logout() {
   }
 }
 
-export function getCommonConfig(token, formData = [], callback) {
+export function getCommonConfig(token, storeId, callback) {
   return dispatch => {
-    const url = `api/common_config2?access_token=${token}`;
-    return postWithTpl(url, formData, (json) => {
+    const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
+    return getWithTpl(url, (json) => {
       if (json.ok) {
         dispatch({type: UPDATE_CFG, payload: {config: json.obj}});
         callback(true)

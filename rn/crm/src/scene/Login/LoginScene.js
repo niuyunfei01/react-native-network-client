@@ -191,9 +191,9 @@ class LoginScene extends PureComponent {
       if (ok) {
 
         const sid = this.props.global ? this.props.global.currStoreId : 0;
-        dispatch(getCommonConfig(token, {_sid: sid}, (ok) => {
+        dispatch(getCommonConfig(token, sid, (ok) => {
 
-          this.doneReqSign()
+          this.doneReqSign();
           
           console.log('login done with ok, next:', this.next, "params", this.nextParams)
           if (Config.ROUTE_ORDERS === this.next || !this.next) {
