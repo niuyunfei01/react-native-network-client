@@ -218,7 +218,7 @@ public class MainActivity extends AbstractActionBarActivity {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.this.onSearchRequested();
+                GlobalCtx.app().toSearchActivity(MainActivity.this, "");
             }
         });
 

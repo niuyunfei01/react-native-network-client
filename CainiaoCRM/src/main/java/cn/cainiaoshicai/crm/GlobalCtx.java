@@ -736,6 +736,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(gog);
     }
 
+    public void toSearchActivity(Activity ctx, String term) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "OrderSearch");
+        Bundle params = new Bundle();
+        if (!TextUtils.isEmpty(term)) {
+            params.putString("term", term);
+        }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     public void toMineActivity(Activity ctx) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "Tab");
