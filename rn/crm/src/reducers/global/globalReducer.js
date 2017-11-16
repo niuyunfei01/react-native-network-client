@@ -9,6 +9,7 @@ const {
   LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
   SET_CURR_STORE,
+  SET_CURR_PROFILE,
   
   LOGOUT_SUCCESS,
   UPDATE_CFG,
@@ -45,6 +46,10 @@ export default function globalReducer (state = initialState, action) {
           currentUserProfile: action.payload,
         };
       } else return state;
+
+    case SET_CURR_PROFILE:
+
+      return {...state, currentUserProfile: action.profile};
 
     case SET_CURR_STORE:
       if (action.payload) {
