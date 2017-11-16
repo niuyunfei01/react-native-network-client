@@ -87,6 +87,7 @@ class MineScene extends PureComponent {
     let {currVendorId, currVersion, currManager, is_mgr, service_uid} = tool.vendor(this.props.global);
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+
     this.state = {
       isRefreshing: false,
       onNavigating: false,
@@ -108,7 +109,7 @@ class MineScene extends PureComponent {
       currManager: currManager,
       is_mgr: is_mgr,
       currVendorName: canReadStores[currStoreId]['vendor'],
-      cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
+      cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -121,10 +122,9 @@ class MineScene extends PureComponent {
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
     }
-    if (this.state.turnover === undefined || this.state.turnover === undefined) {
+    if (is_mgr) {
       this.onGetStoreTurnover();
     }
-
 
     let server_info = tool.server_info(this.props);
     if (tool.length(server_info) === 0) {
@@ -137,7 +137,7 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchUserInfo(uid, accessToken, (resp) => {
-        console.log('resp => ', resp);
+        console.log('server_info => ', resp);
       }));
     });
   }
@@ -219,7 +219,7 @@ class MineScene extends PureComponent {
       currManager: currManager,
       is_mgr: is_mgr,
       currVendorName: canReadStores[currStoreId]['vendor'],
-      cover_image: cover_image !== '' ? Config.ServiceUrl + cover_image : '',
+      cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
     });
   }
 
@@ -249,9 +249,10 @@ class MineScene extends PureComponent {
           currVersion: currVersion,
           currVendorName: canReadStores[store_id]['vendor'],
         });
-        _this.onGetStoreTurnover();
+        // _this.onGetStoreTurnover();
+        native.toOrders();
       } else {
-        ToastShort(msg);
+        ToastLong(msg);
       }
     });
   }
@@ -289,6 +290,7 @@ class MineScene extends PureComponent {
 
   renderManager() {
     let {order_num, turnover} = this.state;
+
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -320,6 +322,7 @@ class MineScene extends PureComponent {
   }
 
   renderWorker() {
+
     return (
       <View
         style={worker_styles.container}
@@ -381,6 +384,9 @@ class MineScene extends PureComponent {
 
     if (route === Config.ROUTE_SETTING) {
       native.toSettings();
+      return;
+    } else if(route === Config.ROUTE_GOODS_COMMENT){
+      native.toUserComments();
       return;
     }
 
@@ -479,6 +485,10 @@ class MineScene extends PureComponent {
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
             style={[block_styles.block_box]}
+            onPress={() => {
+              let url = `${Config.ServiceUrl}market_tools/users.html${token}`;
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            }}
             activeOpacity={customerOpacity}
           >
             <Image style={[block_styles.block_img]} source={require('../../img/My/kehu_.png')}/>
@@ -493,7 +503,15 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/shezhi_.png')}/>
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
-        <View style={[block_styles.block_box]}/>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Home/search_icon.png')}/>
+          <Text style={[block_styles.block_name]}>订单搜索</Text>
+        </TouchableOpacity>
+        {/*<View style={[block_styles.block_box]}/>*/}
       </View>
     )
   }
@@ -609,6 +627,36 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/products.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}vm/index.html${token}&&time=${Date.now()}#!/home`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>反馈与业绩</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>产品评价信息</Text>
         </TouchableOpacity>
       </View>
     )

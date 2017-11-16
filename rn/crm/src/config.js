@@ -35,6 +35,8 @@ export default {
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_DONE_REMIND: 'DoneRemind',
-  ROUTE_TAKE_OUT: 'TAKEOUT',
+  ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
+  ROUTE_GOODS_COMMENT: 'GoodsComment',
+  ROUTE_ORDER_SEARCH: 'OrderSearch',
 };

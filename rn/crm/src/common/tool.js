@@ -59,6 +59,10 @@ export function fullDate(dt) {
   return Moment(dt).format('YYYY-MM-DD HH:mm:ss')
 }
 
+export function storeTime(dt) {
+  return Moment(dt).format('H:ss');
+}
+
 export function vendor(global) {
   const {
     currentUser,
@@ -120,7 +124,7 @@ export function server_info({global, user}) {
   }
   let {service_uid} = vendor(global);
   let {user_info} = user;
-  return user_info[service_uid] === undefined ? {} : user_info[service_uid];
+  return !!user_info[service_uid] ? {} : user_info[service_uid];
 }
 
 

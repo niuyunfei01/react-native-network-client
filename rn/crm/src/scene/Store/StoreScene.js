@@ -163,7 +163,7 @@ class StoreScene extends PureComponent {
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody style={styles.cell_body}>
               <Text style={[styles.store_name]}>{store.name}</Text>
-              <Text style={[styles.open_time]}>{store.open_start}-{store.open_end}</Text>
+              <Text style={[styles.open_time]}>{tool.storeTime(new Date(`1970-01-01 ${store.open_start}`))}-{tool.storeTime(new Date(`1970-01-01 ${store.open_end}`))}</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity
