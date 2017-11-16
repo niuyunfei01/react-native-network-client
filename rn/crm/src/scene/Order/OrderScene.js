@@ -22,7 +22,13 @@ import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import CommonStyle from '../../common/CommonStyles'
 
-import {getOrder, printInCloud, getRemindForOrderPage, saveOrderDelayShip, saveOrderItems} from '../../reducers/order/orderActions'
+import {
+  getOrder,
+  printInCloud,
+  getRemindForOrderPage,
+  saveOrderDelayShip,
+  saveOrderItems
+} from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
@@ -132,7 +138,7 @@ class OrderScene extends Component {
     super(props);
 
     this.state = {
-      
+
       isFetching: false,
       orderReloading: false,
 
@@ -155,7 +161,7 @@ class OrderScene extends Component {
       showCallStore: false,
 
       //remind
-      onProcessed: false, 
+      onProcessed: false,
       reminds: {},
     };
 
@@ -255,7 +261,7 @@ class OrderScene extends Component {
     }
   }
 
-  onSaveDelayShip(date){
+  onSaveDelayShip(date) {
     // let Hours = date.getHours();
     // let Minutes = date.getMinutes();
     let expect_time = tool.fullDate(date);
@@ -450,7 +456,13 @@ class OrderScene extends Component {
       esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
       actionBeforeBack: (prod, num) => {
         console.log(prod, num);
-        this._doAddItem({product_id: prod.pid, num, name: prod.name, price: prod.price, normal_price: prod.price * 100});
+        this._doAddItem({
+          product_id: prod.pid,
+          num,
+          name: prod.name,
+          price: prod.price,
+          normal_price: prod.price * 100
+        });
       },
     };
     navigation.navigate('ProductAutocomplete', params);
@@ -486,9 +498,9 @@ class OrderScene extends Component {
 
   _totalEditingCents() {
     const {order} = this.props.order;
-    const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0  ?
+    const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0 ?
       tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
-    : 0;
+      : 0;
 
     let totalEdit = 0;
     if (this.state.itemsEdited) {
@@ -508,7 +520,7 @@ class OrderScene extends Component {
       //退款规则：
 
       return totalChanged;
-    }  else {
+    } else {
       return totalChanged;
     }
 
@@ -656,8 +668,7 @@ class OrderScene extends Component {
             paddingLeft: pxToDp(10),
             paddingBottom: pxToDp(10),
             backgroundColor: '#fff',
-            marginLeft: pxToDp(20), marginRight: pxToDp(20),
-
+            // marginLeft: pxToDp(20), marginRight: pxToDp(20),
             borderRadius: 4,
             borderWidth: 1,
             borderColor: '#ddd',
@@ -666,6 +677,7 @@ class OrderScene extends Component {
             shadowOffset: {width: -4, height: -4},
             shadowOpacity: 0.75,
             shadowRadius: 4,
+            height: pxToDp(90),
           }}>
             <Button style={[styles.bottomBtn, {marginRight: pxToDp(5),}]} type={'primary'}>联系配送</Button>
             <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}>提醒送达</Button>
@@ -730,8 +742,8 @@ class OrderScene extends Component {
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
-    const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0 ;
-    const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit)  / 100;
+    const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
+    const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit) / 100;
 
     console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
 
@@ -806,9 +818,10 @@ class OrderScene extends Component {
             alignItems: 'center',
             borderBottomColor: colors.color999,
             borderBottomWidth: screen.onePixel,
-            paddingBottom: pxToDp(16),
-            paddingTop: pxToDp(16),
-            marginTop: 0
+            // paddingBottom: pxToDp(16),
+            // paddingTop: pxToDp(16),
+            marginTop: 0,
+            height: pxToDp(70),
           }]}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>商品明细</Text>
@@ -821,8 +834,10 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
 
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
-            <ImageBtn source={require('../../img/Order/good/queren_.png')} imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
-              <ImageBtn source={require('../../img/Order/good/quxiao_.png')} imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
+              <ImageBtn source={require('../../img/Order/good/queren_.png')}
+                        imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
+              <ImageBtn source={require('../../img/Order/good/quxiao_.png')}
+                        imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
 
             {!this.state.isEditing && (
@@ -856,8 +871,14 @@ class OrderScene extends Component {
           })}
 
           {!this.state.itemsHided && this.state.isEditing &&
-          <View style={[styles.row, {height: pxToDp(100), alignItems: 'center', justifyContent: 'center', marginTop: 0, borderBottomColor: colors.color999,
-            borderBottomWidth: screen.onePixel}]}>
+          <View style={[styles.row, {
+            height: pxToDp(100),
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 0,
+            borderBottomColor: colors.color999,
+            borderBottomWidth: screen.onePixel
+          }]}>
             <ImageBtn source={require('../../img/Order/good/jiahuo_.png')}
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
@@ -928,19 +949,18 @@ class OrderScene extends Component {
 
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
-            marginRight: 0, alignItems: 'center',
-            paddingBottom: pxToDp(16), paddingTop: pxToDp(16), marginTop: 0, marginBottom: pxToDp(12)
+            alignItems: 'center',
+            marginTop: 0,
+            height: pxToDp(65),
+            marginRight: 0,
           }]}>
-            <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
-              <Text style={{color: colors.color999, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>运费金额</Text>
-            </View>
+            <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
+            <Text style={{color: colors.color999, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>运费金额</Text>
             <Text>￥7.80</Text>
             <View style={{flex: 1}}/>
 
             {this.state.shipHided ?
-              <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={styles.pullImg} onPress={
-                () => {
+              <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={styles.pullImg} onPress={() => {
                   this.setState({shipHided: false});
                 }
               }/>
@@ -1057,26 +1077,29 @@ class ItemRow extends PureComponent {
           }
         </View>
       </View>
-      {showEditAdded &&<View style={{alignItems: 'flex-end'}}>
-      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>
-      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(editNum * item.normal_price/100).format('0.00')}</Text>
+      {showEditAdded && <View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>
+        <Text
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
       </View>
       }
       {isEditing && !isAdd && edited && edited.num < item.num && <View style={{alignItems: 'flex-end'}}>
-      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{-editNum}件</Text>
-      <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{-editNum}件</Text>
+        <Text
+          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
       </View>
-        }
-      
+      }
+
       {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>加货{item.num}</Text>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{ numeral(item.num * item.price).format('0.00')}</Text>
+        <Text
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
       </View>}
 
       {isPromotion &&
-        <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
+      <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
       }
-      {(!isEditing || isPromotion) && 
+      {(!isEditing || isPromotion) &&
       <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
