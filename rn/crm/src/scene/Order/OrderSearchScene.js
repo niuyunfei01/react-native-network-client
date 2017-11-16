@@ -58,9 +58,6 @@ class OrderSearchScene extends PureComponent {
   constructor(props: Object) {
     super(props);
 
-    // let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-    let {currStoreId} = this.props.global;
-
     this.state = {
       isRefreshing: false,
       isSearching: false,

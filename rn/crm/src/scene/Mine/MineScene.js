@@ -152,7 +152,7 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchUserCount(currentUser, accessToken, (resp) => {
-        console.log(resp);
+        // console.log(resp);
         if (resp.ok) {
           let {sign_count, bad_cases_of} = resp.obj;
           _this.setState({
@@ -173,7 +173,7 @@ class MineScene extends PureComponent {
 
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchStoreTurnover(currStoreId, accessToken, (resp) => {
-        console.log(resp);
+        // console.log(resp);
         if (resp.ok) {
           let {order_num, turnover} = resp.obj;
           _this.setState({
@@ -323,7 +323,7 @@ class MineScene extends PureComponent {
               source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
           </View>
           <View style={[worker_styles.worker_box]}>
-            <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
+            <Text style={worker_styles.worker_name}>{(this.state.screen_name || '').substring(0, 4)}</Text>
           </View>
           <View style={[worker_styles.sales_box]}>
             <Text style={[worker_styles.sale_text]}>今日订单: {order_num}</Text>
@@ -355,7 +355,7 @@ class MineScene extends PureComponent {
               source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
           </View>
           <View style={[worker_styles.worker_box]}>
-            <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
+            <Text style={worker_styles.worker_name}>{(this.state.screen_name || '').substring(0, 4)}</Text>
           </View>
           <View style={[worker_styles.order_box]}>
             <Text style={worker_styles.order_num}>{this.state.sign_count}</Text>
@@ -571,6 +571,9 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
+          onPress={() => {
+            this.onPress(Config.ROUTE_VERSION);
+          }}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/banben_.png')}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>

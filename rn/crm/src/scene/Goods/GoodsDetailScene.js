@@ -45,6 +45,13 @@ class GoodsDetailScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
+      // headerLeft: (
+      //   <NavigationItem
+      //     icon={require('../../img/Register/black_back_.png')}
+      //     iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
+      //     onPress={() => {
+      //     }}
+      //   />),
       headerTitle: (
         <View>
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>商品详情</Text>
