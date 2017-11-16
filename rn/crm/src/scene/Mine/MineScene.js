@@ -26,6 +26,7 @@ import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import ModalSelector from "../../widget/ModalSelector/index";
 import {fetchUserInfo} from "../../reducers/user/userActions";
+import {upCurrentProfile} from "../../reducers/global/globalActions";
 
 
 function mapStateToProps(state) {
@@ -40,6 +41,7 @@ function mapDispatchToProps(dispatch) {
       fetchWorkers,
       fetchStoreTurnover,
       fetchUserInfo,
+      upCurrentProfile,
       ...globalActions
     }, dispatch)
   }
@@ -84,8 +86,7 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currVendorId, currVersion, currManager, is_mgr, service_uid} = tool.vendor(this.props.global);
-
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, service_uid} = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
 
     this.state = {
@@ -103,12 +104,12 @@ class MineScene extends PureComponent {
       screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
-      currStoreName: canReadStores[currStoreId]['name'],
+      currStoreName: currStoreName,
       currVendorId: currVendorId,
       currVersion: currVersion,
       currManager: currManager,
       is_mgr: is_mgr,
-      currVendorName: canReadStores[currStoreId]['vendor'],
+      currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
     };
 
@@ -190,7 +191,6 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
-      canReadStores,
     } = this.props.global;
 
     const {
@@ -201,7 +201,7 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    let {currVendorId, currVersion, currManager, is_mgr} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr} = tool.vendor(this.props.global);
     this.setState({
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
@@ -213,12 +213,12 @@ class MineScene extends PureComponent {
       screen_name: screen_name,
       mobile_phone: mobilephone,
       currStoreId: currStoreId,
-      currStoreName: canReadStores[currStoreId]['name'],
+      currStoreName: currStoreName,
       currVendorId: currVendorId,
       currVersion: currVersion,
       currManager: currManager,
       is_mgr: is_mgr,
-      currVendorName: canReadStores[currStoreId]['vendor'],
+      currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
     });
   }
@@ -231,6 +231,22 @@ class MineScene extends PureComponent {
     } else {
       this.onGetUserCount();
     }
+
+    let _this = this;
+    const {dispatch} = this.props;
+    const {accessToken, currStoreId} = this.props.global;
+    dispatch(upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
+      if(ok){
+        _this.setState({
+          prefer_store: obj.prefer_store,
+          screen_name: obj.screen_name,
+          mobile_phone: obj.mobilephone,
+          cover_image: !!obj.cover_image ? Config.ServiceUrl + obj.cover_image : '',
+        });
+      }else{
+        ToastLong(desc);
+      }
+    }));
   }
 
   _doChangeStore(store_id) {
@@ -324,36 +340,43 @@ class MineScene extends PureComponent {
   renderWorker() {
 
     return (
-      <View
-        style={worker_styles.container}
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => this.onPress(Config.ROUTE_USER, {
+          type: 'mine',
+          currentUser: this.state.currentUser,
+          currVendorId: this.state.currVendorId,
+        })}
       >
-        <View>
-          <Image
-            style={[worker_styles.icon_head]}
-            source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+        <View style={worker_styles.container}>
+          <View>
+            <Image
+              style={[worker_styles.icon_head]}
+              source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+          </View>
+          <View style={[worker_styles.worker_box]}>
+            <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
+          </View>
+          <View style={[worker_styles.order_box]}>
+            <Text style={worker_styles.order_num}>{this.state.sign_count}</Text>
+            <Text style={[worker_styles.tips_text]}>出勤天数</Text>
+          </View>
+          <View style={[worker_styles.question_box]}>
+            <Text style={worker_styles.order_num}>{this.state.bad_cases_of}</Text>
+            <Text style={[worker_styles.tips_text]}>30天投诉</Text>
+          </View>
+          <TouchableOpacity
+            style={[worker_styles.chevron_right]}
+            onPress={() => this.onPress(Config.ROUTE_USER, {
+              type: 'mine',
+              currentUser: this.state.currentUser,
+              currVendorId: this.state.currVendorId,
+            })}
+          >
+            <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
+          </TouchableOpacity>
         </View>
-        <View style={[worker_styles.worker_box]}>
-          <Text style={worker_styles.worker_name}>{this.state.screen_name.substring(0, 4)}</Text>
-        </View>
-        <View style={[worker_styles.order_box]}>
-          <Text style={worker_styles.order_num}>{this.state.sign_count}</Text>
-          <Text style={[worker_styles.tips_text]}>出勤天数</Text>
-        </View>
-        <View style={[worker_styles.question_box]}>
-          <Text style={worker_styles.order_num}>{this.state.bad_cases_of}</Text>
-          <Text style={[worker_styles.tips_text]}>30天投诉</Text>
-        </View>
-        <TouchableOpacity
-          style={[worker_styles.chevron_right]}
-          onPress={() => this.onPress(Config.ROUTE_USER, {
-            type: 'mine',
-            currentUser: this.state.currentUser,
-            currVendorId: this.state.currVendorId,
-          })}
-        >
-          <Button name='chevron-thin-right' style={[worker_styles.right_btn]}/>
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     )
   }
 
@@ -385,7 +408,7 @@ class MineScene extends PureComponent {
     if (route === Config.ROUTE_SETTING) {
       native.toSettings();
       return;
-    } else if(route === Config.ROUTE_GOODS_COMMENT){
+    } else if (route === Config.ROUTE_GOODS_COMMENT) {
       native.toUserComments();
       return;
     }
@@ -757,15 +780,13 @@ const worker_styles = StyleSheet.create({
   tips_text: {
     color: colors.color999,
     fontSize: pxToDp(24),
-    lineHeight: pxToDp(24),
+    lineHeight: pxToDp(26),
     textAlign: 'center',
     marginTop: pxToDp(16),
   },
   chevron_right: {
     position: 'absolute',
-    // right: pxToDp(30),
-    // top: pxToDp(50),
-    right: pxToDp(0),
+    right: 0,
     justifyContent: 'center',
     width: pxToDp(90),
     height: pxToDp(140),

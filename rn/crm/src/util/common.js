@@ -6,7 +6,7 @@ export function getWithTpl(url, okFn, failFn) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
     .then(res => res.json())
     .then(json => {
-      console.log(url, json);
+      // console.log(url, json);
       okFn(json)
     }).catch((error) => {
     failFn(error)

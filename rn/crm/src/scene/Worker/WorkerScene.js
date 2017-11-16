@@ -143,7 +143,7 @@ class WorkerScene extends PureComponent {
           />
         </CellHeader>
         <CellBody>
-          <Text style={[styles.worker_name]}>{user.nickname}({user.id})</Text>
+          <Text style={[styles.worker_name]}>{user.name}({user.id})</Text>
           {/*<Text style={[styles.worker_tel]}>{user.mobilephone}</Text>*/}
           <CallBtn style={[styles.worker_tel]} mobile={user.mobilephone}/>
         </CellBody>

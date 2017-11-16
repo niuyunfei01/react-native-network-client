@@ -39,4 +39,6 @@ export default {
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
+  ROUTE_ORDER_INVALID: 'OrderInvalid',
+  ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
 };
