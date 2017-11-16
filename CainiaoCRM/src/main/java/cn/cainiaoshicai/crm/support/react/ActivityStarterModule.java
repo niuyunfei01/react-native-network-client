@@ -166,10 +166,11 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             Intent intent = new Intent(activity, OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
-            intent.putExtra(SearchManager.QUERY, term);
 
             if ("invalid:".equals(term)) {
                 intent.putExtra("list_type", ListType.INVALID.getValue());
+            } else {
+                intent.putExtra(SearchManager.QUERY, term);
             }
 
             activity.startActivity(intent);

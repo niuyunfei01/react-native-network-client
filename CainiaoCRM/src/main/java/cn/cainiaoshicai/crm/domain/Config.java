@@ -24,6 +24,7 @@ public class Config {
     private String lastHash;
     private SortedMap<Integer, TaskType> task_types;
     private Vendor[] can_read_vendors;
+    private HashMap<String, String> v_b;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
@@ -109,6 +110,14 @@ public class Config {
 
     public void setCan_read_vendors(Vendor[] can_read_vendors) {
         this.can_read_vendors = can_read_vendors;
+    }
+
+    public HashMap<String, String> getV_b() {
+        return v_b;
+    }
+
+    public void setV_b(HashMap<String, String> v_b) {
+        this.v_b = v_b;
     }
 
     private class TaskType {
