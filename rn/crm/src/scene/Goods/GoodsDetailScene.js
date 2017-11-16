@@ -216,7 +216,7 @@ class GoodsDetailScene extends PureComponent {
   renderALlStore = () => {
     let {store_product} = this.state;
     if (!(tool.length(store_product) > 0)) {
-      return null;
+      return <LoadingView/>;
     }
 
     return (

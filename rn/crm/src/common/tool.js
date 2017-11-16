@@ -59,6 +59,10 @@ export function fullDate(dt) {
   return Moment(dt).format('YYYY-MM-DD HH:mm:ss')
 }
 
+export function storeTime(dt) {
+  return Moment(dt).format('H:ss');
+}
+
 export function vendor(global) {
   const {
     currentUser,
@@ -67,8 +71,10 @@ export function vendor(global) {
     canReadVendors,
   } = global;
   let currStore = canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
+
   let currVendorId = currStore['vendor_id'];
   let currVendorName = currStore['vendor'];
+  let currStoreName = currStore['name'];
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
@@ -97,17 +103,16 @@ export function vendor(global) {
 
   let manager = ',' + mgr_ids.join(',') + ',';
   let is_mgr = manager.indexOf(',' + currentUser + ',') !== -1;
-  // console.log('manager -> ', manager, is_mgr);
 
   let service_manager = ',' + mgr_ids.join(',') + ',';
   let is_service_mgr = service_manager.indexOf(',' + currentUser + ',') !== -1;
-  // console.log('service_manager -> ', service_manager, is_service_mgr);
 
   return {
     currVendorId: currVendorId,
     currVendorName: currVendorName,
     currVersion: currVersion,
     currManager: manager,
+    currStoreName: currStoreName,
     is_mgr: is_mgr,
     is_service_mgr: is_service_mgr,
     service_uid: service_uid,
@@ -120,7 +125,7 @@ export function server_info({global, user}) {
   }
   let {service_uid} = vendor(global);
   let {user_info} = user;
-  return user_info[service_uid] === undefined ? {} : user_info[service_uid];
+  return !!user_info[service_uid] ? user_info[service_uid] : {};
 }
 
 

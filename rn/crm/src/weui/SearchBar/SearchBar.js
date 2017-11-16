@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     height: 20,
     fontSize: 14,
     flex: 1,
+    paddingVertical: 0,
   },
   searchCover: {
     position: 'absolute',
@@ -117,7 +118,14 @@ class SearchBar extends Component {
   }
 
   handleBlur() {
-    this.setState({ focus: false })
+    this.setState({ focus: false });
+    const {focus, text} = this.state;
+    console.log('focus -> ', focus);
+    let SearchText = text;
+    let {onBlurSearch} = this.props;
+    if(typeof(onBlurSearch) === "function" && !!SearchText){
+      this.props.onBlurSearch(SearchText);
+    }
   }
 
   focus() {
@@ -133,8 +141,8 @@ class SearchBar extends Component {
       placeholder,
       lang,
       style,
-    } = this.props
-    const { focus, text } = this.state
+    } = this.props;
+    const { focus, text } = this.state;
 
     return (
       <View style={[styles.searchBar, style]}>
@@ -152,6 +160,7 @@ class SearchBar extends Component {
               autoCorrect={false}
               blurOnSubmit={!false}
               returnKeyType="search"
+              underlineColorAndroid='transparent'
             />
             {text ? (
               <Text onPress={this.clearHandle}>
@@ -177,6 +186,7 @@ SearchBar.propTypes = {
   onChange: PropTypes.func,
   onClear: PropTypes.func,
   onCancel: PropTypes.func,
+  onBlurSearch: PropTypes.func,
   lang: PropTypes.object,
   style: View.propTypes.style,
   placeholder: PropTypes.string,

@@ -36,6 +36,7 @@ import NavigationItem from "../widget/NavigationItem";
 import TakeOutScene from "../scene/Store/TakeOutScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
+import OrderSearchScene from "../scene/Order/OrderSearchScene";
 
 const tabDef = {
   Remind: {
@@ -153,7 +154,7 @@ class Navigator extends Component {
       tabInitN = tabInit;
     }
 
-    console.log(tabInitN);
+    // console.log(tabInitN);
 
     const CustomNavigator = StackNavigator(
       {
@@ -187,6 +188,7 @@ class Navigator extends Component {
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
+        [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
 
       },
       stackNavigatorConfigs

@@ -110,7 +110,7 @@ class UserScene extends PureComponent {
       bad_cases_of: mine.bad_cases_of[currentUser] === undefined ? 0 : mine.bad_cases_of[currentUser],
       mobile: mobilephone,
       cover_image: image,
-      screen_name: nickname,
+      screen_name: name,
       currentUser: user_id,
       currVendorId: currVendorId,
       user_status: parseInt(status),
