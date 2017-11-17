@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
     }
 }
 
@@ -22,6 +22,7 @@ dependencies {
     final RETROFIT_VERSION = '2.2.0'
     final ANDROID_LIB_VERSION = '25.3.0';
 
+    //noinspection GradleDependency
     compile "com.android.support:support-v4:$ANDROID_LIB_VERSION"
     compile "com.android.support:gridlayout-v7:$ANDROID_LIB_VERSION"
     compile "com.android.support:cardview-v7:$ANDROID_LIB_VERSION"

@@ -82,10 +82,13 @@ public class RefreshOrderListTask
         try {
             String token = GlobalCtx.app().token();
             OrdersDao ordersDao = new OrdersDao(token);
+            int listValue = this.listType.getValue();
+            int limit = listValue == ListType.ARRIVED.getValue() ? 100 : 0;
+            int offset = 0;
             if (TextUtils.isEmpty(searchTerm)) {
-                return ordersDao.get(this.listType.getValue(), storeIds, !this.byPassCache);
+                return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset);
             } else {
-                return ordersDao.search(searchTerm, this.listType.getValue(), storeIds);
+                return ordersDao.search(searchTerm, listValue, storeIds, limit, offset);
             }
         } catch (ServiceException e) {
 //                cancel(true);
