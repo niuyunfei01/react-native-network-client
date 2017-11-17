@@ -531,7 +531,7 @@ class MineScene extends PureComponent {
           onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/Home/search_icon.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
         {/*<View style={[block_styles.block_box]}/>*/}
@@ -640,7 +640,7 @@ class MineScene extends PureComponent {
           }}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/fukuanjil.png')}/>
           <Text style={[block_styles.block_name]}>微信付款记录</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -662,7 +662,7 @@ class MineScene extends PureComponent {
           }}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/xinxiweihu.png')}/>
           <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -673,7 +673,7 @@ class MineScene extends PureComponent {
           }}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/fankuiyuyeji.png')}/>
           <Text style={[block_styles.block_name]}>反馈与业绩</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -681,7 +681,7 @@ class MineScene extends PureComponent {
           onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/pingjia.png')}/>
           <Text style={[block_styles.block_name]}>产品评价信息</Text>
         </TouchableOpacity>
       </View>

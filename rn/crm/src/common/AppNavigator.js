@@ -95,7 +95,6 @@ const tabDef = {
 
   Mine: {
     screen: MineScene,
-    // screen: VersionScene,
     navigationOptions: ({navigation}) => ({
       tabBarLabel: '我的',
       tabBarIcon: ({focused, tintColor}) => (

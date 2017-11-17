@@ -205,8 +205,10 @@ class UserAddScene extends PureComponent {
             </Cell>
           )}
         </Cells>
-        <Button onPress={() => this.onUserAdd()} type='primary'
-                style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}</Button>
+        <Button
+          onPress={() => this.onUserAdd()} type='primary'
+          style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
+        </Button>
         <Toast
           icon="loading"
           show={this.state.onSubmitting}
@@ -260,17 +262,8 @@ class UserAddScene extends PureComponent {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';
           ToastShort(msg);
 
-          // const backAction = NavigationActions.back();
-          // const backAction = NavigationActions.reset({
-          //   index: 1,
-          //   actions: [
-          //     NavigationActions.navigate({routeName: Config.ROUTE_Mine}),
-          //     NavigationActions.navigate({routeName: Config.ROUTE_WORKER})
-          //   ]
-          // });
-          // _this.props.navigation.dispatch(backAction);
           const setWorkerAction = NavigationActions.setParams({
-            params: { shouldRefresh: true},
+            params: {shouldRefresh: true},
             key: worker_nav_key,
           });
           this.props.navigation.dispatch(setWorkerAction);

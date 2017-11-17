@@ -261,16 +261,14 @@ class UserScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       dispatch(editWorkerStatus(data, accessToken, (resp) => {
         console.log('save_status_resp -> ', resp);
-        _this.setState({
-          onSubmitting: false,
-        });
-
         if (resp.ok) {
           let msg = '操作成功';
           ToastShort(msg);
           _this.setState({
             user_status: user_status,
+            onSubmitting: false,
           });
+
           const setParamsAction = NavigationActions.setParams({
             params: {shouldRefresh: true},
             key: last_nav_key,
@@ -281,9 +279,11 @@ class UserScene extends PureComponent {
             key: this.props.navigation.state.key,
           });
           this.props.navigation.dispatch(setSelfParamsAction);
-
         } else {
           ToastShort(resp.desc);
+          _this.setState({
+            onSubmitting: false,
+          });
         }
       }));
     });

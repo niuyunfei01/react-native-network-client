@@ -15,12 +15,10 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchWmStore, setWmStoreStatus} from "../../reducers/mine/mineActions";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
 import SearchBar from "../../weui/SearchBar/SearchBar";
-import {Paragraph} from "../../widget/Text";
-import {screen, system, tool, native} from '../../common'
+import {native} from '../../common';
 import NavigationItem from "../../widget/NavigationItem";
 import Config from "../../config";
 
@@ -33,8 +31,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchWmStore,
-      setWmStoreStatus,
       ...globalActions
     }, dispatch)
   }
