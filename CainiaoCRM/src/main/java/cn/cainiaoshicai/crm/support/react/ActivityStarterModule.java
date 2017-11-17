@@ -74,6 +74,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         GlobalCtx.app().setAccountBean(null);
     }
 
+    @ReactMethod
     void currentVersion(@Nonnull Callback clb) {
         HashMap<String, String> m = new HashMap<>();
         Activity act = this.getCurrentActivity();

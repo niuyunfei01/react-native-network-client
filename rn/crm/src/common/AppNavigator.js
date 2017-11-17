@@ -37,6 +37,7 @@ import TakeOutScene from "../scene/Store/TakeOutScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
+import VersionScene from "../scene/Mine/VersionScene";
 
 const tabDef = {
   Remind: {
@@ -143,7 +144,7 @@ class Navigator extends Component {
       stackNavigatorConfigs = {
         ...stackNavigatorConfigs,
         initialRouteName: initialRouteName,
-        initialRouteParams: initialRouteParams || {}
+        initialRouteParams: initialRouteParams || {},
       }
     }
 
@@ -189,6 +190,7 @@ class Navigator extends Component {
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
+        [Config.ROUTE_VERSION]: {screen: VersionScene},
 
       },
       stackNavigatorConfigs

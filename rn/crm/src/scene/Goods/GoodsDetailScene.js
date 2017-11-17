@@ -22,7 +22,7 @@ import {fetchProductDetail, fetchVendorProduct} from "../../reducers/product/pro
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
-
+import NavigationItem from "../../widget/NavigationItem";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -43,8 +43,16 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-
     return {
+      headerLeft: (
+        <NavigationItem
+          icon={require('../../img/Register/black_back_.png')}
+          iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
+          onPress={() => {
+            console.log('back');
+            navigation.goBack('Goods');
+          }}
+        />),
       headerTitle: (
         <View>
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>商品详情</Text>

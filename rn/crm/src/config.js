@@ -6,6 +6,7 @@
 export default {
   'AppName': 'Crm',
   'ServiceUrl': 'https://preview.cainiaoshicai.cn/',
+  'DownloadUrl': `https://www.cainiaoshicai.cn/cc.apk`,
   MAP_WAY_URL: 'https://www.cainiaoshicai.cn/util/amap_way',
   FetchTimeout: 10000,
 
@@ -41,4 +42,6 @@ export default {
   ROUTE_ORDER_SEARCH: 'OrderSearch',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
+  ROUTE_VERSION: 'Version',
+  ROUTE_GOODS: 'Goods',
 };
