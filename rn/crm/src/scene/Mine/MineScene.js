@@ -531,7 +531,7 @@ class MineScene extends PureComponent {
           onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
         {/*<View style={[block_styles.block_box]}/>*/}
@@ -640,8 +640,38 @@ class MineScene extends PureComponent {
           }}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/fukuanjil.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/fukuanjilu_.png')}/>
           <Text style={[block_styles.block_name]}>微信付款记录</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}stores/products.html${token}`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/xinxiweihu_.png')}/>
+          <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let url = `${Config.ServiceUrl}vm/index.html${token}&&time=${Date.now()}#!/home`;
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/fankuiyuyeji_.png')}/>
+          <Text style={[block_styles.block_name]}>反馈与业绩</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/sppingjia_.png')}/>
+          <Text style={[block_styles.block_name]}>产品评价信息</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
@@ -653,36 +683,6 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            let url = `${Config.ServiceUrl}stores/products.html${token}`;
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/xinxiweihu.png')}/>
-          <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            let url = `${Config.ServiceUrl}vm/index.html${token}&&time=${Date.now()}#!/home`;
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/fankuiyuyeji.png')}/>
-          <Text style={[block_styles.block_name]}>反馈与业绩</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}
-          activeOpacity={customerOpacity}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/pingjia.png')}/>
-          <Text style={[block_styles.block_name]}>产品评价信息</Text>
         </TouchableOpacity>
       </View>
     )
