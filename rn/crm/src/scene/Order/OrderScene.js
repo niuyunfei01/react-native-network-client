@@ -79,7 +79,7 @@ const supportEditGoods = (orderStatus) => {
     orderStatus === Cts.ORDER_STATUS_SHIPPING
 };
 
-const MENU_EDIT_ADDR = 1;
+const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
 const MENU_EDIT_STORE = 3;
 
@@ -89,7 +89,7 @@ class OrderScene extends Component {
     const {params = {}} = navigation.state;
     let ActionSheet = [
       {key: -999, section: true, label: '操作'},
-      {key: MENU_EDIT_ADDR, label: '修改地址'},
+      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
       {key: MENU_EDIT_STORE, label: '修改门店'},
     ];
@@ -183,6 +183,7 @@ class OrderScene extends Component {
     this.onSaveDelayShip = this.onSaveDelayShip.bind(this);
     this._openAddGood = this._openAddGood.bind(this);
     this._totalEditingCents = this._totalEditingCents.bind(this);
+    this._toEditBasic = this._toEditBasic.bind(this);
   }
 
   componentDidMount() {
@@ -240,9 +241,9 @@ class OrderScene extends Component {
 
   onMenuOptionSelected(option) {
     console.log('option -> ', option);
-    // const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    if (option.key === MENU_EDIT_ADDR) {//修改地址
+    if (option.key === MENU_EDIT_BASIC) {//修改地址
+      this._toEditBasic();
     } else if (option.key === MENU_EDIT_EXPECT_TIME) {//修改配送时间
       if (this.state.doingUpdate) {
         return;
@@ -252,10 +253,8 @@ class OrderScene extends Component {
         isEndVisible: true,
       });
     } else if (option.key === MENU_EDIT_STORE) {
-
       const {navigation, order} = this.props;
       navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order.order});
-
     } else {
       ToastShort('未知的操作');
     }
@@ -323,6 +322,11 @@ class OrderScene extends Component {
         }
       }
     });
+  }
+  
+  _toEditBasic() {
+    const {navigation, order} = this.props;
+    navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order.order});
   }
 
   _hideCallStore() {
@@ -600,7 +604,6 @@ class OrderScene extends Component {
       </ScrollView>
       : (
         <View style={[styles.container, {flex: 1}]}>
-
           {this.state.showOptionMenu &&
           <TouchableOpacity style={[top_styles.icon_dropDown]}>
           </TouchableOpacity>}
@@ -758,9 +761,7 @@ class OrderScene extends Component {
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
-            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
-            }}>
+            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={this._toEditBasic}>
               <Icons name='edit' size={20} color={colors.main_color}/></TouchableOpacity>
             <View style={{flex: 1}}/>
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
