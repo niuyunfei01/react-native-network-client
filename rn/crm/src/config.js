@@ -44,4 +44,5 @@ export default {
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
   ROUTE_VERSION: 'Version',
   ROUTE_GOODS: 'Goods',
+  ROUTE_SELECT_STORE: 'SelectStore',
 };

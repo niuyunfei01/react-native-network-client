@@ -116,10 +116,10 @@ class LoginScene extends PureComponent {
   }
 
   componentWillMount() {
-    
+
     const {dispatch} = this.props;
     dispatch(logout());
-    
+
     const params = (this.props.navigation.state.params || {});
     // this._resetNavStack(Config.ROUTE_LOGIN, params)
   }
@@ -185,29 +185,43 @@ class LoginScene extends PureComponent {
   _signIn(mobile, password, name) {
     this.setState({doingSign: true});
 
-    const {dispatch} = this.props;
+    const {dispatch, navigation} = this.props;
     dispatch(signIn(mobile, password, (ok, msg, token) => {
-      console.log('sign in result:', ok, token)
+      console.log('sign in result:', ok, token);
+
+      this.doneReqSign();
       if (ok) {
-
         const sid = this.props.global ? this.props.global.currStoreId : 0;
-        dispatch(getCommonConfig(token, sid, (ok) => {
 
-          this.doneReqSign();
-          
-          console.log('login done with ok, next:', this.next, "params", this.nextParams)
-          if (Config.ROUTE_ORDERS === this.next || !this.next) {
-            native.toOrders();
-          } else {
-            this.props.navigation.navigate(this.next || Config.ROUTE_ALERT, this.nextParams)
-          }
+        let params = {
+          doneSelectStore: (storeId) => {
+            dispatch(getCommonConfig(token, storeId, (ok) => {
+              if (ok) {
+                native.setCurrStoreId(storeId, () => {
+                  if (Config.ROUTE_ORDERS === this.next || !this.next) {
+                    native.toOrders();
+                  } else {
+                    this.props.navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
+                  }
+                  tool.resetNavStack(this.props.navigation, Config.ROUTE_Mine);
+                });
+              } else {
+                alert('设施店铺失败, 请联系客服经理');
+              }
+            }));
+          },
+        };
 
-          tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
+        let storeId = sid;
+        if (!(storeId > 0)) {
+          navigation.navigate(Config.ROUTE_SELECT_STORE, params);
+        } else {
+          params.doneSelectStore(storeId);
+        }
 
-        }));
       } else {
-        this.doneReqSign()
-        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG)
+        this.doneReqSign();
+        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
         return false;
       }
     }))
@@ -218,7 +232,8 @@ class LoginScene extends PureComponent {
   }
 
   render() {
-    return ( <Image style={[styles.backgroundImage,{backgroundColor: colors.white}]} source={require('../../img/Login/login_bg.png')}>
+    return (<Image style={[styles.backgroundImage, {backgroundColor: colors.white}]}
+                   source={require('../../img/Login/login_bg.png')}>
       <View style={styles.container}>
         <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
         }}>正在登录...</Toast>
@@ -278,10 +293,10 @@ class LoginScene extends PureComponent {
                   this.props.navigation.navigate('Apply')
                 }}>
                   <Text style={{
-                          color: colors.main_color,
-                          fontSize: pxToDp(colors.actionSecondSize),
-                          marginTop: pxToDp(50)
-                        }}>我要开店</Text>
+                    color: colors.main_color,
+                    fontSize: pxToDp(colors.actionSecondSize),
+                    marginTop: pxToDp(50)
+                  }}>我要开店</Text>
                 </TouchableOpacity>
               </View>
             </View>
