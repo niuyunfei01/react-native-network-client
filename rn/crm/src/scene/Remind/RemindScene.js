@@ -68,8 +68,8 @@ function mapDispatchToProps(dispatch) {
 let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [100, 101, 102, 103];
-const _fetchDataTypeIds = [100, 101, 102, 3, 0];
-const _otherSubTypeIds = [3, 0];
+const _fetchDataTypeIds = [100, 101, 102, Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_GOODS_FAILED];
+const _otherSubTypeIds = [Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_GOODS_FAILED];
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
 const _otherTypeTag = 103;
 
@@ -98,7 +98,7 @@ class RemindScene extends PureComponent {
     const {dispatch} = this.props;
     let token = this._getToken();
     let {store_id, vendor_id} = this._getStoreAndVendorId();
-    dispatch(fetchRemindCount(vendor_id,store_id,token));
+    dispatch(fetchRemindCount(vendor_id, store_id, token));
     _fetchDataTypeIds.forEach((typeId) => {
       dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     });
@@ -117,7 +117,7 @@ class RemindScene extends PureComponent {
     const {dispatch} = this.props;
     let token = this._getToken();
     let {store_id, vendor_id} = this._getStoreAndVendorId();
-    dispatch(fetchRemindCount(vendor_id,store_id,token));
+    dispatch(fetchRemindCount(vendor_id, store_id, token));
     dispatch(fetchRemind(true, false, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     canLoadMore = true;
   }
@@ -374,7 +374,7 @@ class RemindScene extends PureComponent {
             height: pxToDp(600)
           }}>
             <Text style={{fontSize: 18}}>
-              没有需要处理的列表...
+              没有提醒...
             </Text>
           </View>}
         initialNumToRender={5}
@@ -529,16 +529,25 @@ class RemindItem extends React.PureComponent {
   render() {
     let {item, index, onPressDropdown, onPress} = this.props;
     return (
-      <TouchableOpacity onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})} activeOpacity={0.6}>
+      <TouchableOpacity
+        onPress={() => {
+          if(item.order_id > 0){
+            onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
+          }
+        }}
+        activeOpacity={0.6}
+      >
         <View style={top_styles.container}>
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
-                {item.quick == 1 ? <Image style={[top_styles.icon_ji]}
-                                          source={require('../../img/Remind/quick.png')}/> : null}
-                <View>
+                {item.quick > 0 ?
+                  <Image
+                    style={[top_styles.icon_ji]}
+                    source={require('../../img/Remind/quick.png')}/> : null}
+                {!!item.orderDate ? <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
-                </View>
+                </View> : null}
                 <View>
                   <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
                 </View>
@@ -610,9 +619,10 @@ const styles = StyleSheet.create({
   },
   subButtonContainerStyle: {
     height: 30,
-    width: 48,
+    // width: 48,
+    paddingHorizontal: pxToDp(20),
     overflow: 'hidden',
-    borderRadius: 15,
+    borderRadius: 13,
     backgroundColor: '#e6e6e6',
     alignItems: 'center',
     justifyContent: 'center',
@@ -621,9 +631,10 @@ const styles = StyleSheet.create({
   },
   subButtonActiveContainerStyle: {
     height: 30,
-    width: 48,
+    // width: 48,
+    paddingHorizontal: pxToDp(20),
     overflow: 'hidden',
-    borderRadius: 15,
+    borderRadius: 13,
     backgroundColor: colors.main_color,
     alignItems: 'center',
     justifyContent: 'center',

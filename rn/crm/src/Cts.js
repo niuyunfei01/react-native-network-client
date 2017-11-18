@@ -18,6 +18,7 @@ export default {
 
   VERSION_DIRECT: 'direct',
 
+  TASK_TYPE_UN_CLASSIFY: 0,//未归类
   TASK_TYPE_COMPLAIN: 1,//待处理评价
   TASK_TYPE_REFUND: 2,//客服待处理退款
   TASK_TYPE_OTHER_IMP: 3,//其他事项
@@ -26,6 +27,7 @@ export default {
   TASK_TYPE_REFUND_BY_USER: 5,//用户申请退款
   TASK_TYPE_DELIVERY_FAILED: 6,//京东配送员申请取消配送
   TASK_TYPE_ORDER_CHANGE: 7, //订单修改
+  TASK_TYPE_UPLOAD_GOODS_FAILED: 8, //外卖上传商品失败
 
   //任务紧急程度
   TASK_QUICK_NO: 0,
