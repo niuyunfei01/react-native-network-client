@@ -54,6 +54,7 @@ class MineScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
+
     const {
       currentUser,
       currStoreId,
@@ -128,7 +129,8 @@ class MineScene extends PureComponent {
     }
 
     let server_info = tool.server_info(this.props);
-    if (tool.length(server_info) === 0) {
+    console.log('service_uid =======>', service_uid);
+    if (tool.length(server_info) === 0 && service_uid>0) {
       this.onGetUserInfo(service_uid);
     }
   }

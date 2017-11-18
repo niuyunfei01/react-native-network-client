@@ -199,7 +199,7 @@ export function resetNavStack(navigation, routeName, params = {}) {
     index: 0,
     actions: [NavigationActions.navigate({routeName: routeName, params: params})]
   });
-  navigation.dispatch(resetAction)
+  navigation.dispatch(resetAction);
 
   console.log('_resetNavStack ' + routeName)
 }

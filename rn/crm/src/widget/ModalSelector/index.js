@@ -48,6 +48,7 @@ const propTypes = {
   supportedOrientations: PropTypes.arrayOf(PropTypes.oneOf(['portrait', 'landscape', 'portrait-upside-down', 'landscape-left', 'landscape-right'])),
   keyboardShouldPersistTaps: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   backdropPressToClose: PropTypes.bool,
+  modalVisible: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -78,6 +79,7 @@ const defaultProps = {
   supportedOrientations: ['portrait', 'landscape'],
   keyboardShouldPersistTaps: 'always',
   backdropPressToClose: false,
+  modalVisible: false,
 };
 
 export default class ModalSelector extends BaseComponent {
@@ -104,6 +106,7 @@ export default class ModalSelector extends BaseComponent {
   componentDidMount() {
     this.setState({selected: this.props.initValue});
     this.setState({cancelText: this.props.cancelText});
+    this.setState({modalVisible: this.props.modalVisible});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -193,13 +196,14 @@ export default class ModalSelector extends BaseComponent {
               </View>
             </ScrollView>
           </View>
-          <View style={styles.cancelContainer}>
+
+          {!this.props.modalVisible ? (<View style={styles.cancelContainer}>
             <TouchableOpacity onPress={this.close}>
               <View style={[styles.cancelStyle, this.props.cancelStyle]}>
                 <Text style={[styles.cancelTextStyle, this.props.cancelTextStyle]}>{this.props.cancelText}</Text>
               </View>
             </TouchableOpacity>
-          </View>
+          </View>) : null}
         </View>
       </TouchableWithoutFeedback>);
   }
