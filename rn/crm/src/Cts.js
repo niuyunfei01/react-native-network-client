@@ -57,4 +57,9 @@ export default {
   STORE_PROD_OFF_SALE: 3,
   STORE_PROD_SOLD_OUT: 2,
 
+  SHIP_AUTO_FN: 1,//蜂鸟
+  SHIP_AUTO_NEW_DADA: 2,//新达达
+  SHIP_AUTO_BD: 5,//百度
+  SHIP_AUTO_SX: 6,//闪送
+
 }
