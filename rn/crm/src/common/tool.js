@@ -229,6 +229,30 @@ export function intOf(val) {
   return val;
 }
 
+export function disWayStatic(){
+  let map = {};
+  map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单';
+  map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
+  map[Cts.DADA_STATUS_SHIPPING] = '配送中'
+  map[Cts.DADA_STATUS_ARRIVED] = '已完成'
+  map[Cts.DADA_STATUS_CANCEL] = '已取消'
+  map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
+  map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
+  return map;
+}
+
+export function disWay(){
+  let map = {};
+  map[Cts.SHIP_AUTO_FN] = '蜂鸟';
+  map[Cts.SHIP_AUTO_NEW_DADA] ='新达达';
+  map[Cts.SHIP_AUTO_BD] ='百度';
+  map[Cts.SHIP_AUTO_SX] ='闪送';
+  
+  return map
+
+}
+
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -243,5 +267,7 @@ export default {
   objectSum,
   objectFilter,
   store,
-  intOf
+  intOf,
+  disWayStatic,
+  disWay
 }

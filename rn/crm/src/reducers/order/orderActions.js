@@ -1,9 +1,9 @@
 'use strict'
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {getWithTpl, jsonWithTpl} from '../../util/common'
+import { getWithTpl, jsonWithTpl } from '../../util/common'
 import Cts from "../../Cts";
-import {ToastShort} from "../../util/ToastUtils";
+import { ToastShort } from "../../util/ToastUtils";
 
 /**
  * ## Imports
@@ -23,6 +23,7 @@ const {
   ORDRE_ADD_ITEM,
   ORDER_EDIT_ITEM,
   ORDER_INVALIDATED,
+  ORDER_WAY_ROCED
 
 } = require('../../common/constants').default;
 
@@ -60,13 +61,13 @@ export function printInCloud(sessionToken, orderId, callback) {
       .then(res => res.json())
       .then(json => {
         if (json.ok) {
-          dispatch(msgPrintInCloudDone({orderId, printTimes: json.obj}))
+          dispatch(msgPrintInCloudDone({ orderId, printTimes: json.obj }))
         }
         callback(json.ok, json.reason, json.obj)
       }).catch((error) => {
-      console.log('print_order error:', error)
-      callback(false, "打印失败, 请检查网络稍后重试")
-    });
+        console.log('print_order error:', error)
+        callback(false, "打印失败, 请检查网络稍后重试")
+      });
   }
 }
 
@@ -80,26 +81,26 @@ export function orderEditItem(item) {
 }
 
 /**
- * 
+ *
  * @param sessionToken
  * @param orderId
  * @param callback (ok, msg|order) => {}
  * @returns {function(*)}
  */
 export function getOrder(sessionToken, orderId, callback) {
-  callback = callback || function(){};
+  callback = callback || function () { };
   return dispatch => {
     dispatch(getOrderRequest());
     const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`;
     getWithTpl(url, (json) => {
-        dispatch(getOrderSuccess(json));
-        const ok = json && json.id === orderId;
-        callback(ok, ok ? json : "返回数据错误")
-      }, (error) => {
-        dispatch(getOrderFailure(error));
-        console.log('getOrder error:', error);
-        callback(false, "网络错误, 请稍后重试")
-      }
+      dispatch(getOrderSuccess(json));
+      const ok = json && json.id === orderId;
+      callback(ok, ok ? json : "返回数据错误")
+    }, (error) => {
+      dispatch(getOrderFailure(error));
+      console.log('getOrder error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -110,14 +111,14 @@ export function saveOrderBaisc(token, orderId, changes, callback) {
   return dispatch => {
     const url = `api/order_chg_basic/${orderId}.json?access_token=${token}`
     jsonWithTpl(url, changes, (json) => {
-        if (json.ok) {
-          dispatch({type: ORDER_INVALIDATED, id: orderId});
-        }
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        console.log('error:', error);
-        callback(false, "网络错误, 请稍后重试")
+      if (json.ok) {
+        dispatch({ type: ORDER_INVALIDATED, id: orderId });
       }
+      callback(json.ok, json.reason, json.obj)
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -128,16 +129,16 @@ export function saveOrderItems(token, wmId, changes, callback) {
   return dispatch => {
     const url = `api/order_chg_goods/${wmId}.json?access_token=${token}`;
     jsonWithTpl(url, changes, (json) => {
-        if (json.ok) {
-          dispatch({type: ORDER_INVALIDATED, id: wmId});
-          callback(true, json.reason, json.obj);
-        } else {
-          callback(false, json.reason, json.obj);
-        }
-      }, (error) => {
-        console.log('error:', error);
-        callback(false, "网络错误, 请稍后重试")
+      if (json.ok) {
+        dispatch({ type: ORDER_INVALIDATED, id: wmId });
+        callback(true, json.reason, json.obj);
+      } else {
+        callback(false, json.reason, json.obj);
       }
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -148,16 +149,16 @@ export function orderChgStore(token, wmId, store_id, old_store_id, reason, callb
   return dispatch => {
     const url = `api/order_chg_store/${wmId}/${store_id}/${old_store_id}.json?access_token=${token}&reason=${reason}`;
     getWithTpl(url, (json) => {
-        if (json.ok) {
-          dispatch({type: ORDER_INVALIDATED, id: wmId});
-          callback(true, json.reason, json.obj);
-        } else {
-          callback(false, json.reason, json.obj);
-        }
-      }, (error) => {
-        console.log('error:', error);
-        callback(false, "网络错误, 请稍后重试")
+      if (json.ok) {
+        dispatch({ type: ORDER_INVALIDATED, id: wmId });
+        callback(true, json.reason, json.obj);
+      } else {
+        callback(false, json.reason, json.obj);
       }
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -166,12 +167,12 @@ export function orderAuditRefund(token, id, task_id, is_agree, reason, callback)
   return dispatch => {
     const url = `api/order_audit_refund/${id}.json?access_token=${token}`;
     const agree_code = is_agree ? Cts.REFUND_AUDIT_AGREE : Cts.REFUND_AUDIT_REFUSE;
-    jsonWithTpl(url, {agree_code, reason, task_id}, (json) => {
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        console.log('error:', error);
-        callback(false, "网络错误, 请稍后重试")
-      }
+    jsonWithTpl(url, { agree_code, reason, task_id }, (json) => {
+      callback(json.ok, json.reason, json.obj)
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -179,12 +180,12 @@ export function orderAuditRefund(token, id, task_id, is_agree, reason, callback)
 export function orderAuditUrging(token, id, task_id, reply_type, custom, callback) {
   return dispatch => {
     const url = `api/order_audit_urging/${id}.json?access_token=${token}`;
-    jsonWithTpl(url, {reply_type, custom, task_id}, (json) => {
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        console.log('error:', error);
-        callback(false, "网络错误, 请稍后重试")
-      }
+    jsonWithTpl(url, { reply_type, custom, task_id }, (json) => {
+      callback(json.ok, json.reason, json.obj)
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -192,12 +193,12 @@ export function orderAuditUrging(token, id, task_id, reply_type, custom, callbac
 export function orderUrgingReplyReasons(token, id, task_id, callback) {
   return dispatch => {
     const url = `api/order_urging_replies/${id}.json?access_token=${token}`;
-    jsonWithTpl(url, {task_id}, (json) => {
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        console.log('error:', error);
-        callback(false, "网络错误, 请稍后重试")
-      }
+    jsonWithTpl(url, { task_id }, (json) => {
+      callback(json.ok, json.reason, json.obj)
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
     )
   }
 }
@@ -285,20 +286,50 @@ export function saveOrderDelayShip(data, token, callback) {
         callback(resp);
       }).catch((error) => {
         ToastShort(error.message);
-        callback({ok: false, desc: error.message});
+        callback({ ok: false, desc: error.message });
       }
-    );
+      );
   }
 }
 
+export function orderWayRecord(orderid, token, callback) {
+  return dispatch => {
+    const url = `api/get_order_ships/${orderid}?access_token=${token}`;
+    getWithTpl(url,
+      (json) => {
+        if (json.ok) {
+          callback(true, json.desc, json.obj);
+        } else {
+          callback(false, '数据获取失败');
+        }
 
+      },
+      (error) => {
+        callback(false,'网络错误'+error)
 
+      }
+    )
 
+  }
+}
 
+export function orderChangeLog(orderid, token, callback) {
+  return dispatch => {
+    const url = `api/get_order_change_log/${orderid}?access_token=${token}`;
+    getWithTpl(url,
+      (json) => {
+        if (json.ok) {
+          callback(true, json.desc, json.obj);
+        } else {
+          callback(false, '数据获取失败');
+        }
 
+      },
+      (error) => {
+        callback(false,'网络错误'+error)
 
+      }
+    )
 
-
-
-
-
+  }
+}
