@@ -1,9 +1,9 @@
 'use strict'
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {getWithTpl, jsonWithTpl} from '../../util/common'
+import { getWithTpl, jsonWithTpl } from '../../util/common'
 import Cts from "../../Cts";
-import {ToastShort} from "../../util/ToastUtils";
+import { ToastShort } from "../../util/ToastUtils";
 
 /**
  * ## Imports
@@ -23,6 +23,7 @@ const {
   ORDRE_ADD_ITEM,
   ORDER_EDIT_ITEM,
   ORDER_INVALIDATED,
+  ORDER_WAY_ROCED
 
 } = require('../../common/constants').default;
 
@@ -167,6 +168,38 @@ export function orderAuditRefund(token, id, task_id, is_agree, reason, callback)
     const url = `api/order_audit_refund/${id}.json?access_token=${token}`;
     const agree_code = is_agree ? Cts.REFUND_AUDIT_AGREE : Cts.REFUND_AUDIT_REFUSE;
     jsonWithTpl(url, {agree_code, reason, task_id}, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id});
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+export function orderToInvalid(token, id, reason_key, custom, callback) {
+  return dispatch => {
+    const url = `api/order_set_invalid/${id}.json?access_token=${token}`;
+    jsonWithTpl(url, {reason_key, custom}, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id});
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+export function orderAddTodo(token, id, taskType, remark, callback) {
+  return dispatch => {
+    const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
+    getWithTpl(url, (json) => {
         callback(json.ok, json.reason, json.obj)
       }, (error) => {
         console.log('error:', error);
@@ -291,14 +324,44 @@ export function saveOrderDelayShip(data, token, callback) {
   }
 }
 
+export function orderWayRecord(orderid, token, callback) {
+  return dispatch => {
+    const url = `api/get_order_ships/${orderid}?access_token=${token}`;
+    getWithTpl(url,
+      (json) => {
+        if (json.ok) {
+          callback(true, json.desc, json.obj);
+        } else {
+          callback(false, '数据获取失败');
+        }
 
+      },
+      (error) => {
+        callback(false,'网络错误'+error)
 
+      }
+    )
 
+  }
+}
 
+export function orderChangeLog(orderid, token, callback) {
+  return dispatch => {
+    const url = `api/get_order_change_log/${orderid}?access_token=${token}`;
+    getWithTpl(url,
+      (json) => {
+        if (json.ok) {
+          callback(true, json.desc, json.obj);
+        } else {
+          callback(false, '数据获取失败');
+        }
 
+      },
+      (error) => {
+        callback(false,'网络错误'+error)
 
+      }
+    )
 
-
-
-
-
+  }
+}

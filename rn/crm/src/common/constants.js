@@ -12,6 +12,8 @@ export default keyMirror({
   SET_CURR_PROFILE: null,
   SET_CURR_STORE: null,
   UPDATE_CFG: null,
+  UPDATE_CFG_ITEM: null,
+  HOST_UPDATED: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
@@ -61,6 +63,7 @@ export default keyMirror({
   ORDER_ADD_ITEM: null,
   ORDER_EDIT_ITEM: null,
   ORDER_INVALIDATED: null,
+  ORDER_WAY_ROCED:null,
 
   FORGOT_PASSWORD: null,
   LOGIN: null,

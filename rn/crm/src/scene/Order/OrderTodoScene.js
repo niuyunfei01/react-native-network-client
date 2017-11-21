@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
-import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
-import {orderAuditUrging, orderUrgingReplyReasons} from '../../reducers/order/orderActions'
+import {orderAddTodo} from '../../reducers/order/orderActions'
+import {getConfigItem} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Msg, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
+import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
 import S from '../../stylekit'
+import {tool} from "../../common";
 
 function mapStateToProps(state) {
   return {
@@ -18,75 +19,89 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({orderAuditUrging, orderUrgingReplyReasons}, dispatch)}
+  return {dispatch, ...bindActionCreators({orderAddTodo, getConfigItem}, dispatch)}
 }
 
-class UrgeShipScene extends Component {
+class OrderTodoScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: '催单',
+      headerTitle: (
+        <View>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>添加稍后处理事项</Text>
+        </View>
+      ),
       headerRight: '',
     }
   };
+
+  convertTypes (types) {
+    return tool.objectMap(types, (val, key) => {
+      return {label: val.name, key: key};
+    });
+  };
+
+  KEY_CUSTOM = 'custom';
+  LABEL_CUSTOM = '其他';
 
   constructor(props: Object) {
     super(props);
 
     this.state = {
-      order: {},
-      remind: {},
-      reasons: [],
+      loadingTypes: false,
+      taskTypes : [],
       reason_idx: -1,
       custom: '',
       doneSubmitting: false,
       onSubmitting: false,
-      onLoadingReasons: false,
     };
 
-    this._onReasonSelected = this._onReasonSelected.bind(this);
-    this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
+    this._onTypeSelected = this._onTypeSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
   }
 
   componentWillMount() {
-    const {order, remind} = (this.props.navigation.state.params || {});
-    this.setState({order, remind, onLoadingReasons: true})
-    const {dispatch, global, navigation} = this.props;
-    dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {
-      console.log(ok, msg, data);
-      this.setState({onLoadingReasons: false});
-      if (ok) {
-        this.setState({reasons: data});
-      } else {
-        this.setState({errorHints: msg});
-      }
-    }))
-  }
+    let order_task_types;
+    const {global, dispatch} = this.props;
+    if (global.cfgOfKey) {
+      order_task_types = global.cfgOfKey.order_task_types.type;
+    }
 
-  _onReasonSelected(idx) {
-    this.setState({reason_idx: idx});
-    const key = this._getReasonKey(idx);
-    if (key === 'custom') {
-      console.log(key, idx);
-      const label = this.state.taskTypes[idx]['label'];
-      this.setState({custom: label === '自定义回复' ? '' : label});
+
+    if (!order_task_types || !order_task_types.length) {
+      this.setState({loadingTypes: true});
+      dispatch(getConfigItem(global.accessToken, 'order_task_types', (ok, msg, types) => {
+        if (ok) {
+          this.setState({taskTypes: this.convertTypes(types.type), loadingTypes: false});
+        } else {
+          this.setState({loadingTypes: false, errorHints: msg});
+        }
+      }));
+    } else {
+      this.setState({taskTypes : this.convertTypes(order_task_types)});
     }
   }
 
-  _checkShowCustomTextArea() {
-    return this._getReasonKey() === 'custom';
+  _onTypeSelected(idx) {
+    this.setState({reason_idx: idx});
+    const key = this._taskType(idx);
+
+    if (key === this.KEY_CUSTOM) {
+      console.log(key, idx);
+      const label = this.state.taskTypes[idx]['label'];
+      this.setState({custom: label === this.LABEL_CUSTOM ? '' : label});
+    }
   }
 
   _checkDisableSubmit() {
-    const key = this._getReasonKey();
+    const key = this._taskType();
     return !(key && (key !== 'custom' || this.state.custom));
   }
 
-  _getReasonKey(idx) {
+  _taskType(idx) {
     if (typeof idx === 'undefined') {
       idx = this.state.reason_idx;
     }
@@ -95,9 +110,9 @@ class UrgeShipScene extends Component {
 
   _doReply() {
     const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
+    const {order} = (navigation.state.params || {});
     this.setState({onSubmitting: true});
-    dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
+    dispatch(orderAddTodo(global.accessToken, order.id, this._taskType(this.state.reason_idx), this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);
       this.setState({onSubmitting: false});
       if (ok) {
@@ -113,7 +128,8 @@ class UrgeShipScene extends Component {
   }
 
   render() {
-    const {order, remind} = (this.props.navigation.state.params || {});
+    console.log(this.state.taskTypes);
+
     const reasonOpts = this.state.taskTypes.map((reason, idx) => {
       return {label: reason.label, value: idx}
     });
@@ -131,30 +147,23 @@ class UrgeShipScene extends Component {
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
 
-      <Toast
-        icon="loading"
-        show={this.state.onLoadingReasons}
-        onRequestClose={() => {
-        }}
-      >正在加载...</Toast>
-
-      <CellsTitle style={styles.cellsTitle}>选择预设信息</CellsTitle>
-      <RadioCells
+      <CellsTitle style={styles.cellsTitle}>选择任务类型</CellsTitle>
+      {!this.state.loadingTypes && <RadioCells
         style={{marginTop: 2}}
         options={reasonOpts}
-        onChange={this._onReasonSelected}
+        onChange={this._onTypeSelected}
         cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
         value={this.state.reason_idx}
-      />
+      />}
 
-      {this._checkShowCustomTextArea() && <View>
-        <CellsTitle style={styles.cellsTitle}>自定义回复</CellsTitle>
+      <View>
+        <CellsTitle style={styles.cellsTitle}>其他信息（选填）</CellsTitle>
         <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody>
             <TextArea
               maxLength={20}
-              placeholder="请输入自定义回复内容"
+              placeholder="输入需要给处理人的其他信息"
               onChange={(v)=>{this.setState({custom: v})}}
               value={this.state.custom}
               underlineColorAndroid={'transparent'}
@@ -162,10 +171,10 @@ class UrgeShipScene extends Component {
             </CellBody>
           </Cell>
         </Cells>
-      </View>}
+      </View>
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>回复客户</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>创建任务</Button>
       </ButtonArea>
 
       <Toast
@@ -176,11 +185,18 @@ class UrgeShipScene extends Component {
       >提交中</Toast>
 
       <Toast
+        icon="loading"
+        show={this.state.loadingTypes}
+        onRequestClose={() => {
+        }}
+      >加载中...</Toast>
+
+      <Toast
         icon="success"
         show={this.state.doneSubmitting}
         onRequestClose={() => {
         }}
-      >已回复客户</Toast>
+      >任务已创建</Toast>
     </ScrollView>
   }
 }
@@ -199,4 +215,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UrgeShipScene)
+export default connect(mapStateToProps, mapDispatchToProps)(OrderTodoScene)

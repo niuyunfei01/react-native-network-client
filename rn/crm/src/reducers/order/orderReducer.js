@@ -21,6 +21,7 @@ const {
 
   ORDER_EDIT_ITEM,
   ORDER_INVALIDATED,
+  ORDER_WAY_ROCED,
 
   LOGOUT_SUCCESS,
 
@@ -87,6 +88,13 @@ export default function orderReducer(state = initialState, action) {
         order.edits.add[item.product_id] = item;
       }
 
+      return {...state, order};
+
+      /**
+      运单记录
+      **/
+
+      case ORDER_WAY_ROCED:
       return {...state, order};
 
     /**

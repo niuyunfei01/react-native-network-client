@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
-import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
-import {orderAuditUrging, orderUrgingReplyReasons} from '../../reducers/order/orderActions'
+import {orderToInvalid} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Msg, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
+import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
 import S from '../../stylekit'
 
 function mapStateToProps(state) {
@@ -18,32 +17,47 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({orderAuditUrging, orderUrgingReplyReasons}, dispatch)}
+  return {dispatch, ...bindActionCreators({orderToInvalid}, dispatch)}
 }
 
-class UrgeShipScene extends Component {
+class OrderToInvalidScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: '催单',
+      headerTitle: (
+        <View>
+          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>置为无效</Text>
+        </View>
+      ),
       headerRight: '',
     }
   };
 
+  KEY_CUSTOM = 'custom';
+  LABEL_CUSTOM = '其他';
+
   constructor(props: Object) {
     super(props);
 
+    const reasons = [
+      {key: 'store_too_busy', label: '店铺忙不过来', },
+      {key: 'no_storage', label: '商品缺货', },
+      {key: 'order_cancelled', label: '订单已退款', },
+      {key: 'customer_cannot_reach', label: '用户联系不上', },
+      {key: 'addr_cannot_reach', label: '地址无法配送', },
+      {key: 'store_suspend', label: ' 店铺已打烊', },
+      {key: 'duplicated', label: '重复订单', },
+      {key: 'custom', label: this.LABEL_CUSTOM, },
+    ];
     this.state = {
       order: {},
-      remind: {},
-      reasons: [],
+      reasons: reasons,
       reason_idx: -1,
       custom: '',
       doneSubmitting: false,
       onSubmitting: false,
-      onLoadingReasons: false,
     };
 
     this._onReasonSelected = this._onReasonSelected.bind(this);
@@ -52,33 +66,19 @@ class UrgeShipScene extends Component {
     this._doReply = this._doReply.bind(this);
   }
 
-  componentWillMount() {
-    const {order, remind} = (this.props.navigation.state.params || {});
-    this.setState({order, remind, onLoadingReasons: true})
-    const {dispatch, global, navigation} = this.props;
-    dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {
-      console.log(ok, msg, data);
-      this.setState({onLoadingReasons: false});
-      if (ok) {
-        this.setState({reasons: data});
-      } else {
-        this.setState({errorHints: msg});
-      }
-    }))
-  }
-
   _onReasonSelected(idx) {
     this.setState({reason_idx: idx});
     const key = this._getReasonKey(idx);
-    if (key === 'custom') {
+
+    if (key === this.KEY_CUSTOM) {
       console.log(key, idx);
-      const label = this.state.taskTypes[idx]['label'];
-      this.setState({custom: label === '自定义回复' ? '' : label});
+      const label = this.state.reasons[idx]['label'];
+      this.setState({custom: label === this.LABEL_CUSTOM ? '' : label});
     }
   }
 
   _checkShowCustomTextArea() {
-    return this._getReasonKey() === 'custom';
+    return this._getReasonKey() === this.KEY_CUSTOM;
   }
 
   _checkDisableSubmit() {
@@ -90,14 +90,15 @@ class UrgeShipScene extends Component {
     if (typeof idx === 'undefined') {
       idx = this.state.reason_idx;
     }
-    return this.state.taskTypes && idx >= 0 ? this.state.taskTypes[idx]['key'] : '';
+    return this.state.reasons && idx >= 0 ? this.state.reasons[idx]['key'] : '';
   }
 
   _doReply() {
     const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
+    const {order} = (navigation.state.params || {});
     this.setState({onSubmitting: true});
-    dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
+    const reasonKey = this._getReasonKey(this.state.reason_idx);
+    dispatch(orderToInvalid(global.accessToken, order.id, reasonKey, this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);
       this.setState({onSubmitting: false});
       if (ok) {
@@ -114,7 +115,7 @@ class UrgeShipScene extends Component {
 
   render() {
     const {order, remind} = (this.props.navigation.state.params || {});
-    const reasonOpts = this.state.taskTypes.map((reason, idx) => {
+    const reasonOpts = this.state.reasons.map((reason, idx) => {
       return {label: reason.label, value: idx}
     });
 
@@ -138,7 +139,7 @@ class UrgeShipScene extends Component {
         }}
       >正在加载...</Toast>
 
-      <CellsTitle style={styles.cellsTitle}>选择预设信息</CellsTitle>
+      <CellsTitle style={styles.cellsTitle}>选择退单原因</CellsTitle>
       <RadioCells
         style={{marginTop: 2}}
         options={reasonOpts}
@@ -148,13 +149,13 @@ class UrgeShipScene extends Component {
       />
 
       {this._checkShowCustomTextArea() && <View>
-        <CellsTitle style={styles.cellsTitle}>自定义回复</CellsTitle>
+        <CellsTitle style={styles.cellsTitle}>自定义原因</CellsTitle>
         <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody>
             <TextArea
               maxLength={20}
-              placeholder="请输入自定义回复内容"
+              placeholder="请输入自定义内容"
               onChange={(v)=>{this.setState({custom: v})}}
               value={this.state.custom}
               underlineColorAndroid={'transparent'}
@@ -165,7 +166,7 @@ class UrgeShipScene extends Component {
       </View>}
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>回复客户</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>置为无效</Button>
       </ButtonArea>
 
       <Toast
@@ -180,7 +181,7 @@ class UrgeShipScene extends Component {
         show={this.state.doneSubmitting}
         onRequestClose={() => {
         }}
-      >已回复客户</Toast>
+      >订单已被置为无效</Toast>
     </ScrollView>
   }
 }
@@ -199,4 +200,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UrgeShipScene)
+export default connect(mapStateToProps, mapDispatchToProps)(OrderToInvalidScene)

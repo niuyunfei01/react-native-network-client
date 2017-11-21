@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import javax.annotation.Nonnull;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -72,6 +74,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
+    }
+
+    @ReactMethod
+    void gotoPage(@Nonnull String page) {
+        Context ctx = getCurrentActivity();
+        if (ctx == null) {
+            ctx = GlobalCtx.app();
+        }
+        Intent intent = new Intent(ctx, GlobalCtx.app().pageToActivity(page).getClass());
+        ctx.startActivity(intent);
     }
 
     @ReactMethod
@@ -183,6 +195,14 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
             activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void getHost(@Nonnull Callback callback) {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            callback.invoke(URLHelper.getHost());
         }
     }
 

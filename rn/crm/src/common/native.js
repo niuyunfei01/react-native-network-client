@@ -48,6 +48,17 @@ export default {
     }
   },
 
+  host :
+    /**
+     * @param callback （host) => {}
+     * @returns {Promise.<void>}
+     */
+    async function(callback) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.getHost(callback);
+    }
+  },
+
   toUserComments: async function() {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.toUserComments();
