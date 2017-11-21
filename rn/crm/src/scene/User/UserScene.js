@@ -56,11 +56,7 @@ class UserScene extends PureComponent {
     const {params = {}, key} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>个人详情</Text>
-        </View>
-      ),
+      headerTitle: '个人详情',
       headerRight: (params.type === 'mine' ? null : (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity

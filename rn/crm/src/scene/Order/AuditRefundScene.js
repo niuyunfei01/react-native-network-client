@@ -35,13 +35,7 @@ class AuditRefundScene extends Component {
     const {params = {}} = navigation.state;
 
     return {
-      // headerTitle: '客户退款申请',
-      // headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>客户退款申请</Text>
-        </View>
-      ),
+      headerTitle: '客户退款申请',
       headerRight: '',
     }
   };

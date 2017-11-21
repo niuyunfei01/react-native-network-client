@@ -32,13 +32,7 @@ class OrderEditScene extends Component {
     const {params = {}} = navigation.state;
     // disabled={this._shouldDisabledSaveBtn()}
     return {
-      // headerTitle: '修改订单信息',
-      // headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>修改订单信息</Text>
-        </View>
-      ),
+      headerTitle: '修改订单信息',
       headerRight: <NavigationItem
           containerStyle = {{width: pxToDp(96), height: pxToDp(46), backgroundColor: colors.main_color, flex: 0, marginRight: 8}}
           titleStyle={{color: colors.white, fontSize: 14, fontWeight: 'bold', margin: 0}}

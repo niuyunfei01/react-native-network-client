@@ -27,11 +27,7 @@ class OrderEditStoreScene extends Component {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>修改店铺</Text>
-        </View>
-      ),
+      headerTitle: '修改店铺',
       headerRight: '',
     }
   };
