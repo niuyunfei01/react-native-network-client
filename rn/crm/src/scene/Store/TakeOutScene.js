@@ -51,11 +51,7 @@ class TakeOutScene extends PureComponent {
     let set_val = !params.isOperating;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>外卖平台列表</Text>
-        </View>
-      ),
+      headerTitle: '外卖平台列表',
       headerRight: (
         <TouchableOpacity
           style={[

@@ -41,11 +41,7 @@ class VersionScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>版本信息</Text>
-        </View>
-      ),
+      headerTitle: '版本信息',
       headerRight: '',
     }
   };

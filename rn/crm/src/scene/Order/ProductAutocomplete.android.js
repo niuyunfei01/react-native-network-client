@@ -39,11 +39,7 @@ class ProductAutocomplete extends Component {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>选择商品</Text>
-        </View>
-      ),
+      headerTitle: '选择商品',
       headerRight: <NavigationItem
           title="保存"
           onPress={() => {

@@ -107,12 +107,7 @@ class OrderScene extends Component {
     ];
 
     return {
-
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>订单详情</Text>
-        </View>
-      ),
+      headerTitle: '订单详情',
       headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}

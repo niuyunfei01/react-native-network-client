@@ -46,11 +46,7 @@ class StoreAddScene extends PureComponent {
     ];
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{title}</Text>
-        </View>
-      ),
+      headerTitle: title,
       headerRight: (params.btn_type === 'add' ? null : (
         <ModalSelector
           onChange={(option) => {

@@ -35,11 +35,7 @@ class CloudPrinterScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>云打印机</Text>
-        </View>
-      ),
+      headerTitle: '云打印机',
       headerRight: '',
     }
   };

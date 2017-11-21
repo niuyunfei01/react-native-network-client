@@ -56,11 +56,7 @@ class UserAddScene extends PureComponent {
     let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{pageTitle}</Text>
-        </View>
-      ),
+      headerTitle: pageTitle,
       headerRight: '',
     }
   };

@@ -8,7 +8,7 @@
 
 //import liraries
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, InteractionManager,} from 'react-native';
+import {View, Text, StyleSheet, Image, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Input, Label, Icon, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -53,11 +53,7 @@ class GoodsDetailScene extends PureComponent {
             navigation.goBack('Goods');
           }}
         />),
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>商品详情</Text>
-        </View>
-      ),
+      headerTitle: '商品详情',
       headerRight: '',
     }
   };
@@ -88,7 +84,6 @@ class GoodsDetailScene extends PureComponent {
         product_detail: product_detail[product_id],
       });
     }
-
     this.getVendorProduct();
   }
 

@@ -33,11 +33,7 @@ class DoneRemindScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params, key} = navigation.state;
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{params.title}</Text>
-        </View>
-      ),
+      headerTitle: params.title,
       headerRight: (
         <View style={{flexDirection: 'row'}}>
           <ModalSelector

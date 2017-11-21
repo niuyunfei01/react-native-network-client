@@ -54,11 +54,7 @@ class PrinterConnectScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>连接蓝牙打印机</Text>
-        </View>
-      ),
+      headerTitle: '连接蓝牙打印机',
       headerRight: '',
     }
   };

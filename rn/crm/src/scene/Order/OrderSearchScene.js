@@ -37,19 +37,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
-  /*static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>订单搜索</Text>
-        </View>
-      ),
-      headerRight: '',
-    }
-  };*/
-  static navigationOptions = {title: 'Mine', header: null};
+  static navigationOptions = {title: 'orderSearch', header: null};
 
   constructor(props: Object) {
     super(props);
@@ -103,7 +91,7 @@ class OrderSearchScene extends PureComponent {
         style={{backgroundColor: colors.main_back}}
       >
         <SearchBar
-          placeholder="请输入搜索内容"
+          placeholder="序号/编号/收货手机姓名/地址/备注/发票/商品"
           onBlurSearch={this.onSearch.bind(this)}
         />
         <View style={styles.label_box}>

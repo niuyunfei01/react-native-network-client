@@ -133,10 +133,19 @@ class Navigator extends Component {
 
   render() {
     const {initialRouteName, screenProps, initialRouteParams} = this.props;
+
     let stackNavigatorConfigs = {
       navigationOptions: {
         headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78), borderColor: '#999', borderBottomWidth: pxToDp(1) },
-        headerTitleStyle: {color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'},
+        headerTitleStyle: {
+          color: '#111111',
+          fontSize: pxToDp(30),
+          fontWeight: 'bold',
+          marginHorizontal: 0,
+          // paddingLeft: pxToDp(10),
+          // borderColor: '#000',
+          // borderLeftWidth:pxToDp(1),
+        },
         headerBackTitle: null,
         headerTintColor: '#333333',
         showIcon: true,
@@ -201,7 +210,7 @@ class Navigator extends Component {
       },
       stackNavigatorConfigs
     );
-    // console.log('go with config:', stackNavigatorConfigs, "props", this.props);
+    // console.log('go with config:', stackNavigatorConfigs, " | props ->", this.props);
     // console.log("screen:", screen);
     return <CustomNavigator screenProps={screenProps}/>
   }

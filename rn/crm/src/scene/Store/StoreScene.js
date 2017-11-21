@@ -54,11 +54,7 @@ class StoreScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>店铺管理</Text>
-        </View>
-      ),
+      headerTitle: '店铺管理',
       headerRight: '',
     }
   };

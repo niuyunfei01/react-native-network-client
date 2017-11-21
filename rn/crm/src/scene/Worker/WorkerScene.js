@@ -53,11 +53,7 @@ class WorkerScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>员工管理</Text>
-        </View>
-      ),
+      headerTitle: '员工管理',
       headerRight: '',
     }
   };
