@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -73,6 +74,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
+    }
+
+    @ReactMethod
+    void gotoPage(@Nonnull String page) {
+        Context ctx = getCurrentActivity();
+        if (ctx == null) {
+            ctx = GlobalCtx.app();
+        }
+        Intent intent = new Intent(ctx, GlobalCtx.app().pageToActivity(page).getClass());
+        ctx.startActivity(intent);
     }
 
     @ReactMethod

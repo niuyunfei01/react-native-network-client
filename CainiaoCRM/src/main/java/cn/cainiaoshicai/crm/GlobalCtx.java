@@ -907,6 +907,10 @@ public class GlobalCtx extends Application {
         return storeCfg != null && storeCfg.isCloudPrint();
     }
 
+    public Activity pageToActivity(String page) {
+        return new MainActivity();
+    }
+
     public interface TaskCountUpdated {
         void callback(int count);
     }

@@ -118,6 +118,8 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         init.putString("access_token", GlobalCtx.app().token());
         init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));
         init.putString("_action", toRoute);
+        init.putString("backPage", "Orders");
+
         if (!TextUtils.isEmpty(nextRoute)) {
             init.putString("_next_action", nextRoute);
         }
