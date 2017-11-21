@@ -23,6 +23,7 @@ import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
 import NavigationItem from "../../widget/NavigationItem";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -43,14 +44,17 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    let {backPage} = params;
     return {
       headerLeft: (
         <NavigationItem
           icon={require('../../img/Register/black_back_.png')}
           iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
           onPress={() => {
-            console.log('back');
-            navigation.goBack('Goods');
+            if(!!backPage){
+              console.log('backPage -> ', backPage);
+              native.gotoPage(backPage);
+            }
           }}
         />),
       headerTitle: '商品详情',
@@ -74,17 +78,25 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    this.productId = (this.props.navigation.state.params || {}).productId;
-    let product_id = this.productId;
+    let {productId, backPage} = (this.props.navigation.state.params || {});
+
+    this.productId = productId;
     const {product_detail} = this.props.product;
-    if (product_detail[product_id] === undefined) {
+    if (product_detail[productId] === undefined) {
       this.getProductDetail();
     } else {
       this.setState({
-        product_detail: product_detail[product_id],
+        product_detail: product_detail[productId],
       });
     }
     this.getVendorProduct();
+  }
+
+  componentDidMount() {
+    let {backPage} = (this.props.navigation.state.params || {});
+    if(!!backPage){
+      this.props.navigation.setParams({backPage: backPage});
+    }
   }
 
   getProductDetail() {

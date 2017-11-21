@@ -69,6 +69,7 @@ export function vendor(global) {
     currStoreId,
     canReadStores,
     canReadVendors,
+    config,
   } = global;
   let currStore = canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
 
@@ -107,6 +108,13 @@ export function vendor(global) {
   let service_manager = ',' + mgr_ids.join(',') + ',';
   let is_service_mgr = service_manager.indexOf(',' + currentUser + ',') !== -1;
 
+  let {help_uid} = config;
+  let is_helper = false;
+  if(!!help_uid){
+    let helper = help_uid.join(',');
+    let is_helper = helper.indexOf(',' + currentUser + ',') !== -1;
+  }
+
   return {
     currVendorId: currVendorId,
     currVendorName: currVendorName,
@@ -115,6 +123,7 @@ export function vendor(global) {
     currStoreName: currStoreName,
     is_mgr: is_mgr,
     is_service_mgr: is_service_mgr,
+    is_helper: is_helper,
     service_uid: service_uid,
   };
 }

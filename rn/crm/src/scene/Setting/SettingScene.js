@@ -51,7 +51,7 @@ class SettingScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      title: '设置',
+      headerTitle: '设置',
     }
   };
 

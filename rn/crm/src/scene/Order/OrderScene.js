@@ -106,7 +106,20 @@ class OrderScene extends Component {
       {key: MENU_ADD_TODO, label: '稍后处理'},
     ];
 
+    let {backPage} = params;
     return {
+      headerLeft: (<NavigationItem
+        icon={require('../../img/Register/black_back_.png')}
+        iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
+        onPress={() => {
+          if(!!backPage){
+            console.log('backPage -> ', backPage);
+            native.gotoPage(backPage);
+          } else {
+            navigation.goBack();
+          }
+        }}
+      />),
       headerTitle: '订单详情',
       headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
@@ -116,17 +129,6 @@ class OrderScene extends Component {
             params.onPrint()
           }}
         />
-        {/*<ModalDropdown
-          options={['暂停提示', '强制关闭', '修改地址']}
-          defaultValue={''}
-          style={top_styles.drop_style}
-          dropdownStyle={top_styles.drop_listStyle}
-          dropdownTextStyle={top_styles.drop_textStyle}
-          dropdownTextHighlightStyle={top_styles.drop_optionStyle}
-          onSelect={(event) => params.onMenuOptionSelected(event)}>
-          <Image style={[top_styles.icon_img_dropDown]}
-                 source={require('../../img/Public/menu.png')}/>
-        </ModalDropdown>*/}
         <ModalSelector
           onChange={(option) => {
             params.onMenuOptionSelected(option)
@@ -199,16 +201,24 @@ class OrderScene extends Component {
   }
 
   componentDidMount() {
-    this.props.navigation.setParams({onMenuOptionSelected: this.onMenuOptionSelected, onPrint: this.onPrint});
+    let {backPage} = (this.props.navigation.state.params || {});
+
+    let params = {
+      onMenuOptionSelected: this.onMenuOptionSelected,
+      onPrint: this.onPrint,
+      backPage: backPage,
+    };
+    this.props.navigation.setParams(params);
   }
 
   componentWillMount() {
 
     const orderId = (this.props.navigation.state.params || {}).orderId;
     this.orderId = orderId;
-    console.log("componentWillMount: params orderId:", orderId);
+    // console.log("componentWillMount: params orderId:", orderId);
     const {order} = this.props.order;
-    console.log("order results:", order);
+    // console.log("order results:", order);
+
     if (!order || !order.id || order.id !== orderId) {
       this.onHeaderRefresh()
     } else {

@@ -48,6 +48,12 @@ export default {
     }
   },
 
+  gotoPage: async function(page) {
+    if (NativeModules.ActivityStarter && page) {
+      await NativeModules.ActivityStarter.gotoPage(page);
+    }
+  },
+
   host :
     /**
      * @param callback （host) => {}
