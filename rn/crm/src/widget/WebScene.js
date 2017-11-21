@@ -65,6 +65,7 @@ class WebScene extends PureComponent {
         const key = '608d75903d29ad471362f8c58c550daf';
         url = `https://www.cainiaoshicai.cn/amap.php?key=${key}&center=${center}`;
       }
+      console.log(url);
       this.setState({source: {uri: url}})
     })
   };

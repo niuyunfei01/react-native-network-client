@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -183,6 +184,14 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
             activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void getHost(@Nonnull Callback callback) {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            callback.invoke(URLHelper.getHost());
         }
     }
 

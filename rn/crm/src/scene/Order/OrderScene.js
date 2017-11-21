@@ -82,6 +82,9 @@ const supportEditGoods = (orderStatus) => {
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
 const MENU_EDIT_STORE = 3;
+const MENU_FEEDBACK = 4;
+const MENU_SET_INVALID = 5;
+const MENU_ADD_TODO = 6;
 
 class OrderScene extends Component {
 
@@ -92,6 +95,9 @@ class OrderScene extends Component {
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
       {key: MENU_EDIT_STORE, label: '修改门店'},
+      {key: MENU_FEEDBACK, label: '客户反馈'},
+      {key: MENU_SET_INVALID, label: '置为无效'},
+      {key: MENU_ADD_TODO, label: '稍后处理'},
     ];
 
     return {
@@ -255,6 +261,20 @@ class OrderScene extends Component {
     } else if (option.key === MENU_EDIT_STORE) {
       const {navigation, order} = this.props;
       navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order.order});
+    } else if (option.key === MENU_FEEDBACK) {
+      const {navigation, order, global, dispatch} = this.props;
+      const _o = order.order;
+      const vm_path = _o.feedback && _o.feedback.id ? "#!/feedback/view/" + _o.feedback.id
+        : "#!/feedback/order/" + _o.id;
+      const path =  `vm?access_token=${accessToken}${vm_path}`;
+      const url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+      navigation.navigate(Config.ROUTE_WEB, {url});
+    } else if (option.key === MENU_SET_INVALID) {
+      const {navigation, order, global, dispatch} = this.props;
+      navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
+    } else if (option.key === MENU_ADD_TODO) {
+      const {navigation, order, global, dispatch} = this.props;
+      navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order.order});
     } else {
       ToastShort('未知的操作');
     }

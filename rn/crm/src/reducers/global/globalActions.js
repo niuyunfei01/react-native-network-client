@@ -25,7 +25,8 @@ const {
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
   SET_CURR_PROFILE,
-  UPDATE_CFG
+  UPDATE_CFG,
+  UPDATE_CFG_ITEM
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -69,6 +70,22 @@ export function logout() {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout()
+  }
+}
+
+export function getConfigItem(token, configKey, callback) {
+  return dispatch => {
+    const url = `api/config_item?access_token=${token}&key=${configKey}`;
+    return getWithTpl(url, (json) => {
+      console.log(json);
+      if (json.ok) {
+        dispatch({type: UPDATE_CFG_ITEM, key: configKey, value: json.obj});
+      }
+      callback(json.ok, json.reason, json.obj);
+    }, (error) => {
+      console.log('获取服务器端配置错误：', error);
+      callback(false)
+    });
   }
 }
 

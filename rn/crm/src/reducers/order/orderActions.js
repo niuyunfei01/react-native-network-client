@@ -167,6 +167,38 @@ export function orderAuditRefund(token, id, task_id, is_agree, reason, callback)
     const url = `api/order_audit_refund/${id}.json?access_token=${token}`;
     const agree_code = is_agree ? Cts.REFUND_AUDIT_AGREE : Cts.REFUND_AUDIT_REFUSE;
     jsonWithTpl(url, {agree_code, reason, task_id}, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id});
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+export function orderToInvalid(token, id, reason_key, custom, callback) {
+  return dispatch => {
+    const url = `api/order_set_invalid/${id}.json?access_token=${token}`;
+    jsonWithTpl(url, {reason_key, custom}, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id});
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
+export function orderAddTodo(token, id, taskType, remark, callback) {
+  return dispatch => {
+    const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
+    getWithTpl(url, (json) => {
         callback(json.ok, json.reason, json.obj)
       }, (error) => {
         console.log('error:', error);

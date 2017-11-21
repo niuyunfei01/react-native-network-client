@@ -3,7 +3,9 @@
  *
  *
  */
+
 'use strict';
+import {host} from "../../config";
 
 const {
   LOGIN_PROFILE_SUCCESS,
@@ -13,6 +15,8 @@ const {
   
   LOGOUT_SUCCESS,
   UPDATE_CFG,
+  HOST_UPDATED,
+  UPDATE_CFG_ITEM,
 
 } = require('../../common/constants').default
 
@@ -26,7 +30,9 @@ const initialState = {
   currentUserProfile: {},
   canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
   canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
-  remindTags:null
+  remindTags:null,
+  host: '',
+  cfgOfKey: {},
 };
 
 /**
@@ -85,6 +91,14 @@ export default function globalReducer (state = initialState, action) {
         canReadVendors: action.payload.canReadVendors || action.payload.can_read_vendors || state.canReadVendors,
         config: action.payload.config || state.config,
       } : state;
+
+    case HOST_UPDATED:
+      const host = action.host;
+      return host ? {...state, host} : state;
+
+    case UPDATE_CFG_ITEM:
+      return (action.key && action.value) ? {...state, cfgOfKey: {...state.cfgOfKey, [action.key]: action.value}}
+        : state;
   }
   return state
 }

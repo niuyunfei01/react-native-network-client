@@ -243,5 +243,5 @@ export default {
   objectSum,
   objectFilter,
   store,
-  intOf
+  intOf,
 }

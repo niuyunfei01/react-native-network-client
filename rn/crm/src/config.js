@@ -1,9 +1,48 @@
 'use strict';
+const {
+  HOST_UPDATED,
+} = require('./common/constants').default
+
+/**
+ * if none in global, return the default host and try to update from settings into global
+ * @param global
+ * @param dispatch
+ * @param native
+ * @returns {*}
+ */
+export function host(global, dispatch, native) {
+  if (global.host) {
+    return global.host;
+  } else {
+    native.host((host) => {
+      if (host) {
+        dispatch({type: HOST_UPDATED, host: host});
+      }
+    });
+
+    return C.defaultHost;
+  }
+}
+
+/**
+ * get server url
+ * @param host
+ * @param path
+ * @param useHttps
+ * @returns {string}
+ */
+export function serverUrl(host, path, useHttps = true) {
+  const proto = useHttps ? 'https' : 'http';
+  return `${proto}://${host}/${path}`;
+}
 
 /**
  * 系统参数配置信息
  */
-export default {
+const C = {
+  https: true,
+  /** Host应该根据是否预发布从系统中获得，而不是直接写死；实在没有，才从这里获得 */
+  defaultHost: 'www.cainiaoshicai.cn',
   'AppName': 'Crm',
   'ServiceUrl': 'https://preview.cainiaoshicai.cn/',
   'DownloadUrl': `https://www.cainiaoshicai.cn/cc.apk`,
@@ -32,6 +71,8 @@ export default {
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
+  ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
+  ROUTE_ORDER_TODO: 'OrderTodo',
   ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
@@ -45,4 +86,12 @@ export default {
   ROUTE_VERSION: 'Version',
   ROUTE_GOODS: 'Goods',
   ROUTE_SELECT_STORE: 'SelectStore',
+  serverUrl,
+
+  /**
+   * @see host
+   */
+  host,
 };
+
+export default C;

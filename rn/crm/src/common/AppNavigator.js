@@ -27,6 +27,7 @@ import CloudPrinterScene from "../scene/Setting/CloudPrinterScene";
 import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 import AuditRefundScene from "../scene/Order/AuditRefundScene";
 import OrderEditScene from "../scene/Order/OrderEditScene";
+import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import DoneRemindScene from '../scene/Remind/DoneRemindScene';
@@ -39,6 +40,7 @@ import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import VersionScene from "../scene/Mine/VersionScene";
 import SelectStoreScene from "../scene/Setting/SelectStoreScene";
+import OrderTodoScene from "../scene/Order/OrderTodoScene";
 
 const tabDef = {
   Remind: {
@@ -184,6 +186,8 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
+        [Config.ROUTE_ORDER_TO_INVALID]: {screen: OrderToInvalidScene},
+        [Config.ROUTE_ORDER_TODO]: {screen: OrderTodoScene},
         [Config.ROUTE_ORDER_STORE]: {screen: OrderEditStoreScene},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
