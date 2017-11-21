@@ -61,5 +61,14 @@ export default {
   SHIP_AUTO_NEW_DADA: 2,//新达达
   SHIP_AUTO_BD: 5,//百度
   SHIP_AUTO_SX: 6,//闪送
+// //新达达：状态编码(待接单＝1 待取货＝2 配送中＝3 已完成＝4 已取消＝5 已过期＝7 指派单=8)
+  DADA_STATUS_NEVER_START : 0,
+  DADA_STATUS_TO_ACCEPT : 1,
+  DADA_STATUS_TO_FETCH : 2,
+  DADA_STATUS_SHIPPING : 3,
+  DADA_STATUS_ARRIVED : 4,
+  DADA_STATUS_CANCEL : 5,
+  DADA_STATUS_TIMEOUT : 7,
+  DADA_STATUS_ABNORMAL : 8,
 
 }

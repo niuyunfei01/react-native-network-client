@@ -63,6 +63,7 @@ export default keyMirror({
   ORDER_ADD_ITEM: null,
   ORDER_EDIT_ITEM: null,
   ORDER_INVALIDATED: null,
+  ORDER_WAY_ROCED:null,
 
   FORGOT_PASSWORD: null,
   LOGIN: null,
