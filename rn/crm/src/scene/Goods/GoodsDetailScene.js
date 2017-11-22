@@ -24,6 +24,8 @@ import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
+import Config from "../../config";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -58,7 +60,19 @@ class GoodsDetailScene extends PureComponent {
           }}
         />),
       headerTitle: '商品详情',
-      headerRight: '',
+      headerRight: ( <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+              });
+            });
+          }}
+        >
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>),
     }
   };
 
@@ -502,6 +516,13 @@ const styles = StyleSheet.create({
   },
   icon_off_sale: {
     color: colors.color999,
+  },
+  btn_edit: {
+    fontSize: pxToDp(40),
+    width: pxToDp(42),
+    height: pxToDp(36),
+    color: colors.color666,
+    marginRight: pxToDp(30),
   },
 });
 

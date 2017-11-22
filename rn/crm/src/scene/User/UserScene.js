@@ -27,7 +27,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {fetchUserCount, fetchWorkers, editWorkerStatus} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
 import {tool} from "../../common";
@@ -76,7 +76,7 @@ class UserScene extends PureComponent {
               });
             }}
           >
-            <Icon name='pencil-square-o' style={styles.btn_edit}/>
+            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
           </TouchableOpacity>
         </View>
       )),

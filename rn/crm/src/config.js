@@ -86,6 +86,7 @@ const C = {
   ROUTE_VERSION: 'Version',
   ROUTE_GOODS: 'Goods',
   ROUTE_SELECT_STORE: 'SelectStore',
+  ROUTE_GOODS_EDIT: 'GoodsEdit',
   serverUrl,
 
   /**
