@@ -8,7 +8,7 @@ import PropTypes from 'prop-types'
 import {ToastShort} from "../../util/ToastUtils";
 import Cts from "../../Cts";
 import Config from "../../config";
-import styles from './orderStyles'
+import styles from './OrderStyles'
 
 const numeral = require('numeral');
 
