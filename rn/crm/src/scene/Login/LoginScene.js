@@ -16,7 +16,10 @@ import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
-import {getCommonConfig, logout, requestSmsCode, signIn} from '../../reducers/global/globalActions'
+import {
+  getCommonConfig, logout, requestSmsCode, setCurrentStore, setUserProfile,
+  signIn
+} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
@@ -28,6 +31,7 @@ import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
 import {Button} from "../../weui";
+import {ToastLong} from "../../util/ToastUtils";
 
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -187,26 +191,29 @@ class LoginScene extends PureComponent {
 
     const {dispatch, navigation} = this.props;
     dispatch(signIn(mobile, password, (ok, msg, token) => {
-      console.log('sign in result:', ok, token);
-
+      // console.log('sign in result:', ok, token);
       this.doneReqSign();
       if (ok) {
         const sid = this.props.global ? this.props.global.currStoreId : 0;
-
         let params = {
           doneSelectStore: (storeId) => {
             dispatch(getCommonConfig(token, storeId, (ok) => {
               if (ok) {
-                native.setCurrStoreId(storeId, () => {
-                  if (Config.ROUTE_ORDERS === this.next || !this.next) {
-                    native.toOrders();
+                native.setCurrStoreId(storeId, (set_ok, msg) => {
+                  if (set_ok) {
+                    dispatch(setCurrentStore(storeId));
+                    if (Config.ROUTE_ORDERS === this.next || !this.next) {
+                      native.toOrders();
+                    } else {
+                      this.props.navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
+                    }
+                    tool.resetNavStack(this.props.navigation, Config.ROUTE_Mine);
                   } else {
-                    this.props.navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
+                    ToastLong(msg);
                   }
-                  tool.resetNavStack(this.props.navigation, Config.ROUTE_Mine);
                 });
               } else {
-                alert('设施店铺失败, 请联系客服经理');
+                alert('设置店铺失败, 请联系客服经理');
               }
             }));
           },

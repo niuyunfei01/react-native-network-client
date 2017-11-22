@@ -149,7 +149,6 @@ class StoreScene extends PureComponent {
     }
 
     let _this = this;
-    console.log(curr_stores);
     return curr_stores.map(function (store, idx) {
       let {nickname} = (curr_user_list[store.owner_id] || {});
       let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;

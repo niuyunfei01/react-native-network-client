@@ -42,9 +42,20 @@ export default {
       NativeModules.ActivityStarter.navigateToGoods());
   },
 
+  toNativeOrder: async function (id) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.toOrder(id));
+  },
+
   toSettings: async function() {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.toSettings();
+    }
+  },
+
+  gotoPage: async function(page) {
+    if (NativeModules.ActivityStarter && page) {
+      await NativeModules.ActivityStarter.gotoPage(page);
     }
   },
 

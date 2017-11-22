@@ -61,7 +61,6 @@ class MineScene extends PureComponent {
       currentUserProfile,
       canReadStores,
     } = this.props.global;
-
     let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
     let sortStores = Object.values(canReadStores).sort(function (a, b) {
       return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
@@ -87,7 +86,7 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, service_uid} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, service_uid} = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
 
     this.state = {
@@ -110,6 +109,7 @@ class MineScene extends PureComponent {
       currVersion: currVersion,
       currManager: currManager,
       is_mgr: is_mgr,
+      is_helper: is_helper,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
     };
@@ -124,7 +124,7 @@ class MineScene extends PureComponent {
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
     }
-    if (is_mgr) {
+    if (is_mgr || is_helper) {
       this.onGetStoreTurnover();
     }
 
@@ -203,7 +203,7 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper} = tool.vendor(this.props.global);
     this.setState({
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
@@ -220,6 +220,7 @@ class MineScene extends PureComponent {
       currVersion: currVersion,
       currManager: currManager,
       is_mgr: is_mgr,
+      is_helper: is_helper,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
     });
@@ -227,8 +228,8 @@ class MineScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
-    let {is_mgr} = this.state;
-    if (is_mgr) {
+    let {is_mgr, is_helper} = this.state;
+    if (is_mgr || is_helper) {
       this.onGetStoreTurnover();
     } else {
       this.onGetUserCount();
@@ -322,7 +323,7 @@ class MineScene extends PureComponent {
           <View>
             <Image
               style={[worker_styles.icon_head]}
-              source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+              source={!!this.state.cover_image ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
           </View>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>{(this.state.screen_name || '').substring(0, 4)}</Text>
@@ -354,7 +355,7 @@ class MineScene extends PureComponent {
           <View>
             <Image
               style={[worker_styles.icon_head]}
-              source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+              source={!!this.state.cover_image ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
           </View>
           <View style={[worker_styles.worker_box]}>
             <Text style={worker_styles.worker_name}>{(this.state.screen_name || '').substring(0, 4)}</Text>
@@ -383,7 +384,7 @@ class MineScene extends PureComponent {
   }
 
   render() {
-    let {currVersion, is_mgr} = this.state;
+    let {currVersion, is_mgr, is_helper} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -396,7 +397,7 @@ class MineScene extends PureComponent {
         style={{backgroundColor: colors.main_back}}
       >
         {this.renderHeader()}
-        {is_mgr ? this.renderManager() : this.renderWorker()}
+        {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
         {this.renderStoreBlock()}
         {this.renderVersionBlock()}
         {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
@@ -422,13 +423,13 @@ class MineScene extends PureComponent {
 
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
-    let {currVendorId, currVersion, is_mgr} = this.state;
+    let {currVendorId, currVersion, is_mgr, is_helper} = this.state;
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            if (is_mgr) {
+            if (is_mgr || is_helper) {
               let url = `${Config.ServiceUrl}stores/worker_stats.html${token}`;
               this.onPress(Config.ROUTE_WEB, {url: url});
             } else {

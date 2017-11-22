@@ -41,6 +41,7 @@ import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import VersionScene from "../scene/Mine/VersionScene";
 import SelectStoreScene from "../scene/Setting/SelectStoreScene";
 import OrderTodoScene from "../scene/Order/OrderTodoScene";
+import OrderCallShip from "../scene/Order/OrderCallShip";
 
 const tabDef = {
   Remind: {
@@ -189,6 +190,7 @@ class Navigator extends Component {
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
+        [Config.ROUTE_ORDER_CALL_SHIP]: {screen: OrderCallShip},
         [Config.ROUTE_SETTING]: {screen: SettingScene},
         [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
         [Config.ROUTE_PRINTER_CONNECT]: {screen: PrinterConnectScene},

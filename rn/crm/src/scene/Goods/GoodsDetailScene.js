@@ -23,6 +23,9 @@ import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
 import NavigationItem from "../../widget/NavigationItem";
+import native from "../../common/native";
+import Config from "../../config";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -43,18 +46,33 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    let {backPage} = params;
     return {
       headerLeft: (
         <NavigationItem
           icon={require('../../img/Register/black_back_.png')}
           iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
           onPress={() => {
-            console.log('back');
-            navigation.goBack('Goods');
+            if(!!backPage){
+              console.log('backPage -> ', backPage);
+              native.gotoPage(backPage);
+            }
           }}
         />),
       headerTitle: '商品详情',
-      headerRight: '',
+      headerRight: ( <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+              });
+            });
+          }}
+        >
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>),
     }
   };
 
@@ -74,17 +92,25 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    this.productId = (this.props.navigation.state.params || {}).productId;
-    let product_id = this.productId;
+    let {productId, backPage} = (this.props.navigation.state.params || {});
+
+    this.productId = productId;
     const {product_detail} = this.props.product;
-    if (product_detail[product_id] === undefined) {
+    if (product_detail[productId] === undefined) {
       this.getProductDetail();
     } else {
       this.setState({
-        product_detail: product_detail[product_id],
+        product_detail: product_detail[productId],
       });
     }
     this.getVendorProduct();
+  }
+
+  componentDidMount() {
+    let {backPage} = (this.props.navigation.state.params || {});
+    if(!!backPage){
+      this.props.navigation.setParams({backPage: backPage});
+    }
   }
 
   getProductDetail() {
@@ -490,6 +516,13 @@ const styles = StyleSheet.create({
   },
   icon_off_sale: {
     color: colors.color999,
+  },
+  btn_edit: {
+    fontSize: pxToDp(40),
+    width: pxToDp(42),
+    height: pxToDp(36),
+    color: colors.color666,
+    marginRight: pxToDp(30),
   },
 });
 
