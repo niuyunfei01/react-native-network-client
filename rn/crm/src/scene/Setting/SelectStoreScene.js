@@ -71,28 +71,6 @@ class SelectStoreScene extends PureComponent {
     params.doneSelectStore(StoreId);
   }
 
-
-  onHeaderRefresh() {
-    this.setState({isRefreshing: true});
-    this.setState({isRefreshing: false});
-  }
-
-  onPress(route, params = {}) {
-    let _this = this;
-
-    if (route === Config.ROUTE_ORDER_INVALID) {
-      native.ordersInvalid();
-      return;
-    } else if (route === Config.ROUTE_ORDER_SERIOUS_DELAY) {
-      native.ordersSeriousDelay();
-      return;
-    }
-
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
-    });
-  }
-
   render() {
     return (
       <ModalSelector

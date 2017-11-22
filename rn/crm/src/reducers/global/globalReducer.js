@@ -43,7 +43,6 @@ const initialState = {
 export default function globalReducer (state = initialState, action) {
 
   switch (action.type) {
-
     case LOGIN_PROFILE_SUCCESS:
       if (action.payload && action.payload.id) {
         return {

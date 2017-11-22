@@ -61,7 +61,6 @@ class MineScene extends PureComponent {
       currentUserProfile,
       canReadStores,
     } = this.props.global;
-
     let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
     let sortStores = Object.values(canReadStores).sort(function (a, b) {
       return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
