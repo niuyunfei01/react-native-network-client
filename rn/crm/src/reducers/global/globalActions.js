@@ -166,15 +166,14 @@ export function signIn(mobile, password, callback) {
 
 export function requestSmsCode(mobile, type, callback) {
   return dispatch => {
-    return smsCodeRequest(getDeviceUUID(), mobile, type)
-      .then(response => response.json())
-      .then(json => {
+    const url = `check/app_message_code.json?device_uuid=${getDeviceUUID()}&mobile=${mobile}&type=${type}`;
+    return getWithTpl(url, (json => {
         console.log("requestSmsCode res", json);
         callback(json.success, json.reason)
-      }).catch((error) => {
+      }), (error) => {
         console.log('request error', error);
         callback(false, '网络错误，请检查您的网络连接')
-      })
+      });
   }
 }
 
