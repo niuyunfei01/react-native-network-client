@@ -87,7 +87,11 @@ class OrderCallShip extends Component {
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
 
-      <CellsTitle style={CommonStyle.cellsTitle}>选择配送</CellsTitle>
+      <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
+        <Text style={{ fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>
+      </View>
+
+      <CellsTitle style={CommonStyle.cellsTitle}>选择第三方配送</CellsTitle>
        <RadioCells
         style={{marginTop: 2}}
         options={wayOpts}
