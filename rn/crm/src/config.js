@@ -72,6 +72,7 @@ const C = {
   ROUTE_REFUND_AUDIT: 'AuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
+  ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
   ROUTE_ORDER_TODO: 'OrderTodo',
   ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_STORE: 'Store',

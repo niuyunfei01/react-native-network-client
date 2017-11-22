@@ -3,7 +3,7 @@ import {TouchableOpacity, Text, View} from 'react-native'
 import CallImg from './CallImg'
 import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
-import {native} from "../../common"
+import {native, tool} from "../../common"
 import PropTypes from 'prop-types'
 import {ToastShort} from "../../util/ToastUtils";
 import Cts from "../../Cts";
@@ -33,7 +33,7 @@ class OrderBottom extends PureComponent {
     this._visibleProviding = this._visibleProviding.bind(this);
     this._visibleShipInfoBtn = this._visibleShipInfoBtn.bind(this);
 
-    this.callShipDlg = this.callShipDlg.bind(this);
+    this._callShipDlg = this._callShipDlg.bind(this);
     this._onShipInfoBtnClicked = this._onShipInfoBtnClicked.bind(this);
     this._shipInfoBtnText = this._shipInfoBtnText.bind(this);
     this._visibleShipInfoBtn = this._visibleShipInfoBtn.bind(this);
@@ -52,8 +52,9 @@ class OrderBottom extends PureComponent {
     }
   }
 
-  callShipDlg() {
-
+  _callShipDlg() {
+    const {callShip} = this.props;
+    callShip();
   }
   
   _onToProvide() {
@@ -81,7 +82,8 @@ class OrderBottom extends PureComponent {
 
 
   _onShipInfoBtnClicked () {
-    let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile} = this.props.order;
+    let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
+      dada_call_at} = this.props.order;
     dada_status = parseInt(dada_status);
     orderStatus = parseInt(orderStatus);
     ship_worker_id = parseInt(ship_worker_id);
@@ -89,15 +91,16 @@ class OrderBottom extends PureComponent {
 
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       ToastShort("请使用老版本修改送达时间");
+    } else if (dada_status === Cts.DADA_STATUS_NEVER_START) {
+      this._callShipDlg();
     } else {
 
       let title, msg, buttons;
-      if (dada_status === Cts.DADA_STATUS_NEVER_START) {
-        this.callShipDlg();
-      } else if (dada_status === Cts.DADA_STATUS_TO_ACCEPT) {
+      if (dada_status === Cts.DADA_STATUS_TO_ACCEPT) {
         title = '自动待接单';
-        const minutes = (int)((System.currentTimeMillis() - _order.getDada_call_at().getTime()) / (1000 * 60));
-        msg = `${minutes}分前已发单(${dada_distance}米${dada_fee}元)到%s, 等待${auto_plat}接单中...`;
+        const timeDesc = tool.shortTimeDesc(dada_call_at);
+        const shipDetail = (dada_distance || dada_fee) ? `(${dada_distance}米${dada_fee}元)` : '';
+        msg = `${timeDesc}已发单${shipDetail}到${auto_plat}, 等待接单中...`;
         buttons = [
           {
             type: 'default',
@@ -138,12 +141,12 @@ class OrderBottom extends PureComponent {
         ];
       } else if (dada_status === Cts.DADA_STATUS_CANCEL || dada_status === Cts.DADA_STATUS_TIMEOUT) {
         title = "通过系统呼叫配送";
-        msg = "订单已"+(dada_status === Cts.DADA_STATUS_TIMEOUT ? "超时":"取消")+"，重新发单？";
+        msg = "订单已" + (dada_status === Cts.DADA_STATUS_TIMEOUT ? "超时" : "取消") + "，重新发单？";
         buttons = [{
           type: 'default',
           label: '重新发单',
           onPress: () => {
-            this.callShipDlg();
+            this._callShipDlg();
           },
         },
           this._defCloseBtn(),
@@ -170,7 +173,6 @@ class OrderBottom extends PureComponent {
           this._defCloseBtn(),
         ];
       }
-
       this.setState({
         dlgShipTitle: title,
         dlgShipButtons: buttons,
@@ -187,7 +189,6 @@ class OrderBottom extends PureComponent {
     orderStatus = parseInt(orderStatus);
     ship_worker_id = parseInt(ship_worker_id);
 
-    console.log(`_shipInfoBtnText, `, dada_status, orderStatus, ship_worker_id);
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     }  else {

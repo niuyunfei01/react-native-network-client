@@ -209,6 +209,7 @@ class OrderScene extends Component {
     this._toEditBasic = this._toEditBasic.bind(this);
     this._fnProvidingOnway = this._fnProvidingOnway.bind(this);
     this._onToProvide = this._onToProvide.bind(this);
+    this._callShip = this._callShip.bind(this);
   }
 
   componentDidMount() {
@@ -643,6 +644,11 @@ class OrderScene extends Component {
     return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
 
+  _callShip () {
+    const {navigation, order} = this.props;
+    navigation.navigate(Config.ROUTE_ORDER_CALL_SHIP, {order: order.order});
+  }
+
   _onToProvide() {
     const {order, global, dispatch, navigation} = this.props;
     if (order.order.store_id <= 0) {
@@ -775,7 +781,7 @@ class OrderScene extends Component {
             refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
-            <OrderBottom order={order} fnfnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
+            <OrderBottom order={order} callShip={this._callShip} fnfnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
           <Dialog onRequestClose={() => {
           }}

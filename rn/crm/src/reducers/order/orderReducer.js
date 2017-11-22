@@ -64,7 +64,7 @@ export default function orderReducer(state = initialState, action) {
       }
 
     case ORDER_INVALIDATED:
-      if (action.order && action.id === action.order.id) {
+      if (state.order && action.id === state.order.id) {
         return {
           ...state, order: {}
         }

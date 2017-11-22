@@ -196,6 +196,22 @@ export function orderToInvalid(token, id, reason_key, custom, callback) {
   }
 }
 
+export function orderCallShip(token, id, way, callback) {
+  return dispatch => {
+    const url = `api/order_dada_start/${id}/${way}.json?access_token=${token}`;
+    getWithTpl(url, (json) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id})
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        console.log('error:', error);
+        callback(false, "网络错误, 请稍后重试")
+      }
+    )
+  }
+}
+
 export function orderAddTodo(token, id, taskType, remark, callback) {
   return dispatch => {
     const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
