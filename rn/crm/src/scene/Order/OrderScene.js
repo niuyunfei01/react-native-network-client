@@ -1394,7 +1394,6 @@ const top_styles = StyleSheet.create({
 const wayRecord = StyleSheet.create({
   expressName: {
     height: pxToDp(30),
-    backgroundColor: '#59b26a',
     width: pxToDp(76),
     backgroundColor: '#EEEEEE',
     borderRadius: pxToDp(10)
