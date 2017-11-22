@@ -77,7 +77,7 @@ class StoreAddScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       dispatch(copyStoreGoods(store_id, force, accessToken, (resp) => {
         if (resp.ok) {
-          console.log(resp);
+          //console.log(resp);
           ToastLong(resp.desc);
         }
         this.setState({

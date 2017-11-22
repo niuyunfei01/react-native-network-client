@@ -144,7 +144,8 @@ export function signIn(mobile, password, callback) {
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
           native.updateAfterTokenGot(access_token, expire, (ok, msg, profile) => {
             if (ok) {
-              dispatch({type: LOGIN_PROFILE_SUCCESS, payload: profile});
+              profile = JSON.parse(profile);
+              dispatch(setUserProfile(profile));
               callback(true, 'ok', access_token)
             } else {
               console.log('updateAfterTokenGot error:', msg);
