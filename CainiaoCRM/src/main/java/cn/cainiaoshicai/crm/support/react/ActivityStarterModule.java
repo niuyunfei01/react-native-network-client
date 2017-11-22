@@ -28,6 +28,7 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -147,6 +148,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, SettingsPrintActivity.class);
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toOrder(String wm_id) {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, OrderSingleActivity.class);
+            intent.putExtra("order_id", Integer.parseInt(wm_id));
             activity.startActivity(intent);
         }
     }

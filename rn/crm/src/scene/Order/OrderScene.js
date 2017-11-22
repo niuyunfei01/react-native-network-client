@@ -18,10 +18,11 @@ import {color, NavigationItem, RefreshListView, RefreshState, Separator, Spacing
 import {screen, system, tool, native} from '../../common'
 import {bindActionCreators} from "redux";
 import Icons from 'react-native-vector-icons/FontAwesome';
-import Config from '../../config'
+import Config, {serverUrl} from '../../config'
 import PropTypes from 'prop-types';
 import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
+import OrderBottom from './OrderBottom'
 import CommonStyle from '../../common/CommonStyles'
 
 import {
@@ -39,7 +40,7 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
@@ -48,6 +49,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import { Array } from 'core-js/library/web/timers';
+import styles from './OrderStyles'
 
 const numeral = require('numeral');
 
@@ -85,12 +87,19 @@ const supportEditGoods = (orderStatus) => {
     orderStatus === Cts.ORDER_STATUS_SHIPPING
 };
 
+const shouldShowItems = (orderStatus) => {
+  orderStatus = parseInt(orderStatus);
+  return orderStatus === Cts.ORDER_STATUS_TO_SHIP ||
+    orderStatus === Cts.ORDER_STATUS_TO_READY
+};
+
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
 const MENU_EDIT_STORE = 3;
 const MENU_FEEDBACK = 4;
 const MENU_SET_INVALID = 5;
 const MENU_ADD_TODO = 6;
+const MENU_OLD_VERSION = 7;
 
 class OrderScene extends Component {
 
@@ -104,6 +113,7 @@ class OrderScene extends Component {
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_SET_INVALID, label: '置为无效'},
       {key: MENU_ADD_TODO, label: '稍后处理'},
+      {key: MENU_OLD_VERSION, label: '老版订单页'},
     ];
 
     return {
@@ -152,7 +162,6 @@ class OrderScene extends Component {
 
       doingUpdate: false,
 
-
       //good items editing/display
       isEditing: false,
       isEndVisible: false,
@@ -196,6 +205,8 @@ class OrderScene extends Component {
     this._orderChangeLog = this._orderChangeLog.bind(this);
 
     this._toEditBasic = this._toEditBasic.bind(this);
+    this._fnProvidingOnway = this._fnProvidingOnway.bind(this);
+    this._onToProvide = this._onToProvide.bind(this);
   }
 
   componentDidMount() {
@@ -217,6 +228,7 @@ class OrderScene extends Component {
         const edits = OrderScene._extract_edited_items(order.items);
         this.setState({
           itemsEdited: edits,
+          itemsHided: shouldShowItems(order.orderStatus)
         });
 
         this.store_contacts = this.props.store.contacts[order.store_id];
@@ -252,9 +264,12 @@ class OrderScene extends Component {
   }
 
   onMenuOptionSelected(option) {
-    console.log('option -> ', option);
+
     const {accessToken} = this.props.global;
-    if (option.key === MENU_EDIT_BASIC) {//修改地址
+    const {navigation, order, global, dispatch} = this.props;
+
+    if (option.key === MENU_EDIT_BASIC) {
+
       this._toEditBasic();
     } else if (option.key === MENU_EDIT_EXPECT_TIME) {//修改配送时间
       if (this.state.doingUpdate) {
@@ -265,22 +280,25 @@ class OrderScene extends Component {
         isEndVisible: true,
       });
     } else if (option.key === MENU_EDIT_STORE) {
-      const {navigation, order} = this.props;
+
       navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order.order});
     } else if (option.key === MENU_FEEDBACK) {
-      const {navigation, order, global, dispatch} = this.props;
+
       const _o = order.order;
       const vm_path = _o.feedback && _o.feedback.id ? "#!/feedback/view/" + _o.feedback.id
         : "#!/feedback/order/" + _o.id;
-      const path =  `vm?access_token=${accessToken}${vm_path}`;
+      const path = `vm?access_token=${accessToken}${vm_path}`;
       const url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
-      const {navigation, order, global, dispatch} = this.props;
+
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
     } else if (option.key === MENU_ADD_TODO) {
-      const {navigation, order, global, dispatch} = this.props;
+
       navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order.order});
+    } else if (option.key === MENU_OLD_VERSION) {
+
+      native.toNativeOrder(order.order.id);
     } else {
       ToastShort('未知的操作');
     }
@@ -318,7 +336,6 @@ class OrderScene extends Component {
 
   _onShowStoreCall() {
 
-    console.log(this.store_contacts);
     const store_id = this.props.order.order.store_id;
     if (!this.store_contacts || this.store_contacts.length === 0) {
       this.setState({showContactsLoading: true});
@@ -609,6 +626,24 @@ class OrderScene extends Component {
     }
   }
 
+  _fnProvidingOnway() {
+    const {order, global} = this.props;
+    
+    const storeId = order.order.store_id;
+    return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
+  }
+
+  _onToProvide() {
+    const {order, global, dispatch, navigation} = this.props;
+    if (order.order.store_id <= 0) {
+      ToastLong("所属门店未知，请先设置好订单所属门店！");
+      return false;
+    }
+
+    const path = `stores/orders_go_to_by/${order.order.id}.html?access_token=${global.accessToken}`;
+    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(Config.host(global, dispatch, native), path, Config.https)});
+  }
+
   _getWayRecord() {
 
     this.setState({ shipHided: !this.state.shipHided});
@@ -651,7 +686,7 @@ class OrderScene extends Component {
   }
 
   render() {
-    const {order} = this.props.order;
+    const {order, dispatch, global, navigation} = this.props.order;
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}
       onRefresh={this.onHeaderRefresh}
@@ -730,27 +765,7 @@ class OrderScene extends Component {
             refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
-          <View style={{
-            flexDirection: 'row', justifyContent: 'space-around',
-            paddingTop: pxToDp(10),
-            paddingRight: pxToDp(10),
-            paddingLeft: pxToDp(10),
-            paddingBottom: pxToDp(10),
-            backgroundColor: '#fff',
-            // marginLeft: pxToDp(20), marginRight: pxToDp(20),
-            borderRadius: 4,
-            borderWidth: 1,
-            borderColor: '#ddd',
-            shadowColor: '#000',
-
-            shadowOffset: {width: -4, height: -4},
-            shadowOpacity: 0.75,
-            shadowRadius: 4,
-            height: pxToDp(90),
-          }}>
-            <Button style={[styles.bottomBtn, {marginRight: pxToDp(5),}]} type={'primary'}>联系配送</Button>
-            <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}>提醒送达</Button>
-          </View>
+            <OrderBottom order={order} fnfnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
           <Dialog onRequestClose={() => {
           }}
@@ -806,14 +821,6 @@ class OrderScene extends Component {
 
   renderHeader() {
     const {order} = this.props.order;
-
-    // let onButtonPress = () => {
-    //   this.props.actions.updateOrder(
-    //     this.props.order.id,
-    //     this.props.profile.form.fields.username,
-    //     this.props.profile.form.fields.email,
-    //     this.props.global.currentUser)
-    // }
 
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
@@ -1049,7 +1056,6 @@ class OrderScene extends Component {
 
       {
         !this.state.shipHided ?
-
           tool.objectMap(this.state.orderWayLogs, (item, index) => {
 
             return (
@@ -1367,107 +1373,6 @@ const top_styles = StyleSheet.create({
     color: '#4d4d4d',
     backgroundColor: '#939195',
   },
-});
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'transparent',
-  },
-  btn_select: {
-    marginRight: pxToDp(20),
-    height: pxToDp(60),
-    width: pxToDp(60),
-    fontSize: pxToDp(40),
-    color: colors.color666,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-  },
-  icon: {
-    width: pxToDp(74),
-    height: pxToDp(56),
-    alignItems: 'flex-end'
-  },
-  btn4text: {
-    width: pxToDp(152),
-    height: pxToDp(40)
-  },
-  pullImg: {
-    width: pxToDp(90),
-    height: pxToDp(72)
-  },
-  banner: {
-    width: screen.width,
-    height: screen.width * 0.5
-  },
-  row: {
-    flexDirection: 'row',
-    marginLeft: pxToDp(30),
-    marginRight: pxToDp(40),
-    alignContent: 'center',
-    marginTop: pxToDp(14)
-  },
-  remarkText: {
-    color: '#808080',
-    fontWeight: 'bold',
-    fontSize: pxToDp(24),
-  },
-  remarkTextBody: {
-    marginLeft: pxToDp(6), marginRight: pxToDp(140)
-  },
-  moneyLeft: {
-    width: pxToDp(480),
-    flexDirection: 'row',
-  },
-  moneyRow: {marginTop: 0, marginBottom: pxToDp(12), alignItems: 'center'},
-  moneyListTitle: {
-    fontSize: pxToDp(26),
-    color: colors.color333,
-  },
-  moneyListSub: {
-    fontSize: pxToDp(26),
-    color: colors.main_color,
-  },
-  moneyListNum: {
-    fontSize: pxToDp(26),
-    color: colors.color777,
-  },
-  buyButton: {
-    backgroundColor: '#fc9e28',
-    width: 94,
-    height: 36,
-    borderRadius: 7,
-  },
-  tagContainer: {
-    flexDirection: 'row',
-    padding: 10,
-    alignItems: 'center'
-  },
-  tipHeader: {
-    height: 35,
-    justifyContent: 'center',
-    borderWidth: screen.onePixel,
-    borderColor: color.border,
-    paddingVertical: 8,
-    paddingLeft: 20,
-    backgroundColor: 'white'
-  },
-  bottomBtn: {
-    height: pxToDp(70), flex: 1, alignItems: 'center', justifyContent: 'center'
-  },
-  block: {
-    marginTop: pxToDp(10),
-    backgroundColor: colors.white,
-  },
-  editStatus: {
-    color: colors.white,
-    fontSize: pxToDp(22),
-    borderRadius: pxToDp(5),
-    alignSelf: 'center',
-    paddingLeft: 5,
-    paddingRight: 5,
-    paddingTop: 2,
-    paddingBottom: 2
-  }
 });
 
 const wayRecord = StyleSheet.create({

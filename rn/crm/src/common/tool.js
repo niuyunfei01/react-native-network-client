@@ -63,6 +63,16 @@ export function storeTime(dt) {
   return Moment(dt).format('H:ss');
 }
 
+export function vendorOfStoreId(storeId, global) {
+  const {
+    canReadStores,
+    canReadVendors,
+  } = global;
+
+  const vendorId = canReadStores[storeId] && canReadStores[storeId].vendor_id;
+  return canReadVendors && canReadVendors[vendorId] ? canReadVendors[vendorId] : null;
+}
+
 export function vendor(global) {
   const {
     currentUser,
@@ -269,5 +279,7 @@ export default {
   store,
   intOf,
   disWayStatic,
-  disWay
+  disWay,
+  vendor,
+  vendorOfStoreId,
 }
