@@ -8,7 +8,7 @@
 'use strict';
 
 import Config from '../../config'
-import {serviceSignIn, smsCodeRequest, customerApplyRequest} from '../../services/account'
+import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, postWithTpl} from '../../util/common'
 

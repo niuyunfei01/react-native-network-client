@@ -33,16 +33,12 @@ export function jsonWithTpl(url, data, okFn, failFn) {
 /**
  *
  * @param url
- * @param data plain javascript data, will be converted to FormData
+ * @param data plain javascript data, object key/value pairs
  * @param okFn function with one param: json
  * @param failFn function with error msg
  */
 export function postWithTpl(url, data, okFn, failFn) {
-  const formData  = new FormData();
-  for(let name in data) {
-    formData.append(name, data[name]);
-  }
-  FetchEx.timeout(Config.FetchTimeout, FetchEx.postForm(url, formData))
+  FetchEx.timeout(Config.FetchTimeout, FetchEx.postForm(url, data))
     .then(res => res.json())
     .then(json => {
       okFn(json)

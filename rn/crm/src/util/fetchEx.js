@@ -31,11 +31,11 @@ export default {
       body: formData
     });
   },
-  postForm(action, formData) {
+  postForm(action, object) {
     const url = AppConfig.ServiceUrl + action;
 
-    let parameters = [...formData.entries()] // expand the elements from the .entries() iterator into an actual array
-      .map(e => encodeURIComponent(e[0]) + "=" + encodeURIComponent(e[1]))
+    let parameters = Object.keys(object) // expand the elements from the .entries() iterator into an actual array
+      .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(object[key]))
       .join('&');// transform the elements into encoded key-value-pairs
 
     console.log('postForm to ' + url, parameters);
