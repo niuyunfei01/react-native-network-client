@@ -15,4 +15,5 @@ export default {
   main_back: '#f2f2f2',
   editStatusAdd: '#db5d5d',
   editStatusDeduct: '#3a97ff',
+  new_back: '#dcdcdc',
 };
