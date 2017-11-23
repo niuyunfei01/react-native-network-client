@@ -7,22 +7,25 @@
  */
 
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, WebView, InteractionManager, Platform} from 'react-native'
+import {View, Text, StyleSheet, WebView, InteractionManager, Platform, BackHandler} from 'react-native'
 import Config from "../config";
+import LoadingView from "./LoadingView";
+import {Toast} from "./../weui/index";
+
 
 // create a component
 class WebScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => ({
-    //headerStyle: {backgroundColor: 'white'},
     title: navigation.state.params.title,
-    header: null,
+    // header: null,
   });
 
   constructor(props: Object) {
     super(props);
     this.state = {
       source: {},
+      canGoBack: false,
     };
 
     this._do_go_back = this._do_go_back.bind(this)
@@ -42,6 +45,13 @@ class WebScene extends PureComponent {
     }
   };
 
+  backHandler = () => {
+    if(this.state.canGoBack) {
+      this.webview.goBack();
+      return true;
+    }
+  };
+
   _do_go_back(msg) {
     const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
@@ -55,9 +65,25 @@ class WebScene extends PureComponent {
     }
   }
 
+  _onNavigationStateChange = (navState) => {
+    console.log('set nav state', navState);
+
+    if (navState.canGoBack !== this.state.canGoBack || navState.loading !== this.state.showLoading) {
+      this.setState({
+        canGoBack: navState.canGoBack,
+        showLoading: navState.loading
+      });
+    }
+
+    if (!navState.loading && 'about:blank' === navState.url && !navState.canGoBack && navState.canGoForward) {
+      const {navigation} = this.props;
+      navigation.goBack();
+    }
+  };
+
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.setParams({title: '加载中'})
+      this.props.navigation.setParams({title: '加载中'});
       let {url, action} = this.props.navigation.state.params;
 
       if (action === Config.LOC_PICKER) {
@@ -65,10 +91,15 @@ class WebScene extends PureComponent {
         const key = '608d75903d29ad471362f8c58c550daf';
         url = `https://www.cainiaoshicai.cn/amap.php?key=${key}&center=${center}`;
       }
-      console.log(url);
       this.setState({source: {uri: url}})
-    })
+    });
+
+    BackHandler.addEventListener('hardwareBackPress', this.backHandler);
   };
+
+  componentWillUnmount(){
+    BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
+  }
 
 
   render() {
@@ -79,12 +110,22 @@ class WebScene extends PureComponent {
             this.webview = webview;
           }}
           onMessage={this.onMessage}
+          onNavigationStateChange=
+            {this._onNavigationStateChange.bind(this)}
           automaticallyAdjustContentInsets={false}
           style={styles.webView}
           source={this.state.source}
           onLoadEnd={(e) => this.onLoadEnd(e)}
           scalesPageToFit
         />
+
+        {/*<Toast*/}
+          {/*icon="loading"*/}
+          {/*show={this.state.showLoading}*/}
+          {/*onRequestClose={() => {*/}
+          {/*}}*/}
+        {/*>加载中</Toast>*/}
+
       </View>
     );
   }

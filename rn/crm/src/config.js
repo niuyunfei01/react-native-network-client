@@ -27,12 +27,13 @@ export function host(global, dispatch, native) {
 /**
  * get server url
  * @param host
- * @param path
+ * @param path string
  * @param useHttps
  * @returns {string}
  */
 export function serverUrl(host, path, useHttps = true) {
   const proto = useHttps ? 'https' : 'http';
+  path = path[0] === '/' ? path.substr(1) : path;
   return `${proto}://${host}/${path}`;
 }
 
@@ -46,7 +47,7 @@ const C = {
   'AppName': 'Crm',
   'ServiceUrl': 'https://preview.cainiaoshicai.cn/',
   'DownloadUrl': `https://www.cainiaoshicai.cn/cc.apk`,
-  MAP_WAY_URL: 'https://www.cainiaoshicai.cn/util/amap_way',
+  MAP_WAY_URL: 'util/amap_way',
   FetchTimeout: 10000,
 
   GRANT_TYP_PASSWORD: "password",

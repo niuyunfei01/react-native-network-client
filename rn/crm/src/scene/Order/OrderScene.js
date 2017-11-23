@@ -591,12 +591,14 @@ class OrderScene extends Component {
   }
 
   toMap() {
+    const {dispatch, native, global} = this.props;
     const {order} = this.props.order;
     const validPoi = order.gd_lng && order.gd_lat;
 
     if (validPoi) {
       const store = this.props.global.canReadStores[order.store_id] || {};
-      const uri = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
+      const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
+      const uri = Config.serverUrl(Config.host(global, dispatch, native), path);
       this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
       console.log(uri)
     } else {
