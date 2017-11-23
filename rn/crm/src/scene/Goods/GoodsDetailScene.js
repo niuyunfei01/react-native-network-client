@@ -190,23 +190,26 @@ class GoodsDetailScene extends PureComponent {
       >
         {this.renderImg(product_detail.mid_list_img, product_detail.coverimg)}
 
-        <View style={[styles.goods_view, {marginBottom: 0}]}>
-          <Text style={styles.goods_name}>
-            {product_detail.name}
-          </Text>
+        <View style={[styles.goods_info, styles.top_line]}>
+          <View style={[styles.goods_view]}>
+            <Text style={styles.goods_name}>
+              {product_detail.name}
+            </Text>
+            <Text style={styles.goods_cats}>
+              {product_detail.tag_list}
+            </Text>
+          </View>
+          {!!product_detail.promote_name ?
+            <Text style={styles.promote_name}>{product_detail.promote_name}</Text> : null}
         </View>
-        <View style={[styles.goods_view, {marginTop: 0, justifyContent: 'flex-end'}]}>
-          <Text style={styles.goods_cats}>
-            分类: {product_detail.tag_list}
-          </Text>
-        </View>
-        {!!product_detail.promote_name ?
-          <Text style={styles.promote_name}>描述/广告词：{product_detail.promote_name}</Text> : null}
 
-        <Cells style={[styles.cell_box]}>
+        <View style={[styles.box_title, styles.top_line]}>
+          <Text style={styles.title_name}>规格</Text>
+        </View>
+        <Cells style={[styles.cell_box, {marginTop: 0,}]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
-              <Label style={[styles.cell_label]}>重量</Label>
+              <Label style={[styles.cell_label]}>平均重量</Label>
             </CellHeader>
             <CellBody>
               <Text style={[styles.cell_body]}>{product_detail.weight}g</Text>
@@ -222,7 +225,7 @@ class GoodsDetailScene extends PureComponent {
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
-              <Label style={[styles.cell_label]}>箱含量</Label>
+              <Label style={[styles.cell_label]}>份含量</Label>
             </CellHeader>
             <CellBody>
               <Text style={[styles.cell_body]}>{product_detail.sku_having_unit}</Text>
@@ -230,12 +233,32 @@ class GoodsDetailScene extends PureComponent {
           </Cell>
         </Cells>
 
-        {!!product_detail.tag_info_saving ? (<Text style={styles.goods_desc}>
-          保存方法：{product_detail.tag_info_saving}
-        </Text>) : null}
-        {!!product_detail.tag_info_nur ? (<Text style={styles.goods_desc}>
-          介绍：{product_detail.tag_info_nur}
-        </Text>) : null}
+        {!!product_detail.tag_info_saving && (
+          <View>
+            <View style={[styles.box_title, styles.top_line]}>
+              <Text style={styles.title_name}>保存方法</Text>
+            </View>
+            <Cells style={[styles.cell_box, {marginTop: 0,}]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.desc_body]}>{product_detail.tag_info_saving}</Text>
+                </CellBody>
+              </Cell>
+            </Cells>
+          </View>) }
+        {!!product_detail.tag_info_nur && (
+          <View>
+            <View style={[styles.box_title, styles.top_line]}>
+              <Text style={styles.title_name}>介绍</Text>
+            </View>
+            <Cells style={[styles.cell_box, {marginTop: 0,}]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.desc_body]}>{product_detail.tag_info_nur}</Text>
+                </CellBody>
+              </Cell>
+            </Cells>
+          </View>) }
 
         {this.renderALlStore()}
       </ScrollView>
@@ -244,16 +267,33 @@ class GoodsDetailScene extends PureComponent {
 
   renderALlStore = () => {
     let {store_product} = this.state;
+    let {navigation} = this.props;
     if (!(tool.length(store_product) > 0)) {
       return <LoadingView/>;
     }
 
     return (
       <View style={styles.all_stores}>
-        <View style={styles.store_head}>
+        <View style={styles.box_title}>
+          <Text style={styles.title_name}>门店商品信息</Text>
+          <View style={{flex: 1}}/>
+          <TouchableOpacity
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_STORE_GOODS_EDIT);
+              });
+            }}
+          >
+            <Text style={{fontSize: pxToDp(30), color: '#59b26a', height: pxToDp(70), textAlignVertical: 'center'}}>
+              编辑
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.store_head, styles.top_line]}>
           <Text style={[styles.title_text, styles.store_title]}>门店</Text>
           <Text style={[styles.title_text, styles.stock_title]}>库存</Text>
           <Text style={[styles.title_text, styles.sale_title]}>售价</Text>
+          <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text>
         </View>
         {this.renderStoreProduct(store_product)}
       </View>
@@ -267,13 +307,14 @@ class GoodsDetailScene extends PureComponent {
     return tool.objectMap(store_product, function (s_product, store_id) {
       is_dark_bg = !is_dark_bg;
       return (
-        <View key={store_id} style={[styles.store_info, is_dark_bg && styles.single_back]}>
+        <View key={store_id} style={[styles.store_info, styles.top_line]}>
           <View style={[styles.store_view]}>
             <Text style={[styles.info_text, styles.store_name]}>{s_product.store_name}</Text>
             {_this.renderIcon(parseInt(s_product.status))}
           </View>
           <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
           <Text style={[styles.info_text, styles.sale_price]}>¥ {s_product.price/100}</Text>
+          <Text style={[styles.info_text, styles.is_provide]}>是</Text>
         </View>
       );
     });
@@ -364,26 +405,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#999',
     marginBottom: pxToDp(15),
   },
+  goods_info: {
+    backgroundColor: '#fff',
+    paddingTop: pxToDp(32),
+    paddingBottom: pxToDp(35),
+  },
   goods_view: {
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
-    marginVertical: pxToDp(15),
     alignItems: 'center',
   },
   goods_name: {
-    fontSize: pxToDp(34),
-    color: colors.color333,
+    fontSize: pxToDp(32),
+    color: '#3e3e3e',
   },
   goods_cats: {
-    fontSize: pxToDp(28),
-    color: colors.color666,
+    marginLeft: pxToDp(20),
+    width: pxToDp(118),
+    height: pxToDp(32),
+    borderRadius: 8,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    paddingHorizontal: pxToDp(5),
+    backgroundColor: colors.new_back,
+    fontSize: pxToDp(24),
+    color: '#41aa55',
   },
   promote_name: {
-    fontSize: pxToDp(30),
-    color: colors.color999,
-    fontWeight: 'bold',
+    fontSize: pxToDp(24),
+    color: '#bfbfbf',
     paddingHorizontal: pxToDp(30),
-    marginVertical: pxToDp(15),
+    marginTop: pxToDp(28),
   },
   sale_money: {
     fontSize: pxToDp(28),
@@ -396,35 +448,40 @@ const styles = StyleSheet.create({
   },
 
   cell_box: {
-    backgroundColor: colors.main_back,
-    marginVertical: pxToDp(15),
-    marginHorizontal: pxToDp(30),
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999,
+    borderColor: colors.new_back,
   },
   cell_row: {
-    marginLeft: 0,
-    paddingLeft: pxToDp(3),
-    paddingRight: pxToDp(5),
-    height: pxToDp(60),
+    paddingHorizontal: pxToDp(30),
+    height: pxToDp(80),
     justifyContent: 'center',
+    borderColor: colors.new_back,
+    marginLeft: 0,
   },
   cell_label: {
     width: pxToDp(126),
-    borderRightWidth: pxToDp(1),
-    borderColor: colors.color666,
-    fontSize: pxToDp(26),
-    fontWeight: 'bold',
-    color: colors.color666,
+    fontSize: pxToDp(30),
+    color: '#3e3e3e',
+    // borderRightWidth: pxToDp(1),
+    // borderColor: colors.color666,
   },
   cell_body: {
     textAlign: 'right',
-    fontSize: pxToDp(26),
-    fontWeight: 'bold',
-    color: colors.color333,
+    fontSize: pxToDp(30),
+    color: '#3e3e3e',
+  },
+  desc_body: {
+    fontSize: pxToDp(30),
+    color: '#3e3e3e',
   },
 
+  box_title: {
+    flexDirection: 'row',
+    paddingHorizontal: pxToDp(30),
+    height: pxToDp(70),
+    backgroundColor: colors.main_back,
+  },
   goods_desc: {
     fontSize: pxToDp(30),
     color: colors.color666,
@@ -434,35 +491,41 @@ const styles = StyleSheet.create({
 
   all_stores: {
     marginVertical: pxToDp(15),
+    backgroundColor: '#fff',
   },
   store_head: {
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
-    height: pxToDp(90),
+    height: pxToDp(80),
     alignItems: 'center',
-
+  },
+  top_line: {
     borderTopWidth: pxToDp(1),
-    borderColor: colors.color666,
+    borderColor: '#dcdcdc',
   },
   title_text: {
-    fontSize: pxToDp(40),
+    fontSize: pxToDp(24),
     fontWeight: 'bold',
-    color: colors.color666,
-    paddingLeft: pxToDp(10),
+    color: '#bfbfbf',
   },
   store_title: {
-    width: pxToDp(340),
-    paddingLeft: 0,
+    width: pxToDp(210),
   },
   stock_title: {
-    width: pxToDp(190),
+    textAlign: 'center',
+    width: pxToDp(150),
   },
   sale_title: {
-    width: pxToDp(190),
+    textAlign: 'center',
+    width: pxToDp(150),
+  },
+  goods_provide: {
+    textAlign: 'center',
+    width: pxToDp(150),
   },
   store_info: {
     flexDirection: 'row',
-    height: pxToDp(60),
+    minHeight: pxToDp(80),
     alignItems: 'center',
     paddingHorizontal: pxToDp(30),
   },
@@ -470,43 +533,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6e6e6',
   },
   info_text: {
-    fontSize: pxToDp(28),
-    fontWeight: 'bold',
+    fontSize: pxToDp(30),
     textAlignVertical: 'center',
-    height: pxToDp(35),
-    paddingLeft: pxToDp(10),
+    color: '#3e3e3e',
   },
   store_view: {
     paddingLeft: 0,
-    width: pxToDp(340),
+    width: pxToDp(210),
     flexDirection: 'row',
     alignItems: 'center',
   },
   store_name: {
-    paddingLeft: 0,
-    color: '#111',
   },
   stock_num: {
-    width: pxToDp(190),
-    color: colors.color999,
-    borderLeftWidth: pxToDp(1),
-    borderRightWidth: pxToDp(1),
-    borderColor: colors.color666,
-  },
-  stock_warning: {
-    color: '#f44040',
+    textAlign: 'center',
+    width: pxToDp(150),
   },
   sale_price: {
-    width: pxToDp(190),
-    color: colors.color666,
-    fontWeight: 'normal',
+    textAlign: 'center',
+    width: pxToDp(150),
+  },
+  is_provide: {
+    textAlign: 'center',
+    width: pxToDp(150),
   },
 
   icon_style: {
-    width: pxToDp(30),
-    height: pxToDp(30),
-    fontSize: pxToDp(30),
-    marginLeft: pxToDp(10),
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginLeft: pxToDp(20),
   },
   icon_on_sale: {
     color: colors.main_color,
@@ -523,6 +578,11 @@ const styles = StyleSheet.create({
     height: pxToDp(36),
     color: colors.color666,
     marginRight: pxToDp(30),
+  },
+  title_name: {
+    textAlignVertical: 'center',
+    fontSize: pxToDp(28),
+    color: '#bfbfbf',
   },
 });
 
