@@ -137,15 +137,23 @@ class Navigator extends Component {
 
     let stackNavigatorConfigs = {
       navigationOptions: {
-        headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78), borderColor: '#999', borderBottomWidth: pxToDp(1) },
+        headerStyle: {
+          // backgroundColor: colors.back_color,
+          // height: pxToDp(78),
+          // borderColor: '#999',
+          // borderBottomWidth: pxToDp(1),
+          height: pxToDp(96),
+          borderColor: colors.new_back,
+          borderBottomWidth: pxToDp(1),
+        },
         headerTitleStyle: {
-          color: '#111111',
+          color: '#4a4a4a',
           fontSize: pxToDp(30),
           fontWeight: 'bold',
           marginHorizontal: 0,
-          // paddingLeft: pxToDp(10),
-          // borderColor: '#000',
-          // borderLeftWidth:pxToDp(1),
+          paddingLeft: pxToDp(24),
+          borderColor: colors.new_back,
+          borderLeftWidth:pxToDp(1),
         },
         headerBackTitle: null,
         headerTintColor: '#333333',
