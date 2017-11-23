@@ -97,10 +97,21 @@ class WebScene extends PureComponent {
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);
   };
 
+  componentWillMount() {
+    // this._gestureHandlers = {
+    //   onStartShouldSetResponder: () => true,
+    //   onResponderGrant: () => {
+    //     this.setState({scrollEnabled: true});
+    //   },
+    //   onResponderTerminate: () => {
+    //     this.setState({scrollEnabled: false});
+    //   }
+    // };
+  }
+
   componentWillUnmount(){
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
   }
-
 
   render() {
     return (
@@ -112,20 +123,17 @@ class WebScene extends PureComponent {
           onMessage={this.onMessage}
           onNavigationStateChange=
             {this._onNavigationStateChange.bind(this)}
-          automaticallyAdjustContentInsets={false}
+          automaticallyAdjustContentInsets={true}
           style={styles.webView}
           source={this.state.source}
           onLoadEnd={(e) => this.onLoadEnd(e)}
+          // renderLoading={() => {
+          //   return <Toast>加载中</Toast>
+          // }}
+          // {{...this._gestureHandlers}}
+          // scrollEnabled={this.state.scrollEnabled}
           scalesPageToFit
         />
-
-        {/*<Toast*/}
-          {/*icon="loading"*/}
-          {/*show={this.state.showLoading}*/}
-          {/*onRequestClose={() => {*/}
-          {/*}}*/}
-        {/*>加载中</Toast>*/}
-
       </View>
     );
   }
