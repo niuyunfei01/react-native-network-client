@@ -42,6 +42,7 @@ import VersionScene from "../scene/Mine/VersionScene";
 import SelectStoreScene from "../scene/Setting/SelectStoreScene";
 import OrderTodoScene from "../scene/Order/OrderTodoScene";
 import OrderCallShip from "../scene/Order/OrderCallShip";
+import GoodsEditScene from '../scene/Goods/GoodsEditScene';
 
 const tabDef = {
   Remind: {
@@ -216,6 +217,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},
         [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
+        [Config.ROUTE_GOODS_EDIT]: {screen:GoodsEditScene},
 
       },
       stackNavigatorConfigs

@@ -24,6 +24,7 @@ import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import OrderBottom from './OrderBottom'
 import CommonStyle from '../../common/CommonStyles'
+import LoadingView from "../../widget/LoadingView";
 
 import {
   getOrder,
@@ -427,16 +428,13 @@ class OrderScene extends Component {
   _hidePrinterChooser() {
     this.setState({showPrinterChooser: false})
   }
-
   _cloudPrinterSN() {
     const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
-
     const store = stores[order.id];
     const printerName = (store && store.cloudPrinter) ? store.cloudPrinter : '未知';
     return `云打印(${printerName})`;
   }
-
   _doCloudPrint() {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
@@ -450,7 +448,6 @@ class OrderScene extends Component {
       this._hidePrinterChooser();
     }))
   }
-
   _doBluetoothPrint() {
     const order = this.props.order.order;
     native.printBtPrinter(order, (ok, msg) => {
@@ -458,7 +455,6 @@ class OrderScene extends Component {
     });
     this._hidePrinterChooser();
   }
-
   _onLogin() {
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId: this.orderId}})
   }
@@ -661,45 +657,146 @@ class OrderScene extends Component {
     const path = `stores/orders_go_to_by/${order.order.id}.html?access_token=${global.accessToken}`;
     navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(Config.host(global, dispatch, native), path, Config.https)});
   }
-
   _getWayRecord() {
+    this.setState({ shipHided: !this.state.shipHided })
+    let orderWayLogs = this.state.orderWayLogs
 
-    this.setState({ shipHided: !this.state.shipHided});
+    if (this.state.shipHided && tool.length(tool.length(orderWayLogs) == 0)) {
+      this.wayRecordQuery()
+      console.log(orderWayLogs)
 
-    if(this.state.shipHided){
-      this.setState({orderQuery:true})
-      const { dispatch, order, global } = this.props;
-      dispatch(orderWayRecord(order.order_id, global.accessToken, (ok, msg, contacts) => {
-        if(ok && contacts.length==0){
-          ToastAndroid.show('当前记录为空', ToastAndroid.SHORT)
-        }else if(ok){
-          // ToastAndroid.show('刷新成功', ToastAndroid.SHORT)
-          this.setState({ orderWayLogs: contacts});
-        }else{
-          Alert.alert(msg)
-        }
-        this.setState({orderQuery:false})
-      }));
     }
+
+  }
+
+  wayRecordQuery() {
+    const { dispatch, order, global } = this.props;
+    dispatch(orderWayRecord(order.order_id, global.accessToken, (ok, msg, contacts) => {
+      let mg = 0
+      if (ok) {
+        // if (tool.length(contacts)>0) {
+        mg = contacts
+        // }
+      } else {
+        Alert.alert(msg)
+      }
+      this.setState({ orderWayLogs: mg })
+      console.log(this.state.orderWayLogs)
+
+    }));
+  }
+
+
+
+  renderWayRecord() {
+    let orderWayLogs = this.state.orderWayLogs
+    if (!this.state.shipHided) {
+      if (typeof orderWayLogs == 'object' && (tool.length(orderWayLogs) > 0)) {
+        return tool.objectMap(this.state.orderWayLogs, (item, index) => {
+          return (
+            <View key={index} style={{ flex: 1, backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30), flexDirection: 'row', paddingTop: pxToDp(20), width: '100%' }}>
+              <View style={{ width: pxToDp(124) }}>
+                <View style={wayRecord.expressName}>
+                  <Text style={{ fontSize: pxToDp(24), textAlign: 'center', color: '#58B169' }}>{tool.disWay()[index]}</Text>
+                </View>
+              </View>
+              <View style={{ flex: 1 }}>
+                {
+                  item.map((ite, key) => {
+                    return (
+                      <View key={key}>
+                        <View style={{ paddingBottom: pxToDp(20), flex: 1 }}>
+                          <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ width: pxToDp(140), fontSize: pxToDp(26), marginRight: pxToDp(20) }}>
+                              {
+                                tool.disWayStatic(index)[ite.order_status]
+                              }
+                            </Text>
+                            <Text style={{ fontSize: pxToDp(24) }}>{ite.created}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    )
+                  })
+                }
+              </View>
+              <View style={{ width: pxToDp(90) }}>
+                {
+                  tool.objectMap(this.state.orderWayLogs, (item, index) => {
+                    item.forEach((ite) => {
+                      if (ite.hasOwnProperty('add_tips_btn') && (ite.add_tips_btn == 1)) {
+                        return (
+                          <View style={{ height: pxToDp(30), backgroundColor: '#59b26a', borderRadius: pxToDp(5) }}>
+                            <Text style={{ height: pxToDp(24), fontSize: pxToDp(24), textAlign: 'center', color: '#EEEEEE', lineHeight: pxToDp(24) }}>加小费</Text>
+                          </View>)
+                      }
+                    });
+                  })
+                }
+              </View>
+            </View>
+
+          )
+
+        })
+      } else if (tool.length(orderWayLogs) == 0 && (typeof orderWayLogs == 'object')) {
+        return <View style={{ height: pxToDp(50), backgroundColor: "#fff", paddingLeft: pxToDp(30), flexDirection: 'row', alignItems: 'center' }}>
+
+          <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
+
+        </View>
+      } else {
+        return <LoadingView />
+      }
+    }
+
   }
 
   _orderChangeLog() {
-    this.setState({ changeHide: !this.state.changeHide});
-    const { dispatch, order, global } = this.props;
-    if(!this.state.changeHide){
-      return
+
+    this.setState({ changeHide: !this.state.changeHide })
+    if (this.state.orderChangeLogs.length == 0 && this.state.changeHide) {
+      this._orderChangeLogQuery();
+    } else {
+      this.renderChangeLogs()
     }
-    this.setState({orderQuery:true})
+
+  }
+
+  _orderChangeLogQuery() {
+    const { dispatch, order, global } = this.props;
     dispatch(orderChangeLog(order.order_id, global.accessToken, (ok, msg, contacts) => {
-      if(ok){
-        ToastAndroid.show('刷新成功', ToastAndroid.SHORT)
-        this.setState({orderQuery:false})
-        this.setState({ orderChangeLogs: contacts});
-      }else{
+
+      if (ok) {
+        this.setState({ orderChangeLogs: contacts });
+      } else {
         Alert.alert(msg)
       }
-
     }));
+  }
+
+
+  renderChangeLogs() {
+    if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
+      return this.state.orderChangeLogs.map((item, index) => {
+        return (
+          <View key={index} style={{ paddingBottom: pxToDp(20), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), backgroundColor: '#fff' }}>
+            <View style={{ borderBottomWidth: pxToDp(1), borderColor: '#EEEEEE', borderStyle: 'solid', paddingTop: pxToDp(20), paddingBottom: pxToDp(20) }}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30) }}>{item.updated_name}</Text>
+                <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30), marginLeft: pxToDp(24) }}>{item.modified}</Text>
+              </View>
+              <View style={{ marginTop: pxToDp(20) }}>
+                <Text style={{ fontSize: pxToDp(24) }}>{item.what}</Text>
+              </View>
+            </View>
+          </View>
+        )
+      })
+
+    } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
+      return <LoadingView />
+    }
 
   }
 
@@ -1045,7 +1142,7 @@ class OrderScene extends Component {
           </View>
           }
         </View>
-
+        <View>
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
             alignItems: 'center',
@@ -1053,111 +1150,51 @@ class OrderScene extends Component {
             height: pxToDp(65),
             marginRight: 0,
           }]}>
-            <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
-            {/*<Text style={{color: colors.color999, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>运费金额</Text>*/}
-            {/*<Text>￥7.80</Text>*/}
-            <View style={{flex: 1}}/>
-
-          {this.state.shipHided ?
-            <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={styles.pullImg} onPress={() => {
-              this._getWayRecord()
-
-            }
-            } />
-            : <ImageBtn source={require('../../img/Order/pull_up.png')} imageStyle={styles.pullImg} onPress={() => {
-              this._getWayRecord()
-
-            }} />
-          }
-        </View>
-      </View>
-
-      {
-        !this.state.shipHided ?
-          tool.objectMap(this.state.orderWayLogs, (item, index) => {
-
-            return (
-              <View key={index} style={{ flex: 1, backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30), flexDirection: 'row', paddingTop: pxToDp(20), width: '100%' }}>
-                <View style={{ width: pxToDp(124) }}>
-                  <View style={wayRecord.expressName}>
-                    <Text style={{ fontSize: pxToDp(18), textAlign: 'center', color: '#58B169' }}>{tool.disWay()[index]}</Text>
-                  </View>
-                </View>
-                <View style={{ flex: 1 }}>
-                  {
-                    item.map((ite, key) => {
-                      return (
-                        <View key={key}>
-                          <View style={{ paddingBottom: pxToDp(20), flex: 1 }}>
-                            <View style={{ flexDirection: 'row' }}>
-                              <Text style={{ width: pxToDp(120), fontSize: pxToDp(24) }}>{tool.disWayStatic()[ite.order_status]}</Text>
-                              <Text style={{ fontSize: pxToDp(24) }}>{ite.created}</Text>
-                            </View>
-                          </View>
-                        </View>
-                      )
-
-                    })
-                  }
-                </View>
-                <View style={{ width: pxToDp(70) }}>
-                  <View style={{ height: pxToDp(30), backgroundColor: '#59b26a', width: pxToDp(70), backgroundColor: '#58B169', borderRadius: pxToDp(5) }}>
-                    <Text style={{ fontSize: pxToDp(18), textAlign: 'center', color: '#EEEEEE' }}>加小费</Text>
-                  </View>
-                </View>
-              </View>
-
-            )
-
-          })
-
-          : <View></View>
-      }
-
-      <View style={[CommonStyle.topBottomLine, styles.block]}>
-        <View style={[styles.row, {
-          alignItems: 'center',
-          marginTop: 0,
-          height: pxToDp(65),
-          marginRight: 0,
-        }]}>
-          <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold' }}>修改记录</Text>
-
-          <View style={{ flex: 1 }} />
-
-          {this.state.changeHide ?
-            <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={styles.pullImg} onPress={() => {
-
-              this._orderChangeLog()
-
-            }
-            } />
-            : <ImageBtn source={require('../../img/Order/pull_up.png')} imageStyle={styles.pullImg} onPress={() => {
-
-              this._orderChangeLog()
-
-            }} />
-          }
-        </View>
-      </View>
-
-      {(!this.state.changeHide) && this.state.orderChangeLogs.map((item, index) => {
-        return (
-          <View key={index} style={{ paddingBottom: pxToDp(20), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), backgroundColor: '#fff' }}>
-            <View style={{ borderBottomWidth: pxToDp(1), borderColor: '#EEEEEE', borderStyle: 'solid', paddingTop: pxToDp(20), paddingBottom: pxToDp(20) }}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30) }}>{item.updated_name}</Text>
-                <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30), marginLeft: pxToDp(24) }}>{item.modified}</Text>
-              </View>
-              <View style={{ marginTop: pxToDp(20) }}>
-                <Text style={{ fontSize: pxToDp(24) }}>{item.what}</Text>
-              </View>
-            </View>
+            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold' }}>运单记录</Text>
+            <View style={{ flex: 1 }} />
+            <ImageBtn source={
+              this.state.shipHided ? require('../../img/Order/pull_down.png') : require('../../img/Order/pull_up.png')
+            } imageStyle={styles.pullImg}
+              onPress={() => {
+                this._getWayRecord()
+              }
+              } />
           </View>
+        </View>
+        {
+          this.renderWayRecord()
+        }
+      </View>
 
-        )
-      })
-      }
+      <View>
+        <View style={[CommonStyle.topBottomLine, styles.block]}>
+          <View style={[styles.row, {
+            alignItems: 'center',
+            marginTop: 0,
+            height: pxToDp(65),
+            marginRight: 0,
+          }]}>
+            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold' }}>修改记录</Text>
+
+            <View style={{ flex: 1 }} />
+            <ImageBtn source={
+              this.state.changeHide ? require('../../img/Order/pull_down.png') : require('../../img/Order/pull_up.png')
+            }
+              imageStyle={styles.pullImg} onPress={() => {
+                this._orderChangeLog()
+              }}
+            />
+
+          </View>
+        </View>
+        {
+          this.renderChangeLogs()
+        }
+      </View>
+
+
+
+   
     </View>
     )
   }
@@ -1330,13 +1367,10 @@ class Remark extends PureComponent {
     </View>)
   }
 }
-
 class ImageBtn extends PureComponent {
-
   constructor(props) {
     super(props)
   }
-
   render() {
 
     const {source, onPress, imageStyle, ...others} = this.props;
@@ -1392,7 +1426,6 @@ const top_styles = StyleSheet.create({
     backgroundColor: '#939195',
   },
 });
-
 const wayRecord = StyleSheet.create({
   expressName: {
     height: pxToDp(30),
