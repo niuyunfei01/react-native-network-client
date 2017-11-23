@@ -248,17 +248,31 @@ export function intOf(val) {
   return val;
 }
 
-export function disWayStatic(){
-  let map = {};
-  map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单';
-  map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
-  map[Cts.DADA_STATUS_SHIPPING] = '配送中'
-  map[Cts.DADA_STATUS_ARRIVED] = '已完成'
-  map[Cts.DADA_STATUS_CANCEL] = '已取消'
-  map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
-  map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
-  return map;
+export function disWayStatic(index){
+
+  if(index == 1){
+    let map = {};
+    map[Cts.FN_STATUS_ACCEPTED] = '系统已接单'
+    map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手'
+    map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店'
+    map[Cts.FN_STATUS_ON_WAY] = '配送中'
+    map[Cts.FN_STATUS_ARRIVED] = '已送达'
+    map[Cts.FN_STATUS_CANCELED] = '已取消'
+    map[Cts.FN_STATUS_ABNORMAL] = '异常'
+    return map;
+  } else{
+    let map = {};
+    map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单'
+    map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
+    map[Cts.DADA_STATUS_SHIPPING] = '配送中'
+    map[Cts.DADA_STATUS_ARRIVED] = '已完成'
+    map[Cts.DADA_STATUS_CANCEL] = '已取消'
+    map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
+    map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
+    return map;
+  }
 }
+
 
 export function disWay(){
   let map = {};
@@ -266,10 +280,27 @@ export function disWay(){
   map[Cts.SHIP_AUTO_NEW_DADA] ='新达达';
   map[Cts.SHIP_AUTO_BD] ='百度';
   map[Cts.SHIP_AUTO_SX] ='闪送';
-
   return map
+}
+
+ function getLength(obj){
+ 
+    var objType = typeof obj;
+    if(objType == "string"){
+      return obj.length;
+    }else if(objType == "object"){
+      var objLen = 0;
+      for(var i in obj){
+        objLen++;
+      }
+      return objLen;
+    }
+    return 0;
+  
 
 }
+
+
 
 
 export default {
@@ -289,6 +320,6 @@ export default {
   intOf,
   disWayStatic,
   disWay,
-  vendor,
-  vendorOfStoreId,
+  getLength,
+  length
 }
