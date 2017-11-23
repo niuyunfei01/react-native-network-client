@@ -18,6 +18,10 @@ export default {
 
   VERSION_DIRECT: 'direct',
 
+  TASK_ALL_REFUND: 100,
+  TASK_ALL_SHIP: 101,
+  TASK_ALL_AFTER_SALE: 102,
+
   TASK_TYPE_UN_CLASSIFY: 0,//未归类
   TASK_TYPE_COMPLAIN: 1,//待处理评价
   TASK_TYPE_REFUND: 2,//客服待处理退款

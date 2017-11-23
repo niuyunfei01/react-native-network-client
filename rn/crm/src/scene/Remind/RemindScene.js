@@ -47,6 +47,7 @@ import colors from "../../styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import * as tool from "../../common/tool";
+import {screen} from '../../common';
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -291,7 +292,27 @@ class RemindScene extends PureComponent {
 
   renderFooter(typeId) {
     const {remind} = this.props;
-    if (!remind.isLoadMore[typeId]) return null;
+    if (!remind.isLoadMore[typeId]) return <View style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+      <RNButton
+        activeOpacity={0.7}
+        onPress={() => {
+          this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
+            type: 'DoneRemind',
+            title: '已处理工单'
+          })
+        }}
+        containerStyle={styles.stickyButtonContainer}
+        style={{
+          fontSize: 16,
+          color: '#999'
+        }}>
+        已处理工单
+      </RNButton>
+    </View>;
+    else
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
@@ -344,6 +365,8 @@ class RemindScene extends PureComponent {
       );
     }
 
+    console.log('screen', screen);
+
     return (
       <FlatList
         extraData={this.state.dataSource}
@@ -354,6 +377,17 @@ class RemindScene extends PureComponent {
           minimumViewTime: 3000,
           viewAreaCoveragePercentThreshold: 100,
           waitForInteraction: true,
+        }}
+        onTouchStart={(e) => {
+          this.pageX = e.nativeEvent.pageX;
+          this.pageY = e.nativeEvent.pageY;
+        }}
+        onTouchMove={(e) => {
+          if(Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)){
+            this.setState({scrollLocking: true});
+          } else {
+            this.setState({scrollLocking: false});
+          }
         }}
         onEndReachedThreshold={0.5}
         renderItem={this.renderItem}
@@ -371,10 +405,10 @@ class RemindScene extends PureComponent {
             justifyContent: 'center',
             flex: 1,
             flexDirection: 'row',
-            height: pxToDp(600)
+            height: (screen.height - (tagTypeId !== Cts.TASK_ALL_SHIP && tagTypeId !== Cts.TASK_ALL_AFTER_SALE && tagTypeId !== Cts.TASK_ALL_REFUND ? 210 : 180))
           }}>
             <Text style={{fontSize: 18}}>
-              没有提醒...
+              暂无待处理任务
             </Text>
           </View>}
         initialNumToRender={5}
@@ -420,36 +454,12 @@ class RemindScene extends PureComponent {
         <ScrollableTabView
           initialPage={0}
           renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeIds}/>}
-          locked={remind.processing}
+          locked={true || remind.processing || this.state.scrollLocking}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
           tabBarTextStyle={{fontSize: pxToDp(26)}}>
           {lists}
         </ScrollableTabView>
-        <View style={{
-          position: 'absolute',
-          bottom: 20,
-          left: 0,
-          right: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          <RNButton
-            activeOpacity={0.7}
-            onPress={() => {
-              this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
-                type: 'DoneRemind',
-                title: '已处理工单'
-              })
-            }}
-            containerStyle={styles.stickyButtonContainer}
-            style={{
-              fontSize: 16,
-              color: '#999'
-            }}>
-            已处理工单
-          </RNButton>
-        </View>
         <Dialog onRequestClose={() => this._hideStopRemindDialog()}
                 visible={this.state.showStopRemindDialog}
                 title="不在提醒"
