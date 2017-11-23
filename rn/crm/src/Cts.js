@@ -74,5 +74,14 @@ export default {
   DADA_STATUS_CANCEL : 5,
   DADA_STATUS_TIMEOUT : 7,
   DADA_STATUS_ABNORMAL : 8,
+    //蜂鸟
+  FN_STATUS_ACCEPTED : 1,//	系统已接单	蜂鸟配送开放平台接单后,商户接收到系统已接单状态, 支持取消
+  FN_STATUS_ASSIGNED : 20,//	已分配骑手	蜂鸟配送开放平台接单后,商户接收到已分配骑手状态, 支持取消
+  FN_STATUS_ARRIVED_STORE : 80, //	骑手已到店	蜂鸟配送开放平台将骑手已到店状态回调给商户, 支持取消
+  FN_STATUS_ON_WAY : 2, //	配送中	蜂鸟配送开放平台将骑手配送中状态回调给商户, 不支持取消
+  FN_STATUS_ARRIVED : 3, //	已送达	蜂鸟配送开放平台将已送达状态回调给商户, 不支持取消
+  FN_STATUS_CANCELED : 4, //	已取消(同步取消不需要关注此状态)	商户主动取消订单请求处理成功后,蜂鸟配送开放平台将已取消状态回调给商户
+  FN_STATUS_ABNORMAL : 5, //	异常	推单到物流开放平台后任何阶段产生异常,蜂鸟配送开放平台将异常状态回调给商户
+
 
 }
