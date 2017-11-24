@@ -4,7 +4,6 @@
     android:versionCode="280"
     android:versionName="2.3.1">
 
-    <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
@@ -157,16 +156,18 @@
                 <category android:name="cn.cainiaoshicai.crm" />
             </intent-filter>
         </activity>
-        <!-- Required  SDK核心功能-->
 
         <activity
             android:name=".support.react.MyReactActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="blx-crm"
-                android:host="blx" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:host="blx" android:scheme="blx-crm" />
+            </intent-filter>
         </activity>
 
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />

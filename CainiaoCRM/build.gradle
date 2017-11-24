@@ -1,14 +1,4 @@
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
-    }
-}
-
 apply plugin: 'com.android.application'
 apply from: "../rn/crm/node_modules/react-native-vector-icons/fonts.gradle"
 
@@ -75,7 +65,7 @@ List<String> dirs = [
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         minSdkVersion 18
