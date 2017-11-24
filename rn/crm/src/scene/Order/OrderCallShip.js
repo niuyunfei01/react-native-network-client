@@ -6,8 +6,7 @@ import CommonStyle from '../../common/CommonStyles'
 import {orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, RadioCells, ButtonArea,Toast, Dialog, CellsTitle} from "../../weui/index";
 import S from '../../stylekit'
 
 function mapStateToProps(state) {
