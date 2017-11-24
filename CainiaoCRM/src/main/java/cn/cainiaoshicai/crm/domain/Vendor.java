@@ -21,6 +21,7 @@ public class Vendor {
     private List<Long> service_mgr;
     private List<Long> store_mgr;
     private List<Long> store_vice_mgr;
+    private boolean fnProvidingOnway;
 
     public Vendor() {
     }
@@ -123,7 +124,16 @@ public class Vendor {
         b.putString("service_uid", String.valueOf(service_uid));
         b.putString("service_mgr", TextUtils.join(",", this.service_mgr.toArray()));
         b.putString("support_tel", this.support_tel);
+        b.putBoolean("fnProvidingOnway", this.fnProvidingOnway);
 
         return b;
+    }
+
+    public boolean isFnProvidingOnway() {
+        return fnProvidingOnway;
+    }
+
+    public void setFnProvidingOnway(boolean fnProvidingOnway) {
+        this.fnProvidingOnway = fnProvidingOnway;
     }
 }

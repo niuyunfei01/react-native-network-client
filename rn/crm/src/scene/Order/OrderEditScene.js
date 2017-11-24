@@ -4,7 +4,7 @@ import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity, ListVie
 import Config from '../../config'
 import CommonStyle from '../../common/CommonStyles'
 
-import {saveOrderBaisc, getOrder} from '../../reducers/order/orderActions'
+import {saveOrderBasic, getOrder} from '../../reducers/order/orderActions'
 import {createTaskByOrder} from '../../reducers/remind/remindActions'
 import {connect} from "react-redux";
 import {tool} from '../../common';
@@ -23,7 +23,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({saveOrderBaisc, getOrder, createTaskByOrder }, dispatch)}
+  return {dispatch, ...bindActionCreators({saveOrderBaisc: saveOrderBasic, getOrder, createTaskByOrder }, dispatch)}
 }
 
 class OrderEditScene extends Component {
@@ -175,7 +175,7 @@ class OrderEditScene extends Component {
       
       this.setState({onSubmitting: true});
       const token = global.accessToken;
-      dispatch(saveOrderBaisc(token, order.id, changes, (ok, msg, respData) => {
+      dispatch(saveOrderBasic(token, order.id, changes, (ok, msg, respData) => {
         console.log('results', ok, msg);
 
         if (ok) {

@@ -101,21 +101,12 @@ const MENU_FEEDBACK = 4;
 const MENU_SET_INVALID = 5;
 const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
+const MENU_PROVIDING = 8;
 
 class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let ActionSheet = [
-      {key: -999, section: true, label: '操作'},
-      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
-      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
-      {key: MENU_EDIT_STORE, label: '修改门店'},
-      {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_SET_INVALID, label: '置为无效'},
-      {key: MENU_ADD_TODO, label: '稍后处理'},
-      {key: MENU_OLD_VERSION, label: '老版订单页'},
-    ];
 
     let {backPage} = params;
     return {
@@ -145,8 +136,7 @@ class OrderScene extends Component {
             params.onMenuOptionSelected(option)
           }}
           skin='customer'
-          data={ActionSheet}
-        >
+          data={params.ActionSheet}>
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
       </View>),
@@ -184,6 +174,7 @@ class OrderScene extends Component {
       //remind
       onProcessed: false,
       reminds: {},
+      remindFetching: false,
     };
 
     this.orderId = 0;
@@ -214,14 +205,7 @@ class OrderScene extends Component {
   }
 
   componentDidMount() {
-    let {backPage} = (this.props.navigation.state.params || {});
-
-    let params = {
-      onMenuOptionSelected: this.onMenuOptionSelected,
-      onPrint: this.onPrint,
-      backPage: backPage,
-    };
-    this.props.navigation.setParams(params);
+    this._navSetParams();
   }
 
   componentWillMount() {
@@ -236,13 +220,7 @@ class OrderScene extends Component {
       this.onHeaderRefresh()
     } else {
       if (order) {
-
-        const edits = OrderScene._extract_edited_items(order.items);
-        this.setState({
-          itemsEdited: edits,
-          itemsHided: shouldShowItems(order.orderStatus)
-        });
-
+        this._setAfterOrderGot(order);
         this.store_contacts = this.props.store.contacts[order.store_id];
       }
     }
@@ -255,6 +233,41 @@ class OrderScene extends Component {
     });
     return edits;
   }
+
+  _navSetParams = () => {
+    let {backPage} = (this.props.navigation.state.params || {});
+
+    const as = [
+      {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
+      {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
+      {key: MENU_EDIT_STORE, label: '修改门店'},
+      {key: MENU_FEEDBACK, label: '客户反馈'},
+      {key: MENU_SET_INVALID, label: '置为无效'},
+      {key: MENU_ADD_TODO, label: '稍后处理'},
+      {key: MENU_OLD_VERSION, label: '老版订单页'},
+    ];
+
+    if (this._fnProvidingOnway()) {
+      as.push({key: MENU_PROVIDING, label: '门店备货'});
+    }
+
+    let params = {
+      onMenuOptionSelected: this.onMenuOptionSelected,
+      onPrint: this.onPrint,
+      backPage: backPage,
+      ActionSheet: as
+    };
+    this.props.navigation.setParams(params);
+  };
+
+  _setAfterOrderGot = (order) => {
+    this.setState({
+      itemsEdited: OrderScene._extract_edited_items(order.items),
+      itemsHided: !shouldShowItems(order.orderStatus)
+    });
+
+    this._navSetParams();
+  };
 
   onPrint() {
 
@@ -311,6 +324,8 @@ class OrderScene extends Component {
     } else if (option.key === MENU_OLD_VERSION) {
 
       native.toNativeOrder(order.order.id);
+    } else if (option.key === MENU_PROVIDING) {
+      this._onToProvide();
     } else {
       ToastShort('未知的操作');
     }
@@ -393,14 +408,17 @@ class OrderScene extends Component {
     const sessionToken = this.props.global.accessToken;
     const {dispatch} = this.props;
 
-    dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
-      console.log(ok, data);
-      if (ok) {
-        this.setState({reminds: data})
-      } else {
-        this.setState({errorHints: '获取提醒列表失败'})
-      }
-    }));
+    if (!this.state.remindFetching) {
+      this.setState({remindFetching: true});
+      dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
+        console.log(ok, data);
+        if (ok) {
+          this.setState({reminds: data, remindFetching: false})
+        } else {
+          this.setState({errorHints: '获取提醒列表失败', remindFetching: false})
+        }
+      }));
+    }
 
     if (!this.state.isFetching) {
       this.setState({isFetching: true});
@@ -414,11 +432,7 @@ class OrderScene extends Component {
         if (!ok) {
           state.errorHints = data
         } else {
-          const edits = OrderScene._extract_edited_items(data.items);
-          console.log('edits are:', edits);
-          this.setState({
-            itemsEdited: edits,
-          });
+          this._setAfterOrderGot(data);
         }
         this.setState(state)
       }))
@@ -654,7 +668,7 @@ class OrderScene extends Component {
       return false;
     }
 
-    const path = `stores/orders_go_to_by/${order.order.id}.html?access_token=${global.accessToken}`;
+    const path = `stores/orders_go_to_buy/${order.order.id}.html?access_token=${global.accessToken}`;
     navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(Config.host(global, dispatch, native), path, Config.https)});
   }
   _getWayRecord() {
@@ -808,7 +822,12 @@ class OrderScene extends Component {
       tintColor='gray'
     />;
 
-    return (!order || order.id !== this.orderId) ?
+    const noOrder = (!order || order.id !== this.orderId);
+    if (noOrder) {
+      this.onHeaderRefresh();
+    }
+    
+    return noOrder ?
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
@@ -880,7 +899,7 @@ class OrderScene extends Component {
             refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
-            <OrderBottom order={order} callShip={this._callShip} fnfnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
+            <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip} fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
           <Dialog onRequestClose={() => {
           }}

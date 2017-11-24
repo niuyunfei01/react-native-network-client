@@ -1,6 +1,7 @@
 'use strict'
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
+import {getWithTpl2} from "../../util/common";
 
 /**
  * ## Imports
@@ -11,6 +12,8 @@ const {
   GET_CONTACT_REQUEST,
   GET_CONTACT_SUCCESS,
   GET_CONTACT_FAILURE,
+  GET_PACK_WORKERS,
+  GET_SHIP_WORKERS,
 
 } = require('../../common/constants').default
 
@@ -36,11 +39,35 @@ export function getContactRequest(data) {
   }
 }
 
+export function getStorePackers(token, storeId, callback) {
+  const url = `api/store_packers/${storeId}.json?access_token=${token}`;
+  return getWithTpl2(url, (json, dispatch) => {
+      if (json.ok) {
+        dispatch({type: GET_PACK_WORKERS, store_id: storeId, packers: json.obj})
+      }
+      callback(json.ok, json.reason, json.obj)
+    }
+    , (error) => callback(false, "网络错误, 请稍后重试")
+  )
+}
+
+export function getStoreShippers(token, storeId, callback) {
+  const url = `api/store_shippers/${storeId}.json?access_token=${token}`;
+  return getWithTpl2(url, (json, dispatch) => {
+      if (json.ok) {
+        dispatch({type: GET_SHIP_WORKERS, store_id: storeId, shippers: json.obj})
+      }
+      callback(json.ok, json.reason, json.obj)
+    }
+    , (error) => callback(false, "网络错误, 请稍后重试")
+  )
+}
+
 /**
  */
 export function getContacts(sessionToken, storeId, callback) {
   return dispatch => {
-    dispatch(getContactRequest())
+    dispatch(getContactRequest());
     const url = `api/store_contacts/${storeId}.json?access_token=${sessionToken}`
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(res => res.json())
