@@ -430,7 +430,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             if (is_mgr || is_helper) {
-              let url = `${Config.ServiceUrl}stores/worker_stats.html${token}`;
+              let url = `${Config.ServiceUrl}stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
               this.onPress(Config.ROUTE_WEB, {url: url});
             } else {
               ToastLong('您没有查看业绩的权限');
@@ -445,7 +445,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let url = `${Config.ServiceUrl}stores/show_waimai_evaluations.html${token}`;
+              let url = `${Config.ServiceUrl}stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -472,7 +472,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let url = `${Config.ServiceUrl}stores/sales_ana.html${token}`;
+              let url = `${Config.ServiceUrl}stores/sales_ana.html${token}&&_v_id=${currVendorId}`;
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
