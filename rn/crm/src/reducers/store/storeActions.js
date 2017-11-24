@@ -13,7 +13,7 @@ const {
   GET_CONTACT_SUCCESS,
   GET_CONTACT_FAILURE,
   GET_PACK_WORKERS,
-  GET_PACK_SHIPPERS,
+  GET_SHIP_WORKERS,
 
 } = require('../../common/constants').default
 
@@ -55,7 +55,7 @@ export function getStoreShippers(token, storeId, callback) {
   const url = `api/store_shippers/${storeId}.json?access_token=${token}`;
   return getWithTpl2(url, (json, dispatch) => {
       if (json.ok) {
-        dispatch({type: GET_PACK_SHIPPERS, store_id: storeId, shippers: json.obj})
+        dispatch({type: GET_SHIP_WORKERS, store_id: storeId, shippers: json.obj})
       }
       callback(json.ok, json.reason, json.obj)
     }

@@ -86,6 +86,6 @@ export default keyMirror({
   GET_PRODUCT_DETAIL: null,
 
   GET_PACK_WORKERS: null,
-  GET_PACK_SHIPPERS: null,
+  GET_SHIP_WORKERS: null,
 
 })

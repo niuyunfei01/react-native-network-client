@@ -64,11 +64,20 @@ class OrderBottom extends PureComponent {
 
   _visibleProviding() {
     const {order, fnProvidingOnway} = this.props;
-    return fnProvidingOnway
+    const iStatus = parseInt(order.orderStatus);
+    return (iStatus === Cts.ORDER_STATUS_TO_READY || iStatus === Cts.ORDER_STATUS_TO_SHIP) && fnProvidingOnway
   }
 
   _visibleShipInfoBtn () {
-    return true;
+    let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
+      dada_call_at} = this.props.order;
+    dada_status = parseInt(dada_status);
+    orderStatus = parseInt(orderStatus);
+
+    return (orderStatus === Cts.ORDER_STATUS_SHIPPING && dada_status !== Cts.DADA_STATUS_NEVER_START)
+      || (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER)
+      || (orderStatus === Cts.ORDER_STATUS_TO_SHIP)
+      || (orderStatus === Cts.ORDER_STATUS_TO_READY);
   }
 
   _defCloseBtn = (title) => {
@@ -238,43 +247,6 @@ class OrderBottom extends PureComponent {
   adb.setNegativeButton(getString(R.string.cancel), null);
   adb.show();
 } else {
-
-  Order o1 = OrderSingleActivity.this.orderRef.get();
-  if (o1 == null) {
-    o1 = order;
-  }
-
-  if (fromStatus == Cts.WM_ORDER_STATUS_TO_SHIP) {
-    if (o1.getDada_status() != Cts.DADA_STATUS_NEVER_START
-      && o1.getDada_status() != Cts.DADA_STATUS_CANCEL
-      && o1.getDada_status() != Cts.DADA_STATUS_TIMEOUT) {
-
-      AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, R.string.confirm_msg_manual_dada_auto,
-        "手动出发", new DialogInterface.OnClickListener() {
-      @Override
-        public void onClick(DialogInterface dialog, int which) {
-          helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
-        }
-      }, "暂不", null);
-      return;
-    }
-
-  } else if (fromStatus == Cts.WM_ORDER_STATUS_TO_READY) {
-
-    if (o1.isRemark_warning()) {
-      final String warnTip = "有备注：\n[备注：" + o1.getRemark() + "]";
-      AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, warnTip,
-        "确认无误", new DialogInterface.OnClickListener() {
-      @Override
-        public void onClick(DialogInterface dialog, int which) {
-          helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
-        }
-      }, "取消", null);
-      return;
-    }
-  }
-
-  helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
 }
 */
 
@@ -294,7 +266,7 @@ class OrderBottom extends PureComponent {
     } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
       navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
     } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      return "提醒出发";
+      navigation.navigate(Config.ROUTE_ORDER_START_SHIP, {order});
     }
   }
 
@@ -324,7 +296,7 @@ class OrderBottom extends PureComponent {
               buttons={this.state.dlgShipButtons}
       ><Text>{this.state.dlgShipContent}</Text>
       </Dialog>
-
+      { (this._actionBtnVisible() || this._visibleProviding() || this._visibleShipInfoBtn()) &&
       <View style={{
         flexDirection: 'row', justifyContent: 'space-around',
         paddingTop: pxToDp(10),
@@ -342,15 +314,15 @@ class OrderBottom extends PureComponent {
         shadowOpacity: 0.75,
         shadowRadius: 4,
         height: pxToDp(90),
-      }}>{/*<Button style={[styles.bottomBtn, {marginRight: pxToDp(5),}]} type={'primary'}>联系配送</Button>*/}
-      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
-                                           onPress={this._onActionBtnClicked}>{this._actionBtnText()}</Button>}
+      }}>
       {this._visibleProviding() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'}
                                            onPress={this._onToProvide}>备货</Button>}
+      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
+                                           onPress={this._onActionBtnClicked}>{this._actionBtnText()}</Button>}
       {this._visibleShipInfoBtn() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
                                              onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
-
-    </View></View>;
+    </View>}
+    </View>;
   }
 }
 

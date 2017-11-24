@@ -3,15 +3,13 @@ import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
-import {orderChgPackWorker, orderSetReady} from '../../reducers/order/orderActions'
-import {getStorePackers} from '../../reducers/store/storeActions'
+import {orderChgPackWorker, orderStartShip} from '../../reducers/order/orderActions'
+import {getStoreShippers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, ButtonArea,Toast, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, ButtonArea,Toast, Dialog, Cells, CellsTitle, Cell,  Switch, CellFooter, RadioCells, CellBody} from "../../weui/index";
 import S from '../../stylekit'
-import CheckboxCells from "../../weui/Form/CheckboxCells";
-import Switch from "../../weui/Form/Switch";
-import CellFooter from "../../weui/Cell/CellFooter";
+import Cts from "../../Cts";
 
 function mapStateToProps(state) {
   return {
@@ -20,13 +18,13 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({orderSetReady, getStorePackers, orderChgPackWorker}, dispatch)}
+  return {dispatch, ...bindActionCreators({orderStartShip, getStoreShippers}, dispatch)}
 }
 
-class OrderSetPackDone extends Component {
+class OrderSetShipStart extends Component {
 
   static navigationOptions = {
-    headerTitle: '设置打包完成',
+    headerTitle: '出发提醒',
   };
 
   constructor(props: Object) {
@@ -35,10 +33,9 @@ class OrderSetPackDone extends Component {
     this.state = {
       doneSubmitting: false,
       onSubmitting: false,
-      loadingPacker: false,
+      loadingShippers: false,
       notAutoConfirmed: false,
-      storeRemarkConfirmed: false,
-      checked: [],
+      checked: 0,
     };
   }
 
@@ -46,16 +43,16 @@ class OrderSetPackDone extends Component {
     const {dispatch, global, navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
 
-    this.setState({notAutoConfirmed: !order.remark_warning, storeRemarkConfirmed: !order.store_remark});
+    this.setState({notAutoConfirmed: order.ship_worker_id !== `${Cts.ID_DADA_SHIP_WORKER}`});
 
-    const packWorkers = store.packWorkers[order.store_id];
-    if (!packWorkers || packWorkers.length === 0) {
-      this.setState({loadingPacker: true});
-      dispatch(getStorePackers(global.accessToken, order.store_id, (ok, msg, workers) => {
+    const shipWorkers = store.shipWorkers[order.store_id];
+    if (!shipWorkers || shipWorkers.length === 0) {
+      this.setState({loadingShippers: true});
+      dispatch(getStoreShippers(global.accessToken, order.store_id, (ok, msg, workers) => {
         if (ok) {
-          this.setState({loadingPacker: false});
+          this.setState({loadingShippers: false});
         } else {
-          this.setState({loadingPacker: false, errorHints: msg});
+          this.setState({loadingShippers: false, errorHints: msg});
         }
       }))
     }
@@ -68,14 +65,14 @@ class OrderSetPackDone extends Component {
 
   _checkDisableSubmit = () => {
     console.log(this.state);
-    return !(this.state.checked && this.state.checked.length > 0 && this.state.notAutoConfirmed && this.state.storeRemarkConfirmed);
+    return !(this.state.checked && this.state.notAutoConfirmed);
   };
 
   _doReply = () => {
     const {dispatch, global, navigation} = this.props;
     const {order} = (navigation.state.params || {});
     this.setState({onSubmitting: true});
-    dispatch(orderSetReady(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
+    dispatch(orderStartShip(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
       this.setState({onSubmitting: false});
       if (ok) {
         this.setState({doneSubmitting: true});
@@ -93,15 +90,20 @@ class OrderSetPackDone extends Component {
     const {dispatch, global, navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
 
-    const workers = store.packWorkers[order.store_id];
+    const workers = store.shipWorkers[order.store_id];
 
-
-    const packOpts = workers ? workers.map((worker, idx) => {
-      return {label: `${worker.nickname}`, value: worker.id}
+    const shipperOpts = workers ? workers.map((worker, idx) => {
+      const mobile = worker.id === '' + Cts.ID_DADA_SHIP_WORKER ? order.ship_worker_mobile : worker.mobilephone;
+      return {label: `${worker.nickname}-${mobile}`, value: worker.id}
     }) : [];
 
-    console.log(packOpts);
+    console.log(shipperOpts);
 
+    const iDadaStatus = parseInt(order.dada_status);
+    const shipAuto = order.ship_worker_id === `${Cts.ID_DADA_SHIP_WORKER}`
+      && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
+      && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
+    
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {}}
@@ -116,11 +118,11 @@ class OrderSetPackDone extends Component {
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
 
-      {order.remark_warning && <View>
-        <CellsTitle style={{marginTop: 2}}>客户备注确认</CellsTitle>
+      {shipAuto && <View>
+        <CellsTitle style={{marginTop: 2}}>强制出发确认</CellsTitle>
         <Cells>
           <Cell>
-            <CellBody><Text style={{color: 'red'}}>{order.remark}</Text></CellBody>
+            <CellBody><Text style={{color: 'red'}}>已通过系统呼叫过配送，确定要改为手动管理吗？</Text></CellBody>
             <CellFooter>
             <Switch value={this.state.notAutoConfirmed} onChange={(v) => this.setState({notAutoConfirmed: v})}/>
             </CellFooter>
@@ -129,34 +131,21 @@ class OrderSetPackDone extends Component {
       </View>
       }
 
-      {!!order.store_remark && <View>
-        <CellsTitle>商家备注确认</CellsTitle>
-        <Cells style={{marginTop: 2}}>
-          <Cell>
-            <CellBody><Text style={{color: 'red'}}>{order.store_remark}</Text></CellBody>
-            <CellFooter>
-            <Switch value={this.state.storeRemarkConfirmed} onChange={(v) => this.setState({storeRemarkConfirmed: v})}/>
-            </CellFooter>
-          </Cell>
-        </Cells>
-      </View>
-      }
-
-      <CellsTitle style={CommonStyle.cellsTitle}>选择打包员</CellsTitle>
-       <CheckboxCells
+      <CellsTitle style={CommonStyle.cellsTitle}>选择配送员</CellsTitle>
+       <RadioCells
         style={{marginTop: 2}}
-        options={packOpts}
+        options={shipperOpts}
         onChange={(checked) => this.setState({checked})}
         cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
         value={this.state.checked}
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>保存</Button>
+        <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>通知用户已出发</Button>
       </ButtonArea>
 
       <Toast show={this.state.onSubmitting}>提交中</Toast>
-      <Toast show={this.state.loadingPacker}>加载中</Toast>
+      <Toast show={this.state.loadingShippers}>加载中</Toast>
 
       <Toast
         icon="success"
@@ -166,4 +155,4 @@ class OrderSetPackDone extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderSetPackDone)
+export default connect(mapStateToProps, mapDispatchToProps)(OrderSetShipStart)

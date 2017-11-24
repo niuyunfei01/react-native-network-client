@@ -15,6 +15,7 @@ const {
   GET_CONTACT_SUCCESS,
   GET_CONTACT_FAILURE,
   GET_PACK_WORKERS,
+  GET_SHIP_WORKERS,
 
 } = require('../../common/constants').default
 
@@ -48,6 +49,12 @@ export default function storeReducer(state = initialState, action) {
     case GET_PACK_WORKERS:
       if (action.store_id && action.packers) {
         return {...state, packWorkers: {...state, [action.store_id]: action.packers}}
+      }
+      break;
+
+    case GET_SHIP_WORKERS:
+      if (action.store_id && action.shippers) {
+        return {...state, shipWorkers: {...state, [action.store_id]: action.shippers}}
       }
       break;
   }
