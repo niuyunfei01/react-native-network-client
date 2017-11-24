@@ -601,7 +601,7 @@ class OrderScene extends Component {
   }
 
   toMap() {
-    const {dispatch, native, global} = this.props;
+    const {dispatch, global} = this.props;
     const {order} = this.props.order;
     const validPoi = order.gd_lng && order.gd_lat;
 
