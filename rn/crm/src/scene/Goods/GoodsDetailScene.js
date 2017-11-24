@@ -26,6 +26,7 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -46,7 +47,7 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {backPage} = params;
+    let {backPage,store_product, product_detail} = params;
     return {
       headerLeft: (
         <NavigationItem
@@ -54,7 +55,7 @@ class GoodsDetailScene extends PureComponent {
           iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
           onPress={() => {
             if(!!backPage){
-              console.log('backPage -> ', backPage);
+              // console.log('backPage ----------------------> ', backPage);
               native.gotoPage(backPage);
             }
           }}
@@ -63,11 +64,17 @@ class GoodsDetailScene extends PureComponent {
       headerRight: ( <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => {
-            InteractionManager.runAfterInteractions(() => {
-              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                type: 'edit',
+            if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'edit',
+                  store_product,
+                  product_detail,
+                });
               });
-            });
+            } else {
+              ToastLong('请等待商品加载完成...')
+            }
           }}
         >
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
@@ -93,7 +100,6 @@ class GoodsDetailScene extends PureComponent {
 
   componentWillMount() {
     let {productId, backPage} = (this.props.navigation.state.params || {});
-
     this.productId = productId;
     const {product_detail} = this.props.product;
     if (product_detail[productId] === undefined) {
@@ -110,6 +116,17 @@ class GoodsDetailScene extends PureComponent {
     let {backPage} = (this.props.navigation.state.params || {});
     if(!!backPage){
       this.props.navigation.setParams({backPage: backPage});
+    }
+  }
+
+  setNavParams() {
+    let {product_detail, store_product} = this.state;
+    if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+      let params = {
+        store_product: store_product,
+        product_detail: product_detail,
+      };
+      this.props.navigation.setParams(params);
     }
   }
 
@@ -146,7 +163,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-          // console.log('getVendorProduct -> ', resp);
+          console.log('getVendorProduct -> ', resp);
           if (resp.ok) {
             let store_product = resp.obj;
             _this.setState({
@@ -156,6 +173,8 @@ class GoodsDetailScene extends PureComponent {
           } else {
             _this.setState({isRefreshing: false});
           }
+          _this.setNavParams();
+
         }));
       });
     }
