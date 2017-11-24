@@ -121,8 +121,8 @@ export function vendor(global) {
   let {help_uid} = config;
   let is_helper = false;
   if(!!help_uid){
-    let helper = help_uid.join(',');
-    let is_helper = helper.indexOf(',' + currentUser + ',') !== -1;
+    let helper = ',' + help_uid.join(',') + ',';
+    is_helper = helper.indexOf(',' + currentUser + ',') !== -1;
   }
 
   return {
