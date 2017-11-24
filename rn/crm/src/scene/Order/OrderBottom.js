@@ -301,6 +301,7 @@ class OrderBottom extends PureComponent {
       <Dialog onRequestClose={() => {}}
               visible={this.state.dlgShipVisible}
               buttons={this.state.dlgShipButtons}
+              title={this.state.dlgShipTitle}
       ><Text>{this.state.dlgShipContent}</Text>
       </Dialog>
 
