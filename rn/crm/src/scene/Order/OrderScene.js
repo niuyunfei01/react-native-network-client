@@ -224,6 +224,12 @@ class OrderScene extends Component {
     this.props.navigation.setParams(params);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      likesIncreasing: nextProps.likeCount > this.props.likeCount
+    });
+  }
+
   componentWillMount() {
 
     const orderId = (this.props.navigation.state.params || {}).orderId;
@@ -240,7 +246,7 @@ class OrderScene extends Component {
         const edits = OrderScene._extract_edited_items(order.items);
         this.setState({
           itemsEdited: edits,
-          itemsHided: shouldShowItems(order.orderStatus)
+          itemsHided: !shouldShowItems(order.orderStatus)
         });
 
         this.store_contacts = this.props.store.contacts[order.store_id];
@@ -418,6 +424,7 @@ class OrderScene extends Component {
           console.log('edits are:', edits);
           this.setState({
             itemsEdited: edits,
+            itemsHided: !shouldShowItems(data.orderStatus)
           });
         }
         this.setState(state)
@@ -808,7 +815,12 @@ class OrderScene extends Component {
       tintColor='gray'
     />;
 
-    return (!order || order.id !== this.orderId) ?
+    const noOrder = (!order || order.id !== this.orderId);
+    if (noOrder) {
+      this.onHeaderRefresh();
+    }
+    
+    return noOrder ?
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
@@ -880,7 +892,7 @@ class OrderScene extends Component {
             refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
-            <OrderBottom order={order} callShip={this._callShip} fnfnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
+            <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip} fnfnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
           <Dialog onRequestClose={() => {
           }}

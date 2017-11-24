@@ -2,31 +2,64 @@
 import FetchEx from "./fetchEx";
 import Config from "../config";
 
-export function getWithTpl(url, okFn, failFn) {
+/**
+ * @param url
+ * @param okFn (json, dispatch) => {}
+ * @param failFn (error, dispatch) => {}
+ * @returns {function(*=)}
+ */
+export function getWithTpl2(url, okFn, failFn) {
+
+  failFn = failFn || ((error) => {
+    console.log('error:', error);
+  });
+
+  return (dispatch) => getWithTpl(url, okFn, failFn, dispatch)
+}
+
+export function jsonWithTpl2(url, data, okFn, failFn) {
+
+  failFn = failFn || ((error) => {
+    console.log('error:', error);
+  });
+
+  return (dispatch) => jsonWithTpl(url, data, okFn, failFn, dispatch)
+}
+
+/**
+ *
+ * @deprecated 请优先使用 getWithTpl2
+ * @param url
+ * @param okFn
+ * @param failFn
+ * @param dispatch
+ */
+export function getWithTpl(url, okFn, failFn, dispatch) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
     .then(res => res.json())
-    .then(json => {
-      // console.log(url, json);
-      okFn(json)
+    .then((json) => {
+      okFn(json, dispatch)
     }).catch((error) => {
-    failFn(error)
+    failFn(error, dispatch)
   });
 }
 
 /**
  *
+ * @deprecated 请优先使用 jsonWithTpl2
  * @param url
  * @param data object (will be json.stringify)
  * @param okFn
  * @param failFn
+ * @param dispatch
  */
-export function jsonWithTpl(url, data, okFn, failFn) {
+export function jsonWithTpl(url, data, okFn, failFn, dispatch) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.postJSON(url, data))
     .then(res => res.json())
     .then(json => {
-      okFn(json)
+      okFn(json, dispatch)
     }).catch((error) => {
-    failFn(error)
+    failFn(error, dispatch)
   });
 }
 

@@ -280,16 +280,37 @@ class OrderBottom extends PureComponent {
 
   _actionBtnVisible() {
     const order = this.props.order;
-    const iStatus = order.orderStatus;
+    const iStatus = parseInt(order.orderStatus);
     return iStatus !== Cts.ORDER_STATUS_ARRIVED && iStatus !== Cts.ORDER_STATUS_INVALID;
   }
 
   _onActionBtnClicked() {
+    const order = this.props.order;
+    const iStatus = parseInt(order.orderStatus);
+    const {navigation} = this.props;
 
+    if (iStatus === Cts.ORDER_STATUS_SHIPPING) {
+      return "提醒送达";
+    } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
+      navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
+    } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
+      return "提醒出发";
+    }
   }
 
   _actionBtnText() {
+    const order = this.props.order;
+    const iStatus = parseInt(order.orderStatus);
 
+    if (iStatus === Cts.ORDER_STATUS_SHIPPING) {
+      return "提醒送达";
+    } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
+      return "打包完成";
+    } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
+      return "提醒出发";
+    }
+
+    return '';
   }
 
   render() {
