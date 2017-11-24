@@ -117,7 +117,7 @@ class OrderSetPackDone extends Component {
       ><Text>{this.state.errorHints}</Text></Dialog>
 
       {order.remark_warning && <View>
-        <CellsTitle>客户备注确认</CellsTitle>
+        <CellsTitle style={{marginTop: 2}}>客户备注确认</CellsTitle>
         <Cells>
           <Cell>
             <CellBody><Text style={{color: 'red'}}>{order.remark}</Text></CellBody>
@@ -131,7 +131,7 @@ class OrderSetPackDone extends Component {
 
       {!!order.store_remark && <View>
         <CellsTitle>商家备注确认</CellsTitle>
-        <Cells>
+        <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody><Text style={{color: 'red'}}>{order.store_remark}</Text></CellBody>
             <CellFooter>
