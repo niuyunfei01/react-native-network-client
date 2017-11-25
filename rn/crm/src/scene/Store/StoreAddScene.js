@@ -429,7 +429,7 @@ class StoreAddScene extends PureComponent {
                 <Text style={styles.body_text}>{open_start}</Text>
               </TouchableOpacity>
               <DateTimePicker
-                date={new Date(`1970-01-01 ${open_start}`)}
+                date={new Date(`2000/01/01 ${open_start}`)}
                 mode='time'
                 isVisible={this.state.isStartVisible}
                 onConfirm={(date) => {
@@ -450,7 +450,7 @@ class StoreAddScene extends PureComponent {
                 <Text style={styles.body_text}>{open_end}</Text>
               </TouchableOpacity>
               <DateTimePicker
-                date={new Date(`1970-01-01 ${open_end}`)}
+                date={new Date(`2000/01/01 ${open_end}`)}
                 mode='time'
                 isVisible={this.state.isEndVisible}
                 onConfirm={(date) => {
