@@ -25,6 +25,7 @@ import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 public class RefreshOrderListTask
         extends MyAsyncTask<Void, List<Order>, OrderContainer> {
 
+    private final int maxPastDays;
     private final long[] storeIds;
 
     public interface OrderQueriedDone {
@@ -41,20 +42,21 @@ public class RefreshOrderListTask
     private final boolean byPassCache;
 
     public RefreshOrderListTask(FragmentActivity activity, long[] storeIds,
-                                ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
-        this(activity, "", listType, swipeRefreshLayout, doneCallback, storeIds, byPassCache);
+                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
+        this(activity, "", listType, maxPastDays, swipeRefreshLayout, doneCallback, storeIds, byPassCache);
     }
 
     public RefreshOrderListTask(FragmentActivity activity, String searchTerm,
-                                ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
-        this(activity, searchTerm, listType, swipeRefreshLayout, doneCallback, null, byPassCache);
+                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
+        this(activity, searchTerm, listType, maxPastDays, swipeRefreshLayout, doneCallback, null, byPassCache);
     }
 
     private RefreshOrderListTask(FragmentActivity activity, String searchTerm,
-                                 ListType listType, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, long[] storeIds,
+                                 ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, long[] storeIds,
                                  boolean byPassCache) {
         this.activity = activity;
         this.searchTerm = searchTerm;
+        this.maxPastDays = maxPastDays;
         this.storeIds = storeIds;
         this.listType = listType;
         this.swipeRefreshLayout = swipeRefreshLayout;
@@ -86,9 +88,9 @@ public class RefreshOrderListTask
             int limit = listValue == ListType.ARRIVED.getValue() ? 100 : 0;
             int offset = 0;
             if (TextUtils.isEmpty(searchTerm)) {
-                return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset);
+                return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset, this.maxPastDays);
             } else {
-                return ordersDao.search(searchTerm, listValue, storeIds, limit, offset);
+                return ordersDao.search(searchTerm, listValue, storeIds, limit, offset, this.maxPastDays);
             }
         } catch (ServiceException e) {
 //                cancel(true);
