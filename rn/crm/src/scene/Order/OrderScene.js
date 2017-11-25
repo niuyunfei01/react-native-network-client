@@ -652,7 +652,7 @@ class OrderScene extends Component {
   _fnProvidingOnway() {
     const {order, global} = this.props;
     
-    const storeId = order.order.store_id;
+    const storeId = (order.order||{}).store_id;
     return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
 
