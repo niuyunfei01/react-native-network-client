@@ -424,13 +424,15 @@ class MineScene extends PureComponent {
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
     let {currVendorId, currVersion, is_mgr, is_helper} = this.state;
+    let {global, dispatch} = this.props;
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
             if (is_mgr || is_helper) {
-              let url = `${Config.ServiceUrl}stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+              let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             } else {
               ToastLong('您没有查看业绩的权限');
@@ -445,7 +447,8 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let url = `${Config.ServiceUrl}stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
+              let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
+              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -472,7 +475,8 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let url = `${Config.ServiceUrl}stores/sales_ana.html${token}&&_v_id=${currVendorId}`;
+              let path = `/stores/sales_ana.html${token}&&_v_id=${currVendorId}`;
+              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -485,7 +489,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/working_status.html${token}&&_v_id=${currVendorId}`;
+            let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -512,7 +517,8 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => {
-              let url = `${Config.ServiceUrl}market_tools/users.html${token}`;
+              let path = `/market_tools/users.html${token}`;
+              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -589,12 +595,14 @@ class MineScene extends PureComponent {
   renderDirectBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
     let {currStoreId} = this.state;
+    let {global, dispatch} = this.props;
     return (
       <View style={[block_styles.container]}>
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/provide_req_all.html${token}`;
+            let path = `/stores/provide_req_all.html${token}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -605,7 +613,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/prod_loss.html${token}`;
+            let path = `/stores/prod_loss.html${token}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -616,7 +625,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/orders_buy_combined.html${token}`;
+            let path = `/stores/orders_buy_combined.html${token}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -627,7 +637,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}expenses/show_expenses.html${token}`;
+            let path = `/expenses/show_expenses.html${token}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -638,7 +649,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
+            let path = `/stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -649,7 +661,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/products.html${token}`;
+            let path = `/stores/products.html${token}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -660,7 +673,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}vm/index.html${token}&&time=${Date.now()}#!/home`;
+            let path = `/vm/index.html${token}&&time=${Date.now()}#!/home`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -679,7 +693,8 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let url = `${Config.ServiceUrl}stores/quick_task_list.html${token}`;
+            let path = `/stores/quick_task_list.html${token}`;
+            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
