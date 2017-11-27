@@ -51,6 +51,7 @@ dependencies {
     compile project(':react-native-splash-screen')
     compile project(':react-native-sound')
     compile project(':react-native-ble-manager')
+    compile project(':react-native-image-crop-picker')
 
     releaseCompile 'ch.acra:acra:4.9.2'
 }
@@ -72,7 +73,7 @@ android {
         targetSdkVersion 25
 
         multiDexEnabled true
-
+        vectorDrawables.useSupportLibrary = true
 
         ndk {
             abiFilters "armeabi-v7a", "x86"
