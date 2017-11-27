@@ -921,6 +921,7 @@ public class GlobalCtx extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        MultiDex.install(base);
         CrashReportHelper.attachBaseContext(base, this);
     }
 
