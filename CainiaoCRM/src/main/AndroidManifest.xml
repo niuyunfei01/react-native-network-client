@@ -122,7 +122,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
 
-        <activity android:name="com.example.BlueToothPrinterApp.BlueToothPrinterApp"/>
+        <activity android:name="com.example.btprinter.BlueToothPrinterApp"/>
         <activity android:name=".ui.activity.SettingsPrintActivity" android:screenOrientation="portrait"/>
 
         <activity android:name=".ui.activity.DatepickerActivity" android:screenOrientation="portrait"/>

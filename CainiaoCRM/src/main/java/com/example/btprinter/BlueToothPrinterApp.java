@@ -1,4 +1,4 @@
-package com.example.BlueToothPrinterApp;
+package com.example.btprinter;
 
 import android.app.Activity;
 import android.os.Bundle;
