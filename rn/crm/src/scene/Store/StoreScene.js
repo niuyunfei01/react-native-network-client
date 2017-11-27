@@ -121,9 +121,6 @@ class StoreScene extends PureComponent {
         _this.setState({
           curr_user_list: user_list,
         });
-        if (_this.state.isRefreshing) {
-          ToastShort('刷新员工完成');
-        }
       }
       _this.setState({isRefreshing: false});
     }));
@@ -158,8 +155,7 @@ class StoreScene extends PureComponent {
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody style={styles.cell_body}>
               <Text style={[styles.store_name]}>{store.name}</Text>
-              {/*<Text style={[styles.open_time]}>{tool.storeTime(new Date(`1970-01-01 ${store.open_start}`))}-{tool.storeTime(new Date(`1970-01-01 ${store.open_end}`))}</Text>*/}
-              <Text style={[styles.open_time]}>{tool.storeTime(`1970-01-01 ${store.open_start}`)}-{tool.storeTime(`1970-01-01 ${store.open_end}`)}</Text>
+              <Text style={[styles.open_time]}>{tool.storeTime(`2000-01-01 ${store.open_start}`)}-{tool.storeTime(`2000-01-01 ${store.open_end}`)}</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity
