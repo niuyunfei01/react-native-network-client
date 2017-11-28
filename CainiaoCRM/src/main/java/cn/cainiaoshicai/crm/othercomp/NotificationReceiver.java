@@ -25,10 +25,12 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
+import cn.cainiaoshicai.crm.orders.OrderListFragment;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
@@ -178,12 +180,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 						|| Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())
 						) {
 
-					if (TextUtils.isEmpty(notify.getUrl())) {
+					if (!TextUtils.isEmpty(notify.getUrl())) {
 						i = new Intent(context, GeneralWebViewActivity.class);
 						i.putExtra("url", notify.getUrl());
 					} else {
-						i = new Intent(context, OrderSingleActivity.class);
-						i.putExtra("order_id", notify.getOrder_id());
+						i = new Intent(context, MyReactActivity.class);
+						i.putExtra("order_id", Long.valueOf(notify.getOrder_id()));
 					}
 
 				} else if (Cts.PUSH_TYPE_TODO_COMPLAIN.equals(notify.getType())) {
@@ -204,7 +206,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 					}
 				}
 
-				i.putExtras(bundle);
+				if (bundle != null) {
+					i.putExtras(bundle);
+				}
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				context.startActivity(i);
 			} else {

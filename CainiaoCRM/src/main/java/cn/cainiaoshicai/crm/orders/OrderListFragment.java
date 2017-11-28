@@ -85,15 +85,18 @@ public class OrderListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent openOrder = new Intent(getActivity(), MyReactActivity.class);
-                Order item = (Order) adapter.getItem(position);
-                openOrder.putExtra("order_id", Long.valueOf(item.getId()));
-                openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
-                openOrder.putExtra("order", item);
-                try {
-                    getActivity().startActivity(openOrder);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                FragmentActivity act = getActivity();
+                if (act != null) {
+                    Intent openOrder = new Intent(act, MyReactActivity.class);
+                    Order item = (Order) adapter.getItem(position);
+                    openOrder.putExtra("order_id", Long.valueOf(item.getId()));
+                    openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
+                    openOrder.putExtra("order", item);
+                    try {
+                        act.startActivity(openOrder);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
