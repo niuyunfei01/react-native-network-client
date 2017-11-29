@@ -88,4 +88,5 @@ export default keyMirror({
   GET_PACK_WORKERS: null,
   GET_SHIP_WORKERS: null,
 
+  GET_VENDOR_TAGS: null,
 })

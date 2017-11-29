@@ -7,11 +7,14 @@
 const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
+  GET_VENDOR_TAGS,
 } = require('../../common/constants').default;
 
 const initialState = {
   ext_prod_map: {0:{prods:{}, prices:{}}},   /* 产品名列表, 价格列表*/
   product_detail: {},
+  store_tags: {},
+  basic_category: {},
 };
 
 /**
@@ -39,6 +42,12 @@ export default function productReducer(state = initialState, action) {
         ...state,
         product_detail: product_detail(state, action),
       };
+    case GET_VENDOR_TAGS:
+      return {
+        ...state,
+        store_tags: store_tags(state, action),
+        basic_category: basic_category(state, action),
+      };
     default:
       return state;
   }
@@ -47,6 +56,16 @@ export default function productReducer(state = initialState, action) {
 function product_detail(state, action) {
   state.product_detail[action.product_id] = action.product_detail;
   return state.product_detail;
+}
+
+function store_tags(state, action) {
+  state.store_tags[action._v_id] = action.store_tags;
+  return state.store_tags;
+}
+
+function basic_category(state, action) {
+  state.basic_category[action._v_id] = action.basic_category;
+  return state.basic_category;
 }
 
 
