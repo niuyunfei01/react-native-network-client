@@ -94,8 +94,6 @@ export function fetchVendorTags(_v_id, token, callback) {
         if (resp.ok) {
           let vendor_tags = resp.obj;
           dispatch(receiveVendorTags(_v_id, vendor_tags));
-        } else {
-          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {

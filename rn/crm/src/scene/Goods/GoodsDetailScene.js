@@ -1,12 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
-//import liraries
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import {Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Input, Label, Icon, Toast,} from "../../weui/index";
@@ -15,10 +6,8 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import Entypo from 'react-native-vector-icons/Entypo';
-import Octicons from 'react-native-vector-icons/Octicons';
 import * as tool from "../../common/tool";
-import {fetchProductDetail, fetchVendorProduct} from "../../reducers/product/productActions";
+import {fetchProductDetail, fetchVendorProduct, fetchVendorTags} from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
@@ -38,6 +27,7 @@ function mapDispatchToProps(dispatch) {
     dispatch, ...bindActionCreators({
       fetchProductDetail,
       fetchVendorProduct,
+      fetchVendorTags,
       ...globalActions
     }, dispatch)
   }
@@ -96,12 +86,14 @@ class GoodsDetailScene extends PureComponent {
     this.getProductDetail = this.getProductDetail.bind(this);
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
+    this.getVendorTags = this.getVendorTags.bind(this);
   }
 
   componentWillMount() {
     let {productId, backPage} = (this.props.navigation.state.params || {});
+    let {currVendorId} = tool.vendor(this.props.global);
     this.productId = productId;
-    const {product_detail} = this.props.product;
+    const {product_detail, store_tags, basic_category} = this.props.product;
     if (product_detail[productId] === undefined) {
       this.getProductDetail();
     } else {
@@ -110,6 +102,23 @@ class GoodsDetailScene extends PureComponent {
       });
     }
     this.getVendorProduct();
+
+    if(store_tags[currVendorId] === undefined || basic_category[currVendorId] === undefined){
+      this.getVendorTags(currVendorId);
+    }
+  }
+
+  getVendorTags(_v_id) {
+    if (_v_id > 0) {
+      const {accessToken} = this.props.global;
+      const {dispatch} = this.props;
+      InteractionManager.runAfterInteractions(() => {
+        dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
+            console.log('fetchVendorTags -> ', resp.ok);
+            // console.log(resp.ok, resp.obj.basic_category, resp.ok.store_tags);
+        }));
+      });
+    }
   }
 
   componentDidMount() {
@@ -138,7 +147,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, accessToken, (resp) => {
-          // console.log('product_detail -> ', product_detail);
+          // console.log('product_detail -> ', resp);
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -163,7 +172,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-          console.log('getVendorProduct -> ', resp);
+          // console.log('getVendorProduct -> ', resp);
           if (resp.ok) {
             let store_product = resp.obj;
             _this.setState({
@@ -341,11 +350,11 @@ class GoodsDetailScene extends PureComponent {
 
   renderIcon = (status) => {
     if(status === Cts.STORE_PROD_ON_SALE){
-      return <Entypo name='upload' style={[styles.icon_style, styles.icon_on_sale]}/>;
+      return <Image style={[styles.icon_style]} source={require('../../img/Goods/shangjia_.png')}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE){
-      return <Entypo name='download' style={[styles.icon_style, styles.icon_lack_stock]}/>
+      return <Image style={[styles.icon_style]} source={require('../../img/Goods/xiajia_.png')}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT){
-      return <Octicons name='alert' style={[styles.icon_style, styles.icon_off_sale]}/>
+      return <Image style={[styles.icon_style]} source={require('../../img/Goods/quehuo_.png')}/>;
     }
   };
 
@@ -581,15 +590,6 @@ const styles = StyleSheet.create({
     width: pxToDp(28),
     height: pxToDp(28),
     marginLeft: pxToDp(20),
-  },
-  icon_on_sale: {
-    color: colors.main_color,
-  },
-  icon_lack_stock: {
-    color: '#f44040',
-  },
-  icon_off_sale: {
-    color: colors.color999,
   },
   btn_edit: {
     fontSize: pxToDp(40),
