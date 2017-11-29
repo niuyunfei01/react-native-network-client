@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.loader.RefreshOrderListTask;
 
 public class OrderListFragment extends Fragment {
@@ -83,15 +85,18 @@ public class OrderListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent openOrder = new Intent(getActivity(), OrderSingleActivity.class);
-                Order item = (Order) adapter.getItem(position);
-                openOrder.putExtra("id", item.getId());
-                openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
-                openOrder.putExtra("order", item);
-                try {
-                    getActivity().startActivity(openOrder);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                FragmentActivity act = getActivity();
+                if (act != null) {
+                    Intent openOrder = new Intent(act, MyReactActivity.class);
+                    Order item = (Order) adapter.getItem(position);
+                    openOrder.putExtra("order_id", Long.valueOf(item.getId()));
+                    openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
+                    openOrder.putExtra("order", item);
+                    try {
+                        act.startActivity(openOrder);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -119,7 +124,7 @@ public class OrderListFragment extends Fragment {
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
             RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,
-                    swipeRefreshLayout, new QueryDoneCallback(this), byPassCache);
+                   0,  swipeRefreshLayout, new QueryDoneCallback(this), byPassCache);
             task.executeOnNormal();
         }
     }

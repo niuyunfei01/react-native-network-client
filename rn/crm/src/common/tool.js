@@ -60,7 +60,7 @@ export function fullDate(dt) {
 }
 
 export function storeTime(dt) {
-  return Moment(dt).format('H:ss');
+  return Moment(dt).format('H:mm');
 }
 
 export function vendorOfStoreId(storeId, global) {

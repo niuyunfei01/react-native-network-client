@@ -66,7 +66,7 @@ class OrderTodoScene extends Component {
   componentWillMount() {
     let order_task_types;
     const {global, dispatch} = this.props;
-    if (global.cfgOfKey) {
+    if (global.cfgOfKey && global.cfgOfKey.order_task_types) {
       order_task_types = global.cfgOfKey.order_task_types.type;
     }
 

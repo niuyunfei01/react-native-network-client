@@ -38,11 +38,9 @@ import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
-import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 
 /**
@@ -91,12 +89,12 @@ public class OrderAdapter extends BaseAdapter {
         TextView orderMoney = (TextView) vi.findViewById(R.id.total_money);
         TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
         TextView dayNo = (TextView) vi.findViewById(R.id.feedbackId);
-        TextView sourcePlatform = (TextView) vi.findViewById(R.id.source_platform);
-        TextView orderTimesTxt = (TextView)vi.findViewById(R.id.user_order_times);
-        TextView paidWayTxt = (TextView)vi.findViewById(R.id.fb_status);
+        TextView sourcePlatform = vi.findViewById(R.id.source_platform);
+        TextView orderTimesTxt = vi.findViewById(R.id.user_order_times);
+        TextView paidWayTxt = vi.findViewById(R.id.fb_status);
         TextView labelExpectTxt = (TextView)vi.findViewById(R.id.fb_from_user);
 
-        TextView ship_schedule = (TextView)vi.findViewById(R.id.ship_schedule);
+        TextView ship_schedule = vi.findViewById(R.id.ship_schedule);
         ship_schedule.setVisibility(View.GONE);
 
         GlobalCtx ctx = GlobalCtx.app();
@@ -162,27 +160,6 @@ public class OrderAdapter extends BaseAdapter {
                 direction = " [ " + order.getDirection() + " ]";
             }
             orderAddr.setText((isInvalid ? "[已无效]" : "") + order.getAddress() + direction);
-
-            orderAddr.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context ctx = v.getContext();
-                    if (ctx  == null) {
-                        return;
-                    }
-
-                    Intent openOrder = new Intent(ctx, MyReactActivity.class);
-                    openOrder.putExtra("order_id", Long.valueOf(order.getId()));
-                    openOrder.putExtra("list_type", listType);
-                    openOrder.putExtra("order", order);
-                    try {
-                        ctx.startActivity(openOrder);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
             userName.setText(order.getUserName());
             phone.setText(order.getMobile());
             phone.setOnClickListener(new View.OnClickListener() {
@@ -201,7 +178,8 @@ public class OrderAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
                     intent.setAction(Intent.ACTION_SEARCH);
-                    intent.putExtra(SearchManager.QUERY, order.getMobile());
+                    intent.putExtra(SearchManager.QUERY, "uid:" + order.getUser_id());
+                    intent.putExtra("max_past_day", 10000);
                     v.getContext().startActivity(intent);
                 }
             });
