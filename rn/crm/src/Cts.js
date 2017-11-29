@@ -57,9 +57,12 @@ export default {
   WM_PLAT_ID_JD: 6,
   WM_PLAT_UNKNOWN: -1,
 
-  STORE_PROD_ON_SALE: 1,
-  STORE_PROD_OFF_SALE: 3,
-  STORE_PROD_SOLD_OUT: 2,
+  STORE_PROD_ON_SALE: 1,//上架
+  STORE_PROD_OFF_SALE: 3,//下架
+  STORE_PROD_SOLD_OUT: 2,//缺货
+  
+  STORE_SELF_PROVIDED: 1,//门店自采
+  STORE_COMMON_PROVIDED: 0,//总部供货
 
   SHIP_AUTO_FN: 1,//蜂鸟
   SHIP_AUTO_NEW_DADA: 2,//新达达
@@ -69,23 +72,22 @@ export default {
   ID_DADA_SHIP_WORKER: -999,
   ID_DADA_MANUAL_WORKER: -998,
 
-// //新达达：状态编码(待接单＝1 待取货＝2 配送中＝3 已完成＝4 已取消＝5 已过期＝7 指派单=8)
-  DADA_STATUS_NEVER_START : 0,
-  DADA_STATUS_TO_ACCEPT : 1,
-  DADA_STATUS_TO_FETCH : 2,
-  DADA_STATUS_SHIPPING : 3,
-  DADA_STATUS_ARRIVED : 4,
-  DADA_STATUS_CANCEL : 5,
-  DADA_STATUS_TIMEOUT : 7,
-  DADA_STATUS_ABNORMAL : 8,
-//蜂鸟
-    FN_STATUS_ACCEPTED : 1,//	系统已接单	蜂鸟配送开放平台接单后,商户接收到系统已接单状态, 支持取消
-    FN_STATUS_ASSIGNED : 20,//	已分配骑手	蜂鸟配送开放平台接单后,商户接收到已分配骑手状态, 支持取消
-    FN_STATUS_ARRIVED_STORE : 80, //	骑手已到店	蜂鸟配送开放平台将骑手已到店状态回调给商户, 支持取消
-    FN_STATUS_ON_WAY : 2, //	配送中	蜂鸟配送开放平台将骑手配送中状态回调给商户, 不支持取消
-    FN_STATUS_ARRIVED : 3, //	已送达	蜂鸟配送开放平台将已送达状态回调给商户, 不支持取消
-    FN_STATUS_CANCELED : 4, //	已取消(同步取消不需要关注此状态)	商户主动取消订单请求处理成功后,蜂鸟配送开放平台将已取消状态回调给商户
-    FN_STATUS_ABNORMAL : 5, //	异常	推单到物流开放平台后任何阶段产生异常,蜂鸟配送开放平台将异常状态回调给商户
-  
+  // 新达达：状态编码(待接单＝1 待取货＝2 配送中＝3 已完成＝4 已取消＝5 已过期＝7 指派单=8)
+  DADA_STATUS_NEVER_START: 0,
+  DADA_STATUS_TO_ACCEPT: 1,
+  DADA_STATUS_TO_FETCH: 2,
+  DADA_STATUS_SHIPPING: 3,
+  DADA_STATUS_ARRIVED: 4,
+  DADA_STATUS_CANCEL: 5,
+  DADA_STATUS_TIMEOUT: 7,
+  DADA_STATUS_ABNORMAL: 8,
+  // 蜂鸟
+  FN_STATUS_ACCEPTED: 1,//	系统已接单	蜂鸟配送开放平台接单后,商户接收到系统已接单状态, 支持取消
+  FN_STATUS_ASSIGNED: 20,//	已分配骑手	蜂鸟配送开放平台接单后,商户接收到已分配骑手状态, 支持取消
+  FN_STATUS_ARRIVED_STORE: 80, //	骑手已到店	蜂鸟配送开放平台将骑手已到店状态回调给商户, 支持取消
+  FN_STATUS_ON_WAY: 2, //	配送中	蜂鸟配送开放平台将骑手配送中状态回调给商户, 不支持取消
+  FN_STATUS_ARRIVED: 3, //	已送达	蜂鸟配送开放平台将已送达状态回调给商户, 不支持取消
+  FN_STATUS_CANCELED: 4, //	已取消(同步取消不需要关注此状态)	商户主动取消订单请求处理成功后,蜂鸟配送开放平台将已取消状态回调给商户
+  FN_STATUS_ABNORMAL: 5, //	异常	推单到物流开放平台后任何阶段产生异常,蜂鸟配送开放平台将异常状态回调给商户
 
 }
