@@ -41,8 +41,8 @@ class GoodsDetailScene extends PureComponent {
     return {
       headerLeft: (
         <NavigationItem
-          icon={require('../../img/Register/black_back_.png')}
-          iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
+          icon={require('../../img/Register/back_.png')}
+          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
             if(!!backPage){
               // console.log('backPage ----------------------> ', backPage);

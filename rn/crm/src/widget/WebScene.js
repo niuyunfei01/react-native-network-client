@@ -11,15 +11,27 @@ import {View, Text, StyleSheet, WebView, InteractionManager, Platform, BackHandl
 import Config from "../config";
 import LoadingView from "./LoadingView";
 import {Toast} from "./../weui/index";
+import NavigationItem from "./NavigationItem";
+import pxToDp from "../util/pxToDp";
 
 
 // create a component
 class WebScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => ({
-    title: navigation.state.params.title,
-    // header: null,
-  });
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    return {
+      headerLeft: (
+        <NavigationItem
+          icon={require('../img/Register/back_.png')}
+          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+          onPress={() => {
+            params.backHandler();
+          }}
+        />),
+      headerTitle: params.title,
+    }
+  };
 
   constructor(props: Object) {
     super(props);
@@ -95,6 +107,8 @@ class WebScene extends PureComponent {
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);
+
+    this.props.navigation.setParams({backHandler: this.backHandler});
   };
 
   componentWillMount() {
