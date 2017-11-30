@@ -52,7 +52,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 /**
  * Expose Java to JavaScript.
  */
-class ActivityStarterModule extends ReactContextBaseJavaModule implements PermissionAwareActivity {
+class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     ActivityStarterModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -303,25 +303,5 @@ class ActivityStarterModule extends ReactContextBaseJavaModule implements Permis
 //                catalystInstance.callFunction("JavaScriptVisibleToJava", "alert", params);
 //            }
 //        }
-    }
-
-    @Override
-    public int checkPermission(String permission, int pid, int uid) {
-        return 0;
-    }
-
-    @Override
-    public int checkSelfPermission(String permission) {
-        return 0;
-    }
-
-    @Override
-    public boolean shouldShowRequestPermissionRationale(String permission) {
-        return false;
-    }
-
-    @Override
-    public void requestPermissions(String[] permissions, int requestCode, PermissionListener listener) {
-
     }
 }

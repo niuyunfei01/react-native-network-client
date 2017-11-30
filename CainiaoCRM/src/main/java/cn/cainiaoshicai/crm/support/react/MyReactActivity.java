@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,13 +16,18 @@ import android.view.WindowInsets;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 import com.google.gson.Gson;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
 import java.util.Collection;
 import java.util.HashMap;
+
+import javax.annotation.Nullable;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.Config;
@@ -33,11 +39,15 @@ import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 
 
-public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
+public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
     private static String REACT_PREFERENCES = "react_preferences";
+
+    private @Nullable
+    Callback mPermissionsCallback;
+    private @Nullable PermissionListener mPermissionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,8 +208,31 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         if (first) {
             final SharedPreferences.Editor editor = reader.edit();
             editor.putBoolean("is_first", false);
-            editor.commit();
+            editor.apply();
         }
         return first;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestPermissions(
+            String[] permissions,
+            int requestCode,
+            PermissionListener listener) {
+        mPermissionListener = listener;
+        this.requestPermissions(permissions, requestCode);
+    }
+
+    public void onRequestPermissionsResult(
+            final int requestCode,
+            @NonNull final String[] permissions,
+            @NonNull final int[] grantResults) {
+        mPermissionsCallback = new Callback() {
+            @Override
+            public void invoke(Object... args) {
+                if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+                    mPermissionListener = null;
+                }
+            }
+        };
     }
 }
