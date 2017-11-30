@@ -77,7 +77,7 @@ class ApplyScene extends PureComponent {
     headerLeft: (
       <NavigationItem
         icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
           navigation.navigate('Login')
         }}

@@ -111,8 +111,8 @@ class OrderScene extends Component {
     let {backPage} = params;
     return {
       headerLeft: (<NavigationItem
-        icon={require('../../img/Register/black_back_.png')}
-        iconStyle={{width: pxToDp(87), height: pxToDp(79)}}
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
           if(!!backPage){
             console.log('backPage -> ', backPage);
@@ -794,13 +794,13 @@ class OrderScene extends Component {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
-          <View key={index} style={{ paddingBottom: pxToDp(20), paddingLeft: pxToDp(30), paddingRight: pxToDp(30), backgroundColor: '#fff' }}>
-            <View style={{ borderBottomWidth: pxToDp(1), borderColor: '#EEEEEE', borderStyle: 'solid', paddingTop: pxToDp(20), paddingBottom: pxToDp(20) }}>
+          <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff'}}>
+            <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",height:pxToDp(150),justifyContent:'center'}}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30) }}>{item.updated_name}</Text>
                 <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30), marginLeft: pxToDp(24) }}>{item.modified}</Text>
               </View>
-              <View style={{ marginTop: pxToDp(20) }}>
+              <View style={{ marginTop: pxToDp(20),width:'100%' }}>
                 <Text style={{ fontSize: pxToDp(24) }}>{item.what}</Text>
               </View>
             </View>

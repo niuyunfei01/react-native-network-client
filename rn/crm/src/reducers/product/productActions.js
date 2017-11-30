@@ -7,6 +7,7 @@ import {ToastLong} from '../../util/ToastUtils';
 const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
+  GET_VENDOR_TAGS,
 } = require('../../common/constants').default;
 
 
@@ -83,6 +84,38 @@ export function fetchVendorProduct(_v_id, product_id, token, callback) {
     );
   }
 }
+
+export function fetchVendorTags(_v_id, token, callback) {
+  return dispatch => {
+    const url = `api/get_vendor_tags/${_v_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let vendor_tags = resp.obj;
+          dispatch(receiveVendorTags(_v_id, vendor_tags));
+        }
+        callback(resp);
+      }).catch((error) => {
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+
+function receiveVendorTags(_v_id, vendor_tags = {}) {
+  return {
+    type: GET_VENDOR_TAGS,
+    _v_id: _v_id,
+    store_tags: vendor_tags.store_tags,
+    basic_category: vendor_tags.basic_category,
+  }
+}
+
+
+
+
 
 
 
