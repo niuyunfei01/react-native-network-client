@@ -44,6 +44,9 @@ import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 /**
  * Expose Java to JavaScript.
  */
@@ -261,6 +264,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             promise.resolve(activity.getClass().getSimpleName());
+        }
+    }
+
+    @ReactMethod
+    void gotoLoginWithNoHistory() {
+        Activity act = this.getCurrentActivity();
+        if (act != null) {
+            Intent intent = new Intent(act, LoginActivity.class);
+            intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+            act.startActivity(intent);
         }
     }
 

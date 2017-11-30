@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react'
 import {TouchableOpacity, Text, View} from 'react-native'
-import CallImg from './CallImg'
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import {Button, Dialog} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
 import {native, tool} from "../../common"
 import PropTypes from 'prop-types'
@@ -9,8 +8,22 @@ import {ToastShort} from "../../util/ToastUtils";
 import Cts from "../../Cts";
 import Config from "../../config";
 import styles from './OrderStyles'
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 
 const numeral = require('numeral');
+
+
+function mapStateToProps(state) {
+  return {
+    global: state.global,
+    store: state.store,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {dispatch, ...bindActionCreators({}, dispatch)}
+}
 
 class OrderBottom extends PureComponent {
 
@@ -42,8 +55,23 @@ class OrderBottom extends PureComponent {
     this._actionBtnText = this._actionBtnText.bind(this);
     this._onActionBtnClicked = this._onActionBtnClicked.bind(this);
 
+    this._viewShipDetail = this._viewShipDetail.bind(this);
+    this._cancelShip = this._cancelShip.bind(this);
+
     this._defCloseBtn = this._defCloseBtn.bind(this);
   }
+
+  _viewShipDetail = () => {
+    const {navigation, order} = this.props;
+    this.setState({dlgShipVisible: false});
+    navigation.navigate(Config.ROUTE_ORDER_SHIP_DETAIL, {order});
+  };
+
+  _cancelShip = () => {
+    const {navigation, order} = this.props;
+    this.setState({dlgShipVisible: false});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order});
+  };
 
   _doDial() {
     const {mobile} = this.props;
@@ -104,7 +132,7 @@ class OrderBottom extends PureComponent {
       this._callShipDlg();
     } else {
 
-      let title, msg, buttons;
+      let title, msg, buttons, leftButtons;
       if (dada_status === Cts.DADA_STATUS_TO_ACCEPT) {
         title = '自动待接单';
         const timeDesc = tool.shortTimeDesc(dada_call_at);
@@ -112,19 +140,13 @@ class OrderBottom extends PureComponent {
         msg = `${timeDesc}已发单${shipDetail}到${auto_plat}, 等待接单中...`;
         buttons = [
           {
-            type: 'default',
             label: '撤回呼叫',
-            onPress: () => {
-              // new DadaCancelClicked(false)
-            }
+            onPress: this._cancelShip
           },
           this._defCloseBtn('继续等待'),
           {
-            type: 'default',
-            label: '刷新状态',
-            onPress: () => {
-              // new DadaQueryTask(orderId, helper).executeOnNormal();
-            }
+            label: '查看详细',
+            onPress: this._viewShipDetail
           },
         ];
 
@@ -132,32 +154,28 @@ class OrderBottom extends PureComponent {
         title = "自动待取货";
         msg = `${auto_plat} ${dada_dm_name} (${dada_mobile}) 已接单，如强制取消扣2元费用`;
         buttons = [
-          this._defCloseBtn(),
           {
-            type: 'default',
             label: '强行撤单',
-            onPress: () => {
-              //new DadaCancelClicked(true)
-            },
+            onPress: this._cancelShip,
           },
           {
-            type: 'default',
             label: '呼叫配送员',
             onPress: () => {
               native.dialNumber(dada_mobile);
             }
           },
+          this._defCloseBtn(),
         ];
       } else if (dada_status === Cts.DADA_STATUS_CANCEL || dada_status === Cts.DADA_STATUS_TIMEOUT) {
         title = "通过系统呼叫配送";
         msg = "订单已" + (dada_status === Cts.DADA_STATUS_TIMEOUT ? "超时" : "取消") + "，重新发单？";
-        buttons = [{
-          type: 'default',
-          label: '重新发单',
-          onPress: () => {
-            this._callShipDlg();
+        buttons = [
+          {
+            label: '重新发单',
+            onPress: () => {
+              this._callShipDlg();
+            },
           },
-        },
           this._defCloseBtn(),
         ];
 
@@ -166,17 +184,13 @@ class OrderBottom extends PureComponent {
         msg = `${auto_plat} ${dada_dm_name} (${dada_mobile}) ` + (dada_status === Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达");
         buttons = [
           {
-            type: 'default',
+            label: '查看详细',
+            onPress: this._viewShipDetail
+          },
+          {
             label: '呼叫配送员',
             onPress: () => {
               native.dialNumber(dada_mobile)
-            },
-          },
-          {
-            type: 'default',
-            label: '刷新状态',
-            onPress: () => {
-              //new DadaQueryTask(orderId, helper).executeOnNormal();
             },
           },
           this._defCloseBtn(),
@@ -185,6 +199,7 @@ class OrderBottom extends PureComponent {
       this.setState({
         dlgShipTitle: title,
         dlgShipButtons: buttons,
+        left_buttons: leftButtons,
         dlgShipContent: msg,
         dlgShipVisible: true,
       });
@@ -259,14 +274,14 @@ class OrderBottom extends PureComponent {
   _onActionBtnClicked() {
     const order = this.props.order;
     const iStatus = parseInt(order.orderStatus);
-    const {navigation} = this.props;
+    const {navigation, global} = this.props;
 
     if (iStatus === Cts.ORDER_STATUS_SHIPPING) {
       return "提醒送达";
     } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
       navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
     } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      navigation.navigate(Config.ROUTE_ORDER_START_SHIP, {order});
+      navigation.navigate(Config.ROUTE_ORDER_START_SHIP, {order: order});
     }
   }
 
@@ -334,4 +349,4 @@ OrderBottom.PropTypes = {
   style: View.propTypes.style,
 };
 
-export default OrderBottom
+export default connect(mapStateToProps, mapDispatchToProps)(OrderBottom)

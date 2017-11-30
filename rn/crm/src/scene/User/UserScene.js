@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from 'react'
 import {
   View,
@@ -30,7 +29,7 @@ import {ToastShort} from "../../util/ToastUtils";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
-import {tool} from "../../common";
+import {tool, native} from "../../common";
 import {NavigationActions} from 'react-navigation';
 import {logout} from "../../reducers/global/globalActions";
 
@@ -123,13 +122,10 @@ class UserScene extends PureComponent {
     this._onLogout = this._onLogout.bind(this)
   }
 
-  componentWillMount() {
-  }
-
   _onLogout() {
-    logout();
-    // this.props.navigation.navigate(Config.ROUTE_LOGIN);
-    tool.resetNavStack(this.props.navigation, Config.ROUTE_LOGIN)
+    const {dispatch} = this.props;
+    dispatch(logout());
+    native.gotoLoginWithNoHistory();
   }
 
   onGetUserCount() {
