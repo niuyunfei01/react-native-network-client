@@ -87,6 +87,11 @@ export default {
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },
 
+  gotoLoginWithNoHistory: async function () {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.gotoLoginWithNoHistory());
+  },
+
   logout: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.logout());

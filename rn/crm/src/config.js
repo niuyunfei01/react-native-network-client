@@ -76,6 +76,8 @@ const C = {
   ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
   ROUTE_ORDER_PACK: 'OrderSetPack',
   ROUTE_ORDER_START_SHIP: 'OrderStartShip',
+  ROUTE_ORDER_CANCEL_SHIP: 'OrderCancelShip',
+  ROUTE_ORDER_SHIP_DETAIL: 'OrderShipDetail',
   ROUTE_ORDER_TODO: 'OrderTodo',
   ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_STORE: 'Store',

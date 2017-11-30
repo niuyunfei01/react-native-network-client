@@ -13,8 +13,9 @@ import Cts from "../../Cts";
 
 function mapStateToProps(state) {
   return {
-    global, store
-  } = state;
+    global: state.global,
+    store: state.store,
+  };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -45,7 +46,7 @@ class OrderSetShipStart extends Component {
 
     this.setState({notAutoConfirmed: order.ship_worker_id !== `${Cts.ID_DADA_SHIP_WORKER}`});
 
-    const shipWorkers = store.shipWorkers[order.store_id];
+    const shipWorkers = store && store.shipWorkers ? store.shipWorkers[order.store_id] : null;
     if (!shipWorkers || shipWorkers.length === 0) {
       this.setState({loadingShippers: true});
       dispatch(getStoreShippers(global.accessToken, order.store_id, (ok, msg, workers) => {
