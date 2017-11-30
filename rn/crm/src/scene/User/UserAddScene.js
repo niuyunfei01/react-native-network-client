@@ -34,6 +34,7 @@ import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Cts from "../../Cts";
 import {NavigationActions} from 'react-navigation';
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -64,13 +65,7 @@ class UserAddScene extends PureComponent {
   constructor(props: Object) {
     super(props);
 
-    const {
-      canReadStores,
-      currStoreId,
-    } = this.props.global;
-
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
-    let currVendorName = canReadStores[currStoreId]['vendor'];
+    let {currVendorId, currVendorName} = tool.vendor(this.props.global);
 
     const {mine} = this.props;
     let vendor_stores = (mine === undefined || mine.vendor_stores[currVendorId] === undefined) ? [] : Object.values(mine.vendor_stores[currVendorId]);
