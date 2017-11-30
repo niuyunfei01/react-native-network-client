@@ -205,7 +205,7 @@ class GoodsDetailScene extends PureComponent {
     if(full_screen){
       return this.renderImg(product_detail.list_img, product_detail.source_img);
     }
-    
+
     return (
       <ScrollView
         refreshControl={
