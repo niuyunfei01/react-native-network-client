@@ -365,7 +365,7 @@ class RemindScene extends PureComponent {
       );
     }
 
-    console.log('screen', screen);
+    // console.log('screen', screen);
 
     return (
       <FlatList

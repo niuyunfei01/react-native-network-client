@@ -82,8 +82,7 @@ export function vendor(global) {
     config,
   } = global;
   let currStore = canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
-
-  let currVendorId = currStore['vendor_id'];
+  let currVendorId = currStore['vendor_id'] || currStore['type'];
   let currVendorName = currStore['vendor'];
   let currStoreName = currStore['name'];
 
@@ -120,7 +119,7 @@ export function vendor(global) {
 
   let {help_uid} = config;
   let is_helper = false;
-  if(!!help_uid){
+  if (!!help_uid) {
     let helper = ',' + help_uid.join(',') + ',';
     is_helper = helper.indexOf(',' + currentUser + ',') !== -1;
   }
@@ -139,7 +138,7 @@ export function vendor(global) {
 }
 
 export function server_info({global, user}) {
-  if(user === undefined){
+  if (user === undefined) {
     return {};
   }
   let {service_uid} = vendor(global);
@@ -172,6 +171,19 @@ export function curr_vendor(vendor_data, currVendorId) {
     console.log('curr_data -> ', vendor_data[currVendorId]);
   }
   return curr_data;
+}
+
+export function user_info(mine, currVendorId, currentUser) {
+  let user_info = {};
+  if (this.length(mine.user_list) > 0 && this.length(mine.user_list[currVendorId]) > 0 && this.length(mine.user_list[currVendorId][currentUser]) > 0) {
+    // let {
+    //   id, nickname, nameRemark, mobilephone, image, //user 表数据
+    //   worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
+    // }
+    user_info = mine.user_list[currVendorId][currentUser];
+  }
+
+  return user_info;
 }
 
 export function shortTimestampDesc(timestamp) {
@@ -248,42 +260,92 @@ export function intOf(val) {
   return val;
 }
 
-export function disWayStatic(index){
-  
-    if(index == 1){
-      let map = {};
-      map[Cts.FN_STATUS_ACCEPTED] = '系统已接单'
-      map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手'
-      map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店'
-      map[Cts.FN_STATUS_ON_WAY] = '配送中'
-      map[Cts.FN_STATUS_ARRIVED] = '已送达'
-      map[Cts.FN_STATUS_CANCELED] = '已取消'
-      map[Cts.FN_STATUS_ABNORMAL] = '异常'
-      return map;
-    } else{
-      let map = {};
-      map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单'
-      map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
-      map[Cts.DADA_STATUS_SHIPPING] = '配送中'
-      map[Cts.DADA_STATUS_ARRIVED] = '已完成'
-      map[Cts.DADA_STATUS_CANCEL] = '已取消'
-      map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
-      map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
-      return map;
+export function disWayStatic(index) {
+
+  if (index == 1) {
+    let map = {};
+    map[Cts.FN_STATUS_ACCEPTED] = '系统已接单'
+    map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手'
+    map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店'
+    map[Cts.FN_STATUS_ON_WAY] = '配送中'
+    map[Cts.FN_STATUS_ARRIVED] = '已送达'
+    map[Cts.FN_STATUS_CANCELED] = '已取消'
+    map[Cts.FN_STATUS_ABNORMAL] = '异常'
+    return map;
+  } else {
+    let map = {};
+    map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单'
+    map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
+    map[Cts.DADA_STATUS_SHIPPING] = '配送中'
+    map[Cts.DADA_STATUS_ARRIVED] = '已完成'
+    map[Cts.DADA_STATUS_CANCEL] = '已取消'
+    map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
+    map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
+    return map;
+  }
+}
+
+
+export function disWay() {
+  let map = {};
+  map[Cts.SHIP_AUTO_FN] = '蜂鸟';
+  map[Cts.SHIP_AUTO_NEW_DADA] = '新达达';
+  map[Cts.SHIP_AUTO_BD] = '百度';
+  map[Cts.SHIP_AUTO_SX] = '闪送';
+  return map
+}
+
+
+export function storeActionSheet(canReadStores) {
+  let by = function(name,minor){
+    return function(o,p){
+      let a,b;
+      if(o && p && typeof o === 'object' && typeof p ==='object'){
+        a = o[name];
+        b = p[name];
+        if(a === b){
+          return typeof minor === 'function' ? minor(o,p):0;
+        }
+        if(typeof a === typeof b){
+          return a < b ? -1:1;
+        }
+        return typeof a < typeof b ? -1 : 1;
+      }else{
+        throw("error");
+      }
+    }
+  };
+
+  let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
+  /*let sortStores = Object.values(canReadStores).sort(function (a, b) {
+    let res = (parseInt(a.vendor_id) - parseInt(b.vendor_id));
+    console.log('res ------------------> ', parseInt(a.vendor_id), parseInt(b.vendor_id), res);
+    return res;
+  });*/
+  let sortStores = Object.values(canReadStores).sort(by('vendor_id',by('id')));
+  for (let store of sortStores) {
+    if (store.id > 0) {
+      let item = {
+        key: store.id,
+        label: !!store.vendor ? (store.vendor + ':' + store.name) : store.name,
+      };
+      storeActionSheet.push(item);
     }
   }
-  
-  
-  export function disWay(){
-    let map = {};
-    map[Cts.SHIP_AUTO_FN] = '蜂鸟';
-    map[Cts.SHIP_AUTO_NEW_DADA] ='新达达';
-    map[Cts.SHIP_AUTO_BD] ='百度';
-    map[Cts.SHIP_AUTO_SX] ='闪送';
-    return map
-  }
-  
 
+  return storeActionSheet;
+}
+
+export function first_store_id(canReadStores) {
+  let first_store_id = 0;
+  for (let store of Object.values(canReadStores)) {
+    if (store.id > 0) {
+      first_store_id = store.id;
+      break;
+    }
+  }
+  return first_store_id;
+}
 
 export default {
   urlByAppendingParams,
@@ -305,4 +367,7 @@ export default {
   vendor,
   vendorOfStoreId,
   length,
+  user_info,
+  first_store_id,
+  storeActionSheet,
 }

@@ -199,7 +199,10 @@ class LoginScene extends PureComponent {
           doneSelectStore: (storeId) => {
             dispatch(getCommonConfig(token, storeId, (ok) => {
               if (ok) {
+                console.log('storeId -> ', storeId);
                 native.setCurrStoreId(storeId, (set_ok, msg) => {
+                  console.log('set_ok -> ', set_ok, msg);
+
                   if (set_ok) {
                     dispatch(setCurrentStore(storeId));
                     if (Config.ROUTE_ORDERS === this.next || !this.next) {
@@ -207,7 +210,7 @@ class LoginScene extends PureComponent {
                     } else {
                       this.props.navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
                     }
-                    tool.resetNavStack(this.props.navigation, Config.ROUTE_Mine);
+                    tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
                   } else {
                     ToastLong(msg);
                   }
@@ -220,12 +223,34 @@ class LoginScene extends PureComponent {
         };
 
         let storeId = sid;
-        if (!(storeId > 0)) {
-          navigation.navigate(Config.ROUTE_SELECT_STORE, params);
-        } else {
-          params.doneSelectStore(storeId);
-        }
+        dispatch(getCommonConfig(token, storeId, (ok, err_msg, cfg) => {
+          if(ok){
+            let store_num = 0;
+            let only_store_id = storeId;
+            for (let store of Object.values(cfg.canReadStores)) {
+              if (store.id > 0) {
+                if(store_num > 2){
+                  break;
+                }
+                store_num++;
+                only_store_id = store.id;
+              }
+            }
 
+            if (!(storeId > 0)) {
+              if(store_num === 1 && only_store_id > 0){//单店直接跳转
+                console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
+                params.doneSelectStore(only_store_id);
+              } else {
+                navigation.navigate(Config.ROUTE_SELECT_STORE, params);
+              }
+            } else {
+              params.doneSelectStore(storeId);
+            }
+          } else {
+            ToastAndroid.show(err_msg, ToastAndroid.LONG);
+          }
+        }));
       } else {
         this.doneReqSign();
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);

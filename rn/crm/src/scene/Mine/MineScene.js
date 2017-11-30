@@ -61,19 +61,8 @@ class MineScene extends PureComponent {
       currentUserProfile,
       canReadStores,
     } = this.props.global;
-    let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
-    let sortStores = Object.values(canReadStores).sort(function (a, b) {
-      return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
-    });
-    for (let store of sortStores) {
-      if (store.id > 0) {
-        let item = {
-          key: store.id,
-          label: store.vendor === null ? store.name : (store.vendor + ':' + store.name),
-        };
-        storeActionSheet.push(item);
-      }
-    }
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores);
 
     let prefer_store = '';
     let screen_name = '';
@@ -129,9 +118,19 @@ class MineScene extends PureComponent {
     }
 
     let server_info = tool.server_info(this.props);
-    console.log('service_uid =======>', service_uid);
-    if (tool.length(server_info) === 0 && service_uid>0) {
+    if (tool.length(server_info) === 0 && service_uid > 0) {
       this.onGetUserInfo(service_uid);
+    }
+  }
+
+  componentWillMount() {
+    let {currStoreId, canReadStores} = this.props.global;
+    if (!(currStoreId > 0)) {
+      console.log('currStoreId =======>', currStoreId);
+      let first_store_id = tool.first_store_id(canReadStores);
+      if (first_store_id > 0) {
+        this._doChangeStore(first_store_id, false);
+      }
     }
   }
 
@@ -193,7 +192,10 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
+      canReadStores,
     } = this.props.global;
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores);
 
     const {
       prefer_store,
@@ -205,6 +207,8 @@ class MineScene extends PureComponent {
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper} = tool.vendor(this.props.global);
     this.setState({
+      storeActionSheet: storeActionSheet,
+
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
       order_num: order_num[currStoreId],
@@ -239,20 +243,20 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken, currStoreId} = this.props.global;
     dispatch(upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
-      if(ok){
+      if (ok) {
         _this.setState({
           prefer_store: obj.prefer_store,
           screen_name: obj.screen_name,
           mobile_phone: obj.mobilephone,
           cover_image: !!obj.cover_image ? Config.ServiceUrl + obj.cover_image : '',
         });
-      }else{
+      } else {
         ToastLong(desc);
       }
     }));
   }
 
-  _doChangeStore(store_id) {
+  _doChangeStore(store_id, is_skip = true) {
     const {dispatch} = this.props;
     const {canReadStores} = this.props.global;
     let _this = this;
@@ -269,7 +273,9 @@ class MineScene extends PureComponent {
           currVendorName: canReadStores[store_id]['vendor'],
         });
         // _this.onGetStoreTurnover();
-        native.toOrders();
+        if (is_skip) {
+          native.toOrders();
+        }
       } else {
         ToastLong(msg);
       }
