@@ -365,7 +365,7 @@ class RemindScene extends PureComponent {
       );
     }
 
-    console.log('screen', screen);
+    // console.log('screen', screen);
 
     return (
       <FlatList
@@ -462,7 +462,7 @@ class RemindScene extends PureComponent {
         </ScrollableTabView>
         <Dialog onRequestClose={() => this._hideStopRemindDialog()}
                 visible={this.state.showStopRemindDialog}
-                title="不在提醒"
+                title="不再提醒"
                 buttons={[
                   {
                     type: 'default',

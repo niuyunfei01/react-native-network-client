@@ -93,10 +93,11 @@ class UserScene extends PureComponent {
     } = this.props.navigation.state.params || {};
 
     const {mine} = this.props;
+
     let {
       id, nickname, nameRemark, mobilephone, image, //user 表数据
       worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
-    } = ((mine.user_list || {})[currVendorId] || {})[currentUser];
+    } = tool.user_info(mine, currVendorId, currentUser);
     this.state = {
       isRefreshing: false,
       onSubmitting: false,
