@@ -92,6 +92,11 @@ export default {
       NativeModules.ActivityStarter.gotoLoginWithNoHistory());
   },
 
+  gotoActByUrl: async function (url) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.gotoActByUrl(url));
+  },
+
   logout: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.logout());

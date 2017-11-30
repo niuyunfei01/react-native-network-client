@@ -260,6 +260,15 @@ export function intOf(val) {
   return val;
 }
 
+function parameterByName(name, url) {
+  name = name.replace(/[\[\]]/g, "\\$&");
+  let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 export function disWayStatic(index) {
 
   if (index == 1) {
@@ -285,7 +294,6 @@ export function disWayStatic(index) {
   }
 }
 
-
 export function disWay() {
   let map = {};
   map[Cts.SHIP_AUTO_FN] = '蜂鸟';
@@ -294,7 +302,6 @@ export function disWay() {
   map[Cts.SHIP_AUTO_SX] = '闪送';
   return map
 }
-
 
 export function storeActionSheet(canReadStores) {
   let by = function(name,minor){
@@ -367,6 +374,7 @@ export default {
   vendor,
   vendorOfStoreId,
   length,
+  parameterByName,
   user_info,
   first_store_id,
   storeActionSheet,

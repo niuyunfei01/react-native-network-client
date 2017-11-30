@@ -1214,7 +1214,7 @@ public class Utility {
                     Bundle urlParams = Utility.parseUrl(url);
                     String old_store_id = urlParams.getString("old_store_id");
                     String store_id = urlParams.getString("store_id");
-                    if (old_store_id != null && old_store_id.equals(store_id)) {
+                    if (old_store_id != null && old_store_id.equals(store_id) && view != null) {
                         view.loadUrl(append_token(url, specialToken));
                     } else {
                         Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);

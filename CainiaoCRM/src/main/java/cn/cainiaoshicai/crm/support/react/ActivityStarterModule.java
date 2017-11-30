@@ -13,6 +13,8 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -50,7 +52,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 /**
  * Expose Java to JavaScript.
  */
-class ActivityStarterModule extends ReactContextBaseJavaModule {
+class ActivityStarterModule extends ReactContextBaseJavaModule implements PermissionAwareActivity {
 
     ActivityStarterModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -278,6 +280,14 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void gotoActByUrl(@Nonnull String url) {
+        Activity act = this.getCurrentActivity();
+        if (act != null) {
+            Utility.handleUrlJump(act, null, url);
+        }
+    }
+
+    @ReactMethod
     void callJavaScript() {
 //        Activity activity = getCurrentActivity();
 //        if (activity != null) {
@@ -293,5 +303,25 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 //                catalystInstance.callFunction("JavaScriptVisibleToJava", "alert", params);
 //            }
 //        }
+    }
+
+    @Override
+    public int checkPermission(String permission, int pid, int uid) {
+        return 0;
+    }
+
+    @Override
+    public int checkSelfPermission(String permission) {
+        return 0;
+    }
+
+    @Override
+    public boolean shouldShowRequestPermissionRationale(String permission) {
+        return false;
+    }
+
+    @Override
+    public void requestPermissions(String[] permissions, int requestCode, PermissionListener listener) {
+
     }
 }
