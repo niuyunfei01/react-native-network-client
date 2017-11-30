@@ -45,8 +45,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
     private ReactInstanceManager mReactInstanceManager;
     private static String REACT_PREFERENCES = "react_preferences";
 
-    private @Nullable
-    Callback mPermissionsCallback;
+    private @Nullable Callback mPermissionsCallback;
     private @Nullable PermissionListener mPermissionListener;
 
     @Override
@@ -148,6 +147,11 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         super.onResume();
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostResume(this, this);
+        }
+
+        if (mPermissionsCallback != null) {
+            mPermissionsCallback.invoke();
+            mPermissionsCallback = null;
         }
     }
 
