@@ -581,7 +581,7 @@ class RemindItem extends React.PureComponent {
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>
                   <Text style={top_styles.o_content}>
-                    {item.remark}
+                    {item.remark}  {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
@@ -596,8 +596,8 @@ class RemindItem extends React.PureComponent {
               <View>
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
-              {item.expect_end_time != '' ?
-                <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/> : null}
+              {!!item.expect_end_time &&
+                <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
               </View>
