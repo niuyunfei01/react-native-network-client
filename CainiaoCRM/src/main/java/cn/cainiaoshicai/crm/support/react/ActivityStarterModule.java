@@ -69,7 +69,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToGoods() {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, StoreStorageActivity.class);
             activity.startActivity(intent);
@@ -84,7 +84,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void gotoPage(@Nonnull String page) {
-        Context ctx = getCurrentActivity();
+        Context ctx = GlobalCtx.app().getCurrentRunningActivity();
         if (ctx == null) {
             ctx = GlobalCtx.app();
         }
@@ -95,7 +95,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     void currentVersion(@Nonnull Callback clb) {
         HashMap<String, String> m = new HashMap<>();
-        Activity act = this.getCurrentActivity();
+        Context act = getReactApplicationContext().getApplicationContext();
         if (act != null) {
             m.put("version_code", Utility.getVersionCode(act));
             m.put("version_name", Utility.getVersionName(act));
@@ -129,7 +129,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             long selectedStoreId = Long.parseLong(currId);
             if (selectedStoreId > 0) {
                 SettingUtility.setListenerStores(selectedStoreId);
-                callback.invoke(true, "ok", null);
+                callback.invoke(true, "ok:" + currId + "-" + System.currentTimeMillis(), null);
             } else {
                 callback.invoke(false, "Account is null", null);
             }
@@ -141,16 +141,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToOrders() {
-        Activity activity = getCurrentActivity();
-        if (activity != null) {
-            Intent intent = new Intent(activity, MainActivity.class);
-            activity.startActivity(intent);
+        Context ctx = GlobalCtx.app().getCurrentRunningActivity();
+        if (ctx != null) {
+            Intent intent = new Intent(ctx, MainActivity.class);
+            ctx.startActivity(intent);
         }
     }
 
     @ReactMethod
     void toSettings() {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, SettingsPrintActivity.class);
             activity.startActivity(intent);
@@ -159,7 +159,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toOrder(String wm_id) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderSingleActivity.class);
             intent.putExtra("order_id", Integer.parseInt(wm_id));
@@ -169,7 +169,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toUserComments() {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, UserCommentsActivity.class);
             activity.startActivity(intent);
@@ -178,7 +178,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void ordersByMobileTimes(@Nonnull String mobile, int times) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
@@ -190,7 +190,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void searchOrders(@Nonnull String term) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
@@ -207,7 +207,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void dialNumber(@Nonnull String number) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
             activity.startActivity(intent);
@@ -216,7 +216,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getHost(@Nonnull Callback callback) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             callback.invoke(URLHelper.getHost());
         }
@@ -224,7 +224,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getActivityName(@Nonnull Callback callback) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             callback.invoke(activity.getClass().getSimpleName());
         }
@@ -263,7 +263,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getActivityNameAsPromise(@Nonnull Promise promise) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             promise.resolve(activity.getClass().getSimpleName());
         }
@@ -271,7 +271,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void gotoLoginWithNoHistory() {
-        Activity act = this.getCurrentActivity();
+        Context act = GlobalCtx.app().getCurrentRunningActivity();
         if (act != null) {
             Intent intent = new Intent(act, LoginActivity.class);
             intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
@@ -281,7 +281,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void gotoActByUrl(@Nonnull String url) {
-        Activity act = this.getCurrentActivity();
+        Context act = GlobalCtx.app().getCurrentRunningActivity();
         if (act != null) {
             Utility.handleUrlJump(act, null, url);
         }

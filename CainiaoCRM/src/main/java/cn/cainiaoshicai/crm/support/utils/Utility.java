@@ -102,6 +102,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.error.ErrorCode;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.lib.RecordOperationAppBroadcastReceiver;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.AccountActivity;
 import cn.cainiaoshicai.crm.ui.activity.CustomizedMQConversationActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
@@ -870,7 +871,7 @@ public class Utility {
     public static void showExpiredTokenDialogOrNotification() {
         final Activity activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null && !GlobalCtx.app().tokenExpiredDialogIsShowing) {
-            if (activity.getClass() == LoginActivity.class) {
+            if (activity.getClass() == LoginActivity.class || activity.getClass() == MyReactActivity.class) {
                 return;
             }
             activity.runOnUiThread(new Runnable() {
@@ -1264,7 +1265,7 @@ public class Utility {
     }
 
     @NonNull
-    public static String getVersionCode(Activity act) {
+    public static String getVersionCode(Context act) {
         String versionDesc = "unknown";
         try {
             PackageInfo pInfo;
@@ -1278,7 +1279,7 @@ public class Utility {
     }
 
     @NonNull
-    public static String getVersionName(Activity act) {
+    public static String getVersionName(Context act) {
         String versionDesc = "unknown";
         try {
             PackageInfo pInfo;
