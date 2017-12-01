@@ -10,6 +10,8 @@ import Config from "../../config";
 import styles from './OrderStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import {orderSetArrived} from '../../reducers/order/orderActions'
+import Toast from "../../weui/Toast/Toast";
 
 const numeral = require('numeral');
 
@@ -22,7 +24,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({}, dispatch)}
+  return {dispatch, ...bindActionCreators({orderSetArrived}, dispatch)}
 }
 
 class OrderBottom extends PureComponent {
@@ -71,6 +73,23 @@ class OrderBottom extends PureComponent {
     const {navigation, order} = this.props;
     this.setState({dlgShipVisible: false});
     navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order});
+  };
+
+  _setOrderArrived = () => {
+    const {dispatch, order, global} = this.props;
+
+    this.setState({onSubmitting: true});
+    dispatch(orderSetArrived(global.accessToken, order.id, (ok, msg, data) => {
+      this.setState({onSubmitting: false});
+      if (ok) {
+        this.setState({doneSubmitting: true});
+        setTimeout(() => {
+          this.setState({doneSubmitting: false});
+        }, 2000);
+      } else {
+        this.setState({errorHints: msg});
+      }  
+    }))
   };
 
   _doDial() {
@@ -248,23 +267,6 @@ class OrderBottom extends PureComponent {
     return label;
   }
 
-  /*
-  if (fromStatus == Cts.WM_ORDER_STATUS_TO_ARRIVE) {
-  AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
-  adb.setTitle("送达提醒")
-.setMessage(String.format("您的食材已由快递小哥【%s】送到，如有缺漏、品质或其他问题请立即联系店长【%s(%s)】。春风十里，不如赐个好评就送个金菠萝给你 :)", shipWorkerName, "青青", "18910275329"))
-.setPositiveButton("发送", new DialogInterface.OnClickListener() {
-  @Override
-    public void onClick(DialogInterface dialog, int which) {
-      new OrderActionOp(orderId, OrderSingleActivity.this, listType).executeOnNormal(fromStatus);
-    }
-  });
-  adb.setNegativeButton(getString(R.string.cancel), null);
-  adb.show();
-} else {
-}
-*/
-
   _actionBtnVisible() {
     const order = this.props.order;
     const iStatus = parseInt(order.orderStatus);
@@ -277,7 +279,17 @@ class OrderBottom extends PureComponent {
     const {navigation, global} = this.props;
 
     if (iStatus === Cts.ORDER_STATUS_SHIPPING) {
-      return "提醒送达";
+      const title = '提醒用户已送达';
+      this.setState({
+        dlgShipTitle: title,
+        dlgShipButtons: [{
+          label: '发送提醒',
+          onPress: this._setOrderArrived
+        }],
+        left_buttons: [this._defCloseBtn()],
+        dlgShipContent: '请注意，此操作将会通知用户订单已经送达，如客户未收到，会招致投诉',
+        dlgShipVisible: true,
+      });
     } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
       navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
     } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
@@ -309,9 +321,23 @@ class OrderBottom extends PureComponent {
       <Dialog onRequestClose={() => {}}
               visible={this.state.dlgShipVisible}
               buttons={this.state.dlgShipButtons}
+              left_buttons={this.state.left_buttons}
               title={this.state.dlgShipTitle}
       ><Text>{this.state.dlgShipContent}</Text>
       </Dialog>
+      <Toast show={this.state.onSubmitting}>提交中</Toast>
+      <Toast icon="success" show={this.state.doneSubmitting}>保存成功</Toast>
+      <Dialog onRequestClose={() => {}}
+              visible={!!this.state.errorHints}
+              buttons={[{
+                type: 'default',
+                label: '知道了',
+                onPress: () => {
+                  this.setState({errorHints: ''});
+                }
+              }]}
+      ><Text>{this.state.errorHints}</Text></Dialog>
+
       { (this._actionBtnVisible() || this._visibleProviding() || this._visibleShipInfoBtn()) &&
       <View style={{
         flexDirection: 'row', justifyContent: 'space-around',
