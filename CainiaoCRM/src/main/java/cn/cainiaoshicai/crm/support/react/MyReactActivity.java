@@ -217,6 +217,12 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         return first;
     }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     public void requestPermissions(
             String[] permissions,
