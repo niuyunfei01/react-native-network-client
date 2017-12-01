@@ -57,7 +57,7 @@ class GoodsDetailScene extends PureComponent {
             if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'edit',
+                  type: 'add',
                   store_product,
                   product_detail,
                 });

@@ -244,7 +244,6 @@ export function intOf(val) {
   if (typeof val === 'string') {
     return parseInt(val);
   }
-
   return val;
 }
 
@@ -282,6 +281,27 @@ export function disWayStatic(index){
     map[Cts.SHIP_AUTO_SX] ='闪送';
     return map
   }
+  export function sellingStatus(sell_status) {
+    let map = {};
+    map[Cts.STORE_PROD_ON_SALE] ='上架';
+    map[Cts.STORE_PROD_OFF_SALE] ='下架';
+    map[Cts.STORE_PROD_SOLD_OUT] ='缺货';
+    if (map[sell_status]){
+      return map[sell_status]
+    }else {
+      return '选择门店状态'
+    }
+  }
+export function headerSupply(mode) {
+  let map = {};
+  map[Cts.STORE_SELF_PROVIDED] ='门店自采';
+  map[Cts.STORE_COMMON_PROVIDED] ='总部供货';
+  if (map[mode]){
+    return map[mode]
+  }else {
+    return '选择供货方式'
+  }
+}
   
 
 
@@ -305,4 +325,6 @@ export default {
   vendor,
   vendorOfStoreId,
   length,
+  sellingStatus,
+  headerSupply
 }

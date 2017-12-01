@@ -51,7 +51,6 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import { Array } from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-ToastAndroid.show('A pikachu appeared nearby !', ToastAndroid.SHORT);
 const numeral = require('numeral');
 
 function mapStateToProps(state) {
