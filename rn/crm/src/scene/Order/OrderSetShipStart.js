@@ -91,7 +91,7 @@ class OrderSetShipStart extends Component {
     const {dispatch, global, navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
 
-    const workers = store.shipWorkers[order.store_id];
+    const workers = (store && store.shipWorkers && store.shipWorkers[order.store_id] || []);
 
     const shipperOpts = workers ? workers.map((worker, idx) => {
       const mobile = worker.id === '' + Cts.ID_DADA_SHIP_WORKER ? order.ship_worker_mobile : worker.mobilephone;
