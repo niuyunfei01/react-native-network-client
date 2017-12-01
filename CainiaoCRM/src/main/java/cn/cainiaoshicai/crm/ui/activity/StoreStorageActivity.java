@@ -169,7 +169,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         Toolbar parent = (Toolbar) titleBar.getParent();
         parent.setContentInsetsAbsolute(0, 0);
 
-        Spinner currStoreSpinner = (Spinner) titleBar.findViewById(R.id.spinner_curr_store);
+        Spinner currStoreSpinner = titleBar.findViewById(R.id.spinner_curr_store);
         StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
             @Override
             public void changed(Store newStore) {
@@ -183,7 +183,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         }, false, currStoreSpinner);
 
-        lv = (ListView) findViewById(R.id.list_storage_status);
+        lv = findViewById(R.id.list_storage_status);
         registerForContextMenu(lv);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -193,7 +193,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        this.btnReqList = (Button) titleBar.findViewById(R.id.btn_req_list);
+        this.btnReqList = titleBar.findViewById(R.id.btn_req_list);
+        this.btnReqList.setVisibility(!app.fnEnabledReqProvide() ? View.GONE : View.VISIBLE);
         this.btnReqList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,7 +209,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        this.btnEmptyList = (Button) titleBar.findViewById(R.id.btn_empty_list);
+        this.btnEmptyList = titleBar.findViewById(R.id.btn_empty_list);
         this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -223,7 +224,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
+        ctv = findViewById(R.id.title_product_name);
         ctv.setThreshold(1);
 //            ctv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 //                @Override
@@ -242,7 +243,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 StoreStorageActivity.this.searchTerm = term != null ? term : "";
                 listAdapter.filter(term);
                 InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                if (in != null) {
+                    in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
                 return true;
             }
         });
@@ -254,7 +257,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (selected instanceof StorageItem) {
                     listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    if (in != null) {
+                        in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
                 } else {
                     Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
                 }
@@ -264,7 +269,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         //init first before loading done
         resetListAdapter(null, lv, ctv);
 
-        currStatusSpinner = (Spinner) titleBar.findViewById(R.id.spinner_curr_status);
+        currStatusSpinner = titleBar.findViewById(R.id.spinner_curr_status);
         final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
         statusAdapter.addAll(StatusItem.STATUS);
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
@@ -287,7 +292,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         });
         currStatusSpinner.setSelection(StatusItem.findIdx(filter));
 
-        final ListView categoryLv = (ListView) findViewById(R.id.list_category);
+        findViewById(R.id.add_new_prod).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                app.toGoodsNew(StoreStorageActivity.this);
+            }
+        });
+
+        final ListView categoryLv = findViewById(R.id.list_category);
         final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
         ArrayList<Tag> allTags = GlobalCtx.app().listTags(this.currStore != null ? this.currStore.getId() : 0);
         tagAdapter.addAll(allTags);
@@ -538,9 +550,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item.getStatus() != STORE_PROD_OFF_SALE) {
                     menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
                 }
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
             }
 
-            menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
         }
     }
