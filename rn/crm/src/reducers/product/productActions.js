@@ -1,5 +1,5 @@
 'use strict';
-import {jsonWithTpl} from "../../util/common";
+import {jsonWithTpl,jsonWithTpl2} from "../../util/common";
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../util/ToastUtils';
@@ -102,6 +102,29 @@ export function fetchVendorTags(_v_id, token, callback) {
     );
   }
 }
+
+export function productSave(data,token,callback) {
+    let url = `api/product_save.json?access_token=${token}`;
+    return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+    )
+
+ // return dispatch => {
+ //   FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+ //   .then(res => res.json())
+ //   .then(json => {
+ //     callback(json)
+ //   }).catch((error) => {
+ //     callback(error)
+ //   });
+ // }
+
+}
+
 
 
 function receiveVendorTags(_v_id, vendor_tags = {}) {
