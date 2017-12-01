@@ -1,8 +1,6 @@
-
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native'
-import * as tool from '../../common/tool'
-import screen from '../../common/screen'
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import {tool, native, screen} from '../../common'
 import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
 import CallBtn from './CallBtn'
@@ -17,11 +15,19 @@ class OrderStatusCell extends PureComponent {
 
   constructor(props) {
     super(props)
+    this._callShip = this._callShip.bind(this);
   }
 
   _validStepColor(datetimeStr) {
     return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
   }
+
+  _callShip = () => {
+    const {order} = this.props;
+    if (order.ship_worker_mobile) {
+      native.dialNumber(order.ship_worker_mobile)
+    }
+  };
 
   render() {
 
@@ -31,7 +37,7 @@ class OrderStatusCell extends PureComponent {
     const packWorkers = packWorkersStr.split(',').map(function(uid){return (order.workers[uid] || {}).nickname})
     const packLoggerName = Object.assign({}, order.workers[order.pack_done_logger]).nickname;
 
-    const invalidStyle = order.orderStatus == Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
+    const invalidStyle = parseInt(order.orderStatus) === Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
 
     return <View style={[Styles.topBottomLine, {marginTop: pxToDp(10), backgroundColor:'#f0f9ef'}]}>
       <View style={styles.row}>
@@ -56,9 +62,11 @@ class OrderStatusCell extends PureComponent {
         justifyContent:'space-around'}}>
         <OrderStep statusTxt="已收单" bgColor={this._validStepColor(order.orderTime)} timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
         <OrderStep statusTxt="已分拣" bgColor={this._validStepColor(order.time_ready)} workerNames={packWorkers} loggerName={packLoggerName}
-                   timeAtStr={tool.shortTimeDesc(order.time_ready)}/>
-        <OrderStep statusTxt="已出发" bgColor={this._validStepColor(order.time_start_ship)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}/>
-        <OrderStep statusTxt="已送达" bgColor={this._validStepColor(order.time_arrived)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}/>
+                   timeAtStr={tool.shortTimeDesc(order.time_ready)} onPress={onPressCall}/>
+        <OrderStep statusTxt="已出发" bgColor={this._validStepColor(order.time_start_ship)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}
+          onPress={this._callShip}/>
+        <OrderStep statusTxt="已送达" bgColor={this._validStepColor(order.time_arrived)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}
+          onPress={this._callShip}/>
       </View>
       <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.orderTime), left: (screen.width/8-5)}]}/>
       <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_ready), left: (screen.width/8*3-5)}]}/>
@@ -77,9 +85,9 @@ class OrderStep extends PureComponent {
 
   render() {
 
-    const {statusTxt, workerNames, timeAtStr, loggerName, invalid, bgColor} = this.props;
+    const {statusTxt, workerNames, timeAtStr, loggerName, invalid, bgColor, onPress = function(){}} = this.props;
 
-    return <View style={{flexDirection: 'column', flex: 1, alignItems:'center'}}>
+    return <TouchableOpacity style={{flexDirection: 'column', flex: 1, alignItems:'center'}} onPress={onPress}>
       <View style={{backgroundColor: bgColor , height: pxToDp(4), width: '100%', marginBottom: pxToDp(18)}}/>
       <Text style={[styles.stepText, {color: bgColor, fontSize: pxToDp(26)}]}>{statusTxt}</Text>
       { !!workerNames &&
@@ -88,7 +96,7 @@ class OrderStep extends PureComponent {
       <Text style={styles.stepText}>{timeAtStr}</Text>}
       { !!loggerName &&
       <Text style={styles.stepText}>(by {loggerName})</Text>}
-    </View>;
+    </TouchableOpacity>;
   }
 }
 
@@ -98,7 +106,7 @@ OrderStep.PropTypes = {
   timeAtStr: PropTypes.string.isRequired,
   invalid: PropTypes.bool,
   workerNames: PropTypes.string,
-}
+};
 
 
 const styles = StyleSheet.create({

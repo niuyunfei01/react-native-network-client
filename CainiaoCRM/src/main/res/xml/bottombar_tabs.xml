@@ -30,9 +30,9 @@
         icon="@drawable/ic_settings_applications_black_24dp"
         />
 
-    <tab id="@+id/menu_search"
-        title="@string/action_search"
-        icon="@drawable/ic_search_black_24dp"
-         />
+    <!--<tab id="@+id/menu_search"-->
+        <!--title="@string/action_search"-->
+        <!--icon="@drawable/ic_search_black_24dp"-->
+         <!--/>-->
     
 </tabs>

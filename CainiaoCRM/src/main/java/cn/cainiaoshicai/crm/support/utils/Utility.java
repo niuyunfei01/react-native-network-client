@@ -1214,7 +1214,7 @@ public class Utility {
                     Bundle urlParams = Utility.parseUrl(url);
                     String old_store_id = urlParams.getString("old_store_id");
                     String store_id = urlParams.getString("store_id");
-                    if (old_store_id != null && old_store_id.equals(store_id)) {
+                    if (old_store_id != null && old_store_id.equals(store_id) && view != null) {
                         view.loadUrl(append_token(url, specialToken));
                     } else {
                         Intent ssa = new Intent(ctx, PrePackageCheckActivity.class);
@@ -1261,6 +1261,33 @@ public class Utility {
                 showStoreSelector(context, title, okLabel, cancelLabel, currStoreId, okCallback);
             }
         });
+    }
+
+    @NonNull
+    public static String getVersionCode(Activity act) {
+        String versionDesc = "unknown";
+        try {
+            PackageInfo pInfo;
+            pInfo = act.getPackageManager().getPackageInfo(act.getPackageName(), 0);
+            int verCode = pInfo.versionCode;
+            return String.valueOf(verCode);
+        } catch (PackageManager.NameNotFoundException e) {
+            AppLogger.e("error to read package info:" + e.getMessage(), e);
+        }
+        return versionDesc;
+    }
+
+    @NonNull
+    public static String getVersionName(Activity act) {
+        String versionDesc = "unknown";
+        try {
+            PackageInfo pInfo;
+            pInfo = act.getPackageManager().getPackageInfo(act.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            AppLogger.e("error to read package info:" + e.getMessage(), e);
+        }
+        return versionDesc;
     }
 
 }

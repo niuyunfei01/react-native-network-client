@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
+import pxToDp from "../../util/pxToDp";
 
 const styles = StyleSheet.create({
   dialogWrapper: {
@@ -28,29 +29,42 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   dialogHeader: {
-    paddingTop: 1.2 * $V.baseFontSize,
-    paddingBottom: 0.5 * $V.baseFontSize,
+    // paddingTop: 1.2 * $V.baseFontSize,
+    // paddingBottom: 0.5 * $V.baseFontSize,
+
+    paddingTop: pxToDp(40),
   },
   dialogTitle: {
-    fontWeight: '400',
-    fontSize: 17,
-    textAlign: 'center',
+    // fontWeight: '400',
+    // fontSize: 17,
+    // textAlign: 'center',
+    fontSize: pxToDp(32),
+    marginHorizontal: pxToDp(48),
+    color: '#3e3e3e',
   },
   dialogBody: {
-    paddingLeft: 20,
-    paddingRight: 20,
+    // paddingLeft: 20,
+    // paddingRight: 20,
+    marginTop: pxToDp(34),
+    marginHorizontal: pxToDp(48),
+
+    // borderColor: 'red',
+    // borderWidth: pxToDp(1),
   },
   dialogBodyText: {
-    fontSize: 15,
-    color: $V.globalTextColor,
-    textAlign: 'center',
+    // fontSize: 15,
+    // textAlign: 'center',
+    // color: $V.globalTextColor,
     lineHeight: 15 * $V.baseLineHeight,
     android: {
       lineHeight: Math.round(15 * $V.baseLineHeight),
     },
+
+    fontSize: pxToDp(30),
+    color: '#777',
   },
   dialogFooter: {
-    marginTop: 30,
+    // marginTop: 30,
     height: 42,
     flexDirection: 'row',
     alignItems: 'center',
@@ -58,12 +72,31 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderColor: $V.weuiDialogLineColor,
     borderStyle: 'solid',
+
+    marginTop: pxToDp(50),
+    marginBottom: pxToDp(21),
+    marginHorizontal: pxToDp(10),
+
+    // borderColor: 'red',
+    // borderWidth: pxToDp(1),
+  },
+  otherStyle: {
+    width: '50%',
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  mainStyle: {
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
   },
   dialogFooterOpr: {
     height: 42,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+
+    // borderColor: 'red',
+    // borderWidth: pxToDp(1),
   },
   dialogFooterOprWithBorder: {
     borderLeftWidth: StyleSheet.hairlineWidth,
@@ -71,7 +104,9 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
   },
   dialogFooterOprText: {
-    fontSize: 17,
+    // fontSize: 17,
+    fontSize: pxToDp(28),
+    color: '#59b26a',
   },
   defaultDialogFooterOprText: {
     color: '#353535',
@@ -126,21 +161,43 @@ class Dialog extends Component {
         type,
         label,
         ...others
-      } = button
-
-      return (
-        <TouchableHighlight
-          key={idx}
-          style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
-          underlayColor={underlayColor}
-          {...others}
-        >
-          <Text
-            style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
-          >{label}</Text>
-        </TouchableHighlight>
-      )
+      } = button;
+        return (
+          <TouchableHighlight
+            key={idx}
+            style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+            underlayColor={underlayColor}
+            {...others}
+          >
+            <Text
+              style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
+            >{label}</Text>
+          </TouchableHighlight>
+        );
     })
+  }
+
+  _renderOtherButtons() {
+    let len = (this.props.left_buttons || {}).length;
+    return this.props.left_buttons.map((button, idx) => {
+      const {
+        type,
+        label,
+        ...others
+      } = button;
+        return (
+          <TouchableHighlight
+            key={idx}
+            style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+            underlayColor={underlayColor}
+            {...others}
+          >
+            <Text
+              style={[styles.dialogFooterOprText]}
+            >{label}</Text>
+          </TouchableHighlight>
+        )
+    });
   }
 
   render() {
@@ -156,7 +213,7 @@ class Dialog extends Component {
       children,
       onShow,
       onRequestClose,
-    } = this.props
+    } = this.props;
 
     const childrenWithProps = React.Children.map(children, (child) => {
       if (child.type.displayName === 'Text') {
@@ -165,7 +222,9 @@ class Dialog extends Component {
         })
       }
       return child
-    })
+    });
+
+    let o_len = (this.props.left_buttons || {}).length;
 
     return (
       <Modal
@@ -180,14 +239,23 @@ class Dialog extends Component {
           >
             <Animated.View style={{opacity: this.state.fadeAnim}}>
               <View style={[styles.dialog, style]}>
+                {!!title &&
                 <View style={[styles.dialogHeader, headerStyle]}>
                   <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
                 </View>
+                }
                 <View style={[styles.dialogBody, bodyStyle]}>
                   {childrenWithProps}
                 </View>
                 <View style={[styles.dialogFooter, footerStyle]}>
-                  {this._renderButtons()}
+                  {o_len > 0 &&
+                  <View style={[styles.otherStyle]}>
+                    {this._renderOtherButtons('other')}
+                    {o_len === 1 && <View style={styles.dialogFooterOpr}/>}
+                  </View>}
+                  <View style={[styles.mainStyle, o_len > 0 && {width: '50%'}]}>
+                    {this._renderButtons()}
+                  </View>
                 </View>
               </View>
             </Animated.View>
@@ -201,6 +269,7 @@ class Dialog extends Component {
 Dialog.propTypes = {
   title: PropTypes.string,
   buttons: PropTypes.array,
+  left_buttons: PropTypes.array,
   visible: PropTypes.bool,
   onShow: PropTypes.func,
   duration: PropTypes.number,

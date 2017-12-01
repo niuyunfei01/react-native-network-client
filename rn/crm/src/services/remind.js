@@ -3,8 +3,8 @@
 import AppConfig from '../config.js';
 import FetchEx from '../util/fetchEx';
 
-export function FetchRemindList(token, type, status, page) {
-  let path = 'api/list_notice/' + type + '/' + status + '/' + page + '.json';
+export function FetchRemindList(token, vendor_id, store_id, type, status, page) {
+  let path = 'api/list_notice/' + vendor_id + '/' + store_id + '/' + type + '/' + status + '/' + page + '.json';
   let params = 'access_token=' + token;
   return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(path, params));
 }
@@ -15,8 +15,8 @@ export function SetRemindStatus(token, task_id, status) {
   return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(path, params));
 }
 
-export function FetchRemindCount(token) {
-  let path = 'api/list_notice_count.json';
+export function FetchRemindCount(vendor_id, store_id, token) {
+  let path = 'api/list_notice_count/' + vendor_id + '/' + store_id + '.json';
   let params = 'access_token=' + token;
   return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(path, params));
 }

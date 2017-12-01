@@ -37,20 +37,23 @@ export default StyleSheet.create({
     fontSize: pxToDp(32),
     fontWeight: 'bold',
     textAlignVertical: 'center',
+    marginRight: pxToDp(30),
   },
   o_store_name_text: {
-    height: pxToDp(50),
+    height: pxToDp(40),
     textAlignVertical: 'center',
     fontSize: pxToDp(28),
     color: '#999',
-    paddingLeft: pxToDp(30),
   },
   icon_dropDown: {
     width: pxToDp(88),
     height: pxToDp(55),
     position: 'absolute',
     right: 0,
-    // backgroundColor: 'green',
+  },
+  tag_right:{
+    position: 'absolute',
+    right: 0,
   },
   icon_img_dropDown: {
     width: pxToDp(88),

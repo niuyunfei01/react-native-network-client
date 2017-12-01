@@ -31,6 +31,23 @@ export default {
       body: formData
     });
   },
+  postForm(action, object) {
+    const url = AppConfig.ServiceUrl + action;
+
+    let parameters = Object.keys(object) // expand the elements from the .entries() iterator into an actual array
+      .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(object[key]))
+      .join('&');// transform the elements into encoded key-value-pairs
+
+    console.log('postForm to ' + url, parameters);
+    return fetch(url, {
+      credential: 'include',//带上cookie发送请求请求
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: parameters
+    });
+  },
   postJSON(action, data) {
     const url = AppConfig.ServiceUrl + action
     return fetch(url, {

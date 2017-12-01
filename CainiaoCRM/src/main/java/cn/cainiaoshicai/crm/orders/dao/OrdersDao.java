@@ -57,10 +57,10 @@ public class OrdersDao {
     }
 
     public OrderContainer get(int listType, long[] storeIds) throws ServiceException {
-        return this.get(listType, storeIds, true);
+        return this.get(listType, storeIds, true, 0, 0, 0);
     }
 
-    public OrderContainer get(int listType, long[] storeIds, boolean useCache) throws ServiceException {
+    public OrderContainer get(int listType, long[] storeIds, boolean useCache, int limit, int offset, int maxPastDays) throws ServiceException {
         this.listType = listType;
         this.storeIds = storeIds;
 
@@ -76,7 +76,10 @@ public class OrdersDao {
 
         HashMap<String, String> map = new HashMap<>();
         map.put("access_token", access_token);
+        map.put("limit", String.valueOf(limit));
+        map.put("offset", String.valueOf(offset));
         map.put("status", String.valueOf(this.listType));
+        map.put("max_past_day", String.valueOf(maxPastDays));
 
         if (hasStores) {
             map.put("search", "store:" + TextUtil.join(",", this.storeIds));
@@ -117,13 +120,22 @@ public class OrdersDao {
         this.access_token = access_token;
     }
 
-    public OrderContainer search(String searchTerm, int listType, long[] storeIds) throws ServiceException {
+    public OrderContainer search(String searchTerm, int listType, long[] storeIds, int limit, int offset)
+            throws ServiceException{
+        return this.search(searchTerm, listType, storeIds, limit, offset, 0);
+    }
+
+    public OrderContainer search(String searchTerm, int listType, long[] storeIds, int limit, int offset, int maxPastDays)
+            throws ServiceException {
         this.listType = listType;
         this.storeIds = storeIds;
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("access_token", access_token);
         map.put("status", String.valueOf(this.listType));
+        map.put("limit", String.valueOf(limit));
+        map.put("offset", String.valueOf(offset));
+        map.put("max_past_day", String.valueOf(maxPastDays));
 
         if (storeIds != null && storeIds.length > 0 ) {
             if (!TextUtils.isEmpty(searchTerm)) {

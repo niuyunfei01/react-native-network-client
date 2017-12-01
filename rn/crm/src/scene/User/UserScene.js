@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from 'react'
 import {
   View,
@@ -27,10 +26,10 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {fetchUserCount, fetchWorkers, editWorkerStatus} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
-import {tool} from "../../common";
+import {tool, native} from "../../common";
 import {NavigationActions} from 'react-navigation';
 import {logout} from "../../reducers/global/globalActions";
 
@@ -56,12 +55,7 @@ class UserScene extends PureComponent {
     const {params = {}, key} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>个人详情</Text>
-        </View>
-      ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
+      headerTitle: '个人详情',
       headerRight: (params.type === 'mine' ? null : (
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
@@ -81,7 +75,7 @@ class UserScene extends PureComponent {
               });
             }}
           >
-            <Icon name='pencil-square-o' style={styles.btn_edit}/>
+            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
           </TouchableOpacity>
         </View>
       )),
@@ -99,10 +93,11 @@ class UserScene extends PureComponent {
     } = this.props.navigation.state.params || {};
 
     const {mine} = this.props;
+
     let {
       id, nickname, nameRemark, mobilephone, image, //user 表数据
       worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
-    } = ((mine.user_list || {})[currVendorId] || {})[currentUser];
+    } = tool.user_info(mine, currVendorId, currentUser);
     this.state = {
       isRefreshing: false,
       onSubmitting: false,
@@ -111,7 +106,7 @@ class UserScene extends PureComponent {
       bad_cases_of: mine.bad_cases_of[currentUser] === undefined ? 0 : mine.bad_cases_of[currentUser],
       mobile: mobilephone,
       cover_image: image,
-      screen_name: nickname,
+      screen_name: name,
       currentUser: user_id,
       currVendorId: currVendorId,
       user_status: parseInt(status),
@@ -127,13 +122,10 @@ class UserScene extends PureComponent {
     this._onLogout = this._onLogout.bind(this)
   }
 
-  componentWillMount() {
-  }
-
   _onLogout() {
-    logout();
-    this.props.navigation.navigate(Config.ROUTE_LOGIN);
-    tool.resetNavStack(this.props.navigation, Config.ROUTE_LOGIN)
+    const {dispatch} = this.props;
+    dispatch(logout());
+    native.gotoLoginWithNoHistory();
   }
 
   onGetUserCount() {
@@ -262,16 +254,14 @@ class UserScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       dispatch(editWorkerStatus(data, accessToken, (resp) => {
         console.log('save_status_resp -> ', resp);
-        _this.setState({
-          onSubmitting: false,
-        });
-
         if (resp.ok) {
           let msg = '操作成功';
           ToastShort(msg);
           _this.setState({
             user_status: user_status,
+            onSubmitting: false,
           });
+
           const setParamsAction = NavigationActions.setParams({
             params: {shouldRefresh: true},
             key: last_nav_key,
@@ -282,9 +272,11 @@ class UserScene extends PureComponent {
             key: this.props.navigation.state.key,
           });
           this.props.navigation.dispatch(setSelfParamsAction);
-
         } else {
           ToastShort(resp.desc);
+          _this.setState({
+            onSubmitting: false,
+          });
         }
       }));
     });

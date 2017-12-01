@@ -4,83 +4,216 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Platform,
 } from 'react-native';
+import InputNumber from 'rc-input-number';
+import inputNumberStyles from './inputNumberStyles';
+import pxToDp from "../../util/pxToDp";
+import {getProdPricesList, keyOfProdInfos} from '../../reducers/product/productActions';
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import colors from "../../styles/colors";
+import NavigationItem from "../../widget/NavigationItem";
 
-const API = 'https://swapi.co/api';
-const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+const numeral = require('numeral');
+
+function mapStateToProps(state) {
+  return {
+    global: state.global,
+    product: state.product,
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      getProdPricesList,
+    }, dispatch)
+  }
+}
 
 class ProductAutocomplete extends Component {
-  static renderFilm(film) {
-    const { title, director, opening_crawl, episode_id } = film;
-    const roman = episode_id < ROMAN.length ? ROMAN[episode_id] : episode_id;
 
-    return (
-      <View>
-        <Text style={styles.titleText}>{roman}. {title}</Text>
-        <Text style={styles.directorText}>({director})</Text>
-        <Text style={styles.openingText}>{opening_crawl}</Text>
-      </View>
-    );
-  }
-
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    return {
+      headerTitle: '选择商品',
+      headerRight: <NavigationItem
+          title="保存"
+          onPress={() => {
+            params.saving()
+          }}
+          disabled={params.savingDisabled}
+        />,
+    }
+  };
+  
   constructor(props) {
     super(props);
     this.state = {
-      films: [],
-      query: ''
+      query: '',
+      pid: 0,
+      itemNumber: 0,
+      numOfPid: {},
+      prodInfos: {},
+      loadingInfoError: '',
+      loadingProds: false,
     };
+    this._onInputNumberChange = this._onInputNumberChange.bind(this);
+    this._onProdSelected = this._onProdSelected.bind(this);
+    this._hasPid = this._hasPid.bind(this);
+    this._onSaveAndClose = this._onSaveAndClose.bind(this);
   }
 
   componentDidMount() {
-    fetch(`${API}/films/`).then(res => res.json()).then((json) => {
-      const { results: films } = json;
-      this.setState({ films });
-    });
+
+    const {dispatch, navigation} = this.props;
+
+    const {esId, platform, storeId} = (this.props.navigation.state.params || {});
+    const key = keyOfProdInfos(esId, platform, storeId);
+    const prodInfos = (this.props.product.prodInfos || {})[key];
+    if (!prodInfos) {
+      this.setState({loadingProds: true});
+      const token = this.props.global.accessToken;
+      dispatch(getProdPricesList(token, esId, platform, storeId, (ok, msg, data) => {
+        if (ok && data) {
+          this.setState({loadingProds: false, prodInfos: data})
+        } else {
+          if (!data && ok) {
+            msg = '本店下暂无产品';
+          }
+          this.setState({loadingInfoError: msg, loadingProds: false});
+        }
+      }));
+    } else {
+      this.setState({prodInfos});
+    }
+
+    navigation.setParams({saving: this._onSaveAndClose, savingDisabled: true});
   }
 
   findFilm(query) {
-    if (query === '') {
+    if (query === '' || query === '[上架]' || query === '[下架]' || query === '[' || query === ']') {
       return [];
     }
+    const { prodInfos }  = this.state;
+    try {
+      query = query.replace(/\[上架\]|\[下架\]|\[上架|\[下架|\[上|\[下/, '');
+      const regex = new RegExp(`${query.trim()}`, 'i');
+      return Object.keys(prodInfos).map((k) => prodInfos[k]).filter(prod => prod.name.search(regex) >= 0);
+    }catch (ex) {
+      console.log('ex:', ex);
+      return [];
+    }
+  }
 
-    const { films } = this.state;
-    const regex = new RegExp(`${query.trim()}`, 'i');
-    return films.filter(film => film.title.search(regex) >= 0);
+  _hasPid() {
+    const has = this.state.pid !== '' && this.state.pid !== 0 && this.state.pid !== '0';
+    console.log('has', has);
+    return has;
+  }
+
+  _onProdSelected(name, pid, price) {
+    const num = this.state.numOfPid[pid] || 1;
+    this.setState({query: name, itemNumber: num, pid, numOfPid: {...this.state.numOfPid, [pid]: num}});
+
+    const {dispatch, navigation} = this.props;
+    navigation.setParams({savingDisabled: false});
+  }
+
+  _onInputNumberChange(v) {
+    this.setState({itemNumber: v, numOfPid: {...this.state.numOfPid, [this.state.pid]: v}});
+
+    const {dispatch, navigation} = this.props;
+    navigation.setParams({savingDisabled: !v});
+  }
+
+  _onSaveAndClose() {
+    const {dispatch, navigation} = this.props;
+    const {goBack, state} = this.props.navigation;
+    const params = state.params;
+    if (params.actionBeforeBack && this.state.pid) {
+      const prod = this.state.prodInfos[this.state.pid];
+      const num = this.state.numOfPid[this.state.pid];
+      params.actionBeforeBack(prod, num);
+    }
+    goBack()
   }
 
   render() {
-    const { query } = this.state;
-    const films = this.findFilm(query);
-    const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
 
+    const { query } = this.state;
+    const filteredProds = this.findFilm(query);
+    const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
+    console.log(this.state);
+    
     return (
       <View style={styles.container}>
         <Autocomplete
           autoCapitalize="none"
           autoCorrect={false}
-          containerStyle={styles.autocompleteContainer}
-          data={films.length === 1 && comp(query, films[0].title) ? [] : films}
+          containerStyle={[styles.autocompleteContainer]}
+          data={filteredProds.length === 1 && comp(query, filteredProds[0].name) ? [] : filteredProds}
           defaultValue={query}
-          onChangeText={text => this.setState({ query: text })}
-          placeholder="Enter Star Wars film title"
-          renderItem={({ title, release_date }) => (
-            <TouchableOpacity onPress={() => this.setState({ query: title })}>
+          onChangeText={text => this.setState({query: text})}
+          placeholder="输入商品名模糊查找"
+          renderItem={({name, price, pid}) => (
+            <TouchableOpacity onPress={() => this._onProdSelected(name, pid, price)}>
               <Text style={styles.itemText}>
-                {title} ({release_date.split('-')[0]})
+                {name} ({price})
               </Text>
             </TouchableOpacity>
           )}
+          underlineColorAndroid={'transparent'}
         />
-        <View style={styles.descriptionContainer}>
-          {films.length > 0 ? (
-            ProductAutocomplete.renderFilm(films[0])
-          ) : (
-            <Text style={styles.infoText}>
-              Enter Title of a Star Wars movie
-            </Text>
-          )}
+        
+        {this._hasPid() && <View>
+        <View style={{marginTop: pxToDp(120), height: 44,
+          paddingHorizontal: 10,}}>
+          <InputNumber
+            styles={inputNumberStyles}
+            min={0}
+            value={this.state.itemNumber}
+            inputStyle={{width: 50, flex: 0, height: pxToDp(100)}}
+            onChange={(v) => {
+              this._onInputNumberChange(v)
+            }}
+            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+          />
         </View>
+        <View style={{flexDirection: 'row', marginTop: pxToDp(80)}}>
+          <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+          <Text style={styles.moneyLabel}>单价</Text>
+          <Text style={styles.moneyText}>{(this.state.prodInfos[this.state.pid]||{}).price}/件</Text>
+          </View>
+
+          <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+            <Text style={[styles.moneyLabel]}>总额</Text>
+            <Text style={[styles.moneyText]}>{numeral((this.state.prodInfos[this.state.pid]||{}).price * (this.state.numOfPid[this.state.pid] || 1)).format('0.00')}元</Text>
+          </View>
+
+        </View>
+        </View>}
+
+        <Dialog onRequestClose={() => {}}
+                visible={!!this.state.loadingInfoError}
+                buttons={[{
+                  type: 'default',
+                  label: '知道了',
+                  onPress: () => {
+                    this.setState({loadingInfoError: ''})
+                  }
+                }]}
+        ><Text>{this.state.loadingInfoError}</Text></Dialog>
+
+        <Toast
+          icon="loading"
+          show={this.state.loadingProds}
+          onRequestClose={() => {
+          }}
+        >加载中</Toast>
       </View>
     );
   }
@@ -96,19 +229,17 @@ const styles = StyleSheet.create({
     flex: 1,
     left: 0,
     position: 'absolute',
-    right: 0,
+    right: pxToDp(30),
     top: 0,
+    paddingLeft: pxToDp(30),
+    paddingTop: pxToDp(20),
     zIndex: 1
   },
+  moneyLabel: {fontSize: pxToDp(30), fontWeight:'bold'},
+  moneyText: {fontSize: pxToDp(40), color: colors.color999},
   itemText: {
     fontSize: 15,
     margin: 2
-  },
-  descriptionContainer: {
-    // `backgroundColor` needs to be set otherwise the
-    // autocomplete input will disappear on text input.
-    backgroundColor: '#F5FCFF',
-    marginTop: 25
   },
   infoText: {
     textAlign: 'center'
@@ -131,4 +262,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ProductAutocomplete;
+export default connect(mapStateToProps, mapDispatchToProps)(ProductAutocomplete)

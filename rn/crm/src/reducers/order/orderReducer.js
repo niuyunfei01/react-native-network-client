@@ -20,6 +20,8 @@ const {
   ORDER_UPDATE_FAILURE,
 
   ORDER_EDIT_ITEM,
+  ORDER_INVALIDATED,
+  ORDER_WAY_ROCED,
 
   LOGOUT_SUCCESS,
 
@@ -61,6 +63,15 @@ export default function orderReducer(state = initialState, action) {
         return state;
       }
 
+    case ORDER_INVALIDATED:
+      if (state.order && action.id === state.order.id) {
+        return {
+          ...state, order: {}
+        }
+      } else {
+        return state;
+      }
+
     case ORDER_EDIT_ITEM:
       const {order} = state;
       if (!order.edits) {
@@ -77,6 +88,13 @@ export default function orderReducer(state = initialState, action) {
         order.edits.add[item.product_id] = item;
       }
 
+      return {...state, order};
+
+      /**
+      运单记录
+      **/
+
+      case ORDER_WAY_ROCED:
       return {...state, order};
 
     /**

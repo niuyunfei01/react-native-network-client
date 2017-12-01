@@ -34,6 +34,7 @@ import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Cts from "../../Cts";
 import {NavigationActions} from 'react-navigation';
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -56,12 +57,7 @@ class UserAddScene extends PureComponent {
     let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{pageTitle}</Text>
-        </View>
-      ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
+      headerTitle: pageTitle,
       headerRight: '',
     }
   };
@@ -69,13 +65,7 @@ class UserAddScene extends PureComponent {
   constructor(props: Object) {
     super(props);
 
-    const {
-      canReadStores,
-      currStoreId,
-    } = this.props.global;
-
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
-    let currVendorName = canReadStores[currStoreId]['vendor'];
+    let {currVendorId, currVendorName} = tool.vendor(this.props.global);
 
     const {mine} = this.props;
     let vendor_stores = (mine === undefined || mine.vendor_stores[currVendorId] === undefined) ? [] : Object.values(mine.vendor_stores[currVendorId]);
@@ -130,9 +120,6 @@ class UserAddScene extends PureComponent {
           _this.setState({
             stores: stores.concat(v_store),
           });
-          if (_this.state.isRefreshing) {
-            ToastShort('刷新门店列表完成');
-          }
         }
         _this.setState({isRefreshing: false});
       }));
@@ -209,8 +196,10 @@ class UserAddScene extends PureComponent {
             </Cell>
           )}
         </Cells>
-        <Button onPress={() => this.onUserAdd()} type='primary'
-                style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}</Button>
+        <Button
+          onPress={() => this.onUserAdd()} type='primary'
+          style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
+        </Button>
         <Toast
           icon="loading"
           show={this.state.onSubmitting}
@@ -264,17 +253,8 @@ class UserAddScene extends PureComponent {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';
           ToastShort(msg);
 
-          // const backAction = NavigationActions.back();
-          // const backAction = NavigationActions.reset({
-          //   index: 1,
-          //   actions: [
-          //     NavigationActions.navigate({routeName: Config.ROUTE_Mine}),
-          //     NavigationActions.navigate({routeName: Config.ROUTE_WORKER})
-          //   ]
-          // });
-          // _this.props.navigation.dispatch(backAction);
           const setWorkerAction = NavigationActions.setParams({
-            params: { shouldRefresh: true},
+            params: {shouldRefresh: true},
             key: worker_nav_key,
           });
           this.props.navigation.dispatch(setWorkerAction);

@@ -334,7 +334,7 @@ public class MineActivity extends AbstractActionBarActivity {
 //			String version = pInfo.versionName;
 //			versionDesc = version + "-" + verCode;
 		} catch (PackageManager.NameNotFoundException e) {
-			AppLogger.e("error to userTalkStatus package info:" + e.getMessage(), e);
+			AppLogger.e("error to read package info:" + e.getMessage(), e);
 		}
 		return versionDesc;
 	}
