@@ -78,6 +78,25 @@
             android:layout_width="wrap_content"
             android:layout_marginEnd="10dp"
             android:layout_height="30dp" />
+
+        <TextView android:text="打印机状态"
+            android:id="@+id/label_printer_status"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/label_auto_print"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"/>
+
+        <TextView
+            android:id="@+id/printer_status"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/toggleAutoPrint"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/label_printer_status"
+            android:text="--"
+            android:textAlignment="textEnd" />
+
     </RelativeLayout>
 
     <ListView

@@ -221,7 +221,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
+        mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
