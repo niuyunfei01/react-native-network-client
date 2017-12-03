@@ -21,6 +21,7 @@ import {native} from '../../common';
 import NavigationItem from "../../widget/NavigationItem";
 import Config from "../../config";
 import ModalSelector from "../../widget/ModalSelector/index";
+import * as tool from "../../common/tool";
 
 
 function mapStateToProps(state) {
@@ -44,19 +45,7 @@ class SelectStoreScene extends PureComponent {
 
     const {canReadStores} = this.props.global;
 
-    let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
-    let sortStores = Object.values(canReadStores).sort(function (a, b) {
-      return (parseInt(a.vendor_id) - parseInt(b.vendor_id) )
-    });
-    for (let store of sortStores) {
-      if (store.id > 0) {
-        let item = {
-          key: store.id,
-          label: store.vendor === null ? store.name : (store.vendor + ':' + store.name),
-        };
-        storeActionSheet.push(item);
-      }
-    }
+    let storeActionSheet = tool.storeActionSheet(canReadStores);
 
     this.state = {
       isRefreshing: false,

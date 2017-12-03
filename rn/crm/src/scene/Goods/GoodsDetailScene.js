@@ -43,6 +43,7 @@ class GoodsDetailScene extends PureComponent {
         <NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+
           onPress={() => {
             if(!!backPage){
               // console.log('backPage ----------------------> ', backPage);
@@ -223,12 +224,15 @@ class GoodsDetailScene extends PureComponent {
             <Text style={styles.goods_name}>
               {product_detail.name}
             </Text>
-            <Text style={styles.goods_cats}>
-              {product_detail.tag_list}
-            </Text>
+            {product_detail.tag_list.split(',').map(function(cat_name, idx) {
+              return (
+                <Text key={idx} style={styles.goods_cats}>
+                  {cat_name}
+                </Text>
+              );
+            })}
           </View>
-          {!!product_detail.promote_name ?
-            <Text style={styles.promote_name}>{product_detail.promote_name}</Text> : null}
+          {!!product_detail.promote_name && <Text style={styles.promote_name}>{product_detail.promote_name}</Text>}
         </View>
 
         <View style={[styles.box_title, styles.top_line]}>
@@ -442,8 +446,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
   goods_name: {
+    lineHeight: pxToDp(42),
     fontSize: pxToDp(32),
     color: '#3e3e3e',
   },
@@ -463,7 +469,7 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(24),
     color: '#bfbfbf',
     paddingHorizontal: pxToDp(30),
-    marginTop: pxToDp(28),
+    marginTop: pxToDp(26),
   },
   sale_money: {
     fontSize: pxToDp(28),

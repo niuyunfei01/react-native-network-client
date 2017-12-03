@@ -13,6 +13,8 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -43,6 +45,9 @@ import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Expose Java to JavaScript.
@@ -261,6 +266,24 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             promise.resolve(activity.getClass().getSimpleName());
+        }
+    }
+
+    @ReactMethod
+    void gotoLoginWithNoHistory() {
+        Activity act = this.getCurrentActivity();
+        if (act != null) {
+            Intent intent = new Intent(act, LoginActivity.class);
+            intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+            act.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void gotoActByUrl(@Nonnull String url) {
+        Activity act = this.getCurrentActivity();
+        if (act != null) {
+            Utility.handleUrlJump(act, null, url);
         }
     }
 

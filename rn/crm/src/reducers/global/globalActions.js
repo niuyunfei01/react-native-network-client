@@ -13,6 +13,7 @@ import {native} from "../../common";
 import {getWithTpl, postWithTpl} from '../../util/common'
 
 import DeviceInfo from 'react-native-device-info';
+import tool from "../../common/tool";
 
 /**
  * ## Imports
@@ -69,7 +70,7 @@ export function updateCfg(cfg) {
 export function logout() {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
-    native.logout()
+    native.logout();
   }
 }
 
@@ -94,17 +95,41 @@ export function getCommonConfig(token, storeId, callback) {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
       if (json.ok) {
-        dispatch({type: UPDATE_CFG, payload: {config: json.obj}});
-        callback(true)
+        let resp_data = trans_data_to_java(json.obj);
+        let {can_read_vendors, can_read_stores} = resp_data;
+        let cfg = {
+          canReadStores: can_read_stores,
+          canReadVendors: can_read_vendors,
+          config: json.obj,
+        };
+        dispatch(updateCfg(cfg));
+        callback(true, '获取配置成功', cfg)
       } else {
-        console.log('获取服务器端参数失败：', json);
-        callback(false)
+        let msg = '获取服务器端参数失败, 请联系服务经理';
+        console.log("msg：", json);
+        callback(false, msg)
       }
     }, (error) => {
-      console.log('获取服务器端配置错误：', error);
-      callback(false)
+      let msg = "获取服务器端配置错误: " + error;
+      console.log(msg);
+      callback(false, msg)
     })
   }
+}
+
+export function trans_data_to_java(obj) {
+  let {can_read_vendors} = obj;
+  tool.objectMap(obj.can_read_stores, function (stores) {
+    let vendor_id = stores['type'];
+    stores['vendor_id'] = vendor_id;
+    let vendor_info = can_read_vendors[vendor_id];
+    if(vendor_info !== undefined){
+      stores['vendor'] = vendor_info['brand_name'];
+    }
+    return stores;
+  });
+
+  return obj;
 }
 
 /**

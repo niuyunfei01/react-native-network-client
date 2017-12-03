@@ -1,13 +1,6 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
 import React, {PureComponent} from 'react'
 import {View, Text, StyleSheet, WebView, InteractionManager, Platform, BackHandler} from 'react-native'
+import {native, tool} from '../common'
 import Config from "../config";
 import LoadingView from "./LoadingView";
 import {Toast} from "./../weui/index";
@@ -91,6 +84,47 @@ class WebScene extends PureComponent {
       const {navigation} = this.props;
       navigation.goBack();
     }
+
+    return this._jumpIfShould(navState.url);
+  };
+
+  _jumpIfShould = (url) => {
+    let stop = false;
+    if (url.indexOf("/stores/provide_list.html") >= 0
+      || url.indexOf("/stores/view_order") >= 0
+      || url.indexOf("/market_tools/user_talk") > 0
+      || url.indexOf("/stores/search_wm_orders") > 0
+      || url.indexOf("/stores/storage_common/") >= 0
+      || url.indexOf("/stores/provide_prepare") >= 0
+      || url.indexOf("/users/login/crm/") >= 0
+      || url.indexOf("/users/login?") >= 0
+      || url.indexOf("/users/login/") >= 0) {
+      native.gotoActByUrl(url);
+      stop = true;
+    } else if (url.indexOf("/stores/crm_add_token") > 0) {
+      let path = tool.parameterByName("path", url);
+      let vmPath = tool.parameterByName("vmPath", url);
+      // view.loadUrl(String.format("%s%s&access_token=%s%s", URLHelper.WEB_URL_ROOT, path, specialToken, vmPath));
+
+      const {global, dispatch} = this.props;
+
+      //TODO: to load a new url
+      Config.serverUrl(Config.host(global, dispatch, native), `${path}&access_token=${global.accessToken}&${vmPath}`);
+
+      return true;
+    }
+
+    if (stop) {
+      this.webview.stopLoading();
+      return false;
+    }
+
+    return true;
+  };
+
+  _onShouldStartLoadWithRequest = (e) => {
+    console.log(e);
+    return this._jumpIfShould(e.url);
   };
 
   componentDidMount() {
@@ -135,8 +169,8 @@ class WebScene extends PureComponent {
             this.webview = webview;
           }}
           onMessage={this.onMessage}
-          onNavigationStateChange=
-            {this._onNavigationStateChange.bind(this)}
+          onNavigationStateChange= {this._onNavigationStateChange.bind(this)}
+          onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
           automaticallyAdjustContentInsets={true}
           style={styles.webView}
           source={this.state.source}

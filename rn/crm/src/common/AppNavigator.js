@@ -47,6 +47,8 @@ import GoodsClassifyScene from '../scene/Goods/GoodsClassifyScene';
 
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
+import OrderShipDetail from "../scene/Order/OrderShipDetail";
+import OrderCancelShip from "../scene/Order/OrderCancelShip";
 
 const tabDef = {
   Remind: {
@@ -215,6 +217,8 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_TO_INVALID]: {screen: OrderToInvalidScene},
         [Config.ROUTE_ORDER_TODO]: {screen: OrderTodoScene},
         [Config.ROUTE_ORDER_STORE]: {screen: OrderEditStoreScene},
+        [Config.ROUTE_ORDER_SHIP_DETAIL]: {screen: OrderShipDetail},
+        [Config.ROUTE_ORDER_CANCEL_SHIP]: {screen: OrderCancelShip},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
