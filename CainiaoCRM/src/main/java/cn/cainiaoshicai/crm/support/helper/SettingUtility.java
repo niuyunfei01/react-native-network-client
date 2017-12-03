@@ -498,10 +498,10 @@ public class SettingUtility {
         boolean updated = false;
         if (selectedStoreId > 0 && SettingUtility.getListenerStore() != selectedStoreId) {
             currSelectedStores.add(selectedStoreId);
+            currSelectedStores.add((long) Cts.STORE_UNKNOWN);
+            SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
             updated = true;
         }
-        currSelectedStores.add((long) Cts.STORE_UNKNOWN);
-        SettingHelper.setEditor(getContext(), "listener_stores", TextUtils.join(",", currSelectedStores));
 
         if (updated) {
             GlobalCtx.app().updateCfgInterval();
