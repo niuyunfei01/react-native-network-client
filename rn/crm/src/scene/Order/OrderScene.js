@@ -42,7 +42,7 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import {StatusBar} from "react-native";
+import {StatusBar ,} from "react-native";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -51,7 +51,6 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import { Array } from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-
 const numeral = require('numeral');
 
 function mapStateToProps(state) {
@@ -171,6 +170,7 @@ class OrderScene extends Component {
       orderQuery:false,
       orderChangeLogs: [],
       orderWayLogs: {},
+      loadingShow:false,
       //remind
       onProcessed: false,
       reminds: {},
@@ -236,7 +236,6 @@ class OrderScene extends Component {
 
   _navSetParams = () => {
     let {backPage} = (this.props.navigation.state.params || {});
-
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
@@ -250,7 +249,6 @@ class OrderScene extends Component {
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
@@ -259,13 +257,11 @@ class OrderScene extends Component {
     };
     this.props.navigation.setParams(params);
   };
-
   _setAfterOrderGot = (order) => {
     this.setState({
       itemsEdited: OrderScene._extract_edited_items(order.items),
       itemsHided: !shouldShowItems(order.orderStatus)
     });
-
     this._navSetParams();
   };
 
@@ -675,9 +671,8 @@ class OrderScene extends Component {
     this.setState({ shipHided: !this.state.shipHided })
     let orderWayLogs = this.state.orderWayLogs
 
-    if (this.state.shipHided && tool.length(tool.length(orderWayLogs) == 0)) {
+    if (this.state.shipHided) {
       this.wayRecordQuery()
-      console.log(orderWayLogs)
 
     }
 
@@ -685,6 +680,7 @@ class OrderScene extends Component {
 
   wayRecordQuery() {
     const { dispatch, order, global } = this.props;
+    this.setState({loadingShow:true})
     dispatch(orderWayRecord(order.order_id, global.accessToken, (ok, msg, contacts) => {
       let mg = 0
       if (ok) {
@@ -694,7 +690,7 @@ class OrderScene extends Component {
       } else {
         Alert.alert(msg)
       }
-      this.setState({ orderWayLogs: mg })
+      this.setState({ orderWayLogs: mg,loadingShow:false})
       console.log(this.state.orderWayLogs)
 
     }));
@@ -759,8 +755,6 @@ class OrderScene extends Component {
           <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
 
         </View>
-      } else {
-        return <LoadingView />
       }
     }
 
@@ -1180,7 +1174,9 @@ class OrderScene extends Component {
               } />
           </View>
         </View>
+
         {
+          this.state.loadingShow ? <LoadingView/> :
           this.renderWayRecord()
         }
       </View>
