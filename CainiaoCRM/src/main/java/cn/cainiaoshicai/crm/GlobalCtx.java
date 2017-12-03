@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.provider.Telephony;
@@ -37,6 +38,8 @@ import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.i18n.reactnativei18n.ReactNativeI18n;
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -54,6 +57,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
@@ -91,6 +95,7 @@ import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
+import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -270,6 +275,10 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
+                .addPackage(new RNSoundPackage())
+                .addPackage(new BleManagerPackage())
+                .addPackage(new PickerPackage())
+
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
@@ -640,10 +649,15 @@ public class GlobalCtx extends Application {
     }
 
     public Collection<Store> listStores() {
-        return this.listStores(false);
+        return this.listStores(0, false);
     }
 
+
     public Collection<Store> listStores(boolean forceUpdate) {
+        return this.listStores(0, forceUpdate);
+    }
+
+    public Collection<Store> listStores(int limitVendorId, boolean forceUpdate) {
         final long storeId = SettingUtility.getListenerStore();
         LinkedHashMap<Long, Store> stores = storesRef.get();
         if (forceUpdate || stores == null || stores.isEmpty()) {
@@ -659,15 +673,25 @@ public class GlobalCtx extends Application {
                     } catch (ServiceException e) {
                         AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
                         Activity runningActivity = app().getCurrentRunningActivity();
-                        if (runningActivity != null) {
-                            AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
-                        }
+//                        if (runningActivity != null) {
+                            //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
+//                        }
                     }
                     return null;
                 }
             }.executeOnNormal();
         }
-        return stores != null ? stores.values() : null;
+        if (stores == null || limitVendorId <= 0) {
+            return stores != null ? stores.values() : null;
+        } else {
+            ArrayList<Store> found = new ArrayList<>();
+            for(Store store: stores.values()) {
+                if (store.getType() == limitVendorId) {
+                    found.add(store);
+                }
+            }
+            return found;
+        }
     }
 
 
@@ -731,12 +755,43 @@ public class GlobalCtx extends Application {
         ctx.startActivity(gog);
     }
 
+    public void toSearchActivity(Activity ctx, String term) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "OrderSearch");
+        Bundle params = new Bundle();
+        if (!TextUtils.isEmpty(term)) {
+            params.putString("term", term);
+        }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toMineActivity(Activity ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Tab");
+        Bundle params = new Bundle();
+        params.putString("initTab", "Mine");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toGoodsEditProdStores(Activity ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodMultiEdit");
+        ctx.startActivity(i);
+    }
+
+    public void toGoodsNew(Activity ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsEdit");
+        Bundle params = new Bundle();
+        params.putString("type", "add");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
-//        Intent intent = new Intent(ctx, RemindersActivity.class);
-//        String token = GlobalCtx.app().token();
-//        intent.putExtra("url", String.format("%s/quick_task_list.html?access_token=" + token, URLHelper.getStoresPrefix()));
-
         return new Intent(ctx, MyReactActivity.class);
     }
 
@@ -886,6 +941,10 @@ public class GlobalCtx extends Application {
         return storeCfg != null && storeCfg.isCloudPrint();
     }
 
+    public Activity pageToActivity(String page) {
+        return new MainActivity();
+    }
+
     public interface TaskCountUpdated {
         void callback(int count);
     }
@@ -893,6 +952,7 @@ public class GlobalCtx extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        MultiDex.install(base);
         CrashReportHelper.attachBaseContext(base, this);
     }
 

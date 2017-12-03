@@ -2,49 +2,51 @@
  * Copyright (c) 2017-present, Liu Jinyong
  * All rights reserved.
  *
- * https://github.com/huanxsd/MeiTuan  
+ * https://github.com/huanxsd/MeiTuan
  * @flow
  */
 
 //import liraries
-import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import React, {PureComponent} from 'react'
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
 
 // create a component
 class NavigationItem extends PureComponent {
-    render() {
-        let icon = this.props.icon &&
-            <Image style={[styles.icon, this.props.iconStyle]} source={this.props.icon} />
+  render() {
 
-        let title = this.props.title &&
-            <Text style={[styles.title, this.props.titleStyle]}>{this.props.title}</Text>
-        return (
-            <TouchableOpacity style={styles.container} onPress={this.props.onPress}>
-                {icon}
-                {title}
-            </TouchableOpacity>
-        );
-    }
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress, ...others} = this.props;
+    let _icon = this.props.icon &&
+      <Image style={[styles.icon, iconStyle]} source={icon}/>
+
+    let _title = this.props.title &&
+      <Text style={[styles.title, titleStyle]}>{title}</Text>
+    return (
+      <TouchableOpacity style={[styles.container, containerStyle]} onPress={onPress} {...others}>
+        {_icon}
+        {_title}
+      </TouchableOpacity>
+    );
+  }
 }
 
 // define your styles
 const styles = StyleSheet.create({
-    container: {
-        flex:1,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    icon: {
-        width: 27,
-        height: 27,
-        margin: 8,
-    },
-    title: {
-        fontSize: 15,
-        color: '#333333',
-        margin: 8,
-    }
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  icon: {
+    width: 27,
+    height: 27,
+    margin: 8,
+  },
+  title: {
+    fontSize: 15,
+    color: '#333333',
+    margin: 8,
+  }
 });
 
 //make this component available to the app

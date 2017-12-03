@@ -30,6 +30,7 @@ import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import {NavigationActions} from 'react-navigation';
 import LoadingView from "../../widget/LoadingView";
+import CallBtn from "../Order/CallBtn";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -52,12 +53,7 @@ class WorkerScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>员工管理</Text>
-        </View>
-      ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
+      headerTitle: '员工管理',
       headerRight: '',
     }
   };
@@ -113,9 +109,6 @@ class WorkerScene extends PureComponent {
             normal: normal,
             forbidden: forbidden,
           });
-          if (_this.state.isRefreshing) {
-            ToastShort('刷新完成');
-          }
         }
         _this.setState({isRefreshing: false});
       }));
@@ -146,8 +139,9 @@ class WorkerScene extends PureComponent {
           />
         </CellHeader>
         <CellBody>
-          <Text style={[styles.worker_name]}>{user.nickname}({user.id})</Text>
-          <Text style={[styles.worker_tel]}>{user.mobilephone}</Text>
+          <Text style={[styles.worker_name]}>{user.name}({user.id})</Text>
+          {/*<Text style={[styles.worker_tel]}>{user.mobilephone}</Text>*/}
+          <CallBtn style={[styles.worker_tel]} mobile={user.mobilephone}/>
         </CellBody>
         <CellFooter>
           <TouchableOpacity

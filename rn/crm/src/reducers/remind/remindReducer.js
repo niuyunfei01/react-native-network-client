@@ -84,6 +84,9 @@ export default function remind(state = initialState, action) {
         groupNum: action.groupNum,
         quickNum: action.quickNum
       });
+    case types.NEW_REMIND_CREATED:
+      //可能的话，需要更新相应的提醒列表
+      return state;
     default:
       return state;
   }
@@ -91,9 +94,10 @@ export default function remind(state = initialState, action) {
 
 function _setWithPreventCheck(diff, key, typeId, value) {
 
-  console.log('_setWithPreventCheck', key, typeId, value)
+  //TODO: bugfix for FATAL exception
+  console.log('_setWithPreventCheck', key, typeId, value, diff);
 
-  if (diff[key] === false) {
+  if (diff[key] === false || diff[key] === true) {
     diff[key] = {};
   }
   diff[key][typeId] = value;

@@ -36,16 +36,18 @@ import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {fetchRemind, updateRemind, fetchRemindCount, delayRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
-
 import RNButton from '../../widget/RNButton';
-
 import Config from '../../config'
+import Cts from '../../Cts'
 
 const BadgeTabBar = require('./BadgeTabBar');
-
 import {Dialog, ActionSheet} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";
+import top_styles from './TopStyles'
+import bottom_styles from './BottomStyles'
+import * as tool from "../../common/tool";
+import {screen} from '../../common';
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -67,8 +69,8 @@ function mapDispatchToProps(dispatch) {
 let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [100, 101, 102, 103];
-const _fetchDataTypeIds = [100, 101, 102, 3, 0];
-const _otherSubTypeIds = [3, 0];
+const _fetchDataTypeIds = [100, 101, 102, Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_GOODS_FAILED];
+const _otherSubTypeIds = [Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_GOODS_FAILED];
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
 const _otherTypeTag = 103;
 
@@ -80,6 +82,7 @@ class RemindScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      canSwitch: true,
       dataSource: [],
       showStopRemindDialog: false,
       showDelayRemindDialog: false,
@@ -95,9 +98,10 @@ class RemindScene extends PureComponent {
   componentWillMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
-    dispatch(fetchRemindCount(token));
+    let {store_id, vendor_id} = this._getStoreAndVendorId();
+    dispatch(fetchRemindCount(vendor_id, store_id, token));
     _fetchDataTypeIds.forEach((typeId) => {
-      dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
+      dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     });
   }
 
@@ -107,10 +111,15 @@ class RemindScene extends PureComponent {
   componentWillReceiveProps(nextProps) {
   }
 
+  componentWillUnmount() {
+  }
+
   onRefresh(typeId) {
     const {dispatch} = this.props;
     let token = this._getToken();
-    dispatch(fetchRemind(true, false, typeId, false, 1, token, 0));
+    let {store_id, vendor_id} = this._getStoreAndVendorId();
+    dispatch(fetchRemindCount(vendor_id, store_id, token));
+    dispatch(fetchRemind(true, false, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     canLoadMore = true;
   }
 
@@ -119,26 +128,22 @@ class RemindScene extends PureComponent {
     return global['accessToken']
   }
 
+  _getStoreAndVendorId() {
+    let {currVendorId} = tool.vendor(this.props.global);
+    let {currStoreId} = this.props.global;
+    return {'store_id': currStoreId, 'vendor_id': currVendorId}
+  }
+
+
   onPress(route, params) {
     let self = this;
-    let orderId = self.state.localState.orderId;
-    if (!orderId) {
+    let {canSwitch} = self.state;
+    if (canSwitch) {
+      self.setState({canSwitch: false});
       InteractionManager.runAfterInteractions(() => {
-        self.setState({
-          localState: {
-            orderId: orderId
-          }
-        });
         self.props.navigation.navigate(route, params);
-      }).done(
-        () => {
-          self.setState({
-            localState: {
-              orderId: ''
-            }
-          });
-        }
-      );
+      });
+      this.__resetState();
     }
   }
 
@@ -156,6 +161,12 @@ class RemindScene extends PureComponent {
       this._showStopRemindDialog(type, id);
 
     }
+  }
+
+  __resetState() {
+    setTimeout(() => {
+      this.setState({canSwitch: true})
+    }, 2500)
   }
 
   _hideDelayRemindDialog() {
@@ -190,7 +201,7 @@ class RemindScene extends PureComponent {
     let {type, id} = this.state.opRemind;
     const {dispatch} = this.props;
     let token = this._getToken();
-    dispatch(updateRemind(id, type, Config.TASK_STATUS_DONE, token))
+    dispatch(updateRemind(id, type, Cts.TASK_STATUS_DONE, token))
     this._hideStopRemindDialog();
   }
 
@@ -209,18 +220,17 @@ class RemindScene extends PureComponent {
     let pageNum = remind.currPage[typeId];
     canLoadMore = true;
     if (remind.noMore[typeId]) {
-      ToastShort('没有更多数据了');
       canLoadMore = false;
     }
     if (canLoadMore && time - loadMoreTime > 1) {
       const {dispatch} = this.props;
-      dispatch(fetchRemind(false, false, typeId, true, pageNum + 1, token, 0));
+      let {store_id, vendor_id} = this._getStoreAndVendorId();
+      dispatch(fetchRemind(false, false, typeId, true, pageNum + 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
       loadMoreTime = Date.parse(new Date()) / 1000;
     }
   }
 
   pressSubButton(type) {
-    console.info("press sub button type ", type)
     this.setState({
       otherTypeActive: type
     });
@@ -228,9 +238,14 @@ class RemindScene extends PureComponent {
 
   pressToDoneRemind(route, params = {}) {
     let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
-    });
+    let {canSwitch} = _this.state;
+    if (canSwitch) {
+      _this.setState({canSwitch: false});
+      InteractionManager.runAfterInteractions(() => {
+        _this.props.navigation.navigate(route, params);
+      });
+      this.__resetState();
+    }
   }
 
   __getBadgeButton(key, name, quick) {
@@ -277,7 +292,27 @@ class RemindScene extends PureComponent {
 
   renderFooter(typeId) {
     const {remind} = this.props;
-    if (!remind.isLoadMore[typeId]) return null;
+    if (!remind.isLoadMore[typeId]) return <View style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+      <RNButton
+        activeOpacity={0.7}
+        onPress={() => {
+          this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
+            type: 'DoneRemind',
+            title: '已处理工单'
+          })
+        }}
+        containerStyle={styles.stickyButtonContainer}
+        style={{
+          fontSize: 16,
+          color: '#999'
+        }}>
+        已处理工单
+      </RNButton>
+    </View>;
+    else
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
@@ -302,6 +337,7 @@ class RemindScene extends PureComponent {
       return <LoadingView/>;
     }
     let loading = remind.remindList[typeId] == undefined ? true : false;
+    let {store_id, vendor_id} = this._getStoreAndVendorId();
     if (loading) {
       const {dispatch} = this.props;
       let token = this._getToken();
@@ -315,7 +351,7 @@ class RemindScene extends PureComponent {
             <RefreshControl
               refreshing={loading}
               onRefresh={() => {
-                dispatch(fetchRemind(false, true, typeId, false, 1, token, 0));
+                dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
               }}
               title={"加载中..."}
               colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
@@ -329,6 +365,8 @@ class RemindScene extends PureComponent {
       );
     }
 
+    // console.log('screen', screen);
+
     return (
       <FlatList
         extraData={this.state.dataSource}
@@ -340,7 +378,18 @@ class RemindScene extends PureComponent {
           viewAreaCoveragePercentThreshold: 100,
           waitForInteraction: true,
         }}
-        onEndReachedThreshold={0.1}
+        onTouchStart={(e) => {
+          this.pageX = e.nativeEvent.pageX;
+          this.pageY = e.nativeEvent.pageY;
+        }}
+        onTouchMove={(e) => {
+          if(Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)){
+            this.setState({scrollLocking: true});
+          } else {
+            this.setState({scrollLocking: false});
+          }
+        }}
+        onEndReachedThreshold={0.5}
         renderItem={this.renderItem}
         onEndReached={this.onEndReached.bind(this, typeId)}
         onRefresh={this.onRefresh.bind(this, typeId)}
@@ -356,10 +405,10 @@ class RemindScene extends PureComponent {
             justifyContent: 'center',
             flex: 1,
             flexDirection: 'row',
-            height: pxToDp(600)
+            height: (screen.height - (tagTypeId !== Cts.TASK_ALL_SHIP && tagTypeId !== Cts.TASK_ALL_AFTER_SALE && tagTypeId !== Cts.TASK_ALL_REFUND ? 210 : 180))
           }}>
             <Text style={{fontSize: 18}}>
-              没有数据...
+              暂无待处理任务
             </Text>
           </View>}
         initialNumToRender={5}
@@ -381,7 +430,7 @@ class RemindScene extends PureComponent {
 
   render() {
     const {remind} = this.props;
-    const tagNum = remind.tagNum;
+    const remindCount = remind.remindCount;
     const self = this;
     let lists = [];
     _typeIds.forEach((typeId, index) => {
@@ -404,40 +453,16 @@ class RemindScene extends PureComponent {
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar count={tagNum} countIndex={_typeIds}/>}
-          locked={remind.processing}
+          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeIds}/>}
+          locked={true || remind.processing || this.state.scrollLocking}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
           tabBarTextStyle={{fontSize: pxToDp(26)}}>
           {lists}
         </ScrollableTabView>
-        <View style={{
-          position: 'absolute',
-          bottom: 20,
-          left: 0,
-          right: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          <RNButton
-            activeOpacity={0.7}
-            onPress={() => {
-              this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
-                type: 'DoneRemind',
-                title: '已处理工单'
-              })
-            }}
-            containerStyle={styles.stickyButtonContainer}
-            style={{
-              fontSize: 16,
-              color: '#999'
-            }}>
-            已处理工单
-          </RNButton>
-        </View>
         <Dialog onRequestClose={() => this._hideStopRemindDialog()}
                 visible={this.state.showStopRemindDialog}
-                title="不在提醒"
+                title="不再提醒"
                 buttons={[
                   {
                     type: 'default',
@@ -482,7 +507,7 @@ class RemindScene extends PureComponent {
 
 }
 
-const dropDownImg = require("../../img/Remind/drop-down.png");
+const dropDownImg = require("../../img/Order/pull_down.png");
 const dropUpImg = require("../../img/Order/pull_up.png");
 
 class RemindItem extends React.PureComponent {
@@ -514,16 +539,25 @@ class RemindItem extends React.PureComponent {
   render() {
     let {item, index, onPressDropdown, onPress} = this.props;
     return (
-      <TouchableOpacity onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})} activeOpacity={0.6}>
+      <TouchableOpacity
+        onPress={() => {
+          if(item.order_id > 0){
+            onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
+          }
+        }}
+        activeOpacity={0.6}
+      >
         <View style={top_styles.container}>
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
-                {item.quick == 1 ? <Image style={[top_styles.icon_ji]}
-                                          source={require('../../img/Remind/quick.png')}/> : null}
-                <View>
+                {item.quick > 0 ?
+                  <Image
+                    style={[top_styles.icon_ji]}
+                    source={require('../../img/Remind/quick.png')}/> : null}
+                {!!item.orderDate ? <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
-                </View>
+                </View> : null}
                 <View>
                   <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
                 </View>
@@ -547,7 +581,7 @@ class RemindItem extends React.PureComponent {
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>
                   <Text style={top_styles.o_content}>
-                    {item.remark}
+                    {item.remark}  {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
@@ -562,8 +596,8 @@ class RemindItem extends React.PureComponent {
               <View>
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
-              {item.expect_end_time != '' ?
-                <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/> : null}
+              {!!item.expect_end_time &&
+                <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
               </View>
@@ -595,9 +629,10 @@ const styles = StyleSheet.create({
   },
   subButtonContainerStyle: {
     height: 30,
-    width: 48,
+    // width: 48,
+    paddingHorizontal: pxToDp(20),
     overflow: 'hidden',
-    borderRadius: 15,
+    borderRadius: 13,
     backgroundColor: '#e6e6e6',
     alignItems: 'center',
     justifyContent: 'center',
@@ -606,9 +641,10 @@ const styles = StyleSheet.create({
   },
   subButtonActiveContainerStyle: {
     height: 30,
-    width: 48,
+    // width: 48,
+    paddingHorizontal: pxToDp(20),
     overflow: 'hidden',
-    borderRadius: 15,
+    borderRadius: 13,
     backgroundColor: colors.main_color,
     alignItems: 'center',
     justifyContent: 'center',
@@ -655,158 +691,6 @@ const styles = StyleSheet.create({
     shadowColor: 'black',
     shadowOffset: {height: 0, width: 0},
   }
-});
-
-const top_styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#f2f2f2',
-  },
-  order_box: {
-    backgroundColor: '#fff',
-    marginHorizontal: pxToDp(0),
-    marginVertical: pxToDp(5),
-  },
-  active: {
-    borderWidth: pxToDp(1),
-    borderColor: '#000',
-  },
-  box_top: {
-    marginVertical: pxToDp(12),
-    marginHorizontal: pxToDp(20),
-  },
-
-  order_head: {
-    marginBottom: pxToDp(20),
-    height: pxToDp(50),
-    flexDirection: 'row',
-    // backgroundColor: 'red',
-  },
-
-  icon_ji: {
-    width: pxToDp(35),
-    height: pxToDp(35),
-    alignSelf: 'center',
-    marginRight: pxToDp(5),
-  },
-  o_index_text: {
-    color: '#666',
-    fontSize: pxToDp(32),
-    fontWeight: 'bold',
-    textAlignVertical: 'center',
-  },
-  o_store_name_text: {
-    height: pxToDp(50),
-    textAlignVertical: 'center',
-    fontSize: pxToDp(28),
-    color: '#999',
-    paddingLeft: pxToDp(30),
-  },
-  icon_dropDown: {
-    width: pxToDp(88),
-    height: pxToDp(55),
-    position: 'absolute',
-    right: 0,
-    // backgroundColor: 'green',
-  },
-  icon_img_dropDown: {
-    width: pxToDp(88),
-    height: pxToDp(55),
-  },
-  drop_style: {//和背景图片同框的按钮的样式
-    width: pxToDp(88),
-    height: pxToDp(55),
-  },
-  drop_listStyle: {//下拉列表的样式
-    width: pxToDp(150),
-    height: pxToDp(141),
-    backgroundColor: '#5f6660',
-    marginTop: -StatusBar.currentHeight,
-  },
-  drop_textStyle: {//下拉选项文本的样式
-    textAlignVertical: 'center',
-    textAlign: 'center',
-    fontSize: pxToDp(24),
-    fontWeight: 'bold',
-    color: '#fff',
-    height: pxToDp(69),
-    backgroundColor: '#5f6660',
-    borderRadius: pxToDp(3),
-    borderColor: '#5f6660',
-    borderWidth: 1,
-    shadowRadius: pxToDp(3),
-  },
-  drop_optionStyle: {//选项点击之后的文本样式
-    color: '#4d4d4d',
-    backgroundColor: '#939195',
-  },
-
-  order_body: {
-    // backgroundColor: 'green',
-  },
-  order_body_text: {
-    fontSize: pxToDp(30),
-    color: '#333',
-  },
-  o_content: {
-    fontWeight: 'bold',
-    lineHeight: pxToDp(42),
-  },
-  ship_status: {
-    alignSelf: 'flex-end',
-  },
-  ship_status_text: {
-    fontSize: pxToDp(26),
-    color: '#999',
-  },
-});
-
-const bottom_styles = StyleSheet.create({
-  container: {
-    height: pxToDp(70),
-    borderTopWidth: 1,
-    borderTopColor: '#999',
-    paddingHorizontal: pxToDp(20),
-    flexDirection: 'row',
-  },
-
-  time_date: {
-    marginRight: pxToDp(10),
-  },
-  time_date_text: {
-    color: '#4d4d4d',
-    fontSize: pxToDp(28),
-    height: pxToDp(70),
-    textAlignVertical: 'center',
-  },
-  time_start: {
-    color: '#999',
-    fontSize: pxToDp(28),
-    height: pxToDp(70),
-    textAlignVertical: 'center',
-  },
-  icon_clock: {
-    marginLeft: pxToDp(70),
-    marginRight: pxToDp(5),
-    width: pxToDp(35),
-    height: pxToDp(35),
-    marginTop: pxToDp(5),
-    alignSelf: 'center',
-  },
-  time_end: {
-    color: '#db5d5d',
-    fontSize: pxToDp(34),
-    height: pxToDp(70),
-    textAlignVertical: 'center',
-  },
-  operator: {
-    position: 'absolute',
-    right: pxToDp(20),
-  },
-  operator_text: {
-    fontSize: pxToDp(28),
-    height: pxToDp(70),
-    textAlignVertical: 'center',
-  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RemindScene)

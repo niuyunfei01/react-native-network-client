@@ -23,6 +23,7 @@
     tools:ignore="MergeRootFrame">
 
     <RelativeLayout android:id="@+id/order_q_filters"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 

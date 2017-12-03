@@ -21,6 +21,7 @@ import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
+import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.loader.RefreshOrderListTask;
 
 public class OrderQueryActivity extends AbstractActionBarActivity {
@@ -32,6 +33,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
     private ListType listType = ListType.NONE;
     private String searchTerm = "";
     private int selected_store = Cts.STORE_ALL;
+    private int maxPast = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,9 +60,9 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent openOrder = new Intent(OrderQueryActivity.this, OrderSingleActivity.class);
+                    Intent openOrder = new Intent(OrderQueryActivity.this, MyReactActivity.class);
                     Order item = (Order) adapter.getItem(position);
-                    openOrder.putExtra("id", item.getId());
+                    openOrder.putExtra("order_id", Long.valueOf(item.getId()));
                     openOrder.putExtra("list_type", listType.getValue());
                     openOrder.putExtra("order", item);
                     try {
@@ -89,6 +91,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 this.listType = foundType;
             }
 
+            this.maxPast = intent.getIntExtra("max_past_day", 0);
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 this.searchTerm = intent.getStringExtra(SearchManager.QUERY);
             } else {
@@ -147,7 +150,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 term = "store:" + selected_store;
                 lt = ListType.NONE;
             }
-            new RefreshOrderListTask(this, term, lt, this.swipeRefreshLayout, callback, true).executeOnNormal();
+            new RefreshOrderListTask(this, term, lt, this.maxPast, this.swipeRefreshLayout, callback, true).executeOnNormal();
         }
     }
 

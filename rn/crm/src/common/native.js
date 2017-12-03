@@ -1,5 +1,10 @@
 import {NativeModules} from 'react-native'
 
+let _orderSearch = async function (term) {
+  if (NativeModules.ActivityStarter) {
+    await NativeModules.ActivityStarter.searchOrders(term);
+  }
+};
 export default {
 
   updateAfterTokenGot: async function (access_token, expire, callback = function(){}) {
@@ -14,9 +19,61 @@ export default {
     }
   },
 
+  currentVersion: async function(callback) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.currentVersion(callback);
+    }
+  },
+
+  ordersSeriousDelay: async function () {
+    await _orderSearch('to_ship_late_serious:');
+  },
+
+  ordersInvalid: async function () {
+    await _orderSearch('invalid:');
+  },
+
+  ordersSearch: async function (term) {
+    await _orderSearch(term);
+  },
+
   toGoods: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.navigateToGoods());
+  },
+
+  toNativeOrder: async function (id) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.toOrder(id));
+  },
+
+  toSettings: async function() {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toSettings();
+    }
+  },
+
+  gotoPage: async function(page) {
+    if (NativeModules.ActivityStarter && page) {
+      await NativeModules.ActivityStarter.gotoPage(page);
+    }
+  },
+
+  host :
+    /**
+     * @param callback （host) => {}
+     * @returns {Promise.<void>}
+     */
+    async function(callback) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.getHost(callback);
+    }
+  },
+
+  toUserComments: async function() {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toUserComments();
+    }
   },
 
   /**
@@ -28,6 +85,16 @@ export default {
   setCurrStoreId: async function (storeId, callback = function (){}) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
+  },
+
+  gotoLoginWithNoHistory: async function () {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.gotoLoginWithNoHistory());
+  },
+
+  gotoActByUrl: async function (url) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.gotoActByUrl(url));
   },
 
   logout: async function () {

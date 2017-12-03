@@ -2,37 +2,34 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.telecom.Call;
 
-import com.facebook.react.ReactInstanceManager;
-import com.facebook.react.ReactNativeHost;
 import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.annotation.Nonnull;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
-import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.util.AlertUtil;
-import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
@@ -42,10 +39,15 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Expose Java to JavaScript.
@@ -67,7 +69,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToGoods() {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, StoreStorageActivity.class);
             activity.startActivity(intent);
@@ -81,10 +83,34 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void gotoPage(@Nonnull String page) {
+        Context ctx = GlobalCtx.app().getCurrentRunningActivity();
+        if (ctx == null) {
+            ctx = GlobalCtx.app();
+        }
+        Intent intent = new Intent(ctx, GlobalCtx.app().pageToActivity(page).getClass());
+        ctx.startActivity(intent);
+    }
+
+    @ReactMethod
+    void currentVersion(@Nonnull Callback clb) {
+        HashMap<String, String> m = new HashMap<>();
+        Context act = getReactApplicationContext().getApplicationContext();
+        if (act != null) {
+            m.put("version_code", Utility.getVersionCode(act));
+            m.put("version_name", Utility.getVersionName(act));
+        }
+        clb.invoke(DaoHelper.gson().toJson(m));
+    }
+
+    @ReactMethod
     void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback){
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             AccountBean ab = GlobalCtx.app().getAccountBean();
+
+            AppLogger.i("updateAfterTokenGot " + (ab == null ? "null" : ab.getInfo()));
+
             if (ab != null && ab.getInfo() != null) {
                 callback.invoke(true, "ok", DaoHelper.gson().toJson(ab.getInfo()));
             } else {
@@ -92,7 +118,8 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             }
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
-            callback.invoke(false, "exception:" + e.getMessage(), null);
+            String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
+            callback.invoke(false, reason, null);
         }
     }
 
@@ -102,7 +129,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             long selectedStoreId = Long.parseLong(currId);
             if (selectedStoreId > 0) {
                 SettingUtility.setListenerStores(selectedStoreId);
-                callback.invoke(true, "ok", null);
+                callback.invoke(true, "ok:" + currId + "-" + System.currentTimeMillis(), null);
             } else {
                 callback.invoke(false, "Account is null", null);
             }
@@ -114,16 +141,44 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToOrders() {
-        Activity activity = getCurrentActivity();
+        Context ctx = GlobalCtx.app().getCurrentRunningActivity();
+        if (ctx != null) {
+            Intent intent = new Intent(ctx, MainActivity.class);
+            ctx.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toSettings() {
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
-            Intent intent = new Intent(activity, MainActivity.class);
+            Intent intent = new Intent(activity, SettingsPrintActivity.class);
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toOrder(String wm_id) {
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, OrderSingleActivity.class);
+            intent.putExtra("order_id", Integer.parseInt(wm_id));
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toUserComments() {
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, UserCommentsActivity.class);
             activity.startActivity(intent);
         }
     }
 
     @ReactMethod
     void ordersByMobileTimes(@Nonnull String mobile, int times) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
@@ -134,8 +189,25 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void searchOrders(@Nonnull String term) {
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        if (activity != null) {
+            Intent intent = new Intent(activity, OrderQueryActivity.class);
+            intent.setAction(Intent.ACTION_SEARCH);
+
+            if ("invalid:".equals(term)) {
+                intent.putExtra("list_type", ListType.INVALID.getValue());
+            } else {
+                intent.putExtra(SearchManager.QUERY, term);
+            }
+
+            activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
     void dialNumber(@Nonnull String number) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
             activity.startActivity(intent);
@@ -143,8 +215,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void getHost(@Nonnull Callback callback) {
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        if (activity != null) {
+            callback.invoke(URLHelper.getHost());
+        }
+    }
+
+    @ReactMethod
     void getActivityName(@Nonnull Callback callback) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             callback.invoke(activity.getClass().getSimpleName());
         }
@@ -183,9 +263,27 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getActivityNameAsPromise(@Nonnull Promise promise) {
-        Activity activity = getCurrentActivity();
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
             promise.resolve(activity.getClass().getSimpleName());
+        }
+    }
+
+    @ReactMethod
+    void gotoLoginWithNoHistory() {
+        Context act = GlobalCtx.app().getCurrentRunningActivity();
+        if (act != null) {
+            Intent intent = new Intent(act, LoginActivity.class);
+            intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+            act.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void gotoActByUrl(@Nonnull String url) {
+        Context act = GlobalCtx.app().getCurrentRunningActivity();
+        if (act != null) {
+            Utility.handleUrlJump(act, null, url);
         }
     }
 

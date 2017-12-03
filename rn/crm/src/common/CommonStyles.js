@@ -32,6 +32,13 @@ const Styles = StyleSheet.create({
     marginBottom: (35 - 20.5) / 2
   },
 
+  cellTextH35W70: {
+    width: 70,
+    fontSize: 15,
+    marginTop: (35 - 20.5) / 2,
+    marginBottom: (35 - 20.5) / 2
+  },
+
   cellTextH45: {
     fontSize: 16,
     marginTop: (45 - 21.5) / 2,

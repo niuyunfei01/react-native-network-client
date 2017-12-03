@@ -25,8 +25,8 @@
         android:icon="@drawable/ic_settings_applications_black_24dp"
         support:showAsAction="always"/>
 
-    <item android:id="@+id/menu_search"
-        android:title="@string/action_search"
-        android:icon="@drawable/ic_search_black_24dp"
-        support:showAsAction="always" />
+    <!--<item android:id="@+id/menu_search"-->
+        <!--android:title="@string/action_search"-->
+        <!--android:icon="@drawable/ic_search_black_24dp"-->
+        <!--support:showAsAction="always" />-->
 </menu>

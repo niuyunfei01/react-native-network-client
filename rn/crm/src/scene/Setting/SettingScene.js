@@ -51,13 +51,7 @@ class SettingScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>设置</Text>
-        </View>
-      ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
-      headerRight: '',
+      headerTitle: '设置',
     }
   };
 

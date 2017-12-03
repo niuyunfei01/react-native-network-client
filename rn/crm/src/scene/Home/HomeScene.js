@@ -48,7 +48,6 @@ class HomeScene extends PureComponent {
                 }}
             />
         ),
-        headerStyle: { backgroundColor: color.theme },
     })
 
     state: {

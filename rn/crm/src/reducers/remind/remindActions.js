@@ -3,11 +3,13 @@
 import * as types from './ActionTypes';
 import {ToastShort, ToastLong} from '../../util/ToastUtils';
 import * as RemindServices from '../../services/remind';
+import {getWithTpl, postWithTpl} from "../../util/common";
+import _ from 'underscore';
 
-export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status) {
+export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status, vendor_id, store_id) {
   return dispatch => {
     dispatch(fetchRemindList(isRefreshing, loading, isLoadMore, typeId));
-    return RemindServices.FetchRemindList(token, typeId, status, page)
+    return RemindServices.FetchRemindList(token, vendor_id, store_id, typeId, status, page)
       .then(response => response.json())
       .then((response) => {
         let result = response.obj;
@@ -24,10 +26,10 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
   }
 }
 
-export function fetchRemindCount(token) {
+export function fetchRemindCount(vendor_id, store_id, token) {
   return dispatch => {
     dispatch(doFetchRemindCount());
-    return RemindServices.FetchRemindCount(token)
+    return RemindServices.FetchRemindCount(vendor_id, store_id, token)
       .then(response => response.json())
       .then((response) => {
         let boday = response.obj;
@@ -75,6 +77,63 @@ export function delayRemind(id, typeId, minutes, token) {
         dispatch(delayRemindSuccess(id, typeId, false, 'error'));
         ToastLong('更新任务失败，请重试');
       })
+  }
+}
+
+/**
+ * 用于非提醒页面之外的地方，无需更新 typeId 的情况
+ * @param token
+ * @param task_id
+ * @param status
+ */
+export function markTaskDone(token, task_id, status, callback) {
+  return dispatch => {
+    return getWithTpl(`api/set_task_status/${task_id}/${status}.json?access_token=${token}`,
+      (json) => {
+        callback(json.ok, json.reason);
+      },
+      (error) => {
+        callback(false, error);
+      }
+    );
+  }
+}
+
+/**
+ * @param token
+ * @param orderId
+ * @param task_type
+ * @param remark
+ * @param expectDoneDate  'yyyy-MM-dd HH:mm:ss'
+ * @param quick
+ * @param data object, to be stringify for what the task is
+ * @param callback (ok, msg, data) => {}
+ */
+export function createTaskByOrder(token, orderId, task_type, remark, expectDoneDate, quick, data, callback) {
+  return dispatch => {
+    const url = `api/order_waiting_list/${orderId}?access_token=${token}`;
+    const params = {quick, task_type, remark};
+    if (expectDoneDate) {
+      params.date_expect_done = expectDoneDate;
+    }
+    if (data) {
+      params.data = _.isArray(data) || _.isObject(data) ? JSON.stringify(data) : data;
+    }
+    postWithTpl(url, params, (json) => {
+      if (json.ok) {
+        dispatch({
+          type: types.NEW_REMIND_CREATED,
+          typeId: task_type,
+          quick: quick,
+          remark: remark,
+        });
+        callback(true);
+      } else {
+        callback(false, json.reason)
+      }
+    }, (error) => {
+      callback(false, `网络错误：${error}`)
+    });
   }
 }
 

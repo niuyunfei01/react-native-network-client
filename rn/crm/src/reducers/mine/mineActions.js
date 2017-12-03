@@ -1,13 +1,15 @@
 'use strict';
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {ToastShort, ToastLong} from '../../util/ToastUtils';
+import {ToastLong} from '../../util/ToastUtils';
 import Cts from "../../Cts";
 
 const {
   GET_USER_COUNT,
   GET_WORKER,
   GET_VENDOR_STORES,
+  GET_STORE_TURNOVER,
+  GET_WM_STORES,
 } = require('../../common/constants').default;
 
 export function fetchUserCount(u_id, token, callback) {
@@ -21,12 +23,12 @@ export function fetchUserCount(u_id, token, callback) {
           dispatch(receiveUserCount(u_id, sign_count, bad_cases_of));
         } else {
           dispatch(receiveUserCount(0, 0));
-          ToastShort(resp.desc);
+          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {
         dispatch(receiveUserCount(0, 0));
-        ToastShort(error.message);
+        ToastLong(error.message);
         callback({ok: false, desc: error.message});
       }
     );
@@ -66,12 +68,12 @@ export function fetchWorkers(_v_id, token, callback) {
           dispatch(receiveWorker(_v_id, resp.obj));
         } else {
           dispatch(receiveWorker(_v_id, {}));
-          ToastShort(resp.desc);
+          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {
         dispatch(receiveWorker(_v_id, {}));
-        ToastShort(error.message);
+        ToastLong(error.message);
         callback({ok: false, desc: error.message});
       }
     );
@@ -98,12 +100,12 @@ export function getVendorStores(_v_id, token, callback) {
           dispatch(receiveStores(_v_id, resp.obj));
         } else {
           dispatch(receiveStores(_v_id, {}));
-          ToastShort(resp.desc);
+          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {
         dispatch(receiveStores(_v_id, {}));
-        ToastShort(error.message);
+        ToastLong(error.message);
         callback({ok: false, desc: error.message});
       }
     );
@@ -126,11 +128,11 @@ export function editWorkerStatus({_v_id, worker_id, user_status}, token, callbac
       .then(resp => resp.json())
       .then(resp => {
         if (!resp.ok) {
-          ToastShort(resp.desc);
+          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {
-        ToastShort(error.message);
+        ToastLong(error.message);
         callback({ok: false, desc: error.message});
       }
     );
@@ -156,11 +158,11 @@ export function saveVendorUser(data, token, callback) {
       .then(resp => resp.json())
       .then(resp => {
         if (!resp.ok) {
-          ToastShort(resp.desc);
+          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {
-        ToastShort(error.message);
+        ToastLong(error.message);
         callback({ok: false, desc: error.message});
       }
     );
@@ -183,16 +185,117 @@ export function saveOfflineStore(data, token, callback) {
       .then(resp => resp.json())
       .then(resp => {
         if (!resp.ok) {
-          ToastShort(resp.desc);
+          ToastLong(resp.desc);
         }
         callback(resp);
       }).catch((error) => {
-        ToastShort(error.message);
+        ToastLong(error.message);
         callback({ok: false, desc: error.message});
       }
     );
   }
 }
+
+export function fetchStoreTurnover(store_id, token, callback) {
+  return dispatch => {
+    const url = `api/get_store_turnover/${store_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let {order_num, turnover} = resp.obj;
+          dispatch(receiveStoreTurnover(store_id, order_num, turnover));
+        } else {
+          dispatch(receiveStoreTurnover(store_id));
+          ToastLong(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        dispatch(receiveStoreTurnover(store_id));
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+function receiveStoreTurnover(store_id, order_num = 0, turnover = 0) {
+  return {
+    type: GET_STORE_TURNOVER,
+    store_id: store_id,
+    order_num: order_num,
+    turnover: turnover,
+  }
+}
+
+
+export function copyStoreGoods(store_id, force, token, callback) {
+  return dispatch => {
+    const url = `stores/store_copy_goods/${store_id}/${force}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if(!resp.ok){
+          ToastLong(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+export function fetchWmStore(store_id, cache, token, callback) {
+  return dispatch => {
+    const url = `api/wm_store_list/${store_id}.json?access_token=${token}&&cache=${cache}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          dispatch(receiveWmStore(store_id, resp.obj));
+        } else {
+          dispatch(receiveWmStore(store_id));
+          ToastLong(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        dispatch(receiveWmStore(store_id));
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+function receiveWmStore(store_id, wm_list = {}) {
+  return {
+    type: GET_WM_STORES,
+    store_id: store_id,
+    wm_list: wm_list,
+  }
+}
+
+export function setWmStoreStatus(vendor_id, platform, wid, status, token, callback) {
+  return dispatch => {
+    const url = `api/set_wm_store_status/${vendor_id}/${platform}/${wid}/${status}.json?access_token=${token}`;
+
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (!resp.ok) {
+          ToastLong(resp.desc);
+        }
+        callback(resp);
+      }).catch((error) => {
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
 
 
 

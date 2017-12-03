@@ -10,14 +10,16 @@
  *
  * our 4 reducers
  */
-import device from './device/deviceReducer'
-import global from './global/globalReducer'
-import order from './order/orderReducer'
-import remind from './remind/remindReducer'
-import store from './store/storeReducer'
-import mine from './mine/mineReducer'
+import product from './product/productReducer';
+import device from './device/deviceReducer';
+import global from './global/globalReducer';
+import order from './order/orderReducer';
+import remind from './remind/remindReducer';
+import store from './store/storeReducer';
+import mine from './mine/mineReducer';
+import user from './user/userReducer';
 
-import {combineReducers} from 'redux'
+import {combineReducers} from 'redux';
 
 /**
  * ## CombineReducers
@@ -32,6 +34,8 @@ const rootReducer = combineReducers({
   remind,
   store,
   mine,
+  product,
+  user,
 });
 
 export default rootReducer

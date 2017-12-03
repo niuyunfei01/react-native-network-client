@@ -1,31 +1,9 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from 'react-native';
+import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl, InteractionManager} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Button,
-  ButtonArea,
-  Input,
-  Label,
-  Icon,
-  Toast,
-} from "../../weui/index";
+import {Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Button, ButtonArea, Input, Label, Icon, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -34,11 +12,11 @@ import Config from "../../config";
 import Entypo from 'react-native-vector-icons/Entypo';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Cts from "../../Cts";
-import ModalSelector from "react-native-modal-selector";
-import selector from "../../styles/selector";
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import {saveOfflineStore} from "../../reducers/mine/mineActions";
+import {saveOfflineStore, copyStoreGoods} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
+import Dialog from "../../weui/Dialog/Dialog";
+import ModalSelector from "../../widget/ModalSelector/index";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -49,6 +27,7 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       saveOfflineStore,
+      copyStoreGoods,
       ...globalActions
     }, dispatch)
   }
@@ -60,32 +39,60 @@ class StoreAddScene extends PureComponent {
     const {params = {}} = navigation.state;
 
     let title = params.btn_type === 'add' ? '新增门店' : '门店信息/修改';
+    let ActionSheet = [
+      {key: -999, section: true, label: '操作'},
+      {key: 1, label: '初始化商品'},//force -> true
+      {key: 2, label: '复制商品'},//force -> false
+    ];
 
     return {
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>{title}</Text>
-        </View>
-      ),
-      headerStyle: {backgroundColor: colors.back_color, height: pxToDp(78)},
+      headerTitle: title,
       headerRight: (params.btn_type === 'add' ? null : (
-        <TouchableOpacity
-          style={{marginRight: pxToDp(20), width: pxToDp(60), height: pxToDp(50)}}
-          onPress={() => {
-            ToastShort('onPress');
+        <ModalSelector
+          onChange={(option) => {
+            if (option.label === '初始化商品') {
+              params.goToReset();
+            } else if (option.label === '复制商品') {
+              params.goToCopy();
+            }
           }}
+          data={ActionSheet}
+          skin='customer'
         >
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
-        </TouchableOpacity>
+        </ModalSelector>
       )),
     }
   };
+
+  onStoreCopyGoods(force) {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {store_id} = this.state;
+    if (!(store_id > 0)) {
+      ToastLong('错误的门店信息');
+      return false;
+    }
+    console.log('store_id => ', store_id, force);
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(copyStoreGoods(store_id, force, accessToken, (resp) => {
+        if (resp.ok) {
+          //console.log(resp);
+          ToastLong(resp.desc);
+        }
+        this.setState({
+          goToReset: false,
+          goToCopy: false,
+        })
+      }));
+    });
+  }
 
   constructor(props: Object) {
     super(props);
 
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-    console.log('currVendorId -> ', currVendorId);
+    // console.log('currVendorId -> ', currVendorId);
     const {
       btn_type,
       store_info,
@@ -138,6 +145,8 @@ class StoreAddScene extends PureComponent {
       isRefreshing: false,
       btn_type: btn_type,
       onSubmitting: false,
+      goToCopy: false,
+      goToReset: false,
       user_list: user_list,
       userActionSheet: userActionSheet,
 
@@ -168,6 +177,15 @@ class StoreAddScene extends PureComponent {
     this.onCheckUser = this.onCheckUser.bind(this);
     this.onStoreAdd = this.onStoreAdd.bind(this);
     this.onCheckData = this.onCheckData.bind(this);
+    this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
+
+  }
+
+  componentDidMount() {
+    this.props.navigation.setParams({
+      goToCopy: () => {this.setState({goToCopy: true})},
+      goToReset: () => {this.setState({goToReset: true})},
+    });
   }
 
   onPress(route, params = {}) {
@@ -344,7 +362,6 @@ class StoreAddScene extends PureComponent {
           </Cell>
         </Cells>
 
-
         <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -357,17 +374,8 @@ class StoreAddScene extends PureComponent {
                   this.onCheckUser('owner', option.key)
                 }}
                 data={this.state.userActionSheet}
-                cancelText="取消"
-                selectStyle={selector.selectStyle}
-                selectTextStyle={selector.selectTextStyle}
-                overlayStyle={selector.overlayStyle}
-                sectionStyle={selector.sectionStyle}
-                sectionTextStyle={selector.sectionTextStyle}
-                optionContainerStyle={selector.optionContainerStyle}
-                optionStyle={selector.optionStyle}
-                optionTextStyle={selector.optionTextStyle}
-                cancelStyle={selector.cancelStyle}
-                cancelTextStyle={selector.cancelTextStyle}
+                skin='customer'
+                defaultKey={owner_id}
               >
                 <Text style={styles.body_text}>{owner_id > 0 ? owner_name : '点击选择店长'}</Text>
               </ModalSelector>
@@ -399,17 +407,8 @@ class StoreAddScene extends PureComponent {
                   this.onCheckUser('vice_mgr', option.key)
                 }}
                 data={this.state.userActionSheet}
-                cancelText="取消"
-                selectStyle={selector.selectStyle}
-                selectTextStyle={selector.selectTextStyle}
-                overlayStyle={selector.overlayStyle}
-                sectionStyle={selector.sectionStyle}
-                sectionTextStyle={selector.sectionTextStyle}
-                optionContainerStyle={selector.optionContainerStyle}
-                optionStyle={selector.optionStyle}
-                optionTextStyle={selector.optionTextStyle}
-                cancelStyle={selector.cancelStyle}
-                cancelTextStyle={selector.cancelTextStyle}
+                skin='customer'
+                defaultKey={vice_mgr}
               >
                 <Text style={styles.body_text}>{vice_mgr > 0 ? vice_mgr_name : '点击选择店助'}</Text>
               </ModalSelector>
@@ -430,7 +429,7 @@ class StoreAddScene extends PureComponent {
                 <Text style={styles.body_text}>{open_start}</Text>
               </TouchableOpacity>
               <DateTimePicker
-                date={new Date(`1970-01-01 ${open_start}`)}
+                date={new Date(`2000/01/01 ${open_start}`)}
                 mode='time'
                 isVisible={this.state.isStartVisible}
                 onConfirm={(date) => {
@@ -451,7 +450,7 @@ class StoreAddScene extends PureComponent {
                 <Text style={styles.body_text}>{open_end}</Text>
               </TouchableOpacity>
               <DateTimePicker
-                date={new Date(`1970-01-01 ${open_end}`)}
+                date={new Date(`2000/01/01 ${open_end}`)}
                 mode='time'
                 isVisible={this.state.isEndVisible}
                 onConfirm={(date) => {
@@ -527,6 +526,41 @@ class StoreAddScene extends PureComponent {
           }}
         >提交中</Toast>
 
+        <Dialog
+          onRequestClose={() => {
+          }}
+          visible={this.state.goToReset}
+          buttons={[
+            {
+              type: 'warn',
+              label: '确认',
+              onPress: () => {this.onStoreCopyGoods(true)},
+            }, {
+              type: 'default',
+              label: '取消',
+              onPress: () => {this.setState({goToReset: false})},
+            }
+          ]}
+        >
+          <Text>您选择了重置门店的所有商品、销售状态和价格，一旦修改，商户之前的工作全部归零，不可撤销！</Text>
+        </Dialog>
+        <Dialog
+          onRequestClose={() => {
+          }}
+          visible={this.state.goToCopy}
+          buttons={[{
+            type: 'warn',
+            label: '确认',
+            onPress: () => {this.onStoreCopyGoods(false)},
+          }, {
+            type: 'default',
+            label: '取消',
+            onPress: () => {this.setState({goToCopy: false})},
+          }
+          ]}
+        >
+          <Text>模板店里商品太多，不要轻易复制！</Text>
+        </Dialog>
       </ScrollView>
     );
   }
@@ -621,9 +655,13 @@ class StoreAddScene extends PureComponent {
 // define your styles
 const styles = StyleSheet.create({
   btn_select: {
+    marginRight: pxToDp(20),
+    height: pxToDp(60),
+    width: pxToDp(60),
     fontSize: pxToDp(40),
     color: colors.color666,
     textAlign: 'center',
+    textAlignVertical: 'center',
   },
   cell_title: {
     marginBottom: pxToDp(10),

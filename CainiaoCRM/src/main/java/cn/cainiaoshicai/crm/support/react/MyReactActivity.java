@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,13 +16,18 @@ import android.view.WindowInsets;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.modules.core.PermissionListener;
 import com.google.gson.Gson;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
 import java.util.Collection;
 import java.util.HashMap;
+
+import javax.annotation.Nullable;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.Config;
@@ -31,13 +37,17 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 
 
-public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
+public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
     private static String REACT_PREFERENCES = "react_preferences";
+
+    private @Nullable Callback mPermissionsCallback;
+    private @Nullable PermissionListener mPermissionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +62,11 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         Bundle init = new Bundle();
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
-        Bundle _action_params = new Bundle();
+        Bundle _action_params = intent.getBundleExtra("_action_params");
+        if (_action_params == null) {
+            _action_params = new Bundle();
+        }
+
         String nextRoute = intent.getStringExtra("_next_action");
         Long orderId = intent.getLongExtra("order_id", 0);
         if (orderId > 0) {
@@ -60,6 +74,14 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
             _action_params.putString("orderId", String.valueOf(orderId));
             if (TextUtils.isEmpty(toRoute)) {
                 toRoute = "Order";
+            }
+        }
+
+        Integer productId = intent.getIntExtra("product_id", 0);
+        if (productId > 0) {
+            _action_params.putString("productId", String.valueOf(productId));
+            if (TextUtils.isEmpty(toRoute)) {
+                toRoute = "GoodsDetail";
             }
         }
 
@@ -85,7 +107,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         Bundle vendors = new Bundle();
         boolean found = false;
         Vendor currV = GlobalCtx.app().getVendor();
-        if (config != null && config.getCan_read_vendors() != null) {
+        if (config != null && config.getCan_read_vendors() != null && currV != null) {
             for(Vendor vendor : config.getCan_read_vendors()) {
                 if (vendor != null){
                     vendors.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
@@ -106,6 +128,8 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         init.putString("access_token", GlobalCtx.app().token());
         init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));
         init.putString("_action", toRoute);
+        init.putString("backPage", "Orders");
+
         if (!TextUtils.isEmpty(nextRoute)) {
             init.putString("_next_action", nextRoute);
         }
@@ -124,6 +148,11 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         super.onResume();
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostResume(this, this);
+        }
+
+        if (mPermissionsCallback != null) {
+            mPermissionsCallback.invoke();
+            mPermissionsCallback = null;
         }
     }
 
@@ -184,8 +213,37 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         if (first) {
             final SharedPreferences.Editor editor = reader.edit();
             editor.putBoolean("is_first", false);
-            editor.commit();
+            editor.apply();
         }
         return first;
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestPermissions(
+            String[] permissions,
+            int requestCode,
+            PermissionListener listener) {
+        mPermissionListener = listener;
+        this.requestPermissions(permissions, requestCode);
+    }
+
+    public void onRequestPermissionsResult(
+            final int requestCode,
+            @NonNull final String[] permissions,
+            @NonNull final int[] grantResults) {
+        mPermissionsCallback = new Callback() {
+            @Override
+            public void invoke(Object... args) {
+                if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+                    mPermissionListener = null;
+                }
+            }
+        };
     }
 }
