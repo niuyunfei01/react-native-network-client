@@ -9,6 +9,7 @@ import android.app.ListActivity;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -29,15 +30,16 @@ import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
+import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
-import cn.cainiaoshicai.crm.ui.interfaces.AbstractAppActivity;
 
 public class SettingsPrintActivity extends ListActivity {
 
@@ -50,7 +52,7 @@ public class SettingsPrintActivity extends ListActivity {
     static private BluetoothItemAdapter<BluetoothPrinters.DeviceStatus> listAdapter;
 
 	private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9b66");
-	// UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private BluetoothPrinters.DeviceStatus lastDevice;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -75,8 +77,7 @@ public class SettingsPrintActivity extends ListActivity {
 		boolean isDirect = app.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(app.getVendor().getVersion());
 
 		findViewById(R.id.label_use_preview).setVisibility(isDirect ? View.VISIBLE : View.GONE);
-
-		final Switch toggleUsePreview = (Switch) findViewById(R.id.toggleUsePreview);
+		final Switch toggleUsePreview = findViewById(R.id.toggleUsePreview);
 		toggleUsePreview.setVisibility(isDirect ? View.VISIBLE : View.GONE);
 
 		toggleUsePreview.setChecked(SettingHelper.usePreviewHost());
@@ -105,7 +106,27 @@ public class SettingsPrintActivity extends ListActivity {
 		});
 		toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
 
-		final TextView list_store_filter_values = (TextView) findViewById(R.id.list_store_filter_values);
+        findViewById(R.id.label_printer_status).setVisibility(isDirect ? View.VISIBLE : View.GONE);
+        final TextView printerStatus = findViewById(R.id.printer_status);
+        printerStatus.setVisibility(isDirect ? View.VISIBLE : View.GONE);
+        if (isDirect) {
+            BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
+            boolean connected = GlobalCtx.app().isPrinterConnected() || (p != null && p.isConnected());
+            printerStatus.setText(SettingUtility.getLastConnectedPrinterAddress() + ":" + (connected ? "已连接" : "未连接"));
+            printerStatus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+                    if (printer == null || !printer.isConnected()) {
+                        AppLogger.e("skip to print for printer is not connected!");
+                    }
+                    showTestDlg(SettingsPrintActivity.this, printer == null ? "打印机未连接？" : "点击测试", printer != null ? printer.getSocket() : null);
+                }
+            });
+        }
+
+
+		final TextView list_store_filter_values = findViewById(R.id.list_store_filter_values);
 		((ImageView)findViewById(R.id.list_store_filter_arrow)).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.arrow));
 
 
@@ -113,29 +134,6 @@ public class SettingsPrintActivity extends ListActivity {
 		HashSet<Long> longs = new HashSet<>();
 		longs.add(selectedStores);
 		updateStoreFilterText(list_store_filter_values, longs);
-
-		RelativeLayout v = (RelativeLayout) findViewById(R.id.settings_order_filter);
-
-		v.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-
-				SettingsPrintActivity context = SettingsPrintActivity.this;
-				String title = "选中可以显示的店铺";
-				String okLabel = context.getString(R.string.ok);
-				String cancelLabel = context.getString(R.string.cancel);
-
-				Utility.showStoreSelector(context, title, okLabel, cancelLabel, selectedStores, new StoreSelectedListener() {
-					@Override
-					public void done(long selectedId) {
-						SettingUtility.setListenerStores(selectedId);
-						HashSet<Long> longs = new HashSet<>();
-						longs.add(selectedId);
-						updateStoreFilterText(list_store_filter_values, longs);
-					}
-				});
-			}
-		});
 
 		try {
 			if (initDevicesList() != 0) {
@@ -258,11 +256,11 @@ public class SettingsPrintActivity extends ListActivity {
 							BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(device);
 							if (listAdapter.getPosition(deviceStatus) < 0) {
 								listAdapter.add(deviceStatus);
-								listAdapter.notifyDataSetInvalidated();
 							}
 						}
 
 						connectToLastOne();
+                        listAdapter.notifyDataSetInvalidated();
 					}
 				} catch (Exception ex) {
 					AppLogger.e("error to enable bluebooth", ex);
@@ -322,18 +320,6 @@ public class SettingsPrintActivity extends ListActivity {
 				connecting,
 				Toast.LENGTH_SHORT).show();
 
-//		if (progressFragment != null) {
-//			if (progressFragment.getFragmentManager() != null) {
-//				progressFragment.dismissAllowingStateLoss();
-//			}
-//			if (this.activity != null) {
-//				Utility.forceShowDialog(this, progressFragment);
-//			}
-//		}
-//		progressFragment = ProgressFragment.newInstance(connecting);
-//		if (progressFragment != null) {
-//		}
-//		progressFragment.setAsyncTask(this);
 		Thread connectThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -342,16 +328,21 @@ public class SettingsPrintActivity extends ListActivity {
 					final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
 					final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
 					item.resetSocket(socketWrapper);
-					SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
-					AppLogger.e("connect with wrapper: connected");
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(getApplicationContext(),
-									String.format("已连接到 %s", item.getName()),
-									Toast.LENGTH_SHORT).show();
-						}
-					});
+
+                    final SettingsPrintActivity act = SettingsPrintActivity.this;
+                    SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
+                    act.lastDevice = item;
+
+                    AppLogger.e("connect with wrapper: connected");
+                    final String msg = String.format("已连接到 %s", item.getName());
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showTestDlg(act, msg, item.getSocket());
+                        }
+                    });
+
 				} catch (IOException ex) {
 					AppLogger.e("exception to connect BT device:" + device.getName(), ex);
 					CrashReportHelper.handleUncaughtException(null, ex);
@@ -373,7 +364,27 @@ public class SettingsPrintActivity extends ListActivity {
 		connectThread.start();
 	}
 
-	private Runnable socketErrorRunnable = new Runnable() {
+    public void showTestDlg(final SettingsPrintActivity act, String msg, final BluetoothConnector.BluetoothSocketWrapper socket) {
+        AlertUtil.showAlert(act, R.string.tip_dialog_title, msg, "确定", null,
+                "打印测试", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    if (socket != null) {
+                        OrderPrinter.printTest(socket);
+                    } else {
+                        Utility.toast("打印机端口状态为null", act);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //TODO: 应该自动尝试连接！
+                    Utility.toast("打印错误，请关闭App重新连接！", act);
+                }
+            }
+        });
+    }
+
+    private Runnable socketErrorRunnable = new Runnable() {
 
 		@Override
 		public void run() {

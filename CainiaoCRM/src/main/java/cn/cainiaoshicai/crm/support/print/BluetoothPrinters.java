@@ -83,6 +83,7 @@ public class BluetoothPrinters {
         }
 
         public boolean isBound() {
+            AppLogger.i("bound state(of" + addr + "):" + device.getBondState());
             return this.device != null && (device.getBondState() == BluetoothDevice.BOND_BONDED);
         }
 

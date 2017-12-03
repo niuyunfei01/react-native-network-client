@@ -102,7 +102,7 @@ public class BluetoothConnector {
         return true;
     }
 
-    public static interface BluetoothSocketWrapper {
+    public interface BluetoothSocketWrapper {
 
         InputStream getInputStream() throws IOException;
 

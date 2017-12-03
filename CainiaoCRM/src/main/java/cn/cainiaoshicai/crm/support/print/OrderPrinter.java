@@ -56,7 +56,8 @@ public class OrderPrinter {
         }.executeOnNormal();
     }
 
-    public static void printEstimate(BluetoothConnector.BluetoothSocketWrapper btsocket, ProductEstimate estimate) throws IOException {
+    public static void printEstimate(BluetoothConnector.BluetoothSocketWrapper btsocket,
+                                     ProductEstimate estimate) throws IOException {
         try {
             OutputStream btos = btsocket.getOutputStream();
             BasePrinter printer = new BasePrinter(btos);
@@ -106,6 +107,30 @@ public class OrderPrinter {
             btos.flush();
         } catch (Exception e) {
             AppLogger.e("error in printing estimate lists", e);
+            throw e;
+        }
+    }
+
+    public static void printTest(BluetoothConnector.BluetoothSocketWrapper btsocket) throws IOException {
+        try {
+            OutputStream btos = btsocket.getOutputStream();
+            BasePrinter printer = new BasePrinter(btos);
+
+            btos.write(new byte[]{0x1B, 0x21, 0});
+            btos.write(GPrinterCommand.left);
+
+            printer.starLine().highBigText("   打印测试单").newLine();
+            printer.highText(String.format("合计 %27s", "x100")).newLine();
+
+            printer.starLine().normalText("比邻鲜，好生意！").newLine();
+
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(0x0D);
+            btos.write(GPrinterCommand.walkPaper((byte) 4));
+            btos.flush();
+        } catch (Exception e) {
+            AppLogger.e("error in printing test", e);
             throw e;
         }
     }
