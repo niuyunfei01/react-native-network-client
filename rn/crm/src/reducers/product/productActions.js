@@ -113,7 +113,35 @@ function receiveVendorTags(_v_id, vendor_tags = {}) {
   }
 }
 
+export function uploadImg(file_model_name = 'Product', image_info, callback) {
 
+  let formData = new FormData();
+  let {uri, name} = image_info;
+  let photo = {uri: uri, type: 'application/octet-stream', name: name};
+
+  formData.append("file_post_name", 'photo');
+  formData.append("file_model_name", file_model_name);
+  formData.append("no_db", 0);
+  formData.append("return_type", 'json');
+  formData.append("data_id", 0);
+  formData.append("photo", photo);
+  console.log('formData -> ', formData);
+
+  const url = `uploadfiles/upload`;
+
+  return dispatch => {
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
+      .then(resp => resp.json())
+      .then(resp => {
+        console.log('upload_files resp --->', resp);
+      }).catch((error) => {
+        console.log('error resp --->', error);
+        callback({ok: false, desc: error});
+      }
+    );
+  }
+
+}
 
 
 

@@ -23,6 +23,9 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
 import Config from "../../config";
+import {uploadImg} from "../../reducers/product/productActions";
+import ImagePicker from "react-native-image-crop-picker";
+import {fetchUserInfo} from "../../reducers/user/userActions";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -32,6 +35,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      uploadImg,
       ...globalActions
     }, dispatch)
   }
@@ -92,6 +96,51 @@ class GoodsEditScene extends PureComponent {
     let {key, params} = this.props.navigation.state;
     let {store_categories} = (params || {});
     console.log('store_categories-------->', store_categories)
+  }
+  pickSingle() {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: false,
+      cropperCircleOverlay: false,
+      compressImageMaxWidth: 640,
+      compressImageMaxHeight: 480,
+      compressImageQuality: 0.5,
+      compressVideoPreset: 'MediumQuality',
+      includeExif: true,
+    }).then(image => {
+      let image_path = image.path;
+      let image_arr = image_path.split('/');
+      let image_name = image_arr[image_arr.length-1];
+      // let post_img_data = {
+      //   file_post_name: 'photo',
+      //   file_model_name: 'Product',
+      //   no_db: 0,
+      //   return_type: 'json',
+      //   data_id: 0,
+      //   photo: {uri: image_path, type: 'application/octet-stream', name: image_name},
+      // };
+      // console.log(post_img_data);
+      // console.log('received image -> ', image_path);
+      let image_info = {
+        uri: image_path,
+        name: image_name,
+      };
+      this.uploadImg(image_info);
+      this.setState({
+        image: {uri: image_path, width: image.width, height: image.height, mime: image_name},
+        images: null
+      });
+    }).catch(e => {
+      console.log(e);
+    });
+  }
+
+  uploadImg(image_info) {
+    const {dispatch} = this.props;
+    dispatch(uploadImg('Product', image_info, (ok, desc, obj) => {
+      console.log('uploadImg => ', ok, desc, obj);
+    }));
   }
   render() {
     return (
@@ -246,9 +295,12 @@ class GoodsEditScene extends PureComponent {
               )
             })
           }
-          <View style={[styles.img_add, styles.img_add_box]}>
+          <TouchableOpacity
+            style={[styles.img_add, styles.img_add_box]}
+            onPress={() => this.pickSingle()}
+          >
             <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <GoodAttrs name="门店信息"/>
         <Cells style={styles.my_cells}>
