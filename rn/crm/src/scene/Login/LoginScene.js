@@ -199,18 +199,17 @@ class LoginScene extends PureComponent {
           doneSelectStore: (storeId) => {
             dispatch(getCommonConfig(token, storeId, (ok) => {
               if (ok) {
-                console.log('storeId -> ', storeId);
                 native.setCurrStoreId(storeId, (set_ok, msg) => {
                   console.log('set_ok -> ', set_ok, msg);
-
                   if (set_ok) {
                     dispatch(setCurrentStore(storeId));
+                    console.log('this.next -> ', this.next);
                     if (Config.ROUTE_ORDERS === this.next || !this.next) {
                       native.toOrders();
                     } else {
-                      this.props.navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
+                      navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
                     }
-                    tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
+                    tool.resetNavStack(navigation, Config.ROUTE_ALERT);
                   } else {
                     ToastLong(msg);
                   }
