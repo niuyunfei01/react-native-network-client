@@ -256,6 +256,7 @@ export function intOf(val) {
   if (typeof val === 'string') {
     return parseInt(val);
   }
+
   return val;
 }
 
@@ -321,62 +322,6 @@ export function storeActionSheet(canReadStores) {
       }
     }
   };
-export function disWayStatic(index){
-
-    if(index == 1){
-      let map = {};
-      map[Cts.FN_STATUS_ACCEPTED] = '系统已接单'
-      map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手'
-      map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店'
-      map[Cts.FN_STATUS_ON_WAY] = '配送中'
-      map[Cts.FN_STATUS_ARRIVED] = '已送达'
-      map[Cts.FN_STATUS_CANCELED] = '已取消'
-      map[Cts.FN_STATUS_ABNORMAL] = '异常'
-      return map;
-    } else{
-      let map = {};
-      map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单'
-      map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
-      map[Cts.DADA_STATUS_SHIPPING] = '配送中'
-      map[Cts.DADA_STATUS_ARRIVED] = '已完成'
-      map[Cts.DADA_STATUS_CANCEL] = '已取消'
-      map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
-      map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
-      return map;
-    }
-  }
-
-
-  export function disWay(){
-    let map = {};
-    map[Cts.SHIP_AUTO_FN] = '蜂鸟';
-    map[Cts.SHIP_AUTO_NEW_DADA] ='新达达';
-    map[Cts.SHIP_AUTO_BD] ='百度';
-    map[Cts.SHIP_AUTO_SX] ='闪送';
-    return map
-  }
-  export function sellingStatus(sell_status) {
-    let map = {};
-    map[Cts.STORE_PROD_ON_SALE] ='上架';
-    map[Cts.STORE_PROD_OFF_SALE] ='下架';
-    map[Cts.STORE_PROD_SOLD_OUT] ='缺货';
-    if (map[sell_status]){
-      return map[sell_status]
-    }else {
-      return '选择门店状态'
-    }
-  }
-export function headerSupply(mode) {
-  let map = {};
-  map[Cts.STORE_SELF_PROVIDED] ='门店自采';
-  map[Cts.STORE_COMMON_PROVIDED] ='总部供货';
-  if (map[mode]){
-    return map[mode]
-  }else {
-    return '选择供货方式'
-  }
-}
-
 
   let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
   /*let sortStores = Object.values(canReadStores).sort(function (a, b) {
@@ -409,6 +354,29 @@ export function first_store_id(canReadStores) {
   return first_store_id;
 }
 
+export function sellingStatus(sell_status) {
+  let map = {};
+  map[Cts.STORE_PROD_ON_SALE] ='上架';
+  map[Cts.STORE_PROD_OFF_SALE] ='下架';
+  map[Cts.STORE_PROD_SOLD_OUT] ='缺货';
+  if (map[sell_status]){
+    return map[sell_status]
+  }else {
+    return '选择门店状态'
+  }
+}
+export function headerSupply(mode) {
+let map = {};
+map[Cts.STORE_SELF_PROVIDED] ='门店自采';
+map[Cts.STORE_COMMON_PROVIDED] ='总部供货';
+if (map[mode]){
+  return map[mode]
+}else {
+  return '选择供货方式'
+}
+}
+
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -429,10 +397,10 @@ export default {
   vendor,
   vendorOfStoreId,
   length,
-  sellingStatus,
-  headerSupply
   parameterByName,
   user_info,
   first_store_id,
   storeActionSheet,
+  sellingStatus,
+  headerSupply,
 }
