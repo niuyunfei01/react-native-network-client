@@ -87,9 +87,9 @@ export default {
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },
 
-  gotoLoginWithNoHistory: async function () {
+  gotoLoginWithNoHistory: async function (mobile = '') {
     await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.gotoLoginWithNoHistory());
+      NativeModules.ActivityStarter.gotoLoginWithNoHistory(mobile));
   },
 
   gotoActByUrl: async function (url) {

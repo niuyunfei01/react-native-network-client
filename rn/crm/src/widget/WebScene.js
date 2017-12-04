@@ -89,16 +89,14 @@ class WebScene extends PureComponent {
   };
 
   _jumpIfShould = (url) => {
+
+    const {navigation} = this.props;
     let stop = false;
     if (url.indexOf("/stores/provide_list.html") >= 0
-      || url.indexOf("/stores/view_order") >= 0
       || url.indexOf("/market_tools/user_talk") > 0
       || url.indexOf("/stores/search_wm_orders") > 0
       || url.indexOf("/stores/storage_common/") >= 0
-      || url.indexOf("/stores/provide_prepare") >= 0
-      || url.indexOf("/users/login/crm/") >= 0
-      || url.indexOf("/users/login?") >= 0
-      || url.indexOf("/users/login/") >= 0) {
+      || url.indexOf("/stores/provide_prepare") >= 0) {
       native.gotoActByUrl(url);
       stop = true;
     } else if (url.indexOf("/stores/crm_add_token") > 0) {
@@ -112,6 +110,17 @@ class WebScene extends PureComponent {
       Config.serverUrl(Config.host(global, dispatch, native), `${path}&access_token=${global.accessToken}&${vmPath}`);
 
       return true;
+    } else if (url.indexOf("/stores/view_order") >= 0) {
+
+      navigation.navigate(Config.ROUTE_ORDER, {orderId: tool.parameterByName('wm_id', url)});
+      stop = true;
+    } else if (url.indexOf("/users/login/crm/") >= 0
+      || url.indexOf("/users/login?") >= 0
+      || url.indexOf("/users/login/") >= 0) {
+
+      const mobile = tool.parameterByName("m", url);
+      native.gotoLoginWithNoHistory(mobile);
+      stop = true;
     }
 
     if (stop) {

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telecom.Call;
+import android.text.TextUtils;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
@@ -269,11 +270,18 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    /**
+     *
+     * @param mobile mobile could be null
+     */
     @ReactMethod
-    void gotoLoginWithNoHistory() {
+    void gotoLoginWithNoHistory(String mobile) {
         Context act = GlobalCtx.app().getCurrentRunningActivity();
         if (act != null) {
             Intent intent = new Intent(act, LoginActivity.class);
+            if (!TextUtils.isEmpty(mobile)) {
+                intent.putExtra("mobile", mobile);
+            }
             intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
             act.startActivity(intent);
         }
