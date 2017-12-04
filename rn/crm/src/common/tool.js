@@ -88,7 +88,8 @@ export function vendor(global) {
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
-
+  let fnProviding = currVendor['fnProviding'];
+  let fnProvidingOnway = currVendor['fnProvidingOnway'];
   let mgr_ids = [];
   let service_ids = [];
   let owner_id = currStore['owner_id'];
@@ -134,6 +135,8 @@ export function vendor(global) {
     is_service_mgr: is_service_mgr,
     is_helper: is_helper,
     service_uid: service_uid,
+    fnProviding: fnProviding,
+    fnProvidingOnway: fnProvidingOnway,
   };
 }
 

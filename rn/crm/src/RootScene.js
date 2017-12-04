@@ -21,10 +21,12 @@ import {setAccessToken, setCurrentStore, setUserProfile, updateCfg} from './redu
 import configureStore from "./common/configureStore";
 import AppNavigator from './common/AppNavigator'
 import Caught from './common/Caught'
+import * as _g from './global'
 
 import Config from './config'
 
 import SplashScreen from 'react-native-splash-screen'
+import native from "./common/native";
 
 const lightContentScenes = ['Home', 'Mine']
 
@@ -63,7 +65,7 @@ class RootScene extends PureComponent {
 
     this.state = {
       rehydrated: false
-    }
+    };
 
     this.store = null;
   }
@@ -81,12 +83,17 @@ class RootScene extends PureComponent {
 
       if (access_token) {
         store.dispatch(setAccessToken({access_token}));
-        store.dispatch(setPlatform('android'))
-        store.dispatch(setUserProfile(userProfile))
-        store.dispatch(setCurrentStore(currStoreId))
+        store.dispatch(setPlatform('android'));
+        store.dispatch(setUserProfile(userProfile));
+        store.dispatch(setCurrentStore(currStoreId));
         store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
       }
-      this.setState({rehydrated: true});
+
+      _g.setHostPortNoDef(store.getState().global, native, () => {
+        console.log('setHostPortNoDef done ');
+        this.setState({rehydrated: true});
+      });
+
     }.bind(this));
   }
 

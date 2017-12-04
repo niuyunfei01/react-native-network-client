@@ -673,9 +673,9 @@ public class GlobalCtx extends Application {
                     } catch (ServiceException e) {
                         AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
                         Activity runningActivity = app().getCurrentRunningActivity();
-                        if (runningActivity != null) {
-                            AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
-                        }
+//                        if (runningActivity != null) {
+                            //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
+//                        }
                     }
                     return null;
                 }

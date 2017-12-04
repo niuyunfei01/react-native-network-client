@@ -211,10 +211,10 @@ public class MainActivity extends AbstractActionBarActivity {
 
         final ArrayList<Long> autoPrintStores = SettingUtility.getAutoPrintStores();
         final GlobalCtx app = GlobalCtx.app();
-        TextView printerStatus = (TextView) this.findViewById(R.id.head_status_printer);
-        TextView signInTxt = (TextView) this.findViewById(R.id.head_orders_waiting);
+        TextView printerStatus = this.findViewById(R.id.head_status_printer);
+        TextView signInTxt = this.findViewById(R.id.head_orders_waiting);
 
-        ImageButton searchBtn = (ImageButton) this.findViewById(R.id.head_order_search);
+        ImageButton searchBtn = this.findViewById(R.id.head_order_search);
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -222,7 +222,7 @@ public class MainActivity extends AbstractActionBarActivity {
             }
         });
 
-        TextView tmpBuy = (TextView) this.findViewById(R.id.head_orders_schedule);
+        TextView tmpBuy = this.findViewById(R.id.head_orders_schedule);
         RelativeLayout.LayoutParams params = null;
         if (signInTxt != null) {
             params = (RelativeLayout.LayoutParams) signInTxt.getLayoutParams();
@@ -299,7 +299,7 @@ public class MainActivity extends AbstractActionBarActivity {
             }
         });
 
-        bottomBar = (BottomBar) findViewById(R.id.toolbar_bottom);
+        bottomBar = findViewById(R.id.toolbar_bottom);
         bottomBar.setDefaultTab(R.id.menu_process);
         bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
             @Override

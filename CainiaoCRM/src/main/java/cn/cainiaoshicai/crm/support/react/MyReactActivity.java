@@ -37,9 +37,10 @@ import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 
 
-public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
+public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
@@ -106,7 +107,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         Bundle vendors = new Bundle();
         boolean found = false;
         Vendor currV = GlobalCtx.app().getVendor();
-        if (config != null && config.getCan_read_vendors() != null) {
+        if (config != null && config.getCan_read_vendors() != null && currV != null) {
             for(Vendor vendor : config.getCan_read_vendors()) {
                 if (vendor != null){
                     vendors.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
@@ -215,6 +216,12 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
             editor.apply();
         }
         return first;
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
     }
 
     @TargetApi(Build.VERSION_CODES.M)

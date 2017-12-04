@@ -71,7 +71,7 @@ class WebScene extends PureComponent {
   }
 
   _onNavigationStateChange = (navState) => {
-    console.log('set nav state', navState);
+    // console.log('set nav state', navState);
 
     if (navState.canGoBack !== this.state.canGoBack || navState.loading !== this.state.showLoading) {
       this.setState({

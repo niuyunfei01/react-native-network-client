@@ -91,7 +91,7 @@ class DoneRemindScene extends PureComponent {
     const _this = this;
     let {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId} = this.props.global;
-    const url = AppConfig.ServiceUrl + 'api/list_notice/' + currVendorId + '/' + currStoreId + '/' + '-1/' + Cts.TASK_STATUS_DONE + '/' + page + '.json?access_token=' + token + '&search=' + search + '&time_range=' + filter;
+    const url = AppConfig.apiUrl(`api/list_notice/${currVendorId}/${currStoreId}/-1/${Cts.TASK_STATUS_DONE}/${page}.json?access_token=${token}&search=${search}&time_range=${filter}`);
     fetch(url)
       .then(res => res.json())
       .then(res => {

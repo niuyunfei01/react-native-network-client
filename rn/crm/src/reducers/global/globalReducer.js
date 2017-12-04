@@ -58,6 +58,7 @@ export default function globalReducer (state = initialState, action) {
 
     case SET_CURR_STORE:
       if (action.payload) {
+        console.log('SET_CURR_STORE -> ', action.payload);
         return {
           ...state,
           currStoreId: action.payload,
