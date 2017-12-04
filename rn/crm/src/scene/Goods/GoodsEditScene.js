@@ -113,17 +113,28 @@ class GoodsEditScene extends PureComponent {
 
     };
 
+    this.uploadImg = this.uploadImg.bind(this);
   }
 
   componentWillMount() {
     let {params} = this.props.navigation.state;
     let {type} = params;
     const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = (this.props.navigation.state.params.product_detail || {});
-    let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
-      return {id: img_id, name: img_data.name};
-    });
 
     if (type === 'edit') {
+      // let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
+      //   return {id: img_id, name: img_data.name};
+      // });
+      let upload_files = {};
+      if(tool.length(mid_list_img) > 0){
+        for(let img_id in mid_list_img){
+          if (mid_list_img.hasOwnProperty(img_id)) {
+            let img_data = mid_list_img[img_id];
+            upload_files[img_id] = {id: img_id, name: img_data.name}
+          }
+        }
+      }
+
       this.setState({
         name: name,
         sku_having_unit: sku_having_unit,
@@ -326,8 +337,8 @@ class GoodsEditScene extends PureComponent {
 
   pickSingleImg() {
     ImagePicker.openPicker({
-      width: 300,
-      height: 300,
+      width: 500,
+      height: 500,
       cropping: true,
       cropperCircleOverlay: false,
       compressImageMaxWidth: 640,
@@ -344,19 +355,28 @@ class GoodsEditScene extends PureComponent {
         name: image_name,
       };
       this.uploadImg(image_info);
-      // this.setState({
-      //   image: {uri: image_path, width: image.width, height: image.height, mime: image_name},
-      //   images: null
-      // });
     }).catch(e => {
-      console.log('e -> ', e);
+      console.log('error -> ', e);
     });
   }
 
   uploadImg(image_info) {
     const {dispatch} = this.props;
-    dispatch(uploadImg(image_info, (ok, desc, obj) => {
-      console.log('uploadImg => ', ok, desc, obj);
+    dispatch(uploadImg(image_info, (resp) => {
+      console.log('uploadImg => ', resp);
+      if (resp.ok) {
+        let {list_img, upload_files} = this.state;
+        let {uri, name} = image_info;
+        let file_id = resp.obj.file_id;
+        list_img[file_id] = {
+          url: uri,
+          name: name,
+        };
+        upload_files[file_id] = {id: file_id, name: name};
+        this.setState({list_img, upload_files});
+      } else {
+        ToastLong(resp.desc);
+      }
     }));
   }
 
