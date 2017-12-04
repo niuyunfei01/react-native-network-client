@@ -180,7 +180,8 @@ export function uploadImg(image_info, callback, file_model_name = 'Product') {
         }
         callback({ok, desc, obj: {file_id, fspath}});
       }).catch((error) => {
-        callback({ok: false, desc: error});
+        console.log('error -> ', error);
+        callback({ok: false, desc: '图片上传失败'});
       }
     );
   }

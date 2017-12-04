@@ -134,6 +134,8 @@ class GoodsEditScene extends PureComponent {
           }
         }
       }
+      console.log('componentWillMount--list_img =====> ', list_img);
+      console.log('componentWillMount--upload_files =====> ', upload_files);
 
       this.setState({
         name: name,
@@ -363,16 +365,18 @@ class GoodsEditScene extends PureComponent {
   uploadImg(image_info) {
     const {dispatch} = this.props;
     dispatch(uploadImg(image_info, (resp) => {
-      console.log('uploadImg => ', resp);
+      console.log('image_info => ', resp);
       if (resp.ok) {
         let {list_img, upload_files} = this.state;
-        let {uri, name} = image_info;
-        let file_id = resp.obj.file_id;
+        let {name} = image_info;
+        let {file_id, fspath} = resp.obj;
         list_img[file_id] = {
-          url: uri,
+          url: fspath,
           name: name,
         };
         upload_files[file_id] = {id: file_id, name: name};
+        console.log('--list_img =====> ', list_img);
+        console.log('--upload_files =====> ', upload_files);
         this.setState({list_img, upload_files});
       } else {
         ToastLong(resp.desc);
@@ -381,6 +385,9 @@ class GoodsEditScene extends PureComponent {
   }
 
   render() {
+    let {list_img, upload_files} = this.state;
+    console.log('list_img -> ', list_img);
+    console.log('upload_files -> ', upload_files);
     return (
       <ScrollView>
         <GoodAttrs name="基本信息"/>
