@@ -148,7 +148,7 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   renderList(store_product) {
-    console.log(11111111)
+
     let _this = this
     return tool.objectMap(store_product, function (s_product, store_id) {
       return (
@@ -163,8 +163,7 @@ class GoodsBatchPriceScene extends PureComponent {
                   let  productList = _this.state.productList;
                   productList[store_id]['status']=option.key;
                   _this.forceUpdate()
-                  // _this.setState({flag:Math.random()});
-
+                
                 }}
               >
                 <View style={[styles.item_status]}>

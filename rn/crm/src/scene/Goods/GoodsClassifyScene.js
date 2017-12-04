@@ -3,9 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
-  TouchableHighlight,
   ScrollView,
   RefreshControl,
   InteractionManager,
@@ -20,6 +18,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {NavigationActions} from 'react-navigation';
 import pxToDp from "../../util/pxToDp";
 import {create} from "../../weui/StyleSheet/index";
+import Cts from "../../Cts";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -47,16 +46,13 @@ class GoodsClassifyScene extends PureComponent {
     super(props)
     const {store_categories, vendor_id} = this.props.navigation.state.params
     const store_tags = this.toCheckBoxData(this.props.product.store_tags[vendor_id])
-
     this.state = {
       arrData: store_tags,
       checked: store_categories,
     }
-
   }
 
-  setGoodsCats(checked) {
-    this.setState({checked});
+  async setGoodsCats(checked) {
     let {state, dispatch} = this.props.navigation;
     let tag_list =  this.GetCheckName(checked)
     console.log(tag_list)
@@ -68,9 +64,13 @@ class GoodsClassifyScene extends PureComponent {
   }
 
   toCheckBoxData(arr) {
-    arr.forEach((item) => {
+    arr.forEach((item,index) => {
       item.label = item.name
       item.value = item.id
+      if(item.id == Cts.TAG_HIDE ){
+        arr.splice(index,1)
+      }
+
     })
     return arr
   }
@@ -94,14 +94,17 @@ class GoodsClassifyScene extends PureComponent {
         <ScrollView style={{backgroundColor: "#fff"}}>
           <CheckboxCells
             options={this.state.arrData}
-            onChange={(checked) => this.setGoodsCats(checked)}
+            onChange={(checked) => {
+             this.setState({checked:checked})
+            }}
             style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
             value={this.state.checked}
           />
         </ScrollView>
         <TouchableOpacity
-          onPress={() =>{
-           this.props.navigation.dispatch(NavigationActions.back())
+          onPress={ async () =>{
+            await   this.setGoodsCats(this.state.checked);
+            this.props.navigation.dispatch(NavigationActions.back())
           }}
         >
           <View style={styles.save_btn_box}>

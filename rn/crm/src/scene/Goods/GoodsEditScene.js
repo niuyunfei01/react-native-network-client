@@ -435,24 +435,6 @@ class GoodsEditScene extends PureComponent {
             </ModalSelector>
             <Cell customStyle={[styles.my_cell]}>
               <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>平均重量</Label>
-              </CellHeader>
-              <CellBody>
-                <TextInput
-                  placeholder='请输入商品重量'
-                  underlineColorAndroid='transparent'
-                  style={[styles.input_text]}
-                  value={this.state.weight}
-                  keyboardType='numeric'
-                  onChangeText={(text) => {
-                    this.setState({weight: text})
-                  }}
-                />
-              </CellBody>
-              <CellFooter>克</CellFooter>
-            </Cell>
-            <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={styles.attr_name}>
                 <Label style={[styles.cell_label]}>份含量</Label>
               </CellHeader>
               <CellBody>
@@ -469,6 +451,25 @@ class GoodsEditScene extends PureComponent {
               </CellBody>
               <CellFooter/>
             </Cell>
+            <Cell customStyle={[styles.my_cell]}>
+              <CellHeader style={styles.attr_name}>
+                <Label style={[styles.cell_label]}>平均重量</Label>
+              </CellHeader>
+              <CellBody>
+                <TextInput
+                  placeholder='请输入商品重量'
+                  underlineColorAndroid='transparent'
+                  style={[styles.input_text]}
+                  value={this.state.weight}
+                  keyboardType='numeric'
+                  onChangeText={(text) => {
+                    this.setState({weight: text})
+                  }}
+                />
+              </CellBody>
+              <CellFooter>克</CellFooter>
+            </Cell>
+          
             <ModalSelector
               skin='customer'
               data={this.state.basic_cat_list}
@@ -638,7 +639,7 @@ const styles = StyleSheet.create({
     borderTopWidth: pxToDp(1),
     paddingVertical: pxToDp(35),
     backgroundColor: "#fff",
-    flexWrap: 'wrap',
+   
   },
   area_input_title: {
     color: "#363636",
