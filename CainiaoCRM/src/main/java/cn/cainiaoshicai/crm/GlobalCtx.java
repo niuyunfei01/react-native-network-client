@@ -109,7 +109,6 @@ public class GlobalCtx extends Application {
     public static final int INT_SUCESS_API = 1;
 
     public static final CopyOnWriteArrayList<Integer> newOrderNotifies = new CopyOnWriteArrayList<>();
-    private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
 
     private static GlobalCtx application;
 

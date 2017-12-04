@@ -146,7 +146,7 @@ public class MainActivity extends AbstractActionBarActivity {
         GlobalCtx.app().setAccountBean(accountBean);
         SettingUtility.setDefaultAccountId(accountBean.getUid());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && BuildConfig.DEBUG) {
             if (!Settings.canDrawOverlays(this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + getPackageName()));
