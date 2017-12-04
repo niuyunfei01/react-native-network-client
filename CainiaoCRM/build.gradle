@@ -146,8 +146,6 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
 
-            manifestPlaceholders = [excludeSystemAlertWindowPermission: "false"]
-
             applicationIdSuffix ""
             versionNameSuffix "-debug"
             resValue "string", "applicationId", "cn.cainiaoshicai.crm" + getApplicationIdSuffix()
@@ -159,8 +157,6 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
-
-            manifestPlaceholders = [excludeSystemAlertWindowPermission: "true"]
 
             resValue "string", "applicationId", "cn.cainiaoshicai.crm"
             resValue "string", "Cainiaoshicai.cn",
