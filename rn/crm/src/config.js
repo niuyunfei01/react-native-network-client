@@ -32,6 +32,7 @@ export function apiUrl(path) {
 
 export function staticUrl(path) {
   const hp = (global.hostPort ? global.hostPort : C.defaultHost);
+  path = path[0] === '/' ? path.substr(1) : path;
   return `https://${hp}/${path}`;
 }
 

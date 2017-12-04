@@ -32,6 +32,7 @@ import Cts from '../../Cts';
 import {color, NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
+import Toast from "../../weui/Toast/Toast";
 
 
 function mapStateToProps(state) {
@@ -85,6 +86,7 @@ class GoodsEditScene extends PureComponent {
     store_tags = store_tags[currVendorId];
     this.state = {
       isRefreshing: false,
+      isUploadImg: false,
       basic_cat_list: basic_cat_list,
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
@@ -134,8 +136,6 @@ class GoodsEditScene extends PureComponent {
           }
         }
       }
-      console.log('componentWillMount--list_img =====> ', list_img);
-      console.log('componentWillMount--upload_files =====> ', upload_files);
 
       this.setState({
         name: name,
@@ -207,9 +207,9 @@ class GoodsEditScene extends PureComponent {
     let check_res = this.dataValidate(formData);
     if(check_res){
       console.log('formData -> ', formData);
-      // dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
-      //   console.log(ok,reason,obj)
-      // }))
+      dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
+        console.log(ok,reason,obj)
+      }))
     }
   };
 
@@ -224,7 +224,7 @@ class GoodsEditScene extends PureComponent {
       err_msg = '无效的品牌商';
     } else if (sku_unit !== '斤' && sku_unit !== '个') {
       err_msg = '选择SKU单位';
-    } else if (weight < 0) {
+    } else if (!(weight > 0)) {
       err_msg = '请输入正确的重量';
     } else if (sku_having_unit <= 0) {
       err_msg = '请输入正确的份含量';
@@ -364,30 +364,38 @@ class GoodsEditScene extends PureComponent {
 
   uploadImg(image_info) {
     const {dispatch} = this.props;
+    let {isUploadImg, list_img, upload_files} = this.state;
+    if(isUploadImg){
+      return false;
+    }
+    this.setState({isUploadImg: true});
     dispatch(uploadImg(image_info, (resp) => {
-      console.log('image_info => ', resp);
+      console.log('image_resp ===> ', resp);
       if (resp.ok) {
-        let {list_img, upload_files} = this.state;
-        let {name} = image_info;
+        let {name, uri} = image_info;
         let {file_id, fspath} = resp.obj;
         list_img[file_id] = {
-          url: fspath,
+          url: Config.staticUrl(fspath),
           name: name,
         };
         upload_files[file_id] = {id: file_id, name: name};
-        console.log('--list_img =====> ', list_img);
-        console.log('--upload_files =====> ', upload_files);
-        this.setState({list_img, upload_files});
+
+        console.log('list_img --> ', list_img);
+        this.setState({
+          list_img: list_img,
+          upload_files: upload_files,
+          isUploadImg: false,
+        });
       } else {
         ToastLong(resp.desc);
+        this.setState({
+          isUploadImg: false,
+        });
       }
     }));
   }
 
   render() {
-    let {list_img, upload_files} = this.state;
-    console.log('list_img -> ', list_img);
-    console.log('upload_files -> ', upload_files);
     return (
       <ScrollView>
         <GoodAttrs name="基本信息"/>
@@ -541,6 +549,7 @@ class GoodsEditScene extends PureComponent {
         <View style={[styles.area_cell, {height: pxToDp(215), flexDirection: 'row'}]}>
           {tool.objectMap(this.state.list_img, (img_data, img_id) => {
             let img_url = img_data['url'];
+            console.log(img_url);
             let img_name = img_data['name'];
             return (
               <Image
@@ -561,6 +570,10 @@ class GoodsEditScene extends PureComponent {
           this.renderAddGood()
         }
 
+        <Toast
+          icon="loading"
+          show={this.state.isUploadImg}
+        >图片上传中...</Toast>
       </ScrollView>
     )
   }
@@ -624,7 +637,8 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderTopWidth: pxToDp(1),
     paddingVertical: pxToDp(35),
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
+    flexWrap: 'wrap',
   },
   area_input_title: {
     color: "#363636",

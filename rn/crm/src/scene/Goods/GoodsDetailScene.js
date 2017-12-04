@@ -457,12 +457,11 @@ const styles = StyleSheet.create({
   },
   goods_cats: {
     marginLeft: pxToDp(20),
-    width: pxToDp(118),
     height: pxToDp(32),
     borderRadius: 8,
     textAlign: 'center',
     textAlignVertical: 'center',
-    paddingHorizontal: pxToDp(5),
+    paddingHorizontal: pxToDp(10),
     backgroundColor: colors.new_back,
     fontSize: pxToDp(24),
     color: '#41aa55',
