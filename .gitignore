@@ -65,3 +65,12 @@ fastlane/screenshots
 
 .tmp/
 rn/crm/package-lock.json
+.project
+.project
+.project
+.settings/org.eclipse.buildship.core.prefs
+CainiaoCRM/.settings/org.eclipse.buildship.core.prefs
+CainiaoCRM/.project
+CainiaoCRM/.classpath
+.settings/org.eclipse.buildship.core.prefs
+
