@@ -369,16 +369,18 @@ class GoodsDetailScene extends PureComponent {
 
     if(tool.length(list_img) > 0){
       let _this = this;
-      let img_list = list_img.map((img_url, idx) => {
+      let img_list = tool.objectMap(list_img, (img_data, img_id) => {
+        let img_url = img_data['url'];
+        let img_name = img_data['name'];
         return (
           <TouchableHighlight
-            key={idx}
+            key={img_id}
             onPress={_this.onToggleFullScreen}
           >
-          <Image
-            style={goods_img}
-            source={{uri: img_url}}
-          />
+            <Image
+              style={goods_img}
+              source={{uri: img_url}}
+            />
           </TouchableHighlight>
         );
       });

@@ -108,14 +108,13 @@ class OrderScene extends Component {
     const {params = {}} = navigation.state;
 
     let {backPage} = params;
-    console.log('params-------------->',params)
     return {
       headerLeft: (<NavigationItem
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
           if(!!backPage){
-            console.log('backPage ------------> ', backPage);
+            // console.log('backPage ------------> ', backPage);
             native.gotoPage(backPage);
           } else {
             navigation.goBack();

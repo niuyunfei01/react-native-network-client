@@ -31,9 +31,7 @@ import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {color, NavigationItem} from '../../widget';
 import native from "../../common/native";
-
-
-
+import {ToastLong} from "../../util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -56,18 +54,6 @@ class GoodsEditScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type} = params;
     return {
-       headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if(!!type){
-            console.log('type -> ', type);
-            native.gotoPage(type);
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />),
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerRight: (
         <View style={
@@ -78,7 +64,7 @@ class GoodsEditScene extends PureComponent {
         }>
           <TouchableOpacity
             onPress={() => {
-              navigation.state.params.upLoad()
+              params.upLoad();
             }}
           >
             <Text style={{
@@ -94,9 +80,9 @@ class GoodsEditScene extends PureComponent {
     super(props);
     let {store_tags} = this.props.product;
     let {currVendorId} = tool.vendor(this.props.global);
-    const basic_categories = this.props.product.basic_category[currVendorId]
-    const basic_cat_list = this.toModalData(basic_categories)
-    store_tags = store_tags[currVendorId]
+    const basic_categories = this.props.product.basic_category[currVendorId];
+    const basic_cat_list = this.toModalData(basic_categories);
+    store_tags = store_tags[currVendorId];
     this.state = {
       isRefreshing: false,
       basic_cat_list: basic_cat_list,
@@ -105,17 +91,18 @@ class GoodsEditScene extends PureComponent {
       basic_categories: basic_categories,
       head_supply: -1,
       name: '',
-      sku_having_unit: '',
+      sku_having_unit: 1,
       content: '',
       promote_name: '',
-      upload_files: [],
+      list_img: {},
+      upload_files: {},
       price: '',
-      basic_category: 1,
+      basic_category: 0,
       vendor_id: currVendorId,
       store_categories: [],
       store_tags: store_tags,
       tag_list: '选择门店分类',
-      id: '',
+      id: 0,
       sku_unit: '请选择SKU单位',
       weight: '',
       selling_categories: [
@@ -131,38 +118,41 @@ class GoodsEditScene extends PureComponent {
   componentWillMount() {
     let {params} = this.props.navigation.state;
     let {type} = params;
-    const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img} = (this.props.navigation.state.params.product_detail || {});
+    const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = (this.props.navigation.state.params.product_detail || {});
+    let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
+      return {id: img_id, name: img_data.name};
+    });
 
-    if (type == 'edit') {
+    if (type === 'edit') {
       this.setState({
-          name: name,
-          sku_having_unit: sku_having_unit,
-          content: tag_info_nur,
-          promote_name: promote_name,
-          upload_files: list_img,
-          basic_category: basic_category,
-          store_categories: tag_list_id,
-          tag_list: tag_list,
-          id: id,
-          sku_unit: sku_unit,
-          weight: weight,
-        }
-      )
+        name: name,
+        sku_having_unit: sku_having_unit,
+        content: tag_info_nur,
+        promote_name: promote_name,
+        list_img: mid_list_img,
+        upload_files: upload_files,
+        basic_category: basic_category,
+        store_categories: tag_list_id,
+        tag_list: tag_list,
+        id: id,
+        sku_unit: sku_unit,
+        weight: weight,
+      });
     }
   }
 
   componentDidMount() {
-    let {params} = this.props.navigation.state;
-    params.upLoad = this.upLoad
-    params.store_categories = this.state.store_categories;
-    params.tag_list = this.state.tag_list;
-    this.props.navigation.setParams(params);
+    let {navigation} = this.props;
+    navigation.setParams({upLoad: this.upLoad});
   }
 
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
     let {store_categories, tag_list} = (params || {});
-    this.setState({store_categories: store_categories, tag_list: tag_list})
+    if(store_categories && tag_list){
+      console.log('tag_list -> ', tag_list);
+      this.setState({store_categories: store_categories, tag_list: tag_list});
+    }
   }
 
   toModalData(obj) {
@@ -177,8 +167,8 @@ class GoodsEditScene extends PureComponent {
   }
 
   upLoad = () => {
-    let {type} = this.props.navigation.state.params
-    let {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files, price, sell_status, head_supply} = this.state
+    let {type} = this.props.navigation.state.params;
+    let {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files, price, sell_status, head_supply} = this.state;
     let formData = {
       id,
       vendor_id,
@@ -190,102 +180,74 @@ class GoodsEditScene extends PureComponent {
       store_categories,
       promote_name,
       content,
-      upload_files: {
-        1111: {id: 1111, name: 'asaasasa.jpg'},
-        2222: {id: 2222, name: 'ssssssss.jpg'},
-        3333: {id: 3333, name: '33333333.jpg'}
-      }
-    }
-    if (type == 'edit') {
-
-    } else if (type == 'add') {
-
-      formData = {
-        id,
-        name,
-        vendor_id,
-        sku_unit,
-        weight,
-        sku_having_unit,
-        basic_category,
-        store_categories,
-        promote_name,
-        content,
-        upload_files,
-        price,
-        sell_status,
-        head_supply
-      }
+      upload_files,
+    };
+    if (type === 'add') {
+      formData.price = price;
+      formData.sell_status = sell_status;
+      formData.head_supply = head_supply;
     }
 
-    const {dispatch, global} = this.props;
-    let token = global.accessToken;
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
 
-    this.dataValidate(formData)
-    // dispatch(productSave(formData,token,(ok,reason,obj)=>{
-    //   console.log(ok,reason,obj)
-    // }))
-  }
+    let check_res = this.dataValidate(formData);
+    if(check_res){
+      console.log('formData -> ', formData);
+      // dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
+      //   console.log(ok,reason,obj)
+      // }))
+    }
+  };
 
   dataValidate(formData) {
     let type = this.props.navigation.state.params.type;
-    const {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files} = formData
+    const {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files} = formData;
 
-
-    if (name.length <= 0 || name == 'undefined') {
-      ToastAndroid.show('请输入商品名', ToastAndroid.LONG)
-      return false;
-    } else if (!((sku_unit == '斤') | (sku_unit == '个'))) {
-      ToastAndroid.show('选择SKU单位', ToastAndroid.LONG)
-      return false;
-    } else if (weight <= 0) {
-      ToastAndroid.show('平均重量不能为0', ToastAndroid.LONG)
-      return false;
+    let err_msg = '';
+    if (name.length <= 0 || name == undefined) {
+      err_msg = '请输入商品名';
+    } else if (!(vendor_id > 0)) {
+      err_msg = '无效的品牌商';
+    } else if (sku_unit !== '斤' && sku_unit !== '个') {
+      err_msg = '选择SKU单位';
+    } else if (weight < 0) {
+      err_msg = '请输入正确的重量';
     } else if (sku_having_unit <= 0) {
-      ToastAndroid.show('净含量不能为0', ToastAndroid.LONG)
-      return false;
-    } else if (basic_category < 0) {
-      ToastAndroid.show('请选择基础分类', ToastAndroid.LONG)
-      return false;
+      err_msg = '请输入正确的份含量';
+    } else if (!(basic_category > 0)) {
+      err_msg = '请选择基础分类';
+    } else if (basic_category == Cts.TAG_HIDE) {
+      err_msg = '请勿将基础分类放入列表中隐藏';
     } else if (store_categories.length < 0) {
-      ToastAndroid.show('请选择门店分类', ToastAndroid.LONG)
-      return false;
-    } else if (promote_name.length <= 0) {
-      ToastAndroid.show('请输入广告词', ToastAndroid.LONG)
-      return false;
-    } else if (content.length <= 0) {
-      ToastAndroid.show('请输入商品介绍', ToastAndroid.LONG)
-      return false;
-    } else if (Object.keys(upload_files).length <= 0) {
-      ToastAndroid.show('请重新上传图片', ToastAndroid.LONG)
-      return false;
+      err_msg = '请选择门店分类';
+    } else if (Object.keys(upload_files).length < 1) {
+      err_msg = '请添加商品图片';
     }
 
-    if (type == 'edit') {
-      if (id <= 0) {
-        ToastAndroid.show('不能为空', ToastAndroid.LONG)
-        return false;
-      }
-
-    } else if (type == 'add') {
-   
-      let {price, sell_status, head_supply} = formData
-      if (parseInt(price) <= 0) {
-        ToastAndroid.show('请输入正确价格', ToastAndroid.LONG)
-        return false;
+    if (type === 'edit' && id <= 0) {
+      err_msg = '数据异常, 无法保存';
+    } else if (type === 'add') {
+      let {price, sell_status, head_supply} = formData;
+      if (parseInt(price) < 0) {
+        err_msg = '请输入正确的商品价格';
       } else if (!((sell_status === Cts.STORE_PROD_ON_SALE) || (sell_status === Cts.STORE_PROD_OFF_SALE) || (sell_status === Cts.STORE_PROD_SOLD_OUT))) {
-        ToastAndroid.show('请选择售卖状态', ToastAndroid.LONG)
-        return false;
-      } else if (!((head_supply === Cts.STORE_SELF_PROVIDED) || (head_supply === Cts.STORE_SELF_PROVIDED))) {
-        ToastAndroid.show('选择供货方式', ToastAndroid.LONG)
-        return false;
+        err_msg = '请选择售卖状态';
+      } else if (!((head_supply === Cts.STORE_SELF_PROVIDED) || (head_supply === Cts.STORE_COMMON_PROVIDED))) {
+        err_msg = '选择供货方式';
       }
+    }
+
+    if (err_msg === '') {
+      return true;
+    } else {
+      ToastLong(err_msg);
+      return false;
     }
   }
 
-
   renderAddGood() {
-    let {type} = this.props.navigation.state.params
+    let {type} = this.props.navigation.state.params;
     if (!(type === 'edit')) {
       return <View>
         <GoodAttrs name="门店信息"/>
@@ -361,11 +323,12 @@ class GoodsEditScene extends PureComponent {
       </View>
     }
   }
-  pickSingle() {
+
+  pickSingleImg() {
     ImagePicker.openPicker({
       width: 300,
       height: 300,
-      cropping: false,
+      cropping: true,
       cropperCircleOverlay: false,
       compressImageMaxWidth: 640,
       compressImageMaxHeight: 480,
@@ -375,34 +338,24 @@ class GoodsEditScene extends PureComponent {
     }).then(image => {
       let image_path = image.path;
       let image_arr = image_path.split('/');
-      let image_name = image_arr[image_arr.length-1];
-      // let post_img_data = {
-      //   file_post_name: 'photo',
-      //   file_model_name: 'Product',
-      //   no_db: 0,
-      //   return_type: 'json',
-      //   data_id: 0,
-      //   photo: {uri: image_path, type: 'application/octet-stream', name: image_name},
-      // };
-      // console.log(post_img_data);
-      // console.log('received image -> ', image_path);
+      let image_name = image_arr[image_arr.length - 1];
       let image_info = {
         uri: image_path,
         name: image_name,
       };
       this.uploadImg(image_info);
-      this.setState({
-        image: {uri: image_path, width: image.width, height: image.height, mime: image_name},
-        images: null
-      });
+      // this.setState({
+      //   image: {uri: image_path, width: image.width, height: image.height, mime: image_name},
+      //   images: null
+      // });
     }).catch(e => {
-      console.log(e);
+      console.log('e -> ', e);
     });
   }
 
   uploadImg(image_info) {
     const {dispatch} = this.props;
-    dispatch(uploadImg('Product', image_info, (ok, desc, obj) => {
+    dispatch(uploadImg(image_info, (ok, desc, obj) => {
       console.log('uploadImg => ', ok, desc, obj);
     }));
   }
@@ -482,7 +435,7 @@ class GoodsEditScene extends PureComponent {
               <CellFooter/>
             </Cell>
             <ModalSelector
-              skin='customer' s
+              skin='customer'
               data={this.state.basic_cat_list}
               onChange={(option) => {
                 this.setState({basic_category: option.key})
@@ -559,20 +512,20 @@ class GoodsEditScene extends PureComponent {
         </View>
         <GoodAttrs name="上传图片"/>
         <View style={[styles.area_cell, {height: pxToDp(215), flexDirection: 'row'}]}>
-          {
-            this.state.upload_files.map((img_url, index) => {
-              return (
-                <Image
-                  key={index}
-                  style={styles.img_add}
-                  source={{uri: img_url}}
-                />
-              )
-            })
-          }
+          {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            let img_url = img_data['url'];
+            let img_name = img_data['name'];
+            return (
+              <Image
+                key={img_id}
+                style={styles.img_add}
+                source={{uri: img_url}}
+              />
+            );
+          })}
           <TouchableOpacity
             style={[styles.img_add, styles.img_add_box]}
-            onPress={() => this.pickSingle()}
+            onPress={() => this.pickSingleImg()}
           >
             <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
           </TouchableOpacity>
@@ -653,8 +606,9 @@ const styles = StyleSheet.create({
   img_add: {
     height: pxToDp(145),
     width: pxToDp(145),
-    marginRight: pxToDp(30)
-
+    marginRight: pxToDp(30),
+    borderWidth: pxToDp(1),
+    borderColor: '#bfbfbf',
   },
   img_add_box: {
     justifyContent: 'center',

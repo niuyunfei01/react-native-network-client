@@ -136,7 +136,7 @@ function receiveVendorTags(_v_id, vendor_tags = {}) {
   }
 }
 
-export function uploadImg(file_model_name = 'Product', image_info, callback) {
+export function uploadImg(image_info, callback, file_model_name = 'Product') {
 
   let formData = new FormData();
   let {uri, name} = image_info;
