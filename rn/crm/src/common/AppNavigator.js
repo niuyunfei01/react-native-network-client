@@ -44,6 +44,8 @@ import OrderTodoScene from "../scene/Order/OrderTodoScene";
 import OrderCallShip from "../scene/Order/OrderCallShip";
 import GoodsEditScene from '../scene/Goods/GoodsEditScene';
 import GoodsClassifyScene from '../scene/Goods/GoodsClassifyScene';
+import GoodsBatchPriceScene from "../scene/Goods/GoodsBatchPriceScene";
+
 
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
@@ -228,8 +230,8 @@ class Navigator extends Component {
         [Config.ROUTE_VERSION]: {screen: VersionScene},
         [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
         [Config.ROUTE_GOODS_EDIT]: {screen:GoodsEditScene},
-        [Config.ROUTE_GOODS_CLASSIFY]:{screen:GoodsClassifyScene}
-
+        [Config.ROUTE_GOODS_CLASSIFY]:{screen:GoodsClassifyScene},
+        [Config.ROUTE_GOODS_BATCH_PRICE]:{screen:GoodsBatchPriceScene},
       },
       stackNavigatorConfigs
     );

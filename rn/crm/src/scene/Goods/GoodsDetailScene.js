@@ -58,7 +58,7 @@ class GoodsDetailScene extends PureComponent {
             if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'add',
+                  type: 'edit',
                   store_product,
                   product_detail,
                 });
@@ -312,7 +312,7 @@ class GoodsDetailScene extends PureComponent {
           <TouchableOpacity
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_STORE_GOODS_EDIT);
+                navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE);
               });
             }}
           >

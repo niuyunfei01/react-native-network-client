@@ -28,7 +28,12 @@ import Config from "../../config";
 import {uploadImg} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from '../../common/tool';
-import Cts from '../../Cts'
+import Cts from '../../Cts';
+import {color, NavigationItem} from '../../widget';
+import native from "../../common/native";
+
+
+
 
 
 function mapStateToProps(state) {
@@ -51,6 +56,18 @@ class GoodsEditScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type} = params;
     return {
+       headerLeft: (<NavigationItem
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+        onPress={() => {
+          if(!!type){
+            console.log('type -> ', type);
+            native.gotoPage(type);
+          } else {
+            navigation.goBack();
+          }
+        }}
+      />),
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerRight: (
         <View style={
@@ -105,7 +122,7 @@ class GoodsEditScene extends PureComponent {
         {label: '上架', key: Cts.STORE_PROD_ON_SALE},
         {label: '下架', key: Cts.STORE_PROD_OFF_SALE},
         {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
-      sell_status: 1
+      sell_status: -1
 
     };
 
@@ -123,7 +140,6 @@ class GoodsEditScene extends PureComponent {
           content: tag_info_nur,
           promote_name: promote_name,
           upload_files: list_img,
-          price: price,
           basic_category: basic_category,
           store_categories: tag_list_id,
           tag_list: tag_list,
@@ -252,7 +268,7 @@ class GoodsEditScene extends PureComponent {
       }
 
     } else if (type == 'add') {
-      console.log('----------------------')
+   
       let {price, sell_status, head_supply} = formData
       if (parseInt(price) <= 0) {
         ToastAndroid.show('请输入正确价格', ToastAndroid.LONG)
