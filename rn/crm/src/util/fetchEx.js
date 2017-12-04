@@ -54,7 +54,7 @@ export default {
   postJSON(action, data) {
     const url = AppConfig.apiUrl(action);
 
-    console.log('postJSON: ' + url, parameters);
+    console.log('postJSON: ' + url);
     return fetch(url, {
       credential: 'include',
       method: 'POST',
