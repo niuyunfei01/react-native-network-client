@@ -1148,7 +1148,7 @@ public class Utility {
                     ctx.startActivity(intent);
                     return true;
                 } else if (url.indexOf("/stores/view_order") > 0) {
-                    Intent intent = new Intent(ctx, OrderSingleActivity.class);
+                    Intent intent = new Intent(ctx, MyReactActivity.class);
                     String wm_id = Utility.parseUrl(url).getString("wm_id");
                     if (wm_id != null) {
                         intent.putExtra("order_id", Integer.parseInt(wm_id));
