@@ -100,7 +100,7 @@ class MineScene extends PureComponent {
       is_mgr: is_mgr,
       is_helper: is_helper,
       currVendorName: currVendorName,
-      cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
+      cover_image: !!cover_image ? Config.staticUrl(cover_image) : '',
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -226,7 +226,7 @@ class MineScene extends PureComponent {
       is_mgr: is_mgr,
       is_helper: is_helper,
       currVendorName: currVendorName,
-      cover_image: !!cover_image ? Config.ServiceUrl + cover_image : '',
+      cover_image: !!cover_image ? Config.staticUrl(cover_image) : '',
     });
   }
 
@@ -248,7 +248,7 @@ class MineScene extends PureComponent {
           prefer_store: obj.prefer_store,
           screen_name: obj.screen_name,
           mobile_phone: obj.mobilephone,
-          cover_image: !!obj.cover_image ? Config.ServiceUrl + obj.cover_image : '',
+          cover_image: !!obj.cover_image ? Config.staticUrl(obj.cover_image) : '',
         });
       } else {
         ToastLong(desc);

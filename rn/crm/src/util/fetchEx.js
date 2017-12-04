@@ -19,9 +19,10 @@ export default {
       );
     })
   },
+
   post(action, formData) {
-    const url = AppConfig.ServiceUrl + action;
-    console.log('post to ' + url)
+    const url = AppConfig.apiUrl(action);
+    console.log('post: ' + url);
     return fetch(url, {
       credential: 'include',//带上cookie发送请求请求
       method: 'POST',
@@ -31,14 +32,15 @@ export default {
       body: formData
     });
   },
+  
   postForm(action, object) {
-    const url = AppConfig.ServiceUrl + action;
+    const url = AppConfig.apiUrl(action);
 
     let parameters = Object.keys(object) // expand the elements from the .entries() iterator into an actual array
       .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(object[key]))
       .join('&');// transform the elements into encoded key-value-pairs
 
-    console.log('postForm to ' + url, parameters);
+    console.log('postForm: ' + url, parameters);
     return fetch(url, {
       credential: 'include',//带上cookie发送请求请求
       method: 'POST',
@@ -48,8 +50,11 @@ export default {
       body: parameters
     });
   },
+
   postJSON(action, data) {
-    const url = AppConfig.ServiceUrl + action
+    const url = AppConfig.apiUrl(action);
+
+    console.log('postJSON: ' + url, parameters);
     return fetch(url, {
       credential: 'include',
       method: 'POST',
@@ -60,9 +65,11 @@ export default {
       body: JSON.stringify(data)
     })
   },
+
   get(action, paras = '') {
-    let url = AppConfig.ServiceUrl + action + (paras === '' ? '' : '?' + paras);
-    console.log('url: ', url);
+    let url = AppConfig.apiUrl(action + (paras === '' ? '' : '?' + paras));
+
+    console.log('get: ', url);
     return fetch(url, {
       credential: 'include',//带上cookie发送请求请求
       method: 'GET'

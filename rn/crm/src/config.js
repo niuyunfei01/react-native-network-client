@@ -5,14 +5,15 @@ const {
 
 /**
  * if none in global, return the default host and try to update from settings into global
- * @param global
+ * @param globalRed the reducer of global
  * @param dispatch
  * @param native
  * @returns {*}
+ * @deprecated 直接使用 apiUrl
  */
-export function host(global, dispatch, native) {
-  if (global.host) {
-    return global.host;
+export function host(globalRed, dispatch, native) {
+  if (globalRed.host) {
+    return globalRed.host;
   } else {
     native.host((host) => {
       if (host) {
@@ -22,6 +23,16 @@ export function host(global, dispatch, native) {
 
     return C.defaultHost;
   }
+}
+
+export function apiUrl(path) {
+  const hp = (global.hostPort ? global.hostPort : C.defaultHost);
+  return `https://${hp}/${path}`;
+}
+
+export function staticUrl(path) {
+  const hp = (global.hostPort ? global.hostPort : C.defaultHost);
+  return `https://${hp}/${path}`;
 }
 
 /**
@@ -42,10 +53,10 @@ export function serverUrl(host, path, useHttps = true) {
  */
 const C = {
   https: true,
-  /** Host应该根据是否预发布从系统中获得，而不是直接写死；实在没有，才从这里获得 */
+  /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
   defaultHost: 'www.cainiaoshicai.cn',
   'AppName': 'Crm',
-  'ServiceUrl': 'https://preview.cainiaoshicai.cn/',
+
   'DownloadUrl': `https://www.cainiaoshicai.cn/cc.apk`,
   MAP_WAY_URL: 'util/amap_way',
   FetchTimeout: 10000,
@@ -96,6 +107,8 @@ const C = {
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
   ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
   serverUrl,
+  apiUrl,
+  staticUrl,
 
   /**
    * @see host
