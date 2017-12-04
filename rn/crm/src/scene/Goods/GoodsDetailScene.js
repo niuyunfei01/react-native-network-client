@@ -312,7 +312,7 @@ class GoodsDetailScene extends PureComponent {
           <TouchableOpacity
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_STORE_GOODS_EDIT);
+                navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE);
               });
             }}
           >

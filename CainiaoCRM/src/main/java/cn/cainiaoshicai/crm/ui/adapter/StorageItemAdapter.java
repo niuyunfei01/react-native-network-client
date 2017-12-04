@@ -62,7 +62,9 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         }
 
         final StorageItem item = this.getItem(pos);
-        holder.label.setText(item.nameAndPidStr());
+        if (item != null) {
+            holder.label.setText(item.nameAndPidStr());
+        }
 
         holder.prodStatus.setText(item.getStatusText());
         if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
