@@ -78,7 +78,7 @@ class OrderBottom extends PureComponent {
   _setOrderArrived = () => {
     const {dispatch, order, global} = this.props;
 
-    this.setState({onSubmitting: true});
+    this.setState({onSubmitting: true, dlgShipVisible: false});
     dispatch(orderSetArrived(global.accessToken, order.id, (ok, msg, data) => {
       this.setState({onSubmitting: false});
       if (ok) {
@@ -95,7 +95,7 @@ class OrderBottom extends PureComponent {
   _doDial() {
     const {mobile} = this.props;
     if (mobile) {
-      native.dialNumber(mobile)
+      native.dialNumber(mobile);
     }
   }
 
@@ -181,6 +181,7 @@ class OrderBottom extends PureComponent {
             label: '呼叫配送员',
             onPress: () => {
               native.dialNumber(dada_mobile);
+              this.setState({dlgShipVisible: false});
             }
           },
           this._defCloseBtn(),
@@ -193,6 +194,7 @@ class OrderBottom extends PureComponent {
             label: '重新发单',
             onPress: () => {
               this._callShipDlg();
+              this.setState({dlgShipVisible: false});
             },
           },
           this._defCloseBtn(),
@@ -209,7 +211,8 @@ class OrderBottom extends PureComponent {
           {
             label: '呼叫配送员',
             onPress: () => {
-              native.dialNumber(dada_mobile)
+              native.dialNumber(dada_mobile);
+              this.setState({dlgShipVisible: false});
             },
           },
           this._defCloseBtn(),
