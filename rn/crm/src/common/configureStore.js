@@ -49,10 +49,11 @@ export default function configureStore (persistDoneCall) {
     };
 
     persistStore(store, cfg, () => {
-        console.log(new Date(), 'rehydration complete')
+        console.log(new Date(), 'rehydration complete');
         if (persistDoneCall) {
             persistDoneCall(store)
         }
+      console.log(new Date(), 'rehydration done call complete')
     });
 
   return store
