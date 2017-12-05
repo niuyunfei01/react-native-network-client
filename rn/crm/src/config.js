@@ -59,7 +59,7 @@ const C = {
 
   'DownloadUrl': `https://www.cainiaoshicai.cn/cc.apk`,
   MAP_WAY_URL: 'util/amap_way',
-  FetchTimeout: 10000,
+  FetchTimeout: 30000,
 
   GRANT_TYP_PASSWORD: "password",
   GRANT_CLIENT_ID: "NTQ5NTE5MGViMTgzMDUw",
