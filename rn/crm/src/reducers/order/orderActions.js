@@ -89,12 +89,9 @@ export function printInCloud(sessionToken, orderId, callback) {
   });
 }
 
-export function orderEditItem(item) {
+export function clearLocalOrder(id) {
   return dispatch => {
-    dispatch({
-      type: ORDER_EDIT_ITEM,
-      item,
-    })
+    dispatch({type: ORDER_INVALIDATED, id: id});
   };
 }
 

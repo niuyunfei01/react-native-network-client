@@ -1,7 +1,4 @@
 /**
- * # profileReducer.js
- *
- * The reducer user profile actions
  */
 'use strict'
 
@@ -48,7 +45,7 @@ const initialState = {
  * @param {Object} action - type and payload
  */
 export default function orderReducer(state = initialState, action) {
-  let nextProfileState = null
+  let nextProfileState = null;
 
   switch (action.type) {
 
