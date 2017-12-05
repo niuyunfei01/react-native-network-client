@@ -115,7 +115,7 @@ class AuditRefundScene extends Component {
         this.setState({onSubmitting: false});
         doneCall();
       } else {
-        this.setState({onSubmitting: false, errorHints: '提交失败：' + msg});
+        this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
       }
     }));
   }
@@ -136,16 +136,14 @@ class AuditRefundScene extends Component {
     });
 
     return <ScrollView style={[styles.container, {flex: 1}]}>
-          { !!this.state.errorHints &&
-          <Dialog onRequestClose={()=>{}}
-            visible={!!this.state.errorHints}
-            buttons={[{
-              type: 'default',
-              label: '知道了',
-              onPress: () => {this.setState({errorHints: ''})}
-            }]}      
-          ><Text>{this.state.errorHints}</Text></Dialog>
-          }
+        <Dialog onRequestClose={()=>{}}
+          visible={!!this.state.errorHints}
+          buttons={[{
+            type: 'default',
+            label: '知道了',
+            onPress: () => {this.setState({errorHints: ''})}
+          }]}
+        ><Text>{this.state.errorHints}</Text></Dialog>
 
       <CellsTitle style={CommonStyle.cellsTitle35}>拒绝还是同意？</CellsTitle>
       <RadioCells
