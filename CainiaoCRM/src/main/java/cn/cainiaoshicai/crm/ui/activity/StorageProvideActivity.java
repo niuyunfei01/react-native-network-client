@@ -63,11 +63,11 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.storage_provide_list);
 
-        btn_provide_accept = (Button) findViewById(R.id.btn_provide_accept);
-        btn_provide_edit = (Button) findViewById(R.id.btn_provide_edit);
-        btn_provide_lock = (Button) findViewById(R.id.btn_provide_lock);
-        btn_provide_ship = (Button) findViewById(R.id.btn_provide_ship);
-        btn_provide_print = (Button) findViewById(R.id.btn_provide_print);
+        btn_provide_accept = findViewById(R.id.btn_provide_accept);
+        btn_provide_edit = findViewById(R.id.btn_provide_edit);
+        btn_provide_lock = findViewById(R.id.btn_provide_lock);
+        btn_provide_ship = findViewById(R.id.btn_provide_ship);
+        btn_provide_print = findViewById(R.id.btn_provide_print);
 
         Intent intent = getIntent();
         long store_id = intent.getLongExtra("store_id", 0L);
@@ -84,7 +84,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
-        mWebView = (WebView) findViewById(R.id.activity_main_webview);
+        mWebView = findViewById(R.id.activity_main_webview);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
