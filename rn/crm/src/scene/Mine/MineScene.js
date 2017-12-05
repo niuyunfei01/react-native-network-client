@@ -438,7 +438,7 @@ class MineScene extends PureComponent {
           onPress={() => {
             if (is_mgr || is_helper) {
               let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
-              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+              let url = Config.serverUrl(path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             } else {
               ToastLong('您没有查看业绩的权限');
@@ -454,7 +454,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => {
               let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
-              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+              let url = Config.serverUrl(path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -482,7 +482,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => {
               let path = `/stores/sales_ana.html${token}&&_v_id=${currVendorId}`;
-              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+              let url = Config.serverUrl(path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -496,7 +496,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -524,7 +524,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => {
               let path = `/market_tools/users.html${token}`;
-              let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+              let url = Config.serverUrl(path, Config.https);
               this.onPress(Config.ROUTE_WEB, {url: url});
             }}
             activeOpacity={customerOpacity}
@@ -608,7 +608,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/provide_req_all.html${token}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -620,7 +620,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/prod_loss.html${token}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -632,7 +632,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/orders_buy_combined.html${token}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -644,7 +644,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/expenses/show_expenses.html${token}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -656,7 +656,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -668,7 +668,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/products.html${token}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -680,7 +680,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/vm/index.html${token}&&time=${Date.now()}#!/home`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}
@@ -700,7 +700,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/quick_task_list.html${token}`;
-            let url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+            let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
           activeOpacity={customerOpacity}

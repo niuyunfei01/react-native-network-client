@@ -37,15 +37,15 @@ export function staticUrl(path) {
 
 /**
  * get server url
- * @param host
  * @param path string
  * @param useHttps
  * @returns {string}
  */
-export function serverUrl(host, path, useHttps = true) {
+export function serverUrl(path, useHttps = true) {
   const proto = useHttps ? 'https' : 'http';
+  const hp = (global.hostPort ? global.hostPort : C.defaultHost);
   path = path[0] === '/' ? path.substr(1) : path;
-  return `${proto}://${host}/${path}`;
+  return `${proto}://${hp}/${path}`;
 }
 
 /**

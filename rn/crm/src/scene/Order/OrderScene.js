@@ -313,7 +313,7 @@ class OrderScene extends Component {
       const vm_path = _o.feedback && _o.feedback.id ? "#!/feedback/view/" + _o.feedback.id
         : "#!/feedback/order/" + _o.id;
       const path = `vm?access_token=${accessToken}${vm_path}`;
-      const url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+      const url = Config.serverUrl(path, Config.https);
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
 
@@ -608,7 +608,7 @@ class OrderScene extends Component {
     if (validPoi) {
       const store = this.props.global.canReadStores[order.store_id] || {};
       const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
-      const uri = Config.serverUrl(Config.host(global, dispatch, native), path);
+      const uri = Config.serverUrl(path);
       this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
       console.log(uri)
     } else {
@@ -669,7 +669,7 @@ class OrderScene extends Component {
     }
 
     const path = `stores/orders_go_to_buy/${order.order.id}.html?access_token=${global.accessToken}`;
-    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(Config.host(global, dispatch, native), path, Config.https)});
+    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
   _getWayRecord() {
     this.setState({ shipHided: !this.state.shipHided })

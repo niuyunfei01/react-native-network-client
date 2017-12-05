@@ -6,9 +6,19 @@ import LoadingView from "./LoadingView";
 import {Toast} from "./../weui/index";
 import NavigationItem from "./NavigationItem";
 import pxToDp from "../util/pxToDp";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 
+function mapStateToProps(state) {
+  return {
+    global: state.global,
+  }
+}
 
-// create a component
+function mapDispatchToProps(dispatch) {
+  return {dispatch, ...bindActionCreators({}, dispatch)}
+}
+
 class WebScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
@@ -101,15 +111,13 @@ class WebScene extends PureComponent {
       stop = true;
     } else if (url.indexOf("/stores/crm_add_token") > 0) {
       let path = tool.parameterByName("path", url);
-      let vmPath = tool.parameterByName("vmPath", url);
-      // view.loadUrl(String.format("%s%s&access_token=%s%s", URLHelper.WEB_URL_ROOT, path, specialToken, vmPath));
+      let vmPath = tool.parameterByName("vm_path", url);
 
       const {global, dispatch} = this.props;
 
-      //TODO: to load a new url
-      Config.serverUrl(Config.host(global, dispatch, native), `${path}&access_token=${global.accessToken}&${vmPath}`);
-
-      return true;
+      const nu = Config.serverUrl(`${path}&access_token=${global.accessToken}&${vmPath}`);
+      navigation.navigate(Config.ROUTE_WEB, {url: nu});
+      stop = true;
     } else if (url.indexOf("/stores/view_order") >= 0) {
 
       navigation.navigate(Config.ROUTE_ORDER, {orderId: tool.parameterByName('wm_id', url)});
@@ -214,5 +222,4 @@ const styles = StyleSheet.create({
   }
 });
 
-//make this component available to the app
-export default WebScene;
+export default connect(mapStateToProps, mapDispatchToProps)(WebScene)
