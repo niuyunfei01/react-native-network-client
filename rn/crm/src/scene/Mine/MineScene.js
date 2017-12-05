@@ -323,6 +323,9 @@ class MineScene extends PureComponent {
           type: 'mine',
           currentUser: this.state.currentUser,
           currVendorId: this.state.currVendorId,
+          screen_name: this.state.screen_name,
+          mobile_phone: this.state.mobile_phone,
+          cover_image: this.state.cover_image,
         })}
       >
         <View style={worker_styles.container}>
@@ -355,6 +358,9 @@ class MineScene extends PureComponent {
           type: 'mine',
           currentUser: this.state.currentUser,
           currVendorId: this.state.currVendorId,
+          screen_name: this.state.screen_name,
+          mobile_phone: this.state.mobile_phone,
+          cover_image: this.state.cover_image,
         })}
       >
         <View style={worker_styles.container}>
