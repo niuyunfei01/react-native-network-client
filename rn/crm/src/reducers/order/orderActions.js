@@ -172,10 +172,10 @@ export function orderChgStore(token, wmId, store_id, old_store_id, reason, callb
   return getReqThenInvalidate(url, wmId, callback);
 }
 
-export function orderAuditRefund(token, id, task_id, is_agree, reason, callback) {
+export function orderAuditRefund(token, id, task_id, is_agree, reason, log_money, callback) {
   const url = `api/order_audit_refund/${id}.json?access_token=${token}`;
   const agree_code = is_agree ? Cts.REFUND_AUDIT_AGREE : Cts.REFUND_AUDIT_REFUSE;
-  return jsonReqThenInvalidate(url, id, callback, {agree_code, reason, task_id});
+  return jsonReqThenInvalidate(url, id, callback, {agree_code, reason, task_id, log_money});
 }
 
 export function orderToInvalid(token, id, reason_key, custom, callback) {

@@ -52,8 +52,6 @@ class AuditRefundScene extends Component {
       custom: '',
     };
 
-    this.refundMoney = '1.11';
-
     this._onActionSelected = this._onActionSelected.bind(this);
     this._onReasonSelected = this._onReasonSelected.bind(this);
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
@@ -84,10 +82,6 @@ class AuditRefundScene extends Component {
     return !(this.state.reason_idx && (this.state.reason_idx !== 'custom' || this.state.custom));
   }
 
-  _refundEquals() {
-    return this.state.refund_yuan === this.refundMoney;
-  }
-
   _refundYuanChanged(v) {
     this.setState({refund_yuan: v});
   }
@@ -115,7 +109,8 @@ class AuditRefundScene extends Component {
 
     this.setState({onSubmitting: true});
     const reason = this.state.reason_idx === 'custom' ? this.state.custom : reasons[this.state.reason_idx];
-    dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason, (ok, msg, data) => {
+    dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
+      this.state.refund_yuan, (ok, msg, data) => {
       if (ok) {
         this.setState({onSubmitting: false});
         doneCall();
@@ -126,7 +121,7 @@ class AuditRefundScene extends Component {
   }
 
   _shouldDisabledAgreeBtn() {
-    return this.state.refund_yuan !== this.refundMoney;
+    return !this.state.refund_yuan;
   }
 
   _shouldDisableRefuseBtn() {
@@ -195,10 +190,10 @@ class AuditRefundScene extends Component {
       </View>}
 
       {this.state.selected_action === 'yes' && <View>
-        <CellsTitle style={CommonStyle.cellsTitle35}>请确认退款金额</CellsTitle>
+        <CellsTitle style={CommonStyle.cellsTitle35}>请记录退款金额</CellsTitle>
         <Cells>
-          <Cell error={!this._refundEquals()}>
-            <CellHeader><Label>退款金额</Label></CellHeader>
+          <Cell error={true}>
+            <CellHeader><Label>记录退款金额</Label></CellHeader>
             <CellBody>
               <Input
                 placeholder="0.00"
@@ -210,7 +205,7 @@ class AuditRefundScene extends Component {
             </CellBody>
           </Cell>
         </Cells>
-        <CellsTips>暂不能修改金额，请依平台显示输入</CellsTips>
+        <CellsTips>实际退款金额请以平台为准，此处只做记录</CellsTips>
       </View>
       }
 
