@@ -47,7 +47,7 @@ export function getStorePackers(token, storeId, callback) {
       }
       callback(json.ok, json.reason, json.obj)
     }
-    , (error) => callback(false, "网络错误, 请稍后重试")
+    , (error) => callback(false, "网络错误, 请稍后重试:" + error)
   )
 }
 
