@@ -46,7 +46,6 @@ class GoodsDetailScene extends PureComponent {
 
           onPress={() => {
             if(!!backPage){
-              // console.log('backPage ----------------------> ', backPage);
               native.gotoPage(backPage);
             }
           }}
@@ -54,19 +53,19 @@ class GoodsDetailScene extends PureComponent {
       headerTitle: '商品详情',
       headerRight: ( <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
-          onPress={() => {
-            if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
-              InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'edit',
-                  store_product,
-                  product_detail,
-                });
-              });
-            } else {
-              ToastLong('请等待商品加载完成...')
-            }
-          }}
+          // onPress={() => {
+          //   if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+          //     InteractionManager.runAfterInteractions(() => {
+          //       navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+          //         type: 'edit',
+          //         store_product,
+          //         product_detail,
+          //       });
+          //     });
+          //   } else {
+          //     ToastLong('请等待商品加载完成...')
+          //   }
+          // }}
         >
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
         </TouchableOpacity>
@@ -369,16 +368,18 @@ class GoodsDetailScene extends PureComponent {
 
     if(tool.length(list_img) > 0){
       let _this = this;
-      let img_list = list_img.map((img_url, idx) => {
+      let img_list = tool.objectMap(list_img, (img_data, img_id) => {
+        let img_url = img_data['url'];
+        let img_name = img_data['name'];
         return (
           <TouchableHighlight
-            key={idx}
+            key={img_id}
             onPress={_this.onToggleFullScreen}
           >
-          <Image
-            style={goods_img}
-            source={{uri: img_url}}
-          />
+            <Image
+              style={goods_img}
+              source={{uri: img_url}}
+            />
           </TouchableHighlight>
         );
       });
@@ -387,7 +388,7 @@ class GoodsDetailScene extends PureComponent {
           {img_list}
         </Swiper>
       );
-    } else {
+    }  else {
       return (
         <TouchableHighlight
           style={wrapper}

@@ -48,7 +48,7 @@ class SelectStoreScene extends PureComponent {
     let storeActionSheet = tool.storeActionSheet(canReadStores);
 
     this.state = {
-      isRefreshing: false,
+      modalVisible: true,
       storeActionSheet: storeActionSheet,
     };
 
@@ -57,21 +57,29 @@ class SelectStoreScene extends PureComponent {
 
   _doChangeStore(StoreId) {
     let {params} = this.props.navigation.state;
-    params.doneSelectStore(StoreId);
+    let check_res = params.doneSelectStore(StoreId);
+    console.log('check_res -> ', check_res);
+    if(!check_res){
+      this.setState({
+        modalVisible: true,
+      });
+    }
   }
 
   render() {
     return (
-      <ModalSelector
-        onChange={(option) => {
-          this._doChangeStore(option.key)
-        }}
-        modalVisible={true}
-        skin='customer'
-        data={this.state.storeActionSheet}
-      >
-        <Text>  </Text>
-      </ModalSelector>
+      <View style={{backgroundColor: '#fff'}}>
+        <ModalSelector
+          onChange={(option) => {
+            this._doChangeStore(option.key)
+          }}
+          modalVisible={this.state.modalVisible}
+          skin='customer'
+          data={this.state.storeActionSheet}
+        >
+          <Text>  </Text>
+        </ModalSelector>
+      </View>
     );
   }
 

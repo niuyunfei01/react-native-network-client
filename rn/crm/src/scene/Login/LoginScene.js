@@ -210,12 +210,15 @@ class LoginScene extends PureComponent {
                       navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
                     }
                     tool.resetNavStack(navigation, Config.ROUTE_ALERT);
+                    return true;
                   } else {
                     ToastLong(msg);
+                    return false;
                   }
                 });
               } else {
-                alert('设置店铺失败, 请联系客服经理');
+                ToastLong('选择店铺失败, 请稍候重试');
+                return false;
               }
             }));
           },
