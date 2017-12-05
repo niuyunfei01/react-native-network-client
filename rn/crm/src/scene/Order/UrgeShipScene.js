@@ -54,7 +54,7 @@ class UrgeShipScene extends Component {
 
   componentWillMount() {
     const {order, remind} = (this.props.navigation.state.params || {});
-    this.setState({order, remind, onLoadingReasons: true})
+    this.setState({order, remind, onLoadingReasons: true});
     const {dispatch, global, navigation} = this.props;
     dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {
       console.log(ok, msg, data);
@@ -72,7 +72,7 @@ class UrgeShipScene extends Component {
     const key = this._getReasonKey(idx);
     if (key === 'custom') {
       console.log(key, idx);
-      const label = this.state.taskTypes[idx]['label'];
+      const label = this.state.reasons[idx]['label'];
       this.setState({custom: label === '自定义回复' ? '' : label});
     }
   }
@@ -90,7 +90,7 @@ class UrgeShipScene extends Component {
     if (typeof idx === 'undefined') {
       idx = this.state.reason_idx;
     }
-    return this.state.taskTypes && idx >= 0 ? this.state.taskTypes[idx]['key'] : '';
+    return this.state.reasons && idx >= 0 ? this.state.reasons[idx]['key'] : '';
   }
 
   _doReply() {
@@ -113,8 +113,7 @@ class UrgeShipScene extends Component {
   }
 
   render() {
-    const {order, remind} = (this.props.navigation.state.params || {});
-    const reasonOpts = this.state.taskTypes.map((reason, idx) => {
+    const reasonOpts = (this.state.reasons || []).map((reason, idx) => {
       return {label: reason.label, value: idx}
     });
 
