@@ -8,6 +8,7 @@ import {
   ScrollView,
   TextInput,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import {
   Cells,
@@ -33,7 +34,7 @@ import {color, NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
-
+import Icon from '../../weui/Icon/Icon'
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -56,6 +57,17 @@ class GoodsEditScene extends PureComponent {
     let {type} = params;
     return {
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
+      headerLeft: (<NavigationItem
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+        onPress={() => {
+          if(type == 'add' ){
+            native.gotoPage(type);
+          } else {
+            navigation.goBack();
+          }
+        }}
+      />),
       headerRight: (
         <View style={
           {
@@ -78,9 +90,11 @@ class GoodsEditScene extends PureComponent {
   };
 
   constructor(props) {
+
     super(props);
     let {store_tags} = this.props.product;
     let {currVendorId} = tool.vendor(this.props.global);
+    let {fnProviding} = tool.vendor(this.props.global);
     const basic_categories = this.props.product.basic_category[currVendorId];
     const basic_cat_list = this.toModalData(basic_categories);
     store_tags = store_tags[currVendorId];
@@ -91,9 +105,9 @@ class GoodsEditScene extends PureComponent {
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
       basic_categories: basic_categories,
-      head_supply: -1,
+      provided: -1,
       name: '',
-      sku_having_unit: 1,
+      sku_having_unit: '',
       content: '',
       promote_name: '',
       list_img: {},
@@ -111,16 +125,19 @@ class GoodsEditScene extends PureComponent {
         {label: '上架', key: Cts.STORE_PROD_ON_SALE},
         {label: '下架', key: Cts.STORE_PROD_OFF_SALE},
         {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
-      sell_status: -1
+      sale_status: -1,
+      fnProviding:fnProviding,
+      store_product:[],
 
     };
 
     this.uploadImg = this.uploadImg.bind(this);
+    this.upLoad = this.upLoad.bind(this)
   }
 
   componentWillMount() {
     let {params} = this.props.navigation.state;
-    let {type} = params;
+    let {type,store_product} = params;
     const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = (this.props.navigation.state.params.product_detail || {});
 
     if (type === 'edit') {
@@ -158,7 +175,6 @@ class GoodsEditScene extends PureComponent {
     let {navigation} = this.props;
     navigation.setParams({upLoad: this.upLoad});
   }
-
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
     let {store_categories, tag_list} = (params || {});
@@ -167,21 +183,34 @@ class GoodsEditScene extends PureComponent {
       this.setState({store_categories: store_categories, tag_list: tag_list});
     }
   }
+  back(type){
+    if(type == 'add' ){
+      native.gotoPage(type);
+    } else {
+      navigation.goBack();
+    }
+  }
 
   toModalData(obj) {
     let arr = [];
     Object.keys(obj).map((key) => {
-      let json = {}
-      json.label = obj[key];
-      json.key = key
-      arr.push(json)
+      if(key != Cts.TAG_HIDE ){
+        let json = {}
+        json.label = obj[key];
+        json.key = key
+        arr.push(json)
+      }
     })
     return arr
   }
 
   upLoad = () => {
     let {type} = this.props.navigation.state.params;
-    let {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files, price, sell_status, head_supply} = this.state;
+    if(!this.state.fnProviding){
+      this.setState({provided:Cts.STORE_COMMON_PROVIDED})
+    }
+    let {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name,
+      content, upload_files, price, sale_status, provided} = this.state;
     let formData = {
       id,
       vendor_id,
@@ -196,19 +225,20 @@ class GoodsEditScene extends PureComponent {
       upload_files,
     };
     if (type === 'add') {
-      formData.price = price;
-      formData.sell_status = sell_status;
-      formData.head_supply = head_supply;
+      formData.store_goods_status = {price: price, sale_status: sale_status, provided: provided};
     }
 
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-
     let check_res = this.dataValidate(formData);
+    console.log(check_res)
     if(check_res){
-      console.log('formData -> ', formData);
       dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
         console.log(ok,reason,obj)
+        if(ok){
+          this.back(type)
+        }
+
       }))
     }
   };
@@ -241,12 +271,12 @@ class GoodsEditScene extends PureComponent {
     if (type === 'edit' && id <= 0) {
       err_msg = '数据异常, 无法保存';
     } else if (type === 'add') {
-      let {price, sell_status, head_supply} = formData;
+      let {price, sale_status, provided} = formData.store_goods_status;
       if (parseInt(price) < 0) {
         err_msg = '请输入正确的商品价格';
-      } else if (!((sell_status === Cts.STORE_PROD_ON_SALE) || (sell_status === Cts.STORE_PROD_OFF_SALE) || (sell_status === Cts.STORE_PROD_SOLD_OUT))) {
+      } else if (!((sale_status === Cts.STORE_PROD_ON_SALE) || (sale_status === Cts.STORE_PROD_OFF_SALE) || (sale_status === Cts.STORE_PROD_SOLD_OUT))) {
         err_msg = '请选择售卖状态';
-      } else if (!((head_supply === Cts.STORE_SELF_PROVIDED) || (head_supply === Cts.STORE_COMMON_PROVIDED))) {
+      } else if (!((provided === Cts.STORE_SELF_PROVIDED) || (provided === Cts.STORE_COMMON_PROVIDED))) {
         err_msg = '选择供货方式';
       }
     }
@@ -254,13 +284,14 @@ class GoodsEditScene extends PureComponent {
     if (err_msg === '') {
       return true;
     } else {
-      ToastLong(err_msg);
+      Alert.alert(err_msg)
       return false;
     }
   }
 
   renderAddGood() {
     let {type} = this.props.navigation.state.params;
+    let _this = this
     if (!(type === 'edit')) {
       return <View>
         <GoodAttrs name="门店信息"/>
@@ -269,14 +300,14 @@ class GoodsEditScene extends PureComponent {
             skin='customer'
             data={this.state.selling_categories}
             onChange={(option) => {
-              this.setState({sell_status: option.key})
+              this.setState({sale_status: option.key})
             }}>
             <Cell customStyle={[styles.my_cell]} access>
               <CellHeader style={styles.attr_name}>
                 <Label style={[styles.cell_label]}>售卖状态</Label>
               </CellHeader>
               <CellBody>
-                <Text>{tool.sellingStatus(this.state.sell_status)}</Text>
+                <Text>{tool.sellingStatus(this.state.sale_status)}</Text>
               </CellBody>
               <CellFooter/>
             </Cell>
@@ -299,22 +330,24 @@ class GoodsEditScene extends PureComponent {
             </CellBody>
             <CellFooter>元</CellFooter>
           </Cell>
-          <ModalSelector
-            skin='customer'
-            data={this.state.head_supplies}
-            onChange={(option) => {
-              this.setState({head_supply: option.key})
-            }}>
-            <Cell customStyle={[styles.my_cell]} access>
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>总部供货</Label>
-              </CellHeader>
-              <CellBody>
-                <Text>{tool.headerSupply(this.state.head_supply)}</Text>
-              </CellBody>
-              <CellFooter/>
-            </Cell>
-          </ModalSelector>
+          {
+           _this.state.fnProviding ?  <ModalSelector
+             skin='customer'
+             data={this.state.head_supplies}
+             onChange={(option) => {
+               this.setState({provided: option.key})
+             }}>
+             <Cell customStyle={[styles.my_cell]} access>
+               <CellHeader style={styles.attr_name}>
+                 <Label style={[styles.cell_label]}>总部供货</Label>
+               </CellHeader>
+               <CellBody>
+                 <Text>{tool.headerSupply(this.state.provided)}</Text>
+               </CellBody>
+               <CellFooter/>
+             </Cell>
+           </ModalSelector>: <View/>
+          }
           <Cell customStyle={[styles.my_cell]}>
             <CellHeader style={styles.attr_name}>
               <Label style={[styles.cell_label]}>库存</Label>
@@ -379,7 +412,6 @@ class GoodsEditScene extends PureComponent {
           name: name,
         };
         upload_files[file_id] = {id: file_id, name: name};
-
         console.log('list_img --> ', list_img);
         this.setState({
           list_img: list_img,
@@ -443,7 +475,7 @@ class GoodsEditScene extends PureComponent {
                   underlineColorAndroid='transparent'
                   style={[styles.input_text]}
                   keyboardType='numeric'
-                  value={this.state.sku_having_unit}
+                  value={`${this.state.sku_having_unit}`}
                   onChangeText={(text) => {
                     this.setState({sku_having_unit: text})
                   }}
@@ -460,7 +492,7 @@ class GoodsEditScene extends PureComponent {
                   placeholder='请输入商品重量'
                   underlineColorAndroid='transparent'
                   style={[styles.input_text]}
-                  value={this.state.weight}
+                  value={''+this.state.weight }
                   keyboardType='numeric'
                   onChangeText={(text) => {
                     this.setState({weight: text})
@@ -547,30 +579,48 @@ class GoodsEditScene extends PureComponent {
           </Cells>
         </View>
         <GoodAttrs name="上传图片"/>
-        <View style={[styles.area_cell, {height: pxToDp(215), flexDirection: 'row'}]}>
+        <View style={[styles.area_cell, {  minHeight: pxToDp(215), flexDirection: 'row', flexWrap:'wrap', paddingHorizontal: pxToDp(20),paddingTop:pxToDp(10)}]}>
           {tool.objectMap(this.state.list_img, (img_data, img_id) => {
             let img_url = img_data['url'];
-            console.log(img_url);
+            // console.log(img_url);
             let img_name = img_data['name'];
             return (
-              <Image
-                key={img_id}
-                style={styles.img_add}
-                source={{uri: img_url}}
-              />
+              <View  key={img_id} style = {{height:pxToDp(170),width:pxToDp(170),flexDirection:'row',alignItems:'flex-end'}}>
+                <Image
+                  style={styles.img_add}
+                  source={{uri: img_url}}
+                />
+                <TouchableOpacity
+                  style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
+                  onPress={() => {
+                    delete  this.state.list_img[img_id]
+                    delete  this.state.upload_files[img_id]
+                    this.forceUpdate()
+                  }}
+                >
+                    <Icon
+                      name={'clear'}
+                      size={pxToDp(40)}
+                      style = {{ backgroundColor: '#fff'}}
+                      color={'#d81e06'}
+                      msg={false}
+                    />
+                </TouchableOpacity>
+              </View>
             );
           })}
-          <TouchableOpacity
-            style={[styles.img_add, styles.img_add_box]}
-            onPress={() => this.pickSingleImg()}
-          >
-            <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
-          </TouchableOpacity>
+          <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'center',alignItems:'flex-end'}}>
+            <TouchableOpacity
+              style={[styles.img_add, styles.img_add_box, {flexWrap: 'wrap'}]}
+              onPress={() => this.pickSingleImg()}
+            >
+              <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         {
           this.renderAddGood()
         }
-
         <Toast
           icon="loading"
           show={this.state.isUploadImg}
@@ -639,7 +689,6 @@ const styles = StyleSheet.create({
     borderTopWidth: pxToDp(1),
     paddingVertical: pxToDp(35),
     backgroundColor: "#fff",
-   
   },
   area_input_title: {
     color: "#363636",
@@ -648,7 +697,7 @@ const styles = StyleSheet.create({
   img_add: {
     height: pxToDp(145),
     width: pxToDp(145),
-    marginRight: pxToDp(30),
+    justifyContent:'space-around',
     borderWidth: pxToDp(1),
     borderColor: '#bfbfbf',
   },

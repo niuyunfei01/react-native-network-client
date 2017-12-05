@@ -148,9 +148,9 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   renderList(store_product) {
-
     let _this = this
     return tool.objectMap(store_product, function (s_product, store_id) {
+      let  productItem= _this.state.productList[store_id];
       return (
             <View style={styles.item} key = {store_id}>
               <View style={[styles.store_name]}>
@@ -160,25 +160,25 @@ class GoodsBatchPriceScene extends PureComponent {
                 skin='customer'
                 data={_this.state.selling_categories}
                 onChange={(option) => {
-                  let  productList = _this.state.productList;
-                  productList[store_id]['status']=option.key;
+                  productItem['status']=option.key;
                   _this.forceUpdate()
                 
                 }}
               >
-                <View style={[styles.item_status]}>
+                <View style={[styles.title_item]}>
                   <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)}</Text>
                 </View>
               </ModalSelector>
 
-              <View style={[styles.item_inventory]}>
+              <View style={[styles.title_item]}>
                 <TextInput
                   underlineColorAndroid='transparent'
-                  style={[styles.item_font_style]}
+                  style={[styles.item_font_style,{width:'90%'}]}
                   keyboardType='numeric'
-                  value={ s_product.left_since_last_stat}
+                  value={`${s_product.left_since_last_stat}`}
                   onChangeText={(text) => {
-                    console.log(text)
+                    productItem.left_since_last_stat = text;
+                    _this.forceUpdate()
                   }}/>
               </View>
               <View style={[styles.price]}>
@@ -188,7 +188,8 @@ class GoodsBatchPriceScene extends PureComponent {
                   keyboardType='numeric'
                   value={`${s_product.price/100}`}
                   onChangeText={(text) => {
-                    console.log(text)
+                    productItem.price = text*100;
+                    _this.forceUpdate()
                   }}/>
               </View>
 
@@ -199,7 +200,10 @@ class GoodsBatchPriceScene extends PureComponent {
                   // this.setState({head_supply: option.key})
                 }}>
                 <View style={[styles.header_supply]}>
-                  <Text style={styles.item_font_style}>{'是'}</Text>
+                  <Text style={styles.item_font_style}>
+                    {/*{tool.headerSupply(this.state.head_supply)}*/}
+                    是
+                    </Text>
                 </View>
               </ModalSelector>
 
@@ -214,9 +218,7 @@ class GoodsBatchPriceScene extends PureComponent {
                   {this.renLoading()} */}
               </View>
             </View>
-
       )
-
     })
 
 
@@ -236,7 +238,7 @@ class GoodsBatchPriceScene extends PureComponent {
           <View
             style={[
               styles.title_item, {
-                marginRight: pxToDp(20)
+
               }
             ]}>
             <Text>库存</Text>
@@ -269,8 +271,10 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   title_item: {
-    width: pxToDp(60),
-    marginRight: pxToDp(44)
+    width: pxToDp(120),
+    flexDirection:'row',
+    justifyContent:'center'
+
   },
   header_supply: {
     width: pxToDp(120),
@@ -278,7 +282,6 @@ const styles = StyleSheet.create({
   },
   store_name: {
     width: pxToDp(120),
-    marginRight: pxToDp(44)
   },
   price: {
     width: pxToDp(120),
@@ -295,21 +298,14 @@ const styles = StyleSheet.create({
   },
   item_font_style: {
     fontSize: pxToDp(30),
-    color: '#32b16c'
+    color: '#32b16c',
+    textAlign:'center',
   },
   item_name: {
     fontSize: pxToDp(30),
     color: "#000000"
   },
-  item_status: {
-    marginRight: pxToDp(40),
-    width: pxToDp(60)
-  },
-  item_inventory: {
-    width: pxToDp(60),
-    alignItems: 'center',
-    marginRight: pxToDp(20)
-  },
+
   save: {
     width: pxToDp(80),
     alignItems: 'center',
