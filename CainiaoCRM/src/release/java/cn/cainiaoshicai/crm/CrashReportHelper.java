@@ -55,7 +55,7 @@ public class CrashReportHelper {
                             PACKAGE_NAME, FILE_PATH, PHONE_MODEL, BRAND, PRODUCT, ANDROID_VERSION, BUILD, TOTAL_MEM_SIZE,
                             AVAILABLE_MEM_SIZE, BUILD_CONFIG, CUSTOM_DATA, IS_SILENT, STACK_TRACE, INITIAL_CONFIGURATION, CRASH_CONFIGURATION,
                             DISPLAY/*, USER_COMMENT, USER_EMAIL*/, USER_APP_START_DATE, USER_CRASH_DATE, DUMPSYS_MEMINFO, LOGCAT,
-                            INSTALLATION_ID, DEVICE_FEATURES, ENVIRONMENT, SHARED_PREFERENCES, CUSTOM_DATA, USER_IP)
+                            INSTALLATION_ID, DEVICE_FEATURES, ENVIRONMENT/*, SHARED_PREFERENCES*/, CUSTOM_DATA, USER_IP)
                     .setReportingInteractionMode(ReportingInteractionMode.SILENT)
                     .setReportType(HttpSender.Type.JSON)
                     .build();
