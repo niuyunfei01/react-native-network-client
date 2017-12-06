@@ -37,8 +37,8 @@ import Toast from "../../weui/Toast/Toast";
 import Icon from '../../weui/Icon/Icon'
 
 function mapStateToProps(state) {
-  const {product, global} = state;
-  return {product: product, global: global}
+  const {mine,product, global} = state;
+  return {mine:mine,product: product, global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -98,6 +98,8 @@ class GoodsEditScene extends PureComponent {
     const basic_categories = this.props.product.basic_category[currVendorId];
     const basic_cat_list = this.toModalData(basic_categories);
     store_tags = store_tags[currVendorId];
+    let vendor_stores = this.toStores( this.props.mine.vendor_stores[currVendorId]);
+
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
@@ -128,7 +130,7 @@ class GoodsEditScene extends PureComponent {
       sale_status: -1,
       fnProviding:fnProviding,
       store_product:[],
-
+      vendor_stores:vendor_stores,
     };
 
     this.uploadImg = this.uploadImg.bind(this);
@@ -136,6 +138,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   componentWillMount() {
+
     let {params} = this.props.navigation.state;
     let {type,store_product} = params;
     const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = (this.props.navigation.state.params.product_detail || {});
@@ -233,41 +236,19 @@ class GoodsEditScene extends PureComponent {
     let check_res = this.dataValidate(formData);
     console.log(check_res)
     if(check_res){
-      dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
-        console.log(ok,reason,obj)
-        if(ok){
-          this.back(type)
-        }
-
-      }))
+      // dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
+      //   console.log(ok,reason,obj)
+      //   if(ok){
+      //     this.back(type)
+      //   }
+      //
+      // }))
     }
   };
 
   dataValidate(formData) {
     let type = this.props.navigation.state.params.type;
     const {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files} = formData;
-
-    let err_msg = '';
-    if (name.length <= 0 || name == undefined) {
-      err_msg = '请输入商品名';
-    } else if (!(vendor_id > 0)) {
-      err_msg = '无效的品牌商';
-    } else if (sku_unit !== '斤' && sku_unit !== '个') {
-      err_msg = '选择SKU单位';
-    } else if (!(weight > 0)) {
-      err_msg = '请输入正确的重量';
-    } else if (sku_having_unit <= 0) {
-      err_msg = '请输入正确的份含量';
-    } else if (!(basic_category > 0)) {
-      err_msg = '请选择基础分类';
-    } else if (basic_category == Cts.TAG_HIDE) {
-      err_msg = '请勿将基础分类放入列表中隐藏';
-    } else if (store_categories.length < 0) {
-      err_msg = '请选择门店分类';
-    } else if (Object.keys(upload_files).length < 1) {
-      err_msg = '请添加商品图片';
-    }
-
     if (type === 'edit' && id <= 0) {
       err_msg = '数据异常, 无法保存';
     } else if (type === 'add') {
@@ -280,12 +261,35 @@ class GoodsEditScene extends PureComponent {
         err_msg = '选择供货方式';
       }
     }
+    let err_msg = '';
+    if (name.length <= 0 || name == undefined) {
+      err_msg = '请输入商品名';
+    } else if (!(vendor_id > 0)) {
+      err_msg = '无效的品牌商';
+    } else if (sku_unit !== '斤' && sku_unit !== '个') {
+      err_msg = '选择SKU单位';
+    }else if (sku_having_unit <= 0) {
+      err_msg = '请输入正确的份含量';
+    }else if (!(weight > 0)) {
+      err_msg = '请输入正确的重量';
+    }  else if (!(basic_category > 0)) {
+      err_msg = '请选择基础分类';
+    } else if (basic_category == Cts.TAG_HIDE) {
+      err_msg = '请勿将基础分类放入列表中隐藏';
+    } else if (store_categories.length < 0) {
+      err_msg = '请选择门店分类';
+    } else if (Object.keys(upload_files).length < 1) {
+      err_msg = '请添加商品图片';
+    }
+
+
 
     if (err_msg === '') {
       return true;
     } else {
-      Alert.alert(err_msg)
+      ToastLong(err_msg)
       return false;
+
     }
   }
 
@@ -331,7 +335,7 @@ class GoodsEditScene extends PureComponent {
             <CellFooter>元</CellFooter>
           </Cell>
           {
-           _this.state.fnProviding ?  <ModalSelector
+           this.state.fnProviding ?  <ModalSelector
              skin='customer'
              data={this.state.head_supplies}
              onChange={(option) => {
@@ -364,7 +368,11 @@ class GoodsEditScene extends PureComponent {
             fontSize: pxToDp(30),
             marginTop: pxToDp(25),
             marginBottom: pxToDp(32)
-          }}>回龙观店,望京店,三元桥店,西直门店</Text>
+          }}>
+            {
+              this.state.vendor_stores
+            }
+            </Text>
         </View>
       </View>
     }
@@ -425,6 +433,14 @@ class GoodsEditScene extends PureComponent {
         });
       }
     }));
+  }
+  toStores(obj){
+    let storesArr=[]
+    tool.objectMap(obj,function (item,id) {
+      storesArr.push(item.name)
+    })
+
+    return storesArr.join(' , ')
   }
 
   render() {
