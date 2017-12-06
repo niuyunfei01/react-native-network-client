@@ -35,6 +35,7 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
 import Icon from '../../weui/Icon/Icon'
+import {NavigationActions} from "react-navigation";
 
 function mapStateToProps(state) {
   const {mine,product, global} = state;
@@ -92,14 +93,15 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
 
     super(props);
+   
     let {store_tags} = this.props.product;
     let {currVendorId} = tool.vendor(this.props.global);
     let {fnProviding} = tool.vendor(this.props.global);
     const basic_categories = this.props.product.basic_category[currVendorId];
     const basic_cat_list = this.toModalData(basic_categories);
     store_tags = store_tags[currVendorId];
-    let vendor_stores = this.toStores( this.props.mine.vendor_stores[currVendorId]);
-
+     let vendor_store = this.toStores(this.props.mine.vendor_stores[currVendorId]) 
+     
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
@@ -130,11 +132,11 @@ class GoodsEditScene extends PureComponent {
       sale_status: -1,
       fnProviding:fnProviding,
       store_product:[],
-      vendor_stores:vendor_stores,
+      vendor_stores:vendor_store,
     };
-
     this.uploadImg = this.uploadImg.bind(this);
-    this.upLoad = this.upLoad.bind(this)
+    this.upLoad = this.upLoad.bind(this);
+
   }
 
   componentWillMount() {
@@ -142,7 +144,7 @@ class GoodsEditScene extends PureComponent {
     let {params} = this.props.navigation.state;
     let {type,store_product} = params;
     const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = (this.props.navigation.state.params.product_detail || {});
-
+    console.log(mid_list_img)
     if (type === 'edit') {
       // let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
       //   return {id: img_id, name: img_data.name};
@@ -190,8 +192,16 @@ class GoodsEditScene extends PureComponent {
     if(type == 'add' ){
       native.gotoPage(type);
     } else {
-      navigation.goBack();
+      this.props.navigation.goBack();
     }
+  }
+  async setBeforeRefresh(checked) {
+    let {state, dispatch} = this.props.navigation;
+    const setRefreshAction = NavigationActions.setParams({
+      params: {isRefreshing: true},
+      key: state.params.detail_key
+    });
+    dispatch(setRefreshAction);
   }
 
   toModalData(obj) {
@@ -207,7 +217,7 @@ class GoodsEditScene extends PureComponent {
     return arr
   }
 
-  upLoad = () => {
+  upLoad = async () => {
     let {type} = this.props.navigation.state.params;
     if(!this.state.fnProviding){
       this.setState({provided:Cts.STORE_COMMON_PROVIDED})
@@ -235,15 +245,16 @@ class GoodsEditScene extends PureComponent {
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
     console.log(check_res)
-    if(check_res){
+    // if(check_res){
       // dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
       //   console.log(ok,reason,obj)
       //   if(ok){
-      //     this.back(type)
+         await this.setBeforeRefresh()
+          this.back(type)
       //   }
       //
       // }))
-    }
+    // }
   };
 
   dataValidate(formData) {
@@ -435,12 +446,16 @@ class GoodsEditScene extends PureComponent {
     }));
   }
   toStores(obj){
-    let storesArr=[]
-    tool.objectMap(obj,function (item,id) {
-      storesArr.push(item.name)
-    })
+    let arr = []
+    if(obj){
+        tool.objectMap(obj,(item,id) => {
+          arr.push(item.name);
+        })
+      
+      return arr.join(' , ')
+    }
+    
 
-    return storesArr.join(' , ')
   }
 
   render() {

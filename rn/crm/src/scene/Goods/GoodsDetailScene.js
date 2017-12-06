@@ -56,11 +56,13 @@ class GoodsDetailScene extends PureComponent {
         <TouchableOpacity
           onPress={() => {
             if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'edit',
                   store_product,
                   product_detail,
+                  detail_key:navigation.state.key
                 });
               });
             } else {
@@ -108,7 +110,12 @@ class GoodsDetailScene extends PureComponent {
       this.getVendorTags(currVendorId);
     }
   }
-
+  componentDidUpdate() {
+    let {key, params} = this.props.navigation.state;
+    console.log('-------------->',params.isRefreshing)
+    let {isRefreshing} = (params || {});
+      this.setState({isRefreshing: isRefreshing,});
+  }
   getVendorTags(_v_id) {
     if (_v_id > 0) {
       const {accessToken} = this.props.global;
