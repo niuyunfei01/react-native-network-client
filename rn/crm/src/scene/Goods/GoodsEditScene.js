@@ -22,6 +22,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {productSave} from "../../reducers/product/productActions";
+import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -93,15 +94,12 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
 
     super(props);
-   
     let {store_tags} = this.props.product;
     let {currVendorId} = tool.vendor(this.props.global);
     let {fnProviding} = tool.vendor(this.props.global);
     const basic_categories = this.props.product.basic_category[currVendorId];
     const basic_cat_list = this.toModalData(basic_categories);
-    store_tags = store_tags[currVendorId];
-     let vendor_store = this.toStores(this.props.mine.vendor_stores[currVendorId]) 
-     
+    
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
@@ -132,23 +130,30 @@ class GoodsEditScene extends PureComponent {
       sale_status: -1,
       fnProviding:fnProviding,
       store_product:[],
-      vendor_stores:vendor_store,
+      vendor_stores:'',
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
+    this.getVendorStore = this.getVendorStore.bind(this)
 
   }
 
   componentWillMount() {
-
+    let _this = this;
     let {params} = this.props.navigation.state;
-    let {type,store_product} = params;
-    const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = (this.props.navigation.state.params.product_detail || {});
-    console.log(mid_list_img)
+    let {type} = params;
+   
     if (type === 'edit') {
       // let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
       //   return {id: img_id, name: img_data.name};
       // });
+      let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
+      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail
+      
+      if(!(id>0)){
+        Alert.alert('请返回重试!')
+      }
+
       let upload_files = {};
       if(tool.length(mid_list_img) > 0){
         for(let img_id in mid_list_img){
@@ -173,7 +178,16 @@ class GoodsEditScene extends PureComponent {
         sku_unit: sku_unit,
         weight: weight,
       });
+    }else{
+      try {
+        let vendor_store = this.toStores(this.props.mine.vendor_stores[this.state.vendor_id])
+        this.setState({vendor_stores:vendor_store})
+      } catch (error) {
+        _this.getVendorStore()
+      }
+     
     }
+
   }
 
   componentDidMount() {
@@ -202,6 +216,26 @@ class GoodsEditScene extends PureComponent {
       key: state.params.detail_key
     });
     dispatch(setRefreshAction);
+  }
+
+  getVendorStore() {
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
+    let _this = this;
+    dispatch(getVendorStores(currVendorId, accessToken, (resp) => {
+      console.log('store resp -> ', resp.ok, resp.desc);
+      if (resp.ok) {
+        let curr_stores = resp.obj;
+        let curr_stores_arr = []
+        Object.values(curr_stores).forEach((item,id)=>{
+          curr_stores_arr.push(item.name)
+        })
+        _this.setState({
+          vendor_stores: curr_stores_arr.join(' , '),
+        });
+      }
+    }));
   }
 
   toModalData(obj) {
@@ -544,7 +578,10 @@ class GoodsEditScene extends PureComponent {
                   <Label style={[styles.cell_label]}>基础分类</Label>
                 </CellHeader>
                 <CellBody>
-                  <Text>{!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}</Text>
+                  <Text> 
+                    
+                    {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
+                    </Text>
                 </CellBody>
                 <CellFooter/>
               </Cell>

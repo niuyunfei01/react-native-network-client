@@ -380,6 +380,37 @@ if (map[mode]){
 }
 
 
+function deepClone(obj){
+  function isClass(o){
+    if(o===null) return "Null";
+    if(o===undefined) return "Undefined";
+    return Object.prototype.toString.call(o).slice(8,-1);
+  }
+
+  let result;
+  let oClass=isClass(obj);
+  if(oClass==="Object"){
+      result={};
+  }else if(oClass==="Array"){
+      result=[];
+  }else{
+      return obj;
+  }
+  for(let key in obj){
+     let copy=obj[key];
+     if(isClass(copy)=="Object"){
+         result[key]=arguments.callee(copy);//递归调用
+      }else if(isClass(copy)=="Array"){
+         result[key]=arguments.callee(copy);
+      }else{
+          result[key]=obj[key];
+      }
+  }
+return result;
+}
+
+
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -406,4 +437,5 @@ export default {
   storeActionSheet,
   sellingStatus,
   headerSupply,
+  deepClone
 }
