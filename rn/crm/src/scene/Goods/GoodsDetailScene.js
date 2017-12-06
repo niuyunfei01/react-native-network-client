@@ -16,6 +16,8 @@ import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {ToastLong} from "../../util/ToastUtils";
+import {NavigationActions} from 'react-navigation';
+
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -112,9 +114,17 @@ class GoodsDetailScene extends PureComponent {
   }
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
-    console.log('-------------->',params.isRefreshing)
     let {isRefreshing} = (params || {});
-      this.setState({isRefreshing: isRefreshing,});
+    if(isRefreshing){
+      this.setState({isRefreshing:isRefreshing})
+      const setRefresh =  this.props.navigation.setParams({
+        isRefreshing:  false,
+        key:key
+      });
+      this.props.navigation.dispatch(setRefresh);
+      this.getProductDetail();
+    }
+
   }
   getVendorTags(_v_id) {
     if (_v_id > 0) {
