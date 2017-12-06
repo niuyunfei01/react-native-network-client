@@ -1,8 +1,13 @@
 'use strict';
-import {jsonWithTpl, jsonWithTpl2} from "../../util/common";
+import {
+  jsonWithTpl,
+  jsonWithTpl2
+} from "../../util/common";
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {ToastLong} from '../../util/ToastUtils';
+import {
+  ToastLong
+} from '../../util/ToastUtils';
 
 const {
   GET_NAME_PRICES,
@@ -53,9 +58,11 @@ export function fetchProductDetail(product_id, token, callback) {
       }).catch((error) => {
         dispatch(receiveProductDetail(product_id));
         ToastLong(error.message);
-        callback({ok: false, desc: error.message});
-      }
-    );
+        callback({
+          ok: false,
+          desc: error.message
+        });
+      });
   }
 }
 
@@ -79,9 +86,11 @@ export function fetchVendorProduct(_v_id, product_id, token, callback) {
         callback(resp);
       }).catch((error) => {
         ToastLong(error.message);
-        callback({ok: false, desc: error.message});
-      }
-    );
+        callback({
+          ok: false,
+          desc: error.message
+        });
+      });
   }
 }
 
@@ -97,9 +106,11 @@ export function fetchVendorTags(_v_id, token, callback) {
         }
         callback(resp);
       }).catch((error) => {
-        callback({ok: false, desc: error.message});
-      }
-    );
+        callback({
+          ok: false,
+          desc: error.message
+        });
+      });
   }
 }
 
@@ -113,18 +124,20 @@ export function productSave(data, token, callback) {
     }
   )
 
-  // return dispatch => {
-  //   FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-  //   .then(res => res.json())
-  //   .then(json => {
-  //     callback(json)
-  //   }).catch((error) => {
-  //     callback(error)
-  //   });
-  // }
-
 }
 
+export function batchPriceSave(vendor_id, data, token, callback) {
+  let url = `api/product_save.json?access_token=${token}&vendor_id=${vendor_id}`;
+  return false
+  return jsonWithTpl2(url, data, (json) => {
+      callback(json.ok, json.reason, json.obj);
+    },
+    (error) => {
+      callback(error, "网络错误, 请稍后重试")
+    }
+  )
+
+}
 
 function receiveVendorTags(_v_id, vendor_tags = {}) {
   return {
@@ -151,8 +164,15 @@ function receiveVendorTags(_v_id, vendor_tags = {}) {
 export function uploadImg(image_info, callback, file_model_name = 'Product') {
 
   let formData = new FormData();
-  let {uri, name} = image_info;
-  let photo = {uri: uri, type: 'application/octet-stream', name: name};
+  let {
+    uri,
+    name
+  } = image_info;
+  let photo = {
+    uri: uri,
+    type: 'application/octet-stream',
+    name: name
+  };
 
   formData.append("file_post_name", 'photo');
   formData.append("file_model_name", file_model_name);
@@ -171,28 +191,33 @@ export function uploadImg(image_info, callback, file_model_name = 'Product') {
         let ok = false;
         let desc = '';
         console.log('uploadImg resp --->', resp);
-        let {status, fspath, file_id, message} = resp;
+        let {
+          status,
+          fspath,
+          file_id,
+          message
+        } = resp;
         if (parseInt(status) === 1) {
           ok = true;
           desc = '图片上传成功';
         } else {
           desc = message;
         }
-        callback({ok, desc, obj: {file_id, fspath}});
+        callback({
+          ok,
+          desc,
+          obj: {
+            file_id,
+            fspath
+          }
+        });
       }).catch((error) => {
         console.log('error -> ', error);
-        callback({ok: false, desc: '图片上传失败'});
-      }
-    );
+        callback({
+          ok: false,
+          desc: '图片上传失败'
+        });
+      });
   }
 
 }
-
-
-
-
-
-
-
-
-

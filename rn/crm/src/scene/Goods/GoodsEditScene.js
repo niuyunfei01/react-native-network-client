@@ -280,14 +280,13 @@ class GoodsEditScene extends PureComponent {
     let check_res = this.dataValidate(formData);
     console.log(check_res)
     // if(check_res){
-      // dispatch(productSave(formData,accessToken,(ok,reason,obj)=>{
-      //   console.log(ok,reason,obj)
-      //   if(ok){
-         await this.setBeforeRefresh()
-          this.back(type)
-      //   }
-      //
-      // }))
+    //   dispatch(productSave(formData,accessToken, async(ok,reason,obj)=>{
+    //     console.log(ok,reason,obj)
+    //     if(ok){
+    //      await this.setBeforeRefresh()
+    //       this.back(type)
+    //     }
+    //   }))
     // }
   };
 

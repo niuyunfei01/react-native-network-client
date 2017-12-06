@@ -331,7 +331,8 @@ class GoodsDetailScene extends PureComponent {
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
                   productId:this.productId,
-                  store_product:store_product
+                  store_product:store_product,
+                  detail_key:navigation.state.key
                 });
               });
             }}

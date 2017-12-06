@@ -22,7 +22,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {productSave, fetchVendorProduct} from "../../reducers/product/productActions";
+import {productSave, fetchVendorProduct ,batchPriceSave} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -31,7 +31,7 @@ import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
-
+import {Toast} from "../../weui/index";
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
@@ -42,6 +42,7 @@ function mapDispatchToProps(dispatch) {
     dispatch,
     ...bindActionCreators({
       fetchVendorProduct,
+      batchPriceSave,
       ...globalActions
     }, dispatch)
   }
@@ -83,18 +84,20 @@ class GoodsBatchPriceScene extends PureComponent {
       ],
       sell_status: 1,
       head_supplies: [
-        {
+         {
           label: '是',
-          key: Cts.STORE_SELF_PROVIDED
-        }, {
-          label: '否',
           key: Cts.STORE_COMMON_PROVIDED
-        }
+        },
+        {
+          label: '否',
+          key: Cts.STORE_SELF_PROVIDED
+        },
       ],
       head_supply: -1,
       flag: 0,
       productList: {},
-      productListCopy: {}
+      productListCopy: {},
+      uploading:false
     }
     this.getVendorProduct = this
       .getVendorProduct
@@ -102,12 +105,10 @@ class GoodsBatchPriceScene extends PureComponent {
     this.renderList = this
       .renderList
       .bind(this);
-    this.renLoading = this
-      .renLoading
-      .bind(this);
     this.getChange = this
       .getChange
       .bind(this);
+    this.upload = this.upload.bind(this);
   }
 
   componentWillMount() {
@@ -142,24 +143,7 @@ class GoodsBatchPriceScene extends PureComponent {
     }
   }
 
-  renLoading(color = "#ccc") {
-    if (Platform.OS === 'ios') {
-      return <ActivityIndicatorIOS
-        color={color}
-        size="large"
-        style={{
-        height: pxToDp(32),
-        width: pxToDp(32)
-      }}/>
-    }
-    return <ActivityIndicator
-      color={color}
-      size={pxToDp(50)}
-      style={{
-      height: pxToDp(80),
-      width: pxToDp(80)
-    }}/>
-  }
+ 
 
   renderOperation(s_product, store_id) {
     let flag = this.getChange(s_product, store_id);
@@ -176,9 +160,7 @@ class GoodsBatchPriceScene extends PureComponent {
       return (
         <TouchableOpacity
           onPress={() =>{
-
             this.upload(s_product)
-
           }}
         >
           <Text style={styles.save_btn}>保存</Text>
@@ -186,7 +168,7 @@ class GoodsBatchPriceScene extends PureComponent {
       )
     }
 
-    // {this.renLoading()}
+    
   }
 
   getChange(s_product, store_id) {
@@ -201,11 +183,35 @@ class GoodsBatchPriceScene extends PureComponent {
     }
     return flag
   }
+  async setBeforeRefresh(checked) {
+    let {state, dispatch} = this.props.navigation;
+    const setRefreshAction = NavigationActions.setParams({
+      params: {isRefreshing: true},
+      key: state.params.detail_key
+    });
+    dispatch(setRefreshAction);
+  }
+   upload(s_product) {
 
-  upload(s_product) {
+    const {store_id,product_id,price,status,self_provided} = s_product;
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
+    let formData = {store_id,product_id,price,status,self_provided}
+    // let check_res = this.dataValidate(formData);
+    // if(check_res){
+      this.setState({uploading:true})
+      dispatch(batchPriceSave(currVendorId,formData,accessToken,async(ok,reason,obj)=>{
+        console.log(ok,reason,obj);
+        this.state.setState({uploading:fasle})
+        if(ok){
+          this.setBeforeRefresh()
+          this.back(type)
+        }
 
-    console.log(s_product);
-    
+      }))
+    // }
+
 
   }
 
@@ -265,11 +271,15 @@ class GoodsBatchPriceScene extends PureComponent {
           <ModalSelector
             skin='customer'
             data={_this.state.head_supplies}
-            onChange={(option) => {  this.setState({head_supply: option.key}) }}>
+            onChange={(option) => {  
+              productItem.self_provided = option.key;
+              console.log(option.key)
+              _this.forceUpdate()
+              
+              }}>
             <View style={[styles.header_supply]}>
               <Text style={styles.item_font_style}>
-                {/*{tool.headerSupply(this.state.head_supply)}*/}
-                是
+                {_this.headerSupply(productItem.self_provided)}
               </Text>
             </View>
           </ModalSelector>
@@ -283,9 +293,23 @@ class GoodsBatchPriceScene extends PureComponent {
 
   }
 
+  headerSupply(mode) {
+    let map = {};
+      map[Cts.STORE_SELF_PROVIDED] = '否';
+      map[Cts.STORE_COMMON_PROVIDED] = '是';
+    return map[mode]
+
+  }
+
   render() {
     return (
       <ScrollView>
+        <Toast
+            icon="loading"
+            show={this.state.uploading}
+            onRequestClose={() => {
+            }}
+          >提交中</Toast>
         <View style={styles.title}>
           <View style={styles.store_name}>
             <Text>门店名称
