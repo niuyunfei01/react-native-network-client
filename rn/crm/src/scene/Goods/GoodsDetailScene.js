@@ -46,30 +46,33 @@ class GoodsDetailScene extends PureComponent {
 
           onPress={() => {
             if(!!backPage){
-              native.gotoPage(backPage);
+              console.log("backPage------------", backPage);
+              native.nativeBack();
+            }else {
+
             }
           }}
         />),
       headerTitle: '商品详情',
-      headerRight: ( <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          // onPress={() => {
-          //   if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
-          //     InteractionManager.runAfterInteractions(() => {
-          //       navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-          //         type: 'edit',
-          //         store_product,
-          //         product_detail,
-          //       });
-          //     });
-          //   } else {
-          //     ToastLong('请等待商品加载完成...')
-          //   }
-          // }}
-        >
-          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-        </TouchableOpacity>
-      </View>),
+      // headerRight: ( <View style={{flexDirection: 'row'}}>
+      //   <TouchableOpacity
+      //     onPress={() => {
+      //       if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+      //         InteractionManager.runAfterInteractions(() => {
+      //           navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+      //             type: 'edit',
+      //             store_product,
+      //             product_detail,
+      //           });
+      //         });
+      //       } else {
+      //         ToastLong('请等待商品加载完成...')
+      //       }
+      //     }}
+      //   >
+      //     <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+      //   </TouchableOpacity>
+      // </View>),
     }
   };
 

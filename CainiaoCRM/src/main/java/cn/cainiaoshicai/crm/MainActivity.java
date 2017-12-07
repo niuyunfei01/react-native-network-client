@@ -380,7 +380,7 @@ public class MainActivity extends AbstractActionBarActivity {
                             try {
                                 StaffDao staffDao = new StaffDao(app.token());
                                 final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
-                                if (msg.isOk()) {
+                                if (msg != null && msg.isOk()) {
                                     MainActivity.this.runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -434,7 +434,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         @Override
                                         protected void onPostExecute(Void aVoid) {
                                             pf.dismissAllowingStateLoss();
-                                            if (resultBean.isOk()) {
+                                            if (resultBean != null && resultBean.isOk()) {
                                                 final HashMap<String, String> obj = resultBean.getObj();
 
                                                 final String okTips = "打卡成功，今日值班店长："
@@ -504,7 +504,7 @@ public class MainActivity extends AbstractActionBarActivity {
                     @Override
                     public void onResponse(Call<ResultBean<ShipAcceptStatus>> call, Response<ResultBean<ShipAcceptStatus>> response) {
                         ResultBean<ShipAcceptStatus> body = response.body();
-                        if (body.isOk()) {
+                        if (body != null && body.isOk()) {
                             app.getAccountBean().setShipAcceptStatus(body.getObj());
                             initShipAccept(app);
                         } else {
@@ -555,7 +555,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
                                                                Response<ResultBean<ShipAcceptStatus>> response) {
                                             ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body.isOk()) {
+                                            if (body != null && body.isOk()) {
                                                 app.getAccountBean().setShipAcceptStatus(body.getObj());
                                                 dlg(storeId);
                                             } else {
@@ -587,7 +587,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
                                                                Response<ResultBean<ShipAcceptStatus>> response) {
                                             ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body.isOk()) {
+                                            if (body!=null && body.isOk()) {
                                                 app.getAccountBean().setShipAcceptStatus(body.getObj());
                                                 initShipAccept(app);
                                                 Utility.toast("操作成功", MainActivity.this);
@@ -854,7 +854,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                 @Override
                                 protected void onPostExecute(Void aVoid) {
                                     pf.dismissAllowingStateLoss();
-                                    if (resultBean.isOk()) {
+                                    if (resultBean != null && resultBean.isOk()) {
                                         MainActivity.this.runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
