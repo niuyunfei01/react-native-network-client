@@ -336,10 +336,15 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void nativeBack() {
         final Activity activity = getCurrentActivity();
         if (activity != null) {
-            FragmentManager fm = activity.getFragmentManager();
+            final FragmentManager fm = activity.getFragmentManager();
             if (fm.getBackStackEntryCount() > 0) {
-                Log.i("MainActivity popping backstack");
-                fm.popBackStack();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i("MainActivity popping backstack");
+                        fm.popBackStack();
+                    }
+                });
             } else {
                 activity.runOnUiThread(new Runnable() {
                     @Override
