@@ -59,6 +59,18 @@ export default {
     }
   },
 
+  gotoNativeActivity: async function (activityName) {
+    if (NativeModules.ActivityStarter && activityName) {
+      await NativeModules.ActivityStarter.navigateToNativeActivity(activityName);
+    }
+  },
+
+  nativeBack: async function(){
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.nativeBack();
+    }
+  },
+
   host :
     /**
      * @param callback （host) => {}

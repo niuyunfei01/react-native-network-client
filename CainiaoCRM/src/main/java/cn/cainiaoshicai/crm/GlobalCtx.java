@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -241,6 +242,7 @@ public class GlobalCtx extends Application {
         }
         return fileCache.get();
     }
+
 
     @Override
     public void onCreate() {
