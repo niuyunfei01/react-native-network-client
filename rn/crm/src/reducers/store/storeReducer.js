@@ -30,6 +30,8 @@ const initialState = {
   packWorkers: [],
 }
 
+var moment = require('moment');
+
 export default function storeReducer(state = initialState, action) {
 
   switch (action.type) {
@@ -48,7 +50,7 @@ export default function storeReducer(state = initialState, action) {
 
     case GET_PACK_WORKERS:
       if (action.store_id && action.packers) {
-        return {...state, packWorkers: {...state, [action.store_id]: action.packers}}
+        return {...state, packWorkers: {...state, [action.store_id]: action.packers, persistExpiresAt: moment().add(300, 'seconds').toDate()}}
       }
       break;
 
