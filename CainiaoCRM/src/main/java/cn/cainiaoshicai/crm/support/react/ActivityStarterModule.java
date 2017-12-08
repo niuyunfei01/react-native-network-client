@@ -1,21 +1,25 @@
 package cn.cainiaoshicai.crm.support.react;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.telecom.Call;
 import android.text.TextUtils;
 
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.modules.core.PermissionAwareActivity;
-import com.facebook.react.modules.core.PermissionListener;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -31,6 +35,7 @@ import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
@@ -54,6 +59,8 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * Expose Java to JavaScript.
  */
 class ActivityStarterModule extends ReactContextBaseJavaModule {
+
+    private static DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter = null;
 
     ActivityStarterModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -297,19 +304,63 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void callJavaScript() {
-//        Activity activity = getCurrentActivity();
-//        if (activity != null) {
-//            MainApplication application = (MainApplication) activity.getApplication();
-//            ReactNativeHost reactNativeHost = application.getReactNativeHost();
-//            ReactInstanceManager reactInstanceManager = reactNativeHost.getReactInstanceManager();
-//            ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
-//
-//            if (reactContext != null) {
-//                CatalystInstance catalystInstance = reactContext.getCatalystInstance();
-//                WritableNativeArray params = new WritableNativeArray();
-//                params.pushString("Hello, JavaScript!");
-//                catalystInstance.callFunction("JavaScriptVisibleToJava", "alert", params);
-//            }
-//        }
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            ReactInstanceManager reactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
+            ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
+            if (reactContext != null) {
+                CatalystInstance catalystInstance = reactContext.getCatalystInstance();
+                WritableNativeArray params = new WritableNativeArray();
+                params.pushString("Hello, JavaScript!");
+                catalystInstance.callFunction("JavaScriptVisibleToJava", "alert", params);
+            }
+        }
+    }
+
+    @ReactMethod
+    void navigateToNativeActivity(String activityName) {
+        Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Class<?> cls = null;
+            try {
+                cls = Class.forName(activityName);
+                Intent intent = new Intent(activity, cls);
+                activity.startActivity(intent);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @ReactMethod
+    void nativeBack() {
+        final Activity activity = getCurrentActivity();
+        if (activity != null) {
+            final FragmentManager fm = activity.getFragmentManager();
+            if (fm.getBackStackEntryCount() > 0) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i("MainActivity popping backstack");
+                        fm.popBackStack();
+                    }
+                });
+            } else {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i("MainActivity nothing on backstack, calling super");
+                        activity.onBackPressed();
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * To pass an object instead of a simple string, create a {@link WritableNativeMap} and populate it.
+     */
+    static void triggerAlert(@Nonnull String message) {
+        eventEmitter.emit("MyReactEventValue", message);
     }
 }

@@ -73,7 +73,7 @@ let getReqThenInvalidate = function (url, id, callback) {
         dispatch({type: ORDER_INVALIDATED, id: id});
       }
       callback(json.ok, json.reason, json.obj)
-    }, (error) => callback(false, "网络错误, 请稍后重试"))
+    }, (error) => callback(false, "网络错误, 请稍后重试" + (error ? ':' : '') + error))
 };
 
 export function printInCloud(sessionToken, orderId, callback) {
@@ -89,12 +89,9 @@ export function printInCloud(sessionToken, orderId, callback) {
   });
 }
 
-export function orderEditItem(item) {
+export function clearLocalOrder(id) {
   return dispatch => {
-    dispatch({
-      type: ORDER_EDIT_ITEM,
-      item,
-    })
+    dispatch({type: ORDER_INVALIDATED, id: id});
   };
 }
 

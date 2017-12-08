@@ -54,12 +54,29 @@ class OrderSetPackDone extends Component {
       dispatch(getStorePackers(global.accessToken, order.store_id, (ok, msg, workers) => {
         if (ok) {
           this.setState({loadingPacker: false});
+          this.__setCurrentAsDefault();
         } else {
           this.setState({loadingPacker: false, errorHints: msg});
         }
       }))
+    } else {
+      this.__setCurrentAsDefault();
     }
   }
+
+  __setCurrentAsDefault = () => {
+
+    const {global, store, navigation} = this.props;
+    const {order} = (navigation.state.params || {});
+    const workers = (store.packWorkers || {})[order.store_id];
+
+    if (workers && this.state.checked.length === 0) {
+      const currUid = '' + global.currentUser;
+      if (workers.filter(w => w.id === currUid).length > 0) {
+        this.setState({checked: [currUid]})
+      }
+    }
+  };
 
   _back = () => {
     const {navigation} = this.props;
@@ -94,7 +111,6 @@ class OrderSetPackDone extends Component {
     const {order} = (navigation.state.params || {});
 
     const workers = store.packWorkers[order.store_id];
-
 
     const packOpts = workers ? workers.map((worker, idx) => {
       return {label: `${worker.nickname}`, value: worker.id}
