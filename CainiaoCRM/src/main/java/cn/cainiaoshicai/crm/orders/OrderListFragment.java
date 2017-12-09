@@ -143,7 +143,7 @@ public class OrderListFragment extends Fragment {
                 return;
             }
 
-            if (value != null) {
+            if (value != null && value.getOrders() != null) {
                 for (final Order order : value.getOrders()) {
                     if (order.shouldTryAutoPrint()
                             && order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY
