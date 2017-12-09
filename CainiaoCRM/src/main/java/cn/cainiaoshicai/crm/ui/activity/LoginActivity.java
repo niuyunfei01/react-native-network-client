@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.devio.rn.splashscreen.SplashScreen;
+
 import java.lang.ref.WeakReference;
 
 import cn.cainiaoshicai.crm.Cts;

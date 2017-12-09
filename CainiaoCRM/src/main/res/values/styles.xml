@@ -22,6 +22,13 @@
         <item name="android:windowBackground">@drawable/launcher_</item>
     </style>
 
+    <!-- Base application theme. -->
+    <style name="ReactTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
     <style name="Widget.Styled.ActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
         <item name="background">@drawable/ab_solid_styled</item>
         <item name="backgroundStacked">@drawable/ab_stacked_solid_styled</item>
