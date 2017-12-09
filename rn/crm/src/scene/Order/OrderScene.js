@@ -209,17 +209,20 @@ class OrderScene extends Component {
   }
 
   componentWillMount() {
-
     const orderId = (this.props.navigation.state.params || {}).orderId;
-    const {dispatch, order, global, store} = this.props;
-    this.__getDataIfRequired(dispatch, global, order, store, orderId);
+    const {dispatch, order, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, order, orderId);
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   // this.__getDataIfRequired(dispatch, global, order, store, orderId);
-  // }
+  componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps order.order', nextProps.order.order);
 
-  __getDataIfRequired = (dispatch, global, order, store, orderId) => {
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const {dispatch, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+  }
+
+  __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
 
     console.log('__getDataIfRequired', orderId);
 
@@ -228,11 +231,11 @@ class OrderScene extends Component {
     }
     
     const sessionToken = global.accessToken;
-    const o = order.order;
+    const o = orderStateToCmp.order;
 
     if (!o || !o.id || o.id !== orderId) {
 
-      console.log('__getDataIfRequired refresh', orderId);
+      console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -830,13 +833,13 @@ class OrderScene extends Component {
       tintColor='gray'
     />;
 
-    const noOrder = (!order || !order.id);
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const noOrder = (!order || !order.id || order.id !== orderId);
     console.log('noOrder', noOrder, order);
 
     if (noOrder) {
-      const orderId = (this.props.navigation.state.params || {}).orderId;
       const {dispatch, global, store} = this.props;
-      this.__getDataIfRequired(dispatch, global, this.props.order, store, orderId);
+      this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
 
     return noOrder ?
