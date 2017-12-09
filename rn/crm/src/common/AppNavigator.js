@@ -45,12 +45,15 @@ import OrderCallShip from "../scene/Order/OrderCallShip";
 import GoodsEditScene from '../scene/Goods/GoodsEditScene';
 import GoodsClassifyScene from '../scene/Goods/GoodsClassifyScene';
 import GoodsBatchPriceScene from "../scene/Goods/GoodsBatchPriceScene";
+import GoodsApplyRecordScene from '../scene/Goods/GoodsApplyRecordScene';
 
 
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
 import OrderCancelShip from "../scene/Order/OrderCancelShip";
+
+import  HelpScene from '../scene/Help/HelpScene';
 
 const tabDef = {
   Remind: {
@@ -229,9 +232,11 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},
         [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
-        [Config.ROUTE_GOODS_EDIT]: {screen:GoodsEditScene},
-        [Config.ROUTE_GOODS_CLASSIFY]:{screen:GoodsClassifyScene},
-        [Config.ROUTE_GOODS_BATCH_PRICE]:{screen:GoodsBatchPriceScene},
+        [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
+        [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
+        [Config.ROUTE_HELP_SCENE]: {screen: HelpScene},
+
+
       },
       stackNavigatorConfigs
     );

@@ -569,10 +569,14 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
+          onPress={() => {
+              this.onPress(Config.ROUTE_HELP_SCENE)
+          }}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
@@ -707,6 +711,17 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let {state, navigate} = this.props.navigation;
+            navigate(Config.ROUTE_GOODS_APPLY_RECORD);
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>申请记录</Text>
         </TouchableOpacity>
       </View>
     )
