@@ -572,6 +572,7 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/huiyuan_.png')}/>
           <Text style={[block_styles.block_name]}>会员信息</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
@@ -579,6 +580,18 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity
+         style={[block_styles.block_box]}
+          onPress={() => {
+            this.onPress(Config.ROUTE_GOODS_APPLY_RECORD);
+          }}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
+          <Text style={[block_styles.block_name]}>申请记录</Text>
+        </TouchableOpacity>
+
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
