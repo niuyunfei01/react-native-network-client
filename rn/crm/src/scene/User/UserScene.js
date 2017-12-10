@@ -90,6 +90,9 @@ class UserScene extends PureComponent {
       currentUser,//个人页的当前用户ID必须是传入进来的
       navigation_key,
       currVendorId,
+      screen_name,
+      mobile_phone,
+      cover_image,
     } = this.props.navigation.state.params || {};
 
     const {mine} = this.props;
@@ -98,6 +101,13 @@ class UserScene extends PureComponent {
       id, nickname, nameRemark, mobilephone, image, //user 表数据
       worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
     } = tool.user_info(mine, currVendorId, currentUser);
+
+    if(type === 'mine'){
+      mobilephone = mobile_phone;
+      image = cover_image;
+      name = screen_name;
+    }
+
     this.state = {
       isRefreshing: false,
       onSubmitting: false,
@@ -170,8 +180,11 @@ class UserScene extends PureComponent {
         style={{backgroundColor: colors.white}}
       >
         <View style={styles.user_box}>
-          <Image style={[styles.user_img]}
-                 source={this.state.cover_image !== '' ? {uri: this.state.cover_image} : require('../../img/My/touxiang180x180_.png')}/>
+          <Image
+            style={[styles.user_img]}
+            source={!!this.state.cover_image ? {uri: this.state.cover_image} :
+              require('../../img/My/touxiang180x180_.png')}
+          />
           <Text style={[styles.user_name]}>{this.state.screen_name}</Text>
         </View>
         <Cells style={[styles.cells]}>

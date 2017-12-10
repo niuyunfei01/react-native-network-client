@@ -68,10 +68,10 @@ class OrderStatusCell extends PureComponent {
         <OrderStep statusTxt="已送达" bgColor={this._validStepColor(order.time_arrived)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}
           onPress={this._callShip}/>
       </View>
-      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.orderTime), left: (screen.width/8-5)}]}/>
-      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_ready), left: (screen.width/8*3-5)}]}/>
-      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_start_ship), left: (screen.width/8*5-5)}]}/>
-      <View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_arrived), left: (screen.width/8*7-5)}]}/>
+      {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.orderTime), left: (screen.width/8-5)}]}/>*/}
+      {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_ready), left: (screen.width/8*3-5)}]}/>*/}
+      {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_start_ship), left: (screen.width/8*5-5)}]}/>*/}
+      {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_arrived), left: (screen.width/8*7-5)}]}/>*/}
     </View>
   }
 }

@@ -68,16 +68,18 @@ class SelectStoreScene extends PureComponent {
 
   render() {
     return (
-      <ModalSelector
-        onChange={(option) => {
-          this._doChangeStore(option.key)
-        }}
-        modalVisible={this.state.modalVisible}
-        skin='customer'
-        data={this.state.storeActionSheet}
-      >
-        <Text>  </Text>
-      </ModalSelector>
+      <View style={{backgroundColor: '#fff'}}>
+        <ModalSelector
+          onChange={(option) => {
+            this._doChangeStore(option.key)
+          }}
+          modalVisible={this.state.modalVisible}
+          skin='customer'
+          data={this.state.storeActionSheet}
+        >
+          <Text>  </Text>
+        </ModalSelector>
+      </View>
     );
   }
 

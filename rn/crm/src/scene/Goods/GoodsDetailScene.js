@@ -48,8 +48,10 @@ class GoodsDetailScene extends PureComponent {
 
           onPress={() => {
             if(!!backPage){
-              // console.log('backPage ----------------------> ', backPage);
-              native.gotoPage(backPage);
+              console.log("backPage------------", backPage);
+              native.nativeBack();
+            }else {
+
             }
           }}
         />),
@@ -413,7 +415,7 @@ class GoodsDetailScene extends PureComponent {
           {img_list}
         </Swiper>
       );
-    } else {
+    }  else {
       return (
         <TouchableHighlight
           style={wrapper}

@@ -286,7 +286,7 @@ class GoodsBatchPriceScene extends PureComponent {
               }
             ]}
               keyboardType='numeric'
-              value={`${s_product.left_since_last_stat}`}
+              value={`${parseInt(s_product.left_since_last_stat)}`}
               onChangeText={(text) => {
               productItem.left_since_last_stat = text;
                 _this.forceUpdate()
@@ -304,7 +304,7 @@ class GoodsBatchPriceScene extends PureComponent {
               keyboardType='numeric'
               value={`${s_product.price / 100}`}
               onChangeText={(text) => {
-              productItem.price = text * 100;
+                  
               _this.forceUpdate()
             }}/>
           </View>

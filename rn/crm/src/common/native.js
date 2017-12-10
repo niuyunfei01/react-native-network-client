@@ -59,6 +59,18 @@ export default {
     }
   },
 
+  gotoNativeActivity: async function (activityName) {
+    if (NativeModules.ActivityStarter && activityName) {
+      await NativeModules.ActivityStarter.navigateToNativeActivity(activityName);
+    }
+  },
+
+  nativeBack: async function(){
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.nativeBack();
+    }
+  },
+
   host :
     /**
      * @param callback （host) => {}
@@ -87,9 +99,9 @@ export default {
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },
 
-  gotoLoginWithNoHistory: async function () {
+  gotoLoginWithNoHistory: async function (mobile = '') {
     await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.gotoLoginWithNoHistory());
+      NativeModules.ActivityStarter.gotoLoginWithNoHistory(mobile));
   },
 
   gotoActByUrl: async function (url) {

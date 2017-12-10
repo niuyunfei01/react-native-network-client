@@ -28,7 +28,9 @@ import {REHYDRATE} from 'redux-persist/constants'
 const initialState = {
   contacts: {}, //store_id => contact list
   packWorkers: [],
-}
+};
+
+const moment = require('moment');
 
 export default function storeReducer(state = initialState, action) {
 
@@ -48,7 +50,7 @@ export default function storeReducer(state = initialState, action) {
 
     case GET_PACK_WORKERS:
       if (action.store_id && action.packers) {
-        return {...state, packWorkers: {...state, [action.store_id]: action.packers}}
+        return {...state, packWorkers: {...state, [action.store_id]: action.packers, persistExpiresAt: moment().add(300, 'seconds').toDate()}}
       }
       break;
 

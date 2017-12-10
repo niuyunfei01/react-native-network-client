@@ -119,10 +119,17 @@ export function getCommonConfig(token, storeId, callback) {
 
 export function trans_data_to_java(obj) {
   let {can_read_vendors} = obj;
+  let vendor_list = {};
+  for (let vendor of can_read_vendors){
+    let vendor_id = vendor['id'];
+    vendor_list[vendor_id] = vendor;
+  }
+  obj.can_read_vendors = vendor_list;
+
   tool.objectMap(obj.can_read_stores, function (stores) {
     let vendor_id = stores['type'];
     stores['vendor_id'] = vendor_id;
-    let vendor_info = can_read_vendors[vendor_id];
+    let vendor_info = vendor_list[vendor_id];
     if(vendor_info !== undefined){
       stores['vendor'] = vendor_info['brand_name'];
     }

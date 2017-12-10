@@ -45,7 +45,6 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
 
     private StorageActionDao sad = null;
 
-    private Button btn_provide_print;
     private ProductEstimate productEstimate;
 
     @Override
@@ -93,7 +92,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
-        mWebView = (WebView) findViewById(R.id.activity_main_webview);
+        mWebView = findViewById(R.id.activity_main_webview);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 

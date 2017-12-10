@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -110,7 +111,6 @@ public class GlobalCtx extends Application {
     public static final int INT_SUCESS_API = 1;
 
     public static final CopyOnWriteArrayList<Integer> newOrderNotifies = new CopyOnWriteArrayList<>();
-    private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
 
     private static GlobalCtx application;
 
@@ -243,6 +243,7 @@ public class GlobalCtx extends Application {
         }
         return fileCache.get();
     }
+
 
     @Override
     public void onCreate() {

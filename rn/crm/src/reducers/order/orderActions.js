@@ -73,7 +73,7 @@ let getReqThenInvalidate = function (url, id, callback) {
         dispatch({type: ORDER_INVALIDATED, id: id});
       }
       callback(json.ok, json.reason, json.obj)
-    }, (error) => callback(false, "网络错误, 请稍后重试"))
+    }, (error) => callback(false, "网络错误, 请稍后重试" + (error ? ':' : '') + error))
 };
 
 export function printInCloud(sessionToken, orderId, callback) {
@@ -89,12 +89,9 @@ export function printInCloud(sessionToken, orderId, callback) {
   });
 }
 
-export function orderEditItem(item) {
+export function clearLocalOrder(id) {
   return dispatch => {
-    dispatch({
-      type: ORDER_EDIT_ITEM,
-      item,
-    })
+    dispatch({type: ORDER_INVALIDATED, id: id});
   };
 }
 
@@ -172,10 +169,10 @@ export function orderChgStore(token, wmId, store_id, old_store_id, reason, callb
   return getReqThenInvalidate(url, wmId, callback);
 }
 
-export function orderAuditRefund(token, id, task_id, is_agree, reason, callback) {
+export function orderAuditRefund(token, id, task_id, is_agree, reason, log_money, callback) {
   const url = `api/order_audit_refund/${id}.json?access_token=${token}`;
   const agree_code = is_agree ? Cts.REFUND_AUDIT_AGREE : Cts.REFUND_AUDIT_REFUSE;
-  return jsonReqThenInvalidate(url, id, callback, {agree_code, reason, task_id});
+  return jsonReqThenInvalidate(url, id, callback, {agree_code, reason, task_id, log_money});
 }
 
 export function orderToInvalid(token, id, reason_key, custom, callback) {

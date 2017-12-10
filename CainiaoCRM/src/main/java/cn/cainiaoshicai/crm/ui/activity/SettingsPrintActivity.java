@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.ListActivity;
 import android.bluetooth.BluetoothDevice;
@@ -305,6 +306,7 @@ public class SettingsPrintActivity extends ListActivity {
 	}
 
 	private ProgressFragment progressFragment;
+	private AtomicBoolean isConnecting = new AtomicBoolean(false);
 
 	private void connectPrinter(final BluetoothPrinters.DeviceStatus item) {
 		if (btAdapter == null) {
@@ -320,43 +322,51 @@ public class SettingsPrintActivity extends ListActivity {
 				connecting,
 				Toast.LENGTH_SHORT).show();
 
+		if (!isConnecting.compareAndSet(false, true)) {
+			return;
+		}
+
 		Thread connectThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				final BluetoothDevice device = item.getDevice();
 				try {
-					final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
-					final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
-					item.resetSocket(socketWrapper);
+					final BluetoothDevice device = item.getDevice();
+					try {
+						final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
+						final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+						item.resetSocket(socketWrapper);
 
-                    final SettingsPrintActivity act = SettingsPrintActivity.this;
-                    SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
-                    act.lastDevice = item;
+						final SettingsPrintActivity act = SettingsPrintActivity.this;
+						SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
+						act.lastDevice = item;
 
-                    AppLogger.e("connect with wrapper: connected");
-                    final String msg = String.format("已连接到 %s", item.getName());
+						AppLogger.e("connect with wrapper: connected");
+						final String msg = String.format("已连接到 %s", item.getName());
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showTestDlg(act, msg, item.getSocket());
-                        }
-                    });
-
-				} catch (IOException ex) {
-					AppLogger.e("exception to connect BT device:" + device.getName(), ex);
-					CrashReportHelper.handleUncaughtException(null, ex);
-					runOnUiThread(socketErrorRunnable);
-				} finally {
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							listAdapter.notifyDataSetChanged();
-							if (progressFragment != null) {
-								progressFragment.dismissAllowingStateLoss();
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								showTestDlg(act, msg, item.getSocket());
 							}
-						}
-					});
+						});
+
+					} catch (IOException ex) {
+						AppLogger.e("exception to connect BT device:" + device.getName(), ex);
+						CrashReportHelper.handleUncaughtException(null, ex);
+						runOnUiThread(socketErrorRunnable);
+					} finally {
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								listAdapter.notifyDataSetChanged();
+								if (progressFragment != null) {
+									progressFragment.dismissAllowingStateLoss();
+								}
+							}
+						});
+					}
+				} finally {
+					isConnecting.compareAndSet(true, false);
 				}
 			}
 		});

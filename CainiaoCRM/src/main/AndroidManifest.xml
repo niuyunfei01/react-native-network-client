@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="284"
-    android:versionName="2.3.2">
+    android:versionCode="286"
+    android:versionName="2.3.3">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -31,7 +31,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA"/>
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" tools:remove="${excludeSystemAlertWindowPermission}"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <!-- Optional for location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -162,7 +162,7 @@
 
         <activity
             android:name=".support.react.MyReactActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:theme="@style/ReactTheme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

@@ -33,7 +33,8 @@ import {
   saveOrderDelayShip,
   saveOrderItems,
   orderWayRecord,
-  orderChangeLog
+  orderChangeLog,
+  clearLocalOrder
 } from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
@@ -71,6 +72,7 @@ function mapDispatchToProps(dispatch) {
       saveOrderItems,
       markTaskDone,
       orderWayRecord,
+      clearLocalOrder,
     }, dispatch)
   }
 }
@@ -175,15 +177,13 @@ class OrderScene extends Component {
       onProcessed: false,
       reminds: {},
       remindFetching: false,
+      store_contacts: [],
     };
-
-    this.orderId = 0;
-    this.store_contacts = [];
 
     this._onLogin = this._onLogin.bind(this);
     this.toMap = this.toMap.bind(this);
     this.goToSetMap = this.goToSetMap.bind(this);
-    this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
+    this._dispatchToInvalidate = this._dispatchToInvalidate.bind(this);
     this.onToggleMenuOption = this.onToggleMenuOption.bind(this);
     this.onPrint = this.onPrint.bind(this);
     this._onShowStoreCall = this._onShowStoreCall.bind(this);
@@ -209,22 +209,61 @@ class OrderScene extends Component {
   }
 
   componentWillMount() {
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const {dispatch, order, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, order, orderId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps order.order', nextProps.order.order);
 
     const orderId = (this.props.navigation.state.params || {}).orderId;
-    this.orderId = orderId;
-    // console.log("componentWillMount: params orderId:", orderId);
-    const {order} = this.props.order;
-    // console.log("order results:", order);
+    const {dispatch, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+  }
 
-    if (!order || !order.id || order.id !== orderId) {
-      this.onHeaderRefresh()
-    } else {
-      if (order) {
-        this._setAfterOrderGot(order);
-        this.store_contacts = this.props.store.contacts[order.store_id];
+  __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
+
+    console.log('__getDataIfRequired', orderId);
+
+    if (!orderId) {
+      return;
+    }
+    
+    const sessionToken = global.accessToken;
+    const o = orderStateToCmp.order;
+
+    if (!o || !o.id || o.id !== orderId) {
+
+      console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
+      if (!this.state.isFetching) {
+        this.setState({isFetching: true});
+        dispatch(getOrder(sessionToken, orderId, (ok, data) => {
+
+          let state = {
+            isFetching: false,
+          };
+
+          if (!ok) {
+            state.errorHints = data;
+            this.setState(state)
+          } else {
+            this._setAfterOrderGot(data, state);
+            if (!this.state.remindFetching) {
+              this.setState({remindFetching: true});
+              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, data) => {
+                if (ok) {
+                  this.setState({reminds: data, remindFetching: false})
+                } else {
+                  this.setState({errorHints: '获取提醒列表失败', remindFetching: false})
+                }
+              }));
+            }
+          }
+        }))
       }
     }
-  }
+  };
 
   static _extract_edited_items(items) {
     const edits = {};
@@ -257,11 +296,14 @@ class OrderScene extends Component {
     };
     this.props.navigation.setParams(params);
   };
-  _setAfterOrderGot = (order) => {
+
+  _setAfterOrderGot = (order, initialState) => {
     this.setState({
       itemsEdited: OrderScene._extract_edited_items(order.items),
-      itemsHided: !shouldShowItems(order.orderStatus)
-    });
+      itemsHided: !shouldShowItems(order.orderStatus),
+      ...initialState,
+  });
+
     this._navSetParams();
   };
 
@@ -309,7 +351,7 @@ class OrderScene extends Component {
       const vm_path = _o.feedback && _o.feedback.id ? "#!/feedback/view/" + _o.feedback.id
         : "#!/feedback/order/" + _o.id;
       const path = `vm?access_token=${accessToken}${vm_path}`;
-      const url = Config.serverUrl(Config.host(global, dispatch, native), path, Config.https);
+      const url = Config.serverUrl(path, Config.https);
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
 
@@ -351,7 +393,7 @@ class OrderScene extends Component {
         });
         if (resp.ok) {
           ToastShort('操作成功');
-          this.onHeaderRefresh();
+          this._dispatchToInvalidate();
         }
       }));
     });
@@ -359,16 +401,17 @@ class OrderScene extends Component {
 
   _onShowStoreCall() {
 
+    const {store, dispatch, global} = this.props;
+
     const store_id = this.props.order.order.store_id;
-    if (!this.store_contacts || this.store_contacts.length === 0) {
+    const contacts = (store.store_contacts ||{}).store_id;
+
+    if (!contacts || contacts.length === 0) {
       this.setState({showContactsLoading: true});
 
-      const {dispatch} = this.props;
-
-      dispatch(getContacts(this.props.global.accessToken, store_id, (ok, msg, contacts) => {
+      dispatch(getContacts(global.accessToken, store_id, (ok, msg, contacts) => {
         console.log("getContacts: ok=", ok, "msg", msg);
-        this.store_contacts = contacts;
-        this.setState({showContactsLoading: false, showCallStore: true})
+        this.setState({store_contacts: contacts, showContactsLoading: false, showCallStore: true})
       }));
     } else {
       this.setState({showCallStore: true})
@@ -377,7 +420,7 @@ class OrderScene extends Component {
 
   _contacts2menus() {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
-    return (this.store_contacts || []).map((contact, idx) => {
+    return (this.state.store_contacts || []).map((contact, idx) => {
       console.log(contact, idx);
       const {sign, mobile, desc, id} = contact;
       return {
@@ -399,40 +442,9 @@ class OrderScene extends Component {
     this.setState({showCallStore: false});
   }
 
-  onHeaderRefresh() {
-
-    const sessionToken = this.props.global.accessToken;
-    const {dispatch} = this.props;
-
-    if (!this.state.remindFetching) {
-      this.setState({remindFetching: true});
-      dispatch(getRemindForOrderPage(sessionToken, this.orderId, (ok, data) => {
-        console.log(ok, data);
-        if (ok) {
-          this.setState({reminds: data, remindFetching: false})
-        } else {
-          this.setState({errorHints: '获取提醒列表失败', remindFetching: false})
-        }
-      }));
-    }
-
-    if (!this.state.isFetching) {
-      this.setState({isFetching: true});
-
-      dispatch(getOrder(sessionToken, this.orderId, (ok, data) => {
-
-        let state = {
-          isFetching: false,
-        };
-
-        if (!ok) {
-          state.errorHints = data
-        } else {
-          this._setAfterOrderGot(data);
-        }
-        this.setState(state)
-      }))
-    }
+  _dispatchToInvalidate() {
+    const {dispatch, order} = this.props;
+    dispatch(clearLocalOrder(order.order.id));
   }
 
   _hidePrinterChooser() {
@@ -446,9 +458,9 @@ class OrderScene extends Component {
     return `云打印(${printerName})`;
   }
   _doCloudPrint() {
-    const {dispatch} = this.props;
+    const {dispatch, order} = this.props;
     const {accessToken} = this.props.global;
-    dispatch(printInCloud(accessToken, this.orderId, (ok, msg, data) => {
+    dispatch(printInCloud(accessToken, order.order.id, (ok, msg, data) => {
       console.log('print done:', ok, msg, data);
       if (ok) {
         ToastShort("已发送到打印机");
@@ -466,7 +478,8 @@ class OrderScene extends Component {
     this._hidePrinterChooser();
   }
   _onLogin() {
-    this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId: this.orderId}})
+    const orderId = this.props.order.order.id;
+    this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId}})
   }
 
   _doSaveItemsEdit() {
@@ -604,7 +617,7 @@ class OrderScene extends Component {
     if (validPoi) {
       const store = this.props.global.canReadStores[order.store_id] || {};
       const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
-      const uri = Config.serverUrl(Config.host(global, dispatch, native), path);
+      const uri = Config.serverUrl(path);
       this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
       console.log(uri)
     } else {
@@ -665,7 +678,7 @@ class OrderScene extends Component {
     }
 
     const path = `stores/orders_go_to_buy/${order.order.id}.html?access_token=${global.accessToken}`;
-    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(Config.host(global, dispatch, native), path, Config.https)});
+    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
   _getWayRecord() {
     this.setState({ shipHided: !this.state.shipHided })
@@ -809,18 +822,22 @@ class OrderScene extends Component {
   }
 
   render() {
-    const {order, dispatch, global, navigation} = this.props.order;
+    const order = this.props.order.order;
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}
-      onRefresh={this.onHeaderRefresh}
+      onRefresh={this._dispatchToInvalidate}
       tintColor='gray'
     />;
 
-    const noOrder = (!order || order.id !== this.orderId);
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const noOrder = (!order || !order.id || order.id !== orderId);
+    console.log('noOrder', noOrder, order);
+
     if (noOrder) {
-      this.onHeaderRefresh();
+      const {dispatch, global, store} = this.props;
+      this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
-    
+
     return noOrder ?
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}

@@ -152,8 +152,10 @@ public class StorageActionDao {
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
 
-            if (!storagesMap.isSuccess()) {
-                throw new ServiceException(storagesMap.getErrorAlert());
+
+            if (storagesMap == null || !storagesMap.isSuccess()) {
+                String msg = storagesMap == null ? "请求失败" : storagesMap.getErrorAlert();
+                throw new ServiceException(msg);
             }
 
             if (storagesMap.getStore_products() != null) {
