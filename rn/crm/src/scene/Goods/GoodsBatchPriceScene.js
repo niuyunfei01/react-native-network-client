@@ -5,38 +5,27 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Platform,
   TextInput,
-  ActivityIndicator,
-  ActivityIndicatorIOS,
-  InteractionManager
+
 } from 'react-native';
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label
-} from "../../weui/index";
+
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {productSave, fetchVendorProduct ,batchPriceSave} from "../../reducers/product/productActions";
+import {fetchVendorProduct ,batchPriceSave} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
-import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {Toast} from "../../weui/index";
+import {NavigationActions} from "react-navigation";
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
-
+import {ToastLong} from "../../util/ToastUtils";
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -109,6 +98,7 @@ class GoodsBatchPriceScene extends PureComponent {
       .getChange
       .bind(this);
     this.upload = this.upload.bind(this);
+    this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
 
   componentWillMount() {
@@ -147,7 +137,6 @@ class GoodsBatchPriceScene extends PureComponent {
 
   renderOperation(s_product, store_id) {
     let flag = this.getChange(s_product, store_id);
-
     if (flag) {
       return (<Icon
         name={'success_circle'}
@@ -177,40 +166,91 @@ class GoodsBatchPriceScene extends PureComponent {
     for (const key in productListCopy) {
       if (productListCopy.hasOwnProperty(key)) {
         if (s_product[key] != productListCopy[key]) {
-          return false;
+
+          flag = false;
+          return false
+
         }
       }
     }
     return flag
   }
-  async setBeforeRefresh(checked) {
+
+ setBeforeRefresh() {
     let {state, dispatch} = this.props.navigation;
-    const setRefreshAction = NavigationActions.setParams({
+     const setRefreshAction =   NavigationActions.setParams({
       params: {isRefreshing: true},
       key: state.params.detail_key
     });
     dispatch(setRefreshAction);
-  }
-   upload(s_product) {
 
-    const {store_id,product_id,price,status,self_provided} = s_product;
+
+  }
+   async upload(s_product) {
+
+    const {store_id,product_id,price,status,self_provided,left_since_last_stat} = s_product;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global);
-    let formData = {store_id,product_id,price,status,self_provided}
-    // let check_res = this.dataValidate(formData);
-    // if(check_res){
+     let {currVendorId} = tool.vendor(this.props.global);
+     let formData = {
+       store_id,
+       product_id,
+       price,
+       sale_status:status,
+       provided:self_provided,
+       stock:left_since_last_stat
+     }
+
+    let check_res = this.dataValidate(formData);
+     let product =  tool.deepClone(s_product)
+    if(check_res){
       this.setState({uploading:true})
-      dispatch(batchPriceSave(currVendorId,formData,accessToken,async(ok,reason,obj)=>{
-        console.log(ok,reason,obj);
-        this.state.setState({uploading:fasle})
+      dispatch(batchPriceSave(currVendorId,formData,accessToken,(ok,reason,obj)=>{
+        this.setState({uploading:false})
         if(ok){
-          this.setBeforeRefresh()
-          this.back(type)
+            this.setBeforeRefresh();
+            this.state.productListCopy[store_id] =product
+            this.forceUpdate()
+
+        }else {
+
         }
 
       }))
-    // }
+    }
+
+
+  }
+
+   dataValidate(data){
+
+    let {store_id,product_id,price,sale_status,provided,stock} = data;
+
+     if(price <= 0){
+
+       return alert(false , '价格不能小于0,请重新输入！')
+
+     }else  if(!((sale_status == Cts.STORE_PROD_ON_SALE) || (sale_status == Cts.STORE_PROD_OFF_SALE) || (sale_status == Cts.STORE_PROD_SOLD_OUT) )){
+
+       return alert(false , '请重新选择状态！')
+
+     }else if(!((provided == Cts.STORE_COMMON_PROVIDED) || (provided == Cts.STORE_SELF_PROVIDED))){
+
+       return alert(false , '请重新选择订货方式！')
+
+     }else if(isNaN(stock)){
+
+       return alert(false , '库存必须是数字')
+
+     }
+     function alert(flag,msg) {
+
+       ToastLong(msg);
+       return flag
+     }
+     return true
+
+
 
 
   }
@@ -219,6 +259,7 @@ class GoodsBatchPriceScene extends PureComponent {
     let _this = this
     return tool.objectMap(store_product, function (s_product, store_id) {
       let productItem = _this.state.productList[store_id];
+      let productItemCopy = _this.state.productListCopy[store_id]
       return (
         <View style={styles.item} key={store_id}>
           <View style={[styles.store_name]}>
@@ -248,7 +289,7 @@ class GoodsBatchPriceScene extends PureComponent {
               value={`${s_product.left_since_last_stat}`}
               onChangeText={(text) => {
               productItem.left_since_last_stat = text;
-              _this.forceUpdate()
+                _this.forceUpdate()
             }}/>
           </View>
           <View style={[styles.price]}>

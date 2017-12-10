@@ -127,10 +127,9 @@ export function productSave(data, token, callback) {
 }
 
 export function batchPriceSave(vendor_id, data, token, callback) {
-  let url = `api/product_save.json?access_token=${token}&vendor_id=${vendor_id}`;
-  return false
+  let url = `api/edit_store_product/${vendor_id}?access_token=${token}`;
   return jsonWithTpl2(url, data, (json) => {
-      callback(json.ok, json.reason, json.obj);
+       callback(json.ok, json.reason, json.obj);
     },
     (error) => {
       callback(error, "网络错误, 请稍后重试")

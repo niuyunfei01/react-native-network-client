@@ -123,6 +123,7 @@ class GoodsDetailScene extends PureComponent {
       });
       this.props.navigation.dispatch(setRefresh);
       this.getProductDetail();
+      this.getVendorProduct();
     }
 
   }
@@ -190,7 +191,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-          // console.log('getVendorProduct -> ', resp);
+          // console.log('getVendorProduct -> ', resp.obj['1']);
           if (resp.ok) {
             let store_product = resp.obj;
             _this.setState({
@@ -329,11 +330,13 @@ class GoodsDetailScene extends PureComponent {
           <TouchableOpacity
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {
+
                 navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
                   productId:this.productId,
                   store_product:store_product,
                   detail_key:navigation.state.key
                 });
+
               });
             }}
           >
