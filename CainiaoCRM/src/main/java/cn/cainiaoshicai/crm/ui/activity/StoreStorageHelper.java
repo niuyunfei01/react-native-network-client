@@ -280,6 +280,43 @@ public class StoreStorageHelper {
         return dlg;
     }
 
+    public static AlertDialog createApplyChangeSupplyPrice(final Activity activity, final StorageItem item,
+                                                           LayoutInflater inflater, final Runnable succCallback) {
+
+        View npView = inflater.inflate(R.layout.apply_change_supply_price, null);
+
+        final TextView label = (TextView) npView.findViewById(R.id.now_price_label);
+        label.setText("申请调整价格 (原价: " + item.getPricePrecision() + ")");
+
+        final EditText input = (EditText) npView.findViewById(R.id.number_apply_price);
+        input.setText(item.getSupplyPricePrecisionNoSymbol());
+
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(String.format(item.getName()))
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String priceStr = input.getText().toString();
+                                if (TextUtils.isEmpty(priceStr)) {
+                                    AlertUtil.error(activity, "价格不能为空");
+                                    return;
+                                }
+                                final int newCents = (int) (100 * Double.parseDouble(priceStr));
+                                if (newCents < 1) {
+                                    AlertUtil.error(activity, "价格不能低于1分钱");
+                                    return;
+                                }
+                                //TODO do apply
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        input.requestFocus();
+        return dlg;
+    }
+
+
     static AlertDialog createEditProvideDlg(final StoreStorageActivity activity, final StorageItem item) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);

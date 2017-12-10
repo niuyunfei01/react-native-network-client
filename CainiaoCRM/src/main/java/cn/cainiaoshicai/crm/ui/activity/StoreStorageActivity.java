@@ -376,15 +376,19 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         AppLogger.d("resetListAdapter:" + storageItems.size());
 
         if (listAdapter != null) {
+            listAdapter.setStore(currStore);
             listAdapter.changeBackendData(storageItems);
             listAdapter.filter(this.searchTerm);
         } else {
             listAdapter = new StorageItemAdapter<>(this, storageItems);
+            listAdapter.setStore(currStore);
             lv.setAdapter(listAdapter);
             lv.setOnScrollListener(new PicassoScrollListener(StoreStorageActivity.this));
             listAdapter.filter(this.searchTerm);
             listAdapter.notifyDataSetChanged();
+
         }
+
 
         if (ctv != null) {
             ArrayAdapter<StorageItem> ctvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
