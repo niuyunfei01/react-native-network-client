@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
+import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
@@ -29,11 +32,20 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
     Activity context;
+    Store store;
 
     public StorageItemAdapter(Activity context, ArrayList<T> objects) {
         super(context, R.layout.storage_status_row, objects);
         this.backendData.addAll(objects);
         this.context = context;
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public View getView(int pos, View convertView, ViewGroup parent) {
@@ -57,9 +69,14 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.reOnSale = (TextView) row.findViewById(R.id.re_on_sale_desc);
             holder.salePrice = (TextView) row.findViewById(R.id.sale_price);
             holder.goodIcon = (ImageView) row.findViewById(R.id.good_icon);
+
+            holder.applyingPrice = (TextView)row.findViewById(R.id.applying_price);
+            holder.supplyPrice = (TextView)row.findViewById(R.id.supply_price);
+
             convertView = row;
             convertView.setTag(holder);
         }
+
 
         final StorageItem item = this.getItem(pos);
         holder.label.setText(item.nameAndPidStr());
@@ -71,15 +88,53 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.prodStatus.setBackground(null);
         }
 
-        holder.salePrice.setText(item.getPricePrecision());
-        holder.salePrice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StoreStorageChanged ssc = (StoreStorageChanged)getContext();
-                AlertDialog dlg = StoreStorageHelper.createEditPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                dlg.show();
-            }
-        });
+        if (store != null && store.getFn_price_controlled() == 1) {
+            holder.supplyPrice.setVisibility(View.VISIBLE);
+            holder.applyingPrice.setVisibility(View.VISIBLE);
+            holder.leftNumber.setVisibility(View.INVISIBLE);
+            holder.salePrice.setVisibility(View.INVISIBLE);
+
+            holder.supplyPrice.setText(item.getSupplyPricePrecision());
+
+            holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                    AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                    dlg.show();
+                }
+            });
+
+            holder.applyingPrice.setText(item.getApplyingPricePrecision());
+
+            //TODO add apply change price event
+        } else {
+            holder.supplyPrice.setVisibility(View.INVISIBLE);
+            holder.applyingPrice.setVisibility(View.INVISIBLE);
+            holder.leftNumber.setVisibility(View.VISIBLE);
+            holder.salePrice.setVisibility(View.VISIBLE);
+
+            holder.salePrice.setText(item.getPricePrecision());
+            holder.salePrice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                    AlertDialog dlg = StoreStorageHelper.createEditPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                    dlg.show();
+                }
+            });
+
+            holder.leftNumber.setText(item.leftNumberStr());
+            holder.leftNumber.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                    dlg.show();
+                }
+            });
+        }
+
 
         if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
             holder.req_total.setText("订货:" + item.getTotalInReq());
@@ -105,15 +160,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.riskNum.setText("最低库存: " + item.getRisk_min_stat());
 
-        holder.leftNumber.setText(item.leftNumberStr());
-        holder.leftNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StoreStorageChanged ssc = (StoreStorageChanged)getContext();
-                AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                dlg.show();
-            }
-        });
 
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day()/5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
@@ -204,6 +250,9 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView prodStatus;
         TextView req_total;
         TextView riskNum;
+
+        public TextView supplyPrice;
+        public TextView applyingPrice;
 
         TextView reOnSale;
         public TextView salePrice;
