@@ -8,6 +8,7 @@ import {
   Platform,
   TextInput,
   Image,
+  FlatList,
 
 } from 'react-native';
 
@@ -61,6 +62,60 @@ class GoodsApplyRecordScene extends PureComponent {
 tab(num){
   this.setState({tab:num})
 }
+renderList(){
+  let arr = []
+  for(let i = 0; i <20; i++) {
+    
+    arr.push({imgUrl:'',name:'葫芦娃',time:'12121212',original_price:'1.5',price:i})
+    
+  }
+ return(
+
+  <FlatList
+  style = {{flex:1}}
+  data={arr}
+  renderItem={({item,key}) =>{
+    return(
+      <View style={styles.item} key={key}>
+      <View style={[styles.center, styles.image]}>
+      <Image
+        style = {{height:pxToDp(90),width:pxToDp(90)}}
+        source={{ uri: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512925340158&di=45ab61d35ff5c64da5dcdd6511cda77a&imgtype=0&src=http%3A%2F%2Fwww.muslimwww.com%2Fuploadfile%2F2016%2F0212%2F20160212074102495.jpg' }}
+      />
+      
+      </View>
+
+      <View style={[styles.goods_name]}>
+        <View style = {styles.name_text}>
+          <Text>{item.name}</Text>
+        </View>
+          <View>
+            <Text style={styles.name_time}>{item.time}</Text>
+          </View>
+      </View>
+
+      <View style={[styles.center, styles.original_price]}>
+        <Text style={styles.price_text}>{item.original_price}</Text>
+      </View>
+
+      <View style={[styles.center, styles.price]}>
+
+        <Text style={styles.price_text}>{item.price}</Text>
+
+      </View>
+
+    </View>
+    )
+  }}
+  refreshing = {true}
+  onEndReachedThreshold={0.8}
+  onEndReached = {()=>{
+    console.log('加载数据')
+  }}
+  
+/>  
+) 
+}
 
   render() {
     return (
@@ -107,7 +162,7 @@ tab(num){
             <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
 
           </View>
-          <ScrollView>
+          {/* <ScrollView>
             <View style={styles.item}>
               <View style={[styles.center, styles.image]}>
               <Image
@@ -138,7 +193,11 @@ tab(num){
 
             </View>
 
-          </ScrollView>
+          </ScrollView> */}
+
+          {
+            this.renderList()
+          }
 
 
         </View>
@@ -166,9 +225,9 @@ const styles = StyleSheet.create({
     color:colors.fontActiveColor,
     fontSize:pxToDp(28),
     marginTop:pxToDp(20),
-    borderBottomWidth:pxToDp(2),
+    borderBottomWidth:pxToDp(3),
     borderBottomColor:colors.fontActiveColor,
-    paddingBottom: pxToDp(10)
+    paddingBottom: pxToDp(20),
   },
   title: {
     height: pxToDp(55),
@@ -211,7 +270,6 @@ const styles = StyleSheet.create({
   goods_name: {
     width: pxToDp(240),
     height:pxToDp(100),
-    borderWidth:pxToDp(1),
   },
   original_price: {
     width: pxToDp(120)

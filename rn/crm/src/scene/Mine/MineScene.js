@@ -555,6 +555,14 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
+          <Text style={[block_styles.block_name]}>结算记录</Text>
+        </TouchableOpacity>
         {/*<View style={[block_styles.block_box]}/>*/}
       </View>
     )
@@ -581,15 +589,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity
-         style={[block_styles.block_box]}
-          onPress={() => {
-            this.onPress(Config.ROUTE_GOODS_APPLY_RECORD);
-          }}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
-          <Text style={[block_styles.block_name]}>申请记录</Text>
-        </TouchableOpacity>
+        
 
 
         <TouchableOpacity
@@ -612,6 +612,8 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/banben_.png')}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
+
+        
         <View style={[block_styles.empty_box]}/>
       </View>
     )
