@@ -24,6 +24,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Vendor;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
@@ -99,7 +100,11 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                    if (item.getApplyingPrice() > 0) {
+                        AlertUtil.errorOnActivity(context, "调价正在申请！");
+                        return;
+                    }
+                    StoreStorageChanged ssc = (StoreStorageChanged) getContext();
                     AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
                     dlg.show();
                 }

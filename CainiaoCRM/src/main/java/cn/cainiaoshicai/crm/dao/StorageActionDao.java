@@ -148,6 +148,7 @@ public class StorageActionDao {
                 params.put("tag_id", String.valueOf(tag.getId()));
             }
             String json = getJson("/list_store_storage_status/0/" + store.getId() + "/" + filter, params);
+            AppLogger.i("list_store_storage_status json result " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
             }.getType());
@@ -177,6 +178,8 @@ public class StorageActionDao {
                     si.setReqMark(sp.getReq_mark());
                     si.setWhen_sale_again(sp.getRe_on_sale_time());
                     si.setStore_id(sp.getStore_id());
+                    si.setSupplyPrice(sp.getSupply_price());
+                    si.setApplyingPrice(sp.getApplying_price());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {

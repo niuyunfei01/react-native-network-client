@@ -69,6 +69,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private Spinner currStatusSpinner;
     private Button btnReqList;
     private Button btnEmptyList;
+    private Button btnApplyPriceList;
     private LayoutInflater inflater;
     private int lastCategoryPos = 0;
 
@@ -177,6 +178,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     if (currStore == null || currStore.getId() != newStore.getId()) {
                         currStore = newStore;
                         AppLogger.d("start refresh data:");
+                        setTooBar();
                         refreshData();
                     }
                 }
@@ -222,6 +224,17 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 refreshData();
             }
         });
+
+        this.btnApplyPriceList = (Button) titleBar.findViewById(R.id.btn_apply_price_list);
+        this.btnApplyPriceList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO redirect
+
+            }
+        });
+
+        setTooBar();
 
         ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
         ctv.setThreshold(1);
@@ -333,6 +346,18 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
 
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+    }
+
+    private void setTooBar(){
+        if (currStore.getFn_price_controlled() == 1) {
+            this.btnReqList.setVisibility(View.INVISIBLE);
+            this.btnEmptyList.setVisibility(View.INVISIBLE);
+            this.btnApplyPriceList.setVisibility(View.VISIBLE);
+        } else {
+            this.btnReqList.setVisibility(View.VISIBLE);
+            this.btnEmptyList.setVisibility(View.VISIBLE);
+            this.btnApplyPriceList.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void initCurrStore(long storeId) {

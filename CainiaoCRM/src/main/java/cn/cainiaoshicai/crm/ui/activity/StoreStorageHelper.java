@@ -291,7 +291,7 @@ public class StoreStorageHelper {
         final EditText input = (EditText) npView.findViewById(R.id.number_apply_price);
         input.setText(item.getSupplyPricePrecisionNoSymbol());
         final EditText remarkInput = (EditText)npView.findViewById(R.id.remark_edit_txt);
-        final int vendorId = GlobalCtx.app().getVendor().getId();
+
         AlertDialog dlg = new AlertDialog.Builder(activity)
                 .setTitle(String.format(item.getName()))
                 .setView(npView)
@@ -312,7 +312,8 @@ public class StoreStorageHelper {
                                 int storeId = item.getStore_id();
                                 int productId = item.getProduct_id();
                                 int beforePrice = item.getSupplyPrice();
-                                Call<ResultBean> rb = GlobalCtx.app().dao.store_apply_price(vendorId, storeId, productId, beforePrice, newCents, remark);
+                                Store store = GlobalCtx.app().findStore(storeId);
+                                Call<ResultBean> rb = GlobalCtx.app().dao.store_apply_price(store.getType(), storeId, productId, beforePrice, newCents, remark);
                                 rb.enqueue(new Callback<ResultBean>() {
                                     @Override
                                     public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
