@@ -256,7 +256,7 @@ public class StoreStorageHelper {
                                     @Override
                                     public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
                                         ResultBean body = response.body();
-                                        if (body.isOk()) {
+                                        if (body!=null&&body.isOk()) {
                                             item.setPrice(newCents);
                                             if (succCallback != null) {
                                                 succCallback.run();
@@ -281,16 +281,17 @@ public class StoreStorageHelper {
     }
 
     public static AlertDialog createApplyChangeSupplyPrice(final Activity activity, final StorageItem item,
-                                                           LayoutInflater inflater, final Runnable succCallback) {
+                                                           final LayoutInflater inflater, final Runnable succCallback) {
 
         View npView = inflater.inflate(R.layout.apply_change_supply_price, null);
 
         final TextView label = (TextView) npView.findViewById(R.id.now_price_label);
-        label.setText("申请调整价格 (原价: " + item.getPricePrecision() + ")");
+        label.setText("申请调整价格 (原价: " + item.getSupplyPricePrecision() + ")");
 
         final EditText input = (EditText) npView.findViewById(R.id.number_apply_price);
         input.setText(item.getSupplyPricePrecisionNoSymbol());
-
+        final EditText remarkInput = (EditText)npView.findViewById(R.id.remark_edit_txt);
+        final int vendorId = GlobalCtx.app().getVendor().getId();
         AlertDialog dlg = new AlertDialog.Builder(activity)
                 .setTitle(String.format(item.getName()))
                 .setView(npView)
@@ -307,7 +308,31 @@ public class StoreStorageHelper {
                                     AlertUtil.error(activity, "价格不能低于1分钱");
                                     return;
                                 }
-                                //TODO do apply
+                                String remark = remarkInput.getText().toString();
+                                int storeId = item.getStore_id();
+                                int productId = item.getProduct_id();
+                                int beforePrice = item.getSupplyPrice();
+                                Call<ResultBean> rb = GlobalCtx.app().dao.store_apply_price(vendorId, storeId, productId, beforePrice, newCents, remark);
+                                rb.enqueue(new Callback<ResultBean>() {
+                                    @Override
+                                    public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
+                                        ResultBean body = response.body();
+                                        if (body != null && body.isOk()) {
+                                            item.setApplyingPrice(newCents);
+                                            if (succCallback != null) {
+                                                succCallback.run();
+                                            }
+                                            Toast.makeText(activity, "价格已修改申请已经提交", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            AlertUtil.showAlert(activity, "错误提示", "保存失败：" + body.getDesc());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResultBean> call, Throwable t) {
+                                        AlertUtil.showAlert(activity, "错误提示", "无法连接服务器");
+                                    }
+                                });
                             }
                         })
                 .setNegativeButton(R.string.cancel, null)
