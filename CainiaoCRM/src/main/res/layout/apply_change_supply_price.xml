@@ -43,5 +43,5 @@
         android:lines="3"
         android:scrollHorizontally="false"
         android:textColor="@color/gray"/>
-    
+
 </LinearLayout>
