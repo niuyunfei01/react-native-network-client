@@ -91,7 +91,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         if (store != null && store.getFn_price_controlled() == 1) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
-            holder.applyingPrice.setVisibility(View.VISIBLE);
             holder.leftNumber.setVisibility(View.INVISIBLE);
             holder.salePrice.setVisibility(View.INVISIBLE);
 
@@ -109,10 +108,10 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                     dlg.show();
                 }
             });
-
-            holder.applyingPrice.setText(item.getApplyingPricePrecision());
-
-            //TODO add apply change price event
+            if (item.getApplyingPrice() > 0) {
+                holder.applyingPrice.setVisibility(View.VISIBLE);
+                holder.applyingPrice.setText(item.getApplyingPricePrecision());
+            }
         } else {
             holder.supplyPrice.setVisibility(View.INVISIBLE);
             holder.applyingPrice.setVisibility(View.INVISIBLE);
