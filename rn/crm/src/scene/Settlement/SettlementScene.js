@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Image
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -17,7 +18,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 
 import {NavigationActions} from "react-navigation";
 import {color, NavigationItem} from '../../widget';
-
+import  tool from '../../common/tool.js'
 import {
   Cells,
   Cell,
@@ -76,16 +77,13 @@ class SettlementScene extends PureComponent {
   };
 
   constructor(props) {
-    let arr = [];
-    for (let i = 0; i < 20; i++) {
-      arr.push({key: `${i}`, label: `2017-12-${11 + i}`})
-    }
+
     super(props)
     this.state = {
       checked: ['1', '2'],
       authority: false,
       canChecked: false,
-      list: arr
+      list: []
     };
     this.renderList = this.renderList.bind(this);
     this.renderBtn = this.renderBtn.bind(this)
@@ -186,62 +184,77 @@ class SettlementScene extends PureComponent {
       }
     }
   }
-
+  renderEmpty(){
+      return(
+          <View style = {{alignItems:'center',justifyContent:'center',flex:1,marginTop:pxToDp(200)}}>
+            <Image style = {{width:pxToDp(100),height:pxToDp(135)}} source={require('../../img/Goods/zannwujilu.png')}/>
+            <Text style = {{fontSize:pxToDp(24),color:'#bababa',marginTop:pxToDp(30)}}>没有相关记录</Text>
+          </View>
+      )
+  }
   renderList() {
     let _this = this;
     let arr = this.state.list;
-    return (
-        <View>
-          <View
-              style={{flexDirection: 'row', height: pxToDp(55), alignItems: 'center', paddingHorizontal: pxToDp(30)}}>
-            <Text>2017年12月</Text>
+    if(arr.length > 0){
+      return (
+          <View>
+            <View
+                style={{flexDirection: 'row', height: pxToDp(55), alignItems: 'center', paddingHorizontal: pxToDp(30)}}>
+              <Text>2017年12月</Text>
+            </View>
+            <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
+              <FlatList
+                  data={arr}
+                  onEndReachedThreshold={0.9}
+                  onEndReached={() => {
+                    console.log('上拉加载')
+                  }}
+                  renderItem={({item, key}) => {
+                    return (
+                        <Cell customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}} access
+                              onPress={() => {
+                                this.toggleCheck(item.key)
+                              }}
+                        >
+                          <CellHeader style={{
+                            minWidth: pxToDp(180),
+                            flexDirection: 'row',
+                            height: pxToDp(100),
+                            alignItems: 'center'
+                          }}>
+                            {
+                              _this.state.canChecked ? <Icon name={this.inArray(item.key)['have'] ? 'success' : 'circle'}
+                                                             style={{marginRight: pxToDp(10)}}/> : <Text/>
+                            }
+                            <Text style={{height: 'auto'}}> {item.label}</Text>
+                          </CellHeader>
+                          <CellBody style={{marginLeft: pxToDp(10)}}>
+                            {/*<Text style={[styles.status]}>未打款</Text>*/}
+                            <Text style={[styles.status, {
+                              borderColor: colors.main_color,
+                              color: colors.main_color
+                            }]}>已打款</Text>
+                          </CellBody>
+                          <CellFooter style={{color: colors.fontGray}}>
+                            45454.55元
+                          </CellFooter>
+                        </Cell>
+
+                    )
+                  }}
+              />
+
+            </Cells>
           </View>
-          <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
-            <FlatList
-                data={arr}
-                onEndReachedThreshold={0.9}
-                onEndReached={() => {
-                  console.log('上拉加载')
-                }}
-                renderItem={({item, key}) => {
-                  return (
-                      <Cell customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}} access
-                            onPress={() => {
-                              this.toggleCheck(item.key)
-                            }}
-                      >
-                        <CellHeader style={{
-                          minWidth: pxToDp(180),
-                          flexDirection: 'row',
-                          height: pxToDp(100),
-                          alignItems: 'center'
-                        }}>
-                          {
-                            _this.state.canChecked ? <Icon name={this.inArray(item.key)['have'] ? 'success' : 'circle'}
-                                                           style={{marginRight: pxToDp(10)}}/> : <Text/>
-                          }
-                          <Text style={{height: 'auto'}}> {item.label}</Text>
-                        </CellHeader>
-                        <CellBody style={{marginLeft: pxToDp(10)}}>
-                          {/*<Text style={[styles.status]}>未打款</Text>*/}
-                          <Text style={[styles.status, {
-                            borderColor: colors.main_color,
-                            color: colors.main_color
-                          }]}>已打款</Text>
-                        </CellBody>
-                        <CellFooter style={{color: colors.fontGray}}>
-                          45454.55元
-                        </CellFooter>
-                      </Cell>
 
-                  )
-                }}
-            />
+      )
+    }else {
+      return(
+          this.renderEmpty()
+      )
 
-          </Cells>
-        </View>
+    }
 
-    )
   }
 
 
@@ -251,17 +264,18 @@ class SettlementScene extends PureComponent {
 
           <View style={styles.header}>
             <Text style={styles.today_data}>
-              今日数据（2017-12-05)
+              今日数据（{tool.fullDay(new Date())})
             </Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-              <Text style={styles.order_text}>订单 : 96</Text>
-              <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额 : 7623.11</Text>
+              <Text style={styles.order_text}>订单 : 0</Text>
+              <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额 : 0</Text>
             </View>
           </View>
-          <ScrollView>
+          <ScrollView >
             {
               this.renderList()
             }
+
 
           </ScrollView>
           {

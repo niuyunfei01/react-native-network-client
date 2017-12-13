@@ -63,6 +63,10 @@ export function fullDate(dt) {
   return Moment(dt).format('YYYY-MM-DD HH:mm:ss')
 }
 
+export function fullDay(dt) {
+  return Moment(dt).format('YYYY-MM-DD')
+}
+
 export function storeTime(dt) {
   return Moment(dt).format('H:mm');
 }
@@ -385,4 +389,5 @@ export default {
   user_info,
   first_store_id,
   storeActionSheet,
+  fullDay
 }
