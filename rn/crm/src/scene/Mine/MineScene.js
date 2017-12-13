@@ -560,10 +560,13 @@ class MineScene extends PureComponent {
           onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
           activeOpacity={customerOpacity}
         >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
+          <Image style={[block_styles.block_img]} source={require('../../img/My/jiesuanjilu.png')}/>
           <Text style={[block_styles.block_name]}>结算记录</Text>
         </TouchableOpacity>
+
         {/*<View style={[block_styles.block_box]}/>*/}
+        <View style={[block_styles.empty_box]}/>
+
       </View>
     )
   }
@@ -588,9 +591,6 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
-        
-        
-
 
         <TouchableOpacity
           style={[block_styles.block_box]}

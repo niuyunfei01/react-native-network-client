@@ -52,6 +52,10 @@ import OrderShipDetail from "../scene/Order/OrderShipDetail";
 import OrderCancelShip from "../scene/Order/OrderCancelShip";
 
 import SettlementScene from '../scene/Settlement/SettlementScene';
+import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
+
+
+SettlementDetailsScene
 
 const tabDef = {
   Remind: {
@@ -236,6 +240,9 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_CLASSIFY]: { screen: GoodsClassifyScene },
         [Config.ROUTE_GOODS_APPLY_RECORD]: { screen: GoodsApplyRecordScene },
         [Config.ROUTE_SETTLEMENT]: { screen: SettlementScene },
+        [Config.ROUTE_SETTLEMENT_DETAILS]: { screen: SettlementDetailsScene },
+
+
 
         
 

@@ -762,7 +762,7 @@ public class GlobalCtx extends Application {
 
     public void toApplyChangePriceList(Activity ctx){
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "Tab");
+        i.putExtra("_action", "GoodsApplyRecord");
         Bundle params = new Bundle();
         params.putString("initTab", "GoodsApplyRecord");
         ctx.startActivity(i);

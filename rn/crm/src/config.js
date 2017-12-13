@@ -108,6 +108,9 @@ const C = {
   ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
   ROUTE_GOODS_APPLY_RECORD:'GoodsApplyRecord',
   ROUTE_SETTLEMENT:'Settlement',
+  ROUTE_SETTLEMENT_DETAILS:'SettlementDetails',
+
+
   
   serverUrl,
   apiUrl,

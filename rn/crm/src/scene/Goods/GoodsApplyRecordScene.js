@@ -11,13 +11,14 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {productSave, batchPriceSave,fetchApplyRocordList} from "../../reducers/product/productActions";
+import {productSave, batchPriceSave, fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import {NavigationItem} from '../../widget';
 import colors from '../../widget/color'
 import Cts from "../../Cts";
 import {Toast} from "../../weui/index";
 import LoadingView from "../../widget/LoadingView";
+import native from "../../common/native";
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
@@ -43,7 +44,7 @@ class GoodsApplyRecordScene extends PureComponent {
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
-            navigation.goBack();
+            native.nativeBack();
           }}
       />),
     }
@@ -53,62 +54,43 @@ class GoodsApplyRecordScene extends PureComponent {
     super(props);
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
-      page :1,
-      list:[],
-      query:true,
-      pullLoading:false
-
+      page: 1,
+      list: [],
+      query: true,
+      pullLoading: false,
+      total_page: 1,
+      curr_page: 0
     }
     this.tab = this.tab.bind(this);
   }
 
- async tab(num) {
-    if(num != this.state.audit_status){
-      await this.setState({query:true,page:1,audit_status: num,list:[]});
+  async tab(num) {
+    if (num != this.state.audit_status) {
+      await this.setState({query: true, page: 1, audit_status: num, list: []});
       this.getApplyList()
     }
+  }
+
+  componentWillMount() {
 
   }
-  componentWillMount(){
 
-  }
-  getApplyList(){
+  getApplyList() {
     let store_id = this.props.global.currStoreId;
     let audit_status = this.state.audit_status;
     let page = this.state.page;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
-    dispatch(fetchApplyRocordList(store_id, audit_status, page, token,(resp) => {
+    dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
       if (resp.ok) {
-        console.log(resp)
-        for (let i = 0; i < page*20; i++) {
-          this.state.list.push({
-            "key":i,
-            "id": "3",
-            "vendor_id": "2",
-            "store_id": "10",
-            "product_id": "1147",
-            "apply_user": "822472",
-            "before_price": "900",
-            "apply_price": "970",
-            "remark": "涨价了",
-            "audit_status": "0",
-            "audit_user": "0",
-            "audit_desc": "",
-            "created": "2017-12-11 17:34:31",
-            "updated": "2017-12-11 17:34:31",
-            "mt_price": "0",
-            "ele_price": "1183",
-            "bd_price": "1141",
-            "jd_price": "1169",
-            "product_name": "农场直供生态快菜300克",
-            "apply_name": "张昊博",
-            "audit_name": ""
-          })
-          this.state.query = false;
-          this.setState({query:false,pullLoading:false})
-        }
-        this.forceUpdate()
+        let {total_page, curr_page, audit_list} = resp.obj
+        await this.setState({
+          pullLoading: false,
+          list: audit_list,
+          query: false,
+          total_page: total_page,
+          curr_page: curr_page,
+        });
       } else {
         console.log(resp.desc)
       }
@@ -117,10 +99,9 @@ class GoodsApplyRecordScene extends PureComponent {
   }
 
   renderList() {
-    this.state.list.forEach((item ,index)=>{
+    this.state.list.forEach((item, index) => {
       item.key = index
-    })
-
+    });
     return (
         <FlatList
             style={{flex: 1}}
@@ -143,34 +124,49 @@ class GoodsApplyRecordScene extends PureComponent {
                       </View>
                     </View>
                     <View style={[styles.center, styles.original_price]}>
-                      <Text style={styles.price_text}>{item.before_price/100}</Text>
+                      <Text style={styles.price_text}>{item.before_price / 100}</Text>
                     </View>
                     <View style={[styles.center, styles.price]}>
-                      <Text style={styles.price_text}>{item.apply_price/100}</Text>
+                      <Text style={styles.price_text}>{item.apply_price / 100}</Text>
                     </View>
                   </View>
               )
             }}
             refreshing={true}
             onEndReachedThreshold={0.9}
-            onEndReached={ () => {
-
-              this.setState({page:this.state.page++,pullLoading:true})
-              this.getApplyList()
+            onEndReached={async () => {
+              let {curr_page, total_page} = this.state;
+              if (curr_page < total_page) {
+                await this.setState({page: this.state.page++, pullLoading: true})
+                this.getApplyList()
+              }
             }}
-            ListFooterComponent = {()=> {
-              return(
-                  this.state.pullLoading ? <LoadingView/> :<View/>
+            ListFooterComponent={() => {
+              return (
+                  this.state.pullLoading ? <LoadingView/> : <View/>
               )
             }}
+            ListEmptyComponent={this.renderEmpty()}
+
             // getItemLayout={(data, index) => ( {length: pxToDp(90), offset: pxToDp(90) * index, index} )}//开始后卡顿
-
-
         />
     )
   }
 
-  render(){
+  renderEmpty(){
+
+    if(!this.state.query){
+      return(
+          <View style = {{alignItems:'center',justifyContent:'center',flex:1,marginTop:pxToDp(200)}}>
+            <Image style = {{width:pxToDp(100),height:pxToDp(135)}} source={require('../../img/Goods/zannwujilu.png')}/>
+            <Text style = {{fontSize:pxToDp(24),color:'#bababa',marginTop:pxToDp(30)}}>没有相关记录</Text>
+          </View>
+      )
+    }
+
+  }
+
+  render() {
     return (
         <View style={{flex: 1}}>
           <View style={styles.tab}>
@@ -180,7 +176,8 @@ class GoodsApplyRecordScene extends PureComponent {
                 }}
             >
               <View>
-                <Text style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>审核中</Text>
+                <Text
+                    style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>审核中</Text>
               </View>
             </TouchableOpacity>
 
@@ -190,7 +187,8 @@ class GoodsApplyRecordScene extends PureComponent {
                 }}
             >
               <View>
-                <Text style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>已完成</Text>
+                <Text
+                    style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>已完成</Text>
               </View>
             </TouchableOpacity>
 
@@ -201,18 +199,11 @@ class GoodsApplyRecordScene extends PureComponent {
                 }}
             >
               <View>
-                <Text style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>未完成</Text>
+                <Text
+                    style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>未完成</Text>
               </View>
             </TouchableOpacity>
 
-
-          </View>
-          <View style={styles.title}>
-
-            <Text style={[styles.title_text]}>图片</Text>
-            <Text style={[styles.title_text, {width: pxToDp(240)}]}>商品名称</Text>
-            <Text style={[styles.title_text, {width: pxToDp(120)}]}>原价</Text>
-            <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
 
           </View>
           <Toast
@@ -221,12 +212,19 @@ class GoodsApplyRecordScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <View style={styles.title}>
+
+            <Text style={[styles.title_text]}>图片</Text>
+            <Text style={[styles.title_text, {width: pxToDp(240)}]}>商品名称</Text>
+            <Text style={[styles.title_text, {width: pxToDp(120)}]}>原价</Text>
+            <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
+
+          </View>
+
 
           {
             this.renderList()
           }
-
-
         </View>
     )
   }
