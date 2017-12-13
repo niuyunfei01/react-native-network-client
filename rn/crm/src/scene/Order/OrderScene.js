@@ -173,6 +173,8 @@ class OrderScene extends Component {
       orderQuery:false,
       orderChangeLogs: [],
       orderWayLogs: {},
+      wayLoadingShow:false,
+      changeLoadingShow:false,
       //remind
       onProcessed: false,
       reminds: {},
@@ -220,7 +222,7 @@ class OrderScene extends Component {
   // }
 
   __getDataIfRequired = (dispatch, global, order, store, orderId) => {
-
+    console.log(3333333333333333333)
     console.log('__getDataIfRequired', orderId);
 
     if (!orderId) {
@@ -399,7 +401,7 @@ class OrderScene extends Component {
   }
 
   _onShowStoreCall() {
-
+    
     const {store, dispatch, global} = this.props;
 
     const store_id = this.props.order.order.store_id;
@@ -681,14 +683,10 @@ class OrderScene extends Component {
   }
   _getWayRecord() {
     this.setState({ shipHided: !this.state.shipHided })
-    let orderWayLogs = this.state.orderWayLogs
-
-    if (this.state.shipHided && tool.length(tool.length(orderWayLogs) == 0)) {
+    if (this.state.shipHided){
+      this.setState({wayLoadingShow:true})
       this.wayRecordQuery()
-      console.log(orderWayLogs)
-
     }
-
   }
 
   wayRecordQuery() {
@@ -698,17 +696,16 @@ class OrderScene extends Component {
       if (ok) {
         // if (tool.length(contacts)>0) {
         mg = contacts
+        console.log(msg)
         // }
       } else {
         Alert.alert(msg)
       }
-      this.setState({ orderWayLogs: mg })
+      this.setState({ orderWayLogs: mg,wayLoadingShow:false})
       console.log(this.state.orderWayLogs)
 
     }));
   }
-
-
 
   renderWayRecord() {
     let orderWayLogs = this.state.orderWayLogs
@@ -767,8 +764,6 @@ class OrderScene extends Component {
           <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
 
         </View>
-      } else {
-        return <LoadingView />
       }
     }
 
@@ -777,10 +772,9 @@ class OrderScene extends Component {
   _orderChangeLog() {
 
     this.setState({ changeHide: !this.state.changeHide })
-    if (this.state.orderChangeLogs.length == 0 && this.state.changeHide) {
+    if (this.state.changeHide) {
+      this.setState({changeLoadingShow:true})
       this._orderChangeLogQuery();
-    } else {
-      this.renderChangeLogs()
     }
 
   }
@@ -788,9 +782,9 @@ class OrderScene extends Component {
   _orderChangeLogQuery() {
     const { dispatch, order, global } = this.props;
     dispatch(orderChangeLog(order.order_id, global.accessToken, (ok, msg, contacts) => {
-
+      
       if (ok) {
-        this.setState({ orderChangeLogs: contacts });
+        this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
       } else {
         Alert.alert(msg)
       }
@@ -1193,6 +1187,7 @@ class OrderScene extends Component {
           </View>
         </View>
         {
+          this.state.wayLoadingShow ? <LoadingView/> : 
           this.renderWayRecord()
         }
       </View>
@@ -1219,6 +1214,7 @@ class OrderScene extends Component {
           </View>
         </View>
         {
+          this.state.changeLoadingShow ? <LoadingView/> : 
           this.renderChangeLogs()
         }
       </View>
