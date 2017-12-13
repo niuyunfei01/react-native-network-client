@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  Alert
 } from 'react-native';
 
 import {connect} from "react-redux";
@@ -19,11 +20,12 @@ import Cts from "../../Cts";
 import {Toast} from "../../weui/index";
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
+
+
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
-
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -33,7 +35,6 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
-
 class GoodsApplyRecordScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
@@ -63,18 +64,33 @@ class GoodsApplyRecordScene extends PureComponent {
     }
     this.tab = this.tab.bind(this);
   }
-
   async tab(num) {
+
     if (num != this.state.audit_status) {
       await this.setState({query: true, page: 1, audit_status: num, list: []});
       this.getApplyList()
     }
   }
 
-  componentWillMount() {
+  tips(msg){
+    Alert.alert(
+        '提示',
+        `${msg}`,
+        [
+          {text: '确定', onPress: () => console.log('OK Pressed')},
+        ],
+        { cancelable: true }
+    )
 
   }
 
+  ellipsis(str){
+    if(str.length >16){
+      return `${str.substring(0,13)}...`
+    }else {
+      return str
+    }
+  }
   getApplyList() {
     let store_id = this.props.global.currStoreId;
     let audit_status = this.state.audit_status;
@@ -82,6 +98,7 @@ class GoodsApplyRecordScene extends PureComponent {
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
+      console.log(resp)
       if (resp.ok) {
         let {total_page, curr_page, audit_list} = resp.obj
         await this.setState({
@@ -97,39 +114,41 @@ class GoodsApplyRecordScene extends PureComponent {
     }));
 
   }
-
   renderList() {
     this.state.list.forEach((item, index) => {
       item.key = index
     });
     return (
         <FlatList
+            extraData={this.state}
             style={{flex: 1}}
             data={this.state.list}
             renderItem={({item, key}) => {
               return (
-                  <View style={styles.item} key={key}>
-                    <View style={[styles.center, styles.image]}>
-                      <Image
-                          style={{height: pxToDp(90), width: pxToDp(90)}}
-                          source={{uri: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1512925340158&di=45ab61d35ff5c64da5dcdd6511cda77a&imgtype=0&src=http%3A%2F%2Fwww.muslimwww.com%2Fuploadfile%2F2016%2F0212%2F20160212074102495.jpg'}}
-                      />
-                    </View>
-                    <View style={[styles.goods_name]}>
-                      <View style={styles.name_text}>
-                        <Text>{item.product_name}</Text>
+               
+                    <View style={styles.item} key={key}>
+                      <View style={[styles.center, styles.image]}>
+                        <Image
+                            style={{height: pxToDp(90), width: pxToDp(90)}}
+                            source={{uri: item.cover_img}}
+                        />
                       </View>
-                      <View>
-                        <Text style={styles.name_time}>{item.created}</Text>
+                      <View style={[styles.goods_name]}>
+                        <View style={styles.name_text}>
+                          <Text>{this.ellipsis(item.product_name)}</Text>
+                        </View>
+                        <View>
+                          <Text style={styles.name_time}>{item.updated}</Text>
+                        </View>
+                      </View>
+                      <View style={[styles.center, styles.original_price]}>
+                        <Text style={styles.price_text}>{item.before_price / 100}</Text>
+                      </View>
+                      <View style={[styles.center, styles.price]}>
+                        <Text style={styles.price_text}>{item.apply_price / 100}</Text>
                       </View>
                     </View>
-                    <View style={[styles.center, styles.original_price]}>
-                      <Text style={styles.price_text}>{item.before_price / 100}</Text>
-                    </View>
-                    <View style={[styles.center, styles.price]}>
-                      <Text style={styles.price_text}>{item.apply_price / 100}</Text>
-                    </View>
-                  </View>
+       
               )
             }}
             refreshing={true}
@@ -146,7 +165,31 @@ class GoodsApplyRecordScene extends PureComponent {
                   this.state.pullLoading ? <LoadingView/> : <View/>
               )
             }}
+            ListHeaderComponent = { ()=> {
+              if(this.state.list.length > 0){
+                return(
+                    <View style={styles.title}>
+                      <Text style={[styles.title_text]}>图片</Text>
+                      <Text style={[styles.title_text, {width: pxToDp(240)}]}>商品名称</Text>
+                      <Text style={[styles.title_text, {width: pxToDp(120)}]}>原价</Text>
+                      <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
+                    </View>
+                )
+
+              }else {
+                return(
+                    <View/>
+                )
+              }
+
+            } }
             ListEmptyComponent={this.renderEmpty()}
+            refreshing = {false}
+            onRefresh = {() => {
+              console.log(this.state)
+              this.getApplyList()
+            }}
+
 
             // getItemLayout={(data, index) => ( {length: pxToDp(90), offset: pxToDp(90) * index, index} )}//开始后卡顿
         />
@@ -188,7 +231,7 @@ class GoodsApplyRecordScene extends PureComponent {
             >
               <View>
                 <Text
-                    style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>已完成</Text>
+                    style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>已审核</Text>
               </View>
             </TouchableOpacity>
 
@@ -200,7 +243,7 @@ class GoodsApplyRecordScene extends PureComponent {
             >
               <View>
                 <Text
-                    style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>未完成</Text>
+                    style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>未通过</Text>
               </View>
             </TouchableOpacity>
 
@@ -212,14 +255,6 @@ class GoodsApplyRecordScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
-          <View style={styles.title}>
-
-            <Text style={[styles.title_text]}>图片</Text>
-            <Text style={[styles.title_text, {width: pxToDp(240)}]}>商品名称</Text>
-            <Text style={[styles.title_text, {width: pxToDp(120)}]}>原价</Text>
-            <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
-
-          </View>
 
 
           {

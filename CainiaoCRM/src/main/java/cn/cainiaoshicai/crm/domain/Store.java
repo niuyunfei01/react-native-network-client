@@ -177,6 +177,7 @@ public class Store {
         b.putBoolean("cloudPrinterWorking", cloudPrinterWorking);
         b.putString("id", String.valueOf(id));
         b.putInt("fnPriceControlled", fn_price_controlled);
+        b.putInt("fn_price_controlled", fn_price_controlled);
         return b;
     }
 }
