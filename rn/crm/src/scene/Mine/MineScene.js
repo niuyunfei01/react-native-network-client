@@ -436,10 +436,17 @@ class MineScene extends PureComponent {
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
     let {currVendorId, currVersion, is_mgr, is_helper} = this.state;
-    let {global, dispatch} = this.props;
+    let {fnPriceControlled} = tool.vendor(this.props.global);
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity
+        {!!fnPriceControlled ? <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/jiesuanjilu_.png')}/>
+          <Text style={[block_styles.block_name]}>结算记录</Text>
+        </TouchableOpacity> : (<TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
             if (is_mgr || is_helper) {
@@ -454,7 +461,8 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/yeji_.png')}/>
           <Text style={[block_styles.block_name]}>业绩</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>)}
+
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -555,18 +563,6 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-          activeOpacity={customerOpacity}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/jiesuanjilu.png')}/>
-          <Text style={[block_styles.block_name]}>结算记录</Text>
-        </TouchableOpacity>
-
-        {/*<View style={[block_styles.block_box]}/>*/}
-        <View style={[block_styles.empty_box]}/>
-
       </View>
     )
   }
@@ -613,7 +609,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
 
-        
+
         <View style={[block_styles.empty_box]}/>
       </View>
     )
