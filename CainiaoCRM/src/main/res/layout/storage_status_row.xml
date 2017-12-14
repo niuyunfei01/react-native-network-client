@@ -183,7 +183,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="2dp"
         android:text="￥12.20"
-        android:textColor="@color/editable_text_blue"
+        android:textColor="@color/gray"
         android:textSize="@dimen/mini_text"
         />
 
