@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 
 import {connect} from "react-redux";
@@ -17,15 +18,17 @@ import pxToDp from "../../util/pxToDp";
 import {NavigationItem} from '../../widget';
 import colors from '../../widget/color'
 import Cts from "../../Cts";
-import {Toast} from "../../weui/index";
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
+import {ToastLong, ToastShort} from '../../util/ToastUtils';
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
 
 
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
+
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -35,6 +38,7 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
+
 class GoodsApplyRecordScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
@@ -60,37 +64,33 @@ class GoodsApplyRecordScene extends PureComponent {
       query: true,
       pullLoading: false,
       total_page: 1,
-      curr_page: 0
+      curr_page: 0,
+      refresh: false,
+      onSendingConfirm: true,
+      dialog:false
     }
     this.tab = this.tab.bind(this);
   }
-  async tab(num) {
 
+  async tab(num) {
     if (num != this.state.audit_status) {
       await this.setState({query: true, page: 1, audit_status: num, list: []});
       this.getApplyList()
     }
   }
 
-  tips(msg){
-    Alert.alert(
-        '提示',
-        `${msg}`,
-        [
-          {text: '确定', onPress: () => console.log('OK Pressed')},
-        ],
-        { cancelable: true }
-    )
-
+  tips(msg) {
+    this.setState({dialog:true,errMsg:msg})
   }
 
-  ellipsis(str){
-    if(str.length >16){
-      return `${str.substring(0,13)}...`
-    }else {
+  ellipsis(str) {
+    if (str.length > 16) {
+      return `${str.substring(0, 13)}...`
+    } else {
       return str
     }
   }
+
   getApplyList() {
     let store_id = this.props.global.currStoreId;
     let audit_status = this.state.audit_status;
@@ -100,13 +100,20 @@ class GoodsApplyRecordScene extends PureComponent {
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
       console.log(resp)
       if (resp.ok) {
-        let {total_page, curr_page, audit_list} = resp.obj
+        let {total_page, curr_page, audit_list} = resp.obj;
+        let arrList = []
+        if (this.state.refresh) {
+          arrList = audit_list
+        } else {
+          arrList = this.state.list.concat(audit_list)
+        }
         await this.setState({
           pullLoading: false,
-          list: audit_list,
+          list: arrList,
           query: false,
           total_page: total_page,
           curr_page: curr_page,
+          refresh: false
         });
       } else {
         console.log(resp.desc)
@@ -114,18 +121,47 @@ class GoodsApplyRecordScene extends PureComponent {
     }));
 
   }
+
+  renderTitle() {
+    {
+      if (this.state.list.length > 0) {
+        return (
+            <View style={styles.title}>
+              <Text style={[styles.title_text]}>图片</Text>
+              <Text style={[styles.title_text, {width: pxToDp(240)}]}>商品名称</Text>
+              <Text style={[styles.title_text, {width: pxToDp(120)}]}>原价</Text>
+              <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
+            </View>
+        )
+
+      } else {
+        return (
+            <View/>
+        )
+      }
+
+    }
+  }
+
   renderList() {
     this.state.list.forEach((item, index) => {
       item.key = index
     });
     return (
+
         <FlatList
             extraData={this.state}
             style={{flex: 1}}
             data={this.state.list}
             renderItem={({item, key}) => {
               return (
-               
+                  <TouchableOpacity
+                      onPress={() => {
+                        if(item.audit_status == Cts.AUDIT_STATUS_FAILED){
+                          this.tips(item.audit_desc)
+                        }
+                      }}
+                  >
                     <View style={styles.item} key={key}>
                       <View style={[styles.center, styles.image]}>
                         <Image
@@ -148,16 +184,19 @@ class GoodsApplyRecordScene extends PureComponent {
                         <Text style={styles.price_text}>{item.apply_price / 100}</Text>
                       </View>
                     </View>
-       
+                  </TouchableOpacity>
               )
             }}
             refreshing={true}
-            onEndReachedThreshold={0.9}
+            onEndReachedThreshold={0.05}
             onEndReached={async () => {
+              console.log('上拉加载!')
               let {curr_page, total_page} = this.state;
               if (curr_page < total_page) {
                 await this.setState({page: this.state.page++, pullLoading: true})
                 this.getApplyList()
+              } else {
+                ToastLong('已加载全部数据')
               }
             }}
             ListFooterComponent={() => {
@@ -165,53 +204,35 @@ class GoodsApplyRecordScene extends PureComponent {
                   this.state.pullLoading ? <LoadingView/> : <View/>
               )
             }}
-            ListHeaderComponent = { ()=> {
-              if(this.state.list.length > 0){
-                return(
-                    <View style={styles.title}>
-                      <Text style={[styles.title_text]}>图片</Text>
-                      <Text style={[styles.title_text, {width: pxToDp(240)}]}>商品名称</Text>
-                      <Text style={[styles.title_text, {width: pxToDp(120)}]}>原价</Text>
-                      <Text style={[styles.title_text, {width: pxToDp(120)}]}>调整价</Text>
-                    </View>
-                )
-
-              }else {
-                return(
-                    <View/>
-                )
-              }
-
-            } }
             ListEmptyComponent={this.renderEmpty()}
-            refreshing = {false}
-            onRefresh = {() => {
-              this.setState({query:true})
+            refreshing={false}
+            onRefresh={() => {
+              this.setState({query: true, refresh: true});
               this.getApplyList()
             }}
 
-
-            // getItemLayout={(data, index) => ( {length: pxToDp(90), offset: pxToDp(90) * index, index} )}//开始后卡顿
         />
     )
   }
 
-  renderEmpty(){
-
-    if(!this.state.query){
-      return(
-          <View style = {{alignItems:'center',justifyContent:'center',flex:1,marginTop:pxToDp(200)}}>
-            <Image style = {{width:pxToDp(100),height:pxToDp(135)}} source={require('../../img/Goods/zannwujilu.png')}/>
-            <Text style = {{fontSize:pxToDp(24),color:'#bababa',marginTop:pxToDp(30)}}>没有相关记录</Text>
+  renderEmpty() {
+    if (!this.state.query) {
+      return (
+          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+            <Image style={{width: pxToDp(100), height: pxToDp(135)}}
+                   source={require('../../img/Goods/zannwujilu.png')}/>
+            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
           </View>
       )
     }
-
   }
 
   render() {
     return (
+
         <View style={{flex: 1}}>
+
+
           <View style={styles.tab}>
             <TouchableOpacity
                 onPress={() => {
@@ -249,18 +270,38 @@ class GoodsApplyRecordScene extends PureComponent {
 
 
           </View>
+          {
+            this.renderTitle()
+          }
           <Toast
               icon="loading"
               show={this.state.query}
               onRequestClose={() => {
               }}
           >加载中</Toast>
-
+          <Dialog onRequestClose={() => {
+          }}
+                  visible={this.state.dialog}
+                  buttons={[{
+                    type: 'warn',
+                    label: '',
+                    onPress: this.goToSetMap,
+                  },
+                    {
+                      type: 'default',
+                      label: '确定',
+                      onPress: () => this.setState({dialog: false}),
+                    }
+                  ]}
+          >
+            <Text>{this.state.errMsg}</Text>
+          </Dialog>
 
           {
             this.renderList()
           }
         </View>
+
     )
   }
 
@@ -274,7 +315,6 @@ const styles = StyleSheet.create({
     height: pxToDp(90),
     flexDirection: 'row',
     justifyContent: 'space-around',
-
 
   },
   fontStyle: {
@@ -297,7 +337,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderBottomWidth: pxToDp(1),
     borderBottomColor: colors.border,
-
   },
   title_text: {
     fontSize: pxToDp(24),
@@ -349,9 +388,7 @@ const styles = StyleSheet.create({
   name_time: {
     fontSize: pxToDp(18),
     color: colors.fontColor,
-
   }
-
 
 })
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsApplyRecordScene);

@@ -52,7 +52,10 @@ export default {
   AUDIT_STATUS_WAIT: 0,//审核中
   AUDIT_STATUS_PASSED: 1,//已完成
   AUDIT_STATUS_FAILED: 2,//未完成
-
+  //
+  BILL_STATUS_WAIT : 0,//待打款
+  BILL_STATUS_PAID : 1,//已打款
+  BILL_STATUS_INVALID : 2,//已作废
 
 
   WM_PLAT_ID_BD: 1,

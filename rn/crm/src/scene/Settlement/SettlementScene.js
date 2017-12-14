@@ -15,7 +15,7 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-
+import {get_supply_items,get_supply_bill_list} from '../../reducers/settlement/settlementActions'
 import {NavigationActions} from "react-navigation";
 import {color, NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
@@ -30,12 +30,16 @@ import {
 import Config from "../../config";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const { global} = state;
+  return {global: global}
 }
+
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch, ...bindActionCreators({
+    dispatch,
+    ...bindActionCreators({
+      get_supply_items,
+      get_supply_bill_list,
       ...globalActions
     }, dispatch)
   }
@@ -77,18 +81,22 @@ class SettlementScene extends PureComponent {
   };
 
   constructor(props) {
-
     super(props)
     this.state = {
       checked: ['1', '2'],
       authority: false,
       canChecked: false,
-      list: []
+      list: [],
+      orderNum :0,
+      totalPrice:0,
     };
     this.renderList = this.renderList.bind(this);
     this.renderBtn = this.renderBtn.bind(this)
   }
 
+  componentWillMount(){
+    this.getSupplyList()
+  }
   inArray(key) {
     let checked = this.state.checked;
     let index = checked.indexOf(key)
@@ -99,7 +107,34 @@ class SettlementScene extends PureComponent {
     }
   }
 
-  toggleCheck(key) {
+
+  getSupplyList() {
+    let store_id = this.props.global.currStoreId;
+    let {currVendorId} = tool.vendor(this.props.global);
+    let token = this.props.global.accessToken;
+    const {dispatch} = this.props;
+    dispatch(get_supply_bill_list(currVendorId, store_id,token, async (resp) => {
+    
+      if(resp.ok && resp.obj.length>0 ){
+        let list  = resp.obj
+        list.forEach((item)=>{
+          if(item.bill_date == tool.fullDay(new Date())){
+            this.setState({list:resp.obj,orderNum:item.order_num,totalPrice:item.bill_price})
+          }
+        })
+
+
+
+      }else {
+        console.log(resp.desc)
+      }
+
+    }));
+  }
+
+
+
+  toggleCheck(key,date,status) {
     let checked = this.state.checked
     if (this.state.canChecked) {
       let {have, index} = this.inArray(key)
@@ -111,10 +146,29 @@ class SettlementScene extends PureComponent {
       }
       this.forceUpdate()
     }else {
-      this.props.navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS);
+      this.props.navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS,{
+        date:date,
+        status:status
+      });
     }
   }
+  renderStatus(status){
+    
+    if(status == 1){
+     return(
+         <Text style={[styles.status, {
+           borderColor: colors.main_color,
+           color: colors.main_color
+         }]}>已打款</Text>
+         )
 
+    }else {
+      return (
+          <Text style={[styles.status]}>{tool.billStatus(status)}</Text>
+      )
+    }
+
+}
   selectAll() {
     let selectAllList = [];
     let {checked, list} = this.state;
@@ -194,8 +248,11 @@ class SettlementScene extends PureComponent {
   }
   renderList() {
     let _this = this;
-    let arr = this.state.list;
-    if(arr.length > 0){
+    console.log(this.state)
+    if(this.state.list.length > 0){
+        this.state.list.forEach((item)=>{
+          item.key = item.id;
+        })
       return (
           <View>
             <View
@@ -204,7 +261,7 @@ class SettlementScene extends PureComponent {
             </View>
             <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
               <FlatList
-                  data={arr}
+                  data={this.state.list}
                   onEndReachedThreshold={0.9}
                   onEndReached={() => {
                     console.log('上拉加载')
@@ -213,7 +270,7 @@ class SettlementScene extends PureComponent {
                     return (
                         <Cell customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}} access
                               onPress={() => {
-                                this.toggleCheck(item.key)
+                                this.toggleCheck(item.key,item.bill_date,item.status)
                               }}
                         >
                           <CellHeader style={{
@@ -226,17 +283,15 @@ class SettlementScene extends PureComponent {
                               _this.state.canChecked ? <Icon name={this.inArray(item.key)['have'] ? 'success' : 'circle'}
                                                              style={{marginRight: pxToDp(10)}}/> : <Text/>
                             }
-                            <Text style={{height: 'auto'}}> {item.label}</Text>
+                            <Text style={{height: 'auto'}}> {item.bill_date}</Text>
                           </CellHeader>
                           <CellBody style={{marginLeft: pxToDp(10)}}>
-                            {/*<Text style={[styles.status]}>未打款</Text>*/}
-                            <Text style={[styles.status, {
-                              borderColor: colors.main_color,
-                              color: colors.main_color
-                            }]}>已打款</Text>
+                            {
+                              this.renderStatus(item.status)
+                            }
                           </CellBody>
                           <CellFooter style={{color: colors.fontGray}}>
-                            45454.55元
+                            {tool.toFixed(item.bill_price)}元
                           </CellFooter>
                         </Cell>
 
@@ -257,18 +312,16 @@ class SettlementScene extends PureComponent {
 
   }
 
-
   render() {
     return (
         <View style={this.state.authority ? {flex: 1, paddingBottom: pxToDp(110)} : {flex: 1}}>
-
           <View style={styles.header}>
             <Text style={styles.today_data}>
               今日数据（{tool.fullDay(new Date())})
             </Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-              <Text style={styles.order_text}>订单 : 0</Text>
-              <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额 : 0</Text>
+              <Text style={styles.order_text}>订单 : {this.state.orderNum}</Text>
+              <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额 : {tool.toFixed(this.state.totalPrice)}</Text>
             </View>
           </View>
           <ScrollView >

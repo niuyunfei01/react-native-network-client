@@ -235,8 +235,6 @@ class Navigator extends Component {
         [Config.ROUTE_VERSION]: { screen: VersionScene },
         [Config.ROUTE_SELECT_STORE]: { screen: SelectStoreScene },
         // [Config.ROUTE_GOODS_EDIT]: {screen:GoodsEditScene},
-        [Config.ROUTE_GOODS_EDIT]: { screen: GoodsApplyRecordScene },
-        // [Config.ROUTE_GOODS_EDIT]: { screen:SettlementScene},
         [Config.ROUTE_GOODS_CLASSIFY]: { screen: GoodsClassifyScene },
         [Config.ROUTE_GOODS_APPLY_RECORD]: { screen: GoodsApplyRecordScene },
         [Config.ROUTE_SETTLEMENT]: { screen: SettlementScene },
