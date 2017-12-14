@@ -42,7 +42,6 @@
         android:inputType="textMultiLine"
         android:lines="3"
         android:scrollHorizontally="false"
-        android:textColor="@color/light_blue"/>
-
+        android:textColor="@color/gray"/>
 
 </LinearLayout>

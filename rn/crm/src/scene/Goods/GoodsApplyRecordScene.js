@@ -186,7 +186,7 @@ class GoodsApplyRecordScene extends PureComponent {
             ListEmptyComponent={this.renderEmpty()}
             refreshing = {false}
             onRefresh = {() => {
-              console.log(this.state)
+              this.setState({query:true})
               this.getApplyList()
             }}
 
