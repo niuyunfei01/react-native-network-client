@@ -22,13 +22,11 @@ import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {Toast,Dialog,} from "../../weui/index";
-
-
+import * as tool from "../../common/tool";
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
-
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -59,22 +57,23 @@ class GoodsApplyRecordScene extends PureComponent {
     super(props);
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
-      page: 1,
       list: [],
       query: true,
       pullLoading: false,
       total_page: 1,
-      curr_page: -1,
+      curr_page: 1,
       refresh: false,
       onSendingConfirm: true,
       dialog:false
     }
     this.tab = this.tab.bind(this);
   }
-
+componentWillMount(){
+  this.getApplyList()
+}
   async tab(num) {
     if (num != this.state.audit_status) {
-      await this.setState({query: true, page: 1, audit_status: num, list: []});
+      await this.setState({query: true, curr_page: 1, audit_status: num, list: []});
       this.getApplyList()
     }
   }
@@ -94,11 +93,11 @@ class GoodsApplyRecordScene extends PureComponent {
   getApplyList() {
     let store_id = this.props.global.currStoreId;
     let audit_status = this.state.audit_status;
-    let page = this.state.page;
+    let page = this.state.curr_page;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
-      console.log(resp)
+
       if (resp.ok) {
         let {total_page, audit_list} = resp.obj;
         let arrList = []
@@ -118,7 +117,6 @@ class GoodsApplyRecordScene extends PureComponent {
         console.log(resp.desc)
       }
     }));
-
   }
 
   renderTitle() {
@@ -147,7 +145,6 @@ class GoodsApplyRecordScene extends PureComponent {
       item.key = index
     });
     return (
-
         <FlatList
             extraData={this.state}
             style={{flex: 1}}
@@ -167,13 +164,16 @@ class GoodsApplyRecordScene extends PureComponent {
                             style={{height: pxToDp(90), width: pxToDp(90)}}
                             source={{uri: item.cover_img}}
                         />
+
                       </View>
                       <View style={[styles.goods_name]}>
                         <View style={styles.name_text}>
-                          <Text>{this.ellipsis(item.product_name)}</Text>
+                          <Text>{`${this.ellipsis(item.product_name)}`}</Text>
                         </View>
                         <View>
-                          <Text style={styles.name_time}>{item.updated}</Text>
+                          <Text style={styles.name_time}>
+                            #{item.product_id} {tool.orderExpectTime(item.updated)}
+                            </Text>
                         </View>
                       </View>
                       <View style={[styles.center, styles.original_price]}>
@@ -189,11 +189,10 @@ class GoodsApplyRecordScene extends PureComponent {
             refreshing={true}
             onEndReachedThreshold={0.05}
             onEndReached={async () => {
-              console.log('上拉加载!')
               let {curr_page, total_page} = this.state;
-              console.log(curr_page, total_page)
+              console.log('>>>>>>>>>>',this.state.curr_page++);
               if (curr_page < total_page) {
-                await this.setState({curr_page: this.state.page++, pullLoading: true})
+                await this.setState({curr_page: this.state.curr_page++, pullLoading: true})
                 this.getApplyList()
               }
             }}
@@ -204,8 +203,8 @@ class GoodsApplyRecordScene extends PureComponent {
             }}
             ListEmptyComponent={this.renderEmpty()}
             refreshing={false}
-            onRefresh={() => {
-              this.setState({query: true, refresh: true,curr_page:0});
+            onRefresh={async() => {
+             await  this.setState({query: true, refresh: true,curr_page:1});
               this.getApplyList()
             }}
 
@@ -227,10 +226,7 @@ class GoodsApplyRecordScene extends PureComponent {
 
   render() {
     return (
-
         <View style={{flex: 1}}>
-
-
           <View style={styles.tab}>
             <TouchableOpacity
                 onPress={() => {
@@ -254,7 +250,6 @@ class GoodsApplyRecordScene extends PureComponent {
               </View>
             </TouchableOpacity>
 
-
             <TouchableOpacity
                 onPress={() => {
                   this.tab(Cts.AUDIT_STATUS_FAILED)
@@ -265,8 +260,6 @@ class GoodsApplyRecordScene extends PureComponent {
                     style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>未通过</Text>
               </View>
             </TouchableOpacity>
-
-
           </View>
           {
             this.renderTitle()
@@ -277,8 +270,7 @@ class GoodsApplyRecordScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
-          <Dialog onRequestClose={() => {
-          }}
+          <Dialog onRequestClose={() => {}}
                   visible={this.state.dialog}
                   buttons={[{
                     type: 'warn',
@@ -294,7 +286,6 @@ class GoodsApplyRecordScene extends PureComponent {
           >
             <Text>{this.state.errMsg}</Text>
           </Dialog>
-
           {
             this.renderList()
           }

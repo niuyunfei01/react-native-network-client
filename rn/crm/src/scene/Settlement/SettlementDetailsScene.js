@@ -23,6 +23,7 @@ import {NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import Config from "../../config";
 
 
 
@@ -75,34 +76,29 @@ class SettlementScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let {date,status} = this.props.navigation.state.params;
+    let {date,status} = this.props.navigation.state.params || {};
     this.state = {
       total_price: 4200,
       order_num: 1,
       date: date,
       goods_list: [],
       status:status,
-      query:true
+      query:true,
+      dataPicker:false,
     }
-
   }
-
   componentWillMount(){
     this.getDateilsList();
   }
   getDateilsList(){
     let store_id = this.props.global.currStoreId;
-    let date= this.state.date
+    let date= this.state.date;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(get_supply_items(store_id,date , token, async (resp) => {
-      
       if (resp.ok ) {
-
           let {goods_list,order_num,total_price} = resp.obj;
           this.setState({goods_list:goods_list,order_num:order_num,total_price:total_price,query:false})
-
-    
       } else {
         console.log(resp.desc)
       }
@@ -112,7 +108,7 @@ class SettlementScene extends PureComponent {
   renderHeader(){
     const header = StyleSheet.create({
       box: {
-        height: pxToDp(180),
+        height: pxToDp(244),
         backgroundColor: '#fff',
       },
       title:{
@@ -153,37 +149,44 @@ class SettlementScene extends PureComponent {
     return(
         <View style={header.box}>
           <View style = {header.title}>
-            {/*<TouchableOpacity*/}
-                {/*style = {{flexDirection:'row',alignItems:'center',width:pxToDp(200)}}*/}
-                {/*onPress = { async()=>{*/}
-                  {/*this.setState({})*/}
-                  {/*// await this.setState({date:date,query:true});*/}
-                  {/*// this.getDateilsList()*/}
-                {/*}}*/}
-            {/*>*/}
+            <TouchableOpacity
+                style = {{flexDirection:'row',alignItems:'center',width:pxToDp(200)}}
+                onPress = { async()=>{
+                  this.setState({dataPicker:true})
+
+                }}
+            >
               <Text style={header.time}>{this.state.date}</Text>
-              {/*<Image*/}
-                  {/*style ={{alignItems:'center',transform:[{scale:0.4}]}}*/}
-                  {/*source = {require('../../img/Public/xiangxia_.png')}*/}
-              {/*>*/}
-              {/*</Image>*/}
-            {/*</TouchableOpacity>*/}
+              <Image
+                  style ={{alignItems:'center',transform:[{scale:0.4}]}}
+                  source = {require('../../img/Public/xiangxia_.png')}
+              >
+              </Image>
+            </TouchableOpacity>
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'center',marginTop:pxToDp(20)}}>
             <View style = {[header.text_box,{borderRightWidth:pxToDp(1),borderColor:'#ECECEC'}]}>
               <Text style = {header.money}>订单数量 : {this.state.order_num}</Text>
-              {/*<TouchableOpacity*/}
-              {/*>*/}
-              {/*<View>*/}
-                {/*<Text style = {header.headerDeil}>查看详情 ></Text>*/}
-              {/*</View>*/}
-              {/*</TouchableOpacity>*/}
+              <TouchableOpacity
+                  onPress = {()=>{
+                    let {date,status} =this.state
+                    this.props.navigation.navigate(Config.ROUTE_SETTLEMENT_ORDER,{
+                      date:date,
+                      status:status
+                    });
+
+                  }}
+              >
+              <View>
+                <Text style = {header.headerDeil}>查看详情 ></Text>
+              </View>
+              </TouchableOpacity>
             </View>
             <View style = {header.text_box}>
               <Text style = {header.money}>金额 : {tool.toFixed(this.state.total_price)}</Text>
-              {/*<Text style = {[header.headerDeil,header.settle]}>*/}
-                {/*{tool.billStatus(this.state.status)}*/}
-              {/*</Text>*/}
+              <Text style = {[header.headerDeil,header.settle]}>
+                {tool.billStatus(this.state.status)}
+              </Text>
             </View>
           </View>
         </View>
@@ -240,9 +243,9 @@ class SettlementScene extends PureComponent {
               <Text style = {title.comm}>总价</Text>
             </View>
           </View>
-          <View>
+          <ScrollView style = {{flex:1}}>
             {this.renderList()}
-          </View>
+          </ScrollView>
 
           <Toast
               icon="loading"
@@ -253,22 +256,22 @@ class SettlementScene extends PureComponent {
 
           <DateTimePicker
               date={new Date(tool.fullDay(this.state.date))}
+              // minimumDate={new Date()}
               maximumDate={new Date()}
               mode='date'
-              isVisible={this.state.datePicker}
-              onConfirm={(date) => {
+              isVisible={this.state.dataPicker}
+              onConfirm={ async (date) => {
                 let confirm_data = tool.fullDay(date);
-                console.log('----------->>>>',confirm_data)
-                // this.setState({
-                //   datePicker: !datePicker,
-                //   limit_date: '',
-                //   in_date: confirm_data,
-                // });
+                await this.setState({date:confirm_data,dataPicker: false,query:true});
+                this.getDateilsList()
+
               }}
               onCancel={() => {
-                this.setState({datePicker: false});
+                this.setState({dataPicker: false});
               }}
           />
+
+
 
 
 

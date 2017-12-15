@@ -405,5 +405,6 @@ export default {
   storeActionSheet,
   fullDay,
   toFixed,
-  billStatus
+  billStatus,
+  get_platform_name
 }
