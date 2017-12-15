@@ -28,6 +28,7 @@ import {
   Icon
 } from "../../weui/index";
 import Config from "../../config";
+import {Toast} from "../../weui/index";
 
 function mapStateToProps(state) {
   const { global} = state;
@@ -83,12 +84,14 @@ class SettlementScene extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
+      query:true,
       checked: ['1', '2'],
       authority: false,
       canChecked: false,
       list: [],
       orderNum :0,
       totalPrice:0,
+
     };
     this.renderList = this.renderList.bind(this);
     this.renderBtn = this.renderBtn.bind(this)
@@ -114,17 +117,15 @@ class SettlementScene extends PureComponent {
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(get_supply_bill_list(currVendorId, store_id,token, async (resp) => {
-    
+      console.log(resp)
       if(resp.ok && resp.obj.length>0 ){
         let list  = resp.obj
         list.forEach((item)=>{
           if(item.bill_date == tool.fullDay(new Date())){
-            this.setState({list:resp.obj,orderNum:item.order_num,totalPrice:item.bill_price})
+            this.setState({orderNum:item.order_num,totalPrice:item.bill_price})
           }
         })
-
-
-
+        this.setState({list:resp.obj,query:false})
       }else {
         console.log(resp.desc)
       }
@@ -256,8 +257,8 @@ class SettlementScene extends PureComponent {
       return (
           <View>
             <View
-                style={{flexDirection: 'row', height: pxToDp(55), alignItems: 'center', paddingHorizontal: pxToDp(30)}}>
-              <Text>2017年12月</Text>
+                style={{flexDirection: 'row', paddingHorizontal: pxToDp(30),}}>
+              <Text style = {{paddingVertical:pxToDp(5),marginTop:pxToDp(15)}}>2017年12月</Text>
             </View>
             <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
               <FlatList
@@ -297,6 +298,11 @@ class SettlementScene extends PureComponent {
 
                     )
                   }}
+                  refreshing={false}
+                  onRefresh={() => {
+                    this.setState({query: true,});
+                    this.getSupplyList();
+                  }}
               />
 
             </Cells>
@@ -334,6 +340,12 @@ class SettlementScene extends PureComponent {
           {
             this.renderBtn()
           }
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }

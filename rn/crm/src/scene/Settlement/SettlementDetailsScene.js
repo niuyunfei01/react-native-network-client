@@ -19,18 +19,12 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {get_supply_items,get_supply_bill_list} from '../../reducers/settlement/settlementActions'
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {NavigationActions} from "react-navigation";
-import {color, NavigationItem} from '../../widget';
+import {NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
+import {Toast} from "../../weui/index";
+import DateTimePicker from 'react-native-modal-datetime-picker';
 
 
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Icon
-} from "../../weui/index";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -80,23 +74,22 @@ class SettlementScene extends PureComponent {
   };
 
   constructor(props) {
-    super(props)
+    super(props);
     let {date,status} = this.props.navigation.state.params;
-    console.log(date)
     this.state = {
       total_price: 4200,
       order_num: 1,
       date: date,
       goods_list: [],
-      status:status
+      status:status,
+      query:true
     }
-    this.opendate = this.opendate.bind(this)
+
   }
 
   componentWillMount(){
-    this.getDateilsList()
+    this.getDateilsList();
   }
-
   getDateilsList(){
     let store_id = this.props.global.currStoreId;
     let date= this.state.date
@@ -105,36 +98,21 @@ class SettlementScene extends PureComponent {
     dispatch(get_supply_items(store_id,date , token, async (resp) => {
       
       if (resp.ok ) {
-        if(resp.obj.goods_list.length>0){
+
           let {goods_list,order_num,total_price} = resp.obj;
-          this.setState({goods_list:goods_list,order_num:order_num,total_price:total_price})
-        }else{
-          ToastLong('没有相关记录!')
-        }
+          this.setState({goods_list:goods_list,order_num:order_num,total_price:total_price,query:false})
+
     
       } else {
         console.log(resp.desc)
       }
     }));
   }
-async opendate(){
-  try {
-    const {action, year, month, day} = await DatePickerAndroid.open({
-      date: new Date(),
-      maxDate:new Date()
-    });
-    var str = {}
-    if (action !== DatePickerAndroid.dismissedAction) {
-      return( tool.fullDay(new Date(year,month,day).getTime()));
-    }
-  } catch ({code, message}) {
-    console.warn('Cannot open date picker', message);
-  }
-}
+
   renderHeader(){
     const header = StyleSheet.create({
       box: {
-        height: pxToDp(244),
+        height: pxToDp(180),
         backgroundColor: '#fff',
       },
       title:{
@@ -175,42 +153,57 @@ async opendate(){
     return(
         <View style={header.box}>
           <View style = {header.title}>
-            <TouchableOpacity
-                style = {{flexDirection:'row',alignItems:'center',}}
-                onPress = { async()=>{
-                  let date = await this.opendate();
-                  this.setState({date:date})
-                }}
-            >
+            {/*<TouchableOpacity*/}
+                {/*style = {{flexDirection:'row',alignItems:'center',width:pxToDp(200)}}*/}
+                {/*onPress = { async()=>{*/}
+                  {/*this.setState({})*/}
+                  {/*// await this.setState({date:date,query:true});*/}
+                  {/*// this.getDateilsList()*/}
+                {/*}}*/}
+            {/*>*/}
               <Text style={header.time}>{this.state.date}</Text>
-              <Image
-                  style ={{width:pxToDp(20),alignItems:'center'}}
-                  source = {require('../../img/Public/xiangxia_.png')}
-                  resizeMode = {'cover'}
-              >
-              </Image>
-            </TouchableOpacity>
+              {/*<Image*/}
+                  {/*style ={{alignItems:'center',transform:[{scale:0.4}]}}*/}
+                  {/*source = {require('../../img/Public/xiangxia_.png')}*/}
+              {/*>*/}
+              {/*</Image>*/}
+            {/*</TouchableOpacity>*/}
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'center',marginTop:pxToDp(20)}}>
             <View style = {[header.text_box,{borderRightWidth:pxToDp(1),borderColor:'#ECECEC'}]}>
               <Text style = {header.money}>订单数量 : {this.state.order_num}</Text>
-              <View>
-                <Text style = {header.headerDeil}>查看详情 ></Text>
-              </View>
+              {/*<TouchableOpacity*/}
+              {/*>*/}
+              {/*<View>*/}
+                {/*<Text style = {header.headerDeil}>查看详情 ></Text>*/}
+              {/*</View>*/}
+              {/*</TouchableOpacity>*/}
             </View>
             <View style = {header.text_box}>
               <Text style = {header.money}>金额 : {tool.toFixed(this.state.total_price)}</Text>
-              <Text style = {[header.headerDeil,header.settle]}>已结算</Text>
+              {/*<Text style = {[header.headerDeil,header.settle]}>*/}
+                {/*{tool.billStatus(this.state.status)}*/}
+              {/*</Text>*/}
             </View>
           </View>
         </View>
     )
   }
-
+  renderEmpty() {
+    if (!this.state.query) {
+      return (
+          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+            <Image style={{width: pxToDp(100), height: pxToDp(135)}}
+                   source={require('../../img/Goods/zannwujilu.png')}/>
+            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
+          </View>
+      )
+    }
+  }
   renderList() {
     this.state.goods_list.forEach((item)=>{
       item.key = item.product_id
-    })
+    });
    return(
        <FlatList
         data={this.state.goods_list}
@@ -227,6 +220,8 @@ async opendate(){
         ItemSeparatorComponent = {()=>{
           return(<View style = {{borderColor:'#E2E2E2',borderBottomWidth:pxToDp(1)}}/>)
         }}
+        ListEmptyComponent={this.renderEmpty()}
+
     />
    )
   }
@@ -248,6 +243,35 @@ async opendate(){
           <View>
             {this.renderList()}
           </View>
+
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
+
+          <DateTimePicker
+              date={new Date(tool.fullDay(this.state.date))}
+              maximumDate={new Date()}
+              mode='date'
+              isVisible={this.state.datePicker}
+              onConfirm={(date) => {
+                let confirm_data = tool.fullDay(date);
+                console.log('----------->>>>',confirm_data)
+                // this.setState({
+                //   datePicker: !datePicker,
+                //   limit_date: '',
+                //   in_date: confirm_data,
+                // });
+              }}
+              onCancel={() => {
+                this.setState({datePicker: false});
+              }}
+          />
+
+
+
         </View>
 
     )

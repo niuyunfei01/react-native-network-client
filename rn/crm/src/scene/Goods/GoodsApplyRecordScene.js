@@ -21,7 +21,7 @@ import Cts from "../../Cts";
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import {Toast,Dialog,} from "../../weui/index";
 
 
 function mapStateToProps(state) {
