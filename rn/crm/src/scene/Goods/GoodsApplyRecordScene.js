@@ -21,7 +21,7 @@ import Cts from "../../Cts";
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import {Toast,Dialog,} from "../../weui/index";
 
 
 function mapStateToProps(state) {
@@ -64,7 +64,7 @@ class GoodsApplyRecordScene extends PureComponent {
       query: true,
       pullLoading: false,
       total_page: 1,
-      curr_page: 0,
+      curr_page: -1,
       refresh: false,
       onSendingConfirm: true,
       dialog:false
@@ -100,7 +100,7 @@ class GoodsApplyRecordScene extends PureComponent {
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
       console.log(resp)
       if (resp.ok) {
-        let {total_page, curr_page, audit_list} = resp.obj;
+        let {total_page, audit_list} = resp.obj;
         let arrList = []
         if (this.state.refresh) {
           arrList = audit_list
@@ -112,7 +112,6 @@ class GoodsApplyRecordScene extends PureComponent {
           list: arrList,
           query: false,
           total_page: total_page,
-          curr_page: curr_page,
           refresh: false
         });
       } else {
@@ -192,11 +191,10 @@ class GoodsApplyRecordScene extends PureComponent {
             onEndReached={async () => {
               console.log('上拉加载!')
               let {curr_page, total_page} = this.state;
+              console.log(curr_page, total_page)
               if (curr_page < total_page) {
-                await this.setState({page: this.state.page++, pullLoading: true})
+                await this.setState({curr_page: this.state.page++, pullLoading: true})
                 this.getApplyList()
-              } else {
-                ToastLong('已加载全部数据')
               }
             }}
             ListFooterComponent={() => {
@@ -207,7 +205,7 @@ class GoodsApplyRecordScene extends PureComponent {
             ListEmptyComponent={this.renderEmpty()}
             refreshing={false}
             onRefresh={() => {
-              this.setState({query: true, refresh: true});
+              this.setState({query: true, refresh: true,curr_page:0});
               this.getApplyList()
             }}
 
