@@ -326,7 +326,7 @@ class SettlementScene extends PureComponent {
               今日数据（{tool.fullDay(new Date())})
             </Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-              <Text style={styles.order_text}>订单 : {this.state.orderNum}</Text>
+              <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
               <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额 : {tool.toFixed(this.state.totalPrice)}</Text>
             </View>
           </View>

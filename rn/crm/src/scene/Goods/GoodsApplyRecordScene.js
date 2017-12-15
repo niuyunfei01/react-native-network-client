@@ -23,12 +23,10 @@ import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {Toast,Dialog,} from "../../weui/index";
 
-
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
-
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -59,22 +57,23 @@ class GoodsApplyRecordScene extends PureComponent {
     super(props);
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
-      page: 1,
       list: [],
       query: true,
       pullLoading: false,
       total_page: 1,
-      curr_page: -1,
+      curr_page: 1,
       refresh: false,
       onSendingConfirm: true,
       dialog:false
     }
     this.tab = this.tab.bind(this);
   }
-
+componentWillMount(){
+  this.getApplyList()
+}
   async tab(num) {
     if (num != this.state.audit_status) {
-      await this.setState({query: true, page: 1, audit_status: num, list: []});
+      await this.setState({query: true, curr_page: 1, audit_status: num, list: []});
       this.getApplyList()
     }
   }
@@ -94,7 +93,7 @@ class GoodsApplyRecordScene extends PureComponent {
   getApplyList() {
     let store_id = this.props.global.currStoreId;
     let audit_status = this.state.audit_status;
-    let page = this.state.page;
+    let page = this.state.curr_page;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
@@ -191,9 +190,9 @@ class GoodsApplyRecordScene extends PureComponent {
             onEndReached={async () => {
               console.log('上拉加载!')
               let {curr_page, total_page} = this.state;
-              console.log(curr_page, total_page)
+              console.log('>>>>>>>>>>',this.state.curr_page++)
               if (curr_page < total_page) {
-                await this.setState({curr_page: this.state.page++, pullLoading: true})
+                await this.setState({curr_page: this.state.curr_page++, pullLoading: true})
                 this.getApplyList()
               }
             }}
@@ -204,8 +203,8 @@ class GoodsApplyRecordScene extends PureComponent {
             }}
             ListEmptyComponent={this.renderEmpty()}
             refreshing={false}
-            onRefresh={() => {
-              this.setState({query: true, refresh: true,curr_page:0});
+            onRefresh={async() => {
+             await  this.setState({query: true, refresh: true,curr_page:1});
               this.getApplyList()
             }}
 
