@@ -111,6 +111,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             if (item.getApplyingPrice() > 0) {
                 holder.applyingPrice.setVisibility(View.VISIBLE);
                 holder.applyingPrice.setText(item.getApplyingPricePrecision());
+            } else {
+                holder.applyingPrice.setVisibility(View.INVISIBLE);
             }
         } else {
             holder.supplyPrice.setVisibility(View.INVISIBLE);
