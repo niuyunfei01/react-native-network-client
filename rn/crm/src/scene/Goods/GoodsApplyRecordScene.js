@@ -97,7 +97,7 @@ componentWillMount(){
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
-      console.log(resp)
+
       if (resp.ok) {
         let {total_page, audit_list} = resp.obj;
         let arrList = []
@@ -169,7 +169,7 @@ componentWillMount(){
                       </View>
                       <View style={[styles.goods_name]}>
                         <View style={styles.name_text}>
-                          <Text>{this.ellipsis(item.product_name)}</Text>
+                          <Text>{`${this.ellipsis(item.product_name)}# ${item.product_id}`}</Text>
                         </View>
                         <View>
                           <Text style={styles.name_time}>{item.updated}</Text>
