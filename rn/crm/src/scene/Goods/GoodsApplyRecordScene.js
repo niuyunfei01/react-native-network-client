@@ -22,7 +22,7 @@ import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import {Toast,Dialog,} from "../../weui/index";
-
+import * as tool from "../../common/tool";
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
@@ -164,13 +164,16 @@ componentWillMount(){
                             style={{height: pxToDp(90), width: pxToDp(90)}}
                             source={{uri: item.cover_img}}
                         />
+
                       </View>
                       <View style={[styles.goods_name]}>
                         <View style={styles.name_text}>
-                          <Text>{`${this.ellipsis(item.product_name)}# ${item.product_id}`}</Text>
+                          <Text>{`${this.ellipsis(item.product_name)}`}</Text>
                         </View>
                         <View>
-                          <Text style={styles.name_time}>{item.updated}</Text>
+                          <Text style={styles.name_time}>
+                            {`#${item.product_id}  ${ tool.orderExpectTime(new Date(item.updated))}`}
+                            </Text>
                         </View>
                       </View>
                       <View style={[styles.center, styles.original_price]}>
@@ -186,9 +189,8 @@ componentWillMount(){
             refreshing={true}
             onEndReachedThreshold={0.05}
             onEndReached={async () => {
-              console.log('上拉加载!')
               let {curr_page, total_page} = this.state;
-              console.log('>>>>>>>>>>',this.state.curr_page++)
+              console.log('>>>>>>>>>>',this.state.curr_page++);
               if (curr_page < total_page) {
                 await this.setState({curr_page: this.state.curr_page++, pullLoading: true})
                 this.getApplyList()
