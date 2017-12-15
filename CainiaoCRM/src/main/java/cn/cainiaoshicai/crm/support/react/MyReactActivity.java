@@ -44,24 +44,25 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
-    private static String REACT_PREFERENCES = "react_preferences";
 
-    private @Nullable Callback mPermissionsCallback;
-    private @Nullable PermissionListener mPermissionListener;
+    private @Nullable
+    Callback mPermissionsCallback;
+    private @Nullable
+    PermissionListener mPermissionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT >= 20) {
             setTranslucent();
         }
-        if (isFirstLoad(getApplicationContext())) {
-            SplashScreen.show(this);
-        }
         super.onCreate(savedInstanceState);
         mReactRootView = new ReactRootView(this);
         Bundle init = new Bundle();
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
+        if (toRoute.equals("Login")) {
+            SplashScreen.show(this);
+        }
         Bundle _action_params = intent.getBundleExtra("_action_params");
         if (_action_params == null) {
             _action_params = new Bundle();
@@ -95,7 +96,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         Bundle storesB = new Bundle();
 
         if (stores != null) {
-            for(Store s : stores) {
+            for (Store s : stores) {
                 storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
             }
         }
@@ -108,8 +109,8 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         boolean found = false;
         Vendor currV = GlobalCtx.app().getVendor();
         if (config != null && config.getCan_read_vendors() != null && currV != null) {
-            for(Vendor vendor : config.getCan_read_vendors()) {
-                if (vendor != null){
+            for (Vendor vendor : config.getCan_read_vendors()) {
+                if (vendor != null) {
                     vendors.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
                     if (currV.getId() == vendor.getId()) {
                         found = true;
@@ -117,7 +118,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
                 }
             }
         }
-        if (!found && currV != null){
+        if (!found && currV != null) {
             vendors.putBundle(String.valueOf(currV.getId()), currV.toBundle());
         }
 
@@ -206,18 +207,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             }
         });
     }
-
-    public static boolean isFirstLoad(Context context) {
-        final SharedPreferences reader = context.getSharedPreferences(REACT_PREFERENCES, Context.MODE_PRIVATE);
-        final boolean first = reader.getBoolean("is_first", true);
-        if (first) {
-            final SharedPreferences.Editor editor = reader.edit();
-            editor.putBoolean("is_first", false);
-            editor.apply();
-        }
-        return first;
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -211,18 +211,21 @@ class OrderScene extends Component {
   }
 
   componentWillMount() {
-
     const orderId = (this.props.navigation.state.params || {}).orderId;
-    const {dispatch, order, global, store} = this.props;
-    this.__getDataIfRequired(dispatch, global, order, store, orderId);
+    const {dispatch, order, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, order, orderId);
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   // this.__getDataIfRequired(dispatch, global, order, store, orderId);
-  // }
+  componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps order.order', nextProps.order.order);
 
-  __getDataIfRequired = (dispatch, global, order, store, orderId) => {
-    console.log(3333333333333333333)
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const {dispatch, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+  }
+
+  __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
+
     console.log('__getDataIfRequired', orderId);
 
     if (!orderId) {
@@ -230,11 +233,11 @@ class OrderScene extends Component {
     }
     
     const sessionToken = global.accessToken;
-    const o = order.order;
+    const o = orderStateToCmp.order;
 
     if (!o || !o.id || o.id !== orderId) {
 
-      console.log('__getDataIfRequired refresh', orderId);
+      console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -401,7 +404,7 @@ class OrderScene extends Component {
   }
 
   _onShowStoreCall() {
-    
+
     const {store, dispatch, global} = this.props;
 
     const store_id = this.props.order.order.store_id;
@@ -696,7 +699,6 @@ class OrderScene extends Component {
       if (ok) {
         // if (tool.length(contacts)>0) {
         mg = contacts
-        console.log(msg)
         // }
       } else {
         Alert.alert(msg)
@@ -782,7 +784,7 @@ class OrderScene extends Component {
   _orderChangeLogQuery() {
     const { dispatch, order, global } = this.props;
     dispatch(orderChangeLog(order.order_id, global.accessToken, (ok, msg, contacts) => {
-      
+
       if (ok) {
         this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
       } else {
@@ -824,13 +826,13 @@ class OrderScene extends Component {
       tintColor='gray'
     />;
 
-    const noOrder = (!order || !order.id);
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const noOrder = (!order || !order.id || order.id !== orderId);
     console.log('noOrder', noOrder, order);
 
     if (noOrder) {
-      const orderId = (this.props.navigation.state.params || {}).orderId;
       const {dispatch, global, store} = this.props;
-      this.__getDataIfRequired(dispatch, global, this.props.order, store, orderId);
+      this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
 
     return noOrder ?
@@ -1187,7 +1189,7 @@ class OrderScene extends Component {
           </View>
         </View>
         {
-          this.state.wayLoadingShow ? <LoadingView/> : 
+          this.state.wayLoadingShow ? <LoadingView/> :
           this.renderWayRecord()
         }
       </View>
@@ -1214,7 +1216,7 @@ class OrderScene extends Component {
           </View>
         </View>
         {
-          this.state.changeLoadingShow ? <LoadingView/> : 
+          this.state.changeLoadingShow ? <LoadingView/> :
           this.renderChangeLogs()
         }
       </View>
