@@ -118,7 +118,7 @@ class SettlementScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(get_supply_bill_list(currVendorId, store_id,token, async (resp) => {
       console.log(resp)
-      if(resp.ok && resp.obj.length>0 ){
+      if(resp.ok ){
         let list  = resp.obj
         list.forEach((item)=>{
           if(item.bill_date == tool.fullDay(new Date())){
