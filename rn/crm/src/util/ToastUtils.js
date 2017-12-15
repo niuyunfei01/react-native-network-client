@@ -11,5 +11,5 @@ export function ToastShort(content) {
 }
 
 export function ToastLong(content) {
-    ToastAndroid.show(new String(content), ToastAndroid.LONG);
+    ToastAndroid.show(content, ToastAndroid.LONG);
 }

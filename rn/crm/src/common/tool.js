@@ -366,6 +366,18 @@ export function first_store_id(canReadStores) {
   }
   return first_store_id;
 }
+export function toFixed(num) {
+  return (parseInt(num)/100).toFixed(2)
+
+}
+export  function billStatus(status) {
+ let map = {};
+ map[Cts.BILL_STATUS_WAIT] ='待打款';
+ map[Cts.BILL_STATUS_PAID] ='已打款';
+ map[Cts.BILL_STATUS_INVALID] ='已作废';
+ return map[status]
+
+}
 
 export default {
   urlByAppendingParams,
@@ -391,5 +403,7 @@ export default {
   user_info,
   first_store_id,
   storeActionSheet,
-  fullDay
+  fullDay,
+  toFixed,
+  billStatus
 }
