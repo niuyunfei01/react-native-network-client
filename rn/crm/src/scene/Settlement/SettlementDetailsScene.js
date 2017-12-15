@@ -23,6 +23,7 @@ import {NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import Config from "../../config";
 
 
 
@@ -75,7 +76,7 @@ class SettlementScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let {date,status} = this.props.navigation.state.params;
+    let {date,status} = this.props.navigation.state.params || {};
     this.state = {
       total_price: 4200,
       order_num: 1,
@@ -84,21 +85,17 @@ class SettlementScene extends PureComponent {
       status:status,
       query:true,
       dataPicker:false,
-
     }
-
   }
-
   componentWillMount(){
     this.getDateilsList();
   }
   getDateilsList(){
     let store_id = this.props.global.currStoreId;
-    let date= this.state.date
+    let date= this.state.date;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(get_supply_items(store_id,date , token, async (resp) => {
-      
       if (resp.ok ) {
           let {goods_list,order_num,total_price} = resp.obj;
           this.setState({goods_list:goods_list,order_num:order_num,total_price:total_price,query:false})
@@ -172,8 +169,11 @@ class SettlementScene extends PureComponent {
               <Text style = {header.money}>订单数量 : {this.state.order_num}</Text>
               <TouchableOpacity
                   onPress = {()=>{
-
-
+                    let {date,status} =this.state
+                    this.props.navigation.navigate(Config.ROUTE_SETTLEMENT_ORDER,{
+                      date:date,
+                      status:status
+                    });
 
                   }}
               >
@@ -243,9 +243,9 @@ class SettlementScene extends PureComponent {
               <Text style = {title.comm}>总价</Text>
             </View>
           </View>
-          <View>
+          <ScrollView>
             {this.renderList()}
-          </View>
+          </ScrollView>
 
           <Toast
               icon="loading"
