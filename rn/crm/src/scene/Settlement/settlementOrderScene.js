@@ -130,7 +130,7 @@ class SettlementScene extends PureComponent {
               </View>
               {
                 item.down ? <View>
-                  <View style={{height: pxToDp(20), backgroundColor: colors.main_back}}/>
+                  <View style={{height: pxToDp(1), backgroundColor: colors.main_back}}/>
                   {
                     item.items.map((ite, index) => {
                       return (
@@ -169,7 +169,7 @@ class SettlementScene extends PureComponent {
 
   render() {
     return (
-        <View>
+        <View style = {{flex:1}}>
           <View style={{
             height: pxToDp(140),
             backgroundColor: '#fff',
@@ -198,19 +198,21 @@ class SettlementScene extends PureComponent {
               }}>{tool.billStatus(this.state.status)}</Text>
             </View>
           </View>
-          <ScrollView style={{marginTop: pxToDp(20)}}>
-
-            {
-              this.renderList()
-            }
-
-          </ScrollView>
           <Toast
               icon="loading"
               show={this.state.query}
               onRequestClose={() => {
               }}
           >加载中</Toast>
+            <ScrollView style={{marginTop: pxToDp(20)}}>
+
+              {
+                this.renderList()
+              }
+
+            </ScrollView>
+
+
         </View>
 
     )

@@ -243,7 +243,7 @@ class SettlementScene extends PureComponent {
               <Text style = {title.comm}>总价</Text>
             </View>
           </View>
-          <ScrollView>
+          <ScrollView style = {{flex:1}}>
             {this.renderList()}
           </ScrollView>
 

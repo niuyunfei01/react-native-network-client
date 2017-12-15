@@ -117,7 +117,6 @@ componentWillMount(){
         console.log(resp.desc)
       }
     }));
-
   }
 
   renderTitle() {
@@ -146,7 +145,6 @@ componentWillMount(){
       item.key = index
     });
     return (
-
         <FlatList
             extraData={this.state}
             style={{flex: 1}}
@@ -226,10 +224,7 @@ componentWillMount(){
 
   render() {
     return (
-
         <View style={{flex: 1}}>
-
-
           <View style={styles.tab}>
             <TouchableOpacity
                 onPress={() => {
@@ -253,7 +248,6 @@ componentWillMount(){
               </View>
             </TouchableOpacity>
 
-
             <TouchableOpacity
                 onPress={() => {
                   this.tab(Cts.AUDIT_STATUS_FAILED)
@@ -264,8 +258,6 @@ componentWillMount(){
                     style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>未通过</Text>
               </View>
             </TouchableOpacity>
-
-
           </View>
           {
             this.renderTitle()
@@ -276,8 +268,7 @@ componentWillMount(){
               onRequestClose={() => {
               }}
           >加载中</Toast>
-          <Dialog onRequestClose={() => {
-          }}
+          <Dialog onRequestClose={() => {}}
                   visible={this.state.dialog}
                   buttons={[{
                     type: 'warn',
@@ -293,7 +284,6 @@ componentWillMount(){
           >
             <Text>{this.state.errMsg}</Text>
           </Dialog>
-
           {
             this.renderList()
           }
