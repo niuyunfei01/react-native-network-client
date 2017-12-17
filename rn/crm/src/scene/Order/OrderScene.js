@@ -1007,7 +1007,7 @@ class OrderScene extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }} onPress={() => {
-              native.ordersByMobileTimes(order.mobile, order.order_times)
+              native.ordersSearch(`uid:${order.user_id}`)
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
