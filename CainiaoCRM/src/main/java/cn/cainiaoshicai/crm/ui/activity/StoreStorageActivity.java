@@ -230,6 +230,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             @Override
             public void onClick(View view) {
                 //TODO redirect
+                long storeId = StoreStorageActivity.this.currStore != null ? StoreStorageActivity.this.currStore.getId() : -1;
                 GlobalCtx.app().toApplyChangePriceList(StoreStorageActivity.this, storeId);
             }
         });
