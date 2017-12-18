@@ -137,10 +137,10 @@ public class StoreStorageHelper {
                 return;
             }
 
-            if (item.getLeft_since_last_stat() <= 1 ) {
-                AlertUtil.showAlert(context, R.string.tip_dialog_title, R.string.alert_msg_storage_empty_cannot_sold);
-                return;
-            }
+//            if (item.getLeft_since_last_stat() <= 1 ) {
+//                AlertUtil.showAlert(context, R.string.tip_dialog_title, R.string.alert_msg_storage_empty_cannot_sold);
+//                return;
+//            }
 
             new MyAsyncTask<Void, Void, Void>() {
                 @Override protected Void doInBackground(Void... params) {
