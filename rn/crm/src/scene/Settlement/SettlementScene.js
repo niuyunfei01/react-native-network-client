@@ -6,8 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  FlatList,
-  Image
+  RefreshControl,
+  Image,
+
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -15,10 +16,10 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {get_supply_items,get_supply_bill_list} from '../../reducers/settlement/settlementActions'
+import {get_supply_items, get_supply_bill_list} from '../../reducers/settlement/settlementActions'
 import {NavigationActions} from "react-navigation";
 import {color, NavigationItem} from '../../widget';
-import  tool from '../../common/tool.js'
+import tool from '../../common/tool.js'
 import {
   Cells,
   Cell,
@@ -31,7 +32,7 @@ import Config from "../../config";
 import {Toast} from "../../weui/index";
 
 function mapStateToProps(state) {
-  const { global} = state;
+  const {global} = state;
   return {global: global}
 }
 
@@ -45,11 +46,8 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
-
 class SettlementScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
     return {
       headerTitle: '打款记录',
       headerLeft: (<NavigationItem
@@ -57,49 +55,32 @@ class SettlementScene extends PureComponent {
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
             navigation.goBack();
-
           }}
       />),
-      headerRight: (
-          <View style={
-            {
-              flexDirection: 'row',
-              paddingRight: pxToDp(30)
-            }
-          }>
-            <TouchableOpacity
-                onPress={() => {
-                  params.upLoad();
-                }}
-            >
-              {/* <Text style={{
-                  fontSize: pxToDp(32),
-                  color: '#59b26a'
-                }}>保存</Text> */}
-            </TouchableOpacity>
-          </View>),
     }
   };
 
   constructor(props) {
     super(props)
     this.state = {
-      query:true,
+      query: true,
       checked: ['1', '2'],
       authority: false,
       canChecked: false,
       list: [],
-      orderNum :0,
-      totalPrice:0,
+      orderNum: 0,
+      totalPrice: 0,
+      status: 0,
 
     };
     this.renderList = this.renderList.bind(this);
     this.renderBtn = this.renderBtn.bind(this)
   }
 
-  componentWillMount(){
+  componentWillMount() {
     this.getSupplyList()
   }
+
   inArray(key) {
     let checked = this.state.checked;
     let index = checked.indexOf(key)
@@ -109,67 +90,66 @@ class SettlementScene extends PureComponent {
       return {have: false, index};
     }
   }
-
-
   getSupplyList() {
     let store_id = this.props.global.currStoreId;
     let {currVendorId} = tool.vendor(this.props.global);
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
-    dispatch(get_supply_bill_list(currVendorId, store_id,token, async (resp) => {
-      console.log(resp)
-      if(resp.ok ){
-        let list  = resp.obj
-        list.forEach((item)=>{
-          if(item.bill_date == tool.fullDay(new Date())){
-            this.setState({orderNum:item.order_num,totalPrice:item.bill_price})
-          }
-        })
-        this.setState({list:resp.obj,query:false})
-      }else {
+    dispatch(get_supply_bill_list(currVendorId, store_id, token, async (resp) => {
+      if (resp.ok) {
+        let list = resp.obj;
+        tool.objectMap(list,(item,index)=>{
+          tool.objectMap(item,(ite,key)=>{
+            if(key === tool.fullDay(new Date())){
+              this.setState({status:ite.status,orderNum:ite.order_num,totalPrice:ite.bill_price,id:ite.id})
+              delete item[key]
+            }
+          })
+        });
+        this.setState({list: list, query: false})
+      } else {
         console.log(resp.desc)
       }
-
     }));
   }
-
-
-
-  toggleCheck(key,date,status) {
+  toggleCheck(key, date, status,id) {
     let checked = this.state.checked
     if (this.state.canChecked) {
       let {have, index} = this.inArray(key)
       if (have) {
         checked.splice(index, 1)
-
       } else {
         checked.push(key)
       }
       this.forceUpdate()
-    }else {
-      this.props.navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS,{
-        date:date,
-        status:status
-      });
+    } else {
+     this.toDetail(date,status,id)
     }
   }
-  renderStatus(status){
-    
-    if(status == 1){
-     return(
-         <Text style={[styles.status, {
-           borderColor: colors.main_color,
-           color: colors.main_color
-         }]}>已打款</Text>
-         )
+  toDetail(date,status,id){
+    this.props.navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS,{
+      date: date,
+      status: status,
+      id:id
+    });
+  }
+  renderStatus(status) {
+    if (status == 1) {
+      return (
+          <Text style={[styles.status, {
+            borderColor: colors.main_color,
+            color: colors.main_color
+          }]}>已打款</Text>
+      )
 
-    }else {
+    } else {
       return (
           <Text style={[styles.status]}>{tool.billStatus(status)}</Text>
       )
     }
 
-}
+  }
+
   selectAll() {
     let selectAllList = [];
     let {checked, list} = this.state;
@@ -183,6 +163,7 @@ class SettlementScene extends PureComponent {
     this.state.checked = selectAllList;
     this.forceUpdate()
   }
+
   renderBtn() {
     let {checked, list} = this.state;
     if (this.state.authority) {
@@ -239,85 +220,56 @@ class SettlementScene extends PureComponent {
       }
     }
   }
-  renderEmpty(){
-      return(
-          <View style = {{alignItems:'center',justifyContent:'center',flex:1,marginTop:pxToDp(200)}}>
-            <Image style = {{width:pxToDp(100),height:pxToDp(135)}} source={require('../../img/Goods/zannwujilu.png')}/>
-            <Text style = {{fontSize:pxToDp(24),color:'#bababa',marginTop:pxToDp(30)}}>没有相关记录</Text>
-          </View>
-      )
+  renderEmpty() {
+    return (
+        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+          <Image style={{width: pxToDp(100), height: pxToDp(135)}} source={require('../../img/Goods/zannwujilu.png')}/>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
+        </View>
+    )
   }
+
   renderList() {
     let _this = this;
-    console.log(this.state)
-    if(this.state.list.length > 0){
-        this.state.list.forEach((item)=>{
-          item.key = item.id;
-        })
+    return  tool.objectMap(this.state.list, (item, index) => {
       return (
-          <View>
-            <View
-                style={{flexDirection: 'row', paddingHorizontal: pxToDp(30),}}>
-              <Text style = {{paddingVertical:pxToDp(5),marginTop:pxToDp(15)}}>2017年12月</Text>
-            </View>
+          <View key = {index}>
+             <View style={{flexDirection: 'row', paddingHorizontal: pxToDp(30),}}>
+               <Text style={{paddingVertical: pxToDp(5), marginTop: pxToDp(15)}}>{index}</Text>
+             </View>
             <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
-              <FlatList
-                  data={this.state.list}
-                  onEndReachedThreshold={0.9}
-                  onEndReached={() => {
-                    console.log('上拉加载')
-                  }}
-                  renderItem={({item, key}) => {
-                    return (
-                        <Cell customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}} access
-                              onPress={() => {
-                                this.toggleCheck(item.key,item.bill_date,item.status)
-                              }}
-                        >
-                          <CellHeader style={{
-                            minWidth: pxToDp(180),
-                            flexDirection: 'row',
-                            height: pxToDp(100),
-                            alignItems: 'center'
-                          }}>
-                            {
-                              _this.state.canChecked ? <Icon name={this.inArray(item.key)['have'] ? 'success' : 'circle'}
-                                                             style={{marginRight: pxToDp(10)}}/> : <Text/>
-                            }
-                            <Text style={{height: 'auto'}}> {item.bill_date}</Text>
-                          </CellHeader>
-                          <CellBody style={{marginLeft: pxToDp(10)}}>
-                            {
-                              this.renderStatus(item.status)
-                            }
-                          </CellBody>
-                          <CellFooter style={{color: colors.fontGray}}>
-                            {tool.toFixed(item.bill_price)}元
-                          </CellFooter>
-                        </Cell>
-
-                    )
-                  }}
-                  refreshing={false}
-                  onRefresh={() => {
-                    this.setState({query: true,});
-                    this.getSupplyList();
-                  }}
-              />
-
+            {
+              tool.objectMap(item,(ite,key)=>{
+                return (
+                    <Cell key = {key} customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}} access
+                          onPress={() => {
+                            this.toggleCheck(ite.key,ite.bill_date,ite.status,ite.id)
+                          }}
+                    >
+                      <CellHeader style={{
+                        minWidth: pxToDp(180),
+                        flexDirection: 'row',
+                        height: pxToDp(100),
+                        alignItems: 'center'
+                      }}>
+                        <Text style={{height: 'auto'}}> {ite.bill_date}</Text>
+                      </CellHeader>
+                      <CellBody style={{marginLeft: pxToDp(10)}}>
+                        {
+                          this.renderStatus(ite.status)
+                        }
+                      </CellBody>
+                      <CellFooter style={{color: colors.fontGray}}>{tool.toFixed(ite.bill_price)}元
+                      </CellFooter>
+                    </Cell>
+                )
+              })
+             }
             </Cells>
           </View>
-
       )
-    }else {
-      return(
-          this.renderEmpty()
-      )
-
-    }
-
+    })
   }
-
   render() {
     return (
         <View style={this.state.authority ? {flex: 1, paddingBottom: pxToDp(110)} : {flex: 1}}>
@@ -325,17 +277,35 @@ class SettlementScene extends PureComponent {
             <Text style={styles.today_data}>
               今日数据（{tool.fullDay(new Date())})
             </Text>
-            <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-              <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
-              <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额 : {tool.toFixed(this.state.totalPrice)}</Text>
-            </View>
+            <TouchableOpacity
+                onPress = {()=>{
+                 console.log(tool.fullDay(new Date()),this.state.status);
+                  this.toDetail(tool.fullDay(new Date()),this.state.status,this.state.id)}
+                }
+            >
+              <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
+                <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
+                <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额
+                  : {tool.toFixed(this.state.totalPrice)}</Text>
+              </View>
+            </TouchableOpacity>
           </View>
-          <ScrollView >
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.query}
+                    onRefresh={async() => {
+                      await  this.setState({query:true})
+                      this.getSupplyList()
+                    }
+                    }
+                    tintColor='gray'
+                />
+              }
+              style={{flex: 1}}>
             {
               this.renderList()
             }
-
-
           </ScrollView>
           {
             this.renderBtn()

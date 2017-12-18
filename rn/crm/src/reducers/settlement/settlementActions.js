@@ -60,6 +60,23 @@ export function get_supply_bill_list(vendor_id,store_id,token,callback) {
   }
 }
 
+export function to_settlement(id,token,callback) {
+  return dispatch => {
+    const url = `api/audit_supply_bills/${id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          if (!resp.ok) {
+            ToastLong(resp.desc);
+          }
+          callback(resp);
+        }).catch((error) => {
+          ToastLong(error.message);
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
 
 
 

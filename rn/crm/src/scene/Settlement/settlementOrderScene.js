@@ -20,7 +20,6 @@ import {NavigationActions} from "react-navigation";
 import {NavigationItem} from '../../widget';
 import tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
-
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
@@ -48,24 +47,7 @@ class SettlementScene extends PureComponent {
             navigation.goBack();
           }}
       />),
-      headerRight: (
-          <View style={
-            {
-              flexDirection: 'row',
-              paddingRight: pxToDp(30)
-            }
-          }>
-            <TouchableOpacity
-                onPress={() => {
-                  params.upLoad();
-                }}
-            >
-              {/* <Text style={{
-                  fontSize: pxToDp(32),
-                  color: '#59b26a'
-                }}>保存</Text> */}
-            </TouchableOpacity>
-          </View>),
+
     }
   };
   constructor(props) {
@@ -105,6 +87,23 @@ class SettlementScene extends PureComponent {
         console.log(resp.desc)
       }
     }));
+  }
+  renderStatus(status) {
+
+    if (status == 1) {
+      return (
+          <Text style={[styles.status, {
+            borderColor: colors.main_color,
+            color: colors.main_color
+          }]}>已打款</Text>
+      )
+
+    } else {
+      return (
+          <Text style={[styles.status,{}]}>{tool.billStatus(status)}</Text>
+      )
+    }
+
   }
   renderList() {
     if (this.state.order_list.length > 0) {
@@ -185,17 +184,10 @@ class SettlementScene extends PureComponent {
                   marginLeft: pxToDp(80)
                 }}>金额:{tool.toFixed(this.state.total_price)}</Text>
               </View>
-              <Text style={{color:colors.main_color,
-                fontSize:pxToDp(24),
-                borderWidth:pxToDp(1),
-                paddingHorizontal:pxToDp(20),
-                borderColor:colors.main_color,
-                borderRadius:pxToDp(20),
-                lineHeight:pxToDp(34),
-                height:pxToDp(36),
-                textAlign:'center'
+              {
+                this.renderStatus(this.state.status)
+              }
 
-              }}>{tool.billStatus(this.state.status)}</Text>
             </View>
           </View>
           <Toast
@@ -233,8 +225,30 @@ const styles = StyleSheet.create({
     fontSize:pxToDp(30),
     color:'#3e3e3e'
 
+  },
+  status:{
+    fontSize: pxToDp(24),
+    borderWidth: pxToDp(1),
+    paddingHorizontal: pxToDp(20),
+    borderRadius: pxToDp(20),
+    lineHeight: pxToDp(34),
+    height: pxToDp(36),
+    textAlign: 'center',
+    marginTop:pxToDp(5),
   }
+
 })
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)
+// <Text style={{color:colors.main_color,
+//     fontSize:pxToDp(24),
+//     borderWidth:pxToDp(1),
+//     paddingHorizontal:pxToDp(20),
+//     borderColor:colors.main_color,
+//     borderRadius:pxToDp(20),
+//     lineHeight:pxToDp(34),
+//     height:pxToDp(36),
+//     textAlign:'center'
+//
+// }}>{tool.billStatus(this.state.status)}</Text>
