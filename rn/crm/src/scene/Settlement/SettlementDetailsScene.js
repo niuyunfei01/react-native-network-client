@@ -8,7 +8,6 @@ import {
   ScrollView,
   FlatList,
   Image,
-  DatePickerAndroid
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -16,16 +15,15 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {get_supply_items,get_supply_bill_list} from '../../reducers/settlement/settlementActions'
-import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {NavigationActions} from "react-navigation";
+import {get_supply_items,to_settlement} from '../../reducers/settlement/settlementActions'
 import {NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Config from "../../config";
-
-
+import {Button} from "../../weui/index";
+import {ToastLong} from "../../util/ToastUtils";
+import Cts from '../../Cts'
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -35,11 +33,12 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      get_supply_items,
+      to_settlement,
       ...globalActions
     }, dispatch)
   }
 }
-
 class SettlementScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
@@ -53,38 +52,22 @@ class SettlementScene extends PureComponent {
             navigation.goBack();
           }}
       />),
-      headerRight: (
-          <View style={
-            {
-              flexDirection: 'row',
-              paddingRight: pxToDp(30)
-            }
-          }>
-            <TouchableOpacity
-                onPress={() => {
-                  params.upLoad();
-                }}
-            >
-              {/* <Text style={{
-                  fontSize: pxToDp(32),
-                  color: '#59b26a'
-                }}>保存</Text> */}
-            </TouchableOpacity>
-          </View>),
     }
   };
 
   constructor(props) {
     super(props);
-    let {date,status} = this.props.navigation.state.params || {};
+    let {date,status,id} = this.props.navigation.state.params || {};
     this.state = {
-      total_price: 4200,
-      order_num: 1,
+      total_price: 0,
+      order_num: 0,
       date: date,
       goods_list: [],
       status:status,
       query:true,
       dataPicker:false,
+      id:id,
+      auth_finance_admin:false
     }
   }
   componentWillMount(){
@@ -96,15 +79,68 @@ class SettlementScene extends PureComponent {
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(get_supply_items(store_id,date , token, async (resp) => {
+      console.log('resp--------->',resp)
       if (resp.ok ) {
-          let {goods_list,order_num,total_price} = resp.obj;
-          this.setState({goods_list:goods_list,order_num:order_num,total_price:total_price,query:false})
+          let {goods_list,order_num,total_price,auth_finance_admin} = resp.obj;
+          this.setState({
+            goods_list:goods_list,
+            order_num:order_num,
+            total_price:total_price,
+            query:false,
+            auth_finance_admin:auth_finance_admin
+          })
       } else {
         console.log(resp.desc)
       }
     }));
   }
 
+doSettlement(){
+
+  let id= this.state.id;
+  let token = this.props.global.accessToken;
+  const {dispatch} = this.props;
+  dispatch(to_settlement(id,token, async (resp) => {
+    if (resp.ok ) {
+      ToastLong('结算成功');
+      this.setState({status:1})
+    } else {
+    }
+    this.setState({query:false})
+  }));
+}
+renderStatus(status) {
+
+    if (status == 1) {
+      return (
+          <Text style={[styles.status, {
+            borderColor: colors.main_color,
+            color: colors.main_color,
+          }]}>已打款</Text>
+      )
+    } else {
+      return (
+          <Text style={[styles.status]}>{tool.billStatus(status)}</Text>
+      )
+    }
+  }
+  renderBtn() {
+    if(this.state.auth_finance_admin){
+      return (
+          <View style={{paddingHorizontal: pxToDp(20), paddingVertical: pxToDp(20)}}>
+            <Button
+                onPress={() => {
+                  this.doSettlement()
+                }}
+                type={Cts.BILL_STATUS_WAIT == this.state.status ? 'primary' : 'default'}
+                disabled={Cts.BILL_STATUS_WAIT == this.state.status ? false : true}
+            >结算</Button>
+          </View>
+      )
+    }else {
+      return <View/>
+    }
+  }
   renderHeader(){
     const header = StyleSheet.create({
       box: {
@@ -153,7 +189,6 @@ class SettlementScene extends PureComponent {
                 style = {{flexDirection:'row',alignItems:'center',width:pxToDp(200)}}
                 onPress = { async()=>{
                   this.setState({dataPicker:true})
-
                 }}
             >
               <Text style={header.time}>{this.state.date}</Text>
@@ -174,7 +209,6 @@ class SettlementScene extends PureComponent {
                       date:date,
                       status:status
                     });
-
                   }}
               >
               <View>
@@ -184,9 +218,9 @@ class SettlementScene extends PureComponent {
             </View>
             <View style = {header.text_box}>
               <Text style = {header.money}>金额 : {tool.toFixed(this.state.total_price)}</Text>
-              <Text style = {[header.headerDeil,header.settle]}>
-                {tool.billStatus(this.state.status)}
-              </Text>
+              {
+                this.renderStatus(this.state.status)
+              }
             </View>
           </View>
         </View>
@@ -228,7 +262,6 @@ class SettlementScene extends PureComponent {
     />
    )
   }
-
   render() {
     return (
         <View style = {{flex:1}}>
@@ -247,6 +280,10 @@ class SettlementScene extends PureComponent {
             {this.renderList()}
           </ScrollView>
 
+          {
+            this.renderBtn()
+          }
+
           <Toast
               icon="loading"
               show={this.state.query}
@@ -256,7 +293,6 @@ class SettlementScene extends PureComponent {
 
           <DateTimePicker
               date={new Date(tool.fullDay(this.state.date))}
-              // minimumDate={new Date()}
               maximumDate={new Date()}
               mode='date'
               isVisible={this.state.dataPicker}
@@ -264,17 +300,11 @@ class SettlementScene extends PureComponent {
                 let confirm_data = tool.fullDay(date);
                 await this.setState({date:confirm_data,dataPicker: false,query:true});
                 this.getDateilsList()
-
               }}
               onCancel={() => {
                 this.setState({dataPicker: false});
               }}
           />
-
-
-
-
-
         </View>
 
     )
@@ -298,7 +328,21 @@ const title = StyleSheet.create({
     textAlign:"center"
 
   }
-})
-
+});
+const styles = StyleSheet.create({
+  status: {
+    borderWidth: pxToDp(1),
+    height: pxToDp(40),
+    borderRadius: pxToDp(20),
+    width: pxToDp(100),
+    fontSize: pxToDp(24),
+    textAlign: 'center',
+    justifyContent: 'center',
+    color: colors.fontGray,
+    borderColor: colors.fontGray,
+    lineHeight: pxToDp(36),
+    marginTop:pxToDp(25)
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)
