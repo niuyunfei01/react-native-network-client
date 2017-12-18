@@ -18,13 +18,13 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {get_supply_items,to_settlement} from '../../reducers/settlement/settlementActions'
 import {NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
-import {Toast} from "../../weui/index";
+import {Toast,Dialog} from "../../weui/index";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Config from "../../config";
 import {Button} from "../../weui/index";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from '../../Cts'
-
+import {NavigationActions} from 'react-navigation';
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
@@ -45,19 +45,13 @@ class SettlementScene extends PureComponent {
     let {type} = params;
     return {
       headerTitle: '结算详情',
-      headerLeft: (<NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            navigation.goBack();
-          }}
-      />),
     }
   };
 
   constructor(props) {
     super(props);
-    let {date,status,id} = this.props.navigation.state.params || {};
+    let {date,status,id,key} = this.props.navigation.state.params || {};
+    console.log(date,status,id,key)
     this.state = {
       total_price: 0,
       order_num: 0,
@@ -67,11 +61,24 @@ class SettlementScene extends PureComponent {
       query:true,
       dataPicker:false,
       id:id,
-      auth_finance_admin:false
+      auth_finance_admin:false,
+      canClick:true,
+      upload:false,
+      dialog:false
     }
+    this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
   componentWillMount(){
     this.getDateilsList();
+  }
+  async setBeforeRefresh() {
+    
+    let {state, dispatch} = this.props.navigation;
+     const setRefreshAction =   NavigationActions.setParams({
+      params: {isRefreshing: true},
+      key: state.params.key
+    });
+    dispatch(setRefreshAction);
   }
   getDateilsList(){
     let store_id = this.props.global.currStoreId;
@@ -79,7 +86,6 @@ class SettlementScene extends PureComponent {
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(get_supply_items(store_id,date , token, async (resp) => {
-      console.log('resp--------->',resp)
       if (resp.ok ) {
           let {goods_list,order_num,total_price,auth_finance_admin} = resp.obj;
           this.setState({
@@ -88,30 +94,36 @@ class SettlementScene extends PureComponent {
             total_price:total_price,
             query:false,
             auth_finance_admin:auth_finance_admin
+            
           })
       } else {
-        console.log(resp.desc)
+        ToastLong(resp.desc)
       }
+      this.setState({
+        query:false,
+        upload:false
+      })
     }));
   }
-
 doSettlement(){
-
   let id= this.state.id;
   let token = this.props.global.accessToken;
   const {dispatch} = this.props;
   dispatch(to_settlement(id,token, async (resp) => {
     if (resp.ok ) {
       ToastLong('结算成功');
-      this.setState({status:1})
+      this.setState({status:Cts.BILL_STATUS_PAID});
+      await this.setBeforeRefresh();
+      this.props.navigation.goBack()
     } else {
+      ToastLong(resp.desc);
+      this.setState({canClick:true})
     }
-    this.setState({query:false})
+    this.setState({query:false,upload:false})
   }));
 }
 renderStatus(status) {
-
-    if (status == 1) {
+    if (status == Cts.BILL_STATUS_PAID) {
       return (
           <Text style={[styles.status, {
             borderColor: colors.main_color,
@@ -125,12 +137,17 @@ renderStatus(status) {
     }
   }
   renderBtn() {
-    if(this.state.auth_finance_admin){
+    if(this.state.auth_finance_admin && this.state.status == Cts.BILL_STATUS_WAIT ){
       return (
           <View style={{paddingHorizontal: pxToDp(20), paddingVertical: pxToDp(20)}}>
             <Button
-                onPress={() => {
-                  this.doSettlement()
+                onPress={async() => {
+                  if(this.state.canClick){
+                    await this.setState({canClick:false})
+                    this.setState({dialog:true})
+                  }else {
+                    ToastLong('请勿多次点击!')
+                  }
                 }}
                 type={Cts.BILL_STATUS_WAIT == this.state.status ? 'primary' : 'default'}
                 disabled={Cts.BILL_STATUS_WAIT == this.state.status ? false : true}
@@ -142,46 +159,6 @@ renderStatus(status) {
     }
   }
   renderHeader(){
-    const header = StyleSheet.create({
-      box: {
-        height: pxToDp(244),
-        backgroundColor: '#fff',
-      },
-      title:{
-        paddingTop:pxToDp(30),
-        alignItems:'center',
-      },
-      time: {
-        fontSize:pxToDp(24),
-        color:colors.fontGray
-      },
-      text_box:{
-        flex:1,
-        alignItems:'center',
-        paddingVertical:pxToDp(10)
-
-      },
-      headerDeil:{
-        fontSize:pxToDp(24),
-        color:'#00a0e9',
-        marginTop:pxToDp(30)
-
-      },
-      settle:{
-        borderWidth:pxToDp(1),
-        color:colors.main_color,
-        borderColor:colors.main_color,
-        paddingHorizontal:pxToDp(10),
-        paddingVertical:pxToDp(5),
-        borderRadius:pxToDp(20),
-        fontSize:pxToDp(24),
-        marginTop:pxToDp(20)
-      },
-      money:{
-        fontSize:pxToDp(30)
-      }
-
-    });
     return(
         <View style={header.box}>
           <View style = {header.title}>
@@ -258,7 +235,6 @@ renderStatus(status) {
           return(<View style = {{borderColor:'#E2E2E2',borderBottomWidth:pxToDp(1)}}/>)
         }}
         ListEmptyComponent={this.renderEmpty()}
-
     />
    )
   }
@@ -290,6 +266,32 @@ renderStatus(status) {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+
+          <Toast
+              icon="loading"
+              show={this.state.upload}
+              onRequestClose={() => {
+              }}
+          >提交中</Toast>
+       <Dialog onRequestClose={() => {}}
+                  visible={this.state.dialog}
+                  buttons={[{
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => this.setState({dialog: false,canClick:true}),
+                  },
+                    {
+                      type: 'default',
+                      label: '确定',
+                      onPress: async() => {
+                      await  this.setState({dialog: false});
+                      this.doSettlement()
+                      },
+                    }
+                  ]}
+          >
+            <Text>确定结算吗？</Text>
+          </Dialog>
 
           <DateTimePicker
               date={new Date(tool.fullDay(this.state.date))}
@@ -343,6 +345,46 @@ const styles = StyleSheet.create({
     lineHeight: pxToDp(36),
     marginTop:pxToDp(25)
   },
+});
+const header = StyleSheet.create({
+  box: {
+    height: pxToDp(244),
+    backgroundColor: '#fff',
+  },
+  title:{
+    paddingTop:pxToDp(30),
+    alignItems:'center',
+  },
+  time: {
+    fontSize:pxToDp(24),
+    color:colors.fontGray
+  },
+  text_box:{
+    flex:1,
+    alignItems:'center',
+    paddingVertical:pxToDp(10)
+
+  },
+  headerDeil:{
+    fontSize:pxToDp(24),
+    color:'#00a0e9',
+    marginTop:pxToDp(30)
+
+  },
+  settle:{
+    borderWidth:pxToDp(1),
+    color:colors.main_color,
+    borderColor:colors.main_color,
+    paddingHorizontal:pxToDp(10),
+    paddingVertical:pxToDp(5),
+    borderRadius:pxToDp(20),
+    fontSize:pxToDp(24),
+    marginTop:pxToDp(20)
+  },
+  money:{
+    fontSize:pxToDp(30)
+  }
+
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)

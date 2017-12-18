@@ -20,6 +20,8 @@ import {NavigationActions} from "react-navigation";
 import {NavigationItem} from '../../widget';
 import tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
+import Cts from "../../Cts"
+
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
@@ -40,14 +42,6 @@ class SettlementScene extends PureComponent {
     let {type} = params;
     return {
       headerTitle: '订单详情',
-      headerLeft: (<NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            navigation.goBack();
-          }}
-      />),
-
     }
   };
   constructor(props) {
@@ -60,7 +54,6 @@ class SettlementScene extends PureComponent {
       status:status,
       order_list: [],
       query:true,
-
     }
     this.renderList = this.renderList.bind(this)
   }
@@ -80,17 +73,16 @@ class SettlementScene extends PureComponent {
          order_list:resp.obj.order_list,
          total_price:resp.obj.total_price,
          order_num:resp.obj.order_num,
-         query:false,
-
        })
       } else {
-        console.log(resp.desc)
+        ToastLong(resp.desc)
       }
+      this.setState({query:false})
     }));
   }
   renderStatus(status) {
 
-    if (status == 1) {
+    if (status == Cts.BILL_STATUS_PAID) {
       return (
           <Text style={[styles.status, {
             borderColor: colors.main_color,
@@ -187,7 +179,6 @@ class SettlementScene extends PureComponent {
               {
                 this.renderStatus(this.state.status)
               }
-
             </View>
           </View>
           <Toast
@@ -196,6 +187,14 @@ class SettlementScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >提交中</Toast>
+
+
             <ScrollView style={{marginTop: pxToDp(20)}}>
 
               {
@@ -241,14 +240,3 @@ const styles = StyleSheet.create({
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)
-// <Text style={{color:colors.main_color,
-//     fontSize:pxToDp(24),
-//     borderWidth:pxToDp(1),
-//     paddingHorizontal:pxToDp(20),
-//     borderColor:colors.main_color,
-//     borderRadius:pxToDp(20),
-//     lineHeight:pxToDp(34),
-//     height:pxToDp(36),
-//     textAlign:'center'
-//
-// }}>{tool.billStatus(this.state.status)}</Text>

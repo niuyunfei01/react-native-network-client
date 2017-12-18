@@ -55,6 +55,7 @@ class GoodsApplyRecordScene extends PureComponent {
 
   constructor(props) {
     super(props);
+    let {viewStoreId} =this.props.navigation.state.params
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
       list: [],
@@ -64,9 +65,11 @@ class GoodsApplyRecordScene extends PureComponent {
       curr_page: 1,
       refresh: false,
       onSendingConfirm: true,
-      dialog:false
+      dialog:false,
+      viewStoreId:viewStoreId
     }
     this.tab = this.tab.bind(this);
+    this.getApplyList = this.getApplyList.bind(this)
   }
 componentWillMount(){
   this.getApplyList()
@@ -91,13 +94,17 @@ componentWillMount(){
   }
 
   getApplyList() {
-    let store_id = this.props.global.currStoreId;
+    let store_id=0
+    if(this.state.viewStoreId){
+      store_id = this.state.viewStoreId
+    }else{
+      store_id = this.props.global.currStoreId;
+    }
     let audit_status = this.state.audit_status;
     let page = this.state.curr_page;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
     dispatch(fetchApplyRocordList(store_id, audit_status, page, token, async (resp) => {
-
       if (resp.ok) {
         let {total_page, audit_list} = resp.obj;
         let arrList = []
@@ -107,15 +114,13 @@ componentWillMount(){
           arrList = this.state.list.concat(audit_list)
         }
         await this.setState({
-          pullLoading: false,
           list: arrList,
-          query: false,
           total_page: total_page,
-          refresh: false
         });
       } else {
         console.log(resp.desc)
       }
+      this.setState({pullLoading: false, refresh: false,  query: false,})
     }));
   }
 

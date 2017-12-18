@@ -7,7 +7,7 @@ const {
 } = ReactNative;
 
 export function ToastShort(content) {
-    ToastAndroid.show(new String(content), ToastAndroid.SHORT);
+    ToastAndroid.show(content, ToastAndroid.SHORT);
 }
 
 export function ToastLong(content) {
