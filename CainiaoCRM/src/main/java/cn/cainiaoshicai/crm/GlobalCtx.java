@@ -766,6 +766,7 @@ public class GlobalCtx extends Application {
         Bundle params = new Bundle();
         params.putString("initTab", "GoodsApplyRecord");
         params.putString("viewStoreId", String.valueOf(storeId));
+        i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
 
