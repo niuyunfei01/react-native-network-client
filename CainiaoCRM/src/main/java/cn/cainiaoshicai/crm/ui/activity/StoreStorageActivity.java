@@ -185,7 +185,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         }, false, currStoreSpinner);
 
-        lv = (ListView) findViewById(R.id.list_storage_status);
+        lv = findViewById(R.id.list_storage_status);
         registerForContextMenu(lv);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
