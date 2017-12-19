@@ -105,10 +105,10 @@ export function fetchVendorTags(_v_id, token, callback) {
 
 
 
-export function fetchApplyRocordList(store_id, audit_status,page,token,callback) {
+export function fetchApplyRocordList(viewStoreId, audit_status,page,token,callback) {
 
   return dispatch => {
-    const url = `api/store_audit_list/${store_id}/${audit_status}/${page}.json?access_token=${token}`;
+    const url = `api/store_audit_list/${viewStoreId}/${audit_status}/${page}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {
