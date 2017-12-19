@@ -93,7 +93,7 @@ class SettlementScene extends PureComponent {
             order_num:order_num,
             total_price:total_price,
             query:false,
-            auth_finance_admin:true
+            auth_finance_admin:auth_finance_admin
             
           })
       } else {
