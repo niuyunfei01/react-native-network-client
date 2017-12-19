@@ -93,7 +93,7 @@ class SettlementScene extends PureComponent {
             order_num:order_num,
             total_price:total_price,
             query:false,
-            auth_finance_admin:auth_finance_admin
+            auth_finance_admin:true
             
           })
       } else {
@@ -284,7 +284,7 @@ renderStatus(status) {
                       type: 'default',
                       label: '确定',
                       onPress: async() => {
-                      await  this.setState({dialog: false});
+                      await  this.setState({dialog: false,upload:true});
                       this.doSettlement()
                       },
                     }
