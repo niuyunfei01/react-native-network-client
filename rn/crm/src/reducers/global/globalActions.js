@@ -198,7 +198,7 @@ export function signIn(mobile, password, callback) {
 
 export function requestSmsCode(mobile, type, callback) {
   return dispatch => {
-    const url = `check/app_message_code.json?device_uuid=${getDeviceUUID()}&mobile=${mobile}&type=${type}`;
+    const url = `check/blx_app_message_code.json?device_uuid=${getDeviceUUID()}&mobile=${mobile}&type=${type}`;
     return getWithTpl(url, (json => {
         console.log("requestSmsCode res", json);
         callback(json.success, json.reason)
