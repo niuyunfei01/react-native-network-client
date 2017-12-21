@@ -284,7 +284,7 @@ renderStatus(status) {
                       type: 'default',
                       label: '确定',
                       onPress: async() => {
-                      await  this.setState({dialog: false});
+                      await  this.setState({dialog: false,upload:true});
                       this.doSettlement()
                       },
                     }
