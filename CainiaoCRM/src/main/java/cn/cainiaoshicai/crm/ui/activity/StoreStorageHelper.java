@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -285,15 +286,18 @@ public class StoreStorageHelper {
 
         View npView = inflater.inflate(R.layout.apply_change_supply_price, null);
 
-        final TextView label = (TextView) npView.findViewById(R.id.now_price_label);
+        final TextView label = npView.findViewById(R.id.now_price_label);
         label.setText("申请调整价格 (原价: " + item.getSupplyPricePrecision() + ")");
 
-        final EditText input = (EditText) npView.findViewById(R.id.number_apply_price);
+        final EditText input = npView.findViewById(R.id.number_apply_price);
         input.setText(item.getSupplyPricePrecisionNoSymbol());
-        final EditText remarkInput = (EditText)npView.findViewById(R.id.remark_edit_txt);
+        final EditText remarkInput = npView.findViewById(R.id.remark_edit_txt);
+
+        final CheckBox checkBox = npView.findViewById(R.id.setAutoOnsale);
+        checkBox.setVisibility (item.getStatus() != StorageItem.STORE_PROD_ON_SALE ? View.VISIBLE : View.GONE);
 
         AlertDialog dlg = new AlertDialog.Builder(activity)
-                .setTitle(String.format(item.getName()))
+                .setTitle(item.getName())
                 .setView(npView)
                 .setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
@@ -312,8 +316,9 @@ public class StoreStorageHelper {
                                 int storeId = item.getStore_id();
                                 int productId = item.getProduct_id();
                                 int beforePrice = item.getSupplyPrice();
+                                boolean autoOnSale = checkBox.isChecked();
                                 Store store = GlobalCtx.app().findStore(storeId);
-                                Call<ResultBean> rb = GlobalCtx.app().dao.store_apply_price(store.getType(), storeId, productId, beforePrice, newCents, remark);
+                                Call<ResultBean> rb = GlobalCtx.app().dao.store_apply_price(store.getType(), storeId, productId, beforePrice, newCents, remark, autoOnSale ? 1 : 0);
                                 rb.enqueue(new Callback<ResultBean>() {
                                     @Override
                                     public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
@@ -325,7 +330,7 @@ public class StoreStorageHelper {
                                             }
                                             Toast.makeText(activity, "价格已修改申请已经提交", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            AlertUtil.showAlert(activity, "错误提示", "保存失败：" + body.getDesc());
+                                            AlertUtil.showAlert(activity, "错误提示", "保存失败：" + (body != null ? body.getDesc() : ""));
                                         }
                                     }
 

@@ -225,7 +225,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        this.btnApplyPriceList = (Button) titleBar.findViewById(R.id.btn_apply_price_list);
+        this.btnApplyPriceList = titleBar.findViewById(R.id.btn_apply_price_list);
         this.btnApplyPriceList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,7 +237,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         setTooBar();
 
-        ctv = (AutoCompleteTextView) findViewById(R.id.title_product_name);
+        ctv = findViewById(R.id.title_product_name);
         ctv.setThreshold(1);
 //            ctv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 //                @Override
@@ -570,7 +570,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
             }
 
-            menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
+            if (app.fnEnabledLoss()) {
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
+            }
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
         }
     }

@@ -30,7 +30,7 @@
         android:layout_marginEnd="20sp"
         android:layout_marginStart="20sp"
         android:layout_marginTop="10dp"
-        android:text="申请调整理由" />
+        android:text="调整原因" />
 
     <EditText
         android:id="@+id/remark_edit_txt"
@@ -43,5 +43,27 @@
         android:lines="3"
         android:scrollHorizontally="false"
         android:textColor="@color/gray"/>
+
+    <RelativeLayout
+        android:layout_marginEnd="20sp"
+        android:layout_marginStart="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <CheckBox android:id="@+id/setAutoOnsale"
+            android:checked="true"
+            android:layout_alignParentStart="true"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp" />
+
+        <TextView
+            android:id="@+id/label_auto_onsale"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/setAutoOnsale"
+            android:gravity="center_vertical"
+            android:text="调价成功后自动上架" />
+    </RelativeLayout>
 
 </LinearLayout>

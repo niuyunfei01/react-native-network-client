@@ -61,7 +61,7 @@ public interface CRMService {
     @POST("/api/apply_store_price")
     Call<ResultBean> store_apply_price(@Field("vendor_id") int vendorId, @Field("store_id") int storeId,
                                        @Field("product_id") int productId, @Field("before_price") int beforePrice,
-                                       @Field("apply_price") int applyPrice, @Field("remark") String remark);
+                                       @Field("apply_price") int applyPrice, @Field("remark") String remark, @Field("auto_on_sale") int autoOnSale);
 
     @POST("/api/shipping_start_accept/{storeId}")
     Call<ResultBean<ShipAcceptStatus>> shippingStartAccept(@Path("storeId") long storeId);
