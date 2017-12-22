@@ -309,6 +309,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginTop: pxToDp(30),
     marginBottom: pxToDp(25),
+    backgroundColor: '#f2f2f2',
   },
   user_name: {
     fontSize: pxToDp(30),

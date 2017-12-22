@@ -124,7 +124,7 @@ class VersionScene extends PureComponent {
             <Text style={styles.newest_version}>最新版本: {newest_version_name}({newest_version})</Text>
             <Button
               onPress={() => {
-                Linking.openURL(Config.DownloadUrl).catch(err => console.error('An error occurred', err));
+                Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
               }}
               type='primary'
               style={styles.btn_update}
