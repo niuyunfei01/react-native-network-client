@@ -220,8 +220,8 @@ class OrderScene extends Component {
 
   componentWillMount() {
     const orderId = (this.props.navigation.state.params || {}).orderId;
-    const {dispatch, order, global} = this.props;
-    this.__getDataIfRequired(dispatch, global, order, orderId);
+    const {dispatch, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
     this.wayRecordQuery();
 
@@ -244,7 +244,7 @@ class OrderScene extends Component {
     }
 
     const sessionToken = global.accessToken;
-    const o = orderStateToCmp.order;
+    const o = orderStateToCmp ? orderStateToCmp.order : false;
 
     if (!o || !o.id || o.id !== orderId) {
 
