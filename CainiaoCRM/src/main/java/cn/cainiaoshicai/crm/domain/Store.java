@@ -26,6 +26,7 @@ public class Store {
     private String open_start;
     private int call_not_print;
     private int ship_way;
+    private int fn_price_controlled;
 
     public Store() {
     }
@@ -144,6 +145,14 @@ public class Store {
         this.ship_way = ship_way;
     }
 
+    public int getFn_price_controlled() {
+        return fn_price_controlled;
+    }
+
+    public void setFn_price_controlled(int fn_price_controlled) {
+        this.fn_price_controlled = fn_price_controlled;
+    }
+
     public String namePrefixVendor() {
         String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
         return vendorName + this.getName();
@@ -167,6 +176,8 @@ public class Store {
         b.putBoolean("shipCapable", shipCapable);
         b.putBoolean("cloudPrinterWorking", cloudPrinterWorking);
         b.putString("id", String.valueOf(id));
+        b.putInt("fnPriceControlled", fn_price_controlled);
+        b.putInt("fn_price_controlled", fn_price_controlled);
         return b;
     }
 }

@@ -1,8 +1,6 @@
 package cn.cainiaoshicai.crm.dao;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.FileBean;
@@ -15,6 +13,8 @@ import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -56,6 +56,12 @@ public interface CRMService {
     @POST("/api/store_chg_price/{store_id}/{product_id}/{newCents}/{oldCents}")
     Call<ResultBean> store_chg_price(@Path("store_id") int store_id, @Path("product_id") int product_id,
                                @Path("newCents") int newCents, @Path("oldCents") int nowPrice);
+
+    @FormUrlEncoded
+    @POST("/api/apply_store_price")
+    Call<ResultBean> store_apply_price(@Field("vendor_id") int vendorId, @Field("store_id") int storeId,
+                                       @Field("product_id") int productId, @Field("before_price") int beforePrice,
+                                       @Field("apply_price") int applyPrice, @Field("remark") String remark, @Field("auto_on_sale") int autoOnSale);
 
     @POST("/api/shipping_start_accept/{storeId}")
     Call<ResultBean<ShipAcceptStatus>> shippingStartAccept(@Path("storeId") long storeId);

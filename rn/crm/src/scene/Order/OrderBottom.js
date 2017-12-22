@@ -31,7 +31,7 @@ class OrderBottom extends PureComponent {
 
   constructor(props) {
     super(props);
-
+    console.log('>>>>>>>>>>>>>>>>', props.order)
     this.state = {
       dlgShipVisible: false,
       dlgShipButtons: [{
@@ -40,7 +40,7 @@ class OrderBottom extends PureComponent {
         onPress: () => {
         }
       }],
-      dlgShipContent:'',
+      dlgShipContent: '',
     };
 
     this._doDial = this._doDial.bind(this);
@@ -88,7 +88,7 @@ class OrderBottom extends PureComponent {
         }, 2000);
       } else {
         this.setState({errorHints: msg});
-      }  
+      }
     }))
   };
 
@@ -103,7 +103,7 @@ class OrderBottom extends PureComponent {
     const {callShip} = this.props;
     callShip();
   }
-  
+
   _onToProvide() {
     const {onToProvide} = this.props;
     onToProvide();
@@ -139,85 +139,113 @@ class OrderBottom extends PureComponent {
 
   _onShipInfoBtnClicked () {
     let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      dada_call_at} = this.props.order;
+      auto_ship_type, zs_status,dada_call_at} = this.props.order;
     dada_status = parseInt(dada_status);
+    zs_status = parseInt(zs_status);
+    auto_ship_type = parseInt(auto_ship_type);
     orderStatus = parseInt(orderStatus);
     ship_worker_id = parseInt(ship_worker_id);
     dada_fee = numeral('0.00').format(dada_fee);
-
+    let title, msg, buttons, leftButtons;
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       ToastShort("请使用老版本修改送达时间");
-    } else if (dada_status === Cts.DADA_STATUS_NEVER_START) {
-      this._callShipDlg();
     } else {
 
-      let title, msg, buttons, leftButtons;
-      if (dada_status === Cts.DADA_STATUS_TO_ACCEPT) {
-        title = '自动待接单';
-        const timeDesc = tool.shortTimeDesc(dada_call_at);
-        const shipDetail = (dada_distance || dada_fee) ? `(${dada_distance}米${dada_fee}元)` : '';
-        msg = `${timeDesc}已发单${shipDetail}到${auto_plat}, 等待接单中...`;
-        buttons = [
-          {
-            label: '撤回呼叫',
-            onPress: this._cancelShip
-          },
-          this._defCloseBtn('继续等待'),
-          {
-            label: '查看详细',
-            onPress: this._viewShipDetail
-          },
-        ];
+      console.log(auto_ship_type, zs_status, auto_plat);
 
-      } else if (dada_status === Cts.DADA_STATUS_TO_FETCH) {
-        title = "自动待取货";
-        msg = `${auto_plat} ${dada_dm_name} (${dada_mobile}) 已接单，如强制取消扣2元费用`;
-        buttons = [
-          {
-            label: '强行撤单',
-            onPress: this._cancelShip,
-          },
-          {
-            label: '呼叫配送员',
-            onPress: () => {
-              native.dialNumber(dada_mobile);
-              this.setState({dlgShipVisible: false});
-            }
-          },
-          this._defCloseBtn(),
-        ];
-      } else if (dada_status === Cts.DADA_STATUS_CANCEL || dada_status === Cts.DADA_STATUS_TIMEOUT) {
-        title = "通过系统呼叫配送";
-        msg = "订单已" + (dada_status === Cts.DADA_STATUS_TIMEOUT ? "超时" : "取消") + "，重新发单？";
-        buttons = [
-          {
-            label: '重新发单',
-            onPress: () => {
-              this._callShipDlg();
-              this.setState({dlgShipVisible: false});
-            },
-          },
-          this._defCloseBtn(),
-        ];
+      if (auto_ship_type === Cts.SHIP_ZS_JD || auto_ship_type === Cts.SHIP_ZS_MT
+          || auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD) {
+        switch (zs_status) {
+          case Cts.ZS_STATUS_CANCEL:
+          case Cts.ZS_STATUS_NEVER_START:
 
-      } else if (dada_status === Cts.DADA_STATUS_SHIPPING || dada_status === Cts.DADA_STATUS_ARRIVED) {
-        title = "配送在途";
-        msg = `${auto_plat} ${dada_dm_name} (${dada_mobile}) ` + (dada_status === Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达");
-        buttons = [
-          {
-            label: '查看详细',
-            onPress: this._viewShipDetail
-          },
-          {
-            label: '呼叫配送员',
-            onPress: () => {
-              native.dialNumber(dada_mobile);
-              this.setState({dlgShipVisible: false});
+            title = '呼叫专送';
+            msg = zs_status === Cts.ZS_STATUS_CANCEL ? '现在重新呼叫专送吗?' : '现在呼叫专送吗?';
+            buttons = [
+              {
+                label: '立即呼叫',
+                onPress: () => {
+                  this.setState({dlgShipVisible: false});
+                },
+              },
+              this._defCloseBtn('关闭')
+            ];
+            break;
+          case Cts.ZS_STATUS_TO_ACCEPT:
+            break;
+        }
+      } else if (dada_status === Cts.DADA_STATUS_NEVER_START) {
+        this._callShipDlg();
+      } else {
+        if (dada_status === Cts.DADA_STATUS_TO_ACCEPT) {
+          title = '自动待接单';
+          const timeDesc = tool.shortTimeDesc(dada_call_at);
+          const shipDetail = (dada_distance || dada_fee) ? `(${dada_distance}米${dada_fee}元)` : '';
+          msg = `${timeDesc}已发单${shipDetail}到${auto_plat}, 等待接单中...`;
+          buttons = [
+            {
+              label: '撤回呼叫',
+              onPress: this._cancelShip
             },
-          },
-          this._defCloseBtn(),
-        ];
+            this._defCloseBtn('继续等待'),
+            {
+              label: '查看详细',
+              onPress: this._viewShipDetail
+            },
+          ];
+
+        } else if (dada_status === Cts.DADA_STATUS_TO_FETCH) {
+          title = "自动待取货";
+          msg = `${auto_plat} ${dada_dm_name} (${dada_mobile}) 已接单，如强制取消扣2元费用`;
+          buttons = [
+            {
+              label: '强行撤单',
+              onPress: this._cancelShip,
+            },
+            {
+              label: '呼叫配送员',
+              onPress: () => {
+                native.dialNumber(dada_mobile);
+                this.setState({dlgShipVisible: false});
+              }
+            },
+            this._defCloseBtn(),
+          ];
+        } else if (dada_status === Cts.DADA_STATUS_CANCEL || dada_status === Cts.DADA_STATUS_TIMEOUT) {
+          title = "通过系统呼叫配送";
+          msg = "订单已" + (dada_status === Cts.DADA_STATUS_TIMEOUT ? "超时" : "取消") + "，重新发单？";
+          buttons = [
+            {
+              label: '重新发单',
+              onPress: () => {
+                this._callShipDlg();
+                this.setState({dlgShipVisible: false});
+              },
+            },
+            this._defCloseBtn(),
+          ];
+
+        } else if (dada_status === Cts.DADA_STATUS_SHIPPING || dada_status === Cts.DADA_STATUS_ARRIVED) {
+          title = "配送在途";
+          msg = `${auto_plat} ${dada_dm_name} (${dada_mobile}) ` + (dada_status === Cts.DADA_STATUS_SHIPPING ? "配送中" : "已送达");
+          buttons = [
+            {
+              label: '查看详细',
+              onPress: this._viewShipDetail
+            },
+            {
+              label: '呼叫配送员',
+              onPress: () => {
+                native.dialNumber(dada_mobile);
+                this.setState({dlgShipVisible: false});
+              },
+            },
+            this._defCloseBtn(),
+          ];
+        }
       }
+    }
+    if (buttons) {
       this.setState({
         dlgShipTitle: title,
         dlgShipButtons: buttons,
@@ -230,41 +258,44 @@ class OrderBottom extends PureComponent {
 
   _shipInfoBtnText() {
     let label;
-    let {dada_status, orderStatus, ship_worker_id} = this.props.order;
+    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status} = this.props.order;
     dada_status = parseInt(dada_status);
     orderStatus = parseInt(orderStatus);
     ship_worker_id = parseInt(ship_worker_id);
-
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
-    }  else {
-      switch (dada_status) {
-        case Cts.DADA_STATUS_TO_ACCEPT:
-          label = "自动:待接单";
-          break;
-        case Cts.DADA_STATUS_NEVER_START:
-          label = "待呼叫配送";
-          break;
-        case Cts.DADA_STATUS_SHIPPING:
-          label = "自动:已在途";
-          break;
-        case Cts.DADA_STATUS_ARRIVED:
-          label = "自动:已送达";
-          break;
-        case Cts.DADA_STATUS_CANCEL:
-          label = "自动:已取消";
-          break;
-        case Cts.DADA_STATUS_TO_FETCH:
-          label = "自动:已接单";
-          break;
-        case Cts.DADA_STATUS_ABNORMAL:
-          label = "自动:配送异常";
-          break;
-        case Cts.DADA_STATUS_TIMEOUT:
-          label = "自动:呼叫超时";
-          break;
-        default:
-          label = dada_status;
+    } else {
+      if (auto_ship_type == Cts.SHIP_ZS_JD || auto_ship_type == Cts.SHIP_ZS_MT ||auto_ship_type == Cts.SHIP_ZS_ELE ||auto_ship_type == Cts.SHIP_ZS_BD) {
+        label = tool.autoPlat(auto_ship_type,zs_status)
+      } else {
+        switch (dada_status) {
+          case Cts.DADA_STATUS_TO_ACCEPT:
+            label = "自动:待接单";
+            break;
+          case Cts.DADA_STATUS_NEVER_START:
+            label = "待呼叫配送";
+            break;
+          case Cts.DADA_STATUS_SHIPPING:
+            label = "自动:已在途";
+            break;
+          case Cts.DADA_STATUS_ARRIVED:
+            label = "自动:已送达";
+            break;
+          case Cts.DADA_STATUS_CANCEL:
+            label = "自动:已取消";
+            break;
+          case Cts.DADA_STATUS_TO_FETCH:
+            label = "自动:已接单";
+            break;
+          case Cts.DADA_STATUS_ABNORMAL:
+            label = "自动:配送异常";
+            break;
+          case Cts.DADA_STATUS_TIMEOUT:
+            label = "自动:呼叫超时";
+            break;
+          default:
+            label = dada_status;
+        }
       }
     }
     return label;
@@ -321,7 +352,8 @@ class OrderBottom extends PureComponent {
     label = label || mobile;
 
     return <View>
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={this.state.dlgShipVisible}
               buttons={this.state.dlgShipButtons}
               left_buttons={this.state.left_buttons}

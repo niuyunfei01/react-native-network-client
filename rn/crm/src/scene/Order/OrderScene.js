@@ -34,14 +34,16 @@ import {
   saveOrderItems,
   orderWayRecord,
   orderChangeLog,
-  clearLocalOrder
+  clearLocalOrder,
+  addTipMoney,
+
 } from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon ,Input} from "../../weui/index";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import Cts from '../../Cts'
@@ -52,6 +54,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import { Array } from 'core-js/library/web/timers';
 import styles from './OrderStyles'
+import coalesceNonElementChildren from "../../widget/coalesceNonElementChildren";
+import {fetchApplyRocordList} from "../../reducers/product/productActions";
 
 const numeral = require('numeral');
 
@@ -74,6 +78,7 @@ function mapDispatchToProps(dispatch) {
       markTaskDone,
       orderWayRecord,
       clearLocalOrder,
+      addTipMoney,
     }, dispatch)
   }
 }
@@ -173,11 +178,16 @@ class OrderScene extends Component {
       orderQuery:false,
       orderChangeLogs: [],
       orderWayLogs: {},
+      wayLoadingShow:false,
+      changeLoadingShow:false,
       //remind
       onProcessed: false,
       reminds: {},
       remindFetching: false,
       store_contacts: [],
+      addTipDialog:false,
+      addTipMoney:false,
+      addMoneyNum:''
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -210,8 +220,11 @@ class OrderScene extends Component {
 
   componentWillMount() {
     const orderId = (this.props.navigation.state.params || {}).orderId;
-    const {dispatch, order, global} = this.props;
-    this.__getDataIfRequired(dispatch, global, order, orderId);
+    const {dispatch, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, null, orderId);
+    this._orderChangeLogQuery();
+    this.wayRecordQuery();
+
   }
 
   componentWillReceiveProps(nextProps) {
@@ -229,9 +242,9 @@ class OrderScene extends Component {
     if (!orderId) {
       return;
     }
-    
+
     const sessionToken = global.accessToken;
-    const o = orderStateToCmp.order;
+    const o = orderStateToCmp ? orderStateToCmp.order : false;
 
     if (!o || !o.id || o.id !== orderId) {
 
@@ -447,6 +460,8 @@ class OrderScene extends Component {
   _dispatchToInvalidate() {
     const {dispatch, order} = this.props;
     dispatch(clearLocalOrder(order.order.id));
+    this.wayRecordQuery();
+    this._orderChangeLogQuery();
   }
 
   _hidePrinterChooser() {
@@ -662,7 +677,7 @@ class OrderScene extends Component {
 
   _fnProvidingOnway() {
     const {order, global} = this.props;
-    
+
     const storeId = (order.order||{}).store_id;
     return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
@@ -684,36 +699,62 @@ class OrderScene extends Component {
   }
   _getWayRecord() {
     this.setState({ shipHided: !this.state.shipHided })
-    let orderWayLogs = this.state.orderWayLogs
-
-    if (this.state.shipHided && tool.length(tool.length(orderWayLogs) == 0)) {
-      this.wayRecordQuery()
-      console.log(orderWayLogs)
-
-    }
 
   }
 
   wayRecordQuery() {
     const { dispatch, order, global } = this.props;
     dispatch(orderWayRecord(order.order_id, global.accessToken, (ok, msg, contacts) => {
-      let mg = 0
+      let mg = 0;
       if (ok) {
-        // if (tool.length(contacts)>0) {
+
         mg = contacts
-        // }
+
       } else {
         Alert.alert(msg)
       }
-      this.setState({ orderWayLogs: mg })
+      this.setState({ orderWayLogs: mg,wayLoadingShow:false})
       console.log(this.state.orderWayLogs)
 
     }));
   }
 
+  renderAddTip(){
+    let {order} = this.props.order;
+    let dada = this.state.orderWayLogs.hasOwnProperty(Cts.SHIP_AUTO_NEW_DADA)
+    let {orderStatus,auto_ship_type} = order;
+    if((orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) && dada && auto_ship_type == Cts.SHIP_AUTO_NEW_DADA && (!this.state.shipHided)) {
 
+      return (
+          <TouchableOpacity
+              onPress = {()=>{
+                this.setState({addTipDialog:true})
+              }}
+          >
+          <View style={{
+            height: pxToDp(40),
+            backgroundColor: '#59b26a',
+            borderRadius: pxToDp(20),
+            paddingHorizontal: pxToDp(10),
+            paddingVertical: pxToDp(4),
+            marginTop:pxToDp(20),
+            marginRight:pxToDp(30)
+          }}>
+            <Text style={{
+              height: pxToDp(24),
+              fontSize: pxToDp(24),
+              textAlign: 'center',
+              color: '#EEEEEE',
+              lineHeight: pxToDp(24)
+            }}>加小费</Text>
+          </View>
+          </TouchableOpacity>
+      );
+    }
+  }
 
   renderWayRecord() {
+    let order = this.props.order.order
     let orderWayLogs = this.state.orderWayLogs
     if (!this.state.shipHided) {
       if (typeof orderWayLogs == 'object' && (tool.length(orderWayLogs) > 0)) {
@@ -744,63 +785,35 @@ class OrderScene extends Component {
                     )
                   })
                 }
-              </View>
-              <View style={{ width: pxToDp(90) }}>
-                {
-                  tool.objectMap(this.state.orderWayLogs, (item, index) => {
-                    item.forEach((ite) => {
-                      if (ite.hasOwnProperty('add_tips_btn') && (ite.add_tips_btn == 1)) {
-                        return (
-                          <View style={{ height: pxToDp(30), backgroundColor: '#59b26a', borderRadius: pxToDp(5) }}>
-                            <Text style={{ height: pxToDp(24), fontSize: pxToDp(24), textAlign: 'center', color: '#EEEEEE', lineHeight: pxToDp(24) }}>加小费</Text>
-                          </View>)
-                      }
-                    });
-                  })
-                }
+
               </View>
             </View>
-
           )
-
         })
       } else if (tool.length(orderWayLogs) == 0 && (typeof orderWayLogs == 'object')) {
         return <View style={{ height: pxToDp(50), backgroundColor: "#fff", paddingLeft: pxToDp(30), flexDirection: 'row', alignItems: 'center' }}>
-
           <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
-
         </View>
-      } else {
-        return <LoadingView />
       }
     }
-
   }
-
   _orderChangeLog() {
-
     this.setState({ changeHide: !this.state.changeHide })
-    if (this.state.orderChangeLogs.length == 0 && this.state.changeHide) {
-      this._orderChangeLogQuery();
-    } else {
-      this.renderChangeLogs()
-    }
-
+    // if (this.state.changeHide) {
+    //   this.setState({changeLoadingShow:true})
+    //
+    // }
   }
-
   _orderChangeLogQuery() {
     const { dispatch, order, global } = this.props;
     dispatch(orderChangeLog(order.order_id, global.accessToken, (ok, msg, contacts) => {
-
       if (ok) {
-        this.setState({ orderChangeLogs: contacts });
+        this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
       } else {
         Alert.alert(msg)
       }
     }));
   }
-
-
   renderChangeLogs() {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
@@ -808,8 +821,8 @@ class OrderScene extends Component {
           <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff'}}>
             <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",height:pxToDp(150),justifyContent:'center'}}>
               <View style={{ flexDirection: 'row' }}>
-                <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30) }}>{item.updated_name}</Text>
-                <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(30), marginLeft: pxToDp(24) }}>{item.modified}</Text>
+                <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35) }}>{item.updated_name}</Text>
+                <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35), marginLeft: pxToDp(24) }}>{item.modified}</Text>
               </View>
               <View style={{ marginTop: pxToDp(20),width:'100%' }}>
                 <Text style={{ fontSize: pxToDp(24) }}>{item.what}</Text>
@@ -818,13 +831,31 @@ class OrderScene extends Component {
           </View>
         )
       })
-
     } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
       return <LoadingView />
     }
-
   }
-
+  upAddTip(){
+    let {id} = this.props.order.order;
+    let {addMoneyNum} = this.state;
+    let {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    if(addMoneyNum > 0){
+      this.setState({onSubmitting: true});
+      dispatch(addTipMoney(id, addMoneyNum,accessToken, async (resp) => {
+        if (resp.ok) {
+          ToastLong('加小费成功')
+        } else {
+          ToastLong(resp.desc)
+        }
+        await this.setState({onSubmitting: false,addMoneyNum:''});
+        this._orderChangeLogQuery();
+      }));
+    }else {
+      this.setState({addMoneyNum:''});
+      ToastLong('加小费的金额必须大于0')
+    }
+  }
   render() {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
@@ -832,7 +863,6 @@ class OrderScene extends Component {
       onRefresh={this._dispatchToInvalidate}
       tintColor='gray'
     />;
-
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
     console.log('noOrder', noOrder, order);
@@ -916,8 +946,7 @@ class OrderScene extends Component {
           </ScrollView>
             <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip} fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
-          <Dialog onRequestClose={() => {
-          }}
+          <Dialog onRequestClose={() => {}}
                   visible={!!this.state.errorHints}
                   buttons={[{
                     type: 'default',
@@ -926,7 +955,61 @@ class OrderScene extends Component {
                       this.setState({errorHints: ''})
                     }
                   }]}
-          ><Text>{this.state.errorHints}</Text></Dialog>
+          >
+            <Text>{this.state.errorHints}</Text>
+          </Dialog>
+
+
+          <Dialog onRequestClose={() => {
+          }}
+                  visible={this.state.addTipMoney}
+                  title = {'加小费'}
+                  buttons={[{
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => {
+                      this.setState({addTipMoney:false,addMoneyNum:''})
+                    }
+                  },
+                    {
+                      type: 'default',
+                      label: '确定',
+                      onPress: async() => {
+                          await this.setState({addTipMoney:false});
+                          this.upAddTip()
+                      }
+                    }
+                  ]}
+          >
+            <Input placeholder = {'请输入金额，金额只能大于0'}
+                   value={`${this.state.addMoneyNum}`}
+                   keyboardType='numeric'
+                   onChangeText={(text)=>{
+                     this.setState({addMoneyNum:text})
+                   }}
+            />
+          </Dialog>
+
+          <Dialog onRequestClose={() => {
+          }}
+                  visible={this.state.addTipDialog}
+                  buttons={[{
+                    type: 'default',
+                    label: '知道了',
+                    onPress: () => {
+                      this.setState({addTipDialog :false,addTipMoney:true})
+                    }
+                  }]}
+          >
+            <View>
+              <Text style={{color: '#000'}}>
+                1.达达加小费金额以
+                <Text style={{color: "red"}}>最新一次为准</Text>
+                ,新一次金额必须大于上次加小费的金额.
+              </Text>
+              <Text style={{color:'#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>
+            </View>
+          </Dialog>
 
           <Toast
             icon="loading"
@@ -1014,7 +1097,7 @@ class OrderScene extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }} onPress={() => {
-              native.ordersByMobileTimes(order.mobile, order.order_times)
+              native.ordersSearch(`uid:${order.user_id}`)
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
@@ -1195,13 +1278,18 @@ class OrderScene extends Component {
               } />
           </View>
         </View>
-        {
-          this.renderWayRecord()
-        }
+          <View style = {{flexDirection:'row',backgroundColor:'#fff',borderTopWidth:pxToDp(1),borderTopColor:"#D3D3D3"}}>
+            {
+              this.renderWayRecord()
+            }
+            {
+              this.renderAddTip()
+            }
+          </View>
       </View>
 
-      <View>
-        <View style={[CommonStyle.topBottomLine, styles.block]}>
+      <View style={{marginBottom:pxToDp(100)}}>
+        <View style={[CommonStyle.topBottomLine, styles.block,]}>
           <View style={[styles.row, {
             alignItems: 'center',
             marginTop: 0,
@@ -1228,7 +1316,7 @@ class OrderScene extends Component {
 
 
 
-   
+
     </View>
     )
   }

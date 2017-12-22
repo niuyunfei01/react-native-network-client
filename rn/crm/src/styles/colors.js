@@ -16,4 +16,7 @@ export default {
   editStatusAdd: '#db5d5d',
   editStatusDeduct: '#3a97ff',
   new_back: '#dcdcdc',
+  fontColor: '#b2b2b2',
+  fontGray: '#bfbfbf',
+  fontBlack: '#000000',
 };

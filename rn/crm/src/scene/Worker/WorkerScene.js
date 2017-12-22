@@ -31,6 +31,7 @@ import Button from 'react-native-vector-icons/Entypo';
 import {NavigationActions} from 'react-navigation';
 import LoadingView from "../../widget/LoadingView";
 import CallBtn from "../Order/CallBtn";
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -66,11 +67,13 @@ class WorkerScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    console.log('currStoreId -> ', currStoreId);
     let currVendorId = canReadStores[currStoreId]['vendor_id'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
 
     const {mine} = this.props;
+    // let curr_user_info = tool.user_info(mine, currVendorId, currentUser);
+    // console.log('curr_user_info -> ', curr_user_info)
+    // let limit_store = curr_user_info['store_id'];
 
     this.state = {
       isRefreshing: false,
@@ -79,13 +82,14 @@ class WorkerScene extends PureComponent {
       currVendorName: currVendorName,
       normal: mine.normal[currVendorId],
       forbidden: mine.forbidden[currVendorId],
+      limit_store: 0,
     };
 
-    if (this.props.navigation.state.params === undefined ||
+    /*if (this.props.navigation.state.params === undefined ||
       this.state.normal === undefined ||
       this.state.forbidden === undefined) {
-      this.onSearchWorkers();
-    }
+    }*/
+    this.onSearchWorkers();
 
     this.onPress = this.onPress.bind(this);
   }
@@ -98,16 +102,22 @@ class WorkerScene extends PureComponent {
 
   onSearchWorkers() {
     const {dispatch} = this.props;
-    const {accessToken} = this.props.global;
+    const {currentUser, accessToken} = this.props.global;
     let vendor_id = this.state.currVendorId;
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchWorkers(vendor_id, accessToken, (resp) => {
         if (resp.ok) {
-          let {normal, forbidden} = resp.obj;
+          let {normal, forbidden, user_list} = resp.obj;
+          let limit_store = 0;
+          if(user_list[currentUser]){
+            limit_store = user_list[currentUser]['store_id'];
+          }
+          console.log('limit_store -> ', limit_store);
           _this.setState({
             normal: normal,
             forbidden: forbidden,
+            limit_store: parseInt(limit_store),
           });
         }
         _this.setState({isRefreshing: false});
@@ -169,28 +179,50 @@ class WorkerScene extends PureComponent {
   }
 
   renderList() {
-    let {normal, forbidden} = this.state;
+    let {normal, forbidden, limit_store} = this.state;
     if (normal === undefined || forbidden === undefined) {
       return <LoadingView/>;
     }
     let _this = this;
-    let normal_workers = Array.from(normal).map((user) => {
-      return _this.renderUser(user);
+
+    let normal_worker = [];
+    let forbidden_worker = [];
+    for(let user_info of Array.from(normal)){
+      if(limit_store === 0 || (user_info.store_id > 0 && parseInt(user_info.store_id) === limit_store)){
+        normal_worker.push(user_info)
+      }
+    }
+    for(let user_info of Array.from(forbidden)){
+      if(limit_store === 0 || (user_info.store_id > 0 && parseInt(user_info.store_id) === limit_store)){
+        forbidden_worker.push(user_info)
+      }
+    }
+    let normal_workers = normal_worker.map((user) => {
+        return _this.renderUser(user);
     });
-    let forbidden_workers = Array.from(forbidden).map((user) => {
-      return _this.renderUser(user);
+    let forbidden_workers = forbidden_worker.map((user) => {
+        return _this.renderUser(user);
     });
 
     return (
       <View>
-        <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
-        <Cells style={[styles.cells]}>
-          {normal_workers}
-        </Cells>
-        <CellsTitle style={styles.cell_title}>禁用员工列表</CellsTitle>
-        <Cells style={[styles.cells]}>
-          {forbidden_workers}
-        </Cells>
+        {tool.length(normal_worker) > 0  && (
+          <View>
+            <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
+            <Cells style={[styles.cells]}>
+              {normal_workers}
+            </Cells>
+          </View>
+        )}
+
+        {tool.length(forbidden_worker) > 0 && (
+          <View>
+            <CellsTitle style={styles.cell_title}>禁用员工列表</CellsTitle>
+            <Cells style={[styles.cells]}>
+              {forbidden_workers}
+            </Cells>
+          </View>
+        )}
       </View>
     );
   }

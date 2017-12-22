@@ -86,8 +86,12 @@ class StoreScene extends PureComponent {
 
   componentDidMount() {
     let {curr_stores, curr_user_list} = this.state;
-    if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
+    /*if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
       this.getVendorStore();
+      this.onSearchWorkers();
+    }*/
+    this.getVendorStore();
+    if (tool.length(curr_user_list) === 0) {
       this.onSearchWorkers();
     }
   }

@@ -33,6 +33,10 @@ public class StoreProduct {
     private int req_total;
     private String req_mark;
 
+    private int supply_price;
+
+    private int applying_price;
+
     public int getId() {
         return id;
     }
@@ -231,5 +235,21 @@ public class StoreProduct {
 
     public void setReq_mark(String req_mark) {
         this.req_mark = req_mark;
+    }
+
+    public int getSupply_price() {
+        return supply_price;
+    }
+
+    public void setSupply_price(int supply_price) {
+        this.supply_price = supply_price;
+    }
+
+    public int getApplying_price() {
+        return applying_price;
+    }
+
+    public void setApplying_price(int applying_price) {
+        this.applying_price = applying_price;
     }
 }

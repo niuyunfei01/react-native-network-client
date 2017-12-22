@@ -60,7 +60,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         Bundle init = new Bundle();
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
-        if (toRoute.equals("Login")) {
+        if ("Login".equals(toRoute)) {
             SplashScreen.show(this);
         }
         Bundle _action_params = intent.getBundleExtra("_action_params");

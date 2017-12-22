@@ -63,6 +63,10 @@ export function fullDate(dt) {
   return Moment(dt).format('YYYY-MM-DD HH:mm:ss')
 }
 
+export function fullDay(dt) {
+  return Moment(dt).format('YYYY-MM-DD')
+}
+
 export function storeTime(dt) {
   return Moment(dt).format('H:mm');
 }
@@ -89,6 +93,7 @@ export function vendor(global) {
   let currVendorId = currStore['vendor_id'] || currStore['type'];
   let currVendorName = currStore['vendor'];
   let currStoreName = currStore['name'];
+  let fnPriceControlled = currStore['fn_price_controlled'];
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
@@ -141,6 +146,7 @@ export function vendor(global) {
     service_uid: service_uid,
     fnProviding: fnProviding,
     fnProvidingOnway: fnProvidingOnway,
+    fnPriceControlled: fnPriceControlled,
   };
 }
 
@@ -360,6 +366,35 @@ export function first_store_id(canReadStores) {
   }
   return first_store_id;
 }
+export function toFixed(num) {
+  return (parseInt(num)/100).toFixed(2)
+
+}
+export  function billStatus(status) {
+ let map = {};
+ map[Cts.BILL_STATUS_WAIT] ='待打款';
+ map[Cts.BILL_STATUS_PAID] ='已打款';
+ map[Cts.BILL_STATUS_INVALID] ='已作废';
+ return map[status]
+
+}
+export function autoPlat(type,status) {
+  let plat = {};
+  let znMap = {};
+  plat[Cts.SHIP_ZS_JD] = '京东专送';
+  plat[Cts.SHIP_ZS_MT] = '美团转送';
+  plat[Cts.SHIP_ZS_ELE] = '饿了么专送';
+  plat[Cts.SHIP_ZS_BD] = '百度专送';
+
+  znMap[Cts.ZS_STATUS_NEVER_START] = '待召唤';
+  znMap[Cts.ZS_STATUS_TO_ACCEPT] = '待接单';
+  znMap[Cts.ZS_STATUS_TO_FETCH] = '待取货';
+  znMap[Cts.ZS_STATUS_ON_WAY] = '在途';
+  znMap[Cts.ZS_STATUS_ARRIVED] = '送达';
+  znMap[Cts.ZS_STATUS_CANCEL] = '取消';
+return `${plat[type]}:${znMap[status]}`;
+
+}
 
 export default {
   urlByAppendingParams,
@@ -385,4 +420,9 @@ export default {
   user_info,
   first_store_id,
   storeActionSheet,
+  fullDay,
+  toFixed,
+  billStatus,
+  get_platform_name,
+  autoPlat,
 }

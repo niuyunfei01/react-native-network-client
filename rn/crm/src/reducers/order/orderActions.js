@@ -307,7 +307,6 @@ export function orderWayRecord(orderid, token, callback) {
 
       }
     )
-
   }
 }
 
@@ -321,13 +320,25 @@ export function orderChangeLog(orderid, token, callback) {
         } else {
           callback(false, '数据获取失败');
         }
-
       },
       (error) => {
         callback(false,'网络错误'+error)
-
       }
     )
 
+  }
+}
+
+export function addTipMoney(order_id,money,token,callback) {
+  return dispatch => {
+    const url = `api/order_dada_tips/${order_id}/${money}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
   }
 }
