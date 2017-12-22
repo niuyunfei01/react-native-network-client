@@ -378,6 +378,23 @@ export  function billStatus(status) {
  return map[status]
 
 }
+export function autoPlat(type,status) {
+  let plat = {};
+  let znMap = {};
+  plat[Cts.SHIP_ZS_JD] = '京东专送';
+  plat[Cts.SHIP_ZS_MT] = '美团转送';
+  plat[Cts.SHIP_ZS_ELE] = '饿了么专送';
+  plat[Cts.SHIP_ZS_BD] = '百度专送';
+
+  znMap[Cts.ZS_STATUS_NEVER_START] = '待召唤';
+  znMap[Cts.ZS_STATUS_TO_ACCEPT] = '待接单';
+  znMap[Cts.ZS_STATUS_TO_FETCH] = '待取货';
+  znMap[Cts.ZS_STATUS_ON_WAY] = '在途';
+  znMap[Cts.ZS_STATUS_ARRIVED] = '送达';
+  znMap[Cts.ZS_STATUS_CANCEL] = '取消';
+return `${plat[type]}:${znMap[status]}`;
+
+}
 
 export default {
   urlByAppendingParams,
@@ -406,5 +423,6 @@ export default {
   fullDay,
   toFixed,
   billStatus,
-  get_platform_name
+  get_platform_name,
+  autoPlat,
 }
