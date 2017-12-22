@@ -109,7 +109,10 @@ class WorkerScene extends PureComponent {
       dispatch(fetchWorkers(vendor_id, accessToken, (resp) => {
         if (resp.ok) {
           let {normal, forbidden, user_list} = resp.obj;
-          let limit_store = user_list[currentUser]['store_id'];
+          let limit_store = 0;
+          if(user_list[currentUser]){
+            limit_store = user_list[currentUser]['store_id'];
+          }
           console.log('limit_store -> ', limit_store);
           _this.setState({
             normal: normal,
