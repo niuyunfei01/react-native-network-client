@@ -795,7 +795,6 @@ const worker_styles = StyleSheet.create({
     marginVertical: pxToDp(25),
     width: pxToDp(90),
     height: pxToDp(90),
-    backgroundColor: '#f2f2f2',
     borderRadius: pxToDp(50),
   },
   worker_box: {
