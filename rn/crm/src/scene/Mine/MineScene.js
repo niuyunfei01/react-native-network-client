@@ -576,7 +576,7 @@ class MineScene extends PureComponent {
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
           onPress={() => {
-              this.onPress(Config.ROUTE_HELP_SCENE)
+              this.onPress(Config.ROUTE_HELP)
           }}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>

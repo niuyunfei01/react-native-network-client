@@ -237,7 +237,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
         [Config.ROUTE_GOODS_BATCH_PRICE]:{screen:GoodsBatchPriceScene},
         [Config.ROUTE_GOODS_APPLY_RECORD]:{screen:GoodsApplyRecordScene},
-        [Config.ROUTE_HELP_SCENE]: {screen: HelpScene},
+        [Config.ROUTE_HELP]: {screen: HelpScene},
 
 
       },

@@ -709,8 +709,6 @@ class OrderScene extends Component {
     }));
   }
 
-
-
   renderWayRecord() {
     let orderWayLogs = this.state.orderWayLogs
     if (!this.state.shipHided) {
