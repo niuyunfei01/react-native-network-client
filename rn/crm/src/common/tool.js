@@ -124,7 +124,7 @@ export function vendor(global) {
   let manager = ',' + mgr_ids.join(',') + ',';
   let is_mgr = manager.indexOf(',' + currentUser + ',') !== -1;
 
-  let service_manager = ',' + mgr_ids.join(',') + ',';
+  let service_manager = ',' + service_ids.join(',') + ',';
   let is_service_mgr = service_manager.indexOf(',' + currentUser + ',') !== -1;
 
   let {help_uid} = config;

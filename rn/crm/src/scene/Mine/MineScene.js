@@ -21,7 +21,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {fetchWorkers, fetchUserCount, fetchStoreTurnover} from "../../reducers/mine/mineActions";
+import {fetchWorkers, fetchUserCount, fetchStoreTurnover, userCanChangeStore} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -42,6 +42,7 @@ function mapDispatchToProps(dispatch) {
       fetchStoreTurnover,
       fetchUserInfo,
       upCurrentProfile,
+      userCanChangeStore,
       ...globalActions
     }, dispatch)
   }
@@ -104,6 +105,7 @@ class MineScene extends PureComponent {
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
+    this.onCanChangeStore = this.onCanChangeStore.bind(this);
     this.onPress = this.onPress.bind(this);
     this.onGetUserCount = this.onGetUserCount.bind(this);
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
@@ -282,6 +284,20 @@ class MineScene extends PureComponent {
     });
   }
 
+  onCanChangeStore(store_id) {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+
+    let _this = this;
+    dispatch(userCanChangeStore(store_id, accessToken, (resp) => {
+      if(resp.obj.auth_store_change){
+        _this._doChangeStore(store_id);
+      } else {
+        ToastLong('您没有访问该门店的权限');
+      }
+    }));
+  }
+
   renderHeader() {
     let {currStoreId} = this.state;
     return (
@@ -290,7 +306,7 @@ class MineScene extends PureComponent {
           <Text style={header_styles.shop_name}>{this.state.currStoreName}</Text>
           <ModalSelector
             onChange={(option) => {
-              this._doChangeStore(option.key)
+              this.onCanChangeStore(option.key)
             }}
             skin='customer'
             defaultKey={currStoreId}
