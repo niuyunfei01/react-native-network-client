@@ -175,7 +175,7 @@ class OrderBottom extends PureComponent {
                 label: '立即呼叫',
                 onPress: () => {
                     this.setState({dlgShipVisible: false});
-                    this._doReply();
+                    // this._doReply();
                 },
               },
               this._defCloseBtn('关闭')
