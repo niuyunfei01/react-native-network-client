@@ -38,6 +38,8 @@ public class StorageItem {
     private int when_sale_again;
     private String tag_code;
     private int price;
+    private int supplyPrice;
+    private int applyingPrice;
     private String thumbPicUrl;
 
     public int getProduct_id() {
@@ -239,6 +241,21 @@ public class StorageItem {
         return String.format("%.2f", (double)this.price/100);
     }
 
+    public String getSupplyPricePrecision(){
+        return String.format("￥%.2f", (double)this.supplyPrice/100);
+    }
+    public String getSupplyPricePrecisionNoSymbol() {
+        return String.format("%.2f", (double)this.supplyPrice/100);
+    }
+
+    public String getApplyingPricePrecision(){
+        return String.format("￥%.2f", (double)this.applyingPrice/100);
+    }
+    public String getApplyingPricePrecisionNoSymbol() {
+        return String.format("%.2f", (double)this.applyingPrice/100);
+    }
+
+
     public int getPrice() {
         return price;
     }
@@ -257,5 +274,21 @@ public class StorageItem {
 
     public String leftNumberStr() {
         return "库存 " + this.getLeft_since_last_stat();
+    }
+
+    public int getSupplyPrice() {
+        return supplyPrice;
+    }
+
+    public void setSupplyPrice(int supplyPrice) {
+        this.supplyPrice = supplyPrice;
+    }
+
+    public int getApplyingPrice() {
+        return applyingPrice;
+    }
+
+    public void setApplyingPrice(int applyingPrice) {
+        this.applyingPrice = applyingPrice;
     }
 }

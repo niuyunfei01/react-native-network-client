@@ -48,6 +48,15 @@ export default {
   REFUND_AUDIT_AGREE: 1, //同意退款
   REFUND_AUDIT_REFUSE: 0, //拒绝退款
 
+  //审核状态
+  AUDIT_STATUS_WAIT: 0,//审核中
+  AUDIT_STATUS_PASSED: 1,//已完成
+  AUDIT_STATUS_FAILED: 2,//未完成
+  //
+  BILL_STATUS_WAIT : 0,//待打款
+  BILL_STATUS_PAID : 1,//已打款
+  BILL_STATUS_INVALID : 2,//已作废
+
 
   WM_PLAT_ID_BD: 1,
   WM_PLAT_ID_WX: 2,
@@ -89,6 +98,20 @@ export default {
   FN_STATUS_ARRIVED: 3, //	已送达	蜂鸟配送开放平台将已送达状态回调给商户, 不支持取消
   FN_STATUS_CANCELED: 4, //	已取消(同步取消不需要关注此状态)	商户主动取消订单请求处理成功后,蜂鸟配送开放平台将已取消状态回调给商户
   FN_STATUS_ABNORMAL: 5, //	异常	推单到物流开放平台后任何阶段产生异常,蜂鸟配送开放平台将异常状态回调给商户
+ //专送status
+  ZS_STATUS_NEVER_START:0,//待召唤
+  ZS_STATUS_TO_ACCEPT:1,//待接单
+  ZS_STATUS_TO_FETCH:2,//待取货
+  ZS_STATUS_ON_WAY:3,//在途
+  ZS_STATUS_ARRIVED:4,//送达
+  ZS_STATUS_CANCEL:5,//取消
+  ZS_STATUS_TO_ACCEPT_EX:21,//选自送状态
+
+  //
+  SHIP_ZS_JD : 21,//京东专送
+  SHIP_ZS_MT : 22, //美团专送
+  SHIP_ZS_ELE : 23, //饿了专送
+  SHIP_ZS_BD : 24, //百度专送
 
   TAG_HIDE: '74911547', //列表中隐藏tag_id
 

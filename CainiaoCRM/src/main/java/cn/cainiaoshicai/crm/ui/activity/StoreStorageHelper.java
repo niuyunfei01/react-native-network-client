@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -137,10 +138,10 @@ public class StoreStorageHelper {
                 return;
             }
 
-            if (item.getLeft_since_last_stat() <= 1 ) {
-                AlertUtil.showAlert(context, R.string.tip_dialog_title, R.string.alert_msg_storage_empty_cannot_sold);
-                return;
-            }
+//            if (item.getLeft_since_last_stat() <= 1 ) {
+//                AlertUtil.showAlert(context, R.string.tip_dialog_title, R.string.alert_msg_storage_empty_cannot_sold);
+//                return;
+//            }
 
             new MyAsyncTask<Void, Void, Void>() {
                 @Override protected Void doInBackground(Void... params) {
@@ -263,7 +264,7 @@ public class StoreStorageHelper {
                                     @Override
                                     public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
                                         ResultBean body = response.body();
-                                        if (body.isOk()) {
+                                        if (body!=null&&body.isOk()) {
                                             item.setPrice(newCents);
                                             if (succCallback != null) {
                                                 succCallback.run();
@@ -286,6 +287,73 @@ public class StoreStorageHelper {
         et.requestFocus();
         return dlg;
     }
+
+    public static AlertDialog createApplyChangeSupplyPrice(final Activity activity, final StorageItem item,
+                                                           final LayoutInflater inflater, final Runnable succCallback) {
+
+        View npView = inflater.inflate(R.layout.apply_change_supply_price, null);
+
+        final TextView label = npView.findViewById(R.id.now_price_label);
+        label.setText("申请调整价格 (原价: " + item.getSupplyPricePrecision() + ")");
+
+        final EditText input = npView.findViewById(R.id.number_apply_price);
+        input.setText(item.getSupplyPricePrecisionNoSymbol());
+        final EditText remarkInput = npView.findViewById(R.id.remark_edit_txt);
+
+        final CheckBox checkBox = npView.findViewById(R.id.setAutoOnsale);
+        checkBox.setVisibility (item.getStatus() != StorageItem.STORE_PROD_ON_SALE ? View.VISIBLE : View.GONE);
+
+        AlertDialog dlg = new AlertDialog.Builder(activity)
+                .setTitle(item.getName())
+                .setView(npView)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                String priceStr = input.getText().toString();
+                                if (TextUtils.isEmpty(priceStr)) {
+                                    AlertUtil.error(activity, "价格不能为空");
+                                    return;
+                                }
+                                final int newCents = (int) (100 * Double.parseDouble(priceStr));
+                                if (newCents < 1) {
+                                    AlertUtil.error(activity, "价格不能低于1分钱");
+                                    return;
+                                }
+                                String remark = remarkInput.getText().toString();
+                                int storeId = item.getStore_id();
+                                int productId = item.getProduct_id();
+                                int beforePrice = item.getSupplyPrice();
+                                boolean autoOnSale = checkBox.isChecked();
+                                Store store = GlobalCtx.app().findStore(storeId);
+                                Call<ResultBean> rb = GlobalCtx.app().dao.store_apply_price(store.getType(), storeId, productId, beforePrice, newCents, remark, autoOnSale ? 1 : 0);
+                                rb.enqueue(new Callback<ResultBean>() {
+                                    @Override
+                                    public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
+                                        ResultBean body = response.body();
+                                        if (body != null && body.isOk()) {
+                                            item.setApplyingPrice(newCents);
+                                            if (succCallback != null) {
+                                                succCallback.run();
+                                            }
+                                            Toast.makeText(activity, "价格已修改申请已经提交", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            AlertUtil.showAlert(activity, "错误提示", "保存失败：" + (body != null ? body.getDesc() : ""));
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResultBean> call, Throwable t) {
+                                        AlertUtil.showAlert(activity, "错误提示", "无法连接服务器");
+                                    }
+                                });
+                            }
+                        })
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        input.requestFocus();
+        return dlg;
+    }
+
 
     static AlertDialog createEditProvideDlg(final StoreStorageActivity activity, final StorageItem item) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -56,6 +56,10 @@ import OrderCancelShip from "../scene/Order/OrderCancelShip";
 
 import  HelpScene from '../scene/Help/HelpScene';
 
+import SettlementScene from '../scene/Settlement/SettlementScene';
+import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
+import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
+
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -231,12 +235,16 @@ class Navigator extends Component {
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
-        [Config.ROUTE_VERSION]: {screen: VersionScene},
-        [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
-        [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
-        [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
+        [Config.ROUTE_VERSION]: { screen: VersionScene },
+        [Config.ROUTE_SELECT_STORE]: { screen: SelectStoreScene },
+        [Config.ROUTE_GOODS_EDIT]: {screen:GoodsEditScene},
+        [Config.ROUTE_GOODS_CLASSIFY]: { screen: GoodsClassifyScene },
+        [Config.ROUTE_GOODS_APPLY_RECORD]: { screen: GoodsApplyRecordScene },
+        [Config.ROUTE_SETTLEMENT]: { screen: SettlementScene },
+        [Config.ROUTE_SETTLEMENT_DETAILS]: { screen: SettlementDetailsScene },
+        [Config.ROUTE_SETTLEMENT_ORDER]: { screen: SettlementOrderScene},
+
         [Config.ROUTE_GOODS_BATCH_PRICE]:{screen:GoodsBatchPriceScene},
-        [Config.ROUTE_GOODS_APPLY_RECORD]:{screen:GoodsApplyRecordScene},
         [Config.ROUTE_HELP]: {screen: HelpScene},
 
 

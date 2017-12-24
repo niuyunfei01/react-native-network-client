@@ -151,30 +151,34 @@ public class OrderListFragment extends Fragment {
                         OrderPrinter.printWhenNeverPrinted(order.getPlatform(), order.getPlatform_oid(), new BasePrinter.PrintCallback() {
                             @Override
                             public void run(boolean result, String desc) {
-                                fragment.getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        order.incrPrintTimes();
-                                        fragment.getAdapter().notifyDataSetChanged();
-                                    }
-                                });
+                                FragmentActivity activity = fragment.getActivity();
+                                if (activity != null) {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            order.incrPrintTimes();
+                                            fragment.getAdapter().notifyDataSetChanged();
+                                        }
+                                    });
+                                }
                             }
                         });
                     }
                 }
 
                 final MainActivity context = (MainActivity) fragment.getActivity();
-
-                //notify reset on main thread
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        fragment.data.clear();
-                        fragment.data.addAll(value.getOrders());
-                        fragment.getAdapter().notifyDataSetChanged();
-                        context.updateStatusCnt(value.getTotals());
-                    }
-                });
+                if (context != null) {
+                    //notify reset on main thread
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment.data.clear();
+                            fragment.data.addAll(value.getOrders());
+                            fragment.getAdapter().notifyDataSetChanged();
+                            context.updateStatusCnt(value.getTotals());
+                        }
+                    });
+                }
 
                 AppLogger.d("display data: type=" + fragment.listType.getValue() + ", size=" + fragment.data.size());
             } else {

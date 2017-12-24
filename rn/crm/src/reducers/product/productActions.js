@@ -138,6 +138,27 @@ export function batchPriceSave(vendor_id, data, token, callback) {
 
 }
 
+
+export function fetchApplyRocordList(viewStoreId, audit_status,page,token,callback) {
+
+  return dispatch => {
+    const url = `api/store_audit_list/${viewStoreId}/${audit_status}/${page}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          if (!resp.ok) {
+            ToastLong(resp.desc);
+          }
+          callback(resp);
+        }).catch((error) => {
+          ToastLong(error.message);
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
+
 function receiveVendorTags(_v_id, vendor_tags = {}) {
   return {
     type: GET_VENDOR_TAGS,

@@ -58,7 +58,7 @@ const C = {
   defaultHost: 'www.cainiaoshicai.cn',
   'AppName': 'Crm',
 
-  'DownloadUrl': `https://www.cainiaoshicai.cn/cc.apk`,
+  'DownloadUrl': `https://www.cainiaoshicai.cn/util/crm_dl`,
   MAP_WAY_URL: 'util/amap_way',
   FetchTimeout: 30000,
 
@@ -109,7 +109,11 @@ const C = {
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD:'GoodsApplyRecord',
   ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
-    ROUTE_HELP_SCENE:'Help',
+  ROUTE_HELP_SCENE:'Help',
+  ROUTE_SETTLEMENT:'Settlement',
+  ROUTE_SETTLEMENT_DETAILS:'SettlementDetails',
+  ROUTE_SETTLEMENT_ORDER:'SettlementOrder',
+
   serverUrl,
   apiUrl,
   staticUrl,
