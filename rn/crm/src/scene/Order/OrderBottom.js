@@ -4,13 +4,13 @@ import {Button, Dialog} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
 import {native, tool} from "../../common"
 import PropTypes from 'prop-types'
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from "../../Cts";
 import Config from "../../config";
 import styles from './OrderStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {orderSetArrived} from '../../reducers/order/orderActions'
+import {orderCallShip, orderSetArrived} from '../../reducers/order/orderActions'
 import Toast from "../../weui/Toast/Toast";
 
 const numeral = require('numeral');
@@ -20,6 +20,8 @@ function mapStateToProps(state) {
   return {
     global: state.global,
     store: state.store,
+    onSubmitting:false,
+
   };
 }
 
@@ -31,7 +33,6 @@ class OrderBottom extends PureComponent {
 
   constructor(props) {
     super(props);
-    console.log('>>>>>>>>>>>>>>>>', props.order)
     this.state = {
       dlgShipVisible: false,
       dlgShipButtons: [{
@@ -77,7 +78,6 @@ class OrderBottom extends PureComponent {
 
   _setOrderArrived = () => {
     const {dispatch, order, global} = this.props;
-
     this.setState({onSubmitting: true, dlgShipVisible: false});
     dispatch(orderSetArrived(global.accessToken, order.id, (ok, msg, data) => {
       this.setState({onSubmitting: false});
@@ -135,11 +135,23 @@ class OrderBottom extends PureComponent {
       label: title,
       onPress: () => { this.setState({dlgShipVisible: false}) }
     }};
+  _doReply(){
+    const {dispatch, global, order} = this.props;
+    this.setState({onSubmitting: true});
+    dispatch(orderCallShip(global.accessToken, order.id, order.auto_ship_type, (ok, msg, data) => {
+      this.setState({onSubmitting: false});
+      if (ok) {
+        ToastLong('呼叫成功!')
+      } else {
+        this.setState({errorHints: msg});
+      }
+    }))
 
-
+}
   _onShipInfoBtnClicked () {
     let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
       auto_ship_type, zs_status,dada_call_at} = this.props.order;
+    zs_status=21;
     dada_status = parseInt(dada_status);
     zs_status = parseInt(zs_status);
     auto_ship_type = parseInt(auto_ship_type);
@@ -151,27 +163,39 @@ class OrderBottom extends PureComponent {
       ToastShort("请使用老版本修改送达时间");
     } else {
 
-      console.log(auto_ship_type, zs_status, auto_plat);
-
       if (auto_ship_type === Cts.SHIP_ZS_JD || auto_ship_type === Cts.SHIP_ZS_MT
           || auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD) {
         switch (zs_status) {
           case Cts.ZS_STATUS_CANCEL:
           case Cts.ZS_STATUS_NEVER_START:
-
             title = '呼叫专送';
             msg = zs_status === Cts.ZS_STATUS_CANCEL ? '现在重新呼叫专送吗?' : '现在呼叫专送吗?';
             buttons = [
               {
                 label: '立即呼叫',
                 onPress: () => {
-                  this.setState({dlgShipVisible: false});
+                    this.setState({dlgShipVisible: false});
+                    // this._doReply();
                 },
               },
               this._defCloseBtn('关闭')
             ];
             break;
           case Cts.ZS_STATUS_TO_ACCEPT:
+            break;
+          case Cts.ZS_STATUS_TO_ACCEPT_EX:
+            title = '呼叫配送';
+            msg = '现在呼叫专送吗?';
+            buttons = [
+              {
+                label: '立即呼叫',
+                onPress: () => {
+                  this.setState({dlgShipVisible: false});
+                  this._callShipDlg();
+                },
+              },
+              this._defCloseBtn('关闭')
+            ];
             break;
         }
       } else if (dada_status === Cts.DADA_STATUS_NEVER_START) {
@@ -399,7 +423,26 @@ class OrderBottom extends PureComponent {
       {this._visibleShipInfoBtn() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
                                              onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
     </View>}
+      <Toast
+          icon="loading"
+          show={this.state.onSubmitting}
+          onRequestClose={() => {
+          }}
+      >提交中</Toast>
+      <Dialog onRequestClose={() => {
+      }}
+              visible={!!this.state.errorHints}
+              buttons={[{
+                type: 'default',
+                label: '知道了',
+                onPress: () => {
+                  this.setState({errorHints: ''})
+                }
+              }]}
+      ><Text>{this.state.errorHints}</Text></Dialog>
     </View>;
+
+
   }
 }
 

@@ -114,7 +114,6 @@ class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-
     let {backPage} = params;
     return {
       headerLeft: (<NavigationItem
@@ -703,8 +702,10 @@ class OrderScene extends Component {
   }
 
   wayRecordQuery() {
-    const { dispatch, order, global } = this.props;
-    dispatch(orderWayRecord(order.order_id, global.accessToken, (ok, msg, contacts) => {
+    const { dispatch, global ,navigation} = this.props;
+    let {orderId} = navigation.state.params;
+    console.log('>>>>>>>>>>>>>>>wayRecordQuery',orderId)
+    dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
 
@@ -799,14 +800,13 @@ class OrderScene extends Component {
   }
   _orderChangeLog() {
     this.setState({ changeHide: !this.state.changeHide })
-    // if (this.state.changeHide) {
-    //   this.setState({changeLoadingShow:true})
-    //
-    // }
   }
+
   _orderChangeLogQuery() {
-    const { dispatch, order, global } = this.props;
-    dispatch(orderChangeLog(order.order_id, global.accessToken, (ok, msg, contacts) => {
+    const {dispatch, global, navigation} = this.props;
+    let {orderId} = navigation.state.params;
+    console.log('>>>>>>>>>>>>>>>_orderChangeLogQuery', orderId)
+    dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
       } else {
@@ -836,13 +836,13 @@ class OrderScene extends Component {
     }
   }
   upAddTip(){
-    let {id} = this.props.order.order;
+    let {orderId} = this.props.navigation.state.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
     if(addMoneyNum > 0){
       this.setState({onSubmitting: true});
-      dispatch(addTipMoney(id, addMoneyNum,accessToken, async (resp) => {
+      dispatch(addTipMoney(orderId, addMoneyNum,accessToken, async (resp) => {
         if (resp.ok) {
           ToastLong('加小费成功')
         } else {
