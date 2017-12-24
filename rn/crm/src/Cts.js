@@ -105,6 +105,8 @@ export default {
   ZS_STATUS_ON_WAY:3,//在途
   ZS_STATUS_ARRIVED:4,//送达
   ZS_STATUS_CANCEL:5,//取消
+  ZS_STATUS_TO_ACCEPT_EX:21,//选自送状态
+
   //
   SHIP_ZS_JD : 21,//京东专送
   SHIP_ZS_MT : 22, //美团专送
