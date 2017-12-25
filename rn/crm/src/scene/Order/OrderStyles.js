@@ -104,7 +104,16 @@ const styles = StyleSheet.create({
     paddingRight: 5,
     paddingTop: 2,
     paddingBottom: 2
+  },
+  product_img:{
+    height: pxToDp(90),
+    width: pxToDp(90),
+    marginRight:pxToDp(15),
+    borderRadius:10,
+    borderWidth:pxToDp(1),
+    borderColor:'#999'
   }
+
 });
 
 export default styles;
