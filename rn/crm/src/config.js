@@ -110,6 +110,7 @@ const C = {
   ROUTE_SETTLEMENT:'Settlement',
   ROUTE_SETTLEMENT_DETAILS:'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER:'SettlementOrder',
+  ROUTE_SELECT_WORKER:'SelectWorkerScene',
 
 
   

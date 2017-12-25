@@ -109,7 +109,8 @@ export function vendor(global) {
   if (owner_id !== '' && owner_id !== undefined && owner_id > 0) {
     mgr_ids.push(owner_id);
   }
-  if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
+  //if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
+  if (vice_mgr !== '' && vice_mgr !== undefined) {//可能有多个 -> '811488,822472'
     mgr_ids.push(vice_mgr);
   }
   if (service_uid !== '' && service_uid !== undefined && service_uid > 0) {

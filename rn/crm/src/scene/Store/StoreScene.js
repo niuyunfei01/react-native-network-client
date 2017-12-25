@@ -152,8 +152,28 @@ class StoreScene extends PureComponent {
     let _this = this;
     return curr_stores.map(function (store, idx) {
       let {nickname} = (curr_user_list[store.owner_id] || {});
-      let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
-      let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
+      // let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
+      // let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
+
+      let storeTel = [{tel: store.tel, desc: '门店'}, {tel: store.mobile, desc: nickname}];
+      let vice_mgr_name = '';
+      if(!!store.vice_mgr && store.vice_mgr !== '0'){
+        for (let vice_mgr of store.vice_mgr.split(',')){
+          if(vice_mgr > 0){
+            let user_info = (curr_user_list[vice_mgr] || {});
+            if (!!user_info) {
+              let mgr_name = user_info['name'] || user_info['nickname'];
+              let mgr_tel = user_info['mobilephone'];
+              if(vice_mgr_name !== ''){
+                vice_mgr_name += ',';
+              }
+              storeTel.push({tel: mgr_tel, desc: mgr_name});
+              vice_mgr_name += mgr_name;
+            }
+          }
+        }
+      }
+
       return (
         <Cells style={[styles.cells]} key={idx}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
@@ -189,10 +209,10 @@ class StoreScene extends PureComponent {
               <Text style={[styles.address]}>{store.dada_address}</Text>
               <View style={styles.store_footer}>
                 <TouchableOpacity onPress={() => {
-                  let storeTel = [{tel: store.tel, desc: '门店'}, {tel: store.mobile, desc: nickname}];
-                  if (vice_mgr_name !== undefined && vice_mgr_tel !== undefined) {
+                  /*let storeTel = [{tel: store.tel, desc: '门店'}, {tel: store.mobile, desc: nickname}];
+                  if (!!vice_mgr_name && !!vice_mgr_tel) {
                     storeTel.push({tel: vice_mgr_tel, desc: vice_mgr_name});
-                  }
+                  }*/
                   _this.setState({
                     showCallStore: true,
                     storeTel: storeTel,
@@ -203,8 +223,8 @@ class StoreScene extends PureComponent {
                     source={require('../../img/Store/call_.png')}
                   />
                 </TouchableOpacity>
-                {nickname === undefined ? null : <Text style={styles.owner_name}>店长: {nickname}</Text>}
-                {vice_mgr_name === undefined ? null : <Text style={styles.owner_name}>店助: {vice_mgr_name}</Text>}
+                {!nickname ? null : <Text style={styles.owner_name}>店长: {nickname}</Text>}
+                {!vice_mgr_name ? null : <Text style={styles.owner_name} numberOfLines={1}>店助: {vice_mgr_name}</Text>}
                 <Text style={styles.remind_time}>催单间隔: {store.call_not_print}分钟</Text>
               </View>
             </CellBody>
@@ -390,6 +410,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.color333,
     alignSelf: 'flex-end',
+    maxWidth: pxToDp(220),
   },
   remind_time: {
     fontSize: pxToDp(26),

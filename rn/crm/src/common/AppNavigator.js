@@ -54,6 +54,7 @@ import OrderCancelShip from "../scene/Order/OrderCancelShip";
 import SettlementScene from '../scene/Settlement/SettlementScene';
 import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
 import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
+import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
 
 SettlementDetailsScene
 
@@ -240,6 +241,7 @@ class Navigator extends Component {
         [Config.ROUTE_SETTLEMENT]: { screen: SettlementScene },
         [Config.ROUTE_SETTLEMENT_DETAILS]: { screen: SettlementDetailsScene },
         [Config.ROUTE_SETTLEMENT_ORDER]: { screen: SettlementOrderScene},
+        [Config.ROUTE_SELECT_WORKER]: { screen: SelectWorkerScene},
 
 
       },
