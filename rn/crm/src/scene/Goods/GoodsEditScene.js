@@ -142,6 +142,7 @@ class GoodsEditScene extends PureComponent {
     let _this = this;
     let {params} = this.props.navigation.state;
     let {type} = params;
+    console.log('>>>>>>>>>>.params',params);
    
     if (type === 'edit') {
       // let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
@@ -247,7 +248,7 @@ class GoodsEditScene extends PureComponent {
         json.key = key
         arr.push(json)
       }
-    })
+    });
     return arr
   }
 
@@ -278,7 +279,7 @@ class GoodsEditScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
-    console.log(check_res)
+    console.log(check_res,formData)
     // if(check_res){
     //   dispatch(productSave(formData,accessToken, async(ok,reason,obj)=>{
     //     console.log(ok,reason,obj)
@@ -339,7 +340,7 @@ class GoodsEditScene extends PureComponent {
 
   renderAddGood() {
     let {type} = this.props.navigation.state.params;
-    let _this = this
+    let _this = this;
     if (!(type === 'edit')) {
       return <View>
         <GoodAttrs name="门店信息"/>
