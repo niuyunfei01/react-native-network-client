@@ -63,6 +63,8 @@ class GoodsBatchPriceScene extends PureComponent {
 
   constructor(props) {
     super(props);
+    let {fnProviding} = tool.vendor(this.props.global);
+
     this.state = {
       selling_categories: [
         {
@@ -90,7 +92,8 @@ class GoodsBatchPriceScene extends PureComponent {
       flag: 0,
       productList: {},
       productListCopy: {},
-      uploading: false
+      uploading: false,
+      fnProviding:fnProviding
     };
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.renderList = this.renderList.bind(this);
@@ -112,14 +115,11 @@ class GoodsBatchPriceScene extends PureComponent {
 
   handleObj(store_product) {
     tool.objectMap(store_product, (item, index) => {
-      console.log(item.price);
       item.price = item.price / 100;
       item.left_since_last_stat = parseInt(item.left_since_last_stat)
     });
     return store_product
-
   }
-
   getVendorProduct() {
     let _this = this;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -140,7 +140,6 @@ class GoodsBatchPriceScene extends PureComponent {
       }))
     }
   }
-
   renderOperation(s_product, store_id) {
     let flag = this.getChange(s_product, store_id);
     if (flag) {
@@ -227,8 +226,8 @@ class GoodsBatchPriceScene extends PureComponent {
       return alert(false, '请重新选择状态！')
     } else if (!((provided == Cts.STORE_COMMON_PROVIDED) || (provided == Cts.STORE_SELF_PROVIDED))) {
       return alert(false, '请重新选择订货方式！')
-    } else if (stock <= 0 || isNaN(stock) ) {
-      return alert(false,'库存必须大于0')
+    } else if (stock < 0 || isNaN(stock) ) {
+      return alert(false,'库存不能小于0')
     }
     function alert(flag, msg) {
       ToastLong(msg);
@@ -263,7 +262,8 @@ class GoodsBatchPriceScene extends PureComponent {
                   style={[
                     styles.item_font_style, {
                       width: '100%'
-                    }
+                    },
+                    styles.title_item
                   ]}
                   // 库存
                   keyboardType='numeric'
@@ -290,7 +290,8 @@ class GoodsBatchPriceScene extends PureComponent {
                   }}/>
             </View>
 
-            <ModalSelector
+            {
+              _this.state.fnProviding ?  <ModalSelector
                 skin='customer'
                 data={_this.state.head_supplies}
                 onChange={(option) => {
@@ -304,7 +305,9 @@ class GoodsBatchPriceScene extends PureComponent {
                   {_this.headerSupply(productItem.self_provided)}
                 </Text>
               </View>
-            </ModalSelector>
+            </ModalSelector>:<View/>
+            }
+
             <View style={styles.save}>
               {_this.renderOperation(s_product, store_id)
               }
@@ -320,7 +323,6 @@ class GoodsBatchPriceScene extends PureComponent {
     map[Cts.STORE_SELF_PROVIDED] = '否';
     map[Cts.STORE_COMMON_PROVIDED] = '是';
     return map[mode]
-
   }
 
   render() {
@@ -333,23 +335,27 @@ class GoodsBatchPriceScene extends PureComponent {
               }}
           >提交中</Toast>
           <View style={styles.title}>
-            <View style={styles.store_name}>
+            <View style={styles.title_item}>
               <Text>门店名称
               </Text>
             </View>
             <View style={styles.title_item}>
               <Text>状态</Text>
             </View>
-            <View style={[styles.title_item, {}]}>
+            <View style={[styles.title_item]}>
               <Text>库存</Text>
             </View>
-            <View style={styles.price}>
+            <View style={styles.title_item}>
               <Text>价格</Text>
             </View>
-            <View style={styles.header_supply}>
-              <Text>总部订货</Text>
-            </View>
-
+            {
+              this.state.fnProviding ?
+                  <View style={[styles.header_supply, {marginRight: pxToDp(80)}]}>
+                    <Text>总部订货</Text>
+                  </View>
+                  :
+                  <Text style={{width: pxToDp(90)}}/>
+            }
           </View>
           <View style={{
             backgroundColor: '#fff'
@@ -367,12 +373,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     height: pxToDp(90),
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent:'space-between'
+
   },
   title_item: {
     width: pxToDp(120),
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
 
   },
   header_supply: {
@@ -393,7 +401,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: pxToDp(30),
-    borderBottomColor: '#EFEFEF'
+    borderBottomColor: '#EFEFEF',
+    justifyContent:'space-between'
   },
   item_font_style: {
     fontSize: pxToDp(30),
