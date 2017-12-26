@@ -302,10 +302,12 @@ public class GlobalCtx extends Application {
 
 
     public void updateCfgInterval() {
-        this.initConfigs(SettingUtility.getListenerStore());
-        this.listStores(true);
-        this.listTags(SettingUtility.getListenerStore(), true);
-        this.updateShipOptions();
+        if (!TextUtils.isEmpty(this.token())) {
+            this.initConfigs(SettingUtility.getListenerStore());
+            this.listStores(true);
+            this.listTags(SettingUtility.getListenerStore(), true);
+            this.updateShipOptions();
+        }
     }
 
     private void initConfigs(final long storeId) {
