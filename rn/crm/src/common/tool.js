@@ -109,7 +109,8 @@ export function vendor(global) {
   if (owner_id !== '' && owner_id !== undefined && owner_id > 0) {
     mgr_ids.push(owner_id);
   }
-  if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
+  //if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
+  if (vice_mgr !== '' && vice_mgr !== undefined) {//可能有多个 -> '811488,822472'
     mgr_ids.push(vice_mgr);
   }
   if (service_uid !== '' && service_uid !== undefined && service_uid > 0) {
@@ -124,7 +125,7 @@ export function vendor(global) {
   let manager = ',' + mgr_ids.join(',') + ',';
   let is_mgr = manager.indexOf(',' + currentUser + ',') !== -1;
 
-  let service_manager = ',' + mgr_ids.join(',') + ',';
+  let service_manager = ',' + service_ids.join(',') + ',';
   let is_service_mgr = service_manager.indexOf(',' + currentUser + ',') !== -1;
 
   let {help_uid} = config;
@@ -316,7 +317,7 @@ export function disWay() {
   return map
 }
 
-export function storeActionSheet(canReadStores) {
+export function storeActionSheet(canReadStores, is_service_mgr = false) {
   let by = function(name,minor){
     return function(o,p){
       let a,b;
@@ -347,7 +348,7 @@ export function storeActionSheet(canReadStores) {
     if (store.id > 0) {
       let item = {
         key: store.id,
-        label: !!store.vendor ? (store.vendor + ':' + store.name) : store.name,
+        label: is_service_mgr && !!store.vendor ? (store.vendor + ':' + store.name) : store.name,
       };
       storeActionSheet.push(item);
     }

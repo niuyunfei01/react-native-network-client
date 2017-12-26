@@ -21,7 +21,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {fetchWorkers, fetchUserCount, fetchStoreTurnover} from "../../reducers/mine/mineActions";
+import {fetchWorkers, fetchUserCount, fetchStoreTurnover, userCanChangeStore} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -42,6 +42,7 @@ function mapDispatchToProps(dispatch) {
       fetchStoreTurnover,
       fetchUserInfo,
       upCurrentProfile,
+      userCanChangeStore,
       ...globalActions
     }, dispatch)
   }
@@ -62,8 +63,6 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     let prefer_store = '';
     let screen_name = '';
     let mobilephone = '';
@@ -75,8 +74,11 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, service_uid} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager,
+      is_mgr, is_helper, service_uid, is_service_mgr} = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores, (is_helper || is_service_mgr));
 
     this.state = {
       isRefreshing: false,
@@ -99,11 +101,13 @@ class MineScene extends PureComponent {
       currManager: currManager,
       is_mgr: is_mgr,
       is_helper: is_helper,
+      is_service_mgr: is_service_mgr,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.staticUrl(cover_image) : '',
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
+    this.onCanChangeStore = this.onCanChangeStore.bind(this);
     this.onPress = this.onPress.bind(this);
     this.onGetUserCount = this.onGetUserCount.bind(this);
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
@@ -195,8 +199,6 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     const {
       prefer_store,
       screen_name,
@@ -205,7 +207,10 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, is_service_mgr} = tool.vendor(this.props.global);
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores, (is_service_mgr || is_helper));
+
     this.setState({
       storeActionSheet: storeActionSheet,
 
@@ -282,6 +287,20 @@ class MineScene extends PureComponent {
     });
   }
 
+  onCanChangeStore(store_id) {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+
+    let _this = this;
+    dispatch(userCanChangeStore(store_id, accessToken, (resp) => {
+      if(resp.obj.auth_store_change){
+        _this._doChangeStore(store_id);
+      } else {
+        ToastLong('您没有访问该门店的权限');
+      }
+    }));
+  }
+
   renderHeader() {
     let {currStoreId} = this.state;
     return (
@@ -290,7 +309,7 @@ class MineScene extends PureComponent {
           <Text style={header_styles.shop_name}>{this.state.currStoreName}</Text>
           <ModalSelector
             onChange={(option) => {
-              this._doChangeStore(option.key)
+              this.onCanChangeStore(option.key)
             }}
             skin='customer'
             defaultKey={currStoreId}

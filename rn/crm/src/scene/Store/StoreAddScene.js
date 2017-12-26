@@ -245,7 +245,25 @@ class StoreAddScene extends PureComponent {
 
   render() {
     let {store_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips, user_list} = this.state;
-    let vice_mgr_name = vice_mgr > 0 ? user_list[vice_mgr]['nickname'] : undefined;
+    //let vice_mgr_name = !!vice_mgr ? user_list[vice_mgr]['nickname'] : undefined;
+
+    let vice_mgr_name = '';
+    if(!!vice_mgr && vice_mgr !== '0'){
+      for (let vice_mgr_id of vice_mgr.split(',')){
+        if(vice_mgr_id > 0){
+          let user_info = (user_list[vice_mgr_id] || {});
+          let mgr_name = user_info['name'] || user_info['nickname'];
+          //let mgr_tel = user_info['mobilephone'];
+          if (!!mgr_name) {
+            if(vice_mgr_name !== ''){
+              vice_mgr_name += ',';
+            }
+            vice_mgr_name += mgr_name;
+          }
+        }
+      }
+    }
+    let _this = this;
 
     return (
       <ScrollView style={{backgroundColor: colors.main_back}}>
@@ -402,7 +420,7 @@ class StoreAddScene extends PureComponent {
               <Label style={[styles.cell_label]}>店助</Label>
             </CellHeader>
             <CellBody>
-              <ModalSelector
+              {/*<ModalSelector
                 onChange={(option) => {
                   this.onCheckUser('vice_mgr', option.key)
                 }}
@@ -411,7 +429,21 @@ class StoreAddScene extends PureComponent {
                 defaultKey={vice_mgr}
               >
                 <Text style={styles.body_text}>{vice_mgr > 0 ? vice_mgr_name : '点击选择店助'}</Text>
-              </ModalSelector>
+              </ModalSelector>*/}
+              <TouchableOpacity onPress={() => {
+                let checked = !!vice_mgr ? vice_mgr.split(",") : [];
+                let params = {
+                  checked: checked,
+                  actionBeforeBack: (resp) => {
+                    console.log('actionBeforeBack resp => ', resp.checked_users);
+                    let vice_mgr = resp.checked_users.join(',');
+                    _this.setState({vice_mgr});
+                  },
+                };
+                this.props.navigation.navigate(Config.ROUTE_SELECT_WORKER, params);
+              }}>
+                <Text style={styles.body_text}>{!!vice_mgr && vice_mgr !== '0' ? vice_mgr_name : '点击选择店助'}</Text>
+              </TouchableOpacity>
             </CellBody>
           </Cell>
         </Cells>
@@ -598,7 +630,7 @@ class StoreAddScene extends PureComponent {
         send_data.id = store_id;
       }
       console.log('send_data -> ', send_data);
-      _this.setState({onSubmitting: false});
+      _this.setState({onSubmitting: true});
 
       InteractionManager.runAfterInteractions(() => {
         dispatch(saveOfflineStore(send_data, accessToken, (resp) => {

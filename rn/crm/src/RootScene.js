@@ -86,7 +86,8 @@ class RootScene extends PureComponent {
         store.dispatch(setPlatform('android'));
         store.dispatch(setUserProfile(userProfile));
         store.dispatch(setCurrentStore(currStoreId));
-        store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
+        //store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
+        store.dispatch(updateCfg({config}))
       }
 
       _g.setHostPortNoDef(store.getState().global, native, () => {
