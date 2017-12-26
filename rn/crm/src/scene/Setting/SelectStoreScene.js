@@ -44,7 +44,6 @@ class SelectStoreScene extends PureComponent {
     super(props);
 
     const {canReadStores} = this.props.global;
-
     let storeActionSheet = tool.storeActionSheet(canReadStores);
 
     this.state = {

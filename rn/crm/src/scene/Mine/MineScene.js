@@ -63,8 +63,6 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     let prefer_store = '';
     let screen_name = '';
     let mobilephone = '';
@@ -76,8 +74,11 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, service_uid} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager,
+      is_mgr, is_helper, service_uid, is_service_mgr} = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores, (is_helper || is_service_mgr));
 
     this.state = {
       isRefreshing: false,
@@ -100,6 +101,7 @@ class MineScene extends PureComponent {
       currManager: currManager,
       is_mgr: is_mgr,
       is_helper: is_helper,
+      is_service_mgr: is_service_mgr,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.staticUrl(cover_image) : '',
     };
@@ -197,8 +199,6 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     const {
       prefer_store,
       screen_name,
@@ -207,7 +207,10 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, is_service_mgr} = tool.vendor(this.props.global);
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores, (is_service_mgr || is_helper));
+
     this.setState({
       storeActionSheet: storeActionSheet,
 
