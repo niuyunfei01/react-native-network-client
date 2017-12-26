@@ -296,6 +296,23 @@ export function setWmStoreStatus(vendor_id, platform, wid, status, token, callba
   }
 }
 
+export function userCanChangeStore(store_id, token, callback) {
+  return dispatch => {
+    const url = `api/can_change_store/${store_id}.json?access_token=${token}`;
+
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+
 
 
 
