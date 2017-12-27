@@ -85,13 +85,6 @@ componentWillMount(){
     this.setState({dialog:true,errMsg:msg})
   }
 
-  ellipsis(str) {
-    if (str.length > 16) {
-      return `${str.substring(0, 13)}...`
-    } else {
-      return str
-    }
-  }
 
   getApplyList() {
     let store_id=0
@@ -173,7 +166,11 @@ componentWillMount(){
                       </View>
                       <View style={[styles.goods_name]}>
                         <View style={styles.name_text}>
-                          <Text>{`${this.ellipsis(item.product_name)}`}</Text>
+                          <Text
+                              numberOfLines={2}
+                          >
+                            {item.product_name}
+                            </Text>
                         </View>
                         <View>
                           <Text style={styles.name_time}>

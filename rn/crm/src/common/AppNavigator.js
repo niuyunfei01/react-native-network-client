@@ -46,9 +46,7 @@ import GoodsEditScene from '../scene/Goods/GoodsEditScene';
 import GoodsClassifyScene from '../scene/Goods/GoodsClassifyScene';
 import GoodsBatchPriceScene from "../scene/Goods/GoodsBatchPriceScene";
 import GoodsApplyRecordScene from '../scene/Goods/GoodsApplyRecordScene';
-
-
-
+import GoodsRelateScene from '../scene/Goods/GoodsRelateScene';
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
@@ -245,8 +243,8 @@ class Navigator extends Component {
         [Config.ROUTE_SETTLEMENT_DETAILS]: { screen: SettlementDetailsScene },
         [Config.ROUTE_SETTLEMENT_ORDER]: { screen: SettlementOrderScene},
         [Config.ROUTE_SELECT_WORKER]: { screen: SelectWorkerScene},
-
         [Config.ROUTE_GOODS_BATCH_PRICE]:{screen:GoodsBatchPriceScene},
+        [Config.ROUTE_GOODS_RELATE]:{screen:GoodsRelateScene},
         [Config.ROUTE_HELP]: {screen: HelpScene},
 
 

@@ -92,8 +92,7 @@ class GoodsEditScene extends PureComponent {
 
     super(props);
     let {store_tags} = this.props.product;
-    let {currVendorId} = tool.vendor(this.props.global);
-    let {fnProviding} = tool.vendor(this.props.global);
+    let {currVendorId ,fnProviding} = tool.vendor(this.props.global);
     const basic_categories = this.props.product.basic_category[currVendorId];
     const basic_cat_list = this.toModalData(basic_categories);
     
@@ -104,7 +103,7 @@ class GoodsEditScene extends PureComponent {
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
       basic_categories: basic_categories,
-      provided: -1,
+      provided: 1,
       name: '',
       sku_having_unit: '',
       content: '',
@@ -263,14 +262,15 @@ class GoodsEditScene extends PureComponent {
       content,
       upload_files,
     };
-    if (type === 'add') {
+    if (type == 'add') {
       formData.store_goods_status = {price: price, sale_status: sale_status, provided: provided};
     }
+    console.log(formData);
 
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
-
+    return false;
     if(check_res){
       this.setState({uploading:true});
       dispatch(productSave(formData,accessToken, async(ok,reason,obj)=>{
@@ -314,7 +314,7 @@ class GoodsEditScene extends PureComponent {
       err_msg = '请选择基础分类';
     } else if (basic_category == Cts.TAG_HIDE) {
       err_msg = '请勿将基础分类放入列表中隐藏';
-    } else if (store_categories.length < 0) {
+    } else if (store_categories.length <= 0) {
       err_msg = '请选择门店分类';
     } else if (Object.keys(upload_files).length < 1) {
       err_msg = '请添加商品图片';
@@ -494,9 +494,10 @@ class GoodsEditScene extends PureComponent {
               </CellHeader>
               <CellBody>
                 <TextInput
-                  placeholder='输入商品名(不超过14个字)'
+                  placeholder='输入商品名(不超过20个字)'
                   underlineColorAndroid='transparent'
                   placeholderTextColor={"#7A7A7A"}
+                  maxLength={20}
                   style={[styles.input_text]}
                   value={this.state.name}
                   onChangeText={(text) => {

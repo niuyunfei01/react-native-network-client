@@ -39,6 +39,7 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    console.log('params===',params);
     let {backPage,store_product, product_detail} = params;
     return {
       headerLeft: (
@@ -60,7 +61,6 @@ class GoodsDetailScene extends PureComponent {
         <TouchableOpacity
           onPress={() => {
             if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
-
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'edit',
@@ -169,7 +169,6 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, accessToken, (resp) => {
-          // console.log('product_detail -> ', resp);
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -325,7 +324,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   renderALlStore = () => {
-    let {store_product} = this.state;
+    let {store_product ,product_detail} = this.state;
     let {navigation} = this.props;
     if (!(tool.length(store_product) > 0)) {
       return <LoadingView/>;
@@ -337,19 +336,36 @@ class GoodsDetailScene extends PureComponent {
           <Text style={styles.title_name}>门店商品信息</Text>
           <View style={{flex: 1}}/>
           <TouchableOpacity
-            onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-
-                navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
-                  productId:this.productId,
-                  store_product:store_product,
-                  detail_key:navigation.state.key
+              style = {styles.related_edit}
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_GOODS_RELATE,{
+                    productId:this.productId,
+                    store_product:store_product,
+                    product_detail:product_detail,
+                    detail_key:navigation.state.key
+                  });
                 });
-
-              });
-            }}
+              }}
           >
-            <Text style={{fontSize: pxToDp(30), color: '#59b26a', height: pxToDp(70), textAlignVertical: 'center'}}>
+            <Text style={{fontSize: pxToDp(30), color: '#59b26a',  textAlignVertical: 'center',marginRight:pxToDp(30)}}>
+              关联
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              style = {styles.related_edit}
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
+                    productId:this.productId,
+                    store_product:store_product,
+                    detail_key:navigation.state.key
+                  });
+
+                });
+              }}
+          >
+            <Text style={{fontSize: pxToDp(30), color: '#59b26a', textAlignVertical: 'center',paddingLeft:pxToDp(30),borderLeftWidth:pxToDp(1),borderColor:'#ccc'}}>
               编辑
             </Text>
           </TouchableOpacity>
@@ -650,7 +666,12 @@ const styles = StyleSheet.create({
   },
   show_providing:{
     justifyContent:'space-between'
-  }
+  },
+  related_edit:{
+    flexDirection:'row',
+    alignItems:'center',
+    height:pxToDp(70),
+    alignItems:'center'}
 });
 
 

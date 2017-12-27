@@ -1,4 +1,6 @@
 'use strict';
+import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
+
 const {
   HOST_UPDATED,
 } = require('./common/constants').default
@@ -114,7 +116,7 @@ const C = {
   ROUTE_SETTLEMENT_DETAILS:'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER:'SettlementOrder',
   ROUTE_SELECT_WORKER:'SelectWorkerScene',
-
+  ROUTE_GOODS_RELATE: 'GoodsRelateScene',
   serverUrl,
   apiUrl,
   staticUrl,

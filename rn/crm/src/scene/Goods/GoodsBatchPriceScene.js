@@ -210,7 +210,6 @@ class GoodsBatchPriceScene extends PureComponent {
           this.setBeforeRefresh();
           this.state.productListCopy[store_id] = product;
           this.forceUpdate()
-
         } else {
           ToastLong(reason)
         }

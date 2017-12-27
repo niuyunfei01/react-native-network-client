@@ -5,10 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  RefreshControl,
-  InteractionManager,
-  TextInput,
-  Button
 } from 'react-native';
 
 import CheckboxCells from "../../weui/Form/CheckboxCells";
@@ -17,7 +13,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {NavigationActions} from 'react-navigation';
 import pxToDp from "../../util/pxToDp";
-import {create} from "../../weui/StyleSheet/index";
 import Cts from "../../Cts";
 
 function mapStateToProps(state) {
@@ -71,7 +66,7 @@ class GoodsClassifyScene extends PureComponent {
         arr.splice(index,1)
       }
 
-    })
+    });
     return arr
   }
 
@@ -84,7 +79,7 @@ class GoodsClassifyScene extends PureComponent {
           tag_list.push(item.name)
         }
       })
-    })
+    });
     return tag_list.join(',')
   }
 
