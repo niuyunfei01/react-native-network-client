@@ -135,7 +135,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
             }
 
-            throw new IllegalArgumentException("illegal filter:" + filter);
+            return null;
         }
 
         static int findIdx(int filter, boolean isPriceControlled) {
@@ -146,7 +146,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
             }
 
-            throw new IllegalArgumentException("illegal filter:" + filter);
+            return -1;
         }
     }
 
@@ -234,14 +234,16 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 Store cs = StoreStorageActivity.this.currStore;
                 boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
 
-                filter = StatusItem.find(FILTER_SOLD_EMPTY, priceControlled).status;
-                currStatusSpinner.setSelection(StatusItem.findIdx(filter, priceControlled));
-                searchTerm = "";
-                Tag tag = new Tag();
-                tag.setId(0);
-                currTag = tag;
-                AppLogger.d("start refresh data:");
-                refreshData();
+                if (!priceControlled) {
+                    filter = StatusItem.find(FILTER_SOLD_EMPTY, priceControlled).status;
+                    currStatusSpinner.setSelection(StatusItem.findIdx(filter, priceControlled));
+                    searchTerm = "";
+                    Tag tag = new Tag();
+                    tag.setId(0);
+                    currTag = tag;
+                    AppLogger.d("start refresh data:");
+                    refreshData();
+                }
             }
         });
 
@@ -517,8 +519,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, boolean isPriceControlled) {
         StatusItem.find(FILTER_ON_SALE, isPriceControlled).setNum(totalOnSale);
-        StatusItem.find(FILTER_OFF_SALE, isPriceControlled).setNum(totalOffSale);
         StatusItem.find(FILTER_SOLD_OUT, isPriceControlled).setNum(totalSoldOut);
+        StatusItem.find(FILTER_OFF_SALE, isPriceControlled).setNum(totalOffSale);
         if(this.currStatusSpinner != null) {
             ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
         }
