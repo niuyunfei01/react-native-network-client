@@ -46,7 +46,6 @@
         android:text="@string/add_prod"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@id/btn_apply_price_list"
-        android:layout_alignParentEnd="true"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
         android:minWidth="40dp"

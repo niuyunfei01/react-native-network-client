@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -238,6 +239,15 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
+        addNewBtn = findViewById(R.id.add_new_prod);
+        addNewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                app.toGoodsNew(StoreStorageActivity.this);
+            }
+        });
+
+        //Must after buttons initialized
         setHeadToolBar();
 
         ctv = findViewById(R.id.title_product_name);
@@ -308,14 +318,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         });
         currStatusSpinner.setSelection(StatusItem.findIdx(filter));
 
-        addNewBtn = findViewById(R.id.add_new_prod);
-        addNewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                app.toGoodsNew(StoreStorageActivity.this);
-            }
-        });
-
         final ListView categoryLv = findViewById(R.id.list_category);
         final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
         ArrayList<Tag> allTags = GlobalCtx.app().listTags(this.currStore != null ? this.currStore.getId() : 0);
@@ -362,15 +364,27 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
     }
 
-    private void setHeadToolBar(){
+    private void setHeadToolBar() {
         if (currStore.getFn_price_controlled() == 1) {
             this.btnReqList.setVisibility(View.INVISIBLE);
             this.btnEmptyList.setVisibility(View.INVISIBLE);
             this.btnApplyPriceList.setVisibility(View.VISIBLE);
+
+            if (this.addNewBtn != null) {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.addNewBtn.getLayoutParams();
+                params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+                this.addNewBtn.setLayoutParams(params);
+            }
         } else {
             this.btnReqList.setVisibility(View.VISIBLE);
             this.btnEmptyList.setVisibility(View.VISIBLE);
             this.btnApplyPriceList.setVisibility(View.INVISIBLE);
+
+            if (this.addNewBtn != null) {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.addNewBtn.getLayoutParams();
+                params.addRule(RelativeLayout.ALIGN_PARENT_END);
+                this.addNewBtn.setLayoutParams(params);
+            }
         }
     }
 
