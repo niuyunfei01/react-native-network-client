@@ -403,16 +403,19 @@ public class SettingUtility {
     public static void putOrderContainerCache(String key, OrderContainer value) {
         putSR(key, value);
         ArrayList<Order> orders = value.getOrders();
-        for(Order o : orders) {
-            int oid = o.getId();
-            String logKey = "ca_idx_o_" + oid;
+        if (orders != null) {
+            for (Order o : orders) {
+                int oid = o.getId();
+                String logKey = "ca_idx_o_" + oid;
 
-            HashSet<String> log = getSR(logKey, new TypeToken<HashSet<String>>(){}.getType());
-            if (log == null) {
-                log = new HashSet<>();
+                HashSet<String> log = getSR(logKey, new TypeToken<HashSet<String>>() {
+                }.getType());
+                if (log == null) {
+                    log = new HashSet<>();
+                }
+                log.add(key);
+                putSR(logKey, log);
             }
-            log.add(key);
-            putSR(logKey, log);
         }
     }
 
