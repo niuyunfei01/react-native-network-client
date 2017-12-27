@@ -82,12 +82,13 @@ class GoodsDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-
+    let {fnProviding} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       full_screen: false,
       product_detail: {},
       store_product: {},
+      fnProviding:fnProviding,
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
@@ -214,6 +215,12 @@ class GoodsDetailScene extends PureComponent {
     this.setState({isRefreshing: true});
     this.getProductDetail();
     this.getVendorProduct();
+  }
+  headerSupply(mode) {
+    let map = {};
+    map[Cts.STORE_SELF_PROVIDED] = '否';
+    map[Cts.STORE_COMMON_PROVIDED] = '是';
+    return map[mode]
   }
 
   render() {
@@ -347,11 +354,14 @@ class GoodsDetailScene extends PureComponent {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={[styles.store_head, styles.top_line]}>
+        <View style={[styles.store_head, styles.top_line,styles.show_providing]}>
           <Text style={[styles.title_text, styles.store_title]}>门店</Text>
           <Text style={[styles.title_text, styles.stock_title]}>库存</Text>
           <Text style={[styles.title_text, styles.sale_title]}>售价</Text>
-          <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text>
+          {
+            this.state.fnProviding ? <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text> : null
+          }
+
         </View>
         {this.renderStoreProduct(store_product)}
       </View>
@@ -365,14 +375,16 @@ class GoodsDetailScene extends PureComponent {
     return tool.objectMap(store_product, function (s_product, store_id) {
       is_dark_bg = !is_dark_bg;
       return (
-        <View key={store_id} style={[styles.store_info, styles.top_line]}>
+        <View key={store_id} style={[styles.store_info, styles.top_line,styles.show_providing]}>
           <View style={[styles.store_view]}>
             <Text style={[styles.info_text, styles.store_name]}>{s_product.store_name}</Text>
             {_this.renderIcon(parseInt(s_product.status))}
           </View>
           <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
           <Text style={[styles.info_text, styles.sale_price]}>¥ {s_product.price/100}</Text>
-          <Text style={[styles.info_text, styles.is_provide]}>是</Text>
+          {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
+            {_this.headerSupply(s_product.self_provided)}
+          </Text> : null}
         </View>
       );
     });
@@ -636,6 +648,9 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(28),
     color: '#bfbfbf',
   },
+  show_providing:{
+    justifyContent:'space-between'
+  }
 });
 
 

@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  ToastAndroid,
-  Alert,
 } from 'react-native';
 import {
   Cells,
@@ -34,9 +32,8 @@ import Cts from '../../Cts';
 import {color, NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
-import Toast from "../../weui/Toast/Toast";
-import Icon from '../../weui/Icon/Icon'
 import {NavigationActions} from "react-navigation";
+import {Toast,Dialog,Icon } from "../../weui/index";
 
 function mapStateToProps(state) {
   const {mine,product, global} = state;
@@ -131,6 +128,7 @@ class GoodsEditScene extends PureComponent {
       fnProviding:fnProviding,
       store_product:[],
       vendor_stores:'',
+      goBackValue:false,
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -142,17 +140,12 @@ class GoodsEditScene extends PureComponent {
     let _this = this;
     let {params} = this.props.navigation.state;
     let {type} = params;
-   
     if (type === 'edit') {
       // let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
       //   return {id: img_id, name: img_data.name};
       // });
       let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
       const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail
-      
-      if(!(id>0)){
-        Alert.alert('请返回重试!')
-      }
 
       let upload_files = {};
       if(tool.length(mid_list_img) > 0){
@@ -179,13 +172,12 @@ class GoodsEditScene extends PureComponent {
         weight: weight,
       });
     }else{
-      try {
         let vendor_store = this.toStores(this.props.mine.vendor_stores[this.state.vendor_id])
+      if(vendor_store){
         this.setState({vendor_stores:vendor_store})
-      } catch (error) {
+      }else {
         _this.getVendorStore()
       }
-     
     }
 
   }
@@ -247,7 +239,7 @@ class GoodsEditScene extends PureComponent {
         json.key = key
         arr.push(json)
       }
-    })
+    });
     return arr
   }
 
@@ -278,16 +270,18 @@ class GoodsEditScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
-    console.log(check_res)
-    // if(check_res){
-    //   dispatch(productSave(formData,accessToken, async(ok,reason,obj)=>{
-    //     console.log(ok,reason,obj)
-    //     if(ok){
-    //      await this.setBeforeRefresh()
-    //       this.back(type)
-    //     }
-    //   }))
-    // }
+
+    if(check_res){
+      this.setState({uploading:true});
+      dispatch(productSave(formData,accessToken, async(ok,reason,obj)=>{
+        this.setState({uploading:false})
+        if(ok){
+         await this.setBeforeRefresh()
+          this.back(type);
+        }else {}
+        ToastLong(reason);
+      }))
+    }
   };
 
   dataValidate(formData) {
@@ -339,7 +333,7 @@ class GoodsEditScene extends PureComponent {
 
   renderAddGood() {
     let {type} = this.props.navigation.state.params;
-    let _this = this
+    let _this = this;
     if (!(type === 'edit')) {
       return <View>
         <GoodAttrs name="门店信息"/>
@@ -369,6 +363,7 @@ class GoodsEditScene extends PureComponent {
                 placeholder='请输入商品价格'
                 underlineColorAndroid='transparent'
                 style={[styles.input_text]}
+                placeholderTextColor={"#7A7A7A"}
                 keyboardType='numeric'
                 value={this.state.price}
                 onChangeText={(text) => {
@@ -401,7 +396,7 @@ class GoodsEditScene extends PureComponent {
               <Label style={[styles.cell_label]}>库存</Label>
             </CellHeader>
             <CellBody>
-              <Text style={[styles.cell_label, {width: '100%'}]}>初始为0,请各门店单独设置</Text>
+              <Text style={[styles.cell_label, {width: '100%',color:"#7A7A7A"}]}>初始为0,请各门店单独设置</Text>
             </CellBody>
           </Cell>
         </Cells>
@@ -484,13 +479,9 @@ class GoodsEditScene extends PureComponent {
         tool.objectMap(obj,(item,id) => {
           arr.push(item.name);
         })
-      
       return arr.join(' , ')
     }
-    
-
   }
-
   render() {
     return (
       <ScrollView>
@@ -505,6 +496,7 @@ class GoodsEditScene extends PureComponent {
                 <TextInput
                   placeholder='输入商品名(不超过14个字)'
                   underlineColorAndroid='transparent'
+                  placeholderTextColor={"#7A7A7A"}
                   style={[styles.input_text]}
                   value={this.state.name}
                   onChangeText={(text) => {
@@ -537,6 +529,7 @@ class GoodsEditScene extends PureComponent {
                 <TextInput
                   placeholder='请输入商品份含量'
                   underlineColorAndroid='transparent'
+                  placeholderTextColor={"#7A7A7A"}
                   style={[styles.input_text]}
                   keyboardType='numeric'
                   value={`${this.state.sku_having_unit}`}
@@ -555,6 +548,7 @@ class GoodsEditScene extends PureComponent {
                 <TextInput
                   placeholder='请输入商品重量'
                   underlineColorAndroid='transparent'
+                  placeholderTextColor={"#7A7A7A"}
                   style={[styles.input_text]}
                   value={''+this.state.weight }
                   keyboardType='numeric'
@@ -616,6 +610,7 @@ class GoodsEditScene extends PureComponent {
                   placeholder='输入广告词'
                   underlineColorAndroid='transparent'
                   maxLength={20}
+                  placeholderTextColor={"#7A7A7A"}
                   style={[styles.input_text, {fontSize: pxToDp(30), flex: 1}]}
                   value={this.state.promote_name}
                   onChangeText={(text) => {
@@ -634,6 +629,7 @@ class GoodsEditScene extends PureComponent {
                   multiline={true}
                   underlineColorAndroid='transparent'
                   placeholder='请输入商品介绍'
+                  placeholderTextColor={"#7A7A7A"}
                   style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
                   value={this.state.content}
                   onChangeText={(text) => {
@@ -692,6 +688,13 @@ class GoodsEditScene extends PureComponent {
           icon="loading"
           show={this.state.isUploadImg}
         >图片上传中...</Toast>
+
+        <Toast
+            icon="loading"
+            show={this.state.uploading}
+            onRequestClose={() => {
+            }}
+        >提交中</Toast>
       </ScrollView>
     )
   }

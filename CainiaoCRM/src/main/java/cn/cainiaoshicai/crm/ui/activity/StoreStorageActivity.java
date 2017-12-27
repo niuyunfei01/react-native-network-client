@@ -81,6 +81,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     private int total_in_req;
     private StoreStatusStat stats;
+    private Button addNewBtn;
 
     private static class StatusItem {
         static final StatusItem[] STATUS = new StatusItem[]{
@@ -147,7 +148,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         inflater = (LayoutInflater)
                 getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            this.setContentView(R.layout.storage_status);
+        this.setContentView(R.layout.storage_status);
 
         this.filter = this.getIntent().getIntExtra("filter", filter);
         final int storeId = this.getIntent().getIntExtra("store_id", -1);
@@ -178,7 +179,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     if (currStore == null || currStore.getId() != newStore.getId()) {
                         currStore = newStore;
                         AppLogger.d("start refresh data:");
-                        setTooBar();
+                        setHeadToolBar();
                         refreshData();
                     }
                 }
@@ -237,7 +238,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        setTooBar();
+        setHeadToolBar();
 
         ctv = findViewById(R.id.title_product_name);
         ctv.setThreshold(1);
@@ -307,7 +308,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         });
         currStatusSpinner.setSelection(StatusItem.findIdx(filter));
 
-        findViewById(R.id.add_new_prod).setOnClickListener(new View.OnClickListener() {
+        addNewBtn = findViewById(R.id.add_new_prod);
+        addNewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 app.toGoodsNew(StoreStorageActivity.this);
@@ -335,8 +337,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     View lastView = getViewByPosition(lastPos, categoryLv);
                     lastView.setBackgroundColor(ContextCompat.getColor(StoreStorageActivity.this, R.color.lightgray));
                 }
-
-
             }
         });
 
@@ -362,7 +362,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
     }
 
-    private void setTooBar(){
+    private void setHeadToolBar(){
         if (currStore.getFn_price_controlled() == 1) {
             this.btnReqList.setVisibility(View.INVISIBLE);
             this.btnEmptyList.setVisibility(View.INVISIBLE);
@@ -425,7 +425,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             lv.setOnScrollListener(new PicassoScrollListener(StoreStorageActivity.this));
             listAdapter.filter(this.searchTerm);
             listAdapter.notifyDataSetChanged();
-
         }
 
 
