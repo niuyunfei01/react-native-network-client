@@ -59,20 +59,20 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder = new ViewHolder();
             View row = inflater.inflate(R.layout.storage_status_row, null);
 
-            holder.label = (TextView) row.findViewById(R.id.product_name);
-            holder.leftNumber = (TextView) row.findViewById(R.id.total_last_stat);
-            holder.sold_5day = (TextView) row.findViewById(R.id.sold_5day);
-            holder.sold_weekend = (TextView) row.findViewById(R.id.sold_weekend);
+            holder.label = row.findViewById(R.id.product_name);
+            holder.leftNumber = row.findViewById(R.id.total_last_stat);
+            holder.sold_5day = row.findViewById(R.id.sold_5day);
+            holder.sold_weekend = row.findViewById(R.id.sold_weekend);
 
-            holder.prodStatus = (TextView) row.findViewById(R.id.store_prod_status);
-            holder.req_total = (TextView) row.findViewById(R.id.provide_total_req);
-            holder.riskNum = (TextView) row.findViewById(R.id.lowest_risk_num);
-            holder.reOnSale = (TextView) row.findViewById(R.id.re_on_sale_desc);
-            holder.salePrice = (TextView) row.findViewById(R.id.sale_price);
-            holder.goodIcon = (ImageView) row.findViewById(R.id.good_icon);
+            holder.prodStatus = row.findViewById(R.id.store_prod_status);
+            holder.req_total = row.findViewById(R.id.provide_total_req);
+            holder.riskNum = row.findViewById(R.id.lowest_risk_num);
+            holder.reOnSale = row.findViewById(R.id.re_on_sale_desc);
+            holder.salePrice = row.findViewById(R.id.sale_price);
+            holder.goodIcon = row.findViewById(R.id.good_icon);
 
-            holder.applyingPrice = (TextView)row.findViewById(R.id.applying_price);
-            holder.supplyPrice = (TextView)row.findViewById(R.id.supply_price);
+            holder.applyingPrice = row.findViewById(R.id.applying_price);
+            holder.supplyPrice = row.findViewById(R.id.supply_price);
 
             convertView = row;
             convertView.setTag(holder);
