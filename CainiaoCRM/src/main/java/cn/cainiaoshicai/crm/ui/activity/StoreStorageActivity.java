@@ -49,6 +49,7 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
+import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
@@ -79,12 +80,16 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_SOLD_OUT = 3;
     public static final int FILTER_OFF_SALE = 4;
     public static final int FILTER_SOLD_EMPTY = 5;
+    public static final int FILTER_TO_SET_PRICE = 6;
+    public static final int FILTER_SET_PROVIDE_PRICE = 7;
 
     private int total_in_req;
     private StoreStatusStat stats;
     private Button addNewBtn;
+    private ArrayAdapter<StatusItem> statusAdapter;
 
     private static class StatusItem {
+
         static final StatusItem[] STATUS = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
                 new StatusItem(FILTER_RISK, " 待订货"),
@@ -92,6 +97,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
         };
+
+        static final StatusItem[] STATUS_PRICE_CONTROLLED = new StatusItem[]{
+                new StatusItem(FILTER_ON_SALE, "在售"),
+                new StatusItem(FILTER_SOLD_OUT, " 缺货"),
+                new StatusItem(FILTER_SET_PROVIDE_PRICE, " 设置保底价"),
+                new StatusItem(FILTER_OFF_SALE, "已下架"),
+        };
+
         public final int status;
         public final String label;
         private int num;
@@ -114,9 +127,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             return String.format(this.label + "(%s)", num > 0 ? num :  "-");
         }
 
-        public static StatusItem find(int filter) {
+        public static StatusItem find(int filter, boolean isPriceControlled) {
             for (StatusItem item :
-                    STATUS) {
+                    isPriceControlled ? STATUS_PRICE_CONTROLLED : STATUS) {
                 if (item.status == filter) {
                     return item;
                 }
@@ -125,9 +138,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             throw new IllegalArgumentException("illegal filter:" + filter);
         }
 
-        static int findIdx(int filter) {
-            for (int i = 0; i < STATUS.length; i++) {
-                if (STATUS[i].status == filter) {
+        static int findIdx(int filter, boolean isPriceControlled) {
+            StatusItem[] ss = isPriceControlled ? STATUS_PRICE_CONTROLLED : STATUS;
+            for (int i = 0; i < ss.length; i++) {
+                if (ss[i].status == filter) {
                     return i;
                 }
             }
@@ -217,8 +231,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                filter = StatusItem.find(FILTER_SOLD_EMPTY).status;
-                currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+                Store cs = StoreStorageActivity.this.currStore;
+                boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
+
+                filter = StatusItem.find(FILTER_SOLD_EMPTY, priceControlled).status;
+                currStatusSpinner.setSelection(StatusItem.findIdx(filter, priceControlled));
                 searchTerm = "";
                 Tag tag = new Tag();
                 tag.setId(0);
@@ -246,9 +263,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 app.toGoodsNew(StoreStorageActivity.this);
             }
         });
-
-        //Must after buttons initialized
-        setHeadToolBar();
 
         ctv = findViewById(R.id.title_product_name);
         ctv.setThreshold(1);
@@ -296,8 +310,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         resetListAdapter(null, lv, ctv);
 
         currStatusSpinner = titleBar.findViewById(R.id.spinner_curr_status);
-        final ArrayAdapter<StatusItem> statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
-        statusAdapter.addAll(StatusItem.STATUS);
+        statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
+        boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
+        statusAdapter.addAll(isPriceControlled ? StatusItem.STATUS_PRICE_CONTROLLED : StatusItem.STATUS);
+
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
         currStatusSpinner.setAdapter(statusAdapter);
         currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -316,7 +332,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
             }
         });
-        currStatusSpinner.setSelection(StatusItem.findIdx(filter));
+        currStatusSpinner.setSelection(StatusItem.findIdx(filter, isPriceControlled));
 
         final ListView categoryLv = findViewById(R.id.list_category);
         final ArrayAdapter<Tag> tagAdapter = new ArrayAdapter<>(this, R.layout.category_item_small);
@@ -361,14 +377,23 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }, 50);
         }
 
+        //Must after buttons initialized
+        setHeadToolBar();
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
     }
 
     private void setHeadToolBar() {
-        if (currStore.getFn_price_controlled() == 1) {
+        boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
+        if (isPriceControlled) {
             this.btnReqList.setVisibility(View.INVISIBLE);
             this.btnEmptyList.setVisibility(View.INVISIBLE);
             this.btnApplyPriceList.setVisibility(View.VISIBLE);
+
+            if (statusAdapter != null) {
+                statusAdapter.clear();
+                statusAdapter.addAll(StatusItem.STATUS_PRICE_CONTROLLED);
+                statusAdapter.notifyDataSetChanged();
+            }
 
             if (this.addNewBtn != null) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.addNewBtn.getLayoutParams();
@@ -379,6 +404,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             this.btnReqList.setVisibility(View.VISIBLE);
             this.btnEmptyList.setVisibility(View.VISIBLE);
             this.btnApplyPriceList.setVisibility(View.INVISIBLE);
+
+            if (statusAdapter != null) {
+                statusAdapter.clear();
+                statusAdapter.addAll(StatusItem.STATUS);
+                statusAdapter.notifyDataSetChanged();
+            }
 
             if (this.addNewBtn != null) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.addNewBtn.getLayoutParams();
@@ -463,9 +494,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
                                        int total_in_req, int totalSoldEmpty) {
-        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale);
-        StatusItem.find(FILTER_RISK).setNum(totalRisk);
-        StatusItem.find(FILTER_SOLD_EMPTY).setNum(totalSoldEmpty);
+
+        boolean isPriceControlled = this.currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
+
+        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, isPriceControlled);
+        StatusItem.find(FILTER_RISK, isPriceControlled).setNum(totalRisk);
+        StatusItem.find(FILTER_SOLD_EMPTY, isPriceControlled).setNum(totalSoldEmpty);
 
         if(this.currStatusSpinner != null) {
             ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
@@ -475,10 +509,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         updateEmptyListBtn(totalSoldEmpty);
     }
 
-    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale) {
-        StatusItem.find(FILTER_ON_SALE).setNum(totalOnSale);
-        StatusItem.find(FILTER_OFF_SALE).setNum(totalOffSale);
-        StatusItem.find(FILTER_SOLD_OUT).setNum(totalSoldOut);
+    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, boolean isPriceControlled) {
+        StatusItem.find(FILTER_ON_SALE, isPriceControlled).setNum(totalOnSale);
+        StatusItem.find(FILTER_OFF_SALE, isPriceControlled).setNum(totalOffSale);
+        StatusItem.find(FILTER_SOLD_OUT, isPriceControlled).setNum(totalSoldOut);
         if(this.currStatusSpinner != null) {
             ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
         }
@@ -635,7 +669,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                         st.setTotal_sold_out(st.getTotal_sold_out() + 1);
                         break;
                 }
-                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale());
+                boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
+                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale(), isPriceControlled);
             }
             if (additional != null) {
                 additional.run();
