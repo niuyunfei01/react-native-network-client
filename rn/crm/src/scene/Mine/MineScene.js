@@ -458,7 +458,7 @@ class MineScene extends PureComponent {
     let {fnPriceControlled} = tool.vendor(this.props.global);
     return (
       <View style={[block_styles.container]}>
-        {!!fnPriceControlled ? <TouchableOpacity
+        {fnPriceControlled > 0 ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
           activeOpacity={customerOpacity}
