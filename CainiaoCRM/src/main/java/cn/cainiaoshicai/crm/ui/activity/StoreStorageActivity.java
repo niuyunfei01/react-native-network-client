@@ -498,8 +498,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         boolean isPriceControlled = this.currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
 
         updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, isPriceControlled);
-        StatusItem.find(FILTER_RISK, isPriceControlled).setNum(totalRisk);
-        StatusItem.find(FILTER_SOLD_EMPTY, isPriceControlled).setNum(totalSoldEmpty);
+        StatusItem riskItem = StatusItem.find(FILTER_RISK, isPriceControlled);
+        if (riskItem != null) {
+            riskItem.setNum(totalRisk);
+        }
+        StatusItem emptyItem = StatusItem.find(FILTER_SOLD_EMPTY, isPriceControlled);
+        if (emptyItem != null) {
+            emptyItem.setNum(totalSoldEmpty);
+        }
 
         if(this.currStatusSpinner != null) {
             ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
