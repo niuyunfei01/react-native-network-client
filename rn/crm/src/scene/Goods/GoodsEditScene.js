@@ -33,11 +33,11 @@ import {color, NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
-import {Toast,Dialog,Icon } from "../../weui/index";
+import {Toast, Dialog, Icon} from "../../weui/index";
 
 function mapStateToProps(state) {
-  const {mine,product, global} = state;
-  return {mine:mine,product: product, global: global}
+  const {mine, product, global} = state;
+  return {mine: mine, product: product, global: global}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -58,35 +58,35 @@ class GoodsEditScene extends PureComponent {
     return {
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+          icon={require('../../img/Register/back_.png')}
+          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
-            if(!!backPage){
+            if (!!backPage) {
               console.log('backPage -> ', backPage);
               native.gotoPage(backPage);
             } else {
               navigation.goBack();
             }
-        }}
+          }}
       />),
       headerRight: (
-        <View style={
-          {
-            flexDirection: 'row',
-            paddingRight: pxToDp(30)
-          }
-        }>
-          <TouchableOpacity
-            onPress={() => {
-              params.upLoad();
-            }}
-          >
-            <Text style={{
-              fontSize: pxToDp(32),
-              color: '#59b26a'
-            }}>保存</Text>
-          </TouchableOpacity>
-        </View>),
+          <View style={
+            {
+              flexDirection: 'row',
+              paddingRight: pxToDp(30)
+            }
+          }>
+            <TouchableOpacity
+                onPress={() => {
+                  params.upLoad();
+                }}
+            >
+              <Text style={{
+                fontSize: pxToDp(32),
+                color: '#59b26a'
+              }}>保存</Text>
+            </TouchableOpacity>
+          </View>),
     }
   };
 
@@ -94,10 +94,10 @@ class GoodsEditScene extends PureComponent {
 
     super(props);
     let {store_tags} = this.props.product;
-    let {currVendorId ,fnProviding} = tool.vendor(this.props.global);
+    let {currVendorId, fnProviding} = tool.vendor(this.props.global);
     const basic_categories = this.props.product.basic_category[currVendorId];
     const basic_cat_list = this.toModalData(basic_categories);
-    
+
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
@@ -126,10 +126,12 @@ class GoodsEditScene extends PureComponent {
         {label: '下架', key: Cts.STORE_PROD_OFF_SALE},
         {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
       sale_status: -1,
-      fnProviding:fnProviding,
-      store_product:[],
-      vendor_stores:'',
-      goBackValue:false,
+      fnProviding: fnProviding,
+      store_product: [],
+      vendor_stores: '',
+      goBackValue: false,
+      remark_id: 0,
+
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -149,8 +151,8 @@ class GoodsEditScene extends PureComponent {
       const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail
 
       let upload_files = {};
-      if(tool.length(mid_list_img) > 0){
-        for(let img_id in mid_list_img){
+      if (tool.length(mid_list_img) > 0) {
+        for (let img_id in mid_list_img) {
           if (mid_list_img.hasOwnProperty(img_id)) {
             let img_data = mid_list_img[img_id];
             upload_files[img_id] = {id: img_id, name: img_data.name}
@@ -172,13 +174,22 @@ class GoodsEditScene extends PureComponent {
         sku_unit: sku_unit,
         weight: weight,
       });
-    }else{
-        let vendor_store = this.toStores(this.props.mine.vendor_stores[this.state.vendor_id])
-      if(vendor_store){
-        this.setState({vendor_stores:vendor_store})
-      }else {
+    } else {
+      let vendor_store = this.toStores(this.props.mine.vendor_stores[this.state.vendor_id]);
+      let {remark_id, name} = this.props.navigation.state.params || {};
+      if (vendor_store) {
+        this.setState({vendor_stores: vendor_store})
+      } else {
         _this.getVendorStore()
       }
+      if (remark_id && name) {
+        this.setState({
+          remark_id: remark_id,
+          name:name
+        })
+      }
+
+
     }
 
   }
@@ -187,21 +198,24 @@ class GoodsEditScene extends PureComponent {
     let {navigation} = this.props;
     navigation.setParams({upLoad: this.upLoad});
   }
+
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
     let {store_categories, tag_list} = (params || {});
-    if(store_categories && tag_list){
+    if (store_categories && tag_list) {
       console.log('tag_list -> ', tag_list);
       this.setState({store_categories: store_categories, tag_list: tag_list});
     }
   }
-  back(type){
-    if(type == 'add' ){
+
+  back(type) {
+    if (type == 'add') {
       native.gotoPage(type);
     } else {
       this.props.navigation.goBack();
     }
   }
+
   async setBeforeRefresh(checked) {
     let {state, dispatch} = this.props.navigation;
     const setRefreshAction = NavigationActions.setParams({
@@ -221,7 +235,7 @@ class GoodsEditScene extends PureComponent {
       if (resp.ok) {
         let curr_stores = resp.obj;
         let curr_stores_arr = []
-        Object.values(curr_stores).forEach((item,id)=>{
+        Object.values(curr_stores).forEach((item, id) => {
           curr_stores_arr.push(item.name)
         })
         _this.setState({
@@ -234,7 +248,7 @@ class GoodsEditScene extends PureComponent {
   toModalData(obj) {
     let arr = [];
     Object.keys(obj).map((key) => {
-      if(key != Cts.TAG_HIDE ){
+      if (key != Cts.TAG_HIDE) {
         let json = {}
         json.label = obj[key];
         json.key = key
@@ -246,11 +260,13 @@ class GoodsEditScene extends PureComponent {
 
   upLoad = async () => {
     let {type} = this.props.navigation.state.params;
-    if(!this.state.fnProviding){
-      this.setState({provided:Cts.STORE_COMMON_PROVIDED})
+    if (!this.state.fnProviding) {
+      this.setState({provided: Cts.STORE_COMMON_PROVIDED})
     }
-    let {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name,
-      content, upload_files, price, sale_status, provided} = this.state;
+    let {
+      id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name,
+      content, upload_files, price, sale_status, provided
+    } = this.state;
     let formData = {
       id,
       vendor_id,
@@ -273,14 +289,15 @@ class GoodsEditScene extends PureComponent {
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
     return false;
-    if(check_res){
-      this.setState({uploading:true});
-      dispatch(productSave(formData,accessToken, async(ok,reason,obj)=>{
-        this.setState({uploading:false})
-        if(ok){
-         await this.setBeforeRefresh()
+    if (check_res) {
+      this.setState({uploading: true});
+      dispatch(productSave(formData, accessToken, async (ok, reason, obj) => {
+        this.setState({uploading: false})
+        if (ok) {
+          await this.setBeforeRefresh()
           this.back(type);
-        }else {}
+        } else {
+        }
         ToastLong(reason);
       }))
     }
@@ -308,11 +325,11 @@ class GoodsEditScene extends PureComponent {
       err_msg = '无效的品牌商';
     } else if (sku_unit !== '斤' && sku_unit !== '个') {
       err_msg = '选择SKU单位';
-    }else if (sku_having_unit <= 0) {
+    } else if (sku_having_unit <= 0) {
       err_msg = '请输入正确的份含量';
-    }else if (!(weight > 0)) {
+    } else if (!(weight > 0)) {
       err_msg = '请输入正确的重量';
-    }  else if (!(basic_category > 0)) {
+    } else if (!(basic_category > 0)) {
       err_msg = '请选择基础分类';
     } else if (basic_category == Cts.TAG_HIDE) {
       err_msg = '请勿将基础分类放入列表中隐藏';
@@ -321,7 +338,6 @@ class GoodsEditScene extends PureComponent {
     } else if (Object.keys(upload_files).length < 1) {
       err_msg = '请添加商品图片';
     }
-
 
 
     if (err_msg === '') {
@@ -341,11 +357,11 @@ class GoodsEditScene extends PureComponent {
         <GoodAttrs name="门店信息"/>
         <Cells style={styles.my_cells}>
           <ModalSelector
-            skin='customer'
-            data={this.state.selling_categories}
-            onChange={(option) => {
-              this.setState({sale_status: option.key})
-            }}>
+              skin='customer'
+              data={this.state.selling_categories}
+              onChange={(option) => {
+                this.setState({sale_status: option.key})
+              }}>
             <Cell customStyle={[styles.my_cell]} access>
               <CellHeader style={styles.attr_name}>
                 <Label style={[styles.cell_label]}>售卖状态</Label>
@@ -362,43 +378,43 @@ class GoodsEditScene extends PureComponent {
             </CellHeader>
             <CellBody>
               <TextInput
-                placeholder='请输入商品价格'
-                underlineColorAndroid='transparent'
-                style={[styles.input_text]}
-                placeholderTextColor={"#7A7A7A"}
-                keyboardType='numeric'
-                value={this.state.price}
-                onChangeText={(text) => {
-                  this.setState({price: text})
-                }}
+                  placeholder='请输入商品价格'
+                  underlineColorAndroid='transparent'
+                  style={[styles.input_text]}
+                  placeholderTextColor={"#7A7A7A"}
+                  keyboardType='numeric'
+                  value={this.state.price}
+                  onChangeText={(text) => {
+                    this.setState({price: text})
+                  }}
               />
             </CellBody>
             <CellFooter>元</CellFooter>
           </Cell>
           {
-           this.state.fnProviding ?  <ModalSelector
-             skin='customer'
-             data={this.state.head_supplies}
-             onChange={(option) => {
-               this.setState({provided: option.key})
-             }}>
-             <Cell customStyle={[styles.my_cell]} access>
-               <CellHeader style={styles.attr_name}>
-                 <Label style={[styles.cell_label]}>总部供货</Label>
-               </CellHeader>
-               <CellBody>
-                 <Text>{tool.headerSupply(this.state.provided)}</Text>
-               </CellBody>
-               <CellFooter/>
-             </Cell>
-           </ModalSelector>: <View/>
+            this.state.fnProviding ? <ModalSelector
+                skin='customer'
+                data={this.state.head_supplies}
+                onChange={(option) => {
+                  this.setState({provided: option.key})
+                }}>
+              <Cell customStyle={[styles.my_cell]} access>
+                <CellHeader style={styles.attr_name}>
+                  <Label style={[styles.cell_label]}>总部供货</Label>
+                </CellHeader>
+                <CellBody>
+                  <Text>{tool.headerSupply(this.state.provided)}</Text>
+                </CellBody>
+                <CellFooter/>
+              </Cell>
+            </ModalSelector> : <View/>
           }
           <Cell customStyle={[styles.my_cell]}>
             <CellHeader style={styles.attr_name}>
               <Label style={[styles.cell_label]}>库存</Label>
             </CellHeader>
             <CellBody>
-              <Text style={[styles.cell_label, {width: '100%',color:"#7A7A7A"}]}>初始为0,请各门店单独设置</Text>
+              <Text style={[styles.cell_label, {width: '100%', color: "#7A7A7A"}]}>初始为0,请各门店单独设置</Text>
             </CellBody>
           </Cell>
         </Cells>
@@ -413,7 +429,7 @@ class GoodsEditScene extends PureComponent {
             {
               this.state.vendor_stores
             }
-            </Text>
+          </Text>
         </View>
       </View>
     }
@@ -447,7 +463,7 @@ class GoodsEditScene extends PureComponent {
   uploadImg(image_info) {
     const {dispatch} = this.props;
     let {isUploadImg, list_img, upload_files} = this.state;
-    if(isUploadImg){
+    if (isUploadImg) {
       return false;
     }
     this.setState({isUploadImg: true});
@@ -475,230 +491,245 @@ class GoodsEditScene extends PureComponent {
       }
     }));
   }
-  toStores(obj){
+
+  toStores(obj) {
     let arr = []
-    if(obj){
-        tool.objectMap(obj,(item,id) => {
-          arr.push(item.name);
-        })
+    if (obj) {
+      tool.objectMap(obj, (item, id) => {
+        arr.push(item.name);
+      })
       return arr.join(' , ')
     }
   }
+
   render() {
     return (
-      <ScrollView>
-        <GoodAttrs name="基本信息"/>
-        <View>
-          <Cells style={styles.my_cells}>
-            <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>商品名称</Label>
-              </CellHeader>
-              <CellBody>
-                <TextInput
-                  placeholder='输入商品名(不超过20个字)'
-                  underlineColorAndroid='transparent'
-                  placeholderTextColor={"#7A7A7A"}
-                  maxLength={20}
-                  style={[styles.input_text]}
-                  value={this.state.name}
-                  onChangeText={(text) => {
-                    this.setState({name: text})
-                  }}
-                />
-              </CellBody>
-            </Cell>
-            <ModalSelector
-              skin='customer'
-              data={this.state.sku_units}
-              onChange={(option) => {
-                this.setState({sku_unit: option.label})
-              }}>
-              <Cell customStyle={[styles.my_cell]} access>
+        <ScrollView>
+          <GoodAttrs name="基本信息"/>
+          <View>
+            <Cells style={styles.my_cells}>
+              <Cell customStyle={[styles.my_cell]}>
                 <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>SKU单位</Label>
+                  <Label style={[styles.cell_label]}>商品名称</Label>
                 </CellHeader>
                 <CellBody>
-                  <Text>{this.state.sku_unit}</Text>
+                  <TextInput
+                      placeholder='输入商品名(不超过20个字)'
+                      underlineColorAndroid='transparent'
+                      placeholderTextColor={"#7A7A7A"}
+                      maxLength={20}
+                      style={[styles.input_text]}
+                      value={this.state.name}
+                      onChangeText={(text) => {
+                        this.setState({name: text})
+                      }}
+                  />
+                </CellBody>
+              </Cell>
+              <ModalSelector
+                  skin='customer'
+                  data={this.state.sku_units}
+                  onChange={(option) => {
+                    this.setState({sku_unit: option.label})
+                  }}>
+                <Cell customStyle={[styles.my_cell]} access>
+                  <CellHeader style={styles.attr_name}>
+                    <Label style={[styles.cell_label]}>SKU单位</Label>
+                  </CellHeader>
+                  <CellBody>
+                    <Text>{this.state.sku_unit}</Text>
+                  </CellBody>
+                  <CellFooter/>
+                </Cell>
+              </ModalSelector>
+              <Cell customStyle={[styles.my_cell]}>
+                <CellHeader style={styles.attr_name}>
+                  <Label style={[styles.cell_label]}>份含量</Label>
+                </CellHeader>
+                <CellBody>
+                  <TextInput
+                      placeholder='请输入商品份含量'
+                      underlineColorAndroid='transparent'
+                      placeholderTextColor={"#7A7A7A"}
+                      style={[styles.input_text]}
+                      keyboardType='numeric'
+                      value={`${this.state.sku_having_unit}`}
+                      onChangeText={(text) => {
+                        this.setState({sku_having_unit: text})
+                      }}
+                  />
                 </CellBody>
                 <CellFooter/>
               </Cell>
-            </ModalSelector>
-            <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>份含量</Label>
-              </CellHeader>
-              <CellBody>
-                <TextInput
-                  placeholder='请输入商品份含量'
-                  underlineColorAndroid='transparent'
-                  placeholderTextColor={"#7A7A7A"}
-                  style={[styles.input_text]}
-                  keyboardType='numeric'
-                  value={`${this.state.sku_having_unit}`}
-                  onChangeText={(text) => {
-                    this.setState({sku_having_unit: text})
-                  }}
-                />
-              </CellBody>
-              <CellFooter/>
-            </Cell>
-            <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>平均重量</Label>
-              </CellHeader>
-              <CellBody>
-                <TextInput
-                  placeholder='请输入商品重量'
-                  underlineColorAndroid='transparent'
-                  placeholderTextColor={"#7A7A7A"}
-                  style={[styles.input_text]}
-                  value={''+this.state.weight }
-                  keyboardType='numeric'
-                  onChangeText={(text) => {
-                    this.setState({weight: text})
-                  }}
-                />
-              </CellBody>
-              <CellFooter>克</CellFooter>
-            </Cell>
-          
-            <ModalSelector
-              skin='customer'
-              data={this.state.basic_cat_list}
-              onChange={(option) => {
-                this.setState({basic_category: option.key})
-              }}>
-              <Cell customStyle={[styles.my_cell]} access>
+              <Cell customStyle={[styles.my_cell]}>
                 <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>基础分类</Label>
+                  <Label style={[styles.cell_label]}>平均重量</Label>
                 </CellHeader>
                 <CellBody>
-                  <Text> 
-                    
-                    {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
-                    </Text>
+                  <TextInput
+                      placeholder='请输入商品重量'
+                      underlineColorAndroid='transparent'
+                      placeholderTextColor={"#7A7A7A"}
+                      style={[styles.input_text]}
+                      value={'' + this.state.weight}
+                      keyboardType='numeric'
+                      onChangeText={(text) => {
+                        this.setState({weight: text})
+                      }}
+                  />
                 </CellBody>
-                <CellFooter/>
+                <CellFooter>克</CellFooter>
               </Cell>
-            </ModalSelector>
-            <Cell
-              customStyle={[styles.my_cell]}
-              access
-              onPress={() => {
-                let {state, navigate} = this.props.navigation;
-                navigate(Config.ROUTE_GOODS_CLASSIFY, {
-                  nav_key: state.key,
-                  store_categories: this.state.store_categories,
-                  vendor_id: this.state.vendor_id
-                });
-              }}
-            >
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>门店分类</Label>
-              </CellHeader>
-              <CellBody>
-                <Text>
-                  {this.state.tag_list}
-                </Text>
-              </CellBody>
-              <CellFooter/>
-            </Cell>
-            <View style={[styles.area_cell, {height: pxToDp(154)}]}>
-              <View>
-                <Text style={[styles.area_input_title]}>广告词</Text>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: "center"}}>
-                <TextInput
-                  placeholder='输入广告词'
-                  underlineColorAndroid='transparent'
-                  maxLength={20}
-                  placeholderTextColor={"#7A7A7A"}
-                  style={[styles.input_text, {fontSize: pxToDp(30), flex: 1}]}
-                  value={this.state.promote_name}
-                  onChangeText={(text) => {
-                    this.setState({promote_name: text})
-                  }}
-                />
-                <Text>{this.state.promote_name.length}/20</Text>
-              </View>
-            </View>
-            <View style={[styles.area_cell, {height: pxToDp(250)}]}>
-              <View>
-                <Text style={[styles.area_input_title]}>商品介绍</Text>
-              </View>
-              <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
-                <TextInput
-                  multiline={true}
-                  underlineColorAndroid='transparent'
-                  placeholder='请输入商品介绍'
-                  placeholderTextColor={"#7A7A7A"}
-                  style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
-                  value={this.state.content}
-                  onChangeText={(text) => {
-                    this.setState({content: text})
-                  }}
-                />
-                <Text style={{alignSelf: 'flex-end'}}>{this.state.content.length}/50</Text>
-              </View>
-            </View>
-          </Cells>
-        </View>
-        <GoodAttrs name="上传图片"/>
-        <View style={[styles.area_cell, {  minHeight: pxToDp(215), flexDirection: 'row', flexWrap:'wrap', paddingHorizontal: pxToDp(20),paddingTop:pxToDp(10)}]}>
-          {tool.objectMap(this.state.list_img, (img_data, img_id) => {
-            let img_url = img_data['url'];
-            // console.log(img_url);
-            let img_name = img_data['name'];
-            return (
-              <View  key={img_id} style = {{height:pxToDp(170),width:pxToDp(170),flexDirection:'row',alignItems:'flex-end'}}>
-                <Image
-                  style={styles.img_add}
-                  source={{uri: img_url}}
-                />
-                <TouchableOpacity
-                  style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
-                  onPress={() => {
-                    delete  this.state.list_img[img_id]
-                    delete  this.state.upload_files[img_id]
-                    this.forceUpdate()
-                  }}
-                >
-                    <Icon
-                      name={'clear'}
-                      size={pxToDp(40)}
-                      style = {{ backgroundColor: '#fff'}}
-                      color={'#d81e06'}
-                      msg={false}
-                    />
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-          <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'center',alignItems:'flex-end'}}>
-            <TouchableOpacity
-              style={[styles.img_add, styles.img_add_box, {flexWrap: 'wrap'}]}
-              onPress={() => this.pickSingleImg()}
-            >
-              <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        {
-          this.renderAddGood()
-        }
-        <Toast
-          icon="loading"
-          show={this.state.isUploadImg}
-        >图片上传中...</Toast>
 
-        <Toast
-            icon="loading"
-            show={this.state.uploading}
-            onRequestClose={() => {
-            }}
-        >提交中</Toast>
-      </ScrollView>
+              <ModalSelector
+                  skin='customer'
+                  data={this.state.basic_cat_list}
+                  onChange={(option) => {
+                    this.setState({basic_category: option.key})
+                  }}>
+                <Cell customStyle={[styles.my_cell]} access>
+                  <CellHeader style={styles.attr_name}>
+                    <Label style={[styles.cell_label]}>基础分类</Label>
+                  </CellHeader>
+                  <CellBody>
+                    <Text>
+
+                      {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
+                    </Text>
+                  </CellBody>
+                  <CellFooter/>
+                </Cell>
+              </ModalSelector>
+              <Cell
+                  customStyle={[styles.my_cell]}
+                  access
+                  onPress={() => {
+                    let {state, navigate} = this.props.navigation;
+                    navigate(Config.ROUTE_GOODS_CLASSIFY, {
+                      nav_key: state.key,
+                      store_categories: this.state.store_categories,
+                      vendor_id: this.state.vendor_id
+                    });
+                  }}
+              >
+                <CellHeader style={styles.attr_name}>
+                  <Label style={[styles.cell_label]}>门店分类</Label>
+                </CellHeader>
+                <CellBody>
+                  <Text>
+                    {this.state.tag_list}
+                  </Text>
+                </CellBody>
+                <CellFooter/>
+              </Cell>
+              <View style={[styles.area_cell, {height: pxToDp(154)}]}>
+                <View>
+                  <Text style={[styles.area_input_title]}>广告词</Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: "center"}}>
+                  <TextInput
+                      placeholder='输入广告词'
+                      underlineColorAndroid='transparent'
+                      maxLength={20}
+                      placeholderTextColor={"#7A7A7A"}
+                      style={[styles.input_text, {fontSize: pxToDp(30), flex: 1}]}
+                      value={this.state.promote_name}
+                      onChangeText={(text) => {
+                        this.setState({promote_name: text})
+                      }}
+                  />
+                  <Text>{this.state.promote_name.length}/20</Text>
+                </View>
+              </View>
+              <View style={[styles.area_cell, {height: pxToDp(250)}]}>
+                <View>
+                  <Text style={[styles.area_input_title]}>商品介绍</Text>
+                </View>
+                <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
+                  <TextInput
+
+                      underlineColorAndroid='transparent'
+                      placeholder='请输入商品介绍'
+                      placeholderTextColor={"#7A7A7A"}
+                      style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
+                      value={this.state.content}
+                      onChangeText={(text) => {
+                        this.setState({content: text})
+                      }}
+                  />
+                  <Text style={{alignSelf: 'flex-end'}}>{this.state.content.length}/50</Text>
+                </View>
+              </View>
+            </Cells>
+          </View>
+          <GoodAttrs name="上传图片"/>
+          <View style={[styles.area_cell, {
+            minHeight: pxToDp(215),
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            paddingHorizontal: pxToDp(20),
+            paddingTop: pxToDp(10)
+          }]}>
+            {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+              let img_url = img_data['url'];
+              // console.log(img_url);
+              let img_name = img_data['name'];
+              return (
+                  <View key={img_id}
+                        style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'flex-end'}}>
+                    <Image
+                        style={styles.img_add}
+                        source={{uri: img_url}}
+                    />
+                    <TouchableOpacity
+                        style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
+                        onPress={() => {
+                          delete  this.state.list_img[img_id]
+                          delete  this.state.upload_files[img_id]
+                          this.forceUpdate()
+                        }}
+                    >
+                      <Icon
+                          name={'clear'}
+                          size={pxToDp(40)}
+                          style={{backgroundColor: '#fff'}}
+                          color={'#d81e06'}
+                          msg={false}
+                      />
+                    </TouchableOpacity>
+                  </View>
+              );
+            })}
+            <View style={{
+              height: pxToDp(170),
+              width: pxToDp(170),
+              flexDirection: 'row',
+              alignItems: 'center',
+              alignItems: 'flex-end'
+            }}>
+              <TouchableOpacity
+                  style={[styles.img_add, styles.img_add_box, {flexWrap: 'wrap'}]}
+                  onPress={() => this.pickSingleImg()}
+              >
+                <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          {
+            this.renderAddGood()
+          }
+          <Toast
+              icon="loading"
+              show={this.state.isUploadImg}
+          >图片上传中...</Toast>
+
+          <Toast
+              icon="loading"
+              show={this.state.uploading}
+              onRequestClose={() => {
+              }}
+          >提交中</Toast>
+        </ScrollView>
     )
   }
 }
@@ -710,9 +741,9 @@ class GoodAttrs extends PureComponent {
 
   render() {
     return (
-      <View style={[styles.GoodAttrs]}>
-        <Text style={{fontSize: pxToDp(30)}}>{this.props.name}</Text>
-      </View>
+        <View style={[styles.GoodAttrs]}>
+          <Text style={{fontSize: pxToDp(30)}}>{this.props.name}</Text>
+        </View>
     )
   }
 }
@@ -770,7 +801,7 @@ const styles = StyleSheet.create({
   img_add: {
     height: pxToDp(145),
     width: pxToDp(145),
-    justifyContent:'space-around',
+    justifyContent: 'space-around',
     borderWidth: pxToDp(1),
     borderColor: '#bfbfbf',
   },

@@ -144,7 +144,9 @@ class GoodsWorkNewProductScene extends PureComponent {
               onPress={() => {
                 this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'add',
-                  remark_id: this.state.obj.id
+                  remark_id: this.state.obj.id,
+                  name:this.state.obj.remark
+
                 })
               }}
           >
