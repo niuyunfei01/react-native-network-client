@@ -925,21 +925,7 @@ class OrderScene extends Component {
             ]}
           />
 
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.gotoEditPoi}
-                  buttons={[{
-                    type: 'warn',
-                    label: '去设置',
-                    onPress: this.goToSetMap,
-                  },
-                    {
-                      type: 'default',
-                      label: '取消',
-                      onPress: () => this.setState({gotoEditPoi: false}),
-                    }
-                  ]}
-          ><Text>没有经纬度信息</Text></Dialog>
+
           <ScrollView
             refreshControl={refreshControl}>
             {this.renderHeader()}

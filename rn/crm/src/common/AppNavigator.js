@@ -47,6 +47,8 @@ import GoodsClassifyScene from '../scene/Goods/GoodsClassifyScene';
 import GoodsBatchPriceScene from "../scene/Goods/GoodsBatchPriceScene";
 import GoodsApplyRecordScene from '../scene/Goods/GoodsApplyRecordScene';
 import GoodsRelateScene from '../scene/Goods/GoodsRelateScene';
+import GoodsApplyNewProductScene from '../scene/Goods/GoodsApplyNewProductScene';
+import GoodsWorkNewProductScene from '../scene/Goods/GoodsWorkNewProductScene';
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
@@ -154,10 +156,6 @@ class Navigator extends Component {
     let stackNavigatorConfigs = {
       navigationOptions: {
         headerStyle: {
-          // backgroundColor: colors.back_color,
-          // height: pxToDp(78),
-          // borderColor: '#999',
-          // borderBottomWidth: pxToDp(1),
           height: pxToDp(96),
           borderColor: colors.new_back,
           borderBottomWidth: pxToDp(1),
@@ -239,14 +237,15 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_EDIT]: {screen:GoodsEditScene},
         [Config.ROUTE_GOODS_CLASSIFY]: { screen: GoodsClassifyScene },
         [Config.ROUTE_GOODS_APPLY_RECORD]: { screen: GoodsApplyRecordScene },
-        [Config.ROUTE_SETTLEMENT]: { screen: SettlementScene },
-        [Config.ROUTE_SETTLEMENT_DETAILS]: { screen: SettlementDetailsScene },
-        [Config.ROUTE_SETTLEMENT_ORDER]: { screen: SettlementOrderScene},
-        [Config.ROUTE_SELECT_WORKER]: { screen: SelectWorkerScene},
-        [Config.ROUTE_GOODS_BATCH_PRICE]:{screen:GoodsBatchPriceScene},
-        [Config.ROUTE_GOODS_RELATE]:{screen:GoodsRelateScene},
+        [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
+        [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
+        [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
+        [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
+        [Config.ROUTE_SETTLEMENT_ORDER]: {screen: SettlementOrderScene},
+        [Config.ROUTE_SELECT_WORKER]: {screen: SelectWorkerScene},
+        [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
+        [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},
         [Config.ROUTE_HELP]: {screen: HelpScene},
-
 
       },
       stackNavigatorConfigs

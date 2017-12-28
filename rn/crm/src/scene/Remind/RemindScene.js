@@ -554,7 +554,7 @@ class RemindItem extends React.PureComponent {
           if (item.order_id > 0) {
             onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
           } else if (parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS) {
-            //onPress(Config.ROUTE_ORDER, {task_id: item.id})
+            onPress(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, {task_id: item.id})
           }
         }}
         activeOpacity={0.6}

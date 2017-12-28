@@ -125,6 +125,17 @@ export function productSave(data, token, callback) {
   )
 
 }
+export function newProductSave(data, token, callback) {
+  let url = `api/up_product_task.json?access_token=${token}`;
+  return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
+}
 
 export function batchPriceSave(vendor_id, data, token, callback) {
   let url = `api/edit_store_product/${vendor_id}?access_token=${token}`;
@@ -135,9 +146,7 @@ export function batchPriceSave(vendor_id, data, token, callback) {
       callback(error, "网络错误, 请稍后重试")
     }
   )
-
 }
-
 
 export function fetchApplyRocordList(viewStoreId, audit_status,page,token,callback) {
 
@@ -239,5 +248,18 @@ export function uploadImg(image_info, callback, file_model_name = 'Product') {
         });
       });
   }
+
+
+
+}
+export function getGoodsProduct(task_id, token, callback) {
+  let url = `api/get_up_goods_task/${task_id}.json?access_token=${token}`;
+  return jsonWithTpl2(url, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
 
 }

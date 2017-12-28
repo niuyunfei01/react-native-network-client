@@ -54,17 +54,19 @@ class GoodsEditScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     let {type} = params;
+    let {backPage} = params;
     return {
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerLeft: (<NavigationItem
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if(type == 'add' ){
-            native.gotoPage(type);
-          } else {
-            navigation.goBack();
-          }
+          onPress={() => {
+            if(!!backPage){
+              console.log('backPage -> ', backPage);
+              native.gotoPage(backPage);
+            } else {
+              navigation.goBack();
+            }
         }}
       />),
       headerRight: (
