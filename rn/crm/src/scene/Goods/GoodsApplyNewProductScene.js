@@ -70,9 +70,11 @@ class GoodsWorkNewProductScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let {store_tags} = this.props.product;
-    let {currStoreId} = this.props.global
-    let {currVendorId,fnProviding} = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
+    let currStoreId = this.props.navigation.state.params.store_id
+    if (!currStoreId) {
+      currStoreId = this.props.global.currStoreId;
+    }
     this.state = {
       vendor_id:currVendorId,
       store_id:currStoreId,
@@ -118,14 +120,6 @@ class GoodsWorkNewProductScene extends PureComponent {
     }
   }
 
-  async setBeforeRefresh(checked) {
-    let {state, dispatch} = this.props.navigation;
-    const setRefreshAction = NavigationActions.setParams({
-      params: {isRefreshing: true},
-      key: state.params.detail_key
-    });
-    dispatch(setRefreshAction);
-  }
 
   getVendorStore() {
     const {dispatch} = this.props;
@@ -139,7 +133,7 @@ class GoodsWorkNewProductScene extends PureComponent {
         let curr_stores_arr = []
         Object.values(curr_stores).forEach((item, id) => {
           curr_stores_arr.push(item.name)
-        })
+        });
         _this.setState({
           vendor_stores: curr_stores_arr.join(' , '),
         });

@@ -131,6 +131,7 @@ class GoodsEditScene extends PureComponent {
       vendor_stores: '',
       goBackValue: false,
       task_id: 0,
+      selectToWhere:false,
 
     };
     this.uploadImg = this.uploadImg.bind(this);
@@ -182,7 +183,6 @@ class GoodsEditScene extends PureComponent {
       } else {
         _this.getVendorStore()
       }
-
       if (task_id && name) {
         this.setState({
           remark_id: task_id,
@@ -232,7 +232,7 @@ class GoodsEditScene extends PureComponent {
       console.log('store resp -> ', resp.ok, resp.desc);
       if (resp.ok) {
         let curr_stores = resp.obj;
-        let curr_stores_arr = []
+        let curr_stores_arr = [];
         Object.values(curr_stores).forEach((item, id) => {
           curr_stores_arr.push(item.name)
         })
@@ -277,23 +277,26 @@ class GoodsEditScene extends PureComponent {
       promote_name,
       content,
       upload_files,
+      task_id
     };
     if (type == 'add') {
       formData.store_goods_status = {price: price, sale_status: sale_status, provided: provided};
     }
-    console.log(formData);
-
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
-    return false;
+    let {task_id} = this.state;
     if (check_res) {
       this.setState({uploading: true});
       dispatch(productSave(formData, accessToken, async (ok, reason, obj) => {
-        this.setState({uploading: false})
+        this.setState({uploading: false});
         if (ok) {
-          await this.setBeforeRefresh()
-          this.back(type);
+         if(task_id >0){
+           this.setState({selectToWhere:true})
+         }else {
+           await this.setBeforeRefresh()
+           this.back(type);
+         }
         } else {
         }
         ToastLong(reason);
@@ -301,9 +304,12 @@ class GoodsEditScene extends PureComponent {
     }
   };
 
+
+
   dataValidate(formData) {
     let type = this.props.navigation.state.params.type;
     const {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files} = formData;
+    let err_msg = '';
     if (type === 'edit' && id <= 0) {
       err_msg = '数据异常, 无法保存';
     } else if (type === 'add') {
@@ -316,7 +322,7 @@ class GoodsEditScene extends PureComponent {
         err_msg = '选择供货方式';
       }
     }
-    let err_msg = '';
+
     if (name.length <= 0 || name == undefined) {
       err_msg = '请输入商品名';
     } else if (!(vendor_id > 0)) {
@@ -670,7 +676,6 @@ class GoodsEditScene extends PureComponent {
           }]}>
             {tool.objectMap(this.state.list_img, (img_data, img_id) => {
               let img_url = img_data['url'];
-              // console.log(img_url);
               let img_name = img_data['name'];
               return (
                   <View key={img_id}
@@ -727,10 +732,34 @@ class GoodsEditScene extends PureComponent {
               onRequestClose={() => {
               }}
           >提交中</Toast>
+          <Dialog onRequestClose={() => {}}
+                  visible={this.state.selectToWhere}
+                  buttons={[{
+                    type: 'default',
+                    label: '回申请页面',
+                    onPress: () => {
+                      this.setState({selectToWhere:false});
+                      this.props.navigation.navigate('Remind')
+                    }
+                  },{
+                    type: 'primary',
+                    label: '去商品页面',
+                    onPress: () => {
+                      this.setState({selectToWhere:false});
+                      native.toGoods()
+                    }
+                  }]}
+          >
+            <Text style = {{width:'100%',textAlign:'center',fontSize:pxToDp(30),color:colors.color333}}>上传成功</Text>
+            <Text style = {{width:'100%',textAlign:'center'}}>商品已成功添加到门店</Text>
+
+          </Dialog>
         </ScrollView>
     )
   }
 }
+
+
 
 class GoodAttrs extends PureComponent {
   constructor(props) {
