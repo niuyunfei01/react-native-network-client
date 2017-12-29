@@ -630,18 +630,8 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/banben_.png')}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-            style={[block_styles.block_box]}
-            activeOpacity={customerOpacity}
-            onPress={() => {
-              this.onPress(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT);
-            }}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/banben_.png')}/>
-          <Text style={[block_styles.block_name]}>申请上新</Text>
-        </TouchableOpacity>
 
-        {/*<View style={[block_styles.empty_box]}/>*/}
+        <View style={[block_styles.empty_box]}/>
       </View>
     )
   }

@@ -198,7 +198,6 @@ class GoodsWorkNewProductScene extends PureComponent {
     }
     this.setState({isUploadImg: true});
     dispatch(uploadImg(image_info, (resp) => {
-      console.log('image_resp ===> ', resp);
       if (resp.ok) {
         let {name, uri} = image_info;
         let {file_id, fspath} = resp.obj;
@@ -206,8 +205,7 @@ class GoodsWorkNewProductScene extends PureComponent {
           url: Config.staticUrl(fspath),
           name: name,
         };
-        upload_files[file_id] = {id: file_id, name: name};
-        console.log('list_img --> ', list_img);
+        upload_files.push({id: file_id, name: name});
         this.setState({
           list_img: list_img,
           upload_files: upload_files,
