@@ -668,11 +668,11 @@ const styles = StyleSheet.create({
   show_providing:{
     justifyContent:'space-between'
   },
-  related_edit:{
-    flexDirection:'row',
-    alignItems:'center',
-    height:pxToDp(70),
-    alignItems:'center'}
+  related_edit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: pxToDp(70)
+  }
 });
 
 

@@ -263,7 +263,7 @@ class GoodsEditScene extends PureComponent {
     }
     let {
       id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name,
-      content, upload_files, price, sale_status, provided
+      content, upload_files, price, sale_status, provided,task_id
     } = this.state;
     let formData = {
       id,
@@ -277,7 +277,7 @@ class GoodsEditScene extends PureComponent {
       promote_name,
       content,
       upload_files,
-      task_id
+      task_id,
     };
     if (type == 'add') {
       formData.store_goods_status = {price: price, sale_status: sale_status, provided: provided};
@@ -285,7 +285,7 @@ class GoodsEditScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
-    let {task_id} = this.state;
+
     if (check_res) {
       this.setState({uploading: true});
       dispatch(productSave(formData, accessToken, async (ok, reason, obj) => {
@@ -294,17 +294,16 @@ class GoodsEditScene extends PureComponent {
          if(task_id >0){
            this.setState({selectToWhere:true})
          }else {
-           await this.setBeforeRefresh()
+           await this.setBeforeRefresh();
            this.back(type);
          }
         } else {
+          ToastLong(reason);
         }
-        ToastLong(reason);
+
       }))
     }
   };
-
-
 
   dataValidate(formData) {
     let type = this.props.navigation.state.params.type;
