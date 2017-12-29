@@ -51,7 +51,8 @@ function mapDispatchToProps(dispatch) {
 class GoodsWorkNewProductScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
+    let {type, backPage} = params;
+
     return {
       headerTitle: '我要上新' ,
       headerLeft: (<NavigationItem
@@ -84,10 +85,7 @@ class GoodsWorkNewProductScene extends PureComponent {
       price_desc: '',
       slogan: '',
       list_img: {},
-      upload_files: {
-        '301715':{id:30715,name:'硒砂瓜图1'},
-        '301716':{id:30715,name:'硒砂瓜图2'}
-      },
+      upload_files: [],
       goBackValue: false,
     };
     this.uploadImg = this.uploadImg.bind(this);
@@ -274,7 +272,6 @@ class GoodsWorkNewProductScene extends PureComponent {
                   <TextInput
                       placeholder='输入商品名(不超过20个字)'
                       underlineColorAndroid='transparent'
-                      placeholderTextColor={"#7A7A7A"}
                       maxLength={20}
                       style={[styles.input_text]}
                       value={this.state.goods_name}
@@ -293,7 +290,6 @@ class GoodsWorkNewProductScene extends PureComponent {
                   <TextInput
                       placeholder='如1.25元每斤或每瓶3元'
                       underlineColorAndroid='transparent'
-                      placeholderTextColor={"#7A7A7A"}
                       style={[styles.input_text]}
                       value={`${this.state.price_desc}`}
                       onChangeText={(text) => {
@@ -313,7 +309,6 @@ class GoodsWorkNewProductScene extends PureComponent {
                       multiline={true}
                       underlineColorAndroid='transparent'
                       placeholder='请输入商品介绍'
-                      placeholderTextColor={"#7A7A7A"}
                       style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
                       value={this.state.slogan}
                       onChangeText={(text) => {

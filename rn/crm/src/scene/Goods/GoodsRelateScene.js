@@ -114,6 +114,10 @@ class GoodsRelatedScene extends PureComponent {
   productToStore(storeId,productId){
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    if (this.state.loading) {
+      return false;
+    }
+
     this.setState({loading: true, msg: '正在关联..'});
     let data = {
       store_id:storeId,

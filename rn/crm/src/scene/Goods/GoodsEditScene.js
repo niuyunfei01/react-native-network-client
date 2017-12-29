@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  TextInput, InteractionManager,
 } from 'react-native';
 import {
   Cells,
@@ -19,7 +19,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {productSave} from "../../reducers/product/productActions";
+import {fetchVendorTags, productSave} from "../../reducers/product/productActions";
 import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
@@ -93,18 +93,16 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
 
     super(props);
-    let {store_tags} = this.props.product;
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
-    const basic_categories = this.props.product.basic_category[currVendorId];
-    const basic_cat_list = this.toModalData(basic_categories);
 
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
-      basic_cat_list: basic_cat_list,
+      basic_cat_list: {},
+      basic_categories: {},
+      store_tags: {},
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
-      basic_categories: basic_categories,
       provided: 1,
       name: '',
       sku_having_unit: '',
@@ -116,7 +114,6 @@ class GoodsEditScene extends PureComponent {
       basic_category: 0,
       vendor_id: currVendorId,
       store_categories: [],
-      store_tags: store_tags,
       tag_list: '选择门店分类',
       id: 0,
       sku_unit: '请选择SKU单位',
@@ -190,6 +187,41 @@ class GoodsEditScene extends PureComponent {
         })
       }
     }
+
+    let {store_tags, basic_category} = this.props.product;
+    let {vendor_id} = this.state;
+    if(store_tags[vendor_id] === undefined || basic_category[vendor_id] === undefined){
+      this.getVendorTags(vendor_id);
+    } else {
+      let basic_cat_list = this.toModalData(basic_category[vendor_id]);
+      this.setState({
+        basic_cat_list: basic_cat_list,
+        basic_categories: basic_category[vendor_id],
+        store_tags: store_tags,
+      });
+    }
+  }
+
+  getVendorTags(_v_id) {
+    if (_v_id > 0) {
+      const {accessToken} = this.props.global;
+      const {dispatch} = this.props;
+      InteractionManager.runAfterInteractions(() => {
+        dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
+          console.log('fetchVendorTags -> ', resp.ok);
+          // console.log(resp.ok, resp.obj.basic_category, resp.ok.store_tags);
+          if(resp.ok){
+            let {store_tags, basic_category} = resp.obj;
+            let basic_cat_list = this.toModalData(basic_category);
+            this.setState({
+              basic_cat_list: basic_cat_list,
+              basic_categories: basic_category,
+              store_tags: store_tags,
+            })
+          }
+        }));
+      });
+    }
   }
 
   componentDidMount() {
@@ -207,7 +239,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   back(type) {
-    if (type == 'add') {
+    if (type === 'add') {
       native.gotoPage(type);
     } else {
       this.props.navigation.goBack();
@@ -279,7 +311,7 @@ class GoodsEditScene extends PureComponent {
       upload_files,
       task_id,
     };
-    if (type == 'add') {
+    if (type === 'add') {
       formData.store_goods_status = {price: price, sale_status: sale_status, provided: provided};
     }
     const {dispatch} = this.props;
@@ -288,6 +320,9 @@ class GoodsEditScene extends PureComponent {
 
     if (check_res) {
       this.setState({uploading: true});
+      if(this.state.uploading){
+        return false;
+      }
       dispatch(productSave(formData, accessToken, async (ok, reason, obj) => {
         this.setState({uploading: false});
         if (ok) {

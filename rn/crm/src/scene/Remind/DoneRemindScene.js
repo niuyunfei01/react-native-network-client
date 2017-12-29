@@ -233,7 +233,13 @@ class Item extends PureComponent {
   render() {
     let {item, onPress} = this.props;
     return (
-      <TouchableOpacity onPress={() => onPress(Config.ROUTE_ORDER, {orderId: item.order_id})} activeOpacity={0.6}>
+      <TouchableOpacity
+        onPress={() => {
+          if (item.order_id > 0) {
+            onPress(Config.ROUTE_ORDER, {orderId: item.order_id});
+          }
+        }}
+        activeOpacity={0.6}>
         <View style={top_styles.container}>
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
