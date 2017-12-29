@@ -597,7 +597,10 @@ class RemindItem extends React.PureComponent {
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>
                   <Text style={top_styles.o_content}>
-                    {item.remark}  {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
+                    {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS ?
+                      '申请上架: '+ item.remark + ';  价格: ' + eval('(' + item.remind_id + ')').price_desc :
+                      item.remark}
+                    {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
