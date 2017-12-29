@@ -184,6 +184,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   getVendorProduct() {
+    this.setState({isRefreshing: false});
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
 
@@ -324,9 +325,9 @@ class GoodsDetailScene extends PureComponent {
   }
 
   renderALlStore = () => {
-    let {store_product ,product_detail} = this.state;
+    let {store_product ,product_detail, isRefreshing} = this.state;
     let {navigation} = this.props;
-    if (!(tool.length(store_product) > 0)) {
+    if (isRefreshing) {
       return <LoadingView/>;
     }
 

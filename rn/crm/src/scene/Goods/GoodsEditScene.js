@@ -182,8 +182,8 @@ class GoodsEditScene extends PureComponent {
       }
       if (task_id && name) {
         this.setState({
-          remark_id: task_id,
-          name:name
+          task_id: task_id,
+          name: name,
         })
       }
     }
@@ -318,6 +318,7 @@ class GoodsEditScene extends PureComponent {
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
 
+    console.log('formData ==> ', formData);
     if (check_res) {
       this.setState({uploading: true});
       if(this.state.uploading){
@@ -741,7 +742,6 @@ class GoodsEditScene extends PureComponent {
               height: pxToDp(170),
               width: pxToDp(170),
               flexDirection: 'row',
-              alignItems: 'center',
               alignItems: 'flex-end'
             }}>
               <TouchableOpacity
