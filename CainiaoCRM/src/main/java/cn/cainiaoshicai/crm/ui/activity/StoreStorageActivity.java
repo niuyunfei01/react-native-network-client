@@ -262,7 +262,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         addNewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                app.toGoodsNew(StoreStorageActivity.this);
+                boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
+                app.toGoodsNew(StoreStorageActivity.this, isPriceControlled, currStore != null ? currStore.getId() : 0L);
             }
         });
 
@@ -586,7 +587,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                progressFragment.dismissAllowingStateLoss();
+                try {
+                    progressFragment.dismissAllowingStateLoss();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (result != null) {
                     StoreStorageActivity.this.runOnUiThread(new Runnable() {
                         @Override
