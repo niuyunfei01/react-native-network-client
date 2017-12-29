@@ -179,8 +179,11 @@ class GoodsWorkNewProductScene extends PureComponent {
           <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
             <TouchableOpacity
                 onPress={async () => {
+                  if(this.state.upReason){
+                    return false
+                  }
                   await this.setState({upReason: true});
-                  this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
+                  this.changeTaskStatus(Cts.TASK_STATUS_DONE,'')
                 }}
             >
               <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记为以上新</Text>
@@ -304,9 +307,12 @@ class GoodsWorkNewProductScene extends PureComponent {
                   }, {
                     type: 'primary',
                     label: '确定',
-                    onPress: () => {
-                      this.setState({showDialog: false, upReason: true});
-                      this.changeTaskStatus(Cts.TASK_STATUS_DONE, this.state.reason)
+                    onPress: async() => {
+                      if(this.state.upReason){
+                        return false
+                      }
+                      await this.setState({showDialog: false, upReason: true});
+                      this.changeTaskStatus(Cts.TASK_STATUS_CONFIRMED, this.state.reason)
                     }
                   }]}
           >

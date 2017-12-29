@@ -93,22 +93,6 @@ class GoodsWorkNewProductScene extends PureComponent {
     this.getVendorStore = this.getVendorStore.bind(this)
   }
 
-  componentWillMount() {
-  }
-
-  componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setParams({upLoad: this.upLoad});
-  }
-
-  componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
-    let {store_categories, tag_list} = (params || {});
-    if (store_categories && tag_list) {
-      console.log('tag_list -> ', tag_list);
-      this.setState({store_categories: store_categories, tag_list: tag_list});
-    }
-  }
 
   back(type) {
     if (type == 'add') {
@@ -117,7 +101,6 @@ class GoodsWorkNewProductScene extends PureComponent {
       this.props.navigation.goBack();
     }
   }
-
 
   getVendorStore() {
     const {dispatch} = this.props;
@@ -157,14 +140,7 @@ class GoodsWorkNewProductScene extends PureComponent {
       dispatch(newProductSave(formData, accessToken, async (ok, reason, obj) => {
         this.setState({uploading: false});
         if (ok) {
-          ToastLong('申请成功,可继续添加');
-          this.setState({
-            goods_name: '',
-            price_desc: '',
-            slogan: '',
-            list_img: {},
-            upload_files: {},
-          })
+          this.setState({dialogStatus:true})
         } else {
           ToastLong(reason);
         }
@@ -251,6 +227,9 @@ class GoodsWorkNewProductScene extends PureComponent {
         <Button
             style={[styles.save_btn]}
             onPress={() => {
+              if(this.state.uploading){
+                return false
+              }
               this.upLoad()
             }}
         >
@@ -377,6 +356,28 @@ class GoodsWorkNewProductScene extends PureComponent {
               onRequestClose={() => {
               }}
           >提交中</Toast>
+          <Dialog onRequestClose={() => {}}
+                  visible={this.state.dialogStatus}
+                  buttons={[{
+                    type: 'default',
+                    label: '知道了',
+                    onPress: () => {
+                      this.setState({
+                        goods_name: '',
+                        price_desc: '',
+                        slogan: '',
+                        list_img: {},
+                        upload_files: {},
+                        dialogStatus:false
+                      })
+
+                    }
+                  }]}
+          >
+            <Text style = {{width:'100%',textAlign:'center',fontSize:pxToDp(30),color:colors.color333}}>提交成功</Text>
+            <Text style = {{width:'100%',textAlign:'center'}}>门店经理会在三个小时内完成上新操作请耐心等候</Text>
+
+          </Dialog>
         </ScrollView>
     )
   }

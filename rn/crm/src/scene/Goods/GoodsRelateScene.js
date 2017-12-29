@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   InteractionManager,
+  RefreshControl,
 } from 'react-native';
 
 import {connect} from "react-redux";
@@ -51,8 +52,9 @@ class GoodsRelatedScene extends PureComponent {
       loading: false,
       product_detail: '',
       msg: '加载中',
+      isRefreshing:false,
       storesList:[]
-    }
+    };
     this.setBeforeRefresh =  this.setBeforeRefresh.bind(this)
   }
 
@@ -88,9 +90,11 @@ class GoodsRelatedScene extends PureComponent {
     const {dispatch} = this.props;
     let {productId} = this.props.navigation.state.params || {};
     this.setState({loading: true, msg: '加载中'});
-    dispatch(getUnRelationGoodsStores(productId, accessToken, (resp) => {
-      console.log(resp);
-      this.setState({loading: false,storesList:resp.obj});
+    dispatch(getUnRelationGoodsStores(productId,accessToken, (resp) => {
+      this.setState({
+        loading: false,
+        storesList:resp.obj,
+        isRefreshing:false});
       if (resp.ok) {
         this.setState({storesList:resp.obj});
       } else {
@@ -105,9 +109,7 @@ class GoodsRelatedScene extends PureComponent {
         this.forceUpdate()
       }
     })
-
   }
-
   setBeforeRefresh() {
     this.props.navigation.state.params.refreshStoreList()
   }
@@ -135,7 +137,17 @@ class GoodsRelatedScene extends PureComponent {
       }
     }))
   }
+  renderEmpty() {
 
+      return (
+          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+            <Image style={{width: pxToDp(100), height: pxToDp(135)}}
+                   source={require('../../img/Goods/zannwujilu.png')}/>
+            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
+          </View>
+      )
+
+  }
 
   render() {
     let {name, id, price, source_img} = this.state.product_detail
@@ -160,22 +172,33 @@ class GoodsRelatedScene extends PureComponent {
           <View style={{height: pxToDp(70), justifyContent: 'center', paddingHorizontal: pxToDp(30)}}>
             <Text>关联店铺</Text>
           </View>
-          <ScrollView style={{backgroundColor: '#fff'}}>
+          <ScrollView style={{backgroundColor: '#fff',flex:1}}
+                      refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.isRefreshing}
+                            onRefresh={() => {
+                              this.setState({isRefreshing:true});
+                              this.getStoresList()
+                            }}
+                            tintColor='gray'
+                        />
+                      }
+          >
             {
-              this.state.storesList.map((item,index) => {
+              this.state.storesList.length > 0 ? this.state.storesList.map((item, index) => {
                 return (
-                    <View style={styles.item} key = {index}>
+                    <View style={styles.item} key={index}>
                       <Text style={[styles.name, {color: colors.color333}]}>{item.name}</Text>
                       <TouchableOpacity
                           onPress={() => {
-                            this.productToStore(item.store_id,id);
+                            this.productToStore(item.store_id, id);
                           }}
                       >
                         <Text style={[styles.btn, styles.order_price]}>关联</Text>
                       </TouchableOpacity>
                     </View>
                 )
-              })
+              }) :this.renderEmpty()
             }
           </ScrollView>
           <Toast
