@@ -130,7 +130,7 @@ class GoodsEditScene extends PureComponent {
       store_product: [],
       vendor_stores: '',
       goBackValue: false,
-      remark_id: 0,
+      task_id: 0,
 
     };
     this.uploadImg = this.uploadImg.bind(this);
@@ -176,22 +176,20 @@ class GoodsEditScene extends PureComponent {
       });
     } else {
       let vendor_store = this.toStores(this.props.mine.vendor_stores[this.state.vendor_id]);
-      let {remark_id, name} = this.props.navigation.state.params || {};
+      let {task_id, name} = this.props.navigation.state.params || {};
       if (vendor_store) {
         this.setState({vendor_stores: vendor_store})
       } else {
         _this.getVendorStore()
       }
-      if (remark_id && name) {
+
+      if (task_id && name) {
         this.setState({
-          remark_id: remark_id,
+          remark_id: task_id,
           name:name
         })
       }
-
-
     }
-
   }
 
   componentDidMount() {
@@ -216,7 +214,7 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  async setBeforeRefresh(checked) {
+  async setBeforeRefresh() {
     let {state, dispatch} = this.props.navigation;
     const setRefreshAction = NavigationActions.setParams({
       params: {isRefreshing: true},

@@ -238,6 +238,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_CLASSIFY]: { screen: GoodsClassifyScene },
         [Config.ROUTE_GOODS_APPLY_RECORD]: { screen: GoodsApplyRecordScene },
         [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
+        [Config.ROUTE_GOODS_APPLY_NEW_PRODUCT]: {screen: GoodsApplyNewProductScene},
         [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},

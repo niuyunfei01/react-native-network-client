@@ -38,7 +38,7 @@ class GoodsClassifyScene extends PureComponent {
   };
 
   constructor(props) {
-    super(props)
+    super(props);
     const {store_categories, vendor_id} = this.props.navigation.state.params
     const store_tags = this.toCheckBoxData(this.props.product.store_tags[vendor_id])
     this.state = {

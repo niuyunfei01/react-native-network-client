@@ -21,15 +21,15 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {getGoodsProduct} from "../../reducers/product/productActions";
-import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
+import {markTaskDone} from '../../reducers/remind/remindActions'
 import colors from "../../styles/colors";
 import tool from '../../common/tool';
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
-import {Toast, Dialog, Icon, Button,Input} from "../../weui/index";
+import {Toast, Dialog, Icon, Button, Input} from "../../weui/index";
 import Cts from '../../Cts'
 import Config from "../../config";
 
@@ -42,6 +42,7 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       getGoodsProduct,
+      markTaskDone,
       ...globalActions
     }, dispatch)
   }
@@ -71,36 +72,28 @@ class GoodsWorkNewProductScene extends PureComponent {
 
     super(props);
     this.state = {
-      isRefreshing: false,
       isUploadImg: false,
       provided: 1,
       name: '',
-      describe: '',
-      content: '',
       list_img: {},
       upload_files: {},
       goBackValue: false,
-      obj: {
-        "id": "5127",
-        "remark": "硒砂瓜",
-        "slogan": "",
-        "images": []
-      },
       uploading: false,
       showDialog: false,
-
+      price_desc: '',
+      slogan: '',
+      images: [],
+      reason: '',
     };
-    this.renderBtn = this.renderBtn.bind(this)
+    this.renderBtn = this.renderBtn.bind(this);
+    this.setBeforeRefresh = this.setBeforeRefresh.bind(this);
   }
 
   componentWillMount() {
-    this.getRemark()
+    this.getRemark();
+    this.setState({task_id:this.props.navigation.state.params.task_id});
   }
 
-  componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setParams({upLoad: this.upLoad});
-  }
 
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
@@ -123,17 +116,40 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {task_id} = this.props.navigation.state.params;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    let _this = this;
-    this.setState({uploading: true})
+    this.setState({uploading: true});
     dispatch(getGoodsProduct(task_id, accessToken, (resp) => {
-      this.setState({uploading: false})
-
+      this.setState({uploading: false});
       if (resp.ok) {
-        this.setState({obj: resp.obj})
+        let {remark, price_desc, slogan, images} = resp.obj;
+        this.setState({
+          name: remark,
+          price_desc: price_desc,
+          slogan: slogan,
+          images: images,
+        })
       } else {
-        ToastLong('resp.desc' + '请返回重试')
+        ToastLong(resp.desc + '请返回重试')
       }
     }));
+  }
+
+  setBeforeRefresh() {
+    this.props.navigation.state.params.refresh_list();
+    this.props.navigation.goBack();
+  }
+
+  async changeTaskStatus(status, reason = '') {
+    let {task_id} = this.props.navigation.state.params;
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    dispatch(markTaskDone(accessToken, task_id, status, async (ok, reason) => {
+      this.setState({upReason: false});
+      if (ok) {
+        await this.setState({reason:''})
+        this.setBeforeRefresh();
+        this.props.navigation.goBack();
+      }
+    }, reason));
   }
 
   renderBtn(type) {
@@ -144,9 +160,8 @@ class GoodsWorkNewProductScene extends PureComponent {
               onPress={() => {
                 this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'add',
-                  remark_id: this.state.obj.id,
-                  name:this.state.obj.remark
-
+                  task_id: this.state.task_id,
+                  name: this.state.name,
                 })
               }}
           >
@@ -161,13 +176,22 @@ class GoodsWorkNewProductScene extends PureComponent {
             <Text style={{color: colors.main_color}}>暂不上新</Text>
           </Button>
 
-          {/*<Text style=>标记为以上新</Text>*/}
+          <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
+            <TouchableOpacity
+                onPress={async () => {
+                  await this.setState({upReason: true});
+                  this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
+                }}
+            >
+              <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记为以上新</Text>
+            </TouchableOpacity>
+          </View>
         </View>
     )
   }
 
   renderImg(images = []) {
-    console.log('images>>>>>>>>', images);
+
     if (images.length > 0) {
       return (
           <View style={[styles.area_cell, styles.add_img_wrapper]}>
@@ -198,7 +222,7 @@ class GoodsWorkNewProductScene extends PureComponent {
   }
 
   render() {
-    let {remark, price_desc, slogan, images} = this.state.obj;
+    let {name, price_desc, slogan, images} = this.state;
     return (
         <ScrollView style={{flex: 1}}>
           <View>
@@ -209,7 +233,7 @@ class GoodsWorkNewProductScene extends PureComponent {
                 </CellHeader>
                 <CellBody>
                   <Text style={[styles.input_text]}>
-                    {remark}
+                    {name}
                   </Text>
                 </CellBody>
               </Cell>
@@ -261,27 +285,38 @@ class GoodsWorkNewProductScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <Toast
+              icon="loading"
+              show={this.state.upReason}
+              onRequestClose={() => {
+              }}
+          >提交中..</Toast>
           <Dialog onRequestClose={() => {
           }}
                   visible={this.state.showDialog}
                   title={'备注(理由)'}
-                  titleStyle={{flexDirection:'row',justifyContent:'center'}}
                   buttons={[{
                     type: 'default',
                     label: '取消',
                     onPress: () => {
                       this.setState({showDialog: false})
                     }
-                  },{
+                  }, {
                     type: 'primary',
                     label: '确定',
                     onPress: () => {
-                      this.setState({showDialog: false})
+                      this.setState({showDialog: false, upReason: true});
+                      this.changeTaskStatus(Cts.TASK_STATUS_DONE, this.state.reason)
                     }
                   }]}
           >
             <Input
                 multiline={true}
+                style={{height: pxToDp(90)}}
+                value={this.state.reason}
+                onChangeText={(text) => {
+                  this.setState({reason: text})
+                }}
             />
           </Dialog>
         </ScrollView>

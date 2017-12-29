@@ -336,7 +336,7 @@ class RemindScene extends PureComponent {
   renderItem(remind) {
     let {item, index} = remind;
     return (
-      <RemindItem item={item} index={index} key={index} onPressDropdown={this.onPressDropdown.bind(this)}
+      <RemindItem item={item} index={index} key={index} onRefresh={() => this.onRefresh(item.type)} onPressDropdown={this.onPressDropdown.bind(this)}
                   onPress={this.onPress.bind(this)}/>
     );
   }
@@ -374,8 +374,6 @@ class RemindScene extends PureComponent {
         </ScrollView>
       );
     }
-
-    // console.log('screen', screen);
 
     return (
       <FlatList
@@ -447,7 +445,6 @@ class RemindScene extends PureComponent {
       let key = typeId + "-" + _typeAlias[index];
       let label = Alias.CATEGORIES[typeId];
       let tabTagId = typeId;
-      //other type
       if (typeId == _otherTypeTag) {
         typeId = self.state.otherTypeActive;
       }
@@ -526,7 +523,8 @@ class RemindItem extends React.PureComponent {
     item: PropTypes.object,
     index: PropTypes.number,
     onPressDropdown: PropTypes.func,
-    onPress: PropTypes.func
+    onPress: PropTypes.func,
+    onRefresh: PropTypes.func,
   };
 
   constructor() {
@@ -547,14 +545,20 @@ class RemindItem extends React.PureComponent {
   }
 
   render() {
-    let {item, index, onPressDropdown, onPress} = this.props;
+    let {item, index, onPressDropdown,navigation, onPress} = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
           if (item.order_id > 0) {
             onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
           } else if (parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS) {
-            onPress(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, {task_id: item.id})
+            let params = {
+              task_id: item.id,
+              refresh_list: () => {
+                this.props.onRefresh()
+              }
+            };
+            onPress(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, params);
           }
         }}
         activeOpacity={0.6}

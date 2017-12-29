@@ -12,7 +12,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchProductDetail} from "../../reducers/product/productActions";
+import {fetchProductDetail,getUnRelationGoodsStores,RelateToStore} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from '../../styles/colors'
 import {ToastLong} from '../../util/ToastUtils';
@@ -29,6 +29,8 @@ function mapDispatchToProps(dispatch) {
     dispatch,
     ...bindActionCreators({
       fetchProductDetail,
+      getUnRelationGoodsStores,
+      RelateToStore,
       ...globalActions
     }, dispatch)
   }
@@ -48,12 +50,10 @@ class GoodsRelatedScene extends PureComponent {
     this.state = {
       loading: false,
       product_detail: '',
-      msg: '加载中'
+      msg: '加载中',
+      storesList:[]
     }
-  }
-
-  doUpload() {
-    this.setState({loading: true, msg: '关联中'})
+    this.setBeforeRefresh =  this.setBeforeRefresh.bind(this)
   }
 
   componentWillMount() {
@@ -61,6 +61,7 @@ class GoodsRelatedScene extends PureComponent {
     if (productId < 0 || product_detail) {
       this.getProductDetail(productId)
     }
+    this.getStoresList()
   }
   getProductDetail(productId) {
     const {accessToken} = this.props.global;
@@ -82,6 +83,55 @@ class GoodsRelatedScene extends PureComponent {
       }));
     });
   }
+  getStoresList(){
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {productId} = this.props.navigation.state.params || {};
+    this.setState({loading: true, msg: '加载中'});
+    dispatch(getUnRelationGoodsStores(productId, accessToken, (resp) => {
+      console.log(resp);
+      this.setState({loading: false,storesList:resp.obj});
+      if (resp.ok) {
+        this.setState({storesList:resp.obj});
+      } else {
+        ToastLong(resp.desc)
+      }
+    }))
+  }
+  deleteFromArr(id){
+    this.state.storesList.forEach((item,index)=>{
+      if(item.store_id == id){
+        this.state.storesList.splice(index,1);
+        this.forceUpdate()
+      }
+    })
+
+  }
+
+  setBeforeRefresh() {
+    this.props.navigation.state.params.refreshStoreList()
+  }
+  productToStore(storeId,productId){
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    this.setState({loading: true, msg: '正在关联..'});
+    let data = {
+      store_id:storeId,
+      product_id:productId
+    };
+    console.log(data);
+    dispatch(RelateToStore(data, accessToken, (ok,reason,obj) => {
+      this.setState({loading: false});
+      if (ok) {
+        ToastLong('关联成功');
+        this.setBeforeRefresh();
+        this.deleteFromArr(storeId);
+      } else {
+        ToastLong(reason)
+      }
+    }))
+  }
+
 
   render() {
     let {name, id, price, source_img} = this.state.product_detail
@@ -107,16 +157,22 @@ class GoodsRelatedScene extends PureComponent {
             <Text>关联店铺</Text>
           </View>
           <ScrollView style={{backgroundColor: '#fff'}}>
-            <View style={styles.item}>
-              <Text style={[styles.name, {color: colors.color333}]}>名字</Text>
-              <TouchableOpacity
-                  onPress={() => {
-                    this.doUpload();
-                  }}
-              >
-                <Text style={[styles.btn, styles.order_price]}>关联</Text>
-              </TouchableOpacity>
-            </View>
+            {
+              this.state.storesList.map((item,index) => {
+                return (
+                    <View style={styles.item} key = {index}>
+                      <Text style={[styles.name, {color: colors.color333}]}>{item.name}</Text>
+                      <TouchableOpacity
+                          onPress={() => {
+                            this.productToStore(item.store_id,id);
+                          }}
+                      >
+                        <Text style={[styles.btn, styles.order_price]}>关联</Text>
+                      </TouchableOpacity>
+                    </View>
+                )
+              })
+            }
           </ScrollView>
           <Toast
               icon="loading"

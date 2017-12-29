@@ -343,7 +343,8 @@ class GoodsDetailScene extends PureComponent {
                     productId:this.productId,
                     store_product:store_product,
                     product_detail:product_detail,
-                    detail_key:navigation.state.key
+                    detail_key:navigation.state.key,
+                    refreshStoreList:() => this.getVendorProduct()
                   });
                 });
               }}

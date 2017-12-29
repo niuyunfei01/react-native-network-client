@@ -263,3 +263,27 @@ export function getGoodsProduct(task_id, token, callback) {
   )
 
 }
+export function getUnRelationGoodsStores(product_id, token, callback) {
+  let url = `api/get_un_relation_goods_stores/${product_id}.json?access_token=${token}`;
+  return jsonWithTpl2(url, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
+}
+
+
+export function RelateToStore(data, token, callback) {
+  let url = `api/relation_goods_to_store.json?access_token=${token}`;
+  return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
+}
