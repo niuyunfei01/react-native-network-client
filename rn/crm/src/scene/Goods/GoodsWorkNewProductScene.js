@@ -152,7 +152,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     }, reason));
   }
 
-  renderBtn(type) {
+  renderBtn() {
     return (
         <View style={{paddingVertical: pxToDp(20)}}>
           <Button
@@ -160,7 +160,7 @@ class GoodsWorkNewProductScene extends PureComponent {
               onPress={() => {
                 this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'add',
-                  task_id: this.state.task_id,
+                  task_id: this.props.navigation.state.params.task_id,
                   name: this.state.name,
                 })
               }}

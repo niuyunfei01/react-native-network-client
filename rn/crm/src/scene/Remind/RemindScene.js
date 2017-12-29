@@ -545,7 +545,14 @@ class RemindItem extends React.PureComponent {
   }
 
   render() {
-    let {item, index, onPressDropdown,navigation, onPress} = this.props;
+    let {item, onPressDropdown, onPress} = this.props;
+    let task_type = parseInt(item.type);
+    let task_info = item.remark;
+    if(task_type === Cts.TASK_TYPE_UPLOAD_NEW_GOODS){
+      let new_goods_info = eval('(' + item.remind_id + ')');
+      task_info = '申请上架: '+ item.remark + ';  价格: ' + new_goods_info.price_desc;
+    }
+
     return (
       <TouchableOpacity
         onPress={() => {
@@ -597,10 +604,8 @@ class RemindItem extends React.PureComponent {
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>
                   <Text style={top_styles.o_content}>
-                    {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS ?
-                      '申请上架: '+ item.remark + ';  价格: ' + eval('(' + item.remind_id + ')').price_desc :
-                      item.remark}
-                    {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
+                    {task_info}
+                    {task_type === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
