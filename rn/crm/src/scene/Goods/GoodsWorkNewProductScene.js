@@ -186,13 +186,12 @@ class GoodsWorkNewProductScene extends PureComponent {
                   this.changeTaskStatus(Cts.TASK_STATUS_DONE,'')
                 }}
             >
-              <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记为以上新</Text>
+              <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新</Text>
             </TouchableOpacity>
           </View>
         </View>
     )
   }
-
   renderImg(images = []) {
 
     if (images.length > 0) {
@@ -261,7 +260,6 @@ class GoodsWorkNewProductScene extends PureComponent {
                       multiline={true}
                       underlineColorAndroid='transparent'
                       editable={false}
-                      placeholder='请输入商品介绍'
                       placeholderTextColor={"#7A7A7A"}
                       style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
                       value={slogan}
