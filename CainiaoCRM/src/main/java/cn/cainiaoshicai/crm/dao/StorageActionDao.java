@@ -13,6 +13,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.domain.Product;
@@ -147,6 +148,7 @@ public class StorageActionDao {
             if (tag != null) {
                 params.put("tag_id", String.valueOf(tag.getId()));
             }
+            params.put("sale_price", "1");
             String json = getJson("/list_store_storage_status/0/" + store.getId() + "/" + filter, params);
             AppLogger.i("list_store_storage_status json result " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -160,6 +162,11 @@ public class StorageActionDao {
             }
 
             if (storagesMap.getStore_products() != null) {
+
+                StorageStatusResults.ExtPrice ep = storagesMap.getExt_price();
+                HashMap<Integer, Integer> plOfExt = ep == null ? null : ep.getExt_store();
+                HashMap<Integer, List<StorageStatusResults.WMPrice>> mapOfPids = ep == null ? null : ep.getWmPricesOfPid();
+
                 for (StoreProduct sp : storagesMap.getStore_products()) {
                     StorageItem si = new StorageItem();
                     si.setId(sp.getId());
@@ -187,6 +194,18 @@ public class StorageActionDao {
                         si.setTag_code(pd.getTag_code());
                         si.setThumbPicUrl(to_full_path(pd.getCoverimg()));
                     }
+
+                    if (mapOfPids != null && plOfExt != null) {
+                        List<StorageStatusResults.WMPrice> prices = mapOfPids.get(sp.getProduct_id());
+                        if (prices != null) {
+                            for (StorageStatusResults.WMPrice p : prices) {
+                                Integer pl = plOfExt.get(p.getExt_store_id());
+                                if (!si.getWm().containsKey(pl)) {
+                                    si.getWm().put(pl, p);
+                                }
+                            }
+                        }
+                    }
                     storageItems.add(si);
                 }
             }
@@ -194,6 +213,7 @@ public class StorageActionDao {
             if (stats != null) {
                 stats.setTotal_req_cnt(storagesMap.getTotal_req_cnt());
             }
+
             return new Pair<>(storageItems, stats);
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);

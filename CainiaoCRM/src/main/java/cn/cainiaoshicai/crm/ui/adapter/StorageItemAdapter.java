@@ -10,21 +10,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
+import cn.cainiaoshicai.crm.domain.StorageStatusResults;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.domain.Vendor;
-import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
@@ -32,8 +33,8 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
-    Activity context;
-    Store store;
+    private Activity context;
+    private Store store;
 
     public StorageItemAdapter(Activity context, ArrayList<T> objects) {
         super(context, R.layout.storage_status_row, objects);
@@ -73,6 +74,12 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
             holder.applyingPrice = row.findViewById(R.id.applying_price);
             holder.supplyPrice = row.findViewById(R.id.supply_price);
+
+            holder.wmBaidu = row.findViewById(R.id.wm_bd);
+            holder.wmElema = row.findViewById(R.id.wm_elema);
+            holder.wmJingdong = row.findViewById(R.id.wm_jd);
+            holder.wmMeituan = row.findViewById(R.id.wm_mt);
+            holder.wmInfoBar = row.findViewById(R.id.wm_info_bar);
 
             convertView = row;
             convertView.setTag(holder);
@@ -143,7 +150,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             });
         }
 
-
         if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
             holder.req_total.setText("订货:" + item.getTotalInReq());
             holder.req_total.setVisibility(View.VISIBLE);
@@ -168,6 +174,37 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.riskNum.setText("最低库存: " + item.getRisk_min_stat());
 
+        holder.wmBaidu.setVisibility(View.INVISIBLE);
+        holder.wmJingdong.setVisibility(View.INVISIBLE);
+        holder.wmMeituan.setVisibility(View.INVISIBLE);
+        holder.wmElema.setVisibility(View.INVISIBLE);
+
+        boolean allInvisible = true;
+        for(Map.Entry<Integer, StorageStatusResults.WMPrice> en: item.getWm().entrySet()) {
+            Button btn = null;
+            if (en.getKey() == Cts.PLAT_BD.id) {
+                btn = holder.wmBaidu;
+            } else if (en.getKey() == Cts.PLAT_ELEME.id) {
+                btn = holder.wmElema;
+            } else if (en.getKey() == Cts.PLAT_JDDJ.id) {
+                btn = holder.wmJingdong;
+            } else if (en.getKey() == Cts.PLAT_MT.id) {
+                btn = holder.wmMeituan;
+            }
+
+            if (btn != null) {
+                String price = String.format("%.2f", (double)(en.getValue().getPrice() / 100.0));
+                btn.setText(price);
+                btn.setTextSize(10);
+                final int color;
+                color = en.getValue().getStatus() == StorageItem.STORE_PROD_OFF_SALE ? R.color.white : R.color.black;
+                btn.setTextColor(ContextCompat.getColor(getContext(), color));
+                btn.setVisibility(View.VISIBLE);
+                allInvisible = false;
+            }
+        }
+
+        holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
 
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day()/5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
@@ -259,11 +296,19 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView req_total;
         TextView riskNum;
 
-        public TextView supplyPrice;
-        public TextView applyingPrice;
+        TextView supplyPrice;
+        TextView applyingPrice;
 
         TextView reOnSale;
-        public TextView salePrice;
-        public ImageView goodIcon;
+        TextView salePrice;
+        ImageView goodIcon;
+
+        Button wmWeixin;
+        Button wmBaidu;
+        Button wmElema;
+        Button wmMeituan;
+        Button wmJingdong;
+
+        LinearLayout wmInfoBar;
     }
 }

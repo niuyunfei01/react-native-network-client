@@ -548,8 +548,8 @@ class RemindItem extends React.PureComponent {
     let {item, onPressDropdown, onPress} = this.props;
     let task_type = parseInt(item.type);
     let task_info = item.remark;
-    if(task_type === Cts.TASK_TYPE_UPLOAD_NEW_GOODS){
-      let new_goods_info = eval('(' + item.remind_id + ')');
+    if(task_type === Cts.TASK_TYPE_UPLOAD_NEW_GOODS && item.remind_id){
+      let new_goods_info = JSON.parse(item.remind_id);
       task_info = '申请上架: '+ item.remark + ';  价格: ' + new_goods_info.price_desc;
     }
 
