@@ -115,5 +115,6 @@ export default {
   SHIP_ZS_BD : 24, //百度专送
 
   TAG_HIDE: '74911547', //列表中隐藏tag_id
+  ORDER_CANCEL_SHIP_REASON:10000
 
 }

@@ -342,3 +342,30 @@ export function addTipMoney(order_id,money,token,callback) {
     );
   }
 }
+
+export function cancelReasonsList(order_id,token,callback) {
+  return dispatch => {
+    const url = `api/order_dada_cancel_reasons/${order_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
+  export function cancelShip(order_id,reason_id,data,token,callback) {
+    const url = `api/order_dada_cancel/${order_id}/${reason}.json?access_token=${token}`;
+    console.log(url,id, reason_id, data, token);
+    return false;
+    return jsonWithTpl2(url, data, (json) => {
+          callback(json.ok, json.reason, json.obj);
+        },
+        (error) => {
+          callback(error, "网络错误, 请稍后重试")
+        }
+    )
+  }

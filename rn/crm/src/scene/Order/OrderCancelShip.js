@@ -1,13 +1,17 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import React, {Component} from 'react'
+import {Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
-import {orderCallShip} from '../../reducers/order/orderActions'
+import {orderCallShip, cancelReasonsList, cancelShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, RadioCells, ButtonArea,Toast, Dialog, CellsTitle} from "../../weui/index";
+import {Button, RadioCells, Icon, ButtonArea, Toast, Input, Dialog, CellsTitle} from "../../weui/index";
+
 import S from '../../stylekit'
+import pxToDp from "../../util/pxToDp";
+import Cts from "../../Cts";
+import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -16,13 +20,12 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({orderCallShip}, dispatch)}
+  return {dispatch, ...bindActionCreators({orderCallShip, cancelReasonsList, cancelShip}, dispatch)}
 }
 
 class OrderCancelShip extends Component {
-
   static navigationOptions = {
-    headerTitle: '取消配送',
+    headerTitle: '撤回呼叫',
   };
 
   constructor(props: Object) {
@@ -32,90 +35,157 @@ class OrderCancelShip extends Component {
       option: -1,
       doneSubmitting: false,
       onSubmitting: false,
+      list: [],
+      showDialog: false,
+      loading: true,
+      reason: '',
+      showOtherDialog: false,
+      upLoading: false,
     };
 
     this._onTypeSelected = this._onTypeSelected.bind(this);
-    this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
-    this._doReply = this._doReply.bind(this);
+
+  }
+
+  componentWillMount() {
+    this.getCancelReasons();
   }
 
   _onTypeSelected(idx) {
     this.setState({option: idx});
   }
 
-  _checkDisableSubmit() {
-    return !this.state.option;
+  isShowDialog() {
+    let option = this.state.option;
+    console.log(option);
+    if (option === Cts.ORDER_CANCEL_SHIP_REASON) {
+      this.setState({showOtherDialog: true,reason:''})
+    } else {
+      this.setState({showDialog: true})
+    }
   }
 
-  _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
-    this.setState({onSubmitting: true});
-    dispatch(orderCallShip(global.accessToken, order.id, this.state.option, (ok, msg, data) => {
-      this.setState({onSubmitting: false});
-      if (ok) {
-        this.setState({doneSubmitting: true});
-        setTimeout(() => {
-          this.setState({doneSubmitting: false});
-          navigation.goBack();
-        }, 2000);
-      } else {
-        this.setState({errorHints: msg});
+  getCancelReasons() {
+    let token = this.props.global.accessToken;
+    let {id} = this.props.navigation.state.params.order;
+    let {dispatch} = this.props;
+    dispatch(cancelReasonsList(id, token, async (resp) => {
+      this.setState({list: resp,loading: false});
+    }));
+  }
+
+  upCancelShip() {
+    if (this.state.upLoading) {
+      return false
+    }
+    let {id, auto_ship_type,} = this.props.navigation.state.params.order;
+    let reason_id = this.state.option;
+    let reason_text = this.state.reason;
+    let token = this.props.global.accessToken;
+    let {dispatch} = this.props;
+    let data = {
+      type: auto_ship_type,
+      reason_text: reason_text
+    };
+    console.log(id, reason_id, data, token);
+    dispatch(cancelShip(id, reason_id, data, token, async (resp) => {
+      this.setState({upLoading:false});
+      if(resp.ok){
+        ToastLong('撤销成功')
+      }else {
+        ToastLong(resp.desc)
       }
-    }))
+
+    }));
   }
 
   render() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
-    const wayOpts = order.callWays.map((way, idx) => {
-      const estimate = way.estimate ? `(${way.estimate})` : '';
-      return {label: `${way.name}${estimate}`, value: way.way}
+    const wayOpts = this.state.list.map((item, idx) => {
+      return {label: item.info, value: item.id}
     });
-
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
-
-      <Dialog onRequestClose={() => {}}
-              visible={!!this.state.errorHints}
-              buttons={[{
-                type: 'default',
-                label: '知道了',
-                onPress: () => {
-                  this.setState({errorHints: ''})
-                }
-              }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
-
-      <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
-        <Text style={{ fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>
-      </View>
-
-      <CellsTitle style={CommonStyle.cellsTitle}>选择第三方配送</CellsTitle>
-       <RadioCells
-        style={{marginTop: 2}}
-        options={wayOpts}
-        onChange={this._onTypeSelected}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.option}
+      <RadioCells
+          style={{marginTop: 2}}
+          options={wayOpts}
+          onChange={this._onTypeSelected}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.option}
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>呼叫配送</Button>
+        <Button type={this.state.option > 0 ? 'primary' : 'default'}
+                disabled={this.state.option > 0 ? false : true}
+                onPress={() => {
+                  this.isShowDialog()
+                }}
+                style={[S.mlr15]}>撤回呼叫</Button>
       </ButtonArea>
 
       <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+          icon="loading"
+          show={this.state.loading}
+          onRequestClose={() => {
+          }}
+      >加载中</Toast>
 
       <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >已发出</Toast>
+          icon="loading"
+          show={this.state.upLoading}
+          onRequestClose={() => {
+          }}
+      >提交中</Toast>
+
+      <Dialog onRequestClose={() => {
+      }}
+              visible={this.state.showOtherDialog}
+              title={'撤销理由'}
+              buttons={[{
+                type: 'default',
+                label: '取消',
+                onPress: () => {
+                  this.setState({showOtherDialog: false})
+                }
+              }, {
+                type: 'primary',
+                label: '确定',
+                onPress: async () => {
+                  this.setState({showOtherDialog: false, upLoading: true})
+                  this.upCancelShip()
+
+                }
+              }]}
+      >
+        <Input
+            multiline={true}
+            style={{height: pxToDp(90)}}
+            value={this.state.reason}
+            onChangeText={(text) => {
+              this.setState({reason: text})
+            }}
+        />
+      </Dialog>
+
+      <Dialog onRequestClose={() => {
+      }}
+              visible={this.state.showDialog}
+              title={''}
+              buttons={[{
+                type: 'default',
+                label: '取消',
+                onPress: () => {
+                  this.setState({showDialog: false})
+                }
+              }, {
+                type: 'primary',
+                label: '确定',
+                onPress: async () => {
+                  this.setState({showDialog: false, upLoading: true})
+                  this.upCancelShip()
+                }
+              }]}
+      >
+        <Text>确定撤销呼叫吗?</Text>
+      </Dialog>
     </ScrollView>
   }
 }
