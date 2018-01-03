@@ -387,6 +387,7 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderStoreProduct = (store_product) => {
+    console.log('store_product',store_product);
     let is_dark_bg = false;
     let _this = this;
 
@@ -395,11 +396,25 @@ class GoodsDetailScene extends PureComponent {
       return (
         <View key={store_id} style={[styles.store_info, styles.top_line,styles.show_providing]}>
           <View style={[styles.store_view]}>
-            <Text style={[styles.info_text, styles.store_name]}>{s_product.store_name}</Text>
+            <Text style={[styles.info_text, styles.store_name,{flex:1}]}>{s_product.store_name}</Text>
             {_this.renderIcon(parseInt(s_product.status))}
           </View>
+
           <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
-          <Text style={[styles.info_text, styles.sale_price]}>¥ {s_product.price/100}</Text>
+          <View style = {{flexDirection:'row',alignItems:'center',width:pxToDp(150)}}>
+            <Text style={[styles.info_text, styles.sale_price]}>
+              ¥ {parseInt(s_product.fn_price_controlled) === 0  ?  s_product.price / 100 :s_product.supply_price / 100 }
+            </Text>
+            {parseInt(s_product.fn_price_controlled) === 0 ? null :
+                <Image
+                    resizeMode={'contain'}
+                    style={{height: pxToDp(34), width: pxToDp(34)}}
+                    source={require('../../img/Goods/bao_.png')}
+                />
+            }
+
+          </View>
+
           {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
             {_this.headerSupply(s_product.self_provided)}
           </Text> : null}
@@ -630,7 +645,7 @@ const styles = StyleSheet.create({
   },
   store_view: {
     paddingLeft: 0,
-    width: pxToDp(210),
+    width: pxToDp(200),
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -642,7 +657,7 @@ const styles = StyleSheet.create({
   },
   sale_price: {
     textAlign: 'center',
-    width: pxToDp(150),
+    width: pxToDp(120),
   },
   is_provide: {
     textAlign: 'center',

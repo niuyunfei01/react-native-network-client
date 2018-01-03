@@ -62,8 +62,7 @@ class GoodsEditScene extends PureComponent {
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
             if (!!backPage) {
-              console.log('backPage -> ', backPage);
-              native.gotoPage(backPage);
+              native.nativeBack();
             } else {
               navigation.goBack();
             }

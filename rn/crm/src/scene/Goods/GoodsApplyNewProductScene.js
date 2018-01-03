@@ -23,7 +23,7 @@ import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {uploadImg,newProductSave} from "../../reducers/product/productActions";
+import {uploadImg, newProductSave} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
@@ -31,7 +31,7 @@ import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
-import {Toast, Dialog, Icon,Button} from "../../weui/index";
+import {Toast, Dialog, Icon, Button} from "../../weui/index";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -54,13 +54,13 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {type, backPage} = params;
 
     return {
-      headerTitle: '我要上新' ,
+      headerTitle: '我要上新',
       headerLeft: (<NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
             if (type == 'add') {
-              native.gotoPage(type);
+              native.nativeBack();
             } else {
               navigation.goBack();
             }
@@ -77,8 +77,8 @@ class GoodsWorkNewProductScene extends PureComponent {
       currStoreId = this.props.global.currStoreId;
     }
     this.state = {
-      vendor_id:currVendorId,
-      store_id:currStoreId,
+      vendor_id: currVendorId,
+      store_id: currStoreId,
       isRefreshing: false,
       isUploadImg: false,
       goods_name: '',
@@ -140,7 +140,7 @@ class GoodsWorkNewProductScene extends PureComponent {
       dispatch(newProductSave(formData, accessToken, async (ok, reason, obj) => {
         this.setState({uploading: false});
         if (ok) {
-          this.setState({dialogStatus:true})
+          this.setState({dialogStatus: true})
         } else {
           ToastLong(reason);
         }
@@ -151,7 +151,7 @@ class GoodsWorkNewProductScene extends PureComponent {
   dataValidate(formData) {
     let {goods_name, price_desc} = formData;
     let err_msg = '';
-    if (goods_name.length <= 0 ) {
+    if (goods_name.length <= 0) {
       err_msg = '请输入商品名';
     }
     else if (price_desc <= 0) {
@@ -193,7 +193,7 @@ class GoodsWorkNewProductScene extends PureComponent {
   uploadImg(image_info) {
     const {dispatch} = this.props;
     let {isUploadImg, list_img, upload_files} = this.state;
-    if(isUploadImg){
+    if (isUploadImg) {
       return false;
     }
     this.setState({isUploadImg: true});
@@ -217,22 +217,32 @@ class GoodsWorkNewProductScene extends PureComponent {
           isUploadImg: false,
         });
       }
-    },'ProductApply'));
+    }, 'ProductApply'));
   }
 
-  renderBtn(type) {
+  renderBtn() {
     return (
-        <Button
-            style={[styles.save_btn]}
-            onPress={() => {
-              if(this.state.uploading){
-                return false
-              }
-              this.upLoad()
-            }}
-        >
-          <Text style = {{color:colors.white}}>保存</Text>
-        </Button>
+        <View>
+          <Button
+              style={[styles.save_btn]}
+              onPress={() => {
+                if (this.state.uploading) {
+                  return false
+                }
+                this.upLoad()
+              }}
+          >
+            <Text style={{color: colors.white}}>保存</Text>
+          </Button>
+          <Button
+              style={[styles.save_btn, {backgroundColor: colors.back_color, borderColor: colors.main_color}]}
+              onPress={() => {
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add',})
+              }}
+
+          ><Text style={{color: colors.main_color}}>直接上新</Text></Button>
+        </View>
+
     )
   }
 
@@ -342,8 +352,9 @@ class GoodsWorkNewProductScene extends PureComponent {
             </View>
           </View>
           {
-            this.renderBtn('NewProduct')
+            this.renderBtn()
           }
+
           <Toast
               icon="loading"
               show={this.state.isUploadImg}
@@ -354,7 +365,8 @@ class GoodsWorkNewProductScene extends PureComponent {
               onRequestClose={() => {
               }}
           >提交中</Toast>
-          <Dialog onRequestClose={() => {}}
+          <Dialog onRequestClose={() => {
+          }}
                   visible={this.state.dialogStatus}
                   buttons={[{
                     type: 'default',
@@ -366,15 +378,14 @@ class GoodsWorkNewProductScene extends PureComponent {
                         slogan: '',
                         list_img: {},
                         upload_files: {},
-                        dialogStatus:false
+                        dialogStatus: false
                       })
 
                     }
                   }]}
           >
-            <Text style = {{width:'100%',textAlign:'center',fontSize:pxToDp(30),color:colors.color333}}>提交成功</Text>
-            <Text style = {{width:'100%',textAlign:'center'}}>门店经理会在三个小时内完成上新操作请耐心等候</Text>
-
+            <Text style={{width: '100%', textAlign: 'center', fontSize: pxToDp(30), color: colors.color333}}>提交成功</Text>
+            <Text style={{width: '100%', textAlign: 'center'}}>门店经理会在三个小时内完成上新操作请耐心等候</Text>
           </Dialog>
         </ScrollView>
     )
@@ -392,8 +403,8 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginLeft: 0,
     borderWidth: 0,
-    borderBottomWidth:0,
-    borderTopWidth:0
+    borderBottomWidth: 0,
+    borderTopWidth: 0
   },
 
   my_cell: {
@@ -441,7 +452,7 @@ const styles = StyleSheet.create({
   input_text: {
     marginLeft: 0,
     paddingLeft: 0,
-    color:colors.color777
+    color: colors.color777
   },
   add_img_wrapper: {
     minHeight: pxToDp(215),
@@ -450,10 +461,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(20),
     paddingTop: pxToDp(10),
   },
-  save_btn:{
-    backgroundColor:colors.main_color,
-    marginTop:pxToDp(50),
-    marginHorizontal:pxToDp(30),
+  save_btn: {
+    backgroundColor: colors.main_color,
+    marginTop: pxToDp(50),
+    marginHorizontal: pxToDp(30),
   }
 });
 
