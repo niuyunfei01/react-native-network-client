@@ -65,7 +65,7 @@ public class SettingsPrintActivity extends ListActivity {
         listAdapter = new BluetoothItemAdapter<>(this, R.layout.print_list, R.id.text1, R.id.storage_item_status);
         setListAdapter(listAdapter);
 
-		Switch toggleSoundNotify = (Switch) findViewById(R.id.toggleSoundNotify);
+		Switch toggleSoundNotify = findViewById(R.id.toggleSoundNotify);
 		toggleSoundNotify.setChecked(!SettingUtility.isDisableSoundNotify());
 		toggleSoundNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -89,7 +89,7 @@ public class SettingsPrintActivity extends ListActivity {
 			}
 		});
 
-		final Switch toggleAutoPrint = (Switch) findViewById(R.id.toggleAutoPrint);
+		final Switch toggleAutoPrint = findViewById(R.id.toggleAutoPrint);
 		toggleAutoPrint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

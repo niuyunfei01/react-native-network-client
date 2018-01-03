@@ -82,11 +82,16 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_SOLD_EMPTY = 5;
     public static final int FILTER_TO_SET_PRICE = 6;
     public static final int FILTER_SET_PROVIDE_PRICE = 7;
+    public static final int FILTER_FREQ_PRODUCT = 8;
+
+    public static final String SORT_BY_SOLD = "sold";
+    public static final String SORT_BY_DEF = "defined";
 
     private int total_in_req;
     private StoreStatusStat stats;
     private Button addNewBtn;
     private ArrayAdapter<StatusItem> statusAdapter;
+    private String sortBy = SORT_BY_SOLD;
 
     private static class StatusItem {
 
@@ -96,6 +101,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_SOLD_EMPTY, " 零库待订"),
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
+                new StatusItem(FILTER_FREQ_PRODUCT, "平价品"),
         };
 
         static final StatusItem[] STATUS_PRICE_CONTROLLED = new StatusItem[]{
@@ -103,6 +109,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
                 new StatusItem(FILTER_SET_PROVIDE_PRICE, " 设置保底价"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
+                new StatusItem(FILTER_FREQ_PRODUCT, "平价品"),
         };
 
         public final int status;
@@ -236,7 +243,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
                 if (!priceControlled) {
                     filter = StatusItem.find(FILTER_SOLD_EMPTY, priceControlled).status;
-                    currStatusSpinner.setSelection(StatusItem.findIdx(filter, priceControlled));
+                    currStatusSpinner.setSelection(StatusItem.findIdx(filter, false));
                     searchTerm = "";
                     Tag tag = new Tag();
                     tag.setId(0);
@@ -379,6 +386,23 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
             }, 50);
         }
+
+        final TextView sortBy = findViewById(R.id.title_total_last_stat);
+        sortBy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String _sort = StoreStorageActivity.this.sortBy;
+                if (SORT_BY_DEF.equals(_sort)) {
+                    StoreStorageActivity.this.sortBy = SORT_BY_SOLD;
+                    sortBy.setText("排序：销量");
+                } else {
+                    StoreStorageActivity.this.sortBy = SORT_BY_DEF;
+                    sortBy.setText("排序：默认");
+                }
+
+                refreshData();
+            }
+        });
 
         //Must after buttons initialized
         setHeadToolBar();
@@ -558,7 +582,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, currTag);
+                    result = sad.getStorageItems(currStore, filter, currTag, sortBy);
                     return null;
                 } catch (final ServiceException e) {
                     AppLogger.e("error to refresh storage items:" + currStore, e);

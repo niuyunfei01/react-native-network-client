@@ -1,6 +1,7 @@
 package cn.cainiaoshicai.crm.dao;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Pair;
 
 import com.google.gson.Gson;
@@ -141,13 +142,17 @@ public class StorageActionDao {
     }
 
     public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter,
-                                                                         Tag tag) throws ServiceException {
+                                                                         Tag tag, String sortBy) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
             if (tag != null) {
                 params.put("tag_id", String.valueOf(tag.getId()));
             }
+            if (!TextUtils.isEmpty(sortBy)) {
+                params.put("sort_by", sortBy);
+            }
+
             params.put("sale_price", "1");
             String json = getJson("/list_store_storage_status/0/" + store.getId() + "/" + filter, params);
             AppLogger.i("list_store_storage_status json result " + json);
