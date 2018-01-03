@@ -12,6 +12,7 @@ import S from '../../stylekit'
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
 import {ToastLong} from "../../util/ToastUtils";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   return {
@@ -24,8 +25,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderCancelShip extends Component {
-  static navigationOptions = {
-    headerTitle: '撤回呼叫',
+  static navigationOptions =({navigation}) => {
+    const {params = {}} = navigation.state;
+    let {type} = params;
+    return{
+      headerTitle: type == 'call' ? '撤回呼叫':'强行撤单'
+    }
   };
 
   constructor(props: Object) {
@@ -65,37 +70,49 @@ class OrderCancelShip extends Component {
     }
   }
 
+  timeOutBack(time) {
+    let _this = this;
+    setTimeout(() => {
+      _this.props.navigation.goBack()
+    }, time)
+  }
   getCancelReasons() {
     let token = this.props.global.accessToken;
     let {id} = this.props.navigation.state.params.order;
     let {dispatch} = this.props;
     dispatch(cancelReasonsList(id, token, async (resp) => {
-      this.setState({list: resp,loading: false});
+      this.setState({loading: false});
+      if(resp.ok){
+        this.setState({list: resp.obj,loading: false});
+      }else {
+        ToastLong('请检查网络')
+      }
+
     }));
   }
 
-  upCancelShip() {
+
+  async upCancelShip() {
     if (this.state.upLoading) {
       return false
     }
     let {id, auto_ship_type,} = this.props.navigation.state.params.order;
     let reason_id = this.state.option;
-    let reason_text = this.state.reason;
     let token = this.props.global.accessToken;
     let {dispatch} = this.props;
     let data = {
       type: auto_ship_type,
-      reason_text: reason_text
+      reason_text: this.state.reason
     };
-    console.log(id, reason_id, data, token);
-    dispatch(cancelShip(id, reason_id, data, token, async (resp) => {
-      this.setState({upLoading:false});
-      if(resp.ok){
-        ToastLong('撤销成功')
-      }else {
-        ToastLong(resp.desc)
-      }
 
+    dispatch(cancelShip(id, reason_id, data, token, async (ok) => {
+      this.setState({upLoading: false});
+      if (ok) {
+        ToastLong('撤回成功,即将返回订单详情页');
+        this.timeOutBack(3000);
+      } else {
+        ToastLong('请检查网络')
+      }
     }));
   }
 
@@ -118,7 +135,7 @@ class OrderCancelShip extends Component {
                 onPress={() => {
                   this.isShowDialog()
                 }}
-                style={[S.mlr15]}>撤回呼叫</Button>
+                style={[S.mlr15]}>撤回</Button>
       </ButtonArea>
 
       <Toast
@@ -138,7 +155,7 @@ class OrderCancelShip extends Component {
       <Dialog onRequestClose={() => {
       }}
               visible={this.state.showOtherDialog}
-              title={'撤销理由'}
+              title={'撤回理由'}
               buttons={[{
                 type: 'default',
                 label: '取消',
@@ -184,7 +201,7 @@ class OrderCancelShip extends Component {
                 }
               }]}
       >
-        <Text>确定撤销呼叫吗?</Text>
+        <Text>确定撤回吗?</Text>
       </Dialog>
     </ScrollView>
   }

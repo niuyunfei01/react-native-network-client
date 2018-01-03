@@ -345,7 +345,7 @@ export function addTipMoney(order_id,money,token,callback) {
 
 export function cancelReasonsList(order_id,token,callback) {
   return dispatch => {
-    const url = `api/order_dada_cancel_reasons/${order_id}.json?access_token=${token}`;
+    const url = `api/order_ship_cancel_reasons2/${order_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {
@@ -358,11 +358,9 @@ export function cancelReasonsList(order_id,token,callback) {
 }
 
   export function cancelShip(order_id,reason_id,data,token,callback) {
-    const url = `api/order_dada_cancel/${order_id}/${reason}.json?access_token=${token}`;
-    console.log(url,id, reason_id, data, token);
-    return false;
+    const url = `api/order_dada_cancel/${order_id}/${reason_id}.json?access_token=${token}`;
     return jsonWithTpl2(url, data, (json) => {
-          callback(json.ok, json.reason, json.obj);
+          callback(json.ok);
         },
         (error) => {
           callback(error, "网络错误, 请稍后重试")

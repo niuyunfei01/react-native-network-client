@@ -28,6 +28,7 @@ function mapStateToProps(state) {
 }
 
 import {ToastLong} from "../../util/ToastUtils";
+import colors from "../../styles/colors";
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -264,7 +265,6 @@ class GoodsBatchPriceScene extends PureComponent {
                     },
                     styles.title_item
                   ]}
-                  // 库存
                   keyboardType='numeric'
                   value={`${s_product.left_since_last_stat}`}
                   onChangeText={(text) => {
@@ -275,15 +275,15 @@ class GoodsBatchPriceScene extends PureComponent {
             <View style={[styles.price]}>
               <TextInput
                   underlineColorAndroid='transparent'
-                  style={[
-                    styles.item_font_style, {
-                      width: '100%',
-                      textAlign: 'center'
-                    }
-                  ]}
+                  style={
+                    s_product.fn_price_controlled == 0 ? [styles.item_font_style, {width: '100%',textAlign: 'center'}]
+                        :[styles.item_font_style, {width: '100%',textAlign: 'center',color:'#ccc'}]
+                  }
+                  editable = {s_product.fn_price_controlled == 0 ? true:false}
                   keyboardType='numeric'
-                  value={`${s_product.price}`}
+                  value={s_product.fn_price_controlled == 0 ? ''+s_product.price:''+s_product.supply_price/100}
                   onChangeText={(text) => {
+                    console.log(text)
                     s_product.price = text;
                     _this.forceUpdate()
                   }}/>
@@ -295,7 +295,6 @@ class GoodsBatchPriceScene extends PureComponent {
                 data={_this.state.head_supplies}
                 onChange={(option) => {
                   productItem.self_provided = option.key;
-                  console.log(option.key)
                   _this.forceUpdate()
 
                 }}>

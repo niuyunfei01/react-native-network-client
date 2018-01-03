@@ -501,7 +501,6 @@ class OrderScene extends Component {
   _doSaveItemsEdit() {
 
     const {dispatch, order, global} = this.props;
-
     const items = {
       ...this.state.itemsAdded,
       ...this.state.itemsEdited,
