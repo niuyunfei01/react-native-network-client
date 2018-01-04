@@ -60,6 +60,10 @@ import SettlementScene from '../scene/Settlement/SettlementScene';
 import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
 import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
+import OperateProfitScene from "../scene/OperateProfit/OperateProfitScene";
+import OperateDetailScene from "../scene/OperateProfit/OperateDetailScene";
+
+
 
 const tabDef = {
   Remind: {
@@ -246,6 +250,8 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
         [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},
         [Config.ROUTE_HELP]: {screen: HelpScene},
+        [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
+        [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
 
       },
       stackNavigatorConfigs

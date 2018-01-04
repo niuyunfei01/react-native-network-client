@@ -593,13 +593,22 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
-          activeOpacity={customerOpacity}
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+            activeOpacity={customerOpacity}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
+          activeOpacity={customerOpacity}
+      >
+        <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
+        <Text style={[block_styles.block_name]}>运营收益</Text>
+      </TouchableOpacity>
+        <View style={[block_styles.empty_box]}/>
       </View>
     )
   }
