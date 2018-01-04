@@ -234,13 +234,6 @@ public class StoreStorageHelper {
         et.setText(String.valueOf(item.getPricePrecisionNoSymbol()));
         ((TextView)npView.findViewById(R.id.number_now_price)).setText("现价：" + item.getPricePrecision());
 
-        npView.findViewById(R.id.to_edit_batch).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.app().toGoodsEditProdStores(activity);
-            }
-        });
-
         AlertDialog dlg = new AlertDialog.Builder(activity)
                 .setTitle(String.format("修改价格:(%s)", item.getName()))
                 .setView(npView)

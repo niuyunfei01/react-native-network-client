@@ -256,7 +256,6 @@
     <string name="app_id">58b571b2</string>
     <string name="tts_toast_format" formatted="false">缓冲进度为%d%%，播放进度为%d%%</string>
     <string name="ship_accept_status">接单状态</string>
-    <string name="edit_prod_multi">批量修改库存价格</string>
 
     <string-array name="feedback_source_array">
         <item>400来电</item>
