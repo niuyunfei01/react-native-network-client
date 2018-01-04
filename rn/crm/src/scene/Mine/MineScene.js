@@ -21,13 +21,14 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {fetchWorkers, fetchUserCount, fetchStoreTurnover} from "../../reducers/mine/mineActions";
+import {fetchWorkers, fetchUserCount, fetchStoreTurnover, userCanChangeStore} from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import ModalSelector from "../../widget/ModalSelector/index";
 import {fetchUserInfo} from "../../reducers/user/userActions";
 import {upCurrentProfile} from "../../reducers/global/globalActions";
-
+import {getCommonConfig} from "../../reducers/global/globalActions";
+import Moment from 'moment';
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -42,6 +43,7 @@ function mapDispatchToProps(dispatch) {
       fetchStoreTurnover,
       fetchUserInfo,
       upCurrentProfile,
+      userCanChangeStore,
       ...globalActions
     }, dispatch)
   }
@@ -62,8 +64,6 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     let prefer_store = '';
     let screen_name = '';
     let mobilephone = '';
@@ -75,8 +75,11 @@ class MineScene extends PureComponent {
       cover_image = currentUserProfile.cover_image;
     }
 
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, service_uid} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager,
+      is_mgr, is_helper, service_uid, is_service_mgr} = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores, (is_helper || is_service_mgr));
 
     this.state = {
       isRefreshing: false,
@@ -99,16 +102,19 @@ class MineScene extends PureComponent {
       currManager: currManager,
       is_mgr: is_mgr,
       is_helper: is_helper,
+      is_service_mgr: is_service_mgr,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? Config.staticUrl(cover_image) : '',
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
+    this.onCanChangeStore = this.onCanChangeStore.bind(this);
     this.onPress = this.onPress.bind(this);
     this.onGetUserCount = this.onGetUserCount.bind(this);
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
     this.onGetUserInfo = this.onGetUserInfo.bind(this);
+    this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
 
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
@@ -195,8 +201,6 @@ class MineScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     const {
       prefer_store,
       screen_name,
@@ -205,7 +209,10 @@ class MineScene extends PureComponent {
     } = currentUserProfile;
 
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper} = tool.vendor(this.props.global);
+    let {currStoreName, currVendorName, currVendorId, currVersion, currManager, is_mgr, is_helper, is_service_mgr} = tool.vendor(this.props.global);
+
+    let storeActionSheet = tool.storeActionSheet(canReadStores, (is_service_mgr || is_helper));
+
     this.setState({
       storeActionSheet: storeActionSheet,
 
@@ -280,6 +287,36 @@ class MineScene extends PureComponent {
         ToastLong(msg);
       }
     });
+
+    this.getTimeoutCommonConfig(store_id);
+  }
+
+  getTimeoutCommonConfig(store_id){
+    const {accessToken, last_get_cfg_ts} = this.props.global;
+    let current_time = Moment(new Date()).unix();
+    let diff_time = (current_time - last_get_cfg_ts);
+    console.log("last_get_cfg_ts -> ", last_get_cfg_ts, ' | current_time ->', current_time);
+    console.log("get config diff_time -> ", diff_time);
+    if(diff_time > 300){
+      const {dispatch} = this.props;
+      dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
+        console.log("getCommonConfig -> ", ok, msg)
+      }));
+    }
+  }
+
+  onCanChangeStore(store_id) {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+
+    let _this = this;
+    dispatch(userCanChangeStore(store_id, accessToken, (resp) => {
+      if(resp.obj.auth_store_change){
+        _this._doChangeStore(store_id);
+      } else {
+        ToastLong('您没有访问该门店的权限');
+      }
+    }));
   }
 
   renderHeader() {
@@ -290,7 +327,7 @@ class MineScene extends PureComponent {
           <Text style={header_styles.shop_name}>{this.state.currStoreName}</Text>
           <ModalSelector
             onChange={(option) => {
-              this._doChangeStore(option.key)
+              this.onCanChangeStore(option.key)
             }}
             skin='customer'
             defaultKey={currStoreId}
@@ -439,7 +476,7 @@ class MineScene extends PureComponent {
     let {fnPriceControlled} = tool.vendor(this.props.global);
     return (
       <View style={[block_styles.container]}>
-        {!!fnPriceControlled ? <TouchableOpacity
+        {fnPriceControlled > 0 ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
           activeOpacity={customerOpacity}
@@ -583,6 +620,9 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
+          onPress={() => {
+              this.onPress(Config.ROUTE_HELP)
+          }}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/help_.png')}/>
           <Text style={[block_styles.block_name]}>帮助</Text>
@@ -608,7 +648,6 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/banben_.png')}/>
           <Text style={[block_styles.block_name]}>版本信息</Text>
         </TouchableOpacity>
-
 
         <View style={[block_styles.empty_box]}/>
       </View>
@@ -724,6 +763,17 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let {state, navigate} = this.props.navigation;
+            navigate(Config.ROUTE_GOODS_APPLY_RECORD);
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>申请记录</Text>
         </TouchableOpacity>
       </View>
     )

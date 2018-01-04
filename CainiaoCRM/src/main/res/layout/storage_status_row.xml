@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout android:layout_alignParentStart="true"
+    <RelativeLayout android:id="@+id/basic_info" android:layout_alignParentStart="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
@@ -189,4 +189,77 @@
 
     </RelativeLayout>
 
+    <LinearLayout android:id="@+id/wm_info_bar"
+        android:layout_below="@id/basic_info"
+        android:layout_width="fill_parent"
+        android:descendantFocusability="blocksDescendants"
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        android:weightSum="100">
+    <Button
+        android:id="@+id/wm_bd"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:drawableStart="@drawable/baidu_list"
+        android:minHeight="0dp"
+        android:text=""/>
+
+    <Button
+        android:id="@+id/wm_mt"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:drawableStart="@drawable/meituan_list"
+        android:text=""/>
+
+    <Button
+        android:id="@+id/wm_elema"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:drawableStart="@drawable/elema_list"
+        android:text=""/>
+
+    <Button
+        android:id="@+id/wm_jd"
+        android:layout_width="0dp"
+        android:layout_weight="25"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:drawableStart="@drawable/jingdong_list"
+        android:text=""/>
+
+    </LinearLayout>
 </RelativeLayout>

@@ -70,10 +70,10 @@ class OrderBottom extends PureComponent {
     navigation.navigate(Config.ROUTE_ORDER_SHIP_DETAIL, {order});
   };
 
-  _cancelShip = () => {
+  _cancelShip = (title) => {
     const {navigation, order} = this.props;
     this.setState({dlgShipVisible: false});
-    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order,type:title});
   };
 
   _setOrderArrived = () => {
@@ -209,7 +209,7 @@ class OrderBottom extends PureComponent {
           buttons = [
             {
               label: '撤回呼叫',
-              onPress: this._cancelShip
+              onPress: () =>this._cancelShip('call')
             },
             this._defCloseBtn('继续等待'),
             {
@@ -224,7 +224,7 @@ class OrderBottom extends PureComponent {
           buttons = [
             {
               label: '强行撤单',
-              onPress: this._cancelShip,
+              onPress: ()=>this._cancelShip('order'),
             },
             {
               label: '呼叫配送员',

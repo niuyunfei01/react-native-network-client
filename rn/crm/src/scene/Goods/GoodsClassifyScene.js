@@ -3,14 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
-  TouchableHighlight,
   ScrollView,
-  RefreshControl,
-  InteractionManager,
-  TextInput,
-  Modal,
 } from 'react-native';
 
 import CheckboxCells from "../../weui/Form/CheckboxCells";
@@ -18,10 +12,14 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {NavigationActions} from 'react-navigation';
+import pxToDp from "../../util/pxToDp";
+import Cts from "../../Cts";
+
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
+
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
@@ -29,7 +27,8 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
-class  GoodsClassifyScene extends  PureComponent{
+
+class GoodsClassifyScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     let {type} = params;
@@ -37,37 +36,99 @@ class  GoodsClassifyScene extends  PureComponent{
       headerTitle: '门店分类',
     }
   };
+
   constructor(props) {
-    super(props)
-    let {Classify} = this.props.navigation.state.params
+    super(props);
+    const {store_categories, vendor_id} = this.props.navigation.state.params
+    const store_tags = this.toCheckBoxData(this.props.product.store_tags[vendor_id])
     this.state = {
-      arrData:Classify,
-      checked:['123'],
+      arrData: store_tags,
+      checked: store_categories,
     }
   }
-  setGoodsCats(checked){
-    this.setState({checked});
-    let {state,dispatch } = this.props.navigation;
-    console.log(state)
+
+  async setGoodsCats(checked) {
+    let {state, dispatch} = this.props.navigation;
+    let tag_list =  this.GetCheckName(checked)
+    console.log(tag_list)
     const setParamsAction = NavigationActions.setParams({
-      params: {store_categories: checked},
-      key: state.params.nav_key,
+      params: {store_categories: checked,tag_list:tag_list},
+      key: state.params.nav_key
     });
     dispatch(setParamsAction);
-    console.log(checked)
   }
-  render(){
-    return(
-      <View >
-        <CheckboxCells
-          options={this.state.arrData}
-          onChange={(checked) => this.setGoodsCats(checked)}
-          style={{marginLeft:0,paddingLeft: 0,}}
-          value={this.state.checked}
-        />
+
+  toCheckBoxData(arr) {
+    arr.forEach((item,index) => {
+      item.label = item.name
+      item.value = item.id
+      if(item.id == Cts.TAG_HIDE ){
+        arr.splice(index,1)
+      }
+
+    });
+    return arr
+  }
+
+  GetCheckName(arr) {
+    let {arrData} = this.state;
+    let tag_list = []
+    arrData.forEach((item) => {
+      arr.forEach((ite) => {
+        if (item.id == ite) {
+          tag_list.push(item.name)
+        }
+      })
+    });
+    return tag_list.join(',')
+  }
+
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        <ScrollView style={{backgroundColor: "#fff"}}>
+          <CheckboxCells
+            options={this.state.arrData}
+            onChange={(checked) => {
+             this.setState({checked:checked})
+            }}
+            style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
+            value={this.state.checked}
+          />
+        </ScrollView>
+        <TouchableOpacity
+          onPress={ async () =>{
+            await   this.setGoodsCats(this.state.checked);
+            this.props.navigation.dispatch(NavigationActions.back())
+          }}
+        >
+          <View style={styles.save_btn_box}>
+           <Text style = { styles.save_btn }>保存</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     )
   }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsClassifyScene)
+
+const styles = StyleSheet.create({
+  save_btn_box:{
+    height:pxToDp(100),
+    width:'100%',
+    flexDirection:'row',
+    justifyContent:'center',
+    alignItems:'center',
+
+  },
+  save_btn:{
+    fontSize:pxToDp(30),
+    color:'#fff',
+    backgroundColor:"#59b26a",
+    textAlign:'center',
+    width:'90%',
+    paddingVertical:pxToDp(15),
+    borderRadius:pxToDp(5)
+  }
+})

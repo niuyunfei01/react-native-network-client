@@ -86,9 +86,9 @@ export function delayRemind(id, typeId, minutes, token) {
  * @param task_id
  * @param status
  */
-export function markTaskDone(token, task_id, status, callback) {
+export function markTaskDone(token, task_id, status, callback,reason='') {
   return dispatch => {
-    return getWithTpl(`api/set_task_status/${task_id}/${status}.json?access_token=${token}`,
+    return getWithTpl(`api/set_task_status/${task_id}/${status}/${reason}.json?access_token=${token}`,
       (json) => {
         callback(json.ok, json.reason);
       },

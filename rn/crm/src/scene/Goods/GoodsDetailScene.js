@@ -16,6 +16,8 @@ import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {ToastLong} from "../../util/ToastUtils";
+import {NavigationActions} from 'react-navigation';
+
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -37,6 +39,7 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    console.log('params===',params);
     let {backPage,store_product, product_detail} = params;
     return {
       headerLeft: (
@@ -54,36 +57,38 @@ class GoodsDetailScene extends PureComponent {
           }}
         />),
       headerTitle: '商品详情',
-      // headerRight: ( <View style={{flexDirection: 'row'}}>
-      //   <TouchableOpacity
-      //     onPress={() => {
-      //       if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
-      //         InteractionManager.runAfterInteractions(() => {
-      //           navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-      //             type: 'edit',
-      //             store_product,
-      //             product_detail,
-      //           });
-      //         });
-      //       } else {
-      //         ToastLong('请等待商品加载完成...')
-      //       }
-      //     }}
-      //   >
-      //     <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-      //   </TouchableOpacity>
-      // </View>),
+      headerRight: ( <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => {
+            if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'edit',
+                  store_product,
+                  product_detail,
+                  detail_key:navigation.state.key
+                });
+              });
+            } else {
+              ToastLong('请等待商品加载完成...')
+            }
+          }}
+        >
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>),
     }
   };
 
   constructor(props: Object) {
     super(props);
-
+    let {fnProviding} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       full_screen: false,
       product_detail: {},
       store_product: {},
+      fnProviding:fnProviding,
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
@@ -110,7 +115,21 @@ class GoodsDetailScene extends PureComponent {
       this.getVendorTags(currVendorId);
     }
   }
+  componentDidUpdate() {
+    let {key, params} = this.props.navigation.state;
+    let {isRefreshing} = (params || {});
+    if(isRefreshing){
+      this.setState({isRefreshing:isRefreshing})
+      const setRefresh =  this.props.navigation.setParams({
+        isRefreshing:  false,
+        key:key
+      });
+      this.props.navigation.dispatch(setRefresh);
+      this.getProductDetail();
+      this.getVendorProduct();
+    }
 
+  }
   getVendorTags(_v_id) {
     if (_v_id > 0) {
       const {accessToken} = this.props.global;
@@ -150,7 +169,6 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, accessToken, (resp) => {
-          // console.log('product_detail -> ', resp);
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -166,6 +184,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   getVendorProduct() {
+    this.setState({isRefreshing: false});
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
 
@@ -175,7 +194,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-          // console.log('getVendorProduct -> ', resp);
+          // console.log('getVendorProduct -> ', resp.obj['1']);
           if (resp.ok) {
             let store_product = resp.obj;
             _this.setState({
@@ -196,6 +215,12 @@ class GoodsDetailScene extends PureComponent {
     this.setState({isRefreshing: true});
     this.getProductDetail();
     this.getVendorProduct();
+  }
+  headerSupply(mode) {
+    let map = {};
+    map[Cts.STORE_SELF_PROVIDED] = '否';
+    map[Cts.STORE_COMMON_PROVIDED] = '是';
+    return map[mode]
   }
 
   render() {
@@ -300,9 +325,9 @@ class GoodsDetailScene extends PureComponent {
   }
 
   renderALlStore = () => {
-    let {store_product} = this.state;
+    let {store_product ,product_detail, isRefreshing} = this.state;
     let {navigation} = this.props;
-    if (!(tool.length(store_product) > 0)) {
+    if (isRefreshing) {
       return <LoadingView/>;
     }
 
@@ -312,22 +337,49 @@ class GoodsDetailScene extends PureComponent {
           <Text style={styles.title_name}>门店商品信息</Text>
           <View style={{flex: 1}}/>
           <TouchableOpacity
-            onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_STORE_GOODS_EDIT);
-              });
-            }}
+              style = {styles.related_edit}
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_GOODS_RELATE,{
+                    productId:this.productId,
+                    store_product:store_product,
+                    product_detail:product_detail,
+                    detail_key:navigation.state.key,
+                    refreshStoreList:() => this.getVendorProduct()
+                  });
+                });
+              }}
           >
-            <Text style={{fontSize: pxToDp(30), color: '#59b26a', height: pxToDp(70), textAlignVertical: 'center'}}>
+            <Text style={{fontSize: pxToDp(30), color: '#59b26a',  textAlignVertical: 'center',marginRight:pxToDp(30)}}>
+              关联
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              style = {styles.related_edit}
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
+                    productId:this.productId,
+                    store_product:store_product,
+                    detail_key:navigation.state.key
+                  });
+
+                });
+              }}
+          >
+            <Text style={{fontSize: pxToDp(30), color: '#59b26a', textAlignVertical: 'center',paddingLeft:pxToDp(30),borderLeftWidth:pxToDp(1),borderColor:'#ccc'}}>
               编辑
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={[styles.store_head, styles.top_line]}>
+        <View style={[styles.store_head, styles.top_line,styles.show_providing]}>
           <Text style={[styles.title_text, styles.store_title]}>门店</Text>
           <Text style={[styles.title_text, styles.stock_title]}>库存</Text>
           <Text style={[styles.title_text, styles.sale_title]}>售价</Text>
-          <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text>
+          {
+            this.state.fnProviding ? <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text> : null
+          }
+
         </View>
         {this.renderStoreProduct(store_product)}
       </View>
@@ -335,20 +387,37 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderStoreProduct = (store_product) => {
+    console.log('store_product',store_product);
     let is_dark_bg = false;
     let _this = this;
 
     return tool.objectMap(store_product, function (s_product, store_id) {
       is_dark_bg = !is_dark_bg;
       return (
-        <View key={store_id} style={[styles.store_info, styles.top_line]}>
+        <View key={store_id} style={[styles.store_info, styles.top_line,styles.show_providing]}>
           <View style={[styles.store_view]}>
-            <Text style={[styles.info_text, styles.store_name]}>{s_product.store_name}</Text>
+            <Text style={[styles.info_text, styles.store_name,{flex:1}]}>{s_product.store_name}</Text>
             {_this.renderIcon(parseInt(s_product.status))}
           </View>
+
           <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
-          <Text style={[styles.info_text, styles.sale_price]}>¥ {s_product.price/100}</Text>
-          <Text style={[styles.info_text, styles.is_provide]}>是</Text>
+          <View style = {{flexDirection:'row',alignItems:'center',width:pxToDp(150)}}>
+            <Text style={[styles.info_text, styles.sale_price]}>
+              ¥ {parseInt(s_product.fn_price_controlled) === 0  ?  s_product.price / 100 :s_product.supply_price / 100 }
+            </Text>
+            {parseInt(s_product.fn_price_controlled) === 0 ? null :
+                <Image
+                    resizeMode={'contain'}
+                    style={{height: pxToDp(34), width: pxToDp(34)}}
+                    source={require('../../img/Goods/bao_.png')}
+                />
+            }
+
+          </View>
+
+          {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
+            {_this.headerSupply(s_product.self_provided)}
+          </Text> : null}
         </View>
       );
     });
@@ -459,12 +528,11 @@ const styles = StyleSheet.create({
   },
   goods_cats: {
     marginLeft: pxToDp(20),
-    width: pxToDp(118),
     height: pxToDp(32),
     borderRadius: 8,
     textAlign: 'center',
     textAlignVertical: 'center',
-    paddingHorizontal: pxToDp(5),
+    paddingHorizontal: pxToDp(10),
     backgroundColor: colors.new_back,
     fontSize: pxToDp(24),
     color: '#41aa55',
@@ -577,7 +645,7 @@ const styles = StyleSheet.create({
   },
   store_view: {
     paddingLeft: 0,
-    width: pxToDp(210),
+    width: pxToDp(200),
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -589,7 +657,7 @@ const styles = StyleSheet.create({
   },
   sale_price: {
     textAlign: 'center',
-    width: pxToDp(150),
+    width: pxToDp(120),
   },
   is_provide: {
     textAlign: 'center',
@@ -613,6 +681,14 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(28),
     color: '#bfbfbf',
   },
+  show_providing:{
+    justifyContent:'space-between'
+  },
+  related_edit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: pxToDp(70)
+  }
 });
 
 

@@ -64,7 +64,7 @@ public class StoreSpinnerHelper {
         if (supportAll) {
             stores.add(Cts.ST_ALL);
         }
-        Collection<Store> listStores = GlobalCtx.app().listStores(true);
+        Collection<Store> listStores = GlobalCtx.app().listStores(currStore.getType(), false);
         if (listStores == null || listStores.isEmpty()) {
             Utility.toast("正在加载店铺列表，请重试...", activity, null, Toast.LENGTH_LONG);
         } else {

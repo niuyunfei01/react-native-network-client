@@ -109,7 +109,8 @@ export function vendor(global) {
   if (owner_id !== '' && owner_id !== undefined && owner_id > 0) {
     mgr_ids.push(owner_id);
   }
-  if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
+  //if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
+  if (vice_mgr !== '' && vice_mgr !== undefined) {//可能有多个 -> '811488,822472'
     mgr_ids.push(vice_mgr);
   }
   if (service_uid !== '' && service_uid !== undefined && service_uid > 0) {
@@ -124,7 +125,7 @@ export function vendor(global) {
   let manager = ',' + mgr_ids.join(',') + ',';
   let is_mgr = manager.indexOf(',' + currentUser + ',') !== -1;
 
-  let service_manager = ',' + mgr_ids.join(',') + ',';
+  let service_manager = ',' + service_ids.join(',') + ',';
   let is_service_mgr = service_manager.indexOf(',' + currentUser + ',') !== -1;
 
   let {help_uid} = config;
@@ -316,7 +317,7 @@ export function disWay() {
   return map
 }
 
-export function storeActionSheet(canReadStores) {
+export function storeActionSheet(canReadStores, is_service_mgr = false) {
   let by = function(name,minor){
     return function(o,p){
       let a,b;
@@ -347,7 +348,7 @@ export function storeActionSheet(canReadStores) {
     if (store.id > 0) {
       let item = {
         key: store.id,
-        label: !!store.vendor ? (store.vendor + ':' + store.name) : store.name,
+        label: is_service_mgr && !!store.vendor ? (store.vendor + ':' + store.name) : store.name,
       };
       storeActionSheet.push(item);
     }
@@ -396,6 +397,60 @@ return `${plat[type]}:${znMap[status]}`;
 
 }
 
+export function sellingStatus(sell_status) {
+  let map = {};
+  map[Cts.STORE_PROD_ON_SALE] ='上架';
+  map[Cts.STORE_PROD_OFF_SALE] ='下架';
+  map[Cts.STORE_PROD_SOLD_OUT] ='缺货';
+  if (map[sell_status]){
+    return map[sell_status]
+  }else {
+    return '选择门店状态'
+  }
+}
+export function headerSupply(mode) {
+let map = {};
+map[Cts.STORE_SELF_PROVIDED] ='门店自采';
+map[Cts.STORE_COMMON_PROVIDED] ='总部供货';
+if (map[mode]){
+  return map[mode]
+}else {
+  return '选择供货方式'
+}
+}
+
+
+function deepClone(obj){
+  function isClass(o){
+    if(o===null) return "Null";
+    if(o===undefined) return "Undefined";
+    return Object.prototype.toString.call(o).slice(8,-1);
+  }
+
+  let result;
+  let oClass=isClass(obj);
+  if(oClass==="Object"){
+      result={};
+  }else if(oClass==="Array"){
+      result=[];
+  }else{
+      return obj;
+  }
+  for(let key in obj){
+     let copy=obj[key];
+     if(isClass(copy)=="Object"){
+         result[key]=arguments.callee(copy);//递归调用
+      }else if(isClass(copy)=="Array"){
+         result[key]=arguments.callee(copy);
+      }else{
+          result[key]=obj[key];
+      }
+  }
+return result;
+}
+
+
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -425,4 +480,7 @@ export default {
   billStatus,
   get_platform_name,
   autoPlat,
+  sellingStatus,
+  headerSupply,
+  deepClone
 }

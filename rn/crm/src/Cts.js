@@ -32,6 +32,7 @@ export default {
   TASK_TYPE_DELIVERY_FAILED: 6,//京东配送员申请取消配送
   TASK_TYPE_ORDER_CHANGE: 7, //订单修改
   TASK_TYPE_UPLOAD_GOODS_FAILED: 8, //外卖上传商品失败
+  TASK_TYPE_UPLOAD_NEW_GOODS: 9, //商家申请上新任务
 
   //任务紧急程度
   TASK_QUICK_NO: 0,
@@ -112,5 +113,8 @@ export default {
   SHIP_ZS_MT : 22, //美团专送
   SHIP_ZS_ELE : 23, //饿了专送
   SHIP_ZS_BD : 24, //百度专送
+
+  TAG_HIDE: '74911547', //列表中隐藏tag_id
+  ORDER_CANCEL_SHIP_REASON:10000
 
 }

@@ -230,7 +230,7 @@ public class StoreStorageHelper {
                                                 LayoutInflater inflater, final Runnable succCallback) {
         View npView = inflater.inflate(R.layout.number_edit_price, null);
 
-        final EditText et = (EditText) npView.findViewById(R.id.number_edit_txt);
+        final EditText et = npView.findViewById(R.id.number_edit_txt);
         et.setText(String.valueOf(item.getPricePrecisionNoSymbol()));
         ((TextView)npView.findViewById(R.id.number_now_price)).setText("现价：" + item.getPricePrecision());
 

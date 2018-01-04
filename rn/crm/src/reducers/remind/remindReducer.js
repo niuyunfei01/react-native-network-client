@@ -95,7 +95,7 @@ export default function remind(state = initialState, action) {
 function _setWithPreventCheck(diff, key, typeId, value) {
 
   //TODO: bugfix for FATAL exception
-  console.log('_setWithPreventCheck', key, typeId, value, diff);
+  //console.log('_setWithPreventCheck', key, typeId, value, diff);
 
   if (diff[key] === false || diff[key] === true) {
     diff[key] = {};

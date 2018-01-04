@@ -69,8 +69,8 @@ function mapDispatchToProps(dispatch) {
 let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [100, 101, 102, 103];
-const _fetchDataTypeIds = [100, 101, 102, Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_GOODS_FAILED];
-const _otherSubTypeIds = [Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_GOODS_FAILED];
+const _fetchDataTypeIds = [100, 101, 102, Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_NEW_GOODS];//其他分类下的子分类定义
+const _otherSubTypeIds = [Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_NEW_GOODS];//其他分类下的子分类定义
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
 const _otherTypeTag = 103;
 
@@ -100,6 +100,11 @@ class RemindScene extends PureComponent {
     let token = this._getToken();
     let {store_id, vendor_id} = this._getStoreAndVendorId();
     dispatch(fetchRemindCount(vendor_id, store_id, token));
+
+    let {is_helper, is_service_mgr} = tool.vendor(this.props.global);
+    if((is_helper || is_service_mgr) && _fetchDataTypeIds.indexOf(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED) === -1){//上传商品失败分类只展示给服务人员和后台人员
+      _fetchDataTypeIds.push(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED);
+    }
     _fetchDataTypeIds.forEach((typeId) => {
       dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     });
@@ -280,6 +285,11 @@ class RemindScene extends PureComponent {
     let buttons = [];
     const {remind} = this.props;
     let quickNum = remind.quickNum;
+
+    let {is_helper, is_service_mgr} = tool.vendor(this.props.global);
+    if((is_helper || is_service_mgr) && _otherSubTypeIds.indexOf(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED) === -1){//上传商品失败分类只展示给服务人员和后台人员
+      _otherSubTypeIds.push(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED);
+    }
     _otherSubTypeIds.forEach((typeId) => {
       buttons.push(self.__getBadgeButton(typeId, Alias.SUB_CATEGORIES[typeId], quickNum[typeId]));
     });
@@ -326,7 +336,7 @@ class RemindScene extends PureComponent {
   renderItem(remind) {
     let {item, index} = remind;
     return (
-      <RemindItem item={item} index={index} key={index} onPressDropdown={this.onPressDropdown.bind(this)}
+      <RemindItem item={item} index={index} key={index} onRefresh={() => this.onRefresh(item.type)} onPressDropdown={this.onPressDropdown.bind(this)}
                   onPress={this.onPress.bind(this)}/>
     );
   }
@@ -364,8 +374,6 @@ class RemindScene extends PureComponent {
         </ScrollView>
       );
     }
-
-    // console.log('screen', screen);
 
     return (
       <FlatList
@@ -437,7 +445,6 @@ class RemindScene extends PureComponent {
       let key = typeId + "-" + _typeAlias[index];
       let label = Alias.CATEGORIES[typeId];
       let tabTagId = typeId;
-      //other type
       if (typeId == _otherTypeTag) {
         typeId = self.state.otherTypeActive;
       }
@@ -516,7 +523,8 @@ class RemindItem extends React.PureComponent {
     item: PropTypes.object,
     index: PropTypes.number,
     onPressDropdown: PropTypes.func,
-    onPress: PropTypes.func
+    onPress: PropTypes.func,
+    onRefresh: PropTypes.func,
   };
 
   constructor() {
@@ -537,12 +545,27 @@ class RemindItem extends React.PureComponent {
   }
 
   render() {
-    let {item, index, onPressDropdown, onPress} = this.props;
+    let {item, onPressDropdown, onPress} = this.props;
+    let task_type = parseInt(item.type);
+    let task_info = item.remark;
+    if(task_type === Cts.TASK_TYPE_UPLOAD_NEW_GOODS && item.remind_id){
+      let new_goods_info = JSON.parse(item.remind_id);
+      task_info = '申请上架: '+ item.remark + ';  价格: ' + new_goods_info.price_desc;
+    }
+
     return (
       <TouchableOpacity
         onPress={() => {
-          if(item.order_id > 0){
+          if (item.order_id > 0) {
             onPress(Config.ROUTE_ORDER, {orderId: item.order_id})
+          } else if (parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_NEW_GOODS) {
+            let params = {
+              task_id: item.id,
+              refresh_list: () => {
+                this.props.onRefresh()
+              }
+            };
+            onPress(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, params);
           }
         }}
         activeOpacity={0.6}
@@ -581,7 +604,8 @@ class RemindItem extends React.PureComponent {
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>
                   <Text style={top_styles.o_content}>
-                    {item.remark}  {parseInt(item.type) === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
+                    {task_info}
+                    {task_type === Cts.TASK_TYPE_UPLOAD_GOODS_FAILED && item.remind_id}
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
@@ -601,11 +625,11 @@ class RemindItem extends React.PureComponent {
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
               </View>
-              <View style={bottom_styles.operator}>
+              {item.delegation_to_user && (<View style={bottom_styles.operator}>
                 <Text style={bottom_styles.operator_text}>
                   处理人：{item.delegation_to_user}
                 </Text>
-              </View>
+              </View>)}
             </View>
           </View>
         </View>

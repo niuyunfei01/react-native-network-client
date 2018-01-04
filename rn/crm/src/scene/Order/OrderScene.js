@@ -227,11 +227,11 @@ class OrderScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps order.order', nextProps.order.order);
-
-    const orderId = (this.props.navigation.state.params || {}).orderId;
-    const {dispatch, global} = this.props;
-    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+    // console.log('componentWillReceiveProps order.order', nextProps.order.order);
+    //
+    // const orderId = (this.props.navigation.state.params || {}).orderId;
+    // const {dispatch, global} = this.props;
+    // this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -260,6 +260,7 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
+            console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
@@ -501,7 +502,6 @@ class OrderScene extends Component {
   _doSaveItemsEdit() {
 
     const {dispatch, order, global} = this.props;
-
     const items = {
       ...this.state.itemsAdded,
       ...this.state.itemsEdited,
@@ -865,11 +865,11 @@ class OrderScene extends Component {
     />;
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
-    console.log('noOrder', noOrder, order);
+    // console.log('noOrder', noOrder, order);
 
     if (noOrder) {
       const {dispatch, global, store} = this.props;
-      this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
+      //this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
 
     return noOrder ?
@@ -925,21 +925,7 @@ class OrderScene extends Component {
             ]}
           />
 
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.gotoEditPoi}
-                  buttons={[{
-                    type: 'warn',
-                    label: '去设置',
-                    onPress: this.goToSetMap,
-                  },
-                    {
-                      type: 'default',
-                      label: '取消',
-                      onPress: () => this.setState({gotoEditPoi: false}),
-                    }
-                  ]}
-          ><Text>没有经纬度信息</Text></Dialog>
+
           <ScrollView
             refreshControl={refreshControl}>
             {this.renderHeader()}
@@ -1411,18 +1397,25 @@ class ItemRow extends PureComponent {
       borderBottomColor: colors.color999,
       borderBottomWidth: screen.onePixel
     }]}>
-      <View style={{flex: 1}}>
-        <Text style={{
-          fontSize: pxToDp(26),
-          color: colors.color333,
-          marginBottom: pxToDp(14)
-        }}>{item.name}</Text>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
-          {!isAdd &&
-          <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
-          }
+      <View style={{flex: 1,flexDirection:'row',alignItems:'center'}}>
+        <Image
+            style={styles.product_img}
+            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+        />
+        <View>
+          <Text style={{
+            fontSize: pxToDp(26),
+            color: colors.color333,
+            marginBottom: pxToDp(14)
+          }}>{item.name}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+            {!isAdd &&
+            <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
+            }
+          </View>
         </View>
+
       </View>
       {showEditAdded && <View style={{alignItems: 'flex-end'}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>

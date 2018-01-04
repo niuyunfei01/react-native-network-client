@@ -1,4 +1,7 @@
 'use strict';
+import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
+
+
 const {
   HOST_UPDATED,
 } = require('./common/constants').default
@@ -32,6 +35,7 @@ export function apiUrl(path) {
 
 export function staticUrl(path) {
   const hp = (global.hostPort ? global.hostPort : C.defaultHost);
+  path = path[0] === '/' ? path.substr(1) : path;
   return `https://${hp}/${path}`;
 }
 
@@ -105,14 +109,17 @@ const C = {
   ROUTE_SELECT_STORE: 'SelectStore',
   ROUTE_GOODS_EDIT: 'GoodsEdit',
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
-  ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
+  ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD:'GoodsApplyRecord',
+  ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
+  ROUTE_HELP:'Help',
   ROUTE_SETTLEMENT:'Settlement',
   ROUTE_SETTLEMENT_DETAILS:'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER:'SettlementOrder',
-
-
-  
+  ROUTE_SELECT_WORKER:'SelectWorkerScene',
+  ROUTE_GOODS_RELATE: 'GoodsRelate',
+  ROUTE_GOODS_APPLY_NEW_PRODUCT:'GoodsApplyNewProduct',
+  ROUTE_GOODS_WORK_NEW_PRODUCT:'GoodsWorkNewProduct',
   serverUrl,
   apiUrl,
   staticUrl,

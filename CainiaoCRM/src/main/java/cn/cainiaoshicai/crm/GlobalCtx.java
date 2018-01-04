@@ -58,6 +58,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
@@ -651,10 +652,15 @@ public class GlobalCtx extends Application {
     }
 
     public Collection<Store> listStores() {
-        return this.listStores(false);
+        return this.listStores(0, false);
     }
 
+
     public Collection<Store> listStores(boolean forceUpdate) {
+        return this.listStores(0, forceUpdate);
+    }
+
+    public Collection<Store> listStores(int limitVendorId, boolean forceUpdate) {
         final long storeId = SettingUtility.getListenerStore();
         LinkedHashMap<Long, Store> stores = storesRef.get();
         if (forceUpdate || stores == null || stores.isEmpty()) {
@@ -678,7 +684,17 @@ public class GlobalCtx extends Application {
                 }
             }.executeOnNormal();
         }
-        return stores != null ? stores.values() : null;
+        if (stores == null || limitVendorId <= 0) {
+            return stores != null ? stores.values() : null;
+        } else {
+            ArrayList<Store> found = new ArrayList<>();
+            for(Store store: stores.values()) {
+                if (store.getType() == limitVendorId) {
+                    found.add(store);
+                }
+            }
+            return found;
+        }
     }
 
 
@@ -758,6 +774,22 @@ public class GlobalCtx extends Application {
         i.putExtra("_action", "Tab");
         Bundle params = new Bundle();
         params.putString("initTab", "Mine");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toGoodsEditProdStores(Activity ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodMultiEdit");
+        ctx.startActivity(i);
+    }
+
+    public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", isPriceControlled ? "GoodsApplyNewProduct" : "GoodsEdit");
+        Bundle params = new Bundle();
+        params.putString("type", "add");
+        params.putString("store_id", String.valueOf(storeId));
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }

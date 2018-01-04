@@ -1,5 +1,8 @@
 package cn.cainiaoshicai.crm.domain;
 
+import java.util.HashMap;
+
+import cn.cainiaoshicai.crm.orders.service.MemoryCache;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 /**
@@ -41,6 +44,7 @@ public class StorageItem {
     private int supplyPrice;
     private int applyingPrice;
     private String thumbPicUrl;
+    private HashMap<Integer, StorageStatusResults.WMPrice> wm = new HashMap<>();
 
     public int getProduct_id() {
         return product_id;
@@ -290,5 +294,13 @@ public class StorageItem {
 
     public void setApplyingPrice(int applyingPrice) {
         this.applyingPrice = applyingPrice;
+    }
+
+    public HashMap<Integer, StorageStatusResults.WMPrice> getWm() {
+        return wm;
+    }
+
+    public void setWm(HashMap<Integer, StorageStatusResults.WMPrice> wm) {
+        this.wm = wm;
     }
 }
