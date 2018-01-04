@@ -27,7 +27,8 @@ import * as tool from "../../common/tool";
 import ModalSelector from "../../widget/ModalSelector/index";
 import {fetchUserInfo} from "../../reducers/user/userActions";
 import {upCurrentProfile} from "../../reducers/global/globalActions";
-
+import {getCommonConfig} from "../../reducers/global/globalActions";
+import Moment from 'moment';
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -113,6 +114,7 @@ class MineScene extends PureComponent {
     this.onGetStoreTurnover = this.onGetStoreTurnover.bind(this);
     this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
     this.onGetUserInfo = this.onGetUserInfo.bind(this);
+    this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
 
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
@@ -285,6 +287,22 @@ class MineScene extends PureComponent {
         ToastLong(msg);
       }
     });
+
+    this.getTimeoutCommonConfig(store_id);
+  }
+
+  getTimeoutCommonConfig(store_id){
+    const {accessToken, last_get_cfg_ts} = this.props.global;
+    let current_time = Moment(new Date()).unix();
+    let diff_time = (current_time - last_get_cfg_ts);
+    console.log("last_get_cfg_ts -> ", last_get_cfg_ts, ' | current_time ->', current_time);
+    console.log("get config diff_time -> ", diff_time);
+    if(diff_time > 300){
+      const {dispatch} = this.props;
+      dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
+        console.log("getCommonConfig -> ", ok, msg)
+      }));
+    }
   }
 
   onCanChangeStore(store_id) {
