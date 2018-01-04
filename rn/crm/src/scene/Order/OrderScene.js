@@ -229,9 +229,9 @@ class OrderScene extends Component {
   componentWillReceiveProps(nextProps) {
     // console.log('componentWillReceiveProps order.order', nextProps.order.order);
     //
-    // const orderId = (this.props.navigation.state.params || {}).orderId;
-    // const {dispatch, global} = this.props;
-    // this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const {dispatch, global} = this.props;
+    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
