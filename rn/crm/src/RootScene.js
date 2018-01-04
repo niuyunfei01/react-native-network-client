@@ -16,7 +16,10 @@ import {Provider} from 'react-redux'
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform, setVersion} from './reducers/device/deviceActions'
-import {setAccessToken, setCurrentStore, setUserProfile, updateCfg} from './reducers/global/globalActions'
+import {
+  getCommonConfig, setAccessToken, setCurrentStore, setUserProfile,
+  updateCfg
+} from './reducers/global/globalActions'
 
 import configureStore from "./common/configureStore";
 import AppNavigator from './common/AppNavigator'
@@ -27,6 +30,7 @@ import Config from './config'
 
 import SplashScreen from 'react-native-splash-screen'
 import native from "./common/native";
+import Moment from "moment/moment";
 
 const lightContentScenes = ['Home', 'Mine']
 
@@ -87,7 +91,6 @@ class RootScene extends PureComponent {
         store.dispatch(setUserProfile(userProfile));
         store.dispatch(setCurrentStore(currStoreId));
         //store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
-        store.dispatch(updateCfg({config}))
       }
 
       _g.setHostPortNoDef(store.getState().global, native, () => {
@@ -122,6 +125,18 @@ class RootScene extends PureComponent {
           initialRouteName = Config.ROUTE_ORDER;
           initialRouteParams = {orderId};
         }
+      }
+
+      let {accessToken, currStoreId} = this.store.getState().global;
+      const {last_get_cfg_ts} = this.store.getState().global;
+      let current_time = Moment(new Date()).unix();
+      let diff_time = (current_time - last_get_cfg_ts);
+      console.log("last_get_cfg_ts -> ", last_get_cfg_ts, ' | current_time ->', current_time);
+      console.log("get config diff_time -> ", diff_time);
+      if(diff_time > 300){
+        this.store.dispatch(getCommonConfig(accessToken, currStoreId, (ok, msg) => {
+          console.log("getCommonConfig -> ", ok, msg)
+        }));
       }
     }
 

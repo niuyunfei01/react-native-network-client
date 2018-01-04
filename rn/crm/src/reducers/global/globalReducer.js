@@ -6,6 +6,7 @@
 
 'use strict';
 import {host} from "../../config";
+import Moment from 'moment';
 
 const {
   LOGIN_PROFILE_SUCCESS,
@@ -33,6 +34,7 @@ const initialState = {
   remindTags:null,
   host: '',
   cfgOfKey: {},
+  last_get_cfg_ts: 0,
 };
 
 /**
@@ -89,6 +91,7 @@ export default function globalReducer (state = initialState, action) {
         canReadStores: action.payload.canReadStores || state.canReadStores,
         canReadVendors: action.payload.canReadVendors || state.canReadVendors,
         config: action.payload.config || state.config,
+        last_get_cfg_ts: action.last_get_cfg_ts || state.last_get_cfg_ts,
       } : state;
 
     case HOST_UPDATED:

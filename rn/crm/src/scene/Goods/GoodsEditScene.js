@@ -514,7 +514,7 @@ class GoodsEditScene extends PureComponent {
           url: Config.staticUrl(fspath),
           name: name,
         };
-        upload_files.push({id: file_id, name: name});
+        upload_files[file_id] = {id: file_id, name: name};
         console.log('list_img --> ', list_img);
         this.setState({
           list_img: list_img,

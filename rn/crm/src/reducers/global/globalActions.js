@@ -14,6 +14,7 @@ import {getWithTpl, postWithTpl} from '../../util/common'
 
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
+import Moment from "moment/moment";
 
 /**
  * ## Imports
@@ -63,7 +64,8 @@ export function setCurrentStore(currStoreId) {
 export function updateCfg(cfg) {
   return {
     type: UPDATE_CFG,
-    payload: cfg
+    payload: cfg,
+    last_get_cfg_ts: Moment(new Date()).unix(),
   }
 }
 
