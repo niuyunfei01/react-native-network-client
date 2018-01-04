@@ -108,10 +108,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    if (item.getApplyingPrice() > 0) {
-//                        AlertUtil.errorOnActivity(context, "调价正在申请！");
-//                        return;
-//                    }
                     StoreStorageChanged ssc = (StoreStorageChanged) getContext();
                     AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
                     dlg.show();

@@ -192,6 +192,7 @@
     <LinearLayout android:id="@+id/wm_info_bar"
         android:layout_below="@id/basic_info"
         android:layout_width="fill_parent"
+        android:descendantFocusability="blocksDescendants"
         android:layout_height="30dp"
         android:orientation="horizontal"
         android:weightSum="100">

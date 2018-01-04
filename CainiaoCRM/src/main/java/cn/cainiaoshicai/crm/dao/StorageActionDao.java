@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.domain.Product;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
@@ -222,6 +223,7 @@ public class StorageActionDao {
             return new Pair<>(storageItems, stats);
         } catch (JsonSyntaxException e) {
             AppLogger.e("[getStorageItems] json syntax error:" + e.getMessage(), e);
+            CrashReportHelper.handleUncaughtException(Thread.currentThread(), e);
             return new Pair<>(storageItems, new StoreStatusStat());
         }
     }

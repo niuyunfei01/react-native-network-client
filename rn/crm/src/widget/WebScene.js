@@ -81,7 +81,7 @@ class WebScene extends PureComponent {
   }
 
   _onNavigationStateChange = (navState) => {
-    // console.log('set nav state', navState);
+    console.log('set nav state', navState);
 
     if (navState.canGoBack !== this.state.canGoBack || navState.loading !== this.state.showLoading) {
       this.setState({
@@ -95,10 +95,10 @@ class WebScene extends PureComponent {
       navigation.goBack();
     }
 
-    return this._jumpIfShould(navState.url);
+    return this._jumpIfShould(navState.url, navState);
   };
 
-  _jumpIfShould = (url) => {
+  _jumpIfShould = (url, navState) => {
 
     const {navigation} = this.props;
     let stop = false;
@@ -119,8 +119,9 @@ class WebScene extends PureComponent {
       navigation.navigate(Config.ROUTE_WEB, {url: nu});
       stop = true;
     } else if (url.indexOf("/stores/view_order") >= 0) {
-
-      navigation.navigate(Config.ROUTE_ORDER, {orderId: tool.parameterByName('wm_id', url)});
+      if (navState && !navState.loading) {
+        navigation.navigate(Config.ROUTE_ORDER, {orderId: tool.parameterByName('wm_id', url)});
+      }
       stop = true;
     } else if (url.indexOf("/users/login/crm/") >= 0
       || url.indexOf("/users/login?") >= 0

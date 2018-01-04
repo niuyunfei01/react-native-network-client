@@ -227,11 +227,11 @@ class OrderScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps order.order', nextProps.order.order);
-
-    const orderId = (this.props.navigation.state.params || {}).orderId;
-    const {dispatch, global} = this.props;
-    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+    // console.log('componentWillReceiveProps order.order', nextProps.order.order);
+    //
+    // const orderId = (this.props.navigation.state.params || {}).orderId;
+    // const {dispatch, global} = this.props;
+    // this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -260,6 +260,7 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
+            console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
@@ -864,11 +865,11 @@ class OrderScene extends Component {
     />;
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
-    console.log('noOrder', noOrder, order);
+    // console.log('noOrder', noOrder, order);
 
     if (noOrder) {
       const {dispatch, global, store} = this.props;
-      this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
+      //this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
 
     return noOrder ?
