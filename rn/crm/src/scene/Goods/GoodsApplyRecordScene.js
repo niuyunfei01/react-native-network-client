@@ -55,7 +55,7 @@ class GoodsApplyRecordScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let {viewStoreId} =this.props.navigation.state.params
+    
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
       list: [],
@@ -66,12 +66,13 @@ class GoodsApplyRecordScene extends PureComponent {
       refresh: false,
       onSendingConfirm: true,
       dialog:false,
-      viewStoreId:viewStoreId
     }
     this.tab = this.tab.bind(this);
     this.getApplyList = this.getApplyList.bind(this)
   }
 componentWillMount(){
+  let {viewStoreId} =this.props.navigation.state.params;
+  this.setState({viewStoreId});
   this.getApplyList()
 }
   async tab(num) {
