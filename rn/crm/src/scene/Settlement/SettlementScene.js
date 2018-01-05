@@ -260,7 +260,7 @@ class SettlementScene extends PureComponent {
                 tool.objectMap(item, (ite, key) => {
                   return (
                       <Cell key={key}
-                            customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}} access
+                            customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}}
                             onPress={() => {
                               this.toggleCheck(ite.key, ite.bill_date, ite.status, ite.id)
                             }}
@@ -279,6 +279,10 @@ class SettlementScene extends PureComponent {
                           }
                         </CellBody>
                         <CellFooter style={{color: colors.fontGray}}>{tool.toFixed(ite.bill_price)}元
+                          <Image
+                              style ={{alignItems:'center',transform:[{scale:0.6},{rotate:'-90deg'}]}}
+                              source = {require('../../img/Public/xiangxia_.png')}
+                          />
                         </CellFooter>
                       </Cell>
                   )

@@ -33,7 +33,6 @@ import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
-import styles from "../Order/OrderStyles";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -152,29 +151,29 @@ const tab = StyleSheet.create({
     color: colors.main_color
   }
 });
-// const styles = StyleSheet.create({
-//   cell: {
-//     height: pxToDp(100),
-//     flexDirection: 'row',
-//     alignItems: 'center'
-//
-//   },
-//   cell_name: {
-//     fontSize: pxToDp(30),
-//     color: '#3e3e3e'
-//   },
-//   cell_num: {
-//     fontSize: pxToDp(24),
-//     color: '#bebebe',
-//     lineHeight: pxToDp(35)
-//   },
-//   cell_money: {
-//     fontSize: pxToDp(36)
-//   }
-// });
+const styles = StyleSheet.create({
+  cell: {
+    height: pxToDp(100),
+    flexDirection: 'row',
+    alignItems: 'center'
+
+  },
+  cell_name: {
+    fontSize: pxToDp(30),
+    color: '#3e3e3e'
+  },
+  cell_num: {
+    fontSize: pxToDp(24),
+    color: '#bebebe',
+    lineHeight: pxToDp(35)
+  },
+  cell_money: {
+    fontSize: pxToDp(36)
+  }
+});
 const other = StyleSheet.create({
-  item:{
-    background:colors.white
+  item: {
+    backgroundColor: colors.white
   }
 })
 export default connect(mapStateToProps, mapDispatchToProps)(OperateIncomeDetailScene)

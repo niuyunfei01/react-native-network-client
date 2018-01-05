@@ -33,6 +33,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
+
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -65,35 +66,24 @@ class OperateDetailScene extends PureComponent {
   render() {
     return (
         <View style={{flex: 1}}>
-          <Header text = {'今日运营收益'} money = {56.66}/>
+          <Header text={'今日运营收益'} money={56.66}/>
           <ScrollView>
             <View style={content.in_box}>
+              <CellsTitle title={'收入流水'} add={'添加输入项'}/>
+
               <View style={content.item}>
+
+                <Text style={content.text}>订单收入</Text>
                 <View style={content.item_img}>
-                  <Text style={content.left}>收入流水</Text>
-                  <TouchableOpacity
-                      onPress = {()=>{
-                        this.props.navigation.navigate(Config.ROUTE_OPERATE_INCOME_DETAIL)
-                      }}
-                  >
-                    <Image
-                        style={content.img}
-                        source={require('../../img/OperateProfit/yiwen_.png')}
-                    />
-                  </TouchableOpacity>
+                  <Text style={content.money}>1235.55</Text>
+                  <Image
+                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                      source={require('../../img/Public/xiangxia_.png')}
+                  />
                 </View>
-                <Text style={content.right}>添加输入项</Text>
               </View>
               <View style={content.item}>
-                <View>
-                  <Text style={content.text}>订单收入</Text>
-                </View>
-                <Text style={content.money}>1235.55</Text>
-              </View>
-              <View style={content.item}>
-                <View>
-                  <Text style={content.text}>其他收入</Text>
-                </View>
+                <Text style={content.text}>其他收入</Text>
                 <Text style={content.money}>3222.33</Text>
               </View>
             </View>
@@ -108,20 +98,14 @@ class OperateDetailScene extends PureComponent {
               <View style={content.item}>
                 <View style={content.item_img}>
                   <Text style={content.text}>用户退款金额(3单)</Text>
-                  <Image
-                      style={content.img}
-                      source={require('../../img/OperateProfit/yiwen_.png')}
-                  />
+
                 </View>
                 <Text style={content.money}>1235.55</Text>
               </View>
               <View style={content.item}>
                 <View style={content.item_img}>
                   <Text style={content.text}>配送小费(2单)</Text>
-                  <Image
-                      style={content.img}
-                      source={require('../../img/OperateProfit/yiwen_.png')}
-                  />
+
                 </View>
                 <Text style={content.money}>3222.33</Text>
               </View>
@@ -152,10 +136,7 @@ class OperateDetailScene extends PureComponent {
                 <View style={content.item}>
                   <View style={content.item_img}>
                     <Text style={content.left}>其他支出流水</Text>
-                    <Image
-                        style={content.img}
-                        source={require('../../img/OperateProfit/yiwen_.png')}
-                    />
+
                   </View>
                   <Text style={content.right}>添加支出项</Text>
                 </View>
@@ -189,13 +170,15 @@ const content = StyleSheet.create({
   in_box: {
     backgroundColor: colors.white,
     marginTop: pxToDp(30),
-    paddingTop: pxToDp(30),
+    paddingHorizontal: pxToDp(30),
   },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: pxToDp(30),
-    marginBottom: pxToDp(44)
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: colors.fontGray,
+    alignItems: 'center',
+    height: pxToDp(90),
   },
   left: {
     fontSize: pxToDp(30),
@@ -238,5 +221,35 @@ const content = StyleSheet.create({
   }
 });
 
+class CellsTitle extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
+  render() {
+    let {title,add} = this.props;
+    return (
+        <View style={content.item}>
+          <Text style={content.left}>{title}</Text>
+          <Text style={content.right}>{add}</Text>
+        </View>
+    )
+  }
+}
+class CellsTitle extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
+  render() {
+    let {title,add} = this.props;
+    return (
+        <View style={content.item}>
+          <Text style={content.left}>{title}</Text>
+          <Text style={content.right}>{add}</Text>
+        </View>
+    )
+  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(OperateDetailScene)
