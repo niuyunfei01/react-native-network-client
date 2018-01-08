@@ -32,7 +32,7 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
-
+import OperateIncomeItem from './OperateIncomeItem'
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -101,6 +101,7 @@ class OperateProfitScene extends PureComponent {
               </Cells>
             </View>
 
+            {/*<OperateIncomeItem/>*/}
           </ScrollView>
         </View>
     )

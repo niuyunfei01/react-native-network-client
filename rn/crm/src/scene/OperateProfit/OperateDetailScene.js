@@ -33,6 +33,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
+import styles from "../Order/OrderStyles";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -62,6 +63,9 @@ class OperateDetailScene extends PureComponent {
     // let currStoreId = this.props.navigation.state.params.store_id
 
   }
+  toOperateDetail() {
+    this.props.navigation.navigate(Config.ROUTE_OPERATE_INCOME_DETAIL)
+  }
 
   render() {
     return (
@@ -69,89 +73,24 @@ class OperateDetailScene extends PureComponent {
           <Header text={'今日运营收益'} money={56.66}/>
           <ScrollView>
             <View style={content.in_box}>
-              <CellsTitle title={'收入流水'} add={'添加输入项'}/>
-
-              <View style={content.item}>
-
-                <Text style={content.text}>订单收入</Text>
-                <View style={content.item_img}>
-                  <Text style={content.money}>1235.55</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </View>
-              </View>
-              <View style={content.item}>
-                <Text style={content.text}>其他收入</Text>
-                <Text style={content.money}>3222.33</Text>
-              </View>
+              <CellsTitle title={'收入流水'} add={'添加收入项'}/>
+              <CellAccess title={'订单收入'} money={'1233.32'}
+                          toOperateDetail = {()=>this.toOperateDetail()}
+              />
+              <CellAccess title={'其他收入'} money={'1233.32'}/>
             </View>
 
             <View style={content.in_box}>
-              <View style={content.item}>
-                <View>
-                  <Text style={content.left}>支出流水</Text>
-                </View>
-                <Text style={content.right}></Text>
-              </View>
-              <View style={content.item}>
-                <View style={content.item_img}>
-                  <Text style={content.text}>用户退款金额(3单)</Text>
-
-                </View>
-                <Text style={content.money}>1235.55</Text>
-              </View>
-              <View style={content.item}>
-                <View style={content.item_img}>
-                  <Text style={content.text}>配送小费(2单)</Text>
-
-                </View>
-                <Text style={content.money}>3222.33</Text>
-              </View>
-              <View style={content.item}>
-                <Text style={content.text}>呼单配送费(69单)</Text>
-                <Text style={content.money}>3222.33</Text>
-              </View>
-              <View style={content.item}>
-
-                <Text style={content.text}>保底计算</Text>
-
-                <Text style={content.money}>3222.33</Text>
-              </View>
-              <View style={content.item}>
-
-                <Text style={content.text}>CRM平台服务费</Text>
-
-                <Text style={content.money}>3222.33</Text>
-              </View>
-
-              <View style={content.item}>
-
-                <Text style={content.text}>外卖平台服务费</Text>
-
-                <Text style={content.money}>3222.33</Text>
-              </View>
-              <View style={[content.in_box, {marginTop: 0, borderTopWidth: pxToDp(1)}]}>
-                <View style={content.item}>
-                  <View style={content.item_img}>
-                    <Text style={content.left}>其他支出流水</Text>
-
-                  </View>
-                  <Text style={content.right}>添加支出项</Text>
-                </View>
-                <View style={content.item}>
-
-                  <Text style={content.text}>物料费</Text>
-
-                  <Text style={content.money}>103.39</Text>
-                </View>
-                <View style={[content.item, content.cancel_item]}>
-                  <Text>报废</Text>
-                  <Text>103.39</Text>
-                  <View style={content.cancel}/>
-                </View>
-              </View>
+              <CellsTitle title={'支出流水'} add={''}/>
+              <CellAccess title={'用户退款金额(3单)'} money={'1233.32'}/>
+              <CellAccess title={'配送小费(2单)'} money={'1233.32'}/>
+              <CellAccess title={'呼叫配送费(69单)'} money={'1233.32'}/>
+              <CellAccess title={'保底结算'} money={'1233.32'}/>
+              <CellAccess title={'CRM平台服务费'} money={'1233.32'}/>
+              <CellAccess title={'外卖平台服务费'} money={'1233.32'}/>
+              <CellsTitle title={'其他支出流水'} add={'添加支出项'}/>
+              <CellAccess title={'物料费'} money={'1233.32'}/>
+              <CellCancel/>
             </View>
 
             <Button
@@ -227,7 +166,7 @@ class CellsTitle extends PureComponent {
   }
 
   render() {
-    let {title,add} = this.props;
+    let {title, add} = this.props;
     return (
         <View style={content.item}>
           <Text style={content.left}>{title}</Text>
@@ -236,17 +175,51 @@ class CellsTitle extends PureComponent {
     )
   }
 }
-class CellsTitle extends PureComponent {
+
+class CellAccess extends PureComponent {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    let {title, money} = this.props;
+    return (
+        <TouchableOpacity
+            onPress={() => {
+              this.props.toOperateDetail()
+            }}
+        >
+          <View style={content.item}>
+            <Text style={content.text}>{title}</Text>
+            <View style={content.item_img}>
+              <Text style={content.money}>{money}</Text>
+              <Image
+                  style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                  source={require('../../img/Public/xiangxia_.png')}
+              />
+            </View>
+          </View>
+        </TouchableOpacity>
+    )
+  }
+}
+
+class CellCancel extends PureComponent {
   constructor(props) {
     super(props)
   }
 
   render() {
-    let {title,add} = this.props;
     return (
-        <View style={content.item}>
-          <Text style={content.left}>{title}</Text>
-          <Text style={content.right}>{add}</Text>
+        <View style={[content.item, {position: 'relative'}]}>
+          <Text>支出流水项目名称</Text>
+          <Text>103.99</Text>
+          <View style={{
+            position: 'absolute',
+            borderTopWidth: pxToDp(1),
+            borderTopColor: '#eee7e8',
+            height: pxToDp(2),
+            width: '100%'
+          }}/>
         </View>
     )
   }

@@ -39,8 +39,8 @@ class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    console.log('params===',params);
-    let {backPage,store_product, product_detail} = params;
+    let {backPage} = params;
+
     return {
       headerLeft: (
         <NavigationItem
@@ -60,6 +60,7 @@ class GoodsDetailScene extends PureComponent {
       headerRight: ( <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => {
+            let {store_product, product_detail} = params;
             if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
@@ -193,18 +194,18 @@ class GoodsDetailScene extends PureComponent {
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
-        dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
+        dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async(resp) => {
           // console.log('getVendorProduct -> ', resp.obj['1']);
           if (resp.ok) {
             let store_product = resp.obj;
-            _this.setState({
+          await _this.setState({
               store_product: store_product,
               isRefreshing: false,
             });
+            _this.setNavParams();
           } else {
             _this.setState({isRefreshing: false});
           }
-          _this.setNavParams();
 
         }));
       });
