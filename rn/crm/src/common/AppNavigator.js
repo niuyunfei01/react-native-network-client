@@ -62,7 +62,7 @@ import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
 import OperateProfitScene from "../scene/OperateProfit/OperateProfitScene";
 import OperateDetailScene from "../scene/OperateProfit/OperateDetailScene";
-
+import OperateIncomeDetailScene from "../scene/OperateProfit/OperateIncomeDetailScene";
 
 
 const tabDef = {
@@ -252,6 +252,7 @@ class Navigator extends Component {
         [Config.ROUTE_HELP]: {screen: HelpScene},
         [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
         [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
+        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
 
       },
       stackNavigatorConfigs
