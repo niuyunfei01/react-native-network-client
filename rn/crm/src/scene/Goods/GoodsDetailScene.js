@@ -60,12 +60,11 @@ class GoodsDetailScene extends PureComponent {
       headerRight: ( <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => {
-            let {store_product, product_detail} = params;
-            if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
+            let {product_detail} = params;
+            if(tool.length(product_detail) > 0){
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'edit',
-                  store_product,
                   product_detail,
                   detail_key:navigation.state.key
                 });
@@ -254,7 +253,7 @@ class GoodsDetailScene extends PureComponent {
             <Text style={styles.goods_name}>
               {product_detail.name}
             </Text>
-            {product_detail.tag_list.split(',').map(function(cat_name, idx) {
+            {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function(cat_name, idx) {
               return (
                 <Text key={idx} style={styles.goods_cats}>
                   {cat_name}
@@ -390,7 +389,6 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderStoreProduct = (store_product) => {
-    console.log('store_product',store_product);
     let is_dark_bg = false;
     let _this = this;
 

@@ -123,7 +123,6 @@ class GoodsEditScene extends PureComponent {
         {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
       sale_status: -1,
       fnProviding: fnProviding,
-      store_product: [],
       vendor_stores: '',
       goBackValue: false,
       task_id: 0,
