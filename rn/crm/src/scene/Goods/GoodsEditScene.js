@@ -144,7 +144,7 @@ class GoodsEditScene extends PureComponent {
       //   return {id: img_id, name: img_data.name};
       // });
       let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
-      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail
+      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail;
 
       let upload_files = {};
       if (tool.length(mid_list_img) > 0) {
@@ -707,7 +707,7 @@ class GoodsEditScene extends PureComponent {
             paddingHorizontal: pxToDp(20),
             paddingTop: pxToDp(10)
           }]}>
-            {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            {this.state.list_img && tool.objectMap(this.state.list_img, (img_data, img_id) => {
               let img_url = img_data['url'];
               let img_name = img_data['name'];
               return (
