@@ -164,12 +164,14 @@ class GoodsDetailScene extends PureComponent {
 
   getProductDetail() {
     let product_id = this.productId;
+    console.log('product_id ---------------------> ', product_id);
     if (product_id > 0) {
+      let {currVendorId} = tool.vendor(this.props.global);
       const {accessToken} = this.props.global;
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
-        dispatch(fetchProductDetail(product_id, accessToken, (resp) => {
+        dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({

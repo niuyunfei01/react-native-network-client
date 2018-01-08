@@ -41,9 +41,9 @@ export function keyOfProdInfos(esId, platform, storeId) {
   return `${esId}_${platform}_${storeId}`;
 }
 
-export function fetchProductDetail(product_id, token, callback) {
+export function fetchProductDetail(product_id, _v_id, token, callback) {
   return dispatch => {
-    const url = `api/get_product_detail/${product_id}.json?access_token=${token}`;
+    const url = `api/get_product_detail/${product_id}/${_v_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
