@@ -174,5 +174,5 @@ const content = StyleSheet.create({
   take_in: {
     color: colors.main_color
   }
-})
+});
 export default connect(mapStateToProps, mapDispatchToProps)(OperateProfitScene)

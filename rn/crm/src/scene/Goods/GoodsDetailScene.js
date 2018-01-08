@@ -38,6 +38,7 @@ function mapDispatchToProps(dispatch) {
 class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
+    console.log('navigation',navigation)
     const {params = {}} = navigation.state;
     let {backPage} = params;
 
@@ -196,7 +197,6 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async(resp) => {
-          // console.log('getVendorProduct -> ', resp.obj['1']);
           if (resp.ok) {
             let store_product = resp.obj;
           await _this.setState({
