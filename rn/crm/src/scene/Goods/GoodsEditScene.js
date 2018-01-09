@@ -6,7 +6,8 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput, InteractionManager,
+  TextInput,
+  InteractionManager,
 } from 'react-native';
 import {
   Cells,
@@ -97,7 +98,7 @@ class GoodsEditScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
-      basic_cat_list: {},
+      basic_cat_list: [],
       basic_categories: {},
       store_tags: {},
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
@@ -126,13 +127,15 @@ class GoodsEditScene extends PureComponent {
       vendor_stores: '',
       goBackValue: false,
       task_id: 0,
-      selectToWhere:false,
+      selectToWhere: false,
 
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
-    this.getVendorStore = this.getVendorStore.bind(this)
-
+    this.getVendorStore = this.getVendorStore.bind(this);
+    this.back = this.back.bind(this);
+    this.toModalData = this.toModalData.bind(this);
+    this.dataValidate = this.dataValidate.bind(this);
   }
 
   componentWillMount() {
@@ -188,10 +191,11 @@ class GoodsEditScene extends PureComponent {
 
     let {store_tags, basic_category} = this.props.product;
     let {vendor_id} = this.state;
-    if(store_tags[vendor_id] === undefined || basic_category[vendor_id] === undefined){
+    if (store_tags[vendor_id] === undefined || basic_category[vendor_id] === undefined) {
       this.getVendorTags(vendor_id);
     } else {
       let basic_cat_list = this.toModalData(basic_category[vendor_id]);
+      console.log('基础分类',basic_cat_list);
       this.setState({
         basic_cat_list: basic_cat_list,
         basic_categories: basic_category[vendor_id],
@@ -207,8 +211,8 @@ class GoodsEditScene extends PureComponent {
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
           console.log('fetchVendorTags -> ', resp.ok);
-          // console.log(resp.ok, resp.obj.basic_category, resp.ok.store_tags);
-          if(resp.ok){
+          console.log(resp.ok, resp.obj.basic_category, resp.ok.store_tags);
+          if (resp.ok) {
             let {store_tags, basic_category} = resp.obj;
             let basic_cat_list = this.toModalData(basic_category);
             this.setState({
@@ -293,7 +297,7 @@ class GoodsEditScene extends PureComponent {
     }
     let {
       id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name,
-      content, upload_files, price, sale_status, provided,task_id
+      content, upload_files, price, sale_status, provided, task_id
     } = this.state;
     let formData = {
       id,
@@ -319,18 +323,18 @@ class GoodsEditScene extends PureComponent {
     console.log('formData ==> ', formData);
     if (check_res) {
       this.setState({uploading: true});
-      if(this.state.uploading){
+      if (this.state.uploading) {
         return false;
       }
       dispatch(productSave(formData, accessToken, async (ok, reason, obj) => {
         this.setState({uploading: false});
         if (ok) {
-         if(task_id >0){
-           this.setState({selectToWhere:true})
-         }else {
-           await this.setBeforeRefresh();
-           this.back(type);
-         }
+          if (task_id > 0) {
+            this.setState({selectToWhere: true})
+          } else {
+            await this.setBeforeRefresh();
+            this.back(type);
+          }
         } else {
           ToastLong(reason);
         }
@@ -764,33 +768,33 @@ class GoodsEditScene extends PureComponent {
               onRequestClose={() => {
               }}
           >提交中</Toast>
-          <Dialog onRequestClose={() => {}}
+          <Dialog onRequestClose={() => {
+          }}
                   visible={this.state.selectToWhere}
                   buttons={[{
                     type: 'default',
                     label: '回申请页面',
                     onPress: () => {
-                      this.setState({selectToWhere:false});
+                      this.setState({selectToWhere: false});
                       this.props.navigation.navigate('Remind')
                     }
-                  },{
+                  }, {
                     type: 'primary',
                     label: '去商品页面',
                     onPress: () => {
-                      this.setState({selectToWhere:false});
+                      this.setState({selectToWhere: false});
                       native.toGoods()
                     }
                   }]}
           >
-            <Text style = {{width:'100%',textAlign:'center',fontSize:pxToDp(30),color:colors.color333}}>上传成功</Text>
-            <Text style = {{width:'100%',textAlign:'center'}}>商品已成功添加到门店</Text>
+            <Text style={{width: '100%', textAlign: 'center', fontSize: pxToDp(30), color: colors.color333}}>上传成功</Text>
+            <Text style={{width: '100%', textAlign: 'center'}}>商品已成功添加到门店</Text>
 
           </Dialog>
         </ScrollView>
     )
   }
 }
-
 
 
 class GoodAttrs extends PureComponent {

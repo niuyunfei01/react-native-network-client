@@ -472,7 +472,7 @@ class MineScene extends PureComponent {
 
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
-    let {currVendorId, currVersion, is_mgr, is_helper} = this.state;
+    let {currVendorId, currVersion, is_mgr, is_helper, is_service_mgr} = this.state;
     let {fnPriceControlled} = tool.vendor(this.props.global);
     return (
       <View style={[block_styles.container]}>
@@ -499,6 +499,25 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/yeji_.png')}/>
           <Text style={[block_styles.block_name]}>业绩</Text>
         </TouchableOpacity>)}
+
+        {fnPriceControlled > 0 && is_service_mgr &&
+        (<TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            if (is_service_mgr) {
+              let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+              let url = Config.serverUrl(path, Config.https);
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            } else {
+              ToastLong('您没有查看托管店业绩的权限');
+            }
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/yeji_.png')}/>
+          <Text style={[block_styles.block_name]}>业绩</Text>
+        </TouchableOpacity>)}
+
 
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
