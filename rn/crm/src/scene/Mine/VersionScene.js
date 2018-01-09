@@ -131,6 +131,14 @@ class VersionScene extends PureComponent {
             >下载并安装</Button>
           </View>
         )}
+        <TouchableOpacity
+          onPress={() => {
+            Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
+          }}
+          style={styles.apk_link}
+        >
+          <Text style={styles.apk_text}>下载链接</Text>
+        </TouchableOpacity>
       </ScrollView>
     );
   }
@@ -152,6 +160,15 @@ const styles = StyleSheet.create({
   btn_update: {
     marginTop: pxToDp(40),
     width: '90%',
+  },
+  apk_link: {
+    marginTop: pxToDp(100),
+  },
+  apk_text: {
+    width: '100%',
+    textAlign: 'center',
+    color: '#cfcfcf',
+    fontSize: pxToDp(18),
   },
 });
 
