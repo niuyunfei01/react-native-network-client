@@ -115,6 +115,16 @@ export default {
   SHIP_ZS_BD : 24, //百度专送
 
   TAG_HIDE: '74911547', //列表中隐藏tag_id
-  ORDER_CANCEL_SHIP_REASON:10000
+  ORDER_CANCEL_SHIP_REASON: 10000,
+  //运营结算的详情的类型  收入的类型
+  OPERATE_ORDER_IN: 1,//订单收入
+  OPERATE_OTHER_IN: 2,//其他收入
+  OPERATE_REFUND_OUT:3,//退款
+  OPERATE_DISTRIBUTION_TIPS:4,//加小费
+  OPERATE_DISTRIBUTION_FEE:5,//运费
+  OPERATE_OTHER_OUT: 6,//其他超出
+
+
+
 
 }

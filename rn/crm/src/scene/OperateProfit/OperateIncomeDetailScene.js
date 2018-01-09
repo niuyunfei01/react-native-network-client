@@ -24,7 +24,6 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
 import {uploadImg, newProductSave} from "../../reducers/product/productActions";
-import ImagePicker from "react-native-image-crop-picker";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
@@ -33,6 +32,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
+import OperateIncomeItem from './OperateIncomeItem'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -52,7 +52,7 @@ function mapDispatchToProps(dispatch) {
 class OperateIncomeDetailScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '输入详情',
+      headerTitle: '收入详情',
     };
   };
 
@@ -66,13 +66,17 @@ class OperateIncomeDetailScene extends PureComponent {
     this.tab = this.tab.bind(this)
   }
 
+  componentWillMount() {
+    let {type} = this.props.navigation.state.params;
+    console.log('type>>>>>>',type);
+    this.setState({tabNum: type})
+  }
   tab(num) {
     this.setState({tabNum: num})
   }
 
   renderContent() {
     let {tabNum} = this.state;
-    console.log(tabNum)
     if (tabNum == 1) {
       return (
           <Cells style={{marginLeft: 0}}>
@@ -93,8 +97,11 @@ class OperateIncomeDetailScene extends PureComponent {
       )
     } else {
       return (
-          <View style={other.item}>
-
+          <View style={{marginTop: pxToDp(20)}}>
+            <OperateIncomeItem/>
+            <Button type={'primary'} style={{marginHorizontal: pxToDp(30), marginTop: pxToDp(160),marginBottom:pxToDp(30)}}>
+              添加新收入
+            </Button>
           </View>
       )
     }
@@ -114,7 +121,6 @@ class OperateIncomeDetailScene extends PureComponent {
             <TouchableOpacity
                 onPress={() => {
                   this.tab(2)
-
                 }}
             >
               <Text
@@ -171,9 +177,5 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(36)
   }
 });
-const other = StyleSheet.create({
-  item: {
-    backgroundColor: colors.white
-  }
-})
+
 export default connect(mapStateToProps, mapDispatchToProps)(OperateIncomeDetailScene)

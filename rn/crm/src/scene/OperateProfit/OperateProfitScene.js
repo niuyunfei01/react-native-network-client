@@ -32,7 +32,6 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
-import OperateIncomeItem from './OperateIncomeItem'
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -88,10 +87,10 @@ class OperateProfitScene extends PureComponent {
                 >
                   <CellHeader style={content.header}>
                     <Text style={content.date}> 2017-12-12</Text>
-                    <Text style={content.payment}>结款</Text>
+                    <Text style={content.payment}>结款 -1700.00</Text>
                   </CellHeader>
                   <CellBody style={{marginLeft: pxToDp(10)}}>
-                    <Text style={[content.text_right, content.expend]}>-1700.00</Text>
+
                     <Text style={[content.text_right, content.take_in]}>+86.00</Text>
                   </CellBody>
                   <CellFooter style={[content.text_right, content.foot, content.date]}>
@@ -100,8 +99,6 @@ class OperateProfitScene extends PureComponent {
                 </Cell>
               </Cells>
             </View>
-
-            {/*<OperateIncomeItem/>*/}
           </ScrollView>
         </View>
     )
@@ -139,15 +136,12 @@ const content = StyleSheet.create({
     color: colors.fontColor
   },
   cell: {
-    height: pxToDp(100),
+    height: pxToDp(125),
     alignItems: 'center',
     justifyContent: 'center'
   },
   header: {
-    width: pxToDp(265),
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
+    minWidth: pxToDp(150),
   },
   body: {
     width: pxToDp(175),
@@ -163,14 +157,16 @@ const content = StyleSheet.create({
     color: colors.fontBlack
   },
   payment: {
-    borderWidth: 1,
+    borderWidth: pxToDp(1),
     borderRadius: pxToDp(30),
-    borderColor: colors.main_color,
-    color: colors.main_color,
+    borderColor: '#fe0000',
+    color: '#fe0000',
     fontSize: pxToDp(24),
     textAlign: 'center',
-    paddingHorizontal: pxToDp(10),
-    lineHeight: pxToDp(30)
+    lineHeight: pxToDp(30),
+    paddingHorizontal:pxToDp(10),
+    paddingVertical:pxToDp(5),
+    marginTop:pxToDp(2)
   },
   expend: {
     color: '#fe0000'
@@ -178,5 +174,5 @@ const content = StyleSheet.create({
   take_in: {
     color: colors.main_color
   }
-})
+});
 export default connect(mapStateToProps, mapDispatchToProps)(OperateProfitScene)

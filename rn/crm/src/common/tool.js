@@ -418,7 +418,13 @@ if (map[mode]){
   return '选择供货方式'
 }
 }
-
+function getOperateDetailsType(type) {
+  let map ={};
+  map[Cts.OPERATE_DISTRIBUTION_TIPS] ='加小费详情';
+  map[Cts.OPERATE_REFUND_OUT] ='退款详情';
+  map[Cts.OPERATE_OTHER_OUT] = '其他支出流水';
+  return map[type]
+}
 
 function deepClone(obj){
   function isClass(o){
@@ -482,5 +488,6 @@ export default {
   autoPlat,
   sellingStatus,
   headerSupply,
-  deepClone
+  deepClone,
+  getOperateDetailsType
 }

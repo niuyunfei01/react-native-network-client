@@ -18,6 +18,8 @@ import pxToDp from "../../util/pxToDp";
 import {NavigationItem} from '../../widget';
 import colors from '../../widget/color'
 import Cts from "../../Cts";
+import Config from "../../config";
+
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
@@ -148,11 +150,15 @@ componentWillMount(){
             style={{flex: 1}}
             data={this.state.list}
             renderItem={({item, key}) => {
+              console.log({productId:item.id});
               return (
                   <TouchableOpacity
                       onPress={() => {
                         if(item.audit_status == Cts.AUDIT_STATUS_FAILED){
                           this.tips(item.audit_desc)
+                        }else {
+                          console.log(item);
+                          this.props.navigation.navigate(Config.ROUTE_GOODS_DETAIL,{productId:item.product_id})
                         }
                       }}
                   >
