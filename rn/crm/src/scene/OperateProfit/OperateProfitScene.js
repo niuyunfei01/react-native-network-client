@@ -14,24 +14,24 @@ import {
   CellHeader,
   CellBody,
   CellFooter,
-  Label,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {getVendorStores} from "../../reducers/mine/mineActions";
+import {fetchProfitHome} from "../../reducers/operateProfit/operateProfitActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {uploadImg, newProductSave} from "../../reducers/product/productActions";
-import ImagePicker from "react-native-image-crop-picker";
+import {uploadImg, newProductSave, fetchApplyRocordList} from "../../reducers/product/productActions";
 import tool from '../../common/tool';
+import {toFixed} from "../../common/tool";
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
-import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
+import OperateDialog from './OperateDialog'
+
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -40,8 +40,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      uploadImg,
-      newProductSave,
+      fetchProfitHome,
       ...globalActions
     }, dispatch)
   }
@@ -56,50 +55,103 @@ class OperateProfitScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let {currVendorId} = tool.vendor(this.props.global);
-    let currStoreId = this.props.navigation.state.params.store_id
+    this.state = {
+      query: true,
+      items: {},
+      unbalanced: 0
+    };
 
+    this.getProfitHome = this.getProfitHome.bind(this)
   }
 
-  toOperateDetail() {
-    this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL)
+  getProfitHome() {
+    const {dispatch} = this.props;
+    let {currStoreId,accessToken} = this.props.global;
+    dispatch(fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
+      if (ok) {
+        this.setState({
+          unbalanced: obj.unbalanced,
+          items: obj.items
+        })
+      }
+      this.setState({query: false,})
+    }));
+  }
+
+  componentWillMount() {
+    this.getProfitHome()
+  }
+
+  toOperateDetail(day) {
+    this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL,{day:day})
+  }
+
+  renderList(obj) {
+
+    return tool.objectMap(obj, (item, index) => {
+      return (
+          <View key={index}>
+            <View style={content.item_header}>
+              <Text style={{color: '#b2b2b2'}}>{index}</Text>
+            </View>
+            <View>
+              <Cells style={{marginTop: 0}}>
+                {
+                  item.map((ite, key) => {
+                    let {day, balance_money, sum_today, total_balanced} = ite;
+                    return (
+                        <Cell access
+                              style={content.cell}
+                              onPress={() => {
+                                this.toOperateDetail(day)
+                              }}
+                              key={key}
+                        >
+                          <CellHeader style={content.header}>
+                            <Text style={content.date}> {day}</Text>
+                            <Text style={content.payment}>结款 {toFixed(balance_money)}</Text>
+                          </CellHeader>
+                          <CellBody style={{marginLeft: pxToDp(10)}}>
+                            {
+                              sum_today > 0 ?
+                                  <Text style={[content.text_right, content.take_in]}>+{toFixed(sum_today)}</Text>
+                                  : <Text style={[content.text_right, content.take_in,{color:'#fe0000'}]}>-{toFixed(sum_today)}</Text>
+                            }
+                          </CellBody>
+                          <CellFooter style={[content.text_right, content.foot, content.date]}>
+                            {toFixed(total_balanced)}
+                          </CellFooter>
+                        </Cell>
+                    )
+                  })
+                }
+              </Cells>
+            </View>
+          </View>
+      )
+    })
+
   }
 
   render() {
     return (
         <View style={{flex: 1}}>
-
           <View style={header.wrapper}>
-            <Text style={header.profit}>83.39</Text>
+            <Text style={header.profit}>{toFixed(this.state.unbalanced)}</Text>
             <Text style={header.desc}>待结算运营收益额</Text>
           </View>
           <ScrollView>
-            <View style={content.item_header}>
-              <Text style={{color: '#b2b2b2'}}>2018年12月</Text>
-            </View>
-            <View>
-              <Cells style={{marginTop: 0}}>
-                <Cell access
-                      style={content.cell}
-                      onPress={() => {
-                        this.toOperateDetail()
-                      }}
-                >
-                  <CellHeader style={content.header}>
-                    <Text style={content.date}> 2017-12-12</Text>
-                    <Text style={content.payment}>结款 -1700.00</Text>
-                  </CellHeader>
-                  <CellBody style={{marginLeft: pxToDp(10)}}>
+            {
+              this.renderList(this.state.items)
+            }
 
-                    <Text style={[content.text_right, content.take_in]}>+86.00</Text>
-                  </CellBody>
-                  <CellFooter style={[content.text_right, content.foot, content.date]}>
-                    10000.00
-                  </CellFooter>
-                </Cell>
-              </Cells>
-            </View>
           </ScrollView>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }
@@ -164,9 +216,9 @@ const content = StyleSheet.create({
     fontSize: pxToDp(24),
     textAlign: 'center',
     lineHeight: pxToDp(30),
-    paddingHorizontal:pxToDp(10),
-    paddingVertical:pxToDp(5),
-    marginTop:pxToDp(2)
+    paddingHorizontal: pxToDp(10),
+    paddingVertical: pxToDp(5),
+    marginTop: pxToDp(2)
   },
   expend: {
     color: '#fe0000'

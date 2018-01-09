@@ -32,8 +32,11 @@ import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
-import {Toast, Dialog, Icon, Button,Input} from "../../weui/index";
+import {Toast, Dialog, Icon, Button, Input} from "../../weui/index";
+import {fetchProfitDaily, fetchProfitHome} from '../../reducers/operateProfit/operateProfitActions'
+
 import Header from './OperateHeader';
+
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -60,53 +63,110 @@ class OperateDetailScene extends PureComponent {
     super(props);
     // let {currVendorId} = tool.vendor(this.props.global);
     // let currStoreId = this.props.navigation.state.params.store_id
+    this.state = {
+      sum: 0,
+      editable: false,
+      check_detail: false,
+      income: [{num: 0, id: 0}, {num: 0, id: 0}],
+      outcome_normal: []
+    }
+  }
+
+  toOperateDetail(url, params = {}) {
+    this.props.navigation.navigate(url, params)
+  }
+
+  getProfitDaily() {
+    let {currStoreId, accessToken} = this.props.global;
+    let {day} = this.props.navigation.state.params;
+    const {dispatch} = this.props;
+    dispatch(fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
+      console.log('obj', obj)
+      let {sum, editable, check_detail, income, outcome_normal, outcome_other} = obj;
+      if (ok) {
+        this.setState({
+          sum,
+          editable,
+          check_detail,
+          income,
+          outcome_normal,
+          outcome_other
+        })
+      }
+      this.setState({query: false,})
+    }));
+  }
+
+  componentWillMount() {
+    this.getProfitDaily();
+  }
+
+  renderOtherOut() {
+    this.state.outcome_other.map((item, index) => {
+      if (item.valid) {
+        return (
+            <CellAccess title={'配送小费(2单)'} money={'1233.32'}
+                        toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})
+                        }
+            />
+        )
+      } else {
+        return (
+            <CellCancel title={'配送小费(2单)'} money={'1233.32'}/>
+        )
+      }
+    })
 
   }
 
-  toOperateDetail(url,params={}) {
-    this.props.navigation.navigate(url,params)
-  }
+  renderOutNormal() {
+    let _this = this;
+    return (
+        <View style={content.in_box}>
+          <CellsTitle title={'支出流水'} add={''}/>
+          <CellAccess title={'用户退款金额(3单)'} money={'1233.32'}
+                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_REFUND_OUT})
+                      }
+          />
+          <CellAccess title={'配送小费(2单)'} money={'1233.32'}
+                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})
+                      }
+          />
+          <CellAccess title={'保底结算'} money={'1233.32'}
+                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
+          />
+          <CellAccess title={'呼叫配送费(69单)'} money={'1233.32'}/>
+          <CellAccess title={'CRM平台服务费'} money={'1233.32'}/>
+          <CellAccess title={'外卖平台服务费'} money={'1233.32'}/>
+          <CellsTitle title={'其他支出流水'} add={'添加支出项'}/>
 
+          {
+            _this.renderOtherOut()
+          }
+        </View>
+    )
+  }
   render() {
+    let {sum, income, outcome_normal} = this.state;
     return (
         <View style={{flex: 1}}>
-          <Header text={'今日运营收益'} money={56.66}/>
+          <Header text={'今日运营收益'} money={sum}/>
           <ScrollView>
             <View style={content.in_box}>
               <CellsTitle title={'收入流水'} add={'添加收入项'}/>
-              <CellAccess title={'订单收入'} money={'1233.32'}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type:Cts.OPERATE_ORDER_IN})
+              <CellAccess title={'订单收入'} money={income[0].num}
+                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type: Cts.OPERATE_ORDER_IN})
                           }
               />
-              <CellAccess title={'其他收入'} money={'1233.32'}
+              <CellAccess title={'其他收入'} money={income[1].num}
                           toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type: Cts.OPERATE_OTHER_IN})
                           }
               />
             </View>
+            {
+              this.renderOutNormal()
+            }
 
-            <View style={content.in_box}>
-              <CellsTitle title={'支出流水'} add={''}/>
-              <CellAccess title={'用户退款金额(3单)'} money={'1233.32'}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_REFUND_OUT})
-                          }
-              />
-              <CellAccess title={'配送小费(2单)'} money={'1233.32'}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})
-                          }
-              />
-
-              <CellAccess title={'保底结算'} money={'1233.32'}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
-              />
-              <CellAccess title={'呼叫配送费(69单)'} money={'1233.32'}/>
-              <CellAccess title={'CRM平台服务费'} money={'1233.32'}/>
-              <CellAccess title={'外卖平台服务费'} money={'1233.32'}/>
-              <CellsTitle title={'其他支出流水'} add={'添加支出项'}/>
-              <CellAccess title={'物料费'} money={'1233.32'}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL,{type:Cts.OPERATE_OTHER_OUT})}
-              />
-              <CellCancel/>
-            </View>
             <Button
                 type={'primary'}
                 style={{marginTop: pxToDp(80), marginHorizontal: pxToDp(30), marginBottom: pxToDp(30)}}
@@ -199,43 +259,54 @@ class CellsTitle extends PureComponent {
           }}
                   visible={this.state.dlgShipVisible}
                   title={'添加其他收入'}
-                  titleStyle={{textAlign:'center',color:colors.white}}
-                  headerStyle={{backgroundColor:colors.main_color,paddingTop:pxToDp(20),justifyContent:'center',paddingBottom:pxToDp(20)}}
+                  titleStyle={{textAlign: 'center', color: colors.white}}
+                  headerStyle={{
+                    backgroundColor: colors.main_color,
+                    paddingTop: pxToDp(20),
+                    justifyContent: 'center',
+                    paddingBottom: pxToDp(20)
+                  }}
                   buttons={[{
                     type: 'default',
                     label: '取消',
                     onPress: () => {
-                      this.setState({dlgShipVisible:false});
+                      this.setState({dlgShipVisible: false});
                     }
-                  },{
+                  }, {
                     type: 'primary',
                     label: '保存',
                     onPress: () => {
-                      this.setState({dlgShipVisible:false});
+                      this.setState({dlgShipVisible: false});
                     }
                   }]}
 
           >
-            <ScrollView style = {{height:pxToDp(500)}}>
-            <Text >项目(不超过15个汉字)</Text>
-            <Input
-                underlineColorAndroid='transparent'
-                style={{borderWidth:pxToDp(1),borderColor:colors.fontGray,borderRadius:pxToDp(10)}}
-                maxLength ={15}
-            />
-            <Text >金额(无)</Text>
-            <Input
-                underlineColorAndroid='transparent'
-                style={{borderWidth:pxToDp(1),borderColor:colors.fontGray,borderRadius:pxToDp(10)}}
-                keyboardType = {"numeric"}
-            />
-            <Text >备注说明</Text>
+            <ScrollView style={{height: pxToDp(500)}}>
+              <Text>项目(不超过15个汉字)</Text>
               <Input
                   underlineColorAndroid='transparent'
-                  style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10),height:pxToDp(150),marginBottom:pxToDp(150)}}
+                  style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10)}}
+                  maxLength={15}
+              />
+              <Text>金额(无)</Text>
+              <Input
+                  underlineColorAndroid='transparent'
+                  style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10)}}
+                  keyboardType={"numeric"}
+              />
+              <Text>备注说明</Text>
+              <Input
+                  underlineColorAndroid='transparent'
+                  style={{
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
+                    borderRadius: pxToDp(10),
+                    height: pxToDp(150),
+                    marginBottom: pxToDp(150)
+                  }}
                   multiline={true}
               />
-          </ScrollView>
+            </ScrollView>
           </Dialog>
         </View>
     )
@@ -248,13 +319,13 @@ class CellAccess extends PureComponent {
   }
 
   render() {
-    let {title, money} = this.props;
+    let {title, money} = this.props || {};
     return (
         <TouchableOpacity
             onPress={() => {
-              if(this.props.toOperateDetail){
+              if (this.props.toOperateDetail) {
                 this.props.toOperateDetail()
-              }else {
+              } else {
                 return false
               }
             }}
@@ -267,7 +338,7 @@ class CellAccess extends PureComponent {
                 this.props.toOperateDetail ? <Image
                     style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                     source={require('../../img/Public/xiangxia_.png')}
-                /> :<View style = {{width:pxToDp(50)}} />
+                /> : <View style={{width: pxToDp(50)}}/>
               }
             </View>
           </View>
@@ -284,8 +355,8 @@ class CellCancel extends PureComponent {
   render() {
     return (
         <View style={[content.item, {position: 'relative'}]}>
-          <Text>支出流水项目名称</Text>
-          <Text>103.99</Text>
+          <Text>{this.props.title}</Text>
+          <Text>{this.props.money}</Text>
           <View style={{
             position: 'absolute',
             borderTopWidth: pxToDp(1),

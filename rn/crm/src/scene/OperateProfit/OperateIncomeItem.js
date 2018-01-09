@@ -15,16 +15,16 @@ class OperateIncomeItem extends PureComponent {
   }
 
   render() {
-    return (
-        <View>
+    if(this.props.invalid){
+      return (
           <View style={item.wrapper}>
             <View style={item.title_wrapper}>
               <Text style={item.title_text}>配送费收入</Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={item.title_money}>135.66</Text>
                 <TouchableOpacity
-                    onPress = {()=>{
-                      this.setState({dlgShipVisible:true})
+                    onPress={() => {
+                      this.setState({dlgShipVisible: true})
                     }}
                 >
                   <Text style={item.title_btn}>置为无效</Text>
@@ -32,44 +32,49 @@ class OperateIncomeItem extends PureComponent {
               </View>
             </View>
             <Text style={item.details}>备注:今年财神不送礼，发条短信传给你。健康快乐长伴你，幸福美满粘着你，还有我要告诉你，财神已经盯上你！</Text>
-          </View>
+            <Dialog onRequestClose={() => {
+              this.setState({dlgShipVisible:false});
+            }}
+                    visible={this.state.dlgShipVisible}
+                    title={'置为无效'}
+                    titleStyle={{textAlign:'center'}}
+                    buttons={[{
+                      type: 'default',
+                      label: '取消',
+                      onPress: () => {
+                        this.setState({dlgShipVisible:false});
+                      }
+                    },{
+                      type: 'primary',
+                      label: '确定',
+                      onPress: () => {
+                        this.setState({dlgShipVisible:false});
 
-          <View style={item.wrapper}>
-            <View style={item.title_wrapper}>
-              <Text style={[item.title_text, {color: colors.fontGray}]}>配送费收入</Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[item.title_money, {color: colors.fontGray}]}>135.66</Text>
-                <Text style={[item.title_btn, {backgroundColor: colors.fontGray}]}>无效</Text>
+                      }
+                    }]}
+
+            ><Text>置为无效后,将保留此项列表,金额将不会计入总数</Text>
+            </Dialog>
+          </View>
+      )
+    }else{
+      return (
+          <View>
+            <View style={item.wrapper}>
+              <View style={item.title_wrapper}>
+                <Text style={[item.title_text, {color: colors.fontGray}]}>配送费收入</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={[item.title_money, {color: colors.fontGray}]}>135.66</Text>
+                  <Text style={[item.title_btn, {backgroundColor: colors.fontGray}]}>无效</Text>
+                </View>
+                <Text style={item.line_though}/>
               </View>
-              <Text style={item.line_though}/>
+              <Text style={item.details}>备注:今年财神不送礼，发条短信传给你。健康快乐长伴你，幸福美满粘着你，还有我要告诉你，财神已经盯上你！</Text>
             </View>
-            <Text style={item.details}>备注:今年财神不送礼，发条短信传给你。健康快乐长伴你，幸福美满粘着你，还有我要告诉你，财神已经盯上你！</Text>
           </View>
-          <Dialog onRequestClose={() => {
-            this.setState({dlgShipVisible:false});
-          }}
-                  visible={this.state.dlgShipVisible}
-                  title={'置为无效'}
-                  titleStyle={{textAlign:'center'}}
-                  buttons={[{
-                    type: 'default',
-                    label: '取消',
-                    onPress: () => {
-                      this.setState({dlgShipVisible:false});
-                    }
-                  },{
-                    type: 'primary',
-                    label: '确定',
-                    onPress: () => {
-                      this.setState({dlgShipVisible:false});
+      )
+    }
 
-                    }
-                  }]}
-
-          ><Text>置为无效后,将保留此项列表,金额将不会计入总数</Text>
-          </Dialog>
-        </View>
-    )
   }
 }
 

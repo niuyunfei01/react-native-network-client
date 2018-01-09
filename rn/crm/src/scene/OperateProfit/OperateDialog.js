@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native'
+import {Text, View, StyleSheet, TouchableOpacity, Modal, TextInput} from 'react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
@@ -12,36 +12,35 @@ class OperateDialog extends PureComponent {
 
   render() {
     return (
-        <View>
-          <Dialog onRequestClose={() => {
+        <Modal
+            transparent={true}
+            visible={true}
+            onRequestClose={() => {
+            }}
 
-          }}
-                  visible={this.state.dlgShipVisible}
-                  title={'添加其他支出'}
-                  titleStyle={{textAlign: 'center',}}
-                  headerStyle={{backgroundColor: colors.main_color}}
-                  buttons={[{
-                    type: 'default',
-                    label: '取消',
-                    onPress: () => {
-                      this.props.dlgShipVisible = false;
-
-                    }
-                  }, {
-                    type: 'primary',
-                    label: '确定',
-                    onPress: () => {
-
-
-                    }
-                  }]}
-
-          ><Text></Text>
-          </Dialog>
-        </View>
+        >
+          <View style={styles.wrapper}>
+            <View style={styles.box}>
+              <TextInput/>
+            </View>
+          </View>
+        </Modal>
     )
   }
 
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    flex: 1,
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  box: {
+    width: '100%',
+    backgroundColor:colors.white
+  }
+});
 
 export default OperateDialog

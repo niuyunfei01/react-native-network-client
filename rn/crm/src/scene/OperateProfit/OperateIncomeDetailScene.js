@@ -23,7 +23,7 @@ import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {uploadImg, newProductSave} from "../../reducers/product/productActions";
+import {fetchProfitIncomeOrderList} from "../../reducers/operateProfit/operateProfitActions";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
@@ -33,6 +33,7 @@ import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
+import {fetchProfitDaily} from "../../reducers/operateProfit/operateProfitActions";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -42,8 +43,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      uploadImg,
-      newProductSave,
+      fetchProfitIncomeOrderList,
       ...globalActions
     }, dispatch)
   }
@@ -58,50 +58,85 @@ class OperateIncomeDetailScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    // let {currVendorId} = tool.vendor(this.props.global);
-    // let currStoreId = this.props.navigation.state.params.store_id
     this.state = {
-      tabNum: 2
+      tabNum: 2,
+      editable:false,
+      orders:[],
+      other:[],
+
     };
     this.tab = this.tab.bind(this)
+  }
+  getProfitIncomeOrderList(){
+    let {currStoreId, accessToken} = this.props.global;
+    let {day,type} = this.props.navigation.state.params;
+    const {dispatch} = this.props;
+    dispatch(fetchProfitIncomeOrderList(type,currStoreId, day, accessToken, async (ok, obj, desc) => {
+      let {orders,other,editable} = obj;
+      if (ok) {
+        this.setState({
+          orders:orders,
+          other:other,
+          editable:editable
+        })
+      }
+      this.setState({query: false,})
+    }));
   }
 
   componentWillMount() {
     let {type} = this.props.navigation.state.params;
-    console.log('type>>>>>>',type);
     this.setState({tabNum: type})
+    this.getProfitIncomeOrderList()
   }
   tab(num) {
     this.setState({tabNum: num})
   }
-
   renderContent() {
-    let {tabNum} = this.state;
+    let {tabNum,orders,other} = this.state;
     if (tabNum == 1) {
       return (
-          <Cells style={{marginLeft: 0}}>
-            <Cell access
-                  style={styles.cell}
-            >
-              <CellHeader>
-                <Text style={styles.cell_name}>#11(饿了么)</Text>
-              </CellHeader>
-              <CellBody style={{justifyContent: 'center'}}>
-                <Text style={styles.cell_num}>21件商品</Text>
-              </CellBody>
-              <CellFooter>
-                <Text style={styles.cell_money}>1716.89</Text>
-              </CellFooter>
-            </Cell>
+          <Cells style={{marginLeft: 0,padding:0}}>
+            {
+              orders.map((item,index)=>{
+                let {good_num,money,name,order_id} = item;
+                return(
+                    <Cell access
+                          key = {index}
+                          style={styles.cell}
+                          onPress = {()=>{
+                            console.log(order_id);
+                          }}
+                    >
+                      <CellHeader>
+                        <Text style={styles.cell_name}>{name}</Text>
+                      </CellHeader>
+                      <CellBody style={{justifyContent: 'center'}}>
+                        <Text style={styles.cell_num}>{good_num}件商品</Text>
+                      </CellBody>
+                      <CellFooter>
+                        <Text style={styles.cell_money}>{money}</Text>
+                      </CellFooter>
+                    </Cell>
+                )
+              })
+            }
           </Cells>
       )
     } else {
       return (
           <View style={{marginTop: pxToDp(20)}}>
-            <OperateIncomeItem/>
-            <Button type={'primary'} style={{marginHorizontal: pxToDp(30), marginTop: pxToDp(160),marginBottom:pxToDp(30)}}>
-              添加新收入
-            </Button>
+            {
+              other.map((item,index)=>{
+                return <OperateIncomeItem invalid = {item.invalid}/>
+              })
+            }
+            {
+              this.state.editable? <Button type={'primary'} style={{marginHorizontal: pxToDp(30), marginTop: pxToDp(160),marginBottom:pxToDp(30)}}>
+                添加新收入
+              </Button>:null
+            }
+
           </View>
       )
     }
@@ -133,6 +168,12 @@ class OperateIncomeDetailScene extends PureComponent {
               this.renderContent()
             }
           </ScrollView>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }
@@ -159,14 +200,14 @@ const tab = StyleSheet.create({
 });
 const styles = StyleSheet.create({
   cell: {
-    height: pxToDp(100),
-    flexDirection: 'row',
-    alignItems: 'center'
-
+    borderTopWidth:0,
+    height:pxToDp(100),
   },
   cell_name: {
     fontSize: pxToDp(30),
-    color: '#3e3e3e'
+    color: '#3e3e3e',
+    height:pxToDp(100),
+    lineHeight:pxToDp(70)
   },
   cell_num: {
     fontSize: pxToDp(24),
