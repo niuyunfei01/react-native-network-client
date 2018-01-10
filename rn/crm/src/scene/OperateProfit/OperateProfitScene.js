@@ -30,7 +30,7 @@ import {NavigationItem} from '../../widget';
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
-import OperateDialog from './OperateDialog'
+import  RenderEmpty from './RenderEmpty'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -63,76 +63,77 @@ class OperateProfitScene extends PureComponent {
 
     this.getProfitHome = this.getProfitHome.bind(this)
   }
-
   getProfitHome() {
     const {dispatch} = this.props;
     let {currStoreId,accessToken} = this.props.global;
     dispatch(fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
+      console.log('obj',obj)
       if (ok) {
         this.setState({
           unbalanced: obj.unbalanced,
           items: obj.items
         })
+      }else {
+
       }
       this.setState({query: false,})
     }));
   }
-
   componentWillMount() {
     this.getProfitHome()
   }
-
   toOperateDetail(day) {
     this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL,{day:day})
   }
-
   renderList(obj) {
-
-    return tool.objectMap(obj, (item, index) => {
-      return (
-          <View key={index}>
-            <View style={content.item_header}>
-              <Text style={{color: '#b2b2b2'}}>{index}</Text>
+    if(tool.length(obj)>0){
+      return tool.objectMap(obj, (item, index) => {
+        return (
+            <View key={index}>
+              <View style={content.item_header}>
+                <Text style={{color: '#b2b2b2'}}>{index}</Text>
+              </View>
+              <View>
+                <Cells style={{marginTop: 0}}>
+                  {
+                    item.map((ite, key) => {
+                      let {day, balance_money, sum_today, total_balanced} = ite;
+                      return (
+                          <Cell access
+                                style={content.cell}
+                                onPress={() => {
+                                  this.toOperateDetail(day)
+                                }}
+                                key={key}
+                          >
+                            <CellHeader style={content.header}>
+                              <Text style={content.date}> {day}</Text>
+                              <Text style={content.payment}>结款 {toFixed(balance_money)}</Text>
+                            </CellHeader>
+                            <CellBody style={{marginLeft: pxToDp(10)}}>
+                              {
+                                sum_today > 0 ?
+                                    <Text style={[content.text_right, content.take_in]}>+{toFixed(sum_today)}</Text>
+                                    : <Text style={[content.text_right, content.take_in,{color:'#fe0000'}]}>-{toFixed(sum_today)}</Text>
+                              }
+                            </CellBody>
+                            <CellFooter style={[content.text_right, content.foot, content.date]}>
+                              {toFixed(total_balanced)}
+                            </CellFooter>
+                          </Cell>
+                      )
+                    })
+                  }
+                </Cells>
+              </View>
             </View>
-            <View>
-              <Cells style={{marginTop: 0}}>
-                {
-                  item.map((ite, key) => {
-                    let {day, balance_money, sum_today, total_balanced} = ite;
-                    return (
-                        <Cell access
-                              style={content.cell}
-                              onPress={() => {
-                                this.toOperateDetail(day)
-                              }}
-                              key={key}
-                        >
-                          <CellHeader style={content.header}>
-                            <Text style={content.date}> {day}</Text>
-                            <Text style={content.payment}>结款 {toFixed(balance_money)}</Text>
-                          </CellHeader>
-                          <CellBody style={{marginLeft: pxToDp(10)}}>
-                            {
-                              sum_today > 0 ?
-                                  <Text style={[content.text_right, content.take_in]}>+{toFixed(sum_today)}</Text>
-                                  : <Text style={[content.text_right, content.take_in,{color:'#fe0000'}]}>-{toFixed(sum_today)}</Text>
-                            }
-                          </CellBody>
-                          <CellFooter style={[content.text_right, content.foot, content.date]}>
-                            {toFixed(total_balanced)}
-                          </CellFooter>
-                        </Cell>
-                    )
-                  })
-                }
-              </Cells>
-            </View>
-          </View>
-      )
-    })
+        )
+      })
+    }else {
+      return <RenderEmpty />
+    }
 
   }
-
   render() {
     return (
         <View style={{flex: 1}}>

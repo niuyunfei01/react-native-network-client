@@ -98,7 +98,7 @@ class GoodsEditScene extends PureComponent {
       isRefreshing: false,
       isUploadImg: false,
       basic_cat_list: {},
-      basic_categories: {},
+      basic_categories: [],
       store_tags: {},
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],

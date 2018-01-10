@@ -122,9 +122,9 @@ export default {
   OPERATE_REFUND_OUT:3,//退款
   OPERATE_DISTRIBUTION_TIPS:4,//加小费
   OPERATE_DISTRIBUTION_FEE:5,//运费
-  OPERATE_OTHER_OUT: 6,//其他超出
-
-
-
+  OPERATE_OUT_BASIC : 7,//保底结算
+  OPERATE_OUT_BLX : 8,//运营服务费
+  OPERATE_OUT_PLAT_FEE : 9,  //外卖平台服务费
+  OPERATE_OTHER_OUT : 6, //其他支出
 
 }

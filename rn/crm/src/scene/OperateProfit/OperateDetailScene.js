@@ -26,7 +26,7 @@ import colors from "../../styles/colors";
 import Config from "../../config";
 import {uploadImg, newProductSave} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
-import tool from '../../common/tool';
+import tool, {toFixed} from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
@@ -61,19 +61,31 @@ class OperateDetailScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    // let {currVendorId} = tool.vendor(this.props.global);
-    // let currStoreId = this.props.navigation.state.params.store_id
     this.state = {
       sum: 0,
       editable: false,
       check_detail: false,
-      income: [{num: 0, id: 0}, {num: 0, id: 0}],
-      outcome_normal: []
+      income: {[Cts.OPERATE_ORDER_IN]:{num:0},[Cts.OPERATE_OTHER_IN]:{num:0}},
+      outcome_normal: {
+        [Cts.OPERATE_REFUND_OUT]:{num:0,order_num:0},
+        [Cts.OPERATE_DISTRIBUTION_TIPS]:{num:0,order_num:0},
+        [Cts.OPERATE_DISTRIBUTION_FEE]:{num:0,order_num:0},
+        [Cts.OPERATE_OUT_BASIC]:{num:0},
+        [Cts.OPERATE_OUT_BLX]:{num:0},
+        [Cts.OPERATE_OUT_PLAT_FEE]:{num:0},
+      },
+      outcome_other:[],
+      query:true
     }
   }
 
   toOperateDetail(url, params = {}) {
-    this.props.navigation.navigate(url, params)
+    params.day = this.props.navigation.state.params.day;
+    // if(this.state.check_detail){
+      this.props.navigation.navigate(url, params)
+    // }else {
+    //   ToastLong('您没有权限!')
+    // }
   }
 
   getProfitDaily() {
@@ -81,7 +93,6 @@ class OperateDetailScene extends PureComponent {
     let {day} = this.props.navigation.state.params;
     const {dispatch} = this.props;
     dispatch(fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
-      console.log('obj', obj)
       let {sum, editable, check_detail, income, outcome_normal, outcome_other} = obj;
       if (ok) {
         this.setState({
@@ -96,50 +107,48 @@ class OperateDetailScene extends PureComponent {
       this.setState({query: false,})
     }));
   }
-
   componentWillMount() {
     this.getProfitDaily();
   }
-
   renderOtherOut() {
-    this.state.outcome_other.map((item, index) => {
-      if (item.valid) {
+  return  this.state.outcome_other.map((item, index) => {
+      if (!(item.valid === false)) {
         return (
-            <CellAccess title={'配送小费(2单)'} money={'1233.32'}
-                        toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})
-                        }
+            <CellAccess key = {index} title={item.label} money={item.num}
+                        toOperateDetail={() =>
+                            this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL,
+                                {editable:this.state.editable,
+                                  id:item.id,
+                                })}
             />
         )
       } else {
         return (
-            <CellCancel title={'配送小费(2单)'} money={'1233.32'}/>
+            <CellCancel key = {index} title={item.label} money={item.num}
+                        toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL)}
+            />
         )
       }
     })
-
   }
-
   renderOutNormal() {
     let _this = this;
+    let {outcome_normal} = this.state;
     return (
         <View style={content.in_box}>
           <CellsTitle title={'支出流水'} add={''}/>
-          <CellAccess title={'用户退款金额(3单)'} money={'1233.32'}
-                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_REFUND_OUT})
-                      }
+          <CellAccess title={`用户退款金额(${outcome_normal[Cts.OPERATE_REFUND_OUT]['order_num']})单`} money={outcome_normal[Cts.OPERATE_REFUND_OUT]['num']}
+                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL,{type: Cts.OPERATE_REFUND_OUT})}
           />
-          <CellAccess title={'配送小费(2单)'} money={'1233.32'}
-                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})
-                      }
+          <CellAccess title={`配送小费(${outcome_normal[Cts.OPERATE_DISTRIBUTION_TIPS]['order_num']}单)`} money={outcome_normal[Cts.OPERATE_DISTRIBUTION_TIPS]['num']}
+                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})}
           />
-          <CellAccess title={'保底结算'} money={'1233.32'}
-                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
+          <CellAccess title={'保底结算'} money={outcome_normal[Cts.OPERATE_OUT_BASIC]['num']} toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
           />
-          <CellAccess title={'呼叫配送费(69单)'} money={'1233.32'}/>
-          <CellAccess title={'CRM平台服务费'} money={'1233.32'}/>
-          <CellAccess title={'外卖平台服务费'} money={'1233.32'}/>
+          <CellAccess title={`呼叫配送费(${outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]['order_num']}单)`} money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]['num']}/>
+          <CellAccess title={'CRM平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_BLX]['num']}/>
+          <CellAccess title={'外卖平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]['num']}/>
           <CellsTitle title={'其他支出流水'} add={'添加支出项'}/>
-
           {
             _this.renderOtherOut()
           }
@@ -147,32 +156,49 @@ class OperateDetailScene extends PureComponent {
     )
   }
   render() {
-    let {sum, income, outcome_normal} = this.state;
+    let {sum, income,editable} = this.state;
     return (
         <View style={{flex: 1}}>
-          <Header text={'今日运营收益'} money={sum}/>
-          <ScrollView>
+          <Header text={'今日运营收益'} money={toFixed(sum)}/>
+          <ScrollView style = {{paddingBottom:pxToDp(50)}}>
             <View style={content.in_box}>
               <CellsTitle title={'收入流水'} add={'添加收入项'}/>
-              <CellAccess title={'订单收入'} money={income[0].num}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type: Cts.OPERATE_ORDER_IN})
-                          }
+              <CellAccess title={'订单收入'} money={income[Cts.OPERATE_ORDER_IN].num}
+                          toOperateDetail={() =>
+                              this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
+                                type: Cts.OPERATE_ORDER_IN,
+                                order_money: income[Cts.OPERATE_ORDER_IN].num,
+                                other_money: income[Cts.OPERATE_OTHER_IN].num,
+                              })}
               />
-              <CellAccess title={'其他收入'} money={income[1].num}
-                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type: Cts.OPERATE_OTHER_IN})
-                          }
+              <CellAccess title={'其他收入'} money={income[Cts.OPERATE_OTHER_IN].num}
+                          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type: Cts.OPERATE_OTHER_IN})}
               />
             </View>
             {
               this.renderOutNormal()
             }
+            {
+              editable ? <Button
+                  type={'primary'}
+                  style={{marginTop: pxToDp(80), marginHorizontal: pxToDp(30), marginBottom: pxToDp(30)}}
+                  onPress={() => {
+                    if (editable) {
 
-            <Button
-                type={'primary'}
-                style={{marginTop: pxToDp(80), marginHorizontal: pxToDp(30), marginBottom: pxToDp(30)}}
-            >
-              给用户结款</Button>
+                    } else {
+                      ToastLong('您没有权限');
+                      return false;
+                    }
+                  }}
+              >给用户结款</Button> : null
+            }
           </ScrollView>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }
@@ -236,7 +262,7 @@ const content = StyleSheet.create({
 
 class CellsTitle extends PureComponent {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       dlgShipVisible: false
     }
@@ -333,7 +359,7 @@ class CellAccess extends PureComponent {
           <View style={content.item}>
             <Text style={content.text}>{title}</Text>
             <View style={content.item_img}>
-              <Text style={content.money}>{money}</Text>
+              <Text style={content.money}>{toFixed(money)}</Text>
               {
                 this.props.toOperateDetail ? <Image
                     style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
@@ -354,17 +380,37 @@ class CellCancel extends PureComponent {
 
   render() {
     return (
-        <View style={[content.item, {position: 'relative'}]}>
-          <Text>{this.props.title}</Text>
-          <Text>{this.props.money}</Text>
-          <View style={{
-            position: 'absolute',
-            borderTopWidth: pxToDp(1),
-            borderTopColor: '#eee7e8',
-            height: pxToDp(2),
-            width: '100%'
-          }}/>
-        </View>
+        <TouchableOpacity
+            onPress={() => {
+              if (this.props.toOperateDetail) {
+                this.props.toOperateDetail()
+              } else {
+                return false
+              }
+            }}
+        >
+          <View style={[content.item, {position: 'relative'}]}>
+            <Text>{this.props.title}</Text>
+            <View style = {{flexDirection:'row',alignItems:'center'}}>
+              <Text>{toFixed(this.props.money)}</Text>
+              {
+                this.props.toOperateDetail ? <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.4}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                /> : <View style={{width: pxToDp(50)}}/>
+              }
+            </View>
+            <View style={{
+              position: 'absolute',
+              borderTopWidth: pxToDp(1),
+              borderTopColor: '#eee7e8',
+              height: pxToDp(2),
+              width: '100%'
+            }}/>
+
+          </View>
+        </TouchableOpacity>
+
     )
   }
 }

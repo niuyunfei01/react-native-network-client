@@ -17,7 +17,6 @@ export function fetchProfitHome(store_id,token,callback) {
   }
 }
 export function fetchProfitDaily(store_id,day,token,callback) {
-  // console.log(store_id,day,token,callback);
   return dispatch => {
     const url = `api/profit_daily/${store_id}/${day}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
@@ -33,6 +32,45 @@ export function fetchProfitDaily(store_id,day,token,callback) {
 export function fetchProfitIncomeOrderList(type,store_id,day,token,callback) {
   return dispatch => {
     const url = `api/profit_income_order_list/${type}/${store_id}/${day}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.obj,resp.desc);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+export function fetchProfitOutcomeNormalList(type,store_id,day,token,callback) {
+  return dispatch => {
+    const url = `api/profit_outcome_normal_list/${type}/${store_id}/${day}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.obj,resp.desc);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+export function changeProfitInvalidate(id,token,callback) {
+  return dispatch => {
+    const url = `api/profit_outcome_other_invalidate/${id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.obj,resp.desc);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+export function fetchProfitOutcomeOtherItem(id,token,callback) {
+  return dispatch => {
+    const url = `api/profit_outcome_other/${id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {

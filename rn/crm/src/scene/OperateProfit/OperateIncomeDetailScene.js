@@ -23,8 +23,8 @@ import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {fetchProfitIncomeOrderList} from "../../reducers/operateProfit/operateProfitActions";
-import tool from '../../common/tool';
+import {fetchProfitIncomeOrderList, changeProfitInvalidate} from "../../reducers/operateProfit/operateProfitActions";
+import tool, {toFixed} from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
@@ -33,7 +33,7 @@ import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
-import {fetchProfitDaily} from "../../reducers/operateProfit/operateProfitActions";
+import RenderEmpty from './RenderEmpty'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -44,6 +44,7 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       fetchProfitIncomeOrderList,
+      changeProfitInvalidate,
       ...globalActions
     }, dispatch)
   }
@@ -60,86 +61,115 @@ class OperateIncomeDetailScene extends PureComponent {
     super(props);
     this.state = {
       tabNum: 2,
-      editable:false,
-      orders:[],
-      other:[],
-
+      editable: false,
+      orders: [],
+      other: [],
+      query: true,
+      upload:false,
+      order_money: 0,
+      other_money: 0
     };
     this.tab = this.tab.bind(this)
   }
-  getProfitIncomeOrderList(){
+
+  async getProfitIncomeOrderList() {
     let {currStoreId, accessToken} = this.props.global;
-    let {day,type} = this.props.navigation.state.params;
+    let {day, type} = this.props.navigation.state.params;
     const {dispatch} = this.props;
-    dispatch(fetchProfitIncomeOrderList(type,currStoreId, day, accessToken, async (ok, obj, desc) => {
-      let {orders,other,editable} = obj;
+    dispatch(fetchProfitIncomeOrderList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
+      let {orders, other, editable} = obj;
+      console.log(obj)
       if (ok) {
         this.setState({
-          orders:orders,
-          other:other,
-          editable:editable
+          orders: orders,
+          other: other,
+          editable: editable
         })
       }
       this.setState({query: false,})
     }));
   }
 
+
   componentWillMount() {
-    let {type} = this.props.navigation.state.params;
-    this.setState({tabNum: type})
+    let {type, order_money, other_money} = this.props.navigation.state.params;
+    this.setState({
+      tabNum: type,
+      order_money: order_money,
+      other_money: other_money,
+    });
     this.getProfitIncomeOrderList()
   }
   tab(num) {
     this.setState({tabNum: num})
   }
   renderContent() {
-    let {tabNum,orders,other} = this.state;
-    if (tabNum == 1) {
+    let {tabNum, orders, other} = this.state;
+    if (tabNum == 1 && orders.length > 0) {
       return (
-          <Cells style={{marginLeft: 0,padding:0}}>
+          <View>
+            <Header text={'今日订单总收入'} money={toFixed(this.state.order_money)}/>
+            <Cells style={{marginLeft: 0, padding: 0}}>
+              {
+                orders.map((item, index) => {
+                  let {good_num, money, name, order_id} = item;
+                  return (
+                      <Cell access
+                            key={index}
+                            style={styles.cell}
+                            onPress={() => {
+                              console.log(order_id);
+                            }}
+                      >
+                        <CellHeader>
+                          <Text style={styles.cell_name}>{name}</Text>
+                        </CellHeader>
+                        <CellBody style={{justifyContent: 'center'}}>
+                          <Text style={styles.cell_num}>{good_num}件商品</Text>
+                        </CellBody>
+                        <CellFooter>
+                          <Text style={styles.cell_money}>{toFixed(money)}</Text>
+                        </CellFooter>
+                      </Cell>
+                  )
+                })
+              }
+            </Cells>
+          </View>)
+
+    } else if (tabNum == 2 && other.length > 0) {
+      return (
+          <View>
+            <Header text={'今日其他总收入'} money={toFixed(this.state.other_money)}/>
             {
-              orders.map((item,index)=>{
-                let {good_num,money,name,order_id} = item;
-                return(
-                    <Cell access
-                          key = {index}
-                          style={styles.cell}
-                          onPress = {()=>{
-                            console.log(order_id);
-                          }}
-                    >
-                      <CellHeader>
-                        <Text style={styles.cell_name}>{name}</Text>
-                      </CellHeader>
-                      <CellBody style={{justifyContent: 'center'}}>
-                        <Text style={styles.cell_num}>{good_num}件商品</Text>
-                      </CellBody>
-                      <CellFooter>
-                        <Text style={styles.cell_money}>{money}</Text>
-                      </CellFooter>
-                    </Cell>
-                )
+              other.map((item, index) => {
+                let {label, invalid, remark, money, id} = item;
+                return (
+                    <OperateIncomeItem
+                        update={()=>this.getProfitIncomeOrderList()}
+                        key = {index}
+                        item = {item}
+                        state={this.state}/>)
               })
             }
-          </Cells>
-      )
-    } else {
-      return (
-          <View style={{marginTop: pxToDp(20)}}>
             {
-              other.map((item,index)=>{
-                return <OperateIncomeItem invalid = {item.invalid}/>
-              })
-            }
-            {
-              this.state.editable? <Button type={'primary'} style={{marginHorizontal: pxToDp(30), marginTop: pxToDp(160),marginBottom:pxToDp(30)}}>
-                添加新收入
-              </Button>:null
+              this.state.editable ?
+                  <Button type={'primary'} style={styles.btn}
+                          onPress={() => {
+                            console.log()
+                          }
+                          }
+                  >
+                    添加新收入
+                  </Button> : null
             }
 
           </View>
       )
+    } else {
+      return <RenderEmpty/>
     }
+
   }
 
   render() {
@@ -162,7 +192,6 @@ class OperateIncomeDetailScene extends PureComponent {
                   style={this.state.tabNum == 2 ? [tab.text, tab.right, tab.active] : [tab.right, tab.text]}>其他收入</Text>
             </TouchableOpacity>
           </View>
-          <Header text={'今日订单总收入'} money={61716.89}/>
           <ScrollView>
             {
               this.renderContent()
@@ -200,14 +229,14 @@ const tab = StyleSheet.create({
 });
 const styles = StyleSheet.create({
   cell: {
-    borderTopWidth:0,
-    height:pxToDp(100),
+    borderTopWidth: 0,
+    height: pxToDp(100),
   },
   cell_name: {
     fontSize: pxToDp(30),
     color: '#3e3e3e',
-    height:pxToDp(100),
-    lineHeight:pxToDp(70)
+    height: pxToDp(100),
+    lineHeight: pxToDp(70)
   },
   cell_num: {
     fontSize: pxToDp(24),
@@ -216,6 +245,11 @@ const styles = StyleSheet.create({
   },
   cell_money: {
     fontSize: pxToDp(36)
+  },
+  btn: {
+    marginHorizontal: pxToDp(30),
+    marginTop: pxToDp(160),
+    marginBottom: pxToDp(30)
   }
 });
 
