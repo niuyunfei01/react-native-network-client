@@ -3,6 +3,7 @@ import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../util/ToastUtils';
 import Cts from "../../Cts";
+import {jsonWithTpl2} from "../../util/common";
 export function fetchProfitHome(store_id,token,callback) {
   return dispatch => {
     const url = `api/profit_home/${store_id}.json?access_token=${token}`;
@@ -80,4 +81,16 @@ export function fetchProfitOutcomeOtherItem(id,token,callback) {
         }
     );
   }
+}
+
+export function fetchProfitOtherAdd(data, token, callback) {
+  let url = `api/profit_other_add.json?access_token=${token}`;
+  return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
 }

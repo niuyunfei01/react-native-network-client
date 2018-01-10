@@ -14,22 +14,17 @@ import {
   CellHeader,
   CellBody,
   CellFooter,
-  Label,
+  Input,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
 import {fetchProfitIncomeOrderList, changeProfitInvalidate} from "../../reducers/operateProfit/operateProfitActions";
 import tool, {toFixed} from '../../common/tool';
 import Cts from '../../Cts';
-import {NavigationItem} from '../../widget';
-import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
@@ -78,12 +73,13 @@ class OperateIncomeDetailScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(fetchProfitIncomeOrderList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
       let {orders, other, editable} = obj;
-      console.log(obj)
+      console.log(obj);
       if (ok) {
         this.setState({
           orders: orders,
           other: other,
-          editable: editable
+          editable: editable,
+          dlgShipVisible:false,
         })
       }
       this.setState({query: false,})
@@ -156,7 +152,7 @@ class OperateIncomeDetailScene extends PureComponent {
               this.state.editable ?
                   <Button type={'primary'} style={styles.btn}
                           onPress={() => {
-                            console.log()
+                            this.setState({dlgShipVisible:true})
                           }
                           }
                   >
@@ -203,6 +199,58 @@ class OperateIncomeDetailScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <Dialog onRequestClose={() => {}}
+                  visible={this.state.dlgShipVisible}
+                  title={'添加其他收入'}
+                  titleStyle={{textAlign: 'center', color: colors.white}}
+                  headerStyle={{
+                    backgroundColor: colors.main_color,
+                    paddingTop: pxToDp(20),
+                    justifyContent: 'center',
+                    paddingBottom: pxToDp(20)
+                  }}
+                  buttons={[{
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => {
+                      this.setState({dlgShipVisible: false});
+                    }
+                  }, {
+                    type: 'primary',
+                    label: '保存',
+                    onPress: () => {
+                      this.setState({dlgShipVisible: false});
+                    }
+                  }]}
+
+          >
+            <ScrollView style={{height: pxToDp(500)}}>
+              <Text>项目(不超过15个汉字)</Text>
+              <Input
+                  underlineColorAndroid='transparent'
+                  style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10)}}
+                  maxLength={15}
+              />
+              <Text>金额(无)</Text>
+              <Input
+                  underlineColorAndroid='transparent'
+                  style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10)}}
+                  keyboardType={"numeric"}
+              />
+              <Text>备注说明</Text>
+              <Input
+                  underlineColorAndroid='transparent'
+                  style={{
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
+                    borderRadius: pxToDp(10),
+                    height: pxToDp(150),
+                    marginBottom: pxToDp(150)
+                  }}
+                  multiline={true}
+              />
+            </ScrollView>
+          </Dialog>
         </View>
     )
   }
