@@ -248,7 +248,8 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(UpdateWMGoods(product_id, include_img, accessToken, async(resp) => {
-          ToastShort(resp.desc);
+          console.log('UpdateWMGoods -> ', resp);
+          ToastLong(resp.desc);
           _this.setState({isSyncGoods: false});
         }));
       });
@@ -282,6 +283,7 @@ class GoodsDetailScene extends PureComponent {
           <View style={[styles.goods_view]}>
             <Text style={styles.goods_name}>
               {product_detail.name}
+              <Text style={styles.goods_id}> (#{product_detail.id})</Text>
             </Text>
             {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function(cat_name, idx) {
               return (
@@ -633,9 +635,13 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(32),
     color: '#3e3e3e',
   },
+  goods_id: {
+    color: '#999',
+    fontSize: pxToDp(24),
+  },
   goods_cats: {
     marginLeft: pxToDp(20),
-    height: pxToDp(32),
+    height: pxToDp(35),
     borderRadius: 8,
     textAlign: 'center',
     textAlignVertical: 'center',
