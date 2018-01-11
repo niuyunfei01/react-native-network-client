@@ -50,6 +50,8 @@ import GoodsRelateScene from '../scene/Goods/GoodsRelateScene';
 import GoodsApplyNewProductScene from '../scene/Goods/GoodsApplyNewProductScene';
 import GoodsWorkNewProductScene from '../scene/Goods/GoodsWorkNewProductScene';
 import GoodsManageScene from '../scene/Goods/GoodsManageScene';
+import GoodsPriceDetailsScene from '../scene/Goods/GoodsPriceDetailsScene';
+
 
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
@@ -258,6 +260,7 @@ class Navigator extends Component {
         [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
         [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
         [Config.ROUTE_ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
+        [Config.ROUTE_ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
 
       },
       stackNavigatorConfigs

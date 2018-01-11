@@ -55,7 +55,12 @@ class GoodsMangerScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      toggle: false
+      toggle: false,
+      tabNum: 0,
+      platName: "美团外卖",
+      brand: '菜鸟食材'
+
+
     }
   }
 
@@ -63,7 +68,10 @@ class GoodsMangerScene extends PureComponent {
     let {toggle} = this.state;
     this.setState({toggle: !toggle})
   }
+  showSelectBox(){
+    this.setState({toggle: true})
 
+  }
   renderSelectBox() {
     let {toggle} = this.state;
     if (toggle) {
@@ -96,8 +104,12 @@ class GoodsMangerScene extends PureComponent {
     } else {
       return null;
     }
-
   }
+
+  selected(num) {
+    this.setState({tabNum: num})
+  }
+
 
   renderGoodsList() {
     return (
@@ -131,20 +143,34 @@ class GoodsMangerScene extends PureComponent {
   }
 
   render() {
+    let {platName, brand, tabNum} = this.state;
     return (
         <View style={{flex: 1}}>
+
+
           <View style={!this.state.toggle ? [select.wrapper] : [select.wrapper, select.wrapper_active]}>
+            <ImageBtn name={platName}
+                      activeStyle={tabNum == 1 ? {backgroundColor: colors.white} : {}}
+                      onPress={() => {
+                        this.selected(1);
+                        this.showSelectBox()
+                      }}
+            />
+            <ImageBtn name={brand}
+                      activeStyle={tabNum == 2 ? {backgroundColor: colors.white} : {}}
+                      onPress={() => {
+                        this.selected(2);
+                        this.showSelectBox()
+                      }}
+            />
 
-            <ImageBtn name='菜鸟食材'/>
-            <View style = {{
-              height:pxToDp(100),
-              width:pxToDp(220),
-              borderBottomColor:colors.white,
-            }}>
-              <ImageBtn name='销量降序'/>
-            </View>
-
-            <ImageBtn name='美团外卖'/>
+            <ImageBtn name='销量降序'
+                      activeStyle={tabNum == 3 ? {backgroundColor: colors.white} : {}}
+                      onPress={() => {
+                        this.selected(3);
+                        this.showSelectBox()
+                      }}
+            />
           </View>
           {
             this.renderSelectBox()
@@ -175,14 +201,15 @@ class ImageBtn extends PureComponent {
   }
 
   render() {
-    let {name, onPress} = this.props;
+    let {name, onPress, activeStyle} = this.props;
+    console.log(activeStyle);
     return (
         <TouchableOpacity
             onPress={() => {
               onPress()
             }}
         >
-          <View style={select.item}>
+          <View style={[select.item,activeStyle ]}>
             <Text style={select.item_text}>{name}</Text>
             <Image source={require('../../img/Public/xiangxialv_.png')}
                    style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
@@ -302,7 +329,7 @@ const select = StyleSheet.create({
   items_wrapper: {
     width: '100%',
     position: 'absolute',
-    top: pxToDp(79),
+    top: pxToDp(90),
     backgroundColor: 'rgba(0,0,0,.4)',
     height: '100%',
     zIndex: 100,
