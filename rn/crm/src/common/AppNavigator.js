@@ -49,13 +49,14 @@ import GoodsApplyRecordScene from '../scene/Goods/GoodsApplyRecordScene';
 import GoodsRelateScene from '../scene/Goods/GoodsRelateScene';
 import GoodsApplyNewProductScene from '../scene/Goods/GoodsApplyNewProductScene';
 import GoodsWorkNewProductScene from '../scene/Goods/GoodsWorkNewProductScene';
+import GoodsManageScene from '../scene/Goods/GoodsManageScene';
+
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
 import OrderCancelShip from "../scene/Order/OrderCancelShip";
 
 import  HelpScene from '../scene/Help/HelpScene';
-
 import SettlementScene from '../scene/Settlement/SettlementScene';
 import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
 import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
@@ -256,7 +257,7 @@ class Navigator extends Component {
         [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
         [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
         [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
-
+        [Config.ROUTE_ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
 
       },
       stackNavigatorConfigs

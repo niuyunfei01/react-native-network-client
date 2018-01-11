@@ -608,7 +608,15 @@ class MineScene extends PureComponent {
         <Image style={[block_styles.block_img]} source={require('../../img/My/yunyingshouyi_.png')}/>
         <Text style={[block_styles.block_name]}>运营收益</Text>
       </TouchableOpacity>
-        <View style={[block_styles.empty_box]}/>
+        <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_ROUTE_GOODS_MANAGE)}
+            activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/yunyingshouyi_.png')}/>
+          <Text style={[block_styles.block_name]}>商品管理</Text>
+        </TouchableOpacity>
+        {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     )
   }

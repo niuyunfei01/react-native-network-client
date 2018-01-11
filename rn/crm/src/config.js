@@ -128,6 +128,7 @@ const C = {
   ROUTE_OPERATE_INCOME_DETAIL:'OperateIncomeDetail',
   ROUTE_OPERATE_EXPEND_DETAIL:'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL:'OperateOtherExpendDetail',
+  ROUTE_ROUTE_GOODS_MANAGE:'GoodsManage',
   serverUrl,
   apiUrl,
   staticUrl,
