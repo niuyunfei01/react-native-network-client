@@ -59,18 +59,18 @@ export default {
   BILL_STATUS_INVALID : 2,//已作废
 
 
-  WM_PLAT_ID_BD: 1,
-  WM_PLAT_ID_WX: 2,
-  WM_PLAT_ID_MT: 3,
-  WM_PLAT_ID_ELE: 4,
+  WM_PLAT_ID_BD: 1,//百度
+  WM_PLAT_ID_WX: 2,//微信
+  WM_PLAT_ID_MT: 3,//美团
+  WM_PLAT_ID_ELE: 4,//饿了么
   WM_PLAT_ID_APP: 5,
-  WM_PLAT_ID_JD: 6,
+  WM_PLAT_ID_JD: 6,//京东
   WM_PLAT_UNKNOWN: -1,
 
   STORE_PROD_ON_SALE: 1,//上架
   STORE_PROD_OFF_SALE: 3,//下架
   STORE_PROD_SOLD_OUT: 2,//缺货
-  
+
   STORE_SELF_PROVIDED: 1,//门店自采
   STORE_COMMON_PROVIDED: 0,//总部供货
 
@@ -126,5 +126,10 @@ export default {
   OPERATE_OUT_BLX : 8,//运营服务费
   OPERATE_OUT_PLAT_FEE : 9,  //外卖平台服务费
   OPERATE_OTHER_OUT : 6, //其他支出
-
+  //品牌常量
+  STORE_TYPE_SELF: 1,//菜鸟
+  STORE_TYPE_AFFILIATE: 2,//菜鸟食材
+  STORE_TYPE_GZW: 4,//果知味
+  STORE_TYPE_BLX: 5,//比邻鲜
+  STORE_TYPE_XGJ: 6,//鲜果集
 }
