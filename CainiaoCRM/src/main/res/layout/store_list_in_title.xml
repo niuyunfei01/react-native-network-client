@@ -63,6 +63,6 @@
         android:minWidth="40dp"
         android:paddingEnd="6dp"
         android:paddingStart="6dp"
-        android:text="调价申请记录"
+        android:text="调价记录"
         android:textSize="@dimen/tiny_text" />
 </RelativeLayout>

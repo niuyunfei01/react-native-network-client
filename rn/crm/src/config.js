@@ -1,5 +1,8 @@
 'use strict';
 import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
+import OperateProfitScene from "./scene/OperateProfit/OperateProfitScene";
+import OperateIncomeDetailScene from "./scene/OperateProfit/OperateIncomeDetailScene";
+import OperateExpendDetailScene from "./scene/OperateProfit/OperateExpendDetailScene";
 
 
 const {
@@ -120,10 +123,14 @@ const C = {
   ROUTE_GOODS_RELATE: 'GoodsRelate',
   ROUTE_GOODS_APPLY_NEW_PRODUCT:'GoodsApplyNewProduct',
   ROUTE_GOODS_WORK_NEW_PRODUCT:'GoodsWorkNewProduct',
+  ROUTE_OPERATE_PROFIT:'OperateProfit',
+  ROUTE_OPERATE_DETAIL:'OperateDetail',
+  ROUTE_OPERATE_INCOME_DETAIL:'OperateIncomeDetail',
+  ROUTE_OPERATE_EXPEND_DETAIL:'OperateExpendDetail',
+  ROUTE_OPERATE_OTHER_EXPEND_DETAIL:'OperateOtherExpendDetail',
   serverUrl,
   apiUrl,
   staticUrl,
-
   /**
    * @see host
    */

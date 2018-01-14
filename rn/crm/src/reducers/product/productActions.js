@@ -41,9 +41,9 @@ export function keyOfProdInfos(esId, platform, storeId) {
   return `${esId}_${platform}_${storeId}`;
 }
 
-export function fetchProductDetail(product_id, token, callback) {
+export function fetchProductDetail(product_id, _v_id, token, callback) {
   return dispatch => {
-    const url = `api/get_product_detail/${product_id}.json?access_token=${token}`;
+    const url = `api/get_product_detail/${product_id}/${_v_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -287,3 +287,22 @@ export function RelateToStore(data, token, callback) {
   )
 
 }
+
+export function UpdateWMGoods(product_id, include_img, token, callback) {
+  return dispatch => {
+    const url = `api/update_wm_sku/${product_id}/${include_img}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+
+
+

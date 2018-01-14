@@ -503,6 +503,16 @@ class MineScene extends PureComponent {
         {fnPriceControlled > 0 && is_service_mgr &&
         (<TouchableOpacity
           style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/yunyingshouyi_.png')}/>
+          <Text style={[block_styles.block_name]}>运营收益</Text>
+        </TouchableOpacity>)}
+
+        {fnPriceControlled > 0 && is_service_mgr &&
+        (<TouchableOpacity
+          style={[block_styles.block_box]}
           onPress={() => {
             if (is_service_mgr) {
               let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
@@ -612,13 +622,14 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
-          activeOpacity={customerOpacity}
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+            activeOpacity={customerOpacity}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
+        <View style={[block_styles.empty_box]}/>
       </View>
     )
   }

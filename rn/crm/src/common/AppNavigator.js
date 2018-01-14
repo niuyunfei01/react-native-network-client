@@ -60,6 +60,11 @@ import SettlementScene from '../scene/Settlement/SettlementScene';
 import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
 import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
+import OperateProfitScene from "../scene/OperateProfit/OperateProfitScene";
+import OperateDetailScene from "../scene/OperateProfit/OperateDetailScene";
+import OperateIncomeDetailScene from "../scene/OperateProfit/OperateIncomeDetailScene";
+import OperateExpendDetailScene from "../scene/OperateProfit/OperateExpendDetailScene";
+import OperateOtherExpendDetailScene from "../scene/OperateProfit/OperateOtherExpendDetailScene";
 
 const tabDef = {
   Remind: {
@@ -246,6 +251,12 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
         [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},
         [Config.ROUTE_HELP]: {screen: HelpScene},
+        [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
+        [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
+        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
+        [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
+        [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
+
 
       },
       stackNavigatorConfigs

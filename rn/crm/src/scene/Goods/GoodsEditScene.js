@@ -98,8 +98,8 @@ class GoodsEditScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
-      basic_cat_list: [],
-      basic_categories: {},
+      basic_cat_list: {},
+      basic_categories: [],
       store_tags: {},
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
@@ -124,7 +124,6 @@ class GoodsEditScene extends PureComponent {
         {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
       sale_status: -1,
       fnProviding: fnProviding,
-      store_product: [],
       vendor_stores: '',
       goBackValue: false,
       task_id: 0,
@@ -148,7 +147,7 @@ class GoodsEditScene extends PureComponent {
       //   return {id: img_id, name: img_data.name};
       // });
       let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
-      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail
+      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail;
 
       let upload_files = {};
       if (tool.length(mid_list_img) > 0) {
@@ -712,7 +711,7 @@ class GoodsEditScene extends PureComponent {
             paddingHorizontal: pxToDp(20),
             paddingTop: pxToDp(10)
           }]}>
-            {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            {this.state.list_img && tool.objectMap(this.state.list_img, (img_data, img_id) => {
               let img_url = img_data['url'];
               let img_name = img_data['name'];
               return (

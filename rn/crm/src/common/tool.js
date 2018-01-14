@@ -1,6 +1,7 @@
 import Moment from 'moment';
 import {NavigationActions} from "react-navigation";
 import Cts from "../Cts";
+import pxToDp from "../util/pxToDp";
 
 export function urlByAppendingParams(url: string, params: Object) {
   let result = url
@@ -418,7 +419,13 @@ if (map[mode]){
   return '选择供货方式'
 }
 }
-
+function getOperateDetailsType(type) {
+  let map ={};
+  map[Cts.OPERATE_DISTRIBUTION_TIPS] ='加小费详情';
+  map[Cts.OPERATE_REFUND_OUT] ='退款详情';
+  map[Cts.OPERATE_OTHER_OUT] = '其他支出流水';
+  return map[type]
+}
 
 function deepClone(obj){
   function isClass(o){
@@ -448,7 +455,6 @@ function deepClone(obj){
   }
 return result;
 }
-
 
 
 export default {
@@ -482,5 +488,6 @@ export default {
   autoPlat,
   sellingStatus,
   headerSupply,
-  deepClone
+  deepClone,
+  getOperateDetailsType
 }
