@@ -317,9 +317,37 @@ export function fetchListVendorTags(vendor_id,token,callback) {
   }
 }
 
-export function fetchListVendorGoods(vendor_id,platform_id,token,callback) {
+export function fetchListVendorGoods(vendor_id,platform_id,sortId,token,callback) {
   return dispatch => {
-    let url = `api/list_vendor_goods/${vendor_id}.json?access_token=${token}`;
+    let url = `api/list_vendor_goods/${vendor_id}/${platform_id}/${sortId}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+export function fetchListStoresGoods(vendor_id,product_id,token,callback) {
+  return dispatch => {
+    let url = `api/list_stores_goods/${vendor_id}/${product_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
+
+export function fetchStoreChgPrice(store_id,product_id,new_price_cents,token,callback) {
+  return dispatch => {
+    let url = `api/store_chg_price/${store_id}/${product_id}/${new_price_cents}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {

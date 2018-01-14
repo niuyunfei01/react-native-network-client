@@ -61,7 +61,7 @@ class GoodsMangerScene extends PureComponent {
       tabNum: 0,
       platId: Cts.WM_PLAT_ID_WX,
       vendorId: Cts.STORE_TYPE_SELF,
-      tagList: {},
+      tagList: [],
       selectedTag: '999999999',
       selectList: [],
       platList: [
@@ -78,7 +78,14 @@ class GoodsMangerScene extends PureComponent {
         Cts.STORE_TYPE_GZW,
         Cts.STORE_TYPE_BLX,
         Cts.STORE_TYPE_XGJ
-      ]
+      ],
+      sortId: '',
+      sortList: [
+        Cts.GOODS_MANAGE_DEFAULT_SORT,
+        Cts.GOODS_MANAGE_SOLD_SORT,
+      ],
+      query: true
+
     }
   }
 
@@ -91,12 +98,22 @@ class GoodsMangerScene extends PureComponent {
     this.setState({toggle: true})
   }
 
-  componentWillMount() {
-    this.getListVendorTags();
+  async componentWillMount() {
+    await this.getListVendorTags();
     this.getListVendorGoods();
   }
 
-  getListVendorTags() {
+  toStoresList(item = {}) {
+    let {vendorId} = this.state;
+    this.props.navigation.navigate(
+        Config.ROUTE_ROUTE_GOODS_PRICE_DETAIL, {
+          vendorId: vendorId,
+          item: item
+        }
+    )
+  }
+
+  async getListVendorTags() {
     const {vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -105,30 +122,37 @@ class GoodsMangerScene extends PureComponent {
     }));
   }
 
-  getListVendorGoods() {
-    const {platId, vendorId} = this.state;
+  async getListVendorGoods() {
+    const {platId, vendorId, sortId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchListVendorGoods(vendorId, platId, accessToken, (ok, desc, obj) => {
-      this.setState({goods: obj})
-
+    dispatch(fetchListVendorGoods(vendorId, platId, sortId, accessToken, (ok, desc, obj) => {
+      this.setState({query: false});
+      if (ok) {
+        this.setState({goods: obj})
+      } else {
+        ToastLong(desc)
+      }
     }));
   }
 
 //渲染下拉列表项
   renderSelectList() {
-    let {selectList, tabNum} = this.state;
+    let {selectList, tabNum, platId, vendorId, sortList, sortId} = this.state;
     if (tabNum == 1) {
       return (
           selectList.map((item, index) => {
             return (
                 <TouchableOpacity
-                    onPress={() => {
-                      this.toggleSelectBox()
+                    onPress={async () => {
+                      await this.setState({platId: item, tabNum: 0, query: true});
+                      this.toggleSelectBox();
+                      this.getListVendorGoods();
                     }}
                     key={index}
                 >
-                  <Text style={[select.select_item, select.select_item_active]}>
+                  <Text
+                      style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
                     {
                       tool.get_platform_name(item)
                     }
@@ -142,12 +166,16 @@ class GoodsMangerScene extends PureComponent {
           selectList.map((item, index) => {
             return (
                 <TouchableOpacity
-                    onPress={() => {
-                      this.toggleSelectBox()
+                    onPress={async () => {
+                      await this.setState({vendorId: item, tabNum: 0, query: true});
+                      this.toggleSelectBox();
+                      this.getListVendorGoods();
                     }}
                     key={index}
                 >
-                  <Text style={[select.select_item, select.select_item_active]}>
+                  <Text
+                      style={vendorId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
+
                     {
                       tool.getVendorName(item)
                     }
@@ -161,14 +189,17 @@ class GoodsMangerScene extends PureComponent {
           selectList.map((item, index) => {
             return (
                 <TouchableOpacity
-                    onPress={() => {
+                    onPress={async () => {
+                      await this.setState({sortId: item, tabNum: 0, query: true});
                       this.toggleSelectBox()
+                      this.getListVendorGoods();
                     }}
                     key={index}
                 >
-                  <Text style={[select.select_item, select.select_item_active]}>
+                  <Text
+                      style={sortId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
                     {
-                      tool.get_platform_name(item)
+                      tool.getSortName(item)
                     }
                   </Text>
                 </TouchableOpacity>
@@ -180,7 +211,7 @@ class GoodsMangerScene extends PureComponent {
 
 //渲染下拉框
   renderSelectBox() {
-    let {toggle,selectList} = this.state;
+    let {toggle, selectList} = this.state;
     if (toggle) {
       return (
           <View style={select.items_wrapper}>
@@ -192,6 +223,13 @@ class GoodsMangerScene extends PureComponent {
                 selectList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
               }
             </View>
+            <TouchableWithoutFeedback
+                onPress={() => {
+                  this.setState({toggle: false, tabNum: 0})
+                }}
+            >
+              <View style={{flex: 1}}/>
+            </TouchableWithoutFeedback>
           </View>
       )
     } else {
@@ -200,14 +238,13 @@ class GoodsMangerScene extends PureComponent {
   }
 
   selected(num) {
-    console.log(num);
-    let {platList,vendorList} = this.state;
+    let {platList, vendorList, sortList} = this.state;
     if (num === 1) {
       this.setState({selectList: platList})
-    }else if(num === 2){
+    } else if (num === 2) {
       this.setState({selectList: vendorList})
-    }else{
-      this.setState({selectList: vendorList})
+    } else {
+      this.setState({selectList: sortList})
 
     }
     this.setState({tabNum: num})
@@ -229,14 +266,21 @@ class GoodsMangerScene extends PureComponent {
                 name,
                 product_id,
                 sale_store_num
-              } = item
+              } = item;
               return (
-                  <View style={content.goods_item}>
-                    <View style={{paddingHorizontal: pxToDp(10)}}>
-                      <Image style={content.good_img}
-                             source={{uri: list_img}}/>
-                      <Text style={content.good_id}>#{product_id}</Text>
-                    </View>
+                  <View style={content.goods_item} key={key}>
+                    <TouchableOpacity
+                        onPress={() => {
+                          this.toStoresList(item);
+                        }}
+                    >
+                      <View style={{paddingHorizontal: pxToDp(10)}}>
+                        <Image style={content.good_img}
+                               source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
+                        />
+                        <Text style={content.good_id}>#{product_id}</Text>
+                      </View>
+                    </TouchableOpacity>
                     <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
                       <Text style={content.good_name}
                             numberOfLines={2}
@@ -265,6 +309,9 @@ class GoodsMangerScene extends PureComponent {
 // 分类列表
   renderTagsList() {
     let {tagList, selectedTag, platId} = this.state;
+    tagList.forEach((item,index)=>{
+           item.key = index
+       })
     return (
         <FlatList
             extraData={this.state}
@@ -273,6 +320,7 @@ class GoodsMangerScene extends PureComponent {
             renderItem={({item, key}) => {
               return (
                   <TouchableOpacity
+                      key={key}
                       onPress={() => {
                         this.setState({selectedTag: item.id})
                       }}
@@ -287,7 +335,7 @@ class GoodsMangerScene extends PureComponent {
   }
 
   render() {
-    let {vendorId, tabNum, platId} = this.state;
+    let {vendorId, tabNum, platId, sortId} = this.state;
     return (
         <View style={{flex: 1}}>
 
@@ -306,7 +354,7 @@ class GoodsMangerScene extends PureComponent {
                         this.showSelectBox()
                       }}
             />
-            <ImageBtn name='销量降序'
+            <ImageBtn name={tool.getSortName(sortId)}
                       activeStyle={tabNum == 3 ? {backgroundColor: colors.white} : {}}
                       onPress={() => {
                         this.selected(3);
@@ -317,21 +365,24 @@ class GoodsMangerScene extends PureComponent {
           {
             this.renderSelectBox()
           }
-
           <View style={content.box}>
             <View style={content.left}>
               {
                 this.renderTagsList()
               }
             </View>
-
             <ScrollView style={content.right}>
               {
                 this.renderGoodsList()
               }
-
             </ScrollView>
           </View>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }
@@ -403,6 +454,8 @@ const content = StyleSheet.create({
   good_img: {
     height: pxToDp(110),
     width: pxToDp(110),
+    borderWidth:pxToDp(1),
+    borderColor:'#eee',
   },
   good_id: {
     height: pxToDp(40),
@@ -435,6 +488,7 @@ const content = StyleSheet.create({
   zuixiaojia: {
     fontSize: pxToDp(24),
     color: '#1f9cdd',
+    marginLeft: pxToDp(8),
   },
   good_desc: {
     height: pxToDp(40),
@@ -480,10 +534,9 @@ const select = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,.4)',
     height: '100%',
     zIndex: 100,
-    borderTopWidth: pxToDp(1)
   },
   items_box: {
-    minHeight: pxToDp(50),
+    minHeight: pxToDp(60),
     backgroundColor: "#fff",
     paddingHorizontal: pxToDp(45),
     flexDirection: 'row',

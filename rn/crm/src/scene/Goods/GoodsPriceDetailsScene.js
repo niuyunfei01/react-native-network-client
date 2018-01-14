@@ -21,6 +21,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {getVendorStores} from "../../reducers/mine/mineActions";
+import {fetchStoreChgPrice, fetchListStoresGoods} from '../../reducers/product/productActions.js';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
@@ -40,6 +41,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      fetchListStoresGoods,
+      fetchStoreChgPrice,
       ...globalActions
     }, dispatch)
   }
@@ -57,34 +60,85 @@ class GoodsPriceDetails extends PureComponent {
     super(props);
     this.state = {
       showDialog: false,
+      list_img: '',
+      name: '',
+      product_id: '',
+      sale_store_num: '',
+      vendorId: 0,
+      storesList: [],
+      query: true,
+      store_id: 0,
+      new_price_cents:'',
+      dialogPrice: '',
     }
   }
 
-  render_status(num) {
-    if (num === 1) {
+  async componentWillMount() {
+    let {item, vendorId} = this.props.navigation.state.params;
+    let {list_img, max_price, min_price, name, product_id, sale_store_num,} = item;
+    await this.setState({list_img, name, product_id, sale_store_num, vendorId});
+    this.getListStoresGoods()
+  }
+
+  getListStoresGoods() {
+    let {product_id, vendorId} = this.state;
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, (ok, desc, obj) => {
+      this.setState({query: false});
+      if (ok) {
+        this.setState({storesList: obj})
+      } else {
+        ToastLong(desc);
+      }
+    }));
+  }
+
+  upChangePrice() {
+    let {product_id, store_id, new_price_cents} = this.state;
+    if(uploading){
+    return false
+    }
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(fetchStoreChgPrice(store_id, product_id, new_price_cents, accessToken, (ok, desc, obj) => {
+      this.setState({uploading: false});
+      if (ok) {
+        ToastLong('提交成功');
+      } else {
+        ToastLong(desc);
+      }
+    }));
+  }
+
+  price_status(item, store_id = 0) {
+    let {status, price, platform_id, sync_price} = item || {};
+    if (sync_price == undefined) {
       return (
           <TouchableOpacity
               onPress={() => {
-                this.setState({showDialog: true})
+                this.setState({showDialog: true, store_id: store_id, dialogPrice: price,new_price_cents:''})
               }}
           >
             <Text style={content.change_price}>修改价格</Text>
           </TouchableOpacity>
       )
-    } else if (num === 2) {
+    } else if (!(parseInt(sync_price) == parseInt(price))) {
       return (
           <View style={{width: pxToDp(200)}}>
-            <Text style={[content.plat_price, {fontWeight: '100', color: colors.color333}]}>51.00 同步中...</Text>
+            <Text style={[content.plat_price, {
+              fontWeight: '100',
+              color: colors.color333
+            }]}>{tool.toFixed(price)} 同步中...</Text>
             <Text style={[content.plat_min_price, {
               lineHeight: pxToDp(28),
               textAlignVertical: 'center',
               marginTop: pxToDp(13),
               marginBottom: pxToDp(2)
-            }]}>45.00 同步中...</Text>
+            }]}>{tool.toFixed(sync_price)} 同步中...</Text>
           </View>
       )
     } else {
-
       return (
           <View style={{width: pxToDp(150), justifyContent: 'center', alignItems: 'center'}}>
             <Icon
@@ -97,97 +151,93 @@ class GoodsPriceDetails extends PureComponent {
     }
   }
 
+  priceMaxMinImg(item) {
+    let {is_max, is_min} = item;
+
+    if (is_max) {
+      return require('../../img/Goods/zuidajia_.png')
+    } else if (is_min) {
+      return require('../../img/Goods/zuixiaojia_.png')
+    } else {
+    }
+  }
+
+  renderList() {
+    let {storesList} = this.state;
+    return storesList.map((item, index) => {
+      let {fn_price_controlled, store_id, store_name, wm_goods} = item;
+      return (
+          <Cells key={index}>
+            <Cell customStyle={content.store} style={{borderTopWidth: 0}} first={true}>
+              <CellHeader style={content.cell_header}>
+                <Text style={content.store_name}>{store_name}</Text>
+                {
+                  fn_price_controlled == 1 ? <Text style={content.store_type}>代运营店铺</Text> : <Text/>
+                }
+              </CellHeader>
+              <CellBody/>
+              {
+                fn_price_controlled == 1 ? <CellFooter>
+                  <Text style={content.store_price}>￥20.00</Text>
+                  <Image source={require('../../img/Goods/baojia_.png')}
+                         style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
+                </CellFooter> : <Text/>
+              }
+            </Cell>
+            {
+              wm_goods.map((ite, key) => {
+                let {status, price, platform_id} = ite;
+                return (
+                    <Cell key={key} customStyle={content.store} style={{borderTopWidth: 0}}>
+                      <CellHeader style={content.cell_header}>
+                        <Image source={tool.platformsLogo(platform_id)} style={content.plat_img}/>
+                        <View>
+                          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <Text style={content.plat_price}>{tool.toFixed(price)}</Text>
+                            <Image style={content.price_status} source={this.priceMaxMinImg(ite)}/>
+                          </View>
+                          {/*<Text style={content.plat_min_price}>45.00</Text>*/}
+                        </View>
+                      </CellHeader>
+                      <CellBody>
+                        {
+                          this.price_status(ite, store_id)
+                        }
+                      </CellBody>
+                      <CellFooter>
+                        <Image source={tool.goodSoldStatusImg(status)}
+                               style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
+                      </CellFooter>
+                    </Cell>
+                )
+              })
+            }
+          </Cells>
+      )
+    })
+  }
+
   render() {
+    let {list_img, name, sale_store_num, product_id} = this.state;
     return (
         <View style={{flex: 1}}>
           <View style={header.box}>
             <Image
                 style={header.image}
-                source={{uri: 'http://images2.1tu.com/jpg_00/00/00/72/77/45/220_6003716697_dOKxo6OdHzuR8C27EDgA.jpg'}}
+                source={{uri: list_img}}
             />
             <View style={header.desc}>
-              <Text style={header.text}>优质品牌优质橘子500g</Text>
-              <Text style={header.text}>#187171</Text>
-              <Text style={header.text}>在售此商品店铺数:32</Text>
+              <Text style={header.text}>{name}</Text>
+              <Text style={header.text}>#{product_id}</Text>
+              <Text style={header.text}>在售此商品店铺数:{sale_store_num}</Text>
             </View>
           </View>
-          <ScrollView>
-            {/*<Cells>*/}
-            <Cell customStyle={content.store} style={{borderTopWidth: 0}} first={true}>
-              <CellHeader style={content.cell_header}>
-                <Text style={content.store_name}>回龙观</Text>
-                <Text style={content.store_type}>代运营店铺</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <Text style={content.store_price}>￥20.00</Text>
-                <Image source={require('../../img/Goods/baojia_.png')}
-                       style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={content.store} style={{borderTopWidth: 0}}>
-              <CellHeader style={content.cell_header}>
-                <Image source={require('../../img/Goods/weixinjiage_.png')} style={content.plat_img}/>
-                <View>
-                  <Text style={content.plat_price}>5145.00</Text>
-                  {/*<Text style={content.plat_min_price}>45.00</Text>*/}
-                </View>
-                <Image style={content.price_status} source={require('../../img/Goods/zuidajia_.png')}/>
-              </CellHeader>
-              <CellBody>
+          <ScrollView
 
-                {
-                  this.render_status(1)
-                }
-              </CellBody>
-              <CellFooter>
-                <Image source={require('../../img/Goods/shangjia.png')}
-                       style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-              </CellFooter>
-            </Cell>
-
-            <Cell customStyle={content.store} style={{borderTopWidth: 0}}>
-              <CellHeader style={content.cell_header}>
-                <Image source={require('../../img/Goods/meituanwaimai_.png')} style={content.plat_img}/>
-                <View>
-                  <Text style={content.plat_price}>51.00</Text>
-                  <Text style={content.plat_min_price}>45.00</Text>
-                </View>
-                <Image style={content.price_status} source={require('../../img/Goods/zuidajia_.png')}/>
-              </CellHeader>
-              <CellBody>
-
-                {
-                  this.render_status(2)
-                }
-              </CellBody>
-              <CellFooter>
-                <Image source={require('../../img/Goods/shangjia.png')}
-                       style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-              </CellFooter>
-            </Cell>
-
-            <Cell customStyle={content.store} style={{borderTopWidth: 0}}>
-              <CellHeader style={content.cell_header}>
-                <Image source={require('../../img/Goods/meituanwaimai_.png')} style={content.plat_img}/>
-                <View>
-                  <Text style={content.plat_price}>51.00</Text>
-                  <Text style={content.plat_min_price}>45.00</Text>
-                </View>
-                <Image style={content.price_status} source={require('../../img/Goods/zuidajia_.png')}/>
-              </CellHeader>
-              <CellBody>
-
-                {
-                  this.render_status(3)
-                }
-              </CellBody>
-              <CellFooter>
-                <Image source={require('../../img/Goods/shangjia.png')}
-                       style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-              </CellFooter>
-            </Cell>
-            {/*</Cells>*/}
+          >
+            {
+              this.renderList()
+            }
           </ScrollView>
           <Dialog onRequestClose={() => {
           }}
@@ -211,31 +261,47 @@ class GoodsPriceDetails extends PureComponent {
                     type: 'primary',
                     label: '保存',
                     onPress: () => {
-                      this.setState({showDialog: false,})
+                      this.setState({showDialog: false, uploading: true});
+                      this.upChangePrice();
                     }
                   }
                   ]}
           >
-            <View >
-              <Text style ={{marginBottom:pxToDp(10)}}>
-                输入要修改的价格(元)<Text style ={{color:colors.main_color,fontSize:pxToDp(24)}}>原价:23.65元</Text>
+            <View>
+              <Text style={{marginBottom: pxToDp(10)}}>
+                输入要修改的价格(元)<Text style={{color: colors.main_color, fontSize: pxToDp(24)}}>
+                原价:{tool.toFixed(this.state.dialogPrice)}元
+              </Text>
               </Text>
               <TextInput
                   style={{
-                    height:pxToDp(90),
-                    borderRadius:pxToDp(10),
-                    borderWidth:pxToDp(1),
-                    borderColor:colors.fontGray,
+                    height: pxToDp(90),
+                    borderRadius: pxToDp(10),
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
                   }}
                   keyboardType={'numeric'}
                   underlineColorAndroid={'transparent'}
-                  onChange={(text) => {
+                  onChangeText={(text) => {
                     console.log(text);
+                    this.setState({new_price_cents: text})
                   }}
               />
             </View>
 
           </Dialog>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中...</Toast>
+          <Toast
+              icon="loading"
+              show={this.state.uploading}
+              onRequestClose={() => {
+              }}
+          >提交中...</Toast>
         </View>
     )
   }
@@ -271,6 +337,7 @@ const content = StyleSheet.create({
     alignItems: 'center',
     height: pxToDp(100),
     backgroundColor: '#fff',
+    borderColor: colors.fontGray,
   },
   cell_header: {
     flexDirection: 'row',
@@ -308,6 +375,7 @@ const content = StyleSheet.create({
     height: pxToDp(32),
     fontWeight: '600',
     color: colors.main_color,
+    lineHeight: pxToDp(32),
   },
   price_status: {
     height: pxToDp(28),
