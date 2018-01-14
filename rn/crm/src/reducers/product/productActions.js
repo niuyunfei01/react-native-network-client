@@ -287,3 +287,22 @@ export function RelateToStore(data, token, callback) {
   )
 
 }
+
+export function UpdateWMGoods(product_id, include_img, token, callback) {
+  return dispatch => {
+    const url = `api/update_wm_sku/${product_id}/${include_img}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      }
+    );
+  }
+}
+
+
+
+

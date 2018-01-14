@@ -761,7 +761,7 @@ class OrderScene extends Component {
       if (typeof orderWayLogs == 'object' && (tool.length(orderWayLogs) > 0)) {
         return tool.objectMap(this.state.orderWayLogs, (item, index) => {
           return (
-            <View key={index} style={{ flex: 1, backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30), flexDirection: 'row', paddingTop: pxToDp(20), width: '100%' }}>
+            <View key={index} style={{ flex: 1,flexDirection:"row", backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30),paddingTop: pxToDp(20), width: '100%' }}>
               <View style={{ width: pxToDp(124) }}>
                 <View style={wayRecord.expressName}>
                   <Text style={{ fontSize: pxToDp(24), textAlign: 'center', color: '#58B169' }}>{tool.disWay()[index]}</Text>
@@ -832,7 +832,9 @@ class OrderScene extends Component {
         )
       })
     } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
-      return <LoadingView />
+      return <View style={{ height: pxToDp(50), backgroundColor: "#fff", paddingLeft: pxToDp(30), flexDirection: 'row', alignItems: 'center' }}>
+        <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
+      </View>
     }
   }
   upAddTip(){
@@ -1264,13 +1266,15 @@ class OrderScene extends Component {
               } />
           </View>
         </View>
-          <View style = {{flexDirection:'row',backgroundColor:'#fff',borderTopWidth:pxToDp(1),borderTopColor:"#D3D3D3"}}>
+          <View style = {{backgroundColor:'#fff',borderTopWidth:pxToDp(1),borderTopColor:"#D3D3D3",position:'relative'}}>
             {
               this.renderWayRecord()
             }
-            {
-              this.renderAddTip()
-            }
+           <View style = {{position:'absolute',right:pxToDp(0),top:pxToDp(0)}}>
+             {
+               this.renderAddTip()
+             }
+           </View>
           </View>
       </View>
 
