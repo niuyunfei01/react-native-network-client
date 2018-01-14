@@ -88,12 +88,6 @@ const _editNum = function (edited, item) {
 };
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
-const supportEditGoods = (orderStatus) => {
-  orderStatus = parseInt(orderStatus);
-  return orderStatus === Cts.ORDER_STATUS_TO_SHIP ||
-    orderStatus === Cts.ORDER_STATUS_TO_READY ||
-    orderStatus === Cts.ORDER_STATUS_SHIPPING
-};
 
 const shouldShowItems = (orderStatus) => {
   orderStatus = parseInt(orderStatus);
@@ -1142,7 +1136,7 @@ class OrderScene extends Component {
             </View>}
 
             {!this.state.isEditing && (
-              supportEditGoods(order.orderStatus) ?
+              order._op_edit_goods ?
                 <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={() => {
                   this.setState({isEditing: true, itemsHided: false})
                 }}/>
