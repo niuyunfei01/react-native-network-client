@@ -25,12 +25,10 @@ import {fetchListVendorTags, fetchListVendorGoods} from '../../reducers/product/
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import tool, {get_platform_name} from '../../common/tool';
+import tool from '../../common/tool';
 import Cts from '../../Cts';
-import {NavigationItem} from '../../widget';
-import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
+import {Toast} from "../../weui/index";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -62,7 +60,7 @@ class GoodsMangerScene extends PureComponent {
       platId: Cts.WM_PLAT_ID_WX,
       vendorId: Cts.STORE_TYPE_SELF,
       tagList: [],
-      selectedTag: '999999999',
+      selectedTag: Cts.GOODS_CLASSIFY_ALL,
       selectList: [],
       platList: [
         Cts.WM_PLAT_ID_WX,
@@ -79,7 +77,7 @@ class GoodsMangerScene extends PureComponent {
         Cts.STORE_TYPE_BLX,
         Cts.STORE_TYPE_XGJ
       ],
-      sortId: '',
+      sortId: Cts.GOODS_MANAGE_SOLD_SORT,
       sortList: [
         Cts.GOODS_MANAGE_DEFAULT_SORT,
         Cts.GOODS_MANAGE_SOLD_SORT,
@@ -117,8 +115,15 @@ class GoodsMangerScene extends PureComponent {
     const {vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    this.setState({query: true});
     dispatch(fetchListVendorTags(vendorId, accessToken, (ok, desc, obj) => {
-      this.setState({tagList: obj})
+      this.setState({query: false});
+      if (ok) {
+        this.setState({tagList: obj});
+      } else {
+        ToastLong(desc);
+      }
+
     }));
   }
 
@@ -126,6 +131,7 @@ class GoodsMangerScene extends PureComponent {
     const {platId, vendorId, sortId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    this.setState({query: true});
     dispatch(fetchListVendorGoods(vendorId, platId, sortId, accessToken, (ok, desc, obj) => {
       this.setState({query: false});
       if (ok) {
@@ -134,6 +140,19 @@ class GoodsMangerScene extends PureComponent {
         ToastLong(desc)
       }
     }));
+  }
+
+  //没有相关记录
+  renderEmpty(str = '没有相关记录') {
+    if (!this.state.query) {
+      return (
+          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+            <Image style={{width: pxToDp(100), height: pxToDp(135)}}
+                   source={require('../../img/Goods/zannwujilu.png')}/>
+            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>{str}</Text>
+          </View>
+      )
+    }
   }
 
 //渲染下拉列表项
@@ -167,15 +186,20 @@ class GoodsMangerScene extends PureComponent {
             return (
                 <TouchableOpacity
                     onPress={async () => {
-                      await this.setState({vendorId: item, tabNum: 0, query: true});
+                      await this.setState({
+                        vendorId: item,
+                        tabNum: 0,
+                        query: true,
+                        selectedTag: Cts.GOODS_CLASSIFY_ALL
+                      });
                       this.toggleSelectBox();
+                      await this.getListVendorTags();
                       this.getListVendorGoods();
                     }}
                     key={index}
                 >
                   <Text
                       style={vendorId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-
                     {
                       tool.getVendorName(item)
                     }
@@ -191,7 +215,7 @@ class GoodsMangerScene extends PureComponent {
                 <TouchableOpacity
                     onPress={async () => {
                       await this.setState({sortId: item, tabNum: 0, query: true});
-                      this.toggleSelectBox()
+                      this.toggleSelectBox();
                       this.getListVendorGoods();
                     }}
                     key={index}
@@ -256,8 +280,12 @@ class GoodsMangerScene extends PureComponent {
     return (
         <FlatList
             extraData={this.state}
-            style={{flex: 1}}
+            style={{flex: 1, borderWidth: 1}}
             data={goods[selectedTag]}
+            getItemLayout={(data, index) => (
+                {length: pxToDp(190), offset: pxToDp(190) * index, index}
+            )}
+            ListEmptyComponent={this.renderEmpty('该品类下没有商品!')}
             renderItem={({item, key}) => {
               let {
                 list_img,
@@ -268,39 +296,46 @@ class GoodsMangerScene extends PureComponent {
                 sale_store_num
               } = item;
               return (
-                  <View style={content.goods_item} key={key}>
-                    <TouchableOpacity
-                        onPress={() => {
-                          this.toStoresList(item);
-                        }}
-                    >
+                  <TouchableOpacity
+                      onPress={() => {
+                        this.toStoresList(item);
+                      }}
+                  >
+                    <View style={content.goods_item} key={key}>
+
                       <View style={{paddingHorizontal: pxToDp(10)}}>
                         <Image style={content.good_img}
                                source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
                         />
                         <Text style={content.good_id}>#{product_id}</Text>
                       </View>
-                    </TouchableOpacity>
-                    <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
-                      <Text style={content.good_name}
-                            numberOfLines={2}
-                      >{name}</Text>
-                      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <View style={content.good_desc}>
-                          <Text style={content.on_sale}>在售({sale_store_num})家</Text>
-                        </View>
-                        <View style={content.good_desc}>
-                          <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
-                          <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
-                        </View>
-                        <View style={content.good_desc}>
-                          <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
-                          <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
+
+                      <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
+                        <Text style={content.good_name}
+                              numberOfLines={2}
+                        >{name}</Text>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                          <View style={content.good_desc}>
+                            <Text style={content.on_sale}>在售({sale_store_num})家</Text>
+                          </View>
+                          <View style={content.good_desc}>
+                            <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
+                            <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
+                          </View>
+                          <View style={content.good_desc}>
+                            <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
+                            <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
               )
+            }}
+            refreshing={false}
+            onRefresh={async () => {
+              await  this.setState({query: true});
+              this.getListVendorGoods();
             }}
         />
     )
@@ -309,9 +344,9 @@ class GoodsMangerScene extends PureComponent {
 // 分类列表
   renderTagsList() {
     let {tagList, selectedTag, platId} = this.state;
-    tagList.forEach((item,index)=>{
-           item.key = index
-       })
+    tagList.forEach((item, index) => {
+      item.key = index
+    });
     return (
         <FlatList
             extraData={this.state}
@@ -322,6 +357,7 @@ class GoodsMangerScene extends PureComponent {
                   <TouchableOpacity
                       key={key}
                       onPress={() => {
+
                         this.setState({selectedTag: item.id})
                       }}
                   >
@@ -371,11 +407,11 @@ class GoodsMangerScene extends PureComponent {
                 this.renderTagsList()
               }
             </View>
-            <ScrollView style={content.right}>
+            <View style={content.right}>
               {
                 this.renderGoodsList()
               }
-            </ScrollView>
+            </View>
           </View>
           <Toast
               icon="loading"
@@ -449,13 +485,14 @@ const content = StyleSheet.create({
     paddingVertical: pxToDp(15),
     marginBottom: pxToDp(5),
     backgroundColor: colors.white,
-    marginLeft: pxToDp(7)
+    marginLeft: pxToDp(7),
+    height: pxToDp(190),
   },
   good_img: {
     height: pxToDp(110),
     width: pxToDp(110),
-    borderWidth:pxToDp(1),
-    borderColor:'#eee',
+    borderWidth: pxToDp(1),
+    borderColor: '#eee',
   },
   good_id: {
     height: pxToDp(40),

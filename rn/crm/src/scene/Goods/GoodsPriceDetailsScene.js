@@ -5,9 +5,9 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   ScrollView,
   TextInput,
+  RefreshControl,
 } from 'react-native';
 import {
   Cells,
@@ -27,8 +27,6 @@ import colors from "../../styles/colors";
 import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
-import {NavigationItem} from '../../widget';
-import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import InputNumber from 'rc-input-number';
@@ -52,7 +50,7 @@ function mapDispatchToProps(dispatch) {
 class GoodsPriceDetails extends PureComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '价格管理',
+      headerTitle: '价格监管',
     };
   };
 
@@ -68,8 +66,11 @@ class GoodsPriceDetails extends PureComponent {
       storesList: [],
       query: true,
       store_id: 0,
-      new_price_cents:'',
+      new_price_cents: '',
       dialogPrice: '',
+      isRefreshing: false,
+      uploading: false,
+
     }
   }
 
@@ -95,13 +96,17 @@ class GoodsPriceDetails extends PureComponent {
   }
 
   upChangePrice() {
-    let {product_id, store_id, new_price_cents} = this.state;
-    if(uploading){
-    return false
+    let {product_id, store_id, new_price_cents, uploading} = this.state;
+    if (Math.ceil(new_price_cents * 100) < 0) {
+      ToastLong('修改价格不能小于0');
+      return false
+    }
+    if (uploading && Math.ceil(new_price_cents * 100) < 0) {
+      return false
     }
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchStoreChgPrice(store_id, product_id, new_price_cents, accessToken, (ok, desc, obj) => {
+    dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, (ok, desc, obj) => {
       this.setState({uploading: false});
       if (ok) {
         ToastLong('提交成功');
@@ -117,7 +122,7 @@ class GoodsPriceDetails extends PureComponent {
       return (
           <TouchableOpacity
               onPress={() => {
-                this.setState({showDialog: true, store_id: store_id, dialogPrice: price,new_price_cents:''})
+                this.setState({showDialog: true, store_id: store_id, dialogPrice: price, new_price_cents: ''})
               }}
           >
             <Text style={content.change_price}>修改价格</Text>
@@ -129,13 +134,13 @@ class GoodsPriceDetails extends PureComponent {
             <Text style={[content.plat_price, {
               fontWeight: '100',
               color: colors.color333
-            }]}>{tool.toFixed(price)} 同步中...</Text>
+            }]}>{tool.toFixed(sync_price)} 同步中...</Text>
             <Text style={[content.plat_min_price, {
               lineHeight: pxToDp(28),
               textAlignVertical: 'center',
               marginTop: pxToDp(13),
               marginBottom: pxToDp(2)
-            }]}>{tool.toFixed(sync_price)} 同步中...</Text>
+            }]}>{tool.toFixed(price)} 同步中...</Text>
           </View>
       )
     } else {
@@ -159,13 +164,14 @@ class GoodsPriceDetails extends PureComponent {
     } else if (is_min) {
       return require('../../img/Goods/zuixiaojia_.png')
     } else {
+      return null;
     }
   }
 
   renderList() {
     let {storesList} = this.state;
     return storesList.map((item, index) => {
-      let {fn_price_controlled, store_id, store_name, wm_goods} = item;
+      let {fn_price_controlled, store_id, store_name, wm_goods, supply_price} = item || {};
       return (
           <Cells key={index}>
             <Cell customStyle={content.store} style={{borderTopWidth: 0}} first={true}>
@@ -178,7 +184,7 @@ class GoodsPriceDetails extends PureComponent {
               <CellBody/>
               {
                 fn_price_controlled == 1 ? <CellFooter>
-                  <Text style={content.store_price}>￥20.00</Text>
+                  <Text style={content.store_price}>￥{tool.toFixed(supply_price)}</Text>
                   <Image source={require('../../img/Goods/baojia_.png')}
                          style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
                 </CellFooter> : <Text/>
@@ -186,7 +192,7 @@ class GoodsPriceDetails extends PureComponent {
             </Cell>
             {
               wm_goods.map((ite, key) => {
-                let {status, price, platform_id} = ite;
+                let {status, price, platform_id, before_price} = ite;
                 return (
                     <Cell key={key} customStyle={content.store} style={{borderTopWidth: 0}}>
                       <CellHeader style={content.cell_header}>
@@ -196,7 +202,10 @@ class GoodsPriceDetails extends PureComponent {
                             <Text style={content.plat_price}>{tool.toFixed(price)}</Text>
                             <Image style={content.price_status} source={this.priceMaxMinImg(ite)}/>
                           </View>
-                          {/*<Text style={content.plat_min_price}>45.00</Text>*/}
+                          {
+                            before_price ?
+                                <Text style={content.plat_min_price}>{tool.toFixed(before_price)}</Text> : null
+                          }
                         </View>
                       </CellHeader>
                       <CellBody>
@@ -233,6 +242,17 @@ class GoodsPriceDetails extends PureComponent {
             </View>
           </View>
           <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => {
+                      this.setState({query: true});
+                      this.getListStoresGoods()
+                    }
+                    }
+                    tintColor='gray'
+                />
+              }
 
           >
             {
@@ -268,11 +288,12 @@ class GoodsPriceDetails extends PureComponent {
                   ]}
           >
             <View>
-              <Text style={{marginBottom: pxToDp(10)}}>
-                输入要修改的价格(元)<Text style={{color: colors.main_color, fontSize: pxToDp(24)}}>
-                原价:{tool.toFixed(this.state.dialogPrice)}元
-              </Text>
-              </Text>
+              <View style={{marginBottom: pxToDp(10),width:'100%',flexDirection:'row'}}>
+                <Text> 输入要修改的价格(元)</Text>
+                <Text style={{color: colors.main_color, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>
+                  原价:{tool.toFixed(this.state.dialogPrice)}元
+                </Text>
+              </View>
               <TextInput
                   style={{
                     height: pxToDp(90),
@@ -309,7 +330,7 @@ class GoodsPriceDetails extends PureComponent {
 
 const header = StyleSheet.create({
   box: {
-    height: pxToDp(134),
+    minHeight: pxToDp(134),
     backgroundColor: colors.main_color,
     paddingHorizontal: pxToDp(30),
     flexDirection: 'row',
@@ -321,7 +342,7 @@ const header = StyleSheet.create({
     width: pxToDp(95),
   },
   desc: {
-    height: pxToDp(95),
+    minHeight: pxToDp(95),
     marginLeft: pxToDp(20),
   },
   text: {
@@ -343,7 +364,8 @@ const content = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     alignItems: 'center',
-    width: pxToDp(270),
+    minWidth: pxToDp(270),
+    maxWidth:pxToDp(350),
   },
   store_name: {
     fontSize: pxToDp(36),

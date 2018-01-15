@@ -467,7 +467,7 @@ function getVendorName(vendorId){
 function getSortName(sortId){
   let map ={};
   map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
-  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量排序";
+  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
 
   return map[sortId];
 
