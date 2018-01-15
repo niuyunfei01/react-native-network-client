@@ -850,6 +850,13 @@ class OrderScene extends Component {
       ToastLong('加小费的金额必须大于0')
     }
   }
+  total_goods_num(items){
+    let num=0
+    items.forEach((item)=>{
+      num += parseInt(item.num);
+    })
+    return num
+  }
   render() {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
@@ -1122,7 +1129,9 @@ class OrderScene extends Component {
                 color: colors.color999,
                 fontSize: pxToDp(24),
                 marginLeft: pxToDp(20)
-              }}>{_items.length}种商品</Text>
+              }}>{
+                this.total_goods_num(_items)
+              }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
 
@@ -1158,10 +1167,10 @@ class OrderScene extends Component {
           </View>
           {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
             return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx}
-                             isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+              nav = {this.props.navigation} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
-            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing}
+            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} nav = {this.props.navigation} isEditing={this.state.isEditing}
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
@@ -1380,7 +1389,7 @@ class ItemRow extends PureComponent {
   render() {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
-      }, isEditing = false
+      }, isEditing = false,nav
     } = this.props;
 
     const editNum = _editNum(edited, item);
@@ -1393,13 +1402,20 @@ class ItemRow extends PureComponent {
       paddingTop: pxToDp(14),
       paddingBottom: pxToDp(14),
       borderBottomColor: colors.color999,
-      borderBottomWidth: screen.onePixel
+      borderBottomWidth: screen.onePixel,
     }]}>
       <View style={{flex: 1,flexDirection:'row',alignItems:'center'}}>
-        <Image
-            style={styles.product_img}
-            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
-        />
+        <TouchableOpacity
+            onPress = {()=>{
+              let {product_id} = item
+              nav.navigate(Config.ROUTE_GOODS_DETAIL,{productId:product_id})
+            }}
+        >
+          <Image
+              style={styles.product_img}
+              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+          />
+        </TouchableOpacity>
         <View>
           <Text style={{
             fontSize: pxToDp(26),
@@ -1438,7 +1454,7 @@ class ItemRow extends PureComponent {
       <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
+      <Text style={item.num>1?{alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'}:{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
       <View style={[{marginLeft: 10}]}>
@@ -1464,6 +1480,7 @@ ItemRow.PropTypes = {
   isAdd: PropTypes.bool,
   edits: PropTypes.object,
   onInputNumberChange: PropTypes.func,
+  nav:PropTypes.object
 };
 
 class Remark extends PureComponent {
