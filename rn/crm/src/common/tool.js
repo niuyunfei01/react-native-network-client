@@ -168,7 +168,7 @@ export function store(store_id, global) {
 }
 
 export function length(obj) {
-  if (obj === undefined) {
+  if (obj === undefined || obj === null) {
     return 0;
   } else {
     if (typeof(obj) === 'object' && obj.length === undefined) {

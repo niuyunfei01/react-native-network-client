@@ -698,7 +698,6 @@ class OrderScene extends Component {
   wayRecordQuery() {
     const { dispatch, global ,navigation} = this.props;
     let {orderId} = navigation.state.params;
-    console.log('>>>>>>>>>>>>>>>wayRecordQuery',orderId)
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
@@ -799,7 +798,6 @@ class OrderScene extends Component {
   _orderChangeLogQuery() {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = navigation.state.params;
-    console.log('>>>>>>>>>>>>>>>_orderChangeLogQuery', orderId)
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
@@ -1129,10 +1127,12 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
 
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
-              <ImageBtn source={require('../../img/Order/good/queren_.png')}
-                        imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
-              <ImageBtn source={require('../../img/Order/good/quxiao_.png')}
-                        imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
+              <ImageBtn
+                source={require('../../img/Order/good/queren_.png')}
+                imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
+              <ImageBtn
+                source={require('../../img/Order/good/quxiao_.png')}
+                imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
 
             {!this.state.isEditing && (
@@ -1404,8 +1404,11 @@ class ItemRow extends PureComponent {
           <Text style={{
             fontSize: pxToDp(26),
             color: colors.color333,
-            marginBottom: pxToDp(14)
-          }}>{item.name}</Text>
+            marginBottom: pxToDp(14),
+          }}>
+            {item.name}
+            <Text style={{fontSize: pxToDp(22),color: colors.fontGray}}>(#{item.product_id})</Text>
+          </Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
             {!isAdd &&
@@ -1415,23 +1418,20 @@ class ItemRow extends PureComponent {
         </View>
 
       </View>
-      {showEditAdded && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>
+      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
-      </View>
-      }
-      {isEditing && !isAdd && edited && edited.num < item.num && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{-editNum}件</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
-      </View>
-      }
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
+      </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>加货{item.num}</Text>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
       </View>}
 
       {isPromotion &&
