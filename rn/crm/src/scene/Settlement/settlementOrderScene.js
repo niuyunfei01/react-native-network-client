@@ -8,7 +8,6 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 
 import {connect} from "react-redux";
@@ -16,12 +15,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import { get_supply_orders} from '../../reducers/settlement/settlementActions'
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {NavigationActions} from "react-navigation";
-import {NavigationItem} from '../../widget';
 import tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
 import Cts from "../../Cts"
 import Config from '../../config'
+import colors from "../../styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -112,7 +110,6 @@ class SettlementScene extends PureComponent {
                 >
                   <Text style={styles.name}>
                     {`${tool.shortOrderDay(orderTime)}#${dayId}`}
-                    {/*({`${tool.get_platform_name(platform)}#${dayId}`})*/}
                   </Text>
                 </TouchableOpacity>
                 <Text style={styles.num}>商品数量:{total_goods_num}</Text>
@@ -230,9 +227,8 @@ const styles = StyleSheet.create({
   },
   name: {
     minWidth: pxToDp(200),
-    maxWidth:pxToDp(300),
     fontSize:pxToDp(32),
-    color:'#3e3e3e',
+    color:colors.main_color,
     fontWeight:'900',
 
   },
@@ -247,7 +243,7 @@ const styles = StyleSheet.create({
     marginTop:pxToDp(5),
   }
 
-})
+});
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)
