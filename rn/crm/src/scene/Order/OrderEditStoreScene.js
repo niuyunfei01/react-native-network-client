@@ -84,7 +84,9 @@ class OrderEditStoreScene extends Component {
 
     const availableStores = tool.objectFilter(global.canReadStores, (store) => store.vendor_id === currVendorId && store.id !== currStoreId );
     const availableOptions = Object.keys(availableStores).map(store_id => {
-      return {label: availableStores[store_id].name, value: store_id};
+      if(store_id > 0){
+        return {label: availableStores[store_id].name, value: store_id};
+      }
     });
 
     return <ScrollView style={[styles.container, {flex: 1}]}>

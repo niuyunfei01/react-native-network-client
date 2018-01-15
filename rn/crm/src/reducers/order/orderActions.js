@@ -209,12 +209,9 @@ export function orderUrgingReplyReasons(token, id, task_id, callback) {
 export function getRemindForOrderPage(token, orderId, callback) {
   return getWithTpl2(`api/list_notice_of_order/${orderId}?access_token=${token}`,
     (json) => {
-      if (json.ok) {
-        callback(true, json.obj)
-      } else {
-        callback(false, "数据获取失败");
-      }
-    }, (error) => callback(false, "网络错误, 请稍后重试")
+      let {ok, desc, obj} = json;
+      callback(ok, desc, obj);
+    }, (error) => callback(false, "网络错误, 请稍后重试", {})
   )
 }
 

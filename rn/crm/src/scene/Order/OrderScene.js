@@ -229,9 +229,6 @@ class OrderScene extends Component {
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
-
-    console.log('__getDataIfRequired', orderId);
-
     if (!orderId) {
       return;
     }
@@ -241,7 +238,7 @@ class OrderScene extends Component {
 
     if (!o || !o.id || o.id !== orderId) {
 
-      console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
+      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -254,15 +251,16 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
-            console.log('__getDataIfRequired refresh, isFetching');
+            //console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
-              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, data) => {
+              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, desc, data) => {
+                console.log('getRemindForOrderPage -> ', ok, desc);
                 if (ok) {
                   this.setState({reminds: data, remindFetching: false})
                 } else {
-                  this.setState({errorHints: '获取提醒列表失败', remindFetching: false})
+                  this.setState({errorHints: desc, remindFetching: false})
                 }
               }));
             }
@@ -698,7 +696,6 @@ class OrderScene extends Component {
   wayRecordQuery() {
     const { dispatch, global ,navigation} = this.props;
     let {orderId} = navigation.state.params;
-    console.log('>>>>>>>>>>>>>>>wayRecordQuery',orderId)
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
@@ -799,7 +796,6 @@ class OrderScene extends Component {
   _orderChangeLogQuery() {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = navigation.state.params;
-    console.log('>>>>>>>>>>>>>>>_orderChangeLogQuery', orderId)
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
@@ -851,6 +847,13 @@ class OrderScene extends Component {
       this.setState({addMoneyNum:''});
       ToastLong('加小费的金额必须大于0')
     }
+  }
+  total_goods_num(items){
+    let num=0
+    items.forEach((item)=>{
+      num += parseInt(item.num);
+    })
+    return num
   }
   render() {
     const order = this.props.order.order;
@@ -1042,8 +1045,7 @@ class OrderScene extends Component {
     const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
     const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit) / 100;
 
-    console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
-
+    //console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
     const task_types = this.props.global.config.task_types || {};
@@ -1124,15 +1126,19 @@ class OrderScene extends Component {
                 color: colors.color999,
                 fontSize: pxToDp(24),
                 marginLeft: pxToDp(20)
-              }}>{_items.length}种商品</Text>
+              }}>{
+                this.total_goods_num(_items)
+              }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
 
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
-              <ImageBtn source={require('../../img/Order/good/queren_.png')}
-                        imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
-              <ImageBtn source={require('../../img/Order/good/quxiao_.png')}
-                        imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
+              <ImageBtn
+                source={require('../../img/Order/good/queren_.png')}
+                imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
+              <ImageBtn
+                source={require('../../img/Order/good/quxiao_.png')}
+                imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
 
             {!this.state.isEditing && (
@@ -1158,10 +1164,10 @@ class OrderScene extends Component {
           </View>
           {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
             return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx}
-                             isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+              nav = {this.props.navigation} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
-            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing}
+            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} nav = {this.props.navigation} isEditing={this.state.isEditing}
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
@@ -1380,7 +1386,7 @@ class ItemRow extends PureComponent {
   render() {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
-      }, isEditing = false
+      }, isEditing = false,nav
     } = this.props;
 
     const editNum = _editNum(edited, item);
@@ -1393,19 +1399,29 @@ class ItemRow extends PureComponent {
       paddingTop: pxToDp(14),
       paddingBottom: pxToDp(14),
       borderBottomColor: colors.color999,
-      borderBottomWidth: screen.onePixel
+      borderBottomWidth: screen.onePixel,
     }]}>
       <View style={{flex: 1,flexDirection:'row',alignItems:'center'}}>
-        <Image
-            style={styles.product_img}
-            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
-        />
+        <TouchableOpacity
+            onPress = {()=>{
+              let {product_id} = item
+              nav.navigate(Config.ROUTE_GOODS_DETAIL,{productId:product_id})
+            }}
+        >
+          <Image
+              style={styles.product_img}
+              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+          />
+        </TouchableOpacity>
         <View>
           <Text style={{
             fontSize: pxToDp(26),
             color: colors.color333,
-            marginBottom: pxToDp(14)
-          }}>{item.name}</Text>
+            marginBottom: pxToDp(14),
+          }}>
+            {item.name}
+            <Text style={{fontSize: pxToDp(22),color: colors.fontGray}}>(#{item.product_id})</Text>
+          </Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
             {!isAdd &&
@@ -1415,30 +1431,27 @@ class ItemRow extends PureComponent {
         </View>
 
       </View>
-      {showEditAdded && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>
+      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
-      </View>
-      }
-      {isEditing && !isAdd && edited && edited.num < item.num && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{-editNum}件</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
-      </View>
-      }
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
+      </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>加货{item.num}</Text>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
       </View>}
 
       {isPromotion &&
       <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
+      <Text style={item.num>1?{alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'}:{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
       <View style={[{marginLeft: 10}]}>
@@ -1464,6 +1477,7 @@ ItemRow.PropTypes = {
   isAdd: PropTypes.bool,
   edits: PropTypes.object,
   onInputNumberChange: PropTypes.func,
+  nav:PropTypes.object
 };
 
 class Remark extends PureComponent {

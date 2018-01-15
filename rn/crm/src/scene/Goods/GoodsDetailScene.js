@@ -39,7 +39,7 @@ class GoodsDetailScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     console.log('navigation',navigation)
     const {params = {}} = navigation.state;
-    let {backPage} = params;
+    let {backPage, product_detail} = params;
 
     return {
       headerLeft: (
@@ -52,16 +52,14 @@ class GoodsDetailScene extends PureComponent {
               console.log("backPage------------", backPage);
               native.nativeBack();
             }else {
-
+              navigation.goBack()
             }
           }}
         />),
       headerTitle: '商品详情',
-      headerRight: ( <View style={{flexDirection: 'row'}}>
+      headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => {
-            let {product_detail} = params;
-            if(tool.length(product_detail) > 0){
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'edit',
@@ -69,9 +67,6 @@ class GoodsDetailScene extends PureComponent {
                   detail_key:navigation.state.key
                 });
               });
-            } else {
-              ToastLong('请等待商品加载完成...')
-            }
           }}
         >
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
@@ -109,13 +104,14 @@ class GoodsDetailScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
-    if (product_detail[productId] === undefined) {
+    /*if (product_detail[productId] === undefined) {
       this.getProductDetail();
     } else {
       this.setState({
         product_detail: product_detail[productId],
       });
-    }
+    }*/
+    this.getProductDetail();
     this.getVendorProduct();
 
     if(store_tags[currVendorId] === undefined || basic_category[currVendorId] === undefined){
@@ -157,17 +153,6 @@ class GoodsDetailScene extends PureComponent {
     }
   }
 
-  setNavParams() {
-    let {product_detail, store_product} = this.state;
-    if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
-      let params = {
-        store_product: store_product,
-        product_detail: product_detail,
-      };
-      this.props.navigation.setParams(params);
-    }
-  }
-
   getProductDetail() {
     let product_id = this.productId;
     console.log('product_id ---------------------> ', product_id);
@@ -180,10 +165,12 @@ class GoodsDetailScene extends PureComponent {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
           if (resp.ok) {
             let product_detail = resp.obj;
+            //console.log('product_detail -------->', product_detail);
             _this.setState({
               product_detail: product_detail,
               isRefreshing: false,
             });
+            _this.props.navigation.setParams({product_detail});
           } else {
             _this.setState({isRefreshing: false});
           }
@@ -209,7 +196,6 @@ class GoodsDetailScene extends PureComponent {
               store_product: store_product,
               isLoading: false,
             });
-            _this.setNavParams();
           } else {
             _this.setState({isLoading: false});
           }
@@ -221,6 +207,8 @@ class GoodsDetailScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
+    let {currVendorId} = tool.vendor(this.props.global);
+    this.getVendorTags(currVendorId);
     this.getProductDetail();
     this.getVendorProduct();
   }

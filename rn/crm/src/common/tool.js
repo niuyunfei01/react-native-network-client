@@ -94,7 +94,7 @@ export function vendor(global) {
   let currVendorId = currStore['vendor_id'] || currStore['type'];
   let currVendorName = currStore['vendor'];
   let currStoreName = currStore['name'];
-  let fnPriceControlled = currStore['fn_price_controlled'];
+  let fnPriceControlled = parseInt(currStore['fn_price_controlled']);
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
@@ -168,7 +168,7 @@ export function store(store_id, global) {
 }
 
 export function length(obj) {
-  if (obj === undefined) {
+  if (obj === undefined || obj === null) {
     return 0;
   } else {
     if (typeof(obj) === 'object' && obj.length === undefined) {
