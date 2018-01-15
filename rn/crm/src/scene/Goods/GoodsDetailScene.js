@@ -52,7 +52,7 @@ class GoodsDetailScene extends PureComponent {
               console.log("backPage------------", backPage);
               native.nativeBack();
             }else {
-
+              navigation.goBack()
             }
           }}
         />),
