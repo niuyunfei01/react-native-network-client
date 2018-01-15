@@ -229,9 +229,6 @@ class OrderScene extends Component {
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
-
-    console.log('__getDataIfRequired', orderId);
-
     if (!orderId) {
       return;
     }
@@ -241,7 +238,7 @@ class OrderScene extends Component {
 
     if (!o || !o.id || o.id !== orderId) {
 
-      console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
+      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -254,15 +251,16 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
-            console.log('__getDataIfRequired refresh, isFetching');
+            //console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
-              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, data) => {
+              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, desc, data) => {
+                console.log('getRemindForOrderPage -> ', ok, desc);
                 if (ok) {
                   this.setState({reminds: data, remindFetching: false})
                 } else {
-                  this.setState({errorHints: '获取提醒列表失败', remindFetching: false})
+                  this.setState({errorHints: desc, remindFetching: false})
                 }
               }));
             }
@@ -1047,8 +1045,7 @@ class OrderScene extends Component {
     const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
     const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit) / 100;
 
-    console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
-
+    //console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
     const task_types = this.props.global.config.task_types || {};
