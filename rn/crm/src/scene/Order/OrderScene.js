@@ -808,14 +808,14 @@ class OrderScene extends Component {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
-          <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff'}}>
-            <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",height:pxToDp(150),justifyContent:'center'}}>
+          <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff',minHeight:pxToDp(180)}}>
+            <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",minHeight:pxToDp(150),justifyContent:'center'}}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35) }}>{item.updated_name}</Text>
                 <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35), marginLeft: pxToDp(24) }}>{item.modified}</Text>
               </View>
-              <View style={{ marginTop: pxToDp(20),width:'100%' }}>
-                <Text style={{ fontSize: pxToDp(24) }}>{item.what}</Text>
+              <View style={{ marginTop: pxToDp(20),width:'100%' ,height:'auto',marginBottom:pxToDp(20)}}>
+                <Text style={{ fontSize: pxToDp(24),height:'auto',lineHeight:pxToDp(28)}}>{item.what}</Text>
               </View>
             </View>
           </View>
@@ -1286,8 +1286,7 @@ class OrderScene extends Component {
             height: pxToDp(65),
             marginRight: 0,
           }]}>
-            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold' }}>修改记录</Text>
-
+            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold',marginBottom:pxToDp(1)}}>修改记录</Text>
             <View style={{ flex: 1 }} />
             <ImageBtn source={
               this.state.changeHide ? require('../../img/Order/pull_down.png') : require('../../img/Order/pull_up.png')
@@ -1299,13 +1298,12 @@ class OrderScene extends Component {
 
           </View>
         </View>
-        {
-          this.renderChangeLogs()
-        }
+        <View style = {{marginTop:pxToDp(1)}}>
+          {
+            this.renderChangeLogs()
+          }
+        </View>
       </View>
-
-
-
 
     </View>
     )

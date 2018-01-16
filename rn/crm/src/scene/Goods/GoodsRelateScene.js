@@ -80,7 +80,7 @@ class GoodsRelatedScene extends PureComponent {
             product_detail: product_detail,
           });
         } else {
-          ToastLong(resp.desc)
+          ToastLong(''+resp.desc)
         }
 
       }));

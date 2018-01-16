@@ -195,7 +195,6 @@ componentWillMount(){
                   </TouchableOpacity>
               )
             }}
-            refreshing={true}
             onEndReachedThreshold={0.05}
             onEndReached={async () => {
               let {curr_page, total_page} = this.state;

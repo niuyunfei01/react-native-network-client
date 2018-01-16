@@ -455,7 +455,39 @@ function deepClone(obj){
   }
 return result;
 }
+function getVendorName(vendorId){
+  let map={};
+  map[Cts.STORE_TYPE_SELF]='菜鸟食材';
+  map[Cts.STORE_TYPE_AFFILIATE]='菜鸟';
+  map[Cts.STORE_TYPE_GZW]='果知味';
+  map[Cts.STORE_TYPE_BLX]='比邻鲜';
+  map[Cts.STORE_TYPE_XGJ]='鲜果集';
+  return map[vendorId];
+}
+function getSortName(sortId){
+  let map ={};
+  map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
+  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
 
+  return map[sortId];
+
+}
+function platformsLogo(plat_id) {
+  let map = {};
+  map[Cts.WM_PLAT_ID_BD] = require('../img/Goods/baiduwaimai_.png');
+  map[Cts.WM_PLAT_ID_MT] = require('../img/Goods/meituanwaimai_.png');
+  map[Cts.WM_PLAT_ID_ELE] = require('../img/Goods/elmwaimai_.png');
+  map[Cts.WM_PLAT_ID_JD] = require('../img/Goods/jingdongdaojia_.png');
+  map[Cts.WM_PLAT_ID_WX] = require('../img/Goods/weixinjiage_.png');
+  return map[plat_id];
+}
+function goodSoldStatusImg(status){
+  let map = {};
+  map[Cts.STORE_PROD_ON_SALE] = require('../img/Goods/shangjia.png');
+  map[Cts.STORE_PROD_OFF_SALE] = require('../img/Goods/xiajia_.png');
+  map[Cts.STORE_PROD_SOLD_OUT] = require('../img/Goods/quehuo.png');
+  return map[status];
+}
 
 export default {
   urlByAppendingParams,
@@ -489,5 +521,9 @@ export default {
   sellingStatus,
   headerSupply,
   deepClone,
-  getOperateDetailsType
+  getOperateDetailsType,
+  getVendorName,
+  getSortName,
+  platformsLogo,
+  goodSoldStatusImg
 }
