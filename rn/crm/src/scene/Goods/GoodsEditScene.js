@@ -98,7 +98,7 @@ class GoodsEditScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       isUploadImg: false,
-      basic_cat_list: {},
+      basic_cat_list: [],
       basic_categories: [],
       store_tags: {},
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
@@ -636,7 +636,6 @@ class GoodsEditScene extends PureComponent {
                   </CellHeader>
                   <CellBody>
                     <Text>
-
                       {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
                     </Text>
                   </CellBody>

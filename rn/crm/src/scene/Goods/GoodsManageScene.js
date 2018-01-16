@@ -97,8 +97,10 @@ class GoodsMangerScene extends PureComponent {
   }
 
   async componentWillMount() {
+    let {currVendorId, } = tool.vendor(this.props.global);
+    await this.setState({vendorId:currVendorId});
     await this.getListVendorTags();
-    this.getListVendorGoods();
+    await this.getListVendorGoods();
   }
 
   toStoresList(item = {}) {
@@ -261,17 +263,22 @@ class GoodsMangerScene extends PureComponent {
     }
   }
 
-  selected(num) {
-    let {platList, vendorList, sortList} = this.state;
+  async selected(num) {
+    let {platList, vendorList, sortList, tabNum} = this.state;
     if (num === 1) {
-      this.setState({selectList: platList})
+      await this.setState({selectList: platList})
     } else if (num === 2) {
-      this.setState({selectList: vendorList})
+      await this.setState({selectList: vendorList})
     } else {
-      this.setState({selectList: sortList})
-
+      await this.setState({selectList: sortList})
     }
-    this.setState({tabNum: num})
+    if (num == tabNum) {
+      this.setState({tabNum:0});
+      this.toggleSelectBox()
+    } else {
+      this.setState({tabNum:num})
+    }
+
   }
 
 //商品列表
@@ -376,25 +383,27 @@ class GoodsMangerScene extends PureComponent {
         <View style={{flex: 1}}>
 
           <View style={!this.state.toggle ? [select.wrapper] : [select.wrapper, select.wrapper_active]}>
-            <ImageBtn name={tool.get_platform_name(platId)}
-                      activeStyle={tabNum == 1 ? {backgroundColor: colors.white} : {}}
-                      onPress={() => {
-                        this.selected(1);
-                        this.showSelectBox()
-                      }}
-            />
+
             <ImageBtn name={tool.getVendorName(vendorId)}
                       activeStyle={tabNum == 2 ? {backgroundColor: colors.white} : {}}
                       onPress={() => {
-                        this.selected(2);
                         this.showSelectBox()
+                        this.selected(2);
+
                       }}
             />
+            <ImageBtn name={tool.get_platform_name(platId)}
+                        activeStyle={tabNum == 1 ? {backgroundColor: colors.white} : {}}
+                        onPress={() => {
+                          this.showSelectBox();
+                          this.selected(1);
+                        }}
+          />
             <ImageBtn name={tool.getSortName(sortId)}
                       activeStyle={tabNum == 3 ? {backgroundColor: colors.white} : {}}
                       onPress={() => {
+                        this.showSelectBox();
                         this.selected(3);
-                        this.showSelectBox()
                       }}
             />
           </View>

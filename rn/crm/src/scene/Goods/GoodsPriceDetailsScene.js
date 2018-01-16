@@ -81,7 +81,7 @@ class GoodsPriceDetails extends PureComponent {
     this.getListStoresGoods()
   }
 
-  getListStoresGoods() {
+  async getListStoresGoods() {
     let {product_id, vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -106,9 +106,10 @@ class GoodsPriceDetails extends PureComponent {
     }
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, (ok, desc, obj) => {
+    dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, async(ok, desc, obj) => {
       this.setState({uploading: false});
       if (ok) {
+        await this.getListStoresGoods();
         ToastLong('提交成功');
       } else {
         ToastLong(desc);
@@ -118,7 +119,7 @@ class GoodsPriceDetails extends PureComponent {
 
   price_status(item, store_id = 0) {
     let {status, price, platform_id, sync_price} = item || {};
-    if (sync_price == undefined) {
+    if (platform_id == Cts.WM_PLAT_ID_WX) {
       return (
           <TouchableOpacity
               onPress={() => {
@@ -128,18 +129,14 @@ class GoodsPriceDetails extends PureComponent {
             <Text style={content.change_price}>修改价格</Text>
           </TouchableOpacity>
       )
-    } else if (!(parseInt(sync_price) == parseInt(price))) {
+    } else if (sync_price >= 0 && (Math.abs(parseInt(sync_price) - parseInt(price)) > 10)) {
       return (
-          <View style={{width: pxToDp(200)}}>
-            <Text style={[content.plat_price, {
-              fontWeight: '100',
-              color: colors.color333
-            }]}>{tool.toFixed(sync_price)} 同步中...</Text>
+          <View style={{minWidth: pxToDp(200), maxWidth: pxToDp(300)}}>
+            <Text style={{fontSize:pxToDp(30)}}>{tool.toFixed(sync_price)} 同步中...</Text>
             <Text style={[content.plat_min_price, {
               lineHeight: pxToDp(28),
               textAlignVertical: 'center',
-              marginTop: pxToDp(13),
-              marginBottom: pxToDp(2)
+              marginTop:pxToDp(4),
             }]}>{tool.toFixed(price)} 同步中...</Text>
           </View>
       )
@@ -242,6 +239,7 @@ class GoodsPriceDetails extends PureComponent {
             </View>
           </View>
           <ScrollView
+              style = {{flex:1}}
               refreshControl={
                 <RefreshControl
                     refreshing={this.state.isRefreshing}
@@ -258,9 +256,9 @@ class GoodsPriceDetails extends PureComponent {
             {
               this.renderList()
             }
+            <View style = {{height:pxToDp(20)}}/>
           </ScrollView>
-          <Dialog onRequestClose={() => {
-          }}
+          <Dialog onRequestClose={() => {}}
                   visible={this.state.showDialog}
                   title={'价格修改'}
                   titleStyle={{textAlign: 'center', color: colors.white}}
@@ -394,15 +392,15 @@ const content = StyleSheet.create({
     marginRight: pxToDp(20),
   },
   plat_price: {
-    height: pxToDp(32),
-    fontWeight: '600',
+    fontSize: pxToDp(32),
+    fontWeight: '900',
     color: colors.main_color,
     lineHeight: pxToDp(32),
   },
   price_status: {
     height: pxToDp(28),
     width: pxToDp(28),
-    marginLeft: pxToDp(20)
+    marginLeft: pxToDp(20),
   },
   plat_min_price: {
     fontSize: pxToDp(20),
@@ -417,7 +415,8 @@ const content = StyleSheet.create({
     textAlign: 'center',
     backgroundColor: '#00a0e9',
     textAlignVertical: 'center',
-    borderRadius: pxToDp(5)
+    borderRadius: pxToDp(5),
+    fontSize:pxToDp(24),
   }
 
 
