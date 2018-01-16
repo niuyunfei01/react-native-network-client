@@ -1151,7 +1151,7 @@ public class Utility {
                     Intent intent = new Intent(ctx, MyReactActivity.class);
                     String wm_id = Utility.parseUrl(url).getString("wm_id");
                     if (wm_id != null) {
-                        intent.putExtra("order_id", Integer.parseInt(wm_id));
+                        intent.putExtra("order_id", Long.parseLong(wm_id));
                     }
                     ctx.startActivity(intent);
                     return true;

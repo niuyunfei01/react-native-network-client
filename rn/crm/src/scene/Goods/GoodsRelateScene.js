@@ -58,8 +58,12 @@ class GoodsRelatedScene extends PureComponent {
 
   componentWillMount() {
     let {productId, product_detail} = this.props.navigation.state.params || {};
-    this.getProductDetail(productId);
-    this.getStoresList();
+    if (!(productId < 0 || product_detail)) {
+      this.getProductDetail(productId)
+    } else {
+      this.setState({product_detail: product_detail})
+    }
+    this.getStoresList()
   }
   getProductDetail(productId) {
     const {accessToken} = this.props.global;

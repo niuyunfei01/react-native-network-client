@@ -180,7 +180,10 @@ public class NotificationReceiver extends BroadcastReceiver {
 						|| Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())
 						) {
 
-					if (!TextUtils.isEmpty(notify.getUrl())) {
+					if (notify.getOrder_id() > 0) {
+						i = new Intent(context, MyReactActivity.class);
+						i.putExtra("order_id", Long.valueOf(notify.getOrder_id()));
+					} else if (!TextUtils.isEmpty(notify.getUrl())) {
 						i = new Intent(context, GeneralWebViewActivity.class);
 						i.putExtra("url", notify.getUrl());
 					} else {
