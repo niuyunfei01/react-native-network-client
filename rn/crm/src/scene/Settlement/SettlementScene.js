@@ -7,6 +7,7 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  TouchableHighlight,
 
 } from 'react-native';
 import colors from "../../styles/colors";
@@ -260,7 +261,12 @@ class SettlementScene extends PureComponent {
                 tool.objectMap(item, (ite, key) => {
                   return (
                       <Cell key={key}
-                            customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}}
+                            customStyle={{
+                              marginLeft: 0,
+                              paddingHorizontal: pxToDp(30),
+                              borderColor: "#EEEEEE",
+                              paddingRight:pxToDp(12)
+                            }}
                             onPress={() => {
                               this.toggleCheck(ite.key, ite.bill_date, ite.status, ite.id)
                             }}
@@ -297,24 +303,36 @@ class SettlementScene extends PureComponent {
   render() {
     return (
         <View style={this.state.authority ? {flex: 1, paddingBottom: pxToDp(110)} : {flex: 1}}>
-          <View style={styles.header}>
-            <Text style={styles.today_data}>
-              今日数据（{tool.fullDay(new Date())})
-            </Text>
-            <TouchableOpacity
-                onPress={() => {
-                  console.log(tool.fullDay(new Date()), this.state.status);
-                  this.toDetail(tool.fullDay(new Date()), this.state.status, this.state.id)
-                }
-                }
-            >
-              <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-                <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
-                <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额
-                  : {tool.toFixed(this.state.totalPrice)}</Text>
+          <TouchableHighlight
+              onPress={() => {
+                console.log(tool.fullDay(new Date()), this.state.status);
+                this.toDetail(tool.fullDay(new Date()), this.state.status, this.state.id)
+              }
+              }
+          >
+            <View style={{flexDirection:'row',backgroundColor:colors.white,alignItems:'center',justifyContent:'space-between'}}>
+              <View>
+                <View style={styles.header}>
+                  <Text style={styles.today_data}>
+                    今日数据（{tool.fullDay(new Date())})
+                  </Text>
+
+                  <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
+                    <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
+                    <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额
+                      : {tool.toFixed(this.state.totalPrice)}</Text>
+                  </View>
+                </View>
               </View>
-            </TouchableOpacity>
-          </View>
+
+              <Image
+                  style={{alignItems: 'center', transform: [{scale: 0.7}, {rotate: '-90deg'}],marginRight:pxToDp(30)}}
+                  source={require('../../img/Public/xiangxia_.png')}
+              />
+            </View>
+
+          </TouchableHighlight>
+
           <ScrollView
               refreshControl={
                 <RefreshControl
