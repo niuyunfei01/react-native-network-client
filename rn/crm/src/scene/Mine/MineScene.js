@@ -724,14 +724,6 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/dingdansousuo_.png')}/>
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        {fnPriceControlled > 0 && is_service_mgr && (<TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
-              activeOpacity={customerOpacity}
-          >
-            <Image style={[block_styles.block_img]} source={require('../../img/My/yunyingshouyi_.png')}/>
-            <Text style={[block_styles.block_name]}>运营收益</Text>
-          </TouchableOpacity>)}
         {(is_helper || is_service_mgr) && (<TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_ROUTE_GOODS_MANAGE)}
@@ -741,8 +733,8 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>商品管理</Text>
         </TouchableOpacity>)}
 
-        {is_service_mgr && (fnPriceControlled > 0 && is_helper ? (<View style={[block_styles.block_box]}/>) :
-            (fnPriceControlled > 0 || is_helper) && (<View style={[block_styles.empty_box]}/>) )}
+        {/*{is_service_mgr && (fnPriceControlled > 0 && is_helper ? (<View style={[block_styles.block_box]}/>) :*/}
+            {/*(fnPriceControlled > 0 || is_helper) && (<View style={[block_styles.empty_box]}/>) )}*/}
         {/*{fnPriceControlled > 0 && is_service_mgr && <View style={[block_styles.block_box]}/>}*/}
         {/*{(is_helper || is_service_mgr) && <View style={[block_styles.block_box]}/>}*/}
 
