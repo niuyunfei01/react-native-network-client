@@ -5,7 +5,7 @@ import {addNavigationHelpers, NavigationActions, StackNavigator, TabNavigator, T
 import Config from '../config';
 import color from '../widget/color'
 import TabBarItem from '../widget/TabBarItem'
-
+import MyTabBarItem from './MyTabBarItem'
 import RemindScene from '../scene/Remind/RemindScene'
 import MineScene from '../scene/Mine/MineScene';
 import OrderScene from '../scene/Order/OrderScene';
@@ -75,7 +75,7 @@ const tabDef = {
     navigationOptions: ({navigation}) => ({
       tabBarLabel: '提醒',
       tabBarIcon: ({focused, tintColor}) => (
-        <TabBarItem
+        <MyTabBarItem
           tintColor={tintColor}
           focused={focused}
           normalImage={require('../img/tabbar/tab_warn.png')}

@@ -268,7 +268,7 @@ class RemindScene extends PureComponent {
         </RNButton>
       }
       BadgeElement={
-        <Text style={{color: '#FFFFFF',fontSize:pxToDp(20)}}>{quick >99 ? '99+':quick}</Text>
+        <Text style={{color: '#FFFFFF',fontSize:pxToDp(18)}}>{quick >99 ? '99+':quick}</Text>
         }
       MainViewStyle={{marginHorizontal: pxToDp(10)}}
       Hidden={quick == 0}

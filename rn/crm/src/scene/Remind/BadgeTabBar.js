@@ -74,7 +74,7 @@ const BadgeTabBar = React.createClass({
           </View>
         }
         BadgeElement={
-          <Text style={{color: '#FFFFFF',fontSize:pxToDp(20)}}>{quick >99 ? '99+':quick}</Text>
+          <Text style={{color: '#FFFFFF',fontSize:pxToDp(18)}}>{quick >99 ? '99+':quick}</Text>
         }
         MainViewStyle={
           [styles.flexOne]
