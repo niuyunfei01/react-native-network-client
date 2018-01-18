@@ -1,3 +1,5 @@
+import pxToDp from "../../util/pxToDp";
+
 const React = require('react');
 const ReactNative = require('react-native');
 
@@ -72,7 +74,7 @@ const BadgeTabBar = React.createClass({
           </View>
         }
         BadgeElement={
-          <Text style={{color: '#FFFFFF'}}>{quick}</Text>
+          <Text style={{color: '#FFFFFF',fontSize:pxToDp(20)}}>{quick >99 ? '99+':quick}</Text>
         }
         MainViewStyle={
           [styles.flexOne]
