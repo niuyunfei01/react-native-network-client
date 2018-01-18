@@ -253,8 +253,21 @@ class SettlementScene extends PureComponent {
     return tool.objectMap(this.state.list, (item, index) => {
       return (
           <View key={index}>
-            <View style={{flexDirection: 'row', paddingHorizontal: pxToDp(30),}}>
+            <View style={{
+              flexDirection: 'row',
+              paddingHorizontal: pxToDp(30),
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+            >
               <Text style={{paddingVertical: pxToDp(5), marginTop: pxToDp(15)}}>{index}</Text>
+              <TouchableOpacity
+                  onPress = {()=>{
+                    this.props.navigation.navigate(Config.ROUTE_ROUTE_SETTLEMENT_GATHER)
+                  }}
+              >
+                <Text style ={styles.to_month}>本月销量汇总</Text>
+              </TouchableOpacity>
             </View>
             <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
               {
@@ -305,7 +318,6 @@ class SettlementScene extends PureComponent {
         <View style={this.state.authority ? {flex: 1, paddingBottom: pxToDp(110)} : {flex: 1}}>
           <TouchableHighlight
               onPress={() => {
-                console.log(tool.fullDay(new Date()), this.state.status);
                 this.toDetail(tool.fullDay(new Date()), this.state.status, this.state.id)
               }
               }
@@ -430,6 +442,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontSize: pxToDp(32),
     lineHeight: pxToDp(80)
+  },
+  to_month:{
+    color:colors.main_color,
+    fontSize:pxToDp(30),
+    textAlignVertical:'center',
+    marginTop:pxToDp(15),
   }
 })
 

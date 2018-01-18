@@ -4,6 +4,7 @@ import OperateProfitScene from "./scene/OperateProfit/OperateProfitScene";
 import OperateIncomeDetailScene from "./scene/OperateProfit/OperateIncomeDetailScene";
 import OperateExpendDetailScene from "./scene/OperateProfit/OperateExpendDetailScene";
 import GoodsPriceDetailsScene from "./scene/Goods/GoodsPriceDetailsScene";
+import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
 
 
 const {
@@ -131,6 +132,8 @@ const C = {
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL:'OperateOtherExpendDetail',
   ROUTE_ROUTE_GOODS_MANAGE:'GoodsManage',
   ROUTE_ROUTE_GOODS_PRICE_DETAIL:'GoodsPriceDetails',
+  ROUTE_ROUTE_SETTLEMENT_GATHER:'SettlementGather',
+
   serverUrl,
   apiUrl,
   staticUrl,
