@@ -225,7 +225,8 @@ class OrderScene extends Component {
     //
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const {dispatch, global} = this.props;
-    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
+
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -259,6 +260,8 @@ class OrderScene extends Component {
                 console.log('getRemindForOrderPage -> ', ok, desc);
                 if (ok) {
                   this.setState({reminds: data, remindFetching: false})
+                  this._orderChangeLogQuery();
+                  this.wayRecordQuery();
                 } else {
                   this.setState({errorHints: desc, remindFetching: false})
                 }
@@ -699,15 +702,11 @@ class OrderScene extends Component {
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
-
         mg = contacts
-
       } else {
         Alert.alert(msg)
       }
       this.setState({ orderWayLogs: mg,wayLoadingShow:false})
-      console.log(this.state.orderWayLogs)
-
     }));
   }
 

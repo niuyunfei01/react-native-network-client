@@ -99,12 +99,13 @@ class OperateProfitScene extends PureComponent {
                     item.map((ite, key) => {
                       let {day, balance_money, sum_today, total_balanced} = ite;
                       return (
-                          <Cell access
+                          <Cell
                                 style={content.cell}
                                 onPress={() => {
                                   this.toOperateDetail(day)
                                 }}
                                 key={key}
+                                customStyle={{paddingRight:pxToDp(12)}}
                           >
                             <CellHeader style={content.header}>
                               <Text style={content.date}> {day}</Text>
@@ -119,6 +120,10 @@ class OperateProfitScene extends PureComponent {
                             </CellBody>
                             <CellFooter style={[content.text_right, content.foot, content.date]}>
                               {toFixed(total_balanced)}
+                              <Image
+                                  style={{transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                                  source={require('../../img/Public/xiangxia_.png')}
+                              />
                             </CellFooter>
                           </Cell>
                       )

@@ -7,6 +7,7 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  TouchableHighlight,
 
 } from 'react-native';
 import colors from "../../styles/colors";
@@ -62,7 +63,7 @@ class SettlementScene extends PureComponent {
       checked: ['1', '2'],
       authority: false,
       canChecked: false,
-      list: [],
+      list: {},
       orderNum: 0,
       totalPrice: 0,
       status: 0,
@@ -74,7 +75,7 @@ class SettlementScene extends PureComponent {
   componentWillMount() {
     this.getSupplyList()
   }
- 
+
     componentDidUpdate(){
       let {key, params} = this.props.navigation.state;
       let {isRefreshing} = (params || {});
@@ -88,10 +89,10 @@ class SettlementScene extends PureComponent {
         this.props.navigation.dispatch(setRefresh);
         this.setState({query:true})
         this.getSupplyList()
-        
+
       }
     }
-  
+
 
   inArray(key) {
     let checked = this.state.checked;
@@ -143,7 +144,7 @@ class SettlementScene extends PureComponent {
   }
 
   toDetail(date, status, id) {
-    let {navigation} = this.props
+    let {navigation} = this.props;
     navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS, {
       date: date,
       status: status,
@@ -151,7 +152,19 @@ class SettlementScene extends PureComponent {
       key:navigation.state.key
     });
   }
+toMonthGather(date){
+  let {navigation} = this.props;
+  let{list} = this.state
+  let dateList=[];
+  tool.objectMap(list,(ite,index)=>{
+    dateList.push({label:index,key:index});
+  });
 
+  navigation.navigate(Config.ROUTE_SETTLEMENT_GATHER, {
+    date: date,
+    dateList:dateList,
+  });
+}
   renderStatus(status) {
     if (status == Cts.BILL_STATUS_PAID) {
       return (
@@ -173,7 +186,6 @@ class SettlementScene extends PureComponent {
     if (checked.length == list.length) {
     } else {
       list.forEach((item) => {
-        console.log(item.key)
         selectAllList.push(item.key)
       });
     }
@@ -252,15 +264,33 @@ class SettlementScene extends PureComponent {
     return tool.objectMap(this.state.list, (item, index) => {
       return (
           <View key={index}>
-            <View style={{flexDirection: 'row', paddingHorizontal: pxToDp(30),}}>
+            <View style={{
+              flexDirection: 'row',
+              paddingHorizontal: pxToDp(30),
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+            >
               <Text style={{paddingVertical: pxToDp(5), marginTop: pxToDp(15)}}>{index}</Text>
+              <TouchableOpacity
+                  onPress = {()=>{
+                    this.toMonthGather(index)
+                  }}
+              >
+                <Text style ={styles.to_month}>本月销量汇总</Text>
+              </TouchableOpacity>
             </View>
             <Cells style={{margin: 0, borderBottomColor: '#fff'}}>
               {
                 tool.objectMap(item, (ite, key) => {
                   return (
                       <Cell key={key}
-                            customStyle={{marginLeft: 0, paddingHorizontal: pxToDp(30), borderColor: "#EEEEEE"}}
+                            customStyle={{
+                              marginLeft: 0,
+                              paddingHorizontal: pxToDp(30),
+                              borderColor: "#EEEEEE",
+                              paddingRight:pxToDp(12)
+                            }}
                             onPress={() => {
                               this.toggleCheck(ite.key, ite.bill_date, ite.status, ite.id)
                             }}
@@ -297,24 +327,35 @@ class SettlementScene extends PureComponent {
   render() {
     return (
         <View style={this.state.authority ? {flex: 1, paddingBottom: pxToDp(110)} : {flex: 1}}>
-          <View style={styles.header}>
-            <Text style={styles.today_data}>
-              今日数据（{tool.fullDay(new Date())})
-            </Text>
-            <TouchableOpacity
-                onPress={() => {
-                  console.log(tool.fullDay(new Date()), this.state.status);
-                  this.toDetail(tool.fullDay(new Date()), this.state.status, this.state.id)
-                }
-                }
-            >
-              <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-                <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
-                <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额
-                  : {tool.toFixed(this.state.totalPrice)}</Text>
+          <TouchableHighlight
+              onPress={() => {
+                this.toDetail(tool.fullDay(new Date()), this.state.status, this.state.id)
+              }
+              }
+          >
+            <View style={{flexDirection:'row',backgroundColor:colors.white,alignItems:'center',justifyContent:'space-between'}}>
+              <View>
+                <View style={styles.header}>
+                  <Text style={styles.today_data}>
+                    今日数据（{tool.fullDay(new Date())})
+                  </Text>
+
+                  <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
+                    <Text style={styles.order_text}>已完成订单 : {this.state.orderNum}</Text>
+                    <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>金额
+                      : {tool.toFixed(this.state.totalPrice)}</Text>
+                  </View>
+                </View>
               </View>
-            </TouchableOpacity>
-          </View>
+
+              <Image
+                  style={{alignItems: 'center', transform: [{scale: 0.7}, {rotate: '-90deg'}],marginRight:pxToDp(30)}}
+                  source={require('../../img/Public/xiangxia_.png')}
+              />
+            </View>
+
+          </TouchableHighlight>
+
           <ScrollView
               refreshControl={
                 <RefreshControl
@@ -412,6 +453,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontSize: pxToDp(32),
     lineHeight: pxToDp(80)
+  },
+  to_month:{
+    color:colors.main_color,
+    fontSize:pxToDp(30),
+    textAlignVertical:'center',
+    marginTop:pxToDp(15),
   }
 })
 

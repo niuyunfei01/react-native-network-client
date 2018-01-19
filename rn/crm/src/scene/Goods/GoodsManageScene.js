@@ -106,7 +106,7 @@ class GoodsMangerScene extends PureComponent {
   toStoresList(item = {}) {
     let {vendorId} = this.state;
     this.props.navigation.navigate(
-        Config.ROUTE_ROUTE_GOODS_PRICE_DETAIL, {
+        Config.ROUTE_GOODS_PRICE_DETAIL, {
           vendorId: vendorId,
           item: item
         }
