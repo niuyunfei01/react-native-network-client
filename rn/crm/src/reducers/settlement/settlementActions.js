@@ -5,9 +5,9 @@ import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../util/ToastUtils';
 
 
-export function get_supply_items(store_id, date, token,callback) {
+export function get_supply_items(store_id, date,type='', token,callback) {
   return dispatch => {
-    const url = `api/get_supply_items/${store_id}/${date}.json?access_token=${token}`;
+    const url = `api/get_supply_items/${store_id}/${date}/${type}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {

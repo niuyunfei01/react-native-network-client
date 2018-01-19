@@ -260,9 +260,9 @@ class Navigator extends Component {
         [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
         [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
         [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
-        [Config.ROUTE_ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
-        [Config.ROUTE_ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
-        [Config.ROUTE_ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
+        [Config.ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
+        [Config.ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
+        [Config.ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
       },
       stackNavigatorConfigs
     );

@@ -130,9 +130,9 @@ const C = {
   ROUTE_OPERATE_INCOME_DETAIL:'OperateIncomeDetail',
   ROUTE_OPERATE_EXPEND_DETAIL:'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL:'OperateOtherExpendDetail',
-  ROUTE_ROUTE_GOODS_MANAGE:'GoodsManage',
-  ROUTE_ROUTE_GOODS_PRICE_DETAIL:'GoodsPriceDetails',
-  ROUTE_ROUTE_SETTLEMENT_GATHER:'SettlementGather',
+  ROUTE_GOODS_MANAGE:'GoodsManage',
+  ROUTE_GOODS_PRICE_DETAIL:'GoodsPriceDetails',
+  ROUTE_SETTLEMENT_GATHER:'SettlementGather',
 
   serverUrl,
   apiUrl,

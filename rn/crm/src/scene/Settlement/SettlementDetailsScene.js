@@ -85,7 +85,7 @@ class SettlementScene extends PureComponent {
     let date= this.state.date;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
-    dispatch(get_supply_items(store_id,date , token, async (resp) => {
+    dispatch(get_supply_items(store_id,date ,'', token, async (resp) => {
       if (resp.ok ) {
           let {goods_list,order_num,total_price,auth_finance_admin} = resp.obj;
           this.setState({

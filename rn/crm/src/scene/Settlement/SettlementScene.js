@@ -63,7 +63,7 @@ class SettlementScene extends PureComponent {
       checked: ['1', '2'],
       authority: false,
       canChecked: false,
-      list: [],
+      list: {},
       orderNum: 0,
       totalPrice: 0,
       status: 0,
@@ -75,7 +75,7 @@ class SettlementScene extends PureComponent {
   componentWillMount() {
     this.getSupplyList()
   }
- 
+
     componentDidUpdate(){
       let {key, params} = this.props.navigation.state;
       let {isRefreshing} = (params || {});
@@ -89,10 +89,10 @@ class SettlementScene extends PureComponent {
         this.props.navigation.dispatch(setRefresh);
         this.setState({query:true})
         this.getSupplyList()
-        
+
       }
     }
-  
+
 
   inArray(key) {
     let checked = this.state.checked;
@@ -144,7 +144,7 @@ class SettlementScene extends PureComponent {
   }
 
   toDetail(date, status, id) {
-    let {navigation} = this.props
+    let {navigation} = this.props;
     navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS, {
       date: date,
       status: status,
@@ -152,7 +152,19 @@ class SettlementScene extends PureComponent {
       key:navigation.state.key
     });
   }
+toMonthGather(date){
+  let {navigation} = this.props;
+  let{list} = this.state
+  let dateList=[];
+  tool.objectMap(list,(ite,index)=>{
+    dateList.push({label:index,key:index});
+  });
 
+  navigation.navigate(Config.ROUTE_SETTLEMENT_GATHER, {
+    date: date,
+    dateList:dateList,
+  });
+}
   renderStatus(status) {
     if (status == Cts.BILL_STATUS_PAID) {
       return (
@@ -174,7 +186,6 @@ class SettlementScene extends PureComponent {
     if (checked.length == list.length) {
     } else {
       list.forEach((item) => {
-        console.log(item.key)
         selectAllList.push(item.key)
       });
     }
@@ -263,7 +274,7 @@ class SettlementScene extends PureComponent {
               <Text style={{paddingVertical: pxToDp(5), marginTop: pxToDp(15)}}>{index}</Text>
               <TouchableOpacity
                   onPress = {()=>{
-                    this.props.navigation.navigate(Config.ROUTE_ROUTE_SETTLEMENT_GATHER)
+                    this.toMonthGather(index)
                   }}
               >
                 <Text style ={styles.to_month}>本月销量汇总</Text>
