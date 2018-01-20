@@ -63,14 +63,22 @@ class GoodsPriceDetails extends PureComponent {
       product_id: '',
       sale_store_num: '',
       vendorId: 0,
-      storesList: [],
-      query: true,
+      query: false,
       store_id: 0,
       new_price_cents: '',
       dialogPrice: '',
       isRefreshing: false,
       uploading: false,
-
+      platId: Cts.WM_PLAT_ID_MT,
+      sort: 0,
+      navListLogo: [
+        {plat_id: Cts.WM_PLAT_ID_WX, logo: require('../../img/Goods/weixinjiage_.png')},
+        {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../img/Goods/baiduwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_ELE, logo: require('../../img/Goods/elmwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../img/Goods/meituanwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../img/Goods/jingdongdaojia_.png')}
+      ],
+      storesList: [{}],
     }
   }
 
@@ -78,7 +86,7 @@ class GoodsPriceDetails extends PureComponent {
     let {item, vendorId} = this.props.navigation.state.params;
     let {list_img, max_price, min_price, name, product_id, sale_store_num,} = item;
     await this.setState({list_img, name, product_id, sale_store_num, vendorId});
-    this.getListStoresGoods()
+    // this.getListStoresGoods()
   }
 
   async getListStoresGoods() {
@@ -106,7 +114,7 @@ class GoodsPriceDetails extends PureComponent {
     }
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, async(ok, desc, obj) => {
+    dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, async (ok, desc, obj) => {
       this.setState({uploading: false});
       if (ok) {
         await this.getListStoresGoods();
@@ -117,114 +125,106 @@ class GoodsPriceDetails extends PureComponent {
     }));
   }
 
-  price_status(item, store_id = 0) {
-    let {status, price, platform_id, sync_price} = item || {};
-    if (platform_id == Cts.WM_PLAT_ID_WX) {
+  renderSort(index) {
+    let {platId, sort} = this.state;
+    if (platId == index) {
       return (
-          <TouchableOpacity
-              onPress={() => {
-                this.setState({showDialog: true, store_id: store_id, dialogPrice: price, new_price_cents: ''})
-              }}
-          >
-            <Text style={content.change_price}>修改价格</Text>
-          </TouchableOpacity>
-      )
-    } else if (sync_price >= 0 && (Math.abs(parseInt(sync_price) - parseInt(price)) > 10)) {
-      return (
-          <View style={{minWidth: pxToDp(200), maxWidth: pxToDp(300)}}>
-            <Text style={{fontSize:pxToDp(30)}}>{tool.toFixed(sync_price)} 同步中...</Text>
-            <Text style={[content.plat_min_price, {
-              lineHeight: pxToDp(28),
-              textAlignVertical: 'center',
-              marginTop:pxToDp(4),
-            }]}>{tool.toFixed(price)} 同步中...</Text>
-          </View>
+          <Image style={[header.sort_img, {transform: [{rotate: `${sort * (180)}deg`}]}]}
+                 source={require('../../img/Goods/paixu_.png')}/>
       )
     } else {
-      return (
-          <View style={{width: pxToDp(150), justifyContent: 'center', alignItems: 'center'}}>
-            <Icon
-                name={'success_circle'}
-                size={pxToDp(50)}
-                color={'#bfbfbf'}
-                msg={false}/>
-          </View>
-      )
+      return <View style={[header.sort_img]}/>
     }
   }
 
-  priceMaxMinImg(item) {
-    let {is_max, is_min} = item;
+  renderNav() {
+    let {navListLogo} = this.state;
+    return navListLogo.map((item, index) => {
+      let {logo, plat_id} = item;
+      let {sort, platId} = this.state;
+      return (
+          <TouchableOpacity
+              style={{flex: 1}}
+              key={index}
+              onPress={() => {
+                if (platId == plat_id) {
+                  this.setState({platId: plat_id, sort: !sort})
+                } else {
+                  this.setState({platId: plat_id, sort: 0})
+                }
+              }}
+          >
+            <View style={header.logo_box}>
+              <Image style={header.plat_img} source={logo}/>
+              {
+                this.renderSort(plat_id)
+              }
+            </View>
+          </TouchableOpacity>
+      )
+    })
 
-    if (is_max) {
-      return require('../../img/Goods/zuidajia_.png')
-    } else if (is_min) {
-      return require('../../img/Goods/zuixiaojia_.png')
-    } else {
-      return null;
-    }
   }
 
   renderList() {
-    let {storesList} = this.state;
+    let {storesList, platId} = this.state;
     return storesList.map((item, index) => {
-      let {fn_price_controlled, store_id, store_name, wm_goods, supply_price} = item || {};
       return (
-          <Cells key={index}>
-            <Cell customStyle={content.store} style={{borderTopWidth: 0}} first={true}>
-              <CellHeader style={content.cell_header}>
-                <Text style={content.store_name}>{store_name}</Text>
-                {
-                  fn_price_controlled == 1 ? <Text style={content.store_type}>代运营店铺</Text> : <Text/>
-                }
+          <View style={content.item} key={index}>
+
+            <Cell customStyle={content.cell} first={true}>
+              <CellHeader>
+                <Text>海军水果</Text>
               </CellHeader>
-              <CellBody/>
-              {
-                fn_price_controlled == 1 ? <CellFooter>
-                  <Text style={content.store_price}>￥{tool.toFixed(supply_price)}</Text>
-                  <Image source={require('../../img/Goods/baojia_.png')}
-                         style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-                </CellFooter> : <Text/>
-              }
+              <CellBody style={{flexDirection: 'row'}}>
+                <Text style={content.change}>改价</Text>
+                <Text style={content.change}>--></Text>
+                <Text style={content.change}>52.50</Text>
+                <Text style={content.change}>生效中</Text>
+              </CellBody>
+              <CellFooter style={content.cell_footer}>
+                <Text style={{marginRight: pxToDp(10), fontSize: pxToDp(24), color: colors.fontGray}}>39.00</Text>
+                <Image style={content.bao_img} source={require('../../img/Goods/baohui_.png')}/>
+              </CellFooter>
             </Cell>
-            {
-              wm_goods.map((ite, key) => {
-                let {status, price, platform_id, before_price} = ite;
-                return (
-                    <Cell key={key} customStyle={content.store} style={{borderTopWidth: 0}}>
-                      <CellHeader style={content.cell_header}>
-                        <Image source={tool.platformsLogo(platform_id)} style={content.plat_img}/>
-                        <View>
-                          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={content.plat_price}>{tool.toFixed(price)}</Text>
-                            <Image style={content.price_status} source={this.priceMaxMinImg(ite)}/>
-                          </View>
-                          {
-                            before_price ?
-                                <Text style={content.plat_min_price}>{tool.toFixed(before_price)}</Text> : null
-                          }
-                        </View>
-                      </CellHeader>
-                      <CellBody>
-                        {
-                          this.price_status(ite, store_id)
-                        }
-                      </CellBody>
-                      <CellFooter>
-                        <Image source={tool.goodSoldStatusImg(status)}
-                               style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-                      </CellFooter>
-                    </Cell>
-                )
-              })
-            }
-          </Cells>
+            <View style={content.price_group}>
+              <View style={content.plat_price_box}>
+               <TouchableOpacity
+                   onPress ={()=>{
+                     this.setState({showDialog:true})
+                   }}
+               >
+                 <Text style={[content.plat_price, content.plat_price_wx]}>585.26</Text>
+               </TouchableOpacity>
+              </View>
+              <View style={[content.plat_price_box]}>
+                <Text style={
+                  Cts.WM_PLAT_ID_BD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]
+                }>559.26</Text>
+              </View>
+              <View style={content.plat_price_box}>
+                <Text
+                    style={Cts.WM_PLAT_ID_ELE == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                  595.26
+                </Text>
+              </View>
+              <View style={content.plat_price_box}>
+                <Text
+                    style={Cts.WM_PLAT_ID_MT == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>595.26</Text>
+              </View>
+              <View style={content.plat_price_box}>
+                <Text
+                    style={Cts.WM_PLAT_ID_JD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>595.26</Text>
+              </View>
+            </View>
+          </View>
       )
     })
   }
 
   render() {
     let {list_img, name, sale_store_num, product_id} = this.state;
+    console.log('list_img',list_img);
     return (
         <View style={{flex: 1}}>
           <View style={header.box}>
@@ -238,27 +238,48 @@ class GoodsPriceDetails extends PureComponent {
               <Text style={header.text}>在售此商品店铺数:{sale_store_num}</Text>
             </View>
           </View>
-          <ScrollView
-              style = {{flex:1}}
-              refreshControl={
-                <RefreshControl
-                    refreshing={this.state.isRefreshing}
-                    onRefresh={() => {
-                      this.setState({query: true});
-                      this.getListStoresGoods()
-                    }
-                    }
-                    tintColor='gray'
-                />
-              }
-
-          >
+          <View style={header.nav}>
+            {
+              this.renderNav()
+            }
+          </View>
+          <ScrollView style={{marginTop: pxToDp(7)}}>
             {
               this.renderList()
             }
-            <View style = {{height:pxToDp(20)}}/>
           </ScrollView>
-          <Dialog onRequestClose={() => {}}
+          <View style={content.footer}>
+            <View>
+              <View style = {content.footer_text_box}>
+                <Text style={content.footer_text}>参考价:62.88 </Text>
+                <Text style={content.footer_text}>100%</Text>
+              </View>
+              <View style = {content.footer_text_box}>
+                <Text style={content.footer_text}>参考价:62.88 </Text>
+                <Text style={content.footer_text}>100%</Text>
+              </View>
+              <View style = {content.footer_text_box}>
+                <Text style={content.footer_text}>参考价:62.88 </Text>
+                <Text style={content.footer_text}>100%</Text>
+              </View>
+
+            </View>
+              <Text style ={{
+                height:pxToDp(90),
+                width:pxToDp(250),
+                backgroundColor:'#fff45c',
+                color:colors.fontBlack,
+                textAlign:'center',
+                textAlignVertical:'center',
+                borderRadius:pxToDp(6)
+              }
+  }>
+                设置参考价
+              </Text>
+          </View>
+
+          <Dialog onRequestClose={() => {
+          }}
                   visible={this.state.showDialog}
                   title={'价格修改'}
                   titleStyle={{textAlign: 'center', color: colors.white}}
@@ -286,7 +307,7 @@ class GoodsPriceDetails extends PureComponent {
                   ]}
           >
             <View>
-              <View style={{marginBottom: pxToDp(10),width:'100%',flexDirection:'row'}}>
+              <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
                 <Text> 输入要修改的价格(元)</Text>
                 <Text style={{color: colors.main_color, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>
                   原价:{tool.toFixed(this.state.dialogPrice)}元
@@ -348,78 +369,107 @@ const header = StyleSheet.create({
     color: colors.white,
     textAlignVertical: 'center',
     lineHeight: pxToDp(30)
-  }
-})
-const content = StyleSheet.create({
-  store: {
-    marginLeft: 0,
-    alignItems: 'center',
+  },
+  nav: {
     height: pxToDp(100),
-    backgroundColor: '#fff',
-    borderColor: colors.fontGray,
-  },
-  cell_header: {
-    flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    minWidth: pxToDp(270),
-    maxWidth:pxToDp(350),
-  },
-  store_name: {
-    fontSize: pxToDp(36),
-    color: colors.fontBlack
-  },
-  store_type: {
-    color: colors.main_color,
-    borderColor: colors.main_color,
-    height: pxToDp(35),
-    lineHeight: pxToDp(30),
-    borderRadius: pxToDp(18),
-    borderWidth: pxToDp(1),
-    marginLeft: pxToDp(20),
-    fontSize: pxToDp(24),
-    textAlignVertical: 'center',
-    width: pxToDp(140),
-    textAlign: 'center',
-  },
-  store_price: {
-    fontSize: pxToDp(30),
-    color: colors.main_color,
+    backgroundColor: '#fff'
   },
   plat_img: {
     height: pxToDp(56),
     width: pxToDp(56),
-    marginRight: pxToDp(20),
+    marginRight: pxToDp(5),
   },
-  plat_price: {
-    fontSize: pxToDp(32),
-    fontWeight: '900',
-    color: colors.main_color,
-    lineHeight: pxToDp(32),
+  logo_box: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
-  price_status: {
+  sort_img: {
+    height: pxToDp(45),
+    width: pxToDp(17),
+    position: 'absolute',
+    right: pxToDp(15)
+  }
+});
+const content = {
+  item: {
+    height: pxToDp(170),
+    backgroundColor: colors.white,
+    marginBottom: pxToDp(1),
+    paddingVertical: pxToDp(30)
+  },
+  cell: {
+    marginLeft: 0,
+    flexDirection: 'row',
+    paddingHorizontal: pxToDp(30),
+    alignItems: 'center',
+  },
+  bao_img: {
     height: pxToDp(28),
     width: pxToDp(28),
-    marginLeft: pxToDp(20),
   },
-  plat_min_price: {
-    fontSize: pxToDp(20),
-    color: colors.fontGray,
-    marginTop: pxToDp(15),
-    width: '100%'
+  change: {
+    marginRight: pxToDp(20)
   },
-  change_price: {
-    width: pxToDp(150),
-    height: pxToDp(50),
-    color: colors.white,
+  cell_footer: {
+    alignItems: 'center',
+  },
+  price_group: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: pxToDp(30),
+    alignItems: 'center',
+    marginTop: pxToDp(20)
+  },
+  plat_price_box: {
+    flex: 1,
+    paddingHorizontal: pxToDp(5)
+  },
+  plat_price: {
+    fontSize: pxToDp(30),
+    fontWeight: '900',
+    color: colors.fontBlack,
     textAlign: 'center',
-    backgroundColor: '#00a0e9',
-    textAlignVertical: 'center',
-    borderRadius: pxToDp(5),
+  },
+  plat_price_wx: {
+    color: colors.fontBlue,
+    borderWidth: pxToDp(1),
+    borderColor: colors.fontBlue,
+    textAlign: 'center',
+    borderRadius: pxToDp(6)
+  },
+  plat_price_select: {
+    backgroundColor: '#ede795',
+    borderRadius: pxToDp(20),
+  },
+  footer: {
+    height:pxToDp(140),
+    backgroundColor:colors.fontBlue,
+    paddingHorizontal:pxToDp(30),
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between'
+  },
+  footer_text:{
     fontSize:pxToDp(24),
+    color:colors.white,
+  },
+  footer_text_box:{
+    flexDirection:'row',
+    width:pxToDp(260),
+    justifyContent:'space-between',
+    alignItems:'center',
+    marginTop:pxToDp(2),
+
   }
 
 
-});
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsPriceDetails)
