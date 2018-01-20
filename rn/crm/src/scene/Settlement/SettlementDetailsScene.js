@@ -85,7 +85,7 @@ class SettlementScene extends PureComponent {
     let date= this.state.date;
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
-    dispatch(get_supply_items(store_id,date , token, async (resp) => {
+    dispatch(get_supply_items(store_id,date ,'', token, async (resp) => {
       if (resp.ok ) {
           let {goods_list,order_num,total_price,auth_finance_admin} = resp.obj;
           this.setState({
@@ -188,8 +188,12 @@ renderStatus(status) {
                     });
                   }}
               >
-              <View>
-                <Text style = {header.headerDeil}>查看详情 ></Text>
+              <View style = {{flexDirection:'row',alignItems:'center',marginTop:pxToDp(20)}}>
+                <Text style = {header.headerDeil}>查看详情 </Text>
+                <Image
+                    style = {{height:pxToDp(19),width:pxToDp(9)}}
+                    source = {require('../../img/Public/xiangyou_.png')}
+                />
               </View>
               </TouchableOpacity>
             </View>
@@ -368,8 +372,8 @@ const header = StyleSheet.create({
   headerDeil:{
     fontSize:pxToDp(24),
     color:'#00a0e9',
-    marginTop:pxToDp(30)
-
+    lineHeight:pxToDp(30),
+    textAlignVertical:'center',
   },
   settle:{
     borderWidth:pxToDp(1),
