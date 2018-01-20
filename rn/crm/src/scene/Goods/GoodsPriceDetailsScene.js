@@ -10,17 +10,14 @@ import {
   RefreshControl,
 } from 'react-native';
 import {
-  Cells,
   Cell,
   CellHeader,
   CellBody,
   CellFooter,
-  Label,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {getVendorStores} from "../../reducers/mine/mineActions";
 import {fetchStoreChgPrice, fetchListStoresGoods} from '../../reducers/product/productActions.js';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
@@ -28,7 +25,8 @@ import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
+import {Toast, Icon, Button} from "../../weui/index";
+import Dialog from  './Dialog'
 import InputNumber from 'rc-input-number';
 
 function mapStateToProps(state) {
@@ -79,6 +77,7 @@ class GoodsPriceDetails extends PureComponent {
         {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../img/Goods/jingdongdaojia_.png')}
       ],
       storesList: [{}],
+      showDialogRefer:false,
     }
   }
 
@@ -171,7 +170,6 @@ class GoodsPriceDetails extends PureComponent {
     return storesList.map((item, index) => {
       return (
           <View style={content.item} key={index}>
-
             <Cell customStyle={content.cell} first={true}>
               <CellHeader>
                 <Text>海军水果</Text>
@@ -189,13 +187,13 @@ class GoodsPriceDetails extends PureComponent {
             </Cell>
             <View style={content.price_group}>
               <View style={content.plat_price_box}>
-               <TouchableOpacity
-                   onPress ={()=>{
-                     this.setState({showDialog:true})
-                   }}
-               >
-                 <Text style={[content.plat_price, content.plat_price_wx]}>585.26</Text>
-               </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                      this.setState({showDialog: true})
+                    }}
+                >
+                  <Text style={[content.plat_price, content.plat_price_wx]}>585.26</Text>
+                </TouchableOpacity>
               </View>
               <View style={[content.plat_price_box]}>
                 <Text style={
@@ -224,7 +222,6 @@ class GoodsPriceDetails extends PureComponent {
 
   render() {
     let {list_img, name, sale_store_num, product_id} = this.state;
-    console.log('list_img',list_img);
     return (
         <View style={{flex: 1}}>
           <View style={header.box}>
@@ -250,32 +247,30 @@ class GoodsPriceDetails extends PureComponent {
           </ScrollView>
           <View style={content.footer}>
             <View>
-              <View style = {content.footer_text_box}>
+              <View style={content.footer_text_box}>
                 <Text style={content.footer_text}>参考价:62.88 </Text>
                 <Text style={content.footer_text}>100%</Text>
               </View>
-              <View style = {content.footer_text_box}>
+              <View style={content.footer_text_box}>
                 <Text style={content.footer_text}>参考价:62.88 </Text>
                 <Text style={content.footer_text}>100%</Text>
               </View>
-              <View style = {content.footer_text_box}>
+              <View style={content.footer_text_box}>
                 <Text style={content.footer_text}>参考价:62.88 </Text>
                 <Text style={content.footer_text}>100%</Text>
               </View>
 
             </View>
-              <Text style ={{
-                height:pxToDp(90),
-                width:pxToDp(250),
-                backgroundColor:'#fff45c',
-                color:colors.fontBlack,
-                textAlign:'center',
-                textAlignVertical:'center',
-                borderRadius:pxToDp(6)
-              }
-  }>
+            <TouchableOpacity
+                onPress={() => {
+                  this.setState({showDialogRefer:true})
+                }}
+            >
+              <Text style={content.footer_btn}>
                 设置参考价
               </Text>
+            </TouchableOpacity>
+
           </View>
 
           <Dialog onRequestClose={() => {
@@ -327,6 +322,65 @@ class GoodsPriceDetails extends PureComponent {
                     this.setState({new_price_cents: text})
                   }}
               />
+            </View>
+
+          </Dialog>
+          <Dialog onRequestClose={() => {
+          }}
+                  visible={this.state.showDialogRefer}
+                  title={'价格修改'}
+                  titleStyle={{textAlign: 'center', color: colors.white}}
+                  headerStyle={{
+                    backgroundColor: colors.main_color,
+                    paddingTop: pxToDp(20),
+                    justifyContent: 'center',
+                    paddingBottom: pxToDp(20)
+                  }}
+                  buttons={[{
+
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => {
+                      this.setState({showDialogRefer: false,})
+                    }
+                  }, {
+                    type: 'primary',
+                    label: '保存',
+                    onPress: () => {
+                      this.setState({showDialogRefer: false, uploading: true});
+                      this.upChangePrice();
+                    }
+                  }
+                  ]}
+          >
+            <View>
+              <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
+                <Text> 参考价(元)</Text>
+              </View>
+              <TextInput
+                  style={{
+                    height: pxToDp(90),
+                    borderRadius: pxToDp(10),
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
+                  }}
+                  keyboardType={'numeric'}
+                  underlineColorAndroid={'transparent'}
+              />
+            </View>
+            <View style ={content.refer}>
+              <Text style={{marginRight:pxToDp(30)}}>上限值</Text>
+              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
+              <Text style = {content.percentage}>100%</Text>
+              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
+              <Text style={{width:pxToDp(140),textAlign:'center'}}>999.99</Text>
+            </View>
+            <View style ={[content.refer,{marginTop:pxToDp(30)}]}>
+              <Text style={{marginRight:pxToDp(30)}}>下限值</Text>
+              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
+              <Text style = {content.percentage}>100%</Text>
+              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
+              <Text style={{width:pxToDp(140),textAlign:'center'}}>999.99</Text>
             </View>
 
           </Dialog>
@@ -449,26 +503,55 @@ const content = {
     borderRadius: pxToDp(20),
   },
   footer: {
-    height:pxToDp(140),
-    backgroundColor:colors.fontBlue,
-    paddingHorizontal:pxToDp(30),
-    flexDirection:'row',
-    alignItems:'center',
-    justifyContent:'space-between'
+    height: pxToDp(140),
+    backgroundColor: colors.fontBlue,
+    paddingHorizontal: pxToDp(30),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
-  footer_text:{
-    fontSize:pxToDp(24),
-    color:colors.white,
+  footer_text: {
+    fontSize: pxToDp(24),
+    color: colors.white,
   },
-  footer_text_box:{
+  footer_text_box: {
+    flexDirection: 'row',
+    width: pxToDp(260),
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: pxToDp(2),
+
+  },
+  footer_btn: {
+    height: pxToDp(90),
+    width: pxToDp(250),
+    backgroundColor: '#fff45c',
+    color: colors.fontBlack,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderRadius: pxToDp(6)
+  },
+  refer:{
     flexDirection:'row',
-    width:pxToDp(260),
+    marginTop:pxToDp(20),
     justifyContent:'space-between',
     alignItems:'center',
-    marginTop:pxToDp(2),
 
+  },
+  add:{
+    height:pxToDp(50),
+    width:pxToDp(50),
+  },
+  percentage:{
+    textAlign:'center',
+    width:pxToDp(130),
+    borderWidth:pxToDp(1),
+    borderColor:colors.fontGray,
+    marginHorizontal:pxToDp(15),
+    borderRadius:pxToDp(6),
+    height:pxToDp(80),
+    textAlignVertical:'center',
   }
-
 
 }
 
