@@ -98,7 +98,7 @@ class MineScene extends PureComponent {
 
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
-      order_num: order_num[currStoreId],
+      order_num: fnPriceControlled > 0 ? 0 : order_num[currStoreId],
       turnover: fnPriceControlled > 0 ? '计算中' : turnover[currStoreId],
 
       currentUser: currentUser,
@@ -250,8 +250,8 @@ class MineScene extends PureComponent {
 
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
-      order_num: order_num[currStoreId],
-      turnover: turnover[currStoreId],
+      order_num: fnPriceControlled > 0 ? 0 : order_num[currStoreId],
+      turnover: fnPriceControlled > 0 ? '计算中' : turnover[currStoreId],
 
       currentUser: currentUser,
       prefer_store: prefer_store,
