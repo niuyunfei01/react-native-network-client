@@ -370,7 +370,6 @@ export function first_store_id(canReadStores) {
 }
 export function toFixed(num) {
   return (parseInt(num)/100).toFixed(2)
-
 }
 export  function billStatus(status) {
  let map = {};

@@ -26,8 +26,7 @@ import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Icon, Button} from "../../weui/index";
-import Dialog from  './Dialog'
-import InputNumber from 'rc-input-number';
+import Dialog from './Dialog'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -61,7 +60,7 @@ class GoodsPriceDetails extends PureComponent {
       product_id: '',
       sale_store_num: '',
       vendorId: 0,
-      query: false,
+      query: true,
       store_id: 0,
       new_price_cents: '',
       dialogPrice: '',
@@ -76,8 +75,12 @@ class GoodsPriceDetails extends PureComponent {
         {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../img/Goods/meituanwaimai_.png')},
         {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../img/Goods/jingdongdaojia_.png')}
       ],
-      storesList: [{}],
-      showDialogRefer:false,
+      storesList: [],
+      showDialogRefer: false,
+      priceSet: '',
+      upperLimit: 100,
+      lowerLimit: 100,
+      referPrice: 0
     }
   }
 
@@ -85,7 +88,7 @@ class GoodsPriceDetails extends PureComponent {
     let {item, vendorId} = this.props.navigation.state.params;
     let {list_img, max_price, min_price, name, product_id, sale_store_num,} = item;
     await this.setState({list_img, name, product_id, sale_store_num, vendorId});
-    // this.getListStoresGoods()
+    this.getListStoresGoods();
   }
 
   async getListStoresGoods() {
@@ -95,11 +98,54 @@ class GoodsPriceDetails extends PureComponent {
     dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, (ok, desc, obj) => {
       this.setState({query: false});
       if (ok) {
-        this.setState({storesList: obj})
+        let {price, upper_limit, lower_limit} = obj.refer_info ||{};
+        this.setState({
+          storesList: obj.store_list,
+          referPrice: price,
+          upperLimit: upper_limit,
+          lowerLimit: lower_limit,
+        })
       } else {
         ToastLong(desc);
       }
     }));
+  }
+
+  reduce(str) {
+    let num = this.state[str];
+    if (str == 'upperLimit') {
+      if (num > 100) {
+        num--;
+      } else {
+        ToastLong('上限值,不能小于100%');
+      }
+      this.setState({[str]: num})
+
+    } else {
+      if (num > 1) {
+        num--;
+        this.setState({[str]: num})
+      } else {
+        ToastLong('下限值,不能小于0');
+      }
+    }
+  }
+
+  add(str) {
+    let num = this.state[str];
+    console.log(num);
+    if (str == 'upperLimit') {
+      num++;
+      console.log(num);
+      this.setState({[str]: num})
+    } else {
+      if (num >= 100) {
+        ToastLong('下线最大值不能超过100%')
+      } else {
+        num++;
+        this.setState({[str]: num})
+      }
+    }
   }
 
   upChangePrice() {
@@ -135,7 +181,14 @@ class GoodsPriceDetails extends PureComponent {
       return <View style={[header.sort_img]}/>
     }
   }
-
+  listSort() {
+    let {platId,storesList} = this.state;
+    storesList.sort(function (a, b) {
+      return b['wm_goods'][platId]-a['wm_goods'][platId]
+    });
+    console.log(storesList);
+    this.forceUpdate();
+  }
   renderNav() {
     let {navListLogo} = this.state;
     return navListLogo.map((item, index) => {
@@ -148,8 +201,10 @@ class GoodsPriceDetails extends PureComponent {
               onPress={() => {
                 if (platId == plat_id) {
                   this.setState({platId: plat_id, sort: !sort})
+                  this.listSort();
                 } else {
-                  this.setState({platId: plat_id, sort: 0})
+                  this.setState({platId: plat_id, sort: 0});
+                  this.listSort();
                 }
               }}
           >
@@ -165,54 +220,118 @@ class GoodsPriceDetails extends PureComponent {
 
   }
 
+  renderChangePrice(wm_goods) {
+    let {platId} = this.state;
+    let goodsDetail = wm_goods[platId];
+    if (!goodsDetail) {
+      return <CellBody/>
+    }
+    let {price, sync_price} = goodsDetail;
+    if(platId==Cts.WM_PLAT_ID_WX){
+      return <CellBody/>
+    }else if (price == sync_price) {
+      return <CellBody/>
+    } else {
+      return (
+          <CellBody style={{flexDirection: 'row'}}>
+            <Text style={content.change}>改价</Text>
+            <Text style={content.change}>--></Text>
+            <Text style={content.change}>{tool.toFixed(sync_price)}</Text>
+            <Text style={content.change}>生效中</Text>
+          </CellBody>
+      )
+    }
+  }
+  getPlatPrice(wm_goods, key) {
+    let goodsDetail = wm_goods[key];
+    if (!goodsDetail) {
+      return '---'
+    }
+    let {price} = goodsDetail;
+    return tool.toFixed(price);
+  }
+
+  storeLevel(wm_goods) {
+    let {referPrice, upperLimit, lowerLimit, platId} = this.state;
+    // let {price} = wm_goods[platId];
+    if(!wm_goods[platId]){
+      return null
+    }else {
+      let {price} = wm_goods[platId];
+      if (price > referPrice * upperLimit) {
+        return require('../../img/Goods/pngpiangao_.png')
+      } else if (price < referPrice * lowerLimit) {
+        return require('../../img/Goods/piandi_.png')
+      } else {
+        return require('../../img/Goods/zhengchang_.png')
+      }
+    }
+
+  }
+
   renderList() {
     let {storesList, platId} = this.state;
     return storesList.map((item, index) => {
+      let {store_name, fn_price_controlled, store_id, supply_price} = item;
       return (
           <View style={content.item} key={index}>
             <Cell customStyle={content.cell} first={true}>
               <CellHeader>
-                <Text>海军水果</Text>
+                <Text style={{color: colors.fontGray}}>{store_name}</Text>
               </CellHeader>
-              <CellBody style={{flexDirection: 'row'}}>
-                <Text style={content.change}>改价</Text>
-                <Text style={content.change}>--></Text>
-                <Text style={content.change}>52.50</Text>
-                <Text style={content.change}>生效中</Text>
-              </CellBody>
-              <CellFooter style={content.cell_footer}>
-                <Text style={{marginRight: pxToDp(10), fontSize: pxToDp(24), color: colors.fontGray}}>39.00</Text>
-                <Image style={content.bao_img} source={require('../../img/Goods/baohui_.png')}/>
-              </CellFooter>
+              {
+                this.renderChangePrice(item.wm_goods)
+              }
+              {
+                fn_price_controlled == 1 ?
+                    <CellFooter style={content.cell_footer}>
+                      <Text style={{
+                        marginRight: pxToDp(10),
+                        fontSize: pxToDp(24),
+                        color: colors.fontGray
+                      }}>{tool.toFixed(supply_price)}</Text>
+                      <Image style={content.bao_img} source={require('../../img/Goods/baohui_.png')}/>
+                    </CellFooter> : <CellFooter/>
+              }
             </Cell>
             <View style={content.price_group}>
+              <Image style={content.price_group_img} source={this.storeLevel(item.wm_goods)}/>
               <View style={content.plat_price_box}>
                 <TouchableOpacity
                     onPress={() => {
                       this.setState({showDialog: true})
                     }}
                 >
-                  <Text style={[content.plat_price, content.plat_price_wx]}>585.26</Text>
+                  <Text
+                      style={[content.plat_price, content.plat_price_wx]}>{this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)}</Text>
                 </TouchableOpacity>
               </View>
               <View style={[content.plat_price_box]}>
                 <Text style={
                   Cts.WM_PLAT_ID_BD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]
-                }>559.26</Text>
-              </View>
-              <View style={content.plat_price_box}>
-                <Text
-                    style={Cts.WM_PLAT_ID_ELE == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
-                  595.26
+                }>
+                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_BD)}
                 </Text>
               </View>
               <View style={content.plat_price_box}>
                 <Text
-                    style={Cts.WM_PLAT_ID_MT == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>595.26</Text>
+                    style={Cts.WM_PLAT_ID_ELE == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_ELE)}
+
+                </Text>
               </View>
               <View style={content.plat_price_box}>
                 <Text
-                    style={Cts.WM_PLAT_ID_JD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>595.26</Text>
+                    style={Cts.WM_PLAT_ID_MT == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_MT)}
+
+                </Text>
+              </View>
+              <View style={content.plat_price_box}>
+                <Text
+                    style={Cts.WM_PLAT_ID_JD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_JD)}
+                </Text>
               </View>
             </View>
           </View>
@@ -221,7 +340,7 @@ class GoodsPriceDetails extends PureComponent {
   }
 
   render() {
-    let {list_img, name, sale_store_num, product_id} = this.state;
+    let {list_img, name, sale_store_num, product_id, upperLimit, lowerLimit,referPrice} = this.state;
     return (
         <View style={{flex: 1}}>
           <View style={header.box}>
@@ -248,22 +367,21 @@ class GoodsPriceDetails extends PureComponent {
           <View style={content.footer}>
             <View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>参考价:62.88 </Text>
+                <Text style={content.footer_text}>参考价:{1}</Text>
                 <Text style={content.footer_text}>100%</Text>
               </View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>参考价:62.88 </Text>
-                <Text style={content.footer_text}>100%</Text>
+                <Text style={content.footer_text}>上限值:{tool.toFixed(referPrice*upperLimit)} </Text>
+                <Text style={content.footer_text}>{upperLimit}%</Text>
               </View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>参考价:62.88 </Text>
-                <Text style={content.footer_text}>100%</Text>
+                <Text style={content.footer_text}>下限值:{tool.toFixed(referPrice*lowerLimit)}</Text>
+                <Text style={content.footer_text}>{lowerLimit}%</Text>
               </View>
-
             </View>
             <TouchableOpacity
                 onPress={() => {
-                  this.setState({showDialogRefer:true})
+                  this.setState({showDialogRefer: true})
                 }}
             >
               <Text style={content.footer_btn}>
@@ -337,7 +455,6 @@ class GoodsPriceDetails extends PureComponent {
                     paddingBottom: pxToDp(20)
                   }}
                   buttons={[{
-
                     type: 'default',
                     label: '取消',
                     onPress: () => {
@@ -368,19 +485,40 @@ class GoodsPriceDetails extends PureComponent {
                   underlineColorAndroid={'transparent'}
               />
             </View>
-            <View style ={content.refer}>
-              <Text style={{marginRight:pxToDp(30)}}>上限值</Text>
-              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
-              <Text style = {content.percentage}>100%</Text>
-              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
-              <Text style={{width:pxToDp(140),textAlign:'center'}}>999.99</Text>
+            <View style={content.refer}>
+              <Text style={{marginRight: pxToDp(30)}}>上限值</Text>
+              <TouchableOpacity
+                  onPress={() => this.reduce('upperLimit')}
+              >
+                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
+
+              </TouchableOpacity>
+              <Text style={content.percentage}>{upperLimit}%</Text>
+              <TouchableOpacity
+                  onPress={() => {
+                    this.add('upperLimit');
+                  }}
+              >
+                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
+              </TouchableOpacity>
+              <Text style={{width: pxToDp(140), textAlign: 'center'}}>999.99</Text>
             </View>
-            <View style ={[content.refer,{marginTop:pxToDp(30)}]}>
-              <Text style={{marginRight:pxToDp(30)}}>下限值</Text>
-              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
-              <Text style = {content.percentage}>100%</Text>
-              <Image style={content.add} source = {require('../../img/Goods/baohui_.png')}/>
-              <Text style={{width:pxToDp(140),textAlign:'center'}}>999.99</Text>
+            <View style={[content.refer, {marginTop: pxToDp(30)}]}>
+              <Text style={{marginRight: pxToDp(30)}}>下限值</Text>
+              <TouchableOpacity
+                  onPress={() => this.reduce('lowerLimit')
+                  }
+              >
+                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
+
+              </TouchableOpacity>
+              <Text style={content.percentage}>{lowerLimit}%</Text>
+              <TouchableOpacity
+                  onPress={() => this.add('lowerLimit')}
+              >
+                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
+              </TouchableOpacity>
+              <Text style={{width: pxToDp(140), textAlign: 'center'}}>999.99</Text>
             </View>
 
           </Dialog>
@@ -408,7 +546,6 @@ const header = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     flexDirection: 'row',
     alignItems: 'center',
-
   },
   image: {
     height: pxToDp(95),
@@ -456,7 +593,8 @@ const content = {
     height: pxToDp(170),
     backgroundColor: colors.white,
     marginBottom: pxToDp(1),
-    paddingVertical: pxToDp(30)
+    paddingVertical: pxToDp(30),
+    position: 'relative',
   },
   cell: {
     marginLeft: 0,
@@ -479,7 +617,15 @@ const content = {
     justifyContent: 'space-between',
     paddingHorizontal: pxToDp(30),
     alignItems: 'center',
-    marginTop: pxToDp(20)
+    height: pxToDp(100)
+  },
+  price_group_img: {
+    position: 'absolute',
+    height: pxToDp(48),
+    width: pxToDp(12),
+    left: pxToDp(10),
+    top: pxToDp(22),
+    zIndex: 100,
   },
   plat_price_box: {
     flex: 1,
@@ -531,26 +677,26 @@ const content = {
     textAlignVertical: 'center',
     borderRadius: pxToDp(6)
   },
-  refer:{
-    flexDirection:'row',
-    marginTop:pxToDp(20),
-    justifyContent:'space-between',
-    alignItems:'center',
+  refer: {
+    flexDirection: 'row',
+    marginTop: pxToDp(20),
+    justifyContent: 'space-between',
+    alignItems: 'center',
 
   },
-  add:{
-    height:pxToDp(50),
-    width:pxToDp(50),
+  add: {
+    height: pxToDp(50),
+    width: pxToDp(50),
   },
-  percentage:{
-    textAlign:'center',
-    width:pxToDp(130),
-    borderWidth:pxToDp(1),
-    borderColor:colors.fontGray,
-    marginHorizontal:pxToDp(15),
-    borderRadius:pxToDp(6),
-    height:pxToDp(80),
-    textAlignVertical:'center',
+  percentage: {
+    textAlign: 'center',
+    width: pxToDp(130),
+    borderWidth: pxToDp(1),
+    borderColor: colors.fontGray,
+    marginHorizontal: pxToDp(15),
+    borderRadius: pxToDp(6),
+    height: pxToDp(80),
+    textAlignVertical: 'center',
   }
 
 }

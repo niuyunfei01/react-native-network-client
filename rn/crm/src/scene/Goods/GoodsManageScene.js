@@ -75,7 +75,7 @@ class GoodsMangerScene extends PureComponent {
         Cts.STORE_TYPE_AFFILIATE,
         Cts.STORE_TYPE_GZW,
         Cts.STORE_TYPE_BLX,
-        Cts.STORE_TYPE_XGJ
+        Cts.STORE_TYPE_XGJ,
       ],
       sortId: Cts.GOODS_MANAGE_SOLD_SORT,
       sortList: [
