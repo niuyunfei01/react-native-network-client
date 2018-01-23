@@ -358,3 +358,15 @@ export function fetchStoreChgPrice(store_id,product_id,new_price_cents,token,cal
     );
   }
 }
+export function editProdReferPrice(data, token, callback) {
+  let url = `api/edit_prod_refer_price.json?access_token=${token}`;
+  console.log('url>>>',url,'data>>>',data)
+  return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
+}

@@ -18,7 +18,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchStoreChgPrice, fetchListStoresGoods} from '../../reducers/product/productActions.js';
+import {fetchStoreChgPrice, fetchListStoresGoods,editProdReferPrice} from '../../reducers/product/productActions.js';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
@@ -32,17 +32,16 @@ function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
 }
-
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       fetchListStoresGoods,
       fetchStoreChgPrice,
-      ...globalActions
+      editProdReferPrice,
+      ...globalActions,
     }, dispatch)
   }
 }
-
 
 class GoodsPriceDetails extends PureComponent {
   static navigationOptions = ({navigation}) => {
@@ -67,7 +66,7 @@ class GoodsPriceDetails extends PureComponent {
       isRefreshing: false,
       uploading: false,
       platId: Cts.WM_PLAT_ID_MT,
-      sort: 0,
+      sort: 1,
       navListLogo: [
         {plat_id: Cts.WM_PLAT_ID_WX, logo: require('../../img/Goods/weixinjiage_.png')},
         {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../img/Goods/baiduwaimai_.png')},
@@ -78,9 +77,12 @@ class GoodsPriceDetails extends PureComponent {
       storesList: [],
       showDialogRefer: false,
       priceSet: '',
-      upperLimit: 100,
-      lowerLimit: 100,
-      referPrice: 0
+      upperLimit: 0,
+      lowerLimit: 0,
+      setUpperLimit: 0,
+      setLowerLimit: 0,
+      referPrice: 0,
+      setReferPrice:0,
     }
   }
 
@@ -95,59 +97,27 @@ class GoodsPriceDetails extends PureComponent {
     let {product_id, vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, (ok, desc, obj) => {
+    let _this = this;
+    dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, async (ok, desc, obj) => {
       this.setState({query: false});
       if (ok) {
-        let {price, upper_limit, lower_limit} = obj.refer_info ||{};
-        this.setState({
+        let {price, upper_limit, lower_limit} = obj.refer_info || {};
+        await _this.setState({
           storesList: obj.store_list,
           referPrice: price,
           upperLimit: upper_limit,
           lowerLimit: lower_limit,
-        })
+          setUpperLimit: upper_limit == 0 ? 100 : upper_limit,
+          setLowerLimit: lower_limit == 0 ? 100 : lower_limit,
+          setReferPrice:tool.toFixed(price),
+        });
+        _this.listSort();
+        this.forceUpdate()
       } else {
         ToastLong(desc);
       }
     }));
   }
-
-  reduce(str) {
-    let num = this.state[str];
-    if (str == 'upperLimit') {
-      if (num > 100) {
-        num--;
-      } else {
-        ToastLong('上限值,不能小于100%');
-      }
-      this.setState({[str]: num})
-
-    } else {
-      if (num > 1) {
-        num--;
-        this.setState({[str]: num})
-      } else {
-        ToastLong('下限值,不能小于0');
-      }
-    }
-  }
-
-  add(str) {
-    let num = this.state[str];
-    console.log(num);
-    if (str == 'upperLimit') {
-      num++;
-      console.log(num);
-      this.setState({[str]: num})
-    } else {
-      if (num >= 100) {
-        ToastLong('下线最大值不能超过100%')
-      } else {
-        num++;
-        this.setState({[str]: num})
-      }
-    }
-  }
-
   upChangePrice() {
     let {product_id, store_id, new_price_cents, uploading} = this.state;
     if (Math.ceil(new_price_cents * 100) < 0) {
@@ -170,6 +140,69 @@ class GoodsPriceDetails extends PureComponent {
     }));
   }
 
+  upEditProdReferPrice() {
+    let {product_id, uploading, setReferPrice,setLowerLimit ,setUpperLimit}= this.state;
+    if (uploading) {
+      return false
+    }
+    // if(Math.ceil(setReferPrice * 100)>0 && product_id>0 && setLowerLimit>0 && setUpperLimit>0){
+    //   ToastLong('请检查参考价数据!');
+    //   return false
+    // }
+    let data = {
+      refer_price: Math.ceil(setReferPrice * 100),
+      product_id: product_id,
+      lower_limit: setLowerLimit,
+      upper_limit : setUpperLimit,
+    };
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(editProdReferPrice(data, accessToken, async (ok, desc, obj) => {
+      this.setState({uploading: false});
+      if (ok) {
+        await this.getListStoresGoods();
+        ToastLong('提交成功');
+      } else {
+        ToastLong(desc);
+      }
+    }));
+  }
+  reduce(str) {
+    let num = this.state[str];
+    if (str == 'setUpperLimit') {
+      if (num > 100) {
+        num--;
+      } else {
+        ToastLong('上限值,不能小于100%');
+      }
+      this.setState({[str]: num})
+
+    } else {
+      if (num > 1) {
+        num--;
+        this.setState({[str]: num})
+      } else {
+        ToastLong('下限值,不能小于0');
+      }
+    }
+  }
+
+  add(str) {
+    let num = this.state[str];
+    if (str == 'setUpperLimit') {
+      num++;
+      console.log(num);
+      this.setState({[str]: num})
+    } else {
+      if (num >= 100) {
+        ToastLong('下线最大值不能超过100%')
+      } else {
+        num++;
+        this.setState({[str]: num})
+      }
+    }
+  }
+
   renderSort(index) {
     let {platId, sort} = this.state;
     if (platId == index) {
@@ -183,28 +216,35 @@ class GoodsPriceDetails extends PureComponent {
   }
   listSort() {
     let {platId,storesList} = this.state;
-    storesList.sort(function (a, b) {
-      return b['wm_goods'][platId]-a['wm_goods'][platId]
+    storesList.forEach((item)=>{
+      let goodsDetail = item['wm_goods'][platId];
+      if(!goodsDetail){
+        item['wm_goods'][platId]={price:0}
+      }
     });
-    console.log(storesList);
-    this.forceUpdate();
+    storesList.sort(function (a, b) {
+      return b['wm_goods'][platId].price - a['wm_goods'][platId].price
+    });
+    return storesList;
   }
   renderNav() {
     let {navListLogo} = this.state;
     return navListLogo.map((item, index) => {
       let {logo, plat_id} = item;
-      let {sort, platId} = this.state;
+      let {sort, platId} = this.state; 
       return (
           <TouchableOpacity
               style={{flex: 1}}
               key={index}
-              onPress={() => {
+              onPress={async() => {
                 if (platId == plat_id) {
-                  this.setState({platId: plat_id, sort: !sort})
-                  this.listSort();
+                  await this.setState({platId: plat_id, sort: !sort})
+                  this.state.storesList.reverse();
+                  this.forceUpdate()
                 } else {
-                  this.setState({platId: plat_id, sort: 0});
+                  await this.setState({platId: plat_id, sort: 1});
                   this.listSort();
+                  this.forceUpdate();
                 }
               }}
           >
@@ -219,7 +259,6 @@ class GoodsPriceDetails extends PureComponent {
     })
 
   }
-
   renderChangePrice(wm_goods) {
     let {platId} = this.state;
     let goodsDetail = wm_goods[platId];
@@ -231,7 +270,9 @@ class GoodsPriceDetails extends PureComponent {
       return <CellBody/>
     }else if (price == sync_price) {
       return <CellBody/>
-    } else {
+    } else if (!sync_price){
+      return <CellBody/>
+    }else {
       return (
           <CellBody style={{flexDirection: 'row'}}>
             <Text style={content.change}>改价</Text>
@@ -244,31 +285,43 @@ class GoodsPriceDetails extends PureComponent {
   }
   getPlatPrice(wm_goods, key) {
     let goodsDetail = wm_goods[key];
-    if (!goodsDetail) {
+    if (tool.length(goodsDetail) <=1) {
       return '---'
     }
     let {price} = goodsDetail;
     return tool.toFixed(price);
   }
-
-  storeLevel(wm_goods) {
+  textPlatPrice(wm_goods, key){
+    let goodsDetail = wm_goods[key];
+    if (tool.length(goodsDetail) <=1) {
+      return (<Text>{this.getPlatPrice(wm_goods,key)}</Text>)
+    }
+    let {status} = goodsDetail;
+    if(status == Cts.STORE_PROD_ON_SALE){
+      return (<Text>{this.getPlatPrice(wm_goods,key)}</Text>)
+    }else {
+      return (<Text style={{color:colors.fontGray}}>{this.getPlatPrice(wm_goods,key)}</Text>)
+    }
+  }
+  storeLevel(wm_goods,name) {
     let {referPrice, upperLimit, lowerLimit, platId} = this.state;
-    // let {price} = wm_goods[platId];
+    console.log(referPrice);
     if(!wm_goods[platId]){
       return null
     }else {
       let {price} = wm_goods[platId];
-      if (price > referPrice * upperLimit) {
+      console.log( 'name',name,'price',price,'参考价',tool.toFixed(referPrice * upperLimit));
+      if ((parseInt(price) === 0) || (parseInt(referPrice) === 0)){
+        return null
+      }else if (price > parseInt(tool.toFixed(referPrice * upperLimit))) {
         return require('../../img/Goods/pngpiangao_.png')
-      } else if (price < referPrice * lowerLimit) {
+      }else if (price < parseInt(tool.toFixed(referPrice * lowerLimit))) {
         return require('../../img/Goods/piandi_.png')
       } else {
         return require('../../img/Goods/zhengchang_.png')
       }
     }
-
   }
-
   renderList() {
     let {storesList, platId} = this.state;
     return storesList.map((item, index) => {
@@ -295,42 +348,42 @@ class GoodsPriceDetails extends PureComponent {
               }
             </Cell>
             <View style={content.price_group}>
-              <Image style={content.price_group_img} source={this.storeLevel(item.wm_goods)}/>
+              <Image style={content.price_group_img} source={this.storeLevel(item.wm_goods,item.store_name)}/>
               <View style={content.plat_price_box}>
                 <TouchableOpacity
                     onPress={() => {
-                      this.setState({showDialog: true})
+                      this.setState({showDialog: true,dialogPrice:this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)})
                     }}
                 >
                   <Text
-                      style={[content.plat_price, content.plat_price_wx]}>{this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)}</Text>
+                      style={[content.plat_price, content.plat_price_wx]}>{this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)}</Text>
                 </TouchableOpacity>
               </View>
               <View style={[content.plat_price_box]}>
                 <Text style={
                   Cts.WM_PLAT_ID_BD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]
                 }>
-                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_BD)}
+                  {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_BD)}
                 </Text>
               </View>
               <View style={content.plat_price_box}>
                 <Text
                     style={Cts.WM_PLAT_ID_ELE == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
-                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_ELE)}
+                  {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_ELE)}
 
                 </Text>
               </View>
               <View style={content.plat_price_box}>
                 <Text
                     style={Cts.WM_PLAT_ID_MT == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
-                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_MT)}
+                  {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_MT)}
 
                 </Text>
               </View>
               <View style={content.plat_price_box}>
                 <Text
                     style={Cts.WM_PLAT_ID_JD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
-                  {this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_JD)}
+                  {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_JD)}
                 </Text>
               </View>
             </View>
@@ -340,13 +393,13 @@ class GoodsPriceDetails extends PureComponent {
   }
 
   render() {
-    let {list_img, name, sale_store_num, product_id, upperLimit, lowerLimit,referPrice} = this.state;
+    let {list_img, name, sale_store_num, product_id, upperLimit, lowerLimit,setUpperLimit, setLowerLimit,referPrice,setReferPrice} = this.state;
     return (
         <View style={{flex: 1}}>
           <View style={header.box}>
             <Image
                 style={header.image}
-                source={{uri: list_img}}
+                source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
             />
             <View style={header.desc}>
               <Text style={header.text}>{name}</Text>
@@ -359,7 +412,18 @@ class GoodsPriceDetails extends PureComponent {
               this.renderNav()
             }
           </View>
-          <ScrollView style={{marginTop: pxToDp(7)}}>
+          <ScrollView style={{marginTop: pxToDp(7)}}
+                      refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.query}
+                            onRefresh={() =>{
+                              this.setState({query:true});
+                              this.getListStoresGoods();
+                            }}
+                            tintColor='gray'
+                        />
+                      }
+          >
             {
               this.renderList()
             }
@@ -367,20 +431,20 @@ class GoodsPriceDetails extends PureComponent {
           <View style={content.footer}>
             <View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>参考价:{1}</Text>
+                <Text style={content.footer_text}>参考价:{tool.toFixed(referPrice)}</Text>
                 <Text style={content.footer_text}>100%</Text>
               </View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>上限值:{tool.toFixed(referPrice*upperLimit)} </Text>
+                <Text style={content.footer_text}>上限值:{tool.toFixed(referPrice*upperLimit/100)} </Text>
                 <Text style={content.footer_text}>{upperLimit}%</Text>
               </View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>下限值:{tool.toFixed(referPrice*lowerLimit)}</Text>
+                <Text style={content.footer_text}>下限值:{tool.toFixed(referPrice*lowerLimit/100)}</Text>
                 <Text style={content.footer_text}>{lowerLimit}%</Text>
               </View>
             </View>
             <TouchableOpacity
-                onPress={() => {
+                onPress={async () => {
                   this.setState({showDialogRefer: true})
                 }}
             >
@@ -423,7 +487,7 @@ class GoodsPriceDetails extends PureComponent {
               <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
                 <Text> 输入要修改的价格(元)</Text>
                 <Text style={{color: colors.main_color, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>
-                  原价:{tool.toFixed(this.state.dialogPrice)}元
+                  原价:{this.state.dialogPrice}元
                 </Text>
               </View>
               <TextInput
@@ -441,12 +505,11 @@ class GoodsPriceDetails extends PureComponent {
                   }}
               />
             </View>
-
           </Dialog>
           <Dialog onRequestClose={() => {
           }}
                   visible={this.state.showDialogRefer}
-                  title={'价格修改'}
+                  title={'设置参考价'}
                   titleStyle={{textAlign: 'center', color: colors.white}}
                   headerStyle={{
                     backgroundColor: colors.main_color,
@@ -454,6 +517,7 @@ class GoodsPriceDetails extends PureComponent {
                     justifyContent: 'center',
                     paddingBottom: pxToDp(20)
                   }}
+                  footerStyle={{borderTopWidth:pxToDp(1)}}
                   buttons={[{
                     type: 'default',
                     label: '取消',
@@ -465,8 +529,8 @@ class GoodsPriceDetails extends PureComponent {
                     label: '保存',
                     onPress: () => {
                       this.setState({showDialogRefer: false, uploading: true});
-                      this.upChangePrice();
-                    }
+                      this.upEditProdReferPrice();
+                    },
                   }
                   ]}
           >
@@ -481,6 +545,11 @@ class GoodsPriceDetails extends PureComponent {
                     borderWidth: pxToDp(1),
                     borderColor: colors.fontGray,
                   }}
+                  value={''+setReferPrice}
+                  onChangeText={(text)=>{
+                    console.log(text)
+                    this.setState({setReferPrice:text})
+                  }}
                   keyboardType={'numeric'}
                   underlineColorAndroid={'transparent'}
               />
@@ -488,37 +557,39 @@ class GoodsPriceDetails extends PureComponent {
             <View style={content.refer}>
               <Text style={{marginRight: pxToDp(30)}}>上限值</Text>
               <TouchableOpacity
-                  onPress={() => this.reduce('upperLimit')}
+                  onPress={() => this.reduce('setUpperLimit')}
               >
-                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
-
+                <Image style={content.add} source={ setUpperLimit<=100?require('../../img/Goods/jianshaohui_.png'):require('../../img/Goods/jianshao_.png')}/>
               </TouchableOpacity>
-              <Text style={content.percentage}>{upperLimit}%</Text>
+              <Text style={content.percentage}>{setUpperLimit}%</Text>
+
               <TouchableOpacity
                   onPress={() => {
-                    this.add('upperLimit');
+                    this.add('setUpperLimit');
                   }}
               >
-                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
+                <Image style={content.add} source={require('../../img/Goods/zengjia_.png')}/>
               </TouchableOpacity>
-              <Text style={{width: pxToDp(140), textAlign: 'center'}}>999.99</Text>
+              <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
+                tool.toFixed(setReferPrice*setUpperLimit)
+              }</Text>
             </View>
-            <View style={[content.refer, {marginTop: pxToDp(30)}]}>
+            <View style={[content.refer]}>
               <Text style={{marginRight: pxToDp(30)}}>下限值</Text>
               <TouchableOpacity
-                  onPress={() => this.reduce('lowerLimit')
-                  }
+                  onPress={() => this.reduce('setLowerLimit')}
               >
-                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
-
+                <Image style={content.add} source={setLowerLimit<1?require('../../img/Goods/jianshaohui_.png'):require('../../img/Goods/jianshao_.png')}/>
               </TouchableOpacity>
-              <Text style={content.percentage}>{lowerLimit}%</Text>
+              <Text style={content.percentage}>{setLowerLimit}%</Text>
               <TouchableOpacity
-                  onPress={() => this.add('lowerLimit')}
+                  onPress={() => this.add('setLowerLimit')}
               >
-                <Image style={content.add} source={require('../../img/Goods/baohui_.png')}/>
+                <Image style={content.add} source={setLowerLimit>=100?require('../../img/Goods/zengjiahui_.png'):require('../../img/Goods/zengjia_.png')}/>
               </TouchableOpacity>
-              <Text style={{width: pxToDp(140), textAlign: 'center'}}>999.99</Text>
+              <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
+                tool.toFixed(setReferPrice*setLowerLimit)
+              }</Text>
             </View>
 
           </Dialog>
@@ -607,7 +678,8 @@ const content = {
     width: pxToDp(28),
   },
   change: {
-    marginRight: pxToDp(20)
+    marginRight: pxToDp(20),
+    color: colors.fontGray,
   },
   cell_footer: {
     alignItems: 'center',
@@ -679,7 +751,7 @@ const content = {
   },
   refer: {
     flexDirection: 'row',
-    marginTop: pxToDp(20),
+    marginTop: pxToDp(50),
     justifyContent: 'space-between',
     alignItems: 'center',
 
@@ -695,7 +767,7 @@ const content = {
     borderColor: colors.fontGray,
     marginHorizontal: pxToDp(15),
     borderRadius: pxToDp(6),
-    height: pxToDp(80),
+    height: pxToDp(60),
     textAlignVertical: 'center',
   }
 
