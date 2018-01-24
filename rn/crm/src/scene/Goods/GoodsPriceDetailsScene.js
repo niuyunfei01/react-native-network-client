@@ -125,6 +125,11 @@ class GoodsPriceDetails extends PureComponent {
       this.setState({uploading: false});
       return false
     }
+    if (store_id <= 0) {
+      ToastLong('未选择店铺,请点击店铺!');
+      this.setState({uploading: false});
+      return false
+    }
     if (uploading && Math.ceil(new_price_cents * 100) < 0) {
       this.setState({uploading: false});
       return false
@@ -350,7 +355,7 @@ class GoodsPriceDetails extends PureComponent {
   renderList() {
     let {storesList, platId} = this.state;
     return storesList.map((item, index) => {
-      let {store_name, fn_price_controlled, store_id, supply_price} = item;
+      let {store_name,store_id, fn_price_controlled, supply_price} = item;
       return (
           <View style={content.item} key={index}>
             <Cell customStyle={content.cell} first={true}>
@@ -377,7 +382,12 @@ class GoodsPriceDetails extends PureComponent {
               <View style={content.plat_price_box}>
                 <TouchableOpacity
                     onPress={() => {
-                      this.setState({showDialog: true,dialogPrice:this.getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)})
+                      this.setState({
+                        showDialog: true,
+                        dialogPrice:this.
+                        getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX),
+                        store_id:store_id
+                      })
                     }}
                 >
                   <Text
