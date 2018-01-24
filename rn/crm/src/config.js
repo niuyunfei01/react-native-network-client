@@ -133,7 +133,7 @@ const C = {
   ROUTE_GOODS_MANAGE:'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL:'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER:'SettlementGather',
-
+  ROUTE_ACTIVITY_RULE:'ActivityRule',
   serverUrl,
   apiUrl,
   staticUrl,

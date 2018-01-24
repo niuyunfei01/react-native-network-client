@@ -733,6 +733,15 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>商品管理</Text>
         </TouchableOpacity>)}
 
+        {(is_helper || is_service_mgr) && (<TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_ACTIVITY_RULE)}
+            activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/jiagejianguan_.png')}/>
+          <Text style={[block_styles.block_name]}>活动加价</Text>
+        </TouchableOpacity>)}
+
         {/*{is_service_mgr && (fnPriceControlled > 0 && is_helper ? (<View style={[block_styles.block_box]}/>) :*/}
             {/*(fnPriceControlled > 0 || is_helper) && (<View style={[block_styles.empty_box]}/>) )}*/}
         {/*{fnPriceControlled > 0 && is_service_mgr && <View style={[block_styles.block_box]}/>}*/}
