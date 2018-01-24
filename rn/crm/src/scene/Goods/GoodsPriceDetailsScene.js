@@ -123,7 +123,6 @@ class GoodsPriceDetails extends PureComponent {
     if (Math.ceil(new_price_cents * 100) < 0) {
       ToastLong('修改价格不能小于0');
       this.setState({uploading: false});
-
       return false
     }
     if (uploading && Math.ceil(new_price_cents * 100) < 0) {
@@ -148,12 +147,17 @@ class GoodsPriceDetails extends PureComponent {
     if(refer_price<=0){
       ToastLong('检查参考价不能为0');
       return false;
-    }else if(lower_limit>0){
+    }else if(lower_limit<0){
       ToastLong('下限值不能为0');
       return false;
-    }else if(upper_limit>100){
+    }else if(lower_limit>100){
+      ToastLong('上限值不能大于100');
+      return false;
+    }else if(upper_limit<100){
       ToastLong('上限值不能小于100');
       return false;
+    }else {
+      return true
     }
 
   }
@@ -170,7 +174,9 @@ class GoodsPriceDetails extends PureComponent {
       lower_limit: setLowerLimit,
       upper_limit : setUpperLimit,
     };
+    console.log(data);
     if(this.validate(data)){
+      this.setState({uploading: true});
       const {accessToken} = this.props.global;
       const {dispatch} = this.props;
       dispatch(editProdReferPrice(data, accessToken, async (ok, desc, obj) => {
@@ -183,6 +189,7 @@ class GoodsPriceDetails extends PureComponent {
         }
       }));
     }else {
+      console.log(7777)
       this.setState({uploading: false});
     }
 
@@ -325,12 +332,10 @@ class GoodsPriceDetails extends PureComponent {
   }
   storeLevel(wm_goods,name) {
     let {referPrice, upperLimit, lowerLimit, platId} = this.state;
-    console.log(referPrice);
     if(!wm_goods[platId]){
       return null
     }else {
       let {price} = wm_goods[platId];
-      console.log( 'name',name,'price',price,'参考价',tool.toFixed(referPrice * upperLimit));
       if ((parseInt(price) === 0) || (parseInt(referPrice) === 0)){
         return null
       }else if (price > parseInt(tool.toFixed(referPrice * upperLimit))) {
