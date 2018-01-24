@@ -99,7 +99,7 @@ class GoodsPriceDetails extends PureComponent {
     const {dispatch} = this.props;
     let _this = this;
     dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, async (ok, desc, obj) => {
-      this.setState({query: false});
+      this.setState({query: false,});
       if (ok) {
         let {price, upper_limit, lower_limit} = obj.refer_info || {};
         await _this.setState({
@@ -109,7 +109,7 @@ class GoodsPriceDetails extends PureComponent {
           lowerLimit: lower_limit,
           setUpperLimit: upper_limit == 0 ? 100 : upper_limit,
           setLowerLimit: lower_limit == 0 ? 100 : lower_limit,
-          setReferPrice:tool.toFixed(price),
+          setReferPrice: price==0?'':tool.toFixed(price),
         });
         _this.listSort();
         this.forceUpdate()
@@ -122,9 +122,12 @@ class GoodsPriceDetails extends PureComponent {
     let {product_id, store_id, new_price_cents, uploading} = this.state;
     if (Math.ceil(new_price_cents * 100) < 0) {
       ToastLong('修改价格不能小于0');
+      this.setState({uploading: false});
+
       return false
     }
     if (uploading && Math.ceil(new_price_cents * 100) < 0) {
+      this.setState({uploading: false});
       return false
     }
     const {accessToken} = this.props.global;
@@ -140,32 +143,49 @@ class GoodsPriceDetails extends PureComponent {
     }));
   }
 
+  validate(data){
+    let {refer_price,product_id,lower_limit,upper_limit} =data
+    if(refer_price<=0){
+      ToastLong('检查参考价不能为0');
+      return false;
+    }else if(lower_limit>0){
+      ToastLong('下限值不能为0');
+      return false;
+    }else if(upper_limit>100){
+      ToastLong('上限值不能小于100');
+      return false;
+    }
+
+  }
+
   upEditProdReferPrice() {
     let {product_id, uploading, setReferPrice,setLowerLimit ,setUpperLimit}= this.state;
     if (uploading) {
       return false
     }
-    // if(Math.ceil(setReferPrice * 100)>0 && product_id>0 && setLowerLimit>0 && setUpperLimit>0){
-    //   ToastLong('请检查参考价数据!');
-    //   return false
-    // }
+
     let data = {
       refer_price: Math.ceil(setReferPrice * 100),
       product_id: product_id,
       lower_limit: setLowerLimit,
       upper_limit : setUpperLimit,
     };
-    const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-    dispatch(editProdReferPrice(data, accessToken, async (ok, desc, obj) => {
+    if(this.validate(data)){
+      const {accessToken} = this.props.global;
+      const {dispatch} = this.props;
+      dispatch(editProdReferPrice(data, accessToken, async (ok, desc, obj) => {
+        this.setState({uploading: false});
+        if (ok) {
+          await this.getListStoresGoods();
+          ToastLong('提交成功');
+        } else {
+          ToastLong(desc);
+        }
+      }));
+    }else {
       this.setState({uploading: false});
-      if (ok) {
-        await this.getListStoresGoods();
-        ToastLong('提交成功');
-      } else {
-        ToastLong(desc);
-      }
-    }));
+    }
+
   }
   reduce(str) {
     let num = this.state[str];
@@ -431,8 +451,8 @@ class GoodsPriceDetails extends PureComponent {
           <View style={content.footer}>
             <View>
               <View style={content.footer_text_box}>
-                <Text style={content.footer_text}>参考价:{tool.toFixed(referPrice)}</Text>
-                <Text style={content.footer_text}>100%</Text>
+                <Text style={[content.footer_text,{color:colors.yellow}]}>参考价:{tool.toFixed(referPrice)}</Text>
+                <Text style={[content.footer_text,{color:colors.yellow}]}>100%</Text>
               </View>
               <View style={content.footer_text_box}>
                 <Text style={content.footer_text}>上限值:{tool.toFixed(referPrice*upperLimit/100)} </Text>
@@ -729,7 +749,7 @@ const content = {
     justifyContent: 'space-between'
   },
   footer_text: {
-    fontSize: pxToDp(24),
+    fontSize: pxToDp(28),
     color: colors.white,
   },
   footer_text_box: {
@@ -743,7 +763,7 @@ const content = {
   footer_btn: {
     height: pxToDp(90),
     width: pxToDp(250),
-    backgroundColor: '#fff45c',
+    backgroundColor: colors.yellow,
     color: colors.fontBlack,
     textAlign: 'center',
     textAlignVertical: 'center',

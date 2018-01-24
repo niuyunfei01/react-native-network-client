@@ -20,4 +20,5 @@ export default {
   fontGray: '#bfbfbf',
   fontBlack: '#3e3e3e',
   fontBlue:'#00a2ff',
+  yellow:'#fff45c',
 };
