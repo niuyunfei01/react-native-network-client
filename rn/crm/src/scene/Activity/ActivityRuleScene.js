@@ -21,7 +21,6 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchListVendorTags, fetchListVendorGoods} from '../../reducers/product/productActions.js';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
@@ -31,15 +30,13 @@ import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
 
 function mapStateToProps(state) {
-  const {mine, product, global} = state;
-  return {mine: mine, product: product, global: global}
+  const {mine, global, activity} = state;
+  return {mine: mine, global: global, activity: activity}
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchListVendorTags,
-      fetchListVendorGoods,
       ...globalActions
     }, dispatch)
   }
@@ -55,18 +52,77 @@ class ActivityScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      list: [{
-        content: [
-          {
-            lower: 0,
-            upper: 5,
-            percent: 100
-          }
-        ]
-      }]
+      commonRule: []
     }
   }
 
+  componentWillMount() {
+    let {commonRule, specialRule} = this.props.activity;
+    this.setState({
+      commonRule: commonRule,
+      specialRule: specialRule,
+    })
+  }
+
+  renderCommon() {
+    let {commonRule} = this.state;
+    return (
+        <Cells style={style.cells}>
+          <Cell customStyle={style.cell} first={true}>
+            <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
+            <CellFooter>
+              <Image style={{height: pxToDp(42), width: pxToDp(42)}}
+                     source={require('../../img/Activity/bianji_.png')}/>
+            </CellFooter>
+          </Cell>
+          {
+            commonRule.map((item, index) => {
+              let {lower, upper, percentage} = item;
+              return (
+                  <Percentage
+                      key={index}
+                      lower={lower}
+                      upper={upper}
+                      percentage={percentage}
+                  />
+              )
+            })
+          }
+        </Cells>
+    )
+  }
+
+  renderSpecial() {
+    let {specialRule} =this.state;
+    return (
+        <View>
+          <Cell customStyle={style.cell}>
+            <CellHeader><Text style={style.cell_header_text}>选择已选分类</Text></CellHeader>
+            <CellFooter>
+              <Text style={style.cell_footer_text}>已选(0)</Text>
+              <Image
+                  style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                  source={require('../../img/Public/xiangxia_.png')}
+              />
+            </CellFooter>
+          </Cell>
+          {
+            specialRule.map((item, index) => {
+              let {lower, upper, percentage} = item;
+              return (
+                  <Percentage
+                      key={index}
+                      lower={lower}
+                      upper={upper}
+                      percentage={percentage}
+                  />
+              )
+            })
+          }
+        </View>
+    )
+
+  }
   render() {
     return (
         <View style={{flex: 1}}>
@@ -91,10 +147,7 @@ class ActivityScene extends PureComponent {
                 </CellFooter>
               </Cell>
               <Cell customStyle={style.cell} first={false}>
-                <TouchableOpacity>
-                  <Text style={style.time}>开始时间</Text>
-                </TouchableOpacity>
-
+                <Text style={style.time}>开始时间</Text>
                 <Text style={[style.time, {marginLeft: pxToDp(40)}]}>结束时间</Text>
               </Cell>
               <Cell customStyle={style.cell}>
@@ -109,20 +162,9 @@ class ActivityScene extends PureComponent {
               </Cell>
             </Cells>
 
-            <Cells style={style.cells}>
-              <Cell customStyle={style.cell} first={true}>
-                <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
-                <CellFooter>
-                  <Image style={{height: pxToDp(42), width: pxToDp(42)}}
-                         source={require('../../img/Activity/bianji_.png')}/>
-                </CellFooter>
-              </Cell>
-              <Percentage/>
-              <Percentage/>
-              <Percentage/>
-              <Percentage/>
-              <Percentage/>
-            </Cells>
+            {
+              this.renderCommon()
+            }
 
             <Cells style={style.cells}>
               <Cell customStyle={style.cell} first={true}>
@@ -132,25 +174,13 @@ class ActivityScene extends PureComponent {
                          source={require('../../img/Activity/xinjian_.png')}/>
                 </CellFooter>
               </Cell>
-              <Cell customStyle={style.cell}>
-                <CellHeader><Text style={style.cell_header_text}>选择已选分类</Text></CellHeader>
-                <CellFooter>
-                  <Text style={style.cell_footer_text}>已选(0)</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-              <Percentage/>
-              <Percentage/>
-              <Percentage/>
-              <Percentage/>
-              <Percentage/>
+              {
+                this.renderSpecial()
+              }
             </Cells>
             <Cells style={style.cells}>
               <Cell customStyle={style.cell} first={true}>
-                <CellHeader><Text style={style.cell_header_text}>特殊分类加价规则</Text></CellHeader>
+                <CellHeader><Text style={style.cell_header_text}>特殊商品规则</Text></CellHeader>
                 <CellFooter>
                   <Image style={{height: pxToDp(42), width: pxToDp(42)}}
                          source={require('../../img/Activity/xinjian_.png')}/>
@@ -169,7 +199,7 @@ class ActivityScene extends PureComponent {
               justifyContent: 'center',
               backgroundColor: colors.main_color,
               alignItems: 'center',
-              borderRadius:pxToDp(5),
+              borderRadius: pxToDp(5),
             }} first={true}
             >
               <Text style={{
@@ -189,12 +219,13 @@ class ActivityScene extends PureComponent {
 
 class Percentage extends PureComponent {
   render() {
+    let {lower, upper, percentage} = this.props;
     return (
         <Cell customStyle={style.cell} first={false}>
-          <CellHeader><Text style={style.cell_header_text}>0元--5元</Text></CellHeader>
+          <CellHeader><Text style={style.cell_header_text}>{lower}元--{upper}元</Text></CellHeader>
           <CellFooter>
             <Image style={style.operation} source={require('../../img/Activity/jianshao_.png')}/>
-            <Text style={style.percentage_text}>100%</Text>
+            <Text style={style.percentage_text}>{percentage}%</Text>
             <Image style={style.operation} source={require('../../img/Activity/zengjia_.png')}/>
           </CellFooter>
         </Cell>
