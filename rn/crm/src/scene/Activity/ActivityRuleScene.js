@@ -5,10 +5,10 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   ScrollView,
   TextInput,
   FlatList,
+  TouchableHighlight,
 } from 'react-native';
 import {
   Cells,
@@ -23,12 +23,14 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
+import DateTimePicker from 'react-native-modal-datetime-picker';
+
 import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
-
+import style from './commonStyle'
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
   return {mine: mine, global: global, activity: activity}
@@ -42,38 +44,114 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class ActivityScene extends PureComponent {
+class ActivityRuleScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: '创建活动价格',
     };
   };
-
   constructor(props) {
     super(props);
     this.state = {
-      commonRule: []
+      commonRule: [
+        {
+          lower: 0,
+          upper: 5,
+          percentage: 100,
+        },
+        {
+          lower: 5,
+          upper: 10,
+          percentage: 100,
+        },
+        {
+          lower: 10,
+          upper: 20,
+          percentage: 100,
+        },
+        {
+          lower: 20,
+          upper: 40,
+          percentage: 100,
+        },
+        {
+          lower: 40,
+          upper: 10000,
+          percentage: 100,
+        }
+      ],
+      specialRuleList: [
+        [
+          {
+            lower: 0,
+            upper: 5,
+            percentage: 100,
+          },
+          {
+            lower: 5,
+            upper: 10,
+            percentage: 100,
+          },
+          {
+            lower: 10,
+            upper: 20,
+            percentage: 100,
+          },
+          {
+            lower: 20,
+            upper: 40,
+            percentage: 100,
+          },
+          {
+            lower: 40,
+            upper: 10000,
+            percentage: 100,
+          }]
+      ],
+      specialRule: [
+        {
+          lower: 0,
+          upper: 5,
+          percentage: 100,
+        },
+        {
+          lower: 5,
+          upper: 10,
+          percentage: 100,
+        },
+        {
+          lower: 10,
+          upper: 20,
+          percentage: 100,
+        },
+        {
+          lower: 20,
+          upper: 40,
+          percentage: 100,
+        },
+        {
+          lower: 40,
+          upper: 10000,
+          percentage: 100,
+        }],
+      dataPicker: false,
+      startTime: '开始时间',
+      endTime: '结束时间',
+      timeKey: ''
     }
   }
-
-  componentWillMount() {
-    let {commonRule, specialRule} = this.props.activity;
-    this.setState({
-      commonRule: commonRule,
-      specialRule: specialRule,
-    })
+  setDate(date) {
+    console.log(date);
+    let {timeKey} = this.state;
+    this.setState({[timeKey]: date, dataPicker: false})
   }
-
   renderCommon() {
     let {commonRule} = this.state;
     return (
         <Cells style={style.cells}>
           <Cell customStyle={style.cell} first={true}>
             <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
-            <CellFooter>
-              <Image style={{height: pxToDp(42), width: pxToDp(42)}}
-                     source={require('../../img/Activity/bianji_.png')}/>
-            </CellFooter>
+            <ImgBtn  require={require('../../img/Activity/bianji_.png')} onPress ={()=>this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE,commonRule)}/>
           </Cell>
           {
             commonRule.map((item, index) => {
@@ -84,6 +162,7 @@ class ActivityScene extends PureComponent {
                       lower={lower}
                       upper={upper}
                       percentage={percentage}
+                      tail={index == (commonRule.length - 1)}
                   />
               )
             })
@@ -93,37 +172,53 @@ class ActivityScene extends PureComponent {
   }
 
   renderSpecial() {
-    let {specialRule} =this.state;
-    return (
-        <View>
-          <Cell customStyle={style.cell}>
-            <CellHeader><Text style={style.cell_header_text}>选择已选分类</Text></CellHeader>
-            <CellFooter>
-              <Text style={style.cell_footer_text}>已选(0)</Text>
-              <Image
-                  style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                  source={require('../../img/Public/xiangxia_.png')}
-              />
-            </CellFooter>
-          </Cell>
-          {
-            specialRule.map((item, index) => {
-              let {lower, upper, percentage} = item;
-              return (
-                  <Percentage
-                      key={index}
-                      lower={lower}
-                      upper={upper}
-                      percentage={percentage}
-                  />
-              )
-            })
-          }
-        </View>
-    )
-
+    let {specialRuleList} = this.state;
+    return specialRuleList.map((item, inex) => {
+      return (
+          <View key={inex}>
+            <Cell customStyle={style.cell} first={true}>
+              <CellHeader><Text style={[style.cell_header_text, {}]}>加价比例设置</Text></CellHeader>
+              <ImgBtn  require={require('../../img/Activity/bianji_.png')} onPress ={()=>this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE,item)}/>
+            </Cell>
+            <Cell customStyle={style.cell}>
+              <CellHeader><Text style={style.cell_header_text}>选择已选分类</Text></CellHeader>
+              <CellFooter>
+                <Text style={style.cell_footer_text}>已选(0)</Text>
+                <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
+            </Cell>
+            {
+              item.map((ite, index) => {
+                let {lower, upper, percentage} = ite;
+                return (
+                    <Percentage
+                        key={index}
+                        lower={lower}
+                        upper={upper}
+                        percentage={percentage}
+                        tail={index == (item.length - 1)}
+                    />
+                )
+              })
+            }
+          </View>
+      )
+    })
   }
+
+
+  toSonPage(route,item) {
+    let {navigate} = this.props.navigation;
+    navigate(route, {
+      rule: item
+    })
+  }
+
   render() {
+    let {startTime, endTime} = this.state;
     return (
         <View style={{flex: 1}}>
           <ScrollView>
@@ -147,10 +242,25 @@ class ActivityScene extends PureComponent {
                 </CellFooter>
               </Cell>
               <Cell customStyle={style.cell} first={false}>
-                <Text style={style.time}>开始时间</Text>
-                <Text style={[style.time, {marginLeft: pxToDp(40)}]}>结束时间</Text>
+                <TouchableOpacity
+                    style={{flex: 1, height: pxToDp(65)}}
+                    onPress={() => {
+                      this.setState({dataPicker: true, key: startTime})
+                    }}
+                >
+                  <Text style={style.time}>{startTime}</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(40)}}
+                    onPress={() => {
+                      this.setState({dataPicker: true, key: endTime})
+                    }}
+                >
+                  <Text style={[style.time]}>{endTime}</Text>
+                </TouchableOpacity>
               </Cell>
-              <Cell customStyle={style.cell}>
+              <Cell customStyle={style.cell} onPress={()=>{this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE)}}>
                 <CellHeader><Text style={style.cell_header_text}>选择店铺</Text></CellHeader>
                 <CellFooter>
                   <Text style={style.cell_footer_text}>已选(0)</Text>
@@ -161,17 +271,24 @@ class ActivityScene extends PureComponent {
                 </CellFooter>
               </Cell>
             </Cells>
-
             {
               this.renderCommon()
             }
-
             <Cells style={style.cells}>
               <Cell customStyle={style.cell} first={true}>
                 <CellHeader><Text style={style.cell_header_text}>特殊分类加价规则</Text></CellHeader>
                 <CellFooter>
-                  <Image style={{height: pxToDp(42), width: pxToDp(42)}}
-                         source={require('../../img/Activity/xinjian_.png')}/>
+                  <TouchableOpacity
+                      onPress={() => {
+                        let {specialRuleList, specialRule} = this.state;
+                        specialRuleList.push(specialRule);
+                        this.forceUpdate()
+                      }}
+                  >
+                    <Image style={{height: pxToDp(42), width: pxToDp(42)}}
+                           source={require('../../img/Activity/xinjian_.png')}/>
+                  </TouchableOpacity>
+
                 </CellFooter>
               </Cell>
               {
@@ -181,11 +298,9 @@ class ActivityScene extends PureComponent {
             <Cells style={style.cells}>
               <Cell customStyle={style.cell} first={true}>
                 <CellHeader><Text style={style.cell_header_text}>特殊商品规则</Text></CellHeader>
-                <CellFooter>
-                  <Image style={{height: pxToDp(42), width: pxToDp(42)}}
-                         source={require('../../img/Activity/xinjian_.png')}/>
-                </CellFooter>
+                <ImgBtn  require={require('../../img/Activity/xinjian_.png')} onPress ={()=>this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE,'')}/>
               </Cell>
+
             </Cells>
           </ScrollView>
           <View style={{
@@ -212,6 +327,19 @@ class ActivityScene extends PureComponent {
               }}>保存</Text>
             </Cell>
           </View>
+          <DateTimePicker
+              date={new Date()}
+              minimumDate={new Date()}
+              mode='datetime'
+              isVisible={this.state.dataPicker}
+              onConfirm={async (date) => {
+                let confirm_data = tool.fullDate(date);
+                this.setDate(confirm_data);
+              }}
+              onCancel={() => {
+                this.setState({dataPicker: false});
+              }}
+          />
         </View>
     )
   }
@@ -219,10 +347,16 @@ class ActivityScene extends PureComponent {
 
 class Percentage extends PureComponent {
   render() {
-    let {lower, upper, percentage} = this.props;
+    let {lower, upper, percentage, tail} = this.props;
     return (
         <Cell customStyle={style.cell} first={false}>
-          <CellHeader><Text style={style.cell_header_text}>{lower}元--{upper}元</Text></CellHeader>
+          <CellHeader>
+            {
+              tail ? <Text style={style.cell_header_text}>{lower}元以上</Text>
+                  : <Text style={style.cell_header_text}>{lower}元--{upper}元</Text>
+            }
+          </CellHeader>
+
           <CellFooter>
             <Image style={style.operation} source={require('../../img/Activity/jianshao_.png')}/>
             <Text style={style.percentage_text}>{percentage}%</Text>
@@ -233,50 +367,25 @@ class Percentage extends PureComponent {
   }
 }
 
-const style = {
-  cell: {
-    backgroundColor: colors.white,
-    height: pxToDp(100),
-    marginLeft: 0,
-    paddingLeft: pxToDp(40),
-    justifyContent: 'space-between',
-    borderTopColor: colors.main_back
-  },
-  cells: {
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  cell_header_text: {
-    fontSize: pxToDp(30),
-    color: colors.fontBlack,
-  },
-  cell_footer_text: {
-    fontSize: pxToDp(30),
-    color: colors.fontGray,
-  },
-  time: {
-    flex: 1,
-    borderWidth: pxToDp(1),
-    borderColor: colors.fontGray,
-    borderRadius: pxToDp(5),
-    height: pxToDp(65),
-    textAlignVertical: 'center',
-    paddingLeft: pxToDp(16),
-  },
-  operation: {
-    height: pxToDp(50),
-    width: pxToDp(50),
-  },
-  percentage_text: {
-    height: pxToDp(56),
-    width: pxToDp(126),
-    borderWidth: pxToDp(1),
-    borderColor: colors.fontGray,
-    borderRadius: pxToDp(5),
-    color: colors.fontBlack,
-    textAlignVertical: 'center',
-    textAlign: 'center',
-    marginHorizontal: pxToDp(40),
+
+class ImgBtn extends PureComponent {
+  onPress() {
+    this.props.onPress()
+  }
+
+  render() {
+    let {require} = this.props
+    return (
+        <TouchableOpacity
+            onPress={() => this.onPress()}
+        >
+          <Image style={{height: pxToDp(42), width: pxToDp(42)}}
+                 source={require}/>
+        </TouchableOpacity>
+    )
   }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(ActivityScene)
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(ActivityRuleScene)

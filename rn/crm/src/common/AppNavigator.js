@@ -70,6 +70,8 @@ import OperateIncomeDetailScene from "../scene/OperateProfit/OperateIncomeDetail
 import OperateExpendDetailScene from "../scene/OperateProfit/OperateExpendDetailScene";
 import OperateOtherExpendDetailScene from "../scene/OperateProfit/OperateOtherExpendDetailScene";
 import ActivityRuleScene from "../scene/Activity/ActivityRuleScene";
+import ActivityEditRuleScene from "../scene/Activity/ActivityEditRuleScene";
+import ActivitySelectStoreScene from "../scene/Activity/ActivitySelectStoreScene";
 
 const tabDef = {
   Remind: {
@@ -246,7 +248,7 @@ class Navigator extends Component {
         [Config.ROUTE_SELECT_STORE]: { screen: SelectStoreScene },
         [Config.ROUTE_GOODS_CLASSIFY]: { screen: GoodsClassifyScene },
         [Config.ROUTE_GOODS_APPLY_RECORD]: { screen: GoodsApplyRecordScene },
-        [Config.ROUTE_GOODS_EDIT]: {screen: ActivityRuleScene},
+        [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
         [Config.ROUTE_GOODS_APPLY_NEW_PRODUCT]: {screen: GoodsApplyNewProductScene},
         [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
@@ -265,6 +267,8 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
         [Config.ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
         [Config.ROUTE_ACTIVITY_RULE]: {screen: ActivityRuleScene},
+        [Config.ROUTE_ACTIVITY_EDIT_RULE]: {screen: ActivityEditRuleScene},
+        [Config.ROUTE_ACTIVITY_SELECT_STORE]: {screen: ActivitySelectStoreScene},
       },
       stackNavigatorConfigs
     );
