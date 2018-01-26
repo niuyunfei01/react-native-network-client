@@ -40,7 +40,7 @@ function mapDispatchToProps(dispatch) {
 class GoodsRelatedScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '商品管理',
+      headerTitle: '商品关联',
     }
   };
 

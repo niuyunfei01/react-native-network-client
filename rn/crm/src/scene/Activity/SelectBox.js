@@ -15,56 +15,19 @@ import colors from "../../styles/colors";
 import tool from "../../common/tool";
 
 class SelectBox extends PureComponent {
+
+  toggle(){
+    this.props.toggle()
+  }
   render() {
     return (
         <View style={select.box}>
           <View style={select.items_box}>
-            <TouchableOpacity
-                onPress={async () => {
-                  console.log('000000')
-                }}
-            >
-              <Text style={[select.select_item, select.select_item_active]}>菜鸟食材</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={async () => {
-                  console.log('000000')
-                }}
-            >
-              <Text style={[select.select_item, select.select_item_active]}>菜鸟食材</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={async () => {
-                  console.log('000000')
-                }}
-            >
-              <Text style={[select.select_item, select.select_item_active]}>菜鸟食材</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={async () => {
-                  console.log('000000')
-                }}
-            >
-              <Text style={[select.select_item, select.select_item_active]}>菜鸟食材</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={async () => {
-                  console.log('000000')
-                }}
-            >
-              <Text style={[select.select_item, select.select_item_active]}>菜鸟食材</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={async () => {
-                  console.log('000000')
-                }}
-            >
-              <Text style={[select.select_item, select.select_item_active]}>菜鸟食材</Text>
-            </TouchableOpacity>
+            {this.props.children}
           </View>
           <TouchableWithoutFeedback
               onPress={() => {
-                console.log('隐藏')
+                this.toggle();
               }}
           >
             <View style={{flex: 1}}/>
@@ -91,14 +54,14 @@ const select = StyleSheet.create({
     flexWrap: 'wrap',
     paddingBottom: pxToDp(50),
     justifyContent: 'space-between',
-    borderTopWidth: pxToDp(1)
+    borderTopWidth: pxToDp(1),
   },
   select_item: {
     width: pxToDp(172),
     marginTop: pxToDp(50),
     height: pxToDp(55),
     textAlign: 'center',
-    borderRadius: pxToDp(25),
+    borderRadius: pxToDp(30),
     textAlignVertical: 'center',
     fontSize: pxToDp(28),
   },

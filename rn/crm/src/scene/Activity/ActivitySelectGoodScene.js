@@ -46,46 +46,19 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class ActivitySelectStoreScene extends PureComponent {
+class ActivitySelectGoodScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     let {type} = params;
     let {backPage} = params;
     return {
-      headerTitle: '选择店铺',
-      headerRight: (
-          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
-            <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>微信</Text>
-            <Image style={{width: pxToDp(80), height: pxToDp(80)}} source={require('../../img/Order/pull_down.png')}/>
-          </TouchableOpacity>
-      )
+      headerTitle: '选择商品',
     }
   };
 
   constructor(props) {
     super(props);
-    this.state = {
-      storeList: [
-        {value: 1, label: '大娃哈哈哈'},
-        {value: 2, label: '二娃哈哈哈'},
-        {value: 3, label: '三娃娃哈哈哈'},
-        {value: 4, label: '四娃哈哈哈'},
-        {value: 5, label: '五娃哈哈哈'},
 
-      ],
-      checked: [],
-      hide: false,
-      vendorId: 0,
-      platList: [
-        Cts.WM_PLAT_ID_WX,
-        Cts.WM_PLAT_ID_BD,
-        Cts.WM_PLAT_ID_MT,
-        Cts.WM_PLAT_ID_ELE,
-        Cts.WM_PLAT_ID_JD,
-      ],
-      platId: Cts.WM_PLAT_ID_WX,
-      showDialog: false,
-    }
   }
 
   componentDidMount() {
@@ -93,43 +66,6 @@ class ActivitySelectStoreScene extends PureComponent {
     navigation.setParams({toggle: this.toggle});
   }
 
-  toggle = () => {
-    let {hide} = this.state;
-    this.setState({hide: !hide})
-  };
-
-  renderSelectBox() {
-    let {hide, vendorId, platList, platId} = this.state;
-    if (hide) {
-      return (
-          <SelectBox toggle={() => this.toggle()}>
-            {
-              platList.map((item, key) => {
-                return (
-                    <TouchableOpacity
-                        key={key}
-                        onPress={async () => {
-                          this.setState({platId: item})
-                        }}
-                    >
-                      <Text
-                          style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-                        {tool.get_platform_name(item)}
-                      </Text>
-
-                    </TouchableOpacity>
-                )
-              })
-            }
-            {
-              platList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
-            }
-          </SelectBox>
-      )
-    } else {
-    }
-    return null;
-  }
 
   render() {
     return (
@@ -142,7 +78,7 @@ class ActivitySelectStoreScene extends PureComponent {
                     }}
               >
                 <CellHeader>
-                  <Text>已选店铺</Text>
+                  <Text>已选商品</Text>
                 </CellHeader>
                 <CellFooter>
                   <Text> {this.state.checked.length}</Text>
@@ -153,18 +89,20 @@ class ActivitySelectStoreScene extends PureComponent {
                 </CellFooter>
               </Cell>
             </Cells>
-            <CheckboxCells
-                options={this.state.storeList}
-                value={this.state.checked}
-                onChange={(checked) => {
-                  this.setState({checked: checked})
-                }}
-                style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
-            />
+            <Cell>
+              <TextInput
+                  placeholder='输入商品名称模糊搜索'
+                  underlineColorAndroid='transparent'
+                  style={[styles.input_text]}
+                  placeholderTextColor={"#7A7A7A"}
+                  keyboardType='numeric'
+                  value={this.state.price}
+                  onChangeText={(text) => {
+                    this.setState({price: text})
+                  }}
+              />
+            </Cell>
           </ScrollView>
-          {
-            this.renderSelectBox()
-          }
           <Dialog onRequestClose={() => {
           }}
                   visible={this.state.showDialog}
@@ -203,10 +141,10 @@ class ActivitySelectStoreScene extends PureComponent {
                 </CellHeader>
                 <TouchableOpacity>
                   <Text style={{
-                    fontSize:pxToDp(30),
-                    color:colors.white,
-                    height:pxToDp(60),
-                    backgroundColor:colors.main_color,
+                    fontSize: pxToDp(30),
+                    color: colors.white,
+                    height: pxToDp(60),
+                    backgroundColor: colors.main_color,
                   }}>移除</Text>
                 </TouchableOpacity>
               </Cell>
@@ -217,43 +155,10 @@ class ActivitySelectStoreScene extends PureComponent {
   }
 }
 
-const select = StyleSheet.create({
-  box: {
-    flex: 1,
-    position: 'absolute',
-    zIndex: 100,
-    width: '100%',
-    backgroundColor: 'rgba(0,0,0,.4)',
-    height: '100%',
-  },
-  items_box: {
-    minHeight: pxToDp(60),
-    backgroundColor: "#fff",
-    paddingHorizontal: pxToDp(45),
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingBottom: pxToDp(50),
-    justifyContent: 'space-between',
-    borderTopWidth: pxToDp(1)
-  },
-  select_item: {
-    width: pxToDp(172),
-    marginTop: pxToDp(48),
-    height: pxToDp(55),
-    textAlign: 'center',
-    borderRadius: pxToDp(25),
-    textAlignVertical: 'center',
-    fontSize: pxToDp(28),
-    marginBottom: pxToDp(2)
-  },
-  select_item_active: {
-    backgroundColor: colors.main_color,
-    color: colors.white,
-  },
-  select_item_cancel: {
-    borderWidth: pxToDp(1),
-    borderColor: colors.fontGray
-  }
-});
+const styles={
+  input_text:{
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActivitySelectStoreScene)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ActivitySelectGoodScene)

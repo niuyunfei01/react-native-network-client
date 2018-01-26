@@ -269,7 +269,6 @@ class GoodsPriceDetails extends PureComponent {
                     paddingBottom: pxToDp(20)
                   }}
                   buttons={[{
-
                     type: 'default',
                     label: '取消',
                     onPress: () => {

@@ -19,4 +19,6 @@ export default {
   fontColor: '#b2b2b2',
   fontGray: '#bfbfbf',
   fontBlack: '#3e3e3e',
+  fontBlue:'#01a0e9',
+  fontOrange:'#f39800',
 };

@@ -24,6 +24,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import ModalSelector from "../../widget/ModalSelector/index";
 
 import Config from "../../config";
 import tool from '../../common/tool';
@@ -137,11 +138,33 @@ class ActivityRuleScene extends PureComponent {
       dataPicker: false,
       startTime: '开始时间',
       endTime: '结束时间',
-      timeKey: ''
+      timeKey: '',
+      vendorId:0,
+      vendorList:[
+        {
+          key: Cts.STORE_TYPE_SELF,
+          label: '菜鸟食材',
+        },
+        {
+          key: Cts.STORE_TYPE_AFFILIATE,
+          label: '菜鸟',
+        },
+        {
+          key: Cts.STORE_TYPE_GZW,
+          label: '果知味',
+        },
+        {
+          key: Cts.STORE_TYPE_BLX,
+          label: '比邻鲜',
+        },
+        {
+          key: Cts.STORE_TYPE_XGJ,
+          label: '鲜果集',
+        }
+      ]
     }
   }
-  setDate(date) {
-    console.log(date);
+  setDateTime(date) {
     let {timeKey} = this.state;
     this.setState({[timeKey]: date, dataPicker: false})
   }
@@ -218,20 +241,34 @@ class ActivityRuleScene extends PureComponent {
   }
 
   render() {
-    let {startTime, endTime} = this.state;
+    let {startTime, endTime,vendorId} = this.state;
     return (
         <View style={{flex: 1}}>
           <ScrollView>
             <Cells style={style.cells}>
-              <Cell customStyle={style.cell} first={true}>
-                <CellHeader><Text style={style.cell_header_text}>选择品牌</Text></CellHeader>
-                <CellFooter>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
+              <ModalSelector
+                  skin='customer'
+                  data={this.state.vendorList}
+                  onChange={(option)=>{
+                    this.setState({vendorId:option.key});
+                    this.forceUpdate();
+                  }}
+              >
+                <Cell customStyle={style.cell} first={true}>
+                  <CellHeader><Text style={style.cell_header_text}>选择品牌</Text></CellHeader>
+                  <CellFooter>
+                    <Text>
+                      {
+                        vendorId > 0 ? tool.getVendorName(vendorId): ''
+                      }
+                    </Text>
+                    <Image
+                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                        source={require('../../img/Public/xiangxia_.png')}
+                    />
+                  </CellFooter>
+                </Cell>
+              </ModalSelector>
             </Cells>
 
             <Cells style={style.cells}>
@@ -245,7 +282,7 @@ class ActivityRuleScene extends PureComponent {
                 <TouchableOpacity
                     style={{flex: 1, height: pxToDp(65)}}
                     onPress={() => {
-                      this.setState({dataPicker: true, key: startTime})
+                      this.setState({dataPicker: true, timeKey: 'startTime'})
                     }}
                 >
                   <Text style={style.time}>{startTime}</Text>
@@ -254,7 +291,7 @@ class ActivityRuleScene extends PureComponent {
                 <TouchableOpacity
                     style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(40)}}
                     onPress={() => {
-                      this.setState({dataPicker: true, key: endTime})
+                      this.setState({dataPicker: true, timeKey: 'endTime'})
                     }}
                 >
                   <Text style={[style.time]}>{endTime}</Text>
@@ -334,7 +371,7 @@ class ActivityRuleScene extends PureComponent {
               isVisible={this.state.dataPicker}
               onConfirm={async (date) => {
                 let confirm_data = tool.fullDate(date);
-                this.setDate(confirm_data);
+                this.setDateTime(confirm_data);
               }}
               onCancel={() => {
                 this.setState({dataPicker: false});

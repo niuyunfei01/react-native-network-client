@@ -18,6 +18,10 @@ const style = {
     fontSize: pxToDp(30),
     color: colors.fontBlack,
   },
+  cell_header_text_white: {
+    fontSize: pxToDp(30),
+    color: colors.white,
+  },
   cell_footer_text: {
     fontSize: pxToDp(30),
     color: colors.fontGray,

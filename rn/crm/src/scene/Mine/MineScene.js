@@ -735,7 +735,7 @@ class MineScene extends PureComponent {
 
         {(is_helper || is_service_mgr) && (<TouchableOpacity
             style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_ACTIVITY_RULE)}
+            onPress={() => this.onPress(Config.ROUTE_ACTIVITY_MANAGE)}
             activeOpacity={customerOpacity}
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/jiagejianguan_.png')}/>

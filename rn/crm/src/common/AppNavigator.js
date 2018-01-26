@@ -72,6 +72,9 @@ import OperateOtherExpendDetailScene from "../scene/OperateProfit/OperateOtherEx
 import ActivityRuleScene from "../scene/Activity/ActivityRuleScene";
 import ActivityEditRuleScene from "../scene/Activity/ActivityEditRuleScene";
 import ActivitySelectStoreScene from "../scene/Activity/ActivitySelectStoreScene";
+import ActivityManageScene from "../scene/Activity/ActivityManageScene";
+import ActivityListScene from "../scene/Activity/ActivityListScene";
+import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
 
 const tabDef = {
   Remind: {
@@ -269,6 +272,9 @@ class Navigator extends Component {
         [Config.ROUTE_ACTIVITY_RULE]: {screen: ActivityRuleScene},
         [Config.ROUTE_ACTIVITY_EDIT_RULE]: {screen: ActivityEditRuleScene},
         [Config.ROUTE_ACTIVITY_SELECT_STORE]: {screen: ActivitySelectStoreScene},
+        [Config.ROUTE_ACTIVITY_MANAGE]: {screen: ActivityManageScene},
+        [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
+        [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
       },
       stackNavigatorConfigs
     );

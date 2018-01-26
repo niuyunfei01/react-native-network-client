@@ -7,6 +7,7 @@ import GoodsPriceDetailsScene from "./scene/Goods/GoodsPriceDetailsScene";
 import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
 import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
 import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
+import ActivityManageScene from "./scene/Activity/ActivityManageScene";
 
 
 const {
@@ -138,6 +139,8 @@ const C = {
   ROUTE_ACTIVITY_RULE:'ActivityRule',
   ROUTE_ACTIVITY_EDIT_RULE:'ActivityEditRule',
   ROUTE_ACTIVITY_SELECT_STORE:'ActivitySelectStore',
+  ROUTE_ACTIVITY_MANAGE:'ActivityManage',
+  ROUTE_ACTIVITY_SELECT_GOOD:'ActivitySelectGood',
   serverUrl,
   apiUrl,
   staticUrl,
