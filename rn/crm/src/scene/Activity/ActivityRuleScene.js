@@ -56,84 +56,84 @@ class ActivityRuleScene extends PureComponent {
     this.state = {
       commonRule: [
         {
-          lower: 0,
-          upper: 5,
-          percentage: 100,
+          min_price: 0,
+          max_price: 5,
+          percent: 100,
         },
         {
-          lower: 5,
-          upper: 10,
-          percentage: 100,
+          min_price: 5,
+          max_price: 10,
+          percent: 100,
         },
         {
-          lower: 10,
-          upper: 20,
-          percentage: 100,
+          min_price: 10,
+          max_price: 20,
+          percent: 100,
         },
         {
-          lower: 20,
-          upper: 40,
-          percentage: 100,
+          min_price: 20,
+          max_price: 40,
+          percent: 100,
         },
         {
-          lower: 40,
-          upper: 10000,
-          percentage: 100,
+          min_price: 40,
+          max_price: 10000,
+          percent: 100,
         }
       ],
       specialRuleList: [
         [
           {
-            lower: 0,
-            upper: 5,
-            percentage: 100,
+            min_price: 0,
+            max_price: 5,
+            percent: 100,
           },
           {
-            lower: 5,
-            upper: 10,
-            percentage: 100,
+            min_price: 5,
+            max_price: 10,
+            percent: 100,
           },
           {
-            lower: 10,
-            upper: 20,
-            percentage: 100,
+            min_price: 10,
+            max_price: 20,
+            percent: 100,
           },
           {
-            lower: 20,
-            upper: 40,
-            percentage: 100,
+            min_price: 20,
+            max_price: 40,
+            percent: 100,
           },
           {
-            lower: 40,
-            upper: 10000,
-            percentage: 100,
+            min_price: 40,
+            max_price: 10000,
+            percent: 100,
           }]
       ],
       specialRule: [
         {
-          lower: 0,
-          upper: 5,
-          percentage: 100,
+          min_price: 0,
+          max_price: 5,
+          percent: 100,
         },
         {
-          lower: 5,
-          upper: 10,
-          percentage: 100,
+          min_price: 5,
+          max_price: 10,
+          percent: 100,
         },
         {
-          lower: 10,
-          upper: 20,
-          percentage: 100,
+          min_price: 10,
+          max_price: 20,
+          percent: 100,
         },
         {
-          lower: 20,
-          upper: 40,
-          percentage: 100,
+          min_price: 20,
+          max_price: 40,
+          percent: 100,
         },
         {
-          lower: 40,
-          upper: 10000,
-          percentage: 100,
+          min_price: 40,
+          max_price: 10000,
+          percent: 100,
         }],
       dataPicker: false,
       startTime: '开始时间',
@@ -161,15 +161,138 @@ class ActivityRuleScene extends PureComponent {
           key: Cts.STORE_TYPE_XGJ,
           label: '鲜果集',
         }
-      ]
+      ],
+      price_rules:{},
+      interval_rules:{},
+      goods_rules:[],
+
     }
+  }
+
+  componentWillMount(){
+    let obj = {
+      "price_rules": {
+        "id": "1",
+        "rule_name": "满49减20",
+        "vendor_id": "1",
+        "status": "1",
+        "start_time": "2018-01-25 00:00:00",
+        "end_time": "2018-01-26 00:00:00",
+        "ext_store_id": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+
+      },
+      "interval_rules": {
+        "1": {
+          "21": {
+            "id": "21",
+            "rule_id": "1",
+            "type_id": "1",
+            "status": "1",
+            "categories": null,
+            "min_price": "0",
+            "max_price": "20",
+            "percent": "120",
+
+          },
+          "22": {
+            "id": "22",
+            "rule_id": "1",
+            "type_id": "1",
+            "status": "1",
+            "categories": null,
+            "min_price": "20",
+            "max_price": "50",
+            "percent": "130"
+          },
+          "23": {
+            "id": "23",
+            "rule_id": "1",
+            "type_id": "1",
+            "status": "1",
+            "categories": null,
+            "min_price": "50",
+            "max_price": "10000",
+            "percent": "110"
+          }
+        },
+        "2": [{
+          "categories": [
+            "81898589",
+            "81898625"
+          ],
+          "rules": {
+            "24": {
+              "id": "24",
+              "rule_id": "1",
+              "type_id": "2",
+              "status": "1",
+              "categories": "81898589,81898625",
+              "min_price": "0",
+              "max_price": "30",
+              "percent": "123"
+            },
+            "25": {
+              "id": "25",
+              "rule_id": "1",
+              "type_id": "2",
+              "status": "1",
+              "categories": "81898589,81898625",
+              "min_price": "30",
+              "max_price": "10000",
+              "percent": "111"
+            }
+          }
+        }]
+      },
+      "goods_rules": [{
+        "id": "9",
+        "rule_id": "1",
+        "status": "1",
+        "product_id": [
+          "1121",
+          "1122",
+          "1123",
+          "1124"
+        ],
+        "percent": "140"
+
+      }]
+    };
+    let {price_rules,interval_rules,goods_rules} = obj;
+
+    this.setState({
+      price_rules:price_rules,
+      interval_rules:interval_rules,
+      goods_rules:goods_rules,
+      commonRule: this.dataToCommon(interval_rules[Cts.RULE_TYPE_GENERAL]),
+    })
+
+  }
+  dataToCommon(obj){
+    let arr=[];
+    tool.objectMap(obj,(item,key)=>{
+      let {type_id,min_price,max_price,percent}=item
+      arr.push({
+        "type_id": type_id,
+        "min_price": min_price,
+        "max_price": max_price,
+        "percent": percent
+      })
+    })
+    return arr;
   }
   setDateTime(date) {
     let {timeKey} = this.state;
     this.setState({[timeKey]: date, dataPicker: false})
   }
   renderCommon() {
-    let {commonRule} = this.state;
+    let {commonRule,price_rules} = this.state;
     return (
         <Cells style={style.cells}>
           <Cell customStyle={style.cell} first={true}>
@@ -178,13 +301,13 @@ class ActivityRuleScene extends PureComponent {
           </Cell>
           {
             commonRule.map((item, index) => {
-              let {lower, upper, percentage} = item;
+              let {min_price, max_price, percent} = item;
               return (
                   <Percentage
                       key={index}
-                      lower={lower}
-                      upper={upper}
-                      percentage={percentage}
+                      min_price={min_price}
+                      max_price={max_price}
+                      percent={percent}
                       tail={index == (commonRule.length - 1)}
                   />
               )
@@ -215,13 +338,13 @@ class ActivityRuleScene extends PureComponent {
             </Cell>
             {
               item.map((ite, index) => {
-                let {lower, upper, percentage} = ite;
+                let {min_price, max_price, percent} = ite;
                 return (
                     <Percentage
                         key={index}
-                        lower={lower}
-                        upper={upper}
-                        percentage={percentage}
+                        min_price={min_price}
+                        max_price={max_price}
+                        percent={percent}
                         tail={index == (item.length - 1)}
                     />
                 )
@@ -329,41 +452,47 @@ class ActivityRuleScene extends PureComponent {
                 </CellFooter>
               </Cell>
               {
-                this.renderSpecial()
+                // this.renderSpecial()
               }
             </Cells>
             <Cells style={style.cells}>
               <Cell customStyle={style.cell} first={true}>
                 <CellHeader><Text style={style.cell_header_text}>特殊商品规则</Text></CellHeader>
-                <ImgBtn  require={require('../../img/Activity/xinjian_.png')} onPress ={()=>this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE,'')}/>
-              </Cell>
+                <ImgBtn  require={require('../../img/Activity/xinjian_.png')}
+                         onPress ={
+                           ()=>this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE,{
+                             commonRule:JSON.stringify(this.state.commonRule)
+                           })
+                         }/>
 
+              </Cell>
             </Cells>
-          </ScrollView>
-          <View style={{
-            height: pxToDp(120),
-            paddingHorizontal: pxToDp(30),
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Cell customStyle={{
-              marginLeft: 0,
-              justifyContent: 'center',
-              backgroundColor: colors.main_color,
+            <View style={{
+              height: pxToDp(120),
+              paddingHorizontal: pxToDp(30),
               alignItems: 'center',
-              borderRadius: pxToDp(5),
-            }} first={true}
-            >
-              <Text style={{
-                fontSize: pxToDp(32),
-                color: colors.white,
-                textAlign: 'center',
-                width: '100%',
-                textAlignVertical: 'center',
-                height: pxToDp(80),
-              }}>保存</Text>
-            </Cell>
-          </View>
+              justifyContent: 'center'
+            }}>
+              <Cell customStyle={{
+                marginLeft: 0,
+                justifyContent: 'center',
+                backgroundColor: colors.main_color,
+                alignItems: 'center',
+                borderRadius: pxToDp(5),
+              }} first={true}
+              >
+                <Text style={{
+                  fontSize: pxToDp(32),
+                  color: colors.white,
+                  textAlign: 'center',
+                  width: '100%',
+                  textAlignVertical: 'center',
+                  height: pxToDp(80),
+                }}>保存</Text>
+              </Cell>
+            </View>
+          </ScrollView>
+
           <DateTimePicker
               date={new Date()}
               minimumDate={new Date()}
@@ -384,19 +513,19 @@ class ActivityRuleScene extends PureComponent {
 
 class Percentage extends PureComponent {
   render() {
-    let {lower, upper, percentage, tail} = this.props;
+    let {min_price, max_price, percent, tail} = this.props;
     return (
         <Cell customStyle={style.cell} first={false}>
           <CellHeader>
             {
-              tail ? <Text style={style.cell_header_text}>{lower}元以上</Text>
-                  : <Text style={style.cell_header_text}>{lower}元--{upper}元</Text>
+              tail ? <Text style={style.cell_header_text}>{min_price}元以上</Text>
+                  : <Text style={style.cell_header_text}>{min_price}元--{max_price}元</Text>
             }
           </CellHeader>
 
           <CellFooter>
             <Image style={style.operation} source={require('../../img/Activity/jianshao_.png')}/>
-            <Text style={style.percentage_text}>{percentage}%</Text>
+            <Text style={style.percent_text}>{percent}%</Text>
             <Image style={style.operation} source={require('../../img/Activity/zengjia_.png')}/>
           </CellFooter>
         </Cell>

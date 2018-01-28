@@ -77,26 +77,115 @@ class ActivityManageScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      storeList: [
-        {value: 1, label: '大娃哈哈哈'},
-        {value: 2, label: '二娃哈哈哈'},
-        {value: 3, label: '三娃娃哈哈哈'},
-        {value: 4, label: '四娃哈哈哈'},
-        {value: 5, label: '五娃哈哈哈'},
-
-      ],
       checked: [],
       hide: false,
       vendorId: 0,
-      platList: [
-        Cts.WM_PLAT_ID_WX,
-        Cts.WM_PLAT_ID_BD,
-        Cts.WM_PLAT_ID_MT,
-        Cts.WM_PLAT_ID_ELE,
-        Cts.WM_PLAT_ID_JD,
-      ],
-      platId: Cts.WM_PLAT_ID_WX,
       showDialog: false,
+      list:[{
+        "price_rules": {
+          "id": "1",
+          "rule_name": "满49减20",
+          "vendor_id": "1",
+          "status": "1",
+          "start_time": "2018-01-25 00:00:00",
+          "end_time": "2018-01-26 00:00:00",
+          "ext_store_id": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "created": "2018-01-25 16:44:06",
+          "updated": "2018-01-25 17:00:31"
+        },
+        "interval_rules": {
+          "1": {
+            "21": {
+              "id": "21",
+              "rule_id": "1",
+              "type_id": "1",
+              "status": "1",
+              "categories": null,
+              "min_price": "0",
+              "max_price": "20",
+              "percent": "120",
+              "created": "2018-01-25 17:00:31",
+              "updated": "2018-01-25 17:00:31"
+            },
+            "22": {
+              "id": "22",
+              "rule_id": "1",
+              "type_id": "1",
+              "status": "1",
+              "categories": null,
+              "min_price": "20",
+              "max_price": "50",
+              "percent": "130",
+              "created": "2018-01-25 17:00:31",
+              "updated": "2018-01-25 17:00:31"
+            },
+            "23": {
+              "id": "23",
+              "rule_id": "1",
+              "type_id": "1",
+              "status": "1",
+              "categories": null,
+              "min_price": "50",
+              "max_price": "10000",
+              "percent": "110",
+              "created": "2018-01-25 17:00:31",
+              "updated": "2018-01-25 17:00:31"
+            }
+          },
+          "2": [{
+            "categories": [
+              "81898589",
+              "81898625"
+            ],
+            "rules": {
+              "24": {
+                "id": "24",
+                "rule_id": "1",
+                "type_id": "2",
+                "status": "1",
+                "categories": "81898589,81898625",
+                "min_price": "0",
+                "max_price": "30",
+                "percent": "123",
+                "created": "2018-01-25 17:00:31",
+                "updated": "2018-01-25 17:00:31"
+              },
+              "25": {
+                "id": "25",
+                "rule_id": "1",
+                "type_id": "2",
+                "status": "1",
+                "categories": "81898589,81898625",
+                "min_price": "30",
+                "max_price": "10000",
+                "percent": "111",
+                "created": "2018-01-25 17:00:31",
+                "updated": "2018-01-25 17:00:31"
+              }
+            }
+          }]
+        },
+        "goods_rules": [{
+          "id": "9",
+          "rule_id": "1",
+          "status": "1",
+          "product_id": [
+            "1121",
+            "1122",
+            "1123",
+            "1124"
+          ],
+          "percent": "140",
+          "created": "2018-01-25 17:00:31",
+          "updated": "2018-01-25 17:00:31"
+        }]
+      }]
     }
   }
 
@@ -109,12 +198,88 @@ class ActivityManageScene extends PureComponent {
     let {hide} = this.state;
     this.setState({hide: !hide})
   };
+  renderOperatingList(){
+    let {list} =this.state;
+    return list.map((item,index)=>{
+      let {id}=item;
+      return (
+          <View style={manage.cells}>
+            <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
+              <CellHeader>
+                <Text style={{fontSize: pxToDp(36), color: colors.main_color, fontWeight: '900'}}>满49减20</Text>
+              </CellHeader>
+              <View>
+                <Text style={manage.cell_footer_text}>2017-01-18 <Text
+                    style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
+                <Text style={manage.cell_footer_text}>至2017-01-18 <Text
+                    style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
+              </View>
+            </Cell>
+            <Cell customStyle={[style.cell, manage.cell]}>
+              <CellHeader>
+                <Text style={style.cell_header_text}>店铺(菜鸟食材)</Text>
+              </CellHeader>
+              <CellFooter>
+                <Text>美团回龙观等8家</Text>
+                <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={[style.cell, manage.cell]}>
+              <CellHeader>
+                <Text style={style.cell_header_text}>通用加价规则</Text>
+              </CellHeader>
+              <CellFooter>
+                <Text>0元-5元(160)等</Text>
+                <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={[style.cell, manage.cell]}>
+              <CellHeader>
+                <Text style={style.cell_header_text}>特殊分类规则</Text>
+              </CellHeader>
+              <CellFooter>
+                <Text>2组分类</Text>
+                <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={[style.cell, manage.cell]}>
+              <CellHeader>
+                <Text style={style.cell_header_text}>特殊商品规则</Text>
+              </CellHeader>
+              <CellFooter>
+                <Text>12组商品</Text>
+                <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
+              <Text style={manage.edit_btn}>修改</Text>
+            </Cell>
+            <View style={[manage.ball, manage.ball_left, manage.ball_main_color]}/>
+            <View style={[manage.ball, manage.ball_right, manage.ball_main_color]}/>
+            <View/>
+          </View>
+      )
+    });
+
+  }
 
   render() {
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
-            <View style={{backgroundColor: '#a3d0ac', paddingBottom: pxToDp(30), marginBottom: pxToDp(30)}}>
+            <View style={{backgroundColor: '#a3d0ac', marginBottom: pxToDp(30)}}>
               <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}>
                 <CellHeader style={{flexDirection: 'row'}}>
                   <Image source={require('../../img/Activity/yunxingzhong_.png')}
@@ -123,7 +288,6 @@ class ActivityManageScene extends PureComponent {
                 </CellHeader>
                 <Image style={manage.down} source={require('../../img/Public/xiangxiabai_.png')}/>
               </Cell>
-              {/**/}
               <View style={manage.cells}>
                 <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
                   <CellHeader>
@@ -191,7 +355,8 @@ class ActivityManageScene extends PureComponent {
                 <View style={[manage.ball, manage.ball_right, manage.ball_main_color]}/>
                 <View/>
               </View>
-              {/**/}
+
+
             </View>
 
             <View style={{backgroundColor: '#f1c377', paddingBottom: pxToDp(30)}}>
@@ -335,7 +500,8 @@ const manage = {
     marginHorizontal: pxToDp(30),
     position: 'relative',
     borderRadius: pxToDp(10),
-    backgroundColor: colors.white
+    backgroundColor: colors.white,
+    marginBottom:pxToDp(20),
   },
   cell: {
     marginLeft: 0,

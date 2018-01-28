@@ -138,4 +138,5 @@ export default {
   GOODS_CLASSIFY_ALL: '999999999',
   RULE_TYPE_GENERAL : 1,//1-通用规则
   RULE_TYPE_SPECIAL : 2,//2-特殊分类规则
+  Rule_PRICE_UPPER:10000
 }

@@ -6,7 +6,7 @@ const style = {
     backgroundColor: colors.white,
     height: pxToDp(100),
     marginLeft: 0,
-    paddingLeft: pxToDp(40),
+    paddingLeft: pxToDp(30),
     justifyContent: 'space-between',
     borderTopColor: colors.main_back
   },

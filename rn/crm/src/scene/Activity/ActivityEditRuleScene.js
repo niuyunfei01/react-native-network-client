@@ -29,7 +29,8 @@ import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast,Icon} from "../../weui/index";
+import {Toast, Icon} from "../../weui/index";
+import BottomBtn from './ActivityBottomBtn';
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -51,30 +52,92 @@ class ActivityEditRuleScene extends PureComponent {
     };
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      rule: []
+    }
+  }
+
+  componentWillMount() {
+    let {rule} = this.props.navigation.state.params;
+    this.setState({rule: rule})
+  }
+  renderList() {
+    let {rule} = this.state;
+    let length = rule.length
+    return rule.map((item, index) => {
+      let {min_price, max_price} = item;
+      return (
+          <View style={style.edit_cell} key={index}>
+            <Text style={style.start}>{min_price}元</Text>
+            <Text style={style.zhi}>至</Text>
+            <TextInput
+                style={style.max_price}
+                underlineColorAndroid='transparent'
+                keyboardType='numeric'
+                value={max_price == Cts.Rule_PRICE_UPPER ? '' : `${max_price}`}
+                onChangeText={(text) => {
+                  item.max_price = text;
+                  if (index == length - 1) {
+                    rule.push({
+                      min_price: text,
+                      max_price: '',
+                    })
+                    this.forceUpdate()
+                  } else {
+                    rule[index + 1].min_price = text;
+                    this.forceUpdate()
+                  }
+                }}
+                onEndEditing={(event) => {
+                  let text = event.nativeEvent.text;
+                  if (parseInt(min_price) > text) {
+                    ToastLong('请重新调整区间!')
+                  }
+                }}
+            />
+            <Text style={[style.zhi, {width: pxToDp(70), textAlign: 'center'}]}>元</Text>
+            <View style={style.delete}>
+              <TouchableOpacity
+                  onPress={() => {
+                    rule[index + 1].min_price = rule[index - 1].max_price;
+                    rule.splice(index, 1);
+                    this.forceUpdate()
+                  }}
+              >
+                {
+                  index == 0 || index == (rule.length - 1) ? null :
+                      <Icon
+                          name={'clear'}
+                          size={pxToDp(40)}
+                          style={{backgroundColor: '#fff'}}
+                          color={'#d81e06'}
+                          msg={false}
+                      />
+                }
+              </TouchableOpacity>
+              {/*{*/}
+              {/*this.renderDelete(index)*/}
+              {/*}*/}
+            </View>
+          </View>
+      )
+    })
+  }
+
   render() {
     return (
         <View style={{flex: 1}}>
           <ScrollView>
-            <View style={style.edit_cell}>
-              <Text style={style.start}>0元</Text>
-              <Text style={style.zhi}>至</Text>
-              <TextInput
-                  style={style.style_input}
-                  underlineColorAndroid='transparent'
-                  value={'5'}
+            {this.renderList()}
+            <TouchableOpacity
+                onPress={() => {
 
-              />
-              <Text style={[style.zhi,{width:pxToDp(70),textAlign:'center'}]}>元</Text>
-              <View style={style.delete}>
-                <Icon
-                    name={'clear'}
-                    size={pxToDp(40)}
-                    style={{backgroundColor: '#fff'}}
-                    color={'#d81e06'}
-                    msg={false}
-                />
-              </View>
-            </View>
+                }}
+            >
+              <BottomBtn/>
+            </TouchableOpacity>
           </ScrollView>
         </View>
     )
@@ -86,29 +149,36 @@ const style = StyleSheet.create({
     height: pxToDp(135),
     backgroundColor: colors.white,
     paddingHorizontal: pxToDp(30),
-    flexDirection:'row',
-    alignItems:'center',
-    marginBottom:pxToDp(1),
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: pxToDp(1),
   },
-  start:{
-    width:pxToDp(200),
-    fontSize:pxToDp(32),
-    color:colors.fontBlack,
+  start: {
+    width: pxToDp(200),
+    fontSize: pxToDp(32),
+    color: colors.fontBlack,
   },
-  zhi:{
-    width:pxToDp(100),
+  zhi: {
+    width: pxToDp(100),
   },
-  style_input:{
-    width:pxToDp(150),
-    height:pxToDp(65),
-    borderColor:colors.main_color,
-    textAlign:'center',
-    borderRadius:pxToDp(5),
-    borderWidth:pxToDp(1),
+  style_input: {
+    width: pxToDp(150),
+    height: pxToDp(65),
+    borderColor: colors.main_color,
+    textAlign: 'center',
+    borderRadius: pxToDp(5),
+    borderWidth: pxToDp(1),
   },
-  delete:{
-    width:pxToDp(140),
-    alignItems:'center',
+  delete: {
+    width: pxToDp(140),
+    alignItems: 'center',
+  },
+  max_price: {
+    borderWidth: pxToDp(1),
+    borderColor: colors.main_color,
+    textAlign: 'center',
+    width: pxToDp(160),
+    height: pxToDp(65)
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityEditRuleScene)

@@ -71,7 +71,6 @@ class ActivitySelectStoreScene extends PureComponent {
         {value: 3, label: '三娃娃哈哈哈'},
         {value: 4, label: '四娃哈哈哈'},
         {value: 5, label: '五娃哈哈哈'},
-
       ],
       checked: [],
       hide: false,
@@ -116,7 +115,6 @@ class ActivitySelectStoreScene extends PureComponent {
                           style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
                         {tool.get_platform_name(item)}
                       </Text>
-
                     </TouchableOpacity>
                 )
               })
@@ -130,8 +128,8 @@ class ActivitySelectStoreScene extends PureComponent {
     }
     return null;
   }
-
   render() {
+    let {checked} =this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
@@ -189,7 +187,6 @@ class ActivitySelectStoreScene extends PureComponent {
                   }}
                   bodyStyle={{
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontGray,
                     marginLeft: pxToDp(15),
                     marginRight: pxToDp(15),
                     height: pxToDp(800),
@@ -197,19 +194,37 @@ class ActivitySelectStoreScene extends PureComponent {
                   }}
           >
             <ScrollView style={{height: pxToDp(700),}}>
-              <Cell customStyle={[style.cell]}>
-                <CellHeader>
-                  <Text>回龙观店(微信)</Text>
-                </CellHeader>
-                <TouchableOpacity>
-                  <Text style={{
-                    fontSize:pxToDp(30),
-                    color:colors.white,
-                    height:pxToDp(60),
-                    backgroundColor:colors.main_color,
-                  }}>移除</Text>
-                </TouchableOpacity>
-              </Cell>
+              {
+                checked.map((item,index)=>{
+                  return(
+                      <Cell customStyle={[style.cell,{paddingLeft:pxToDp(15),paddingRight:pxToDp(15)}]}
+                            first={index==0}
+                            key={index}
+                      >
+                        <CellHeader>
+                          <Text>回龙观店(微信)</Text>
+                        </CellHeader>
+                        <TouchableOpacity
+                            onPress={()=>{
+                              checked.splice(index,1);
+                              this.forceUpdate();
+                            }}
+                        >
+                          <Text style={{
+                            fontSize:pxToDp(30),
+                            color:colors.white,
+                            height:pxToDp(60),
+                            backgroundColor:colors.main_color,
+                            width:pxToDp(130),
+                            textAlign:'center',
+                            textAlignVertical:'center',
+                            borderRadius:pxToDp(5),
+                          }}>移除</Text>
+                        </TouchableOpacity>
+                      </Cell>
+                  )
+                })
+              }
             </ScrollView>
           </Dialog>
         </View>
