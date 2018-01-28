@@ -58,7 +58,9 @@ class ActivitySelectGoodScene extends PureComponent {
 
   constructor(props) {
     super(props);
-
+    this.state = {
+      checked: []
+    }
   }
 
   componentDidMount() {
@@ -89,24 +91,31 @@ class ActivitySelectGoodScene extends PureComponent {
                 </CellFooter>
               </Cell>
             </Cells>
-            <Cell>
-              <TextInput
-                  placeholder='输入商品名称模糊搜索'
-                  underlineColorAndroid='transparent'
-                  style={[styles.input_text]}
-                  placeholderTextColor={"#7A7A7A"}
-                  keyboardType='numeric'
-                  value={this.state.price}
-                  onChangeText={(text) => {
-                    this.setState({price: text})
-                  }}
-              />
+
+            <TextInput
+                placeholder='输入商品名称模糊搜索'
+                underlineColorAndroid='transparent'
+                style={[styles.input_text]}
+                placeholderTextColor={"#7A7A7A"}
+                keyboardType='numeric'
+                value={this.state.price}
+                onChangeText={(text) => {
+                  this.setState({price: text})
+                }}
+            />
+            <Cell customStyle={[style.cell,styles.cell]}>
+                <Image style={styles.img} source={{uri:"https://www.cainiaoshicai.cn/files/201606/thumb_m/59b6a4a5de8_0623.jpg"}}/>
+              <CellBody style={{paddingHorizontal:pxToDp(20)}}>
+                <Text numberOfLines={2} style={style.default_text}>数控技术担惊受恐红色经典哈萨克 回家时候定价说的就是</Text>
+                <Text style={style.default_text}>#1313</Text>
+              </CellBody>
+              <Text style={style.text_btn}>添加</Text>
             </Cell>
           </ScrollView>
           <Dialog onRequestClose={() => {
           }}
                   visible={this.state.showDialog}
-                  title={'已选店铺'}
+                  title={'已选商品'}
                   titleStyle={{textAlign: 'center', color: colors.fontBlack}}
                   headerStyle={{
                     backgroundColor: colors.main_back,
@@ -123,11 +132,9 @@ class ActivitySelectGoodScene extends PureComponent {
                   }]}
                   footerStyle={{
                     borderTopWidth: pxToDp(1),
-                    borderTopColor: colors.fontGray,
                   }}
                   bodyStyle={{
                     borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontGray,
                     marginLeft: pxToDp(15),
                     marginRight: pxToDp(15),
                     height: pxToDp(800),
@@ -135,18 +142,13 @@ class ActivitySelectGoodScene extends PureComponent {
                   }}
           >
             <ScrollView style={{height: pxToDp(700),}}>
-              <Cell customStyle={[style.cell]}>
-                <CellHeader>
-                  <Text>回龙观店(微信)</Text>
-                </CellHeader>
-                <TouchableOpacity>
-                  <Text style={{
-                    fontSize: pxToDp(30),
-                    color: colors.white,
-                    height: pxToDp(60),
-                    backgroundColor: colors.main_color,
-                  }}>移除</Text>
-                </TouchableOpacity>
+              <Cell customStyle={[style.cell,styles.cell,{borderBottomColor:'#d4d4d4',}]}>
+                <Image style={styles.img} source={{uri:"https://www.cainiaoshicai.cn/files/201606/thumb_m/59b6a4a5de8_0623.jpg"}}/>
+                <CellBody style={{paddingHorizontal:pxToDp(20)}}>
+                  <Text numberOfLines={2} style={style.default_text}>数控技术担惊受恐红色经典哈萨克 回家时候定价说的就是</Text>
+                  <Text style={style.default_text}>#1313</Text>
+                </CellBody>
+                <Text style={style.text_btn}>移除</Text>
               </Cell>
             </ScrollView>
           </Dialog>
@@ -155,10 +157,28 @@ class ActivitySelectGoodScene extends PureComponent {
   }
 }
 
-const styles={
-  input_text:{
-
+const styles = {
+  input_text: {
+    borderWidth: pxToDp(2),
+    borderColor: colors.main_color,
+    marginVertical:pxToDp(30),
+    marginHorizontal:pxToDp(30),
+    borderRadius:pxToDp(5),
+  },
+  img:{
+    height:pxToDp(90),
+    width:pxToDp(90),
+  },
+  cell:{
+    borderBottomWidth:pxToDp(1),
+    height:pxToDp(150),
+    backgroundColor:'transparent',
+    borderBottomColor:'#999999',
+    paddingLeft:0,
+    paddingRight:0,
+    marginHorizontal:pxToDp(30),
+    marginLeft:pxToDp(30),
   }
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivitySelectGoodScene)

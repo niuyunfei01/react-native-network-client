@@ -49,6 +49,20 @@ const style = {
     textAlignVertical: 'center',
     textAlign: 'center',
     marginHorizontal: pxToDp(40),
+  },
+  text_btn:{
+    fontSize:pxToDp(30),
+    color:colors.white,
+    height:pxToDp(60),
+    backgroundColor:colors.main_color,
+    minWidth:pxToDp(130),
+    textAlign:'center',
+    textAlignVertical:'center',
+    borderRadius:pxToDp(5),
+  },
+  default_text:{
+    fontSize:pxToDp(24),
+    color:colors.fontBlack,
   }
 };
 export default style;

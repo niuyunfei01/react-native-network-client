@@ -61,7 +61,20 @@ class ActivityEditRuleScene extends PureComponent {
 
   componentWillMount() {
     let {rule} = this.props.navigation.state.params;
-    this.setState({rule: rule})
+    this.setState({rule: this.dataToCommon(rule)})
+  }
+  dataToCommon(obj) {
+    let arr = [];
+    tool.objectMap(obj, (item, key) => {
+      let {type_id, min_price, max_price, percent} = item
+      arr.push({
+        "type_id": type_id,
+        "min_price": min_price,
+        "max_price": max_price,
+        "percent": percent
+      })
+    });
+    return arr;
   }
   renderList() {
     let {rule} = this.state;

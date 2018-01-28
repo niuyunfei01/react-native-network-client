@@ -8,6 +8,7 @@ import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
 import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
 import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
 import ActivityManageScene from "./scene/Activity/ActivityManageScene";
+import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
 
 
 const {
@@ -141,6 +142,7 @@ const C = {
   ROUTE_ACTIVITY_SELECT_STORE:'ActivitySelectStore',
   ROUTE_ACTIVITY_MANAGE:'ActivityManage',
   ROUTE_ACTIVITY_SELECT_GOOD:'ActivitySelectGood',
+  ROUTE_ACTIVITY_CLASSIFY:'ActivitySelectClassify',
   serverUrl,
   apiUrl,
   staticUrl,

@@ -75,6 +75,7 @@ import ActivitySelectStoreScene from "../scene/Activity/ActivitySelectStoreScene
 import ActivityManageScene from "../scene/Activity/ActivityManageScene";
 import ActivityListScene from "../scene/Activity/ActivityListScene";
 import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
+import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
 
 const tabDef = {
   Remind: {
@@ -275,6 +276,7 @@ class Navigator extends Component {
         [Config.ROUTE_ACTIVITY_MANAGE]: {screen: ActivityManageScene},
         [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
         [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
+        [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
       },
       stackNavigatorConfigs
     );
