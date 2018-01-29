@@ -364,7 +364,6 @@ class GoodsMangerScene extends PureComponent {
                   <TouchableOpacity
                       key={key}
                       onPress={() => {
-
                         this.setState({selectedTag: item.id})
                       }}
                   >

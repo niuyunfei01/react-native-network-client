@@ -32,6 +32,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
 import SelectBox from './SelectBox'
+import {fetchListVendorTags} from "../../reducers/product/productActions";
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -41,6 +42,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      fetchListVendorTags,
       ...globalActions
     }, dispatch)
   }
@@ -60,13 +62,7 @@ class ActivitySelectClassifyScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      storeList: [
-        {value: 1, label: '野菜'},
-        {value: 2, label: '蛋类'},
-        {value: 3, label: '野菜'},
-        {value: 4, label: '水果'},
-        {value: 5, label: '火锅'},
-      ],
+      list: [],
       checked: [],
       hide: false,
       vendorId: 0,
@@ -79,12 +75,13 @@ class ActivitySelectClassifyScene extends PureComponent {
       ],
       platId: Cts.WM_PLAT_ID_WX,
       showDialog: false,
+      listJson:{}
     }
   }
 
   componentDidMount() {
     let {navigation} = this.props;
-    navigation.setParams({toggle: this.toggle});
+    this.getListVendorTags()
   }
 
   toggle = () => {
@@ -92,8 +89,43 @@ class ActivitySelectClassifyScene extends PureComponent {
     this.setState({hide: !hide})
   };
 
+  async getListVendorTags() {
+    const {vendorId} = this.props.navigation.state.params;
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    this.setState({query: true});
+    dispatch(fetchListVendorTags(vendorId, accessToken, (ok, desc, obj) => {
+      if (ok) {
+        this.setState({list: this.dataToCheck(obj)});
+      } else {
+        ToastLong(desc);
+      }
+    }));
+  }
+
+  dataToCheck(obj) {
+    obj.forEach((item, index) => {
+      if (item.id == Cts.GOODS_CLASSIFY_ALL ) {
+        obj.splice(index, 1)
+      } else if(item.id == Cts.GOODS_CLASSIFY_UNCLASSIFIED) {
+        item.value = item.id;
+        item.label = item.name;
+      }
+    });
+    return obj;
+  }
+  getClassName(key) {
+    let {list} = this.state;
+    let name='';
+    list.forEach((item) => {
+      if(item.id==key){
+        name= item.label
+      }
+    });
+    return name;
+  }
   renderSelectBox() {
-    let {hide, vendorId, platList, platId} = this.state;
+    let {hide, vendorId, platList, platId,} = this.state;
     if (hide) {
       return (
           <SelectBox toggle={() => this.toggle()}>
@@ -123,8 +155,9 @@ class ActivitySelectClassifyScene extends PureComponent {
     }
     return null;
   }
+
   render() {
-    let {checked} =this.state;
+    let {checked,listJson} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
@@ -147,7 +180,7 @@ class ActivitySelectClassifyScene extends PureComponent {
               </Cell>
             </Cells>
             <CheckboxCells
-                options={this.state.storeList}
+                options={this.state.list}
                 value={this.state.checked}
                 onChange={(checked) => {
                   this.setState({checked: checked})
@@ -158,7 +191,8 @@ class ActivitySelectClassifyScene extends PureComponent {
           {
             this.renderSelectBox()
           }
-          <Dialog onRequestClose={() => {}}
+          <Dialog onRequestClose={() => {
+          }}
                   visible={this.state.showDialog}
                   title={'已选店铺'}
                   titleStyle={{textAlign: 'center', color: colors.fontBlack}}
@@ -189,30 +223,34 @@ class ActivitySelectClassifyScene extends PureComponent {
           >
             <ScrollView style={{height: pxToDp(700),}}>
               {
-                checked.map((item,index)=>{
-                  return(
-                      <Cell customStyle={[style.cell,{paddingLeft:pxToDp(15),paddingRight:pxToDp(15)}]}
-                            first={index==0}
+                checked.map((item, index) => {
+                  return (
+                      <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}
+                            first={index == 0}
                             key={index}
                       >
                         <CellHeader>
-                          <Text>回龙观店(微信)</Text>
+                          <Text>
+                            {
+                              this.getClassName(item)
+                            }
+                          </Text>
                         </CellHeader>
                         <TouchableOpacity
-                            onPress={()=>{
-                              checked.splice(index,1);
+                            onPress={() => {
+                              checked.splice(index,1)
                               this.forceUpdate();
                             }}
                         >
                           <Text style={{
-                            fontSize:pxToDp(30),
-                            color:colors.white,
-                            height:pxToDp(60),
-                            backgroundColor:colors.main_color,
-                            width:pxToDp(130),
-                            textAlign:'center',
-                            textAlignVertical:'center',
-                            borderRadius:pxToDp(5),
+                            fontSize: pxToDp(30),
+                            color: colors.white,
+                            height: pxToDp(60),
+                            backgroundColor: colors.main_color,
+                            width: pxToDp(130),
+                            textAlign: 'center',
+                            textAlignVertical: 'center',
+                            borderRadius: pxToDp(5),
                           }}>移除</Text>
                         </TouchableOpacity>
                       </Cell>

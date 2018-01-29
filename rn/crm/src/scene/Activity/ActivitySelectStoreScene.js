@@ -22,6 +22,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import {fetchWmStores} from '../../reducers/activity/activityAction';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 
@@ -32,6 +33,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
 import SelectBox from './SelectBox'
+import {fetchListVendorTags} from "../../reducers/product/productActions";
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -41,6 +43,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      fetchWmStores,
       ...globalActions
     }, dispatch)
   }
@@ -55,7 +58,7 @@ class ActivitySelectStoreScene extends PureComponent {
       headerTitle: '选择店铺',
       headerRight: (
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
-            <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>微信</Text>
+            <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>品牌</Text>
             <Image style={{width: pxToDp(80), height: pxToDp(80)}} source={require('../../img/Order/pull_down.png')}/>
           </TouchableOpacity>
       )
@@ -65,30 +68,33 @@ class ActivitySelectStoreScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      storeList: [
-        {value: 1, label: '大娃哈哈哈'},
-        {value: 2, label: '二娃哈哈哈'},
-        {value: 3, label: '三娃娃哈哈哈'},
-        {value: 4, label: '四娃哈哈哈'},
-        {value: 5, label: '五娃哈哈哈'},
-      ],
+      storeList: [],
       checked: [],
       hide: false,
       vendorId: 0,
       platList: [
-        Cts.WM_PLAT_ID_WX,
         Cts.WM_PLAT_ID_BD,
         Cts.WM_PLAT_ID_MT,
         Cts.WM_PLAT_ID_ELE,
         Cts.WM_PLAT_ID_JD,
       ],
-      platId: Cts.WM_PLAT_ID_WX,
+      platId: [
+        Cts.WM_PLAT_ID_BD,
+        Cts.WM_PLAT_ID_MT,
+        Cts.WM_PLAT_ID_ELE,
+        Cts.WM_PLAT_ID_JD,],
       showDialog: false,
+      checkedAll: [],
+      checkList: [],
+      listJson:{}
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     let {navigation} = this.props;
+    let {vendorId} = navigation.state.params;
+    await this.setState({vendorId: vendorId});
+    this.getStoreList()
     navigation.setParams({toggle: this.toggle});
   }
 
@@ -97,8 +103,54 @@ class ActivitySelectStoreScene extends PureComponent {
     this.setState({hide: !hide})
   };
 
+  getStoreList() {
+    const {vendorId} = this.state;
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(fetchWmStores(vendorId, accessToken, (ok, desc, obj) => {
+      if (ok) {
+        this.setState({
+          storeList: this.dataToCheck(obj),
+          checkList: this.getRenderArr(obj,0),
+          listJson: this.getRenderArr(obj,1),
+
+        });
+      } else {
+        ToastLong(desc);
+      }
+    }));
+
+  }
+
+  dataToCheck(arr) {
+    arr.forEach((item) => {
+      item.value = item.id;
+      item.label = item.name;
+    });
+    return arr;
+  }
+
+  getRenderArr(arr,type) {
+    let {platId} = this.state;
+    let json = {}
+    let list = [];
+    if(type){
+      arr.forEach((item) => {
+        json[item.id]=item.name
+      });
+      return json;
+    }else {
+      arr.forEach((item) => {
+        if (platId.indexOf(parseInt(item.platform)) >= 0) {
+          list.push(item)
+        }
+      });
+      return list;
+    }
+  }
+
   renderSelectBox() {
-    let {hide, vendorId, platList, platId} = this.state;
+    let {hide, vendorId, platList, platId,storeList,checkList} = this.state;
     if (hide) {
       return (
           <SelectBox toggle={() => this.toggle()}>
@@ -108,11 +160,23 @@ class ActivitySelectStoreScene extends PureComponent {
                     <TouchableOpacity
                         key={key}
                         onPress={async () => {
-                          this.setState({platId: item})
+                          if(platId.indexOf(item)<0){
+                            this.setState({
+                              platId: [item, ...platId],
+                              checkList:this.getRenderArr(storeList)
+                            })
+
+                          }else {
+                            platId.splice(platId.indexOf(item),1);
+                          await  this.setState({
+                            checkList:this.getRenderArr(storeList)
+                            });
+                            this.forceUpdate()
+                          }
                         }}
                     >
                       <Text
-                          style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
+                          style={platId.indexOf(item) >= 0 ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
                         {tool.get_platform_name(item)}
                       </Text>
                     </TouchableOpacity>
@@ -128,8 +192,9 @@ class ActivitySelectStoreScene extends PureComponent {
     }
     return null;
   }
+
   render() {
-    let {checked} =this.state;
+    let {checked, checkList,checkedAll,listJson} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
@@ -143,7 +208,7 @@ class ActivitySelectStoreScene extends PureComponent {
                   <Text>已选店铺</Text>
                 </CellHeader>
                 <CellFooter>
-                  <Text> {this.state.checked.length}</Text>
+                  <Text> {this.state.checkedAll.length}</Text>
                   <Image
                       style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                       source={require('../../img/Public/xiangxia_.png')}
@@ -152,10 +217,12 @@ class ActivitySelectStoreScene extends PureComponent {
               </Cell>
             </Cells>
             <CheckboxCells
-                options={this.state.storeList}
-                value={this.state.checked}
-                onChange={(checked) => {
-                  this.setState({checked: checked})
+                options={checkList}
+                value={this.state.checkedAll}
+                onChange={async (checked) => {
+                 await this.setState({
+                   checkedAll:checked
+                 });
                 }}
                 style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
             />
@@ -195,30 +262,30 @@ class ActivitySelectStoreScene extends PureComponent {
           >
             <ScrollView style={{height: pxToDp(700),}}>
               {
-                checked.map((item,index)=>{
-                  return(
-                      <Cell customStyle={[style.cell,{paddingLeft:pxToDp(15),paddingRight:pxToDp(15)}]}
-                            first={index==0}
+                checkedAll.map((item, index) => {
+                  return (
+                      <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}
+                            first={index == 0}
                             key={index}
                       >
                         <CellHeader>
-                          <Text>回龙观店(微信)</Text>
+                          <Text>{listJson[item]}</Text>
                         </CellHeader>
                         <TouchableOpacity
-                            onPress={()=>{
-                              checked.splice(index,1);
+                            onPress={() => {
+                              checkedAll.splice(index, 1);
                               this.forceUpdate();
                             }}
                         >
                           <Text style={{
-                            fontSize:pxToDp(30),
-                            color:colors.white,
-                            height:pxToDp(60),
-                            backgroundColor:colors.main_color,
-                            width:pxToDp(130),
-                            textAlign:'center',
-                            textAlignVertical:'center',
-                            borderRadius:pxToDp(5),
+                            fontSize: pxToDp(30),
+                            color: colors.white,
+                            height: pxToDp(60),
+                            backgroundColor: colors.main_color,
+                            width: pxToDp(130),
+                            textAlign: 'center',
+                            textAlignVertical: 'center',
+                            borderRadius: pxToDp(5),
                           }}>移除</Text>
                         </TouchableOpacity>
                       </Cell>

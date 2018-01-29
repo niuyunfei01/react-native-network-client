@@ -55,6 +55,7 @@ const select = StyleSheet.create({
     paddingBottom: pxToDp(50),
     justifyContent: 'space-between',
     borderTopWidth: pxToDp(1),
+    borderTopColor:colors.fontGray,
   },
   select_item: {
     width: pxToDp(172),

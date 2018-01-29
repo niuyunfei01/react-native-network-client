@@ -9,6 +9,7 @@ import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
 import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
 import ActivityManageScene from "./scene/Activity/ActivityManageScene";
 import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
+import ActivityListScene from "./scene/Activity/ActivityListScene";
 
 
 const {
@@ -143,6 +144,7 @@ const C = {
   ROUTE_ACTIVITY_MANAGE:'ActivityManage',
   ROUTE_ACTIVITY_SELECT_GOOD:'ActivitySelectGood',
   ROUTE_ACTIVITY_CLASSIFY:'ActivitySelectClassify',
+  ROUTE_ACTIVITY_LIST:'ActivityList',
   serverUrl,
   apiUrl,
   staticUrl,

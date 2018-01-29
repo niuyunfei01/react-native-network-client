@@ -86,12 +86,13 @@ class GoodsPriceDetails extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, (ok, desc, obj) => {
-      this.setState({query: false});
       if (ok) {
-        this.setState({storesList: obj})
+        this.setState({storesList: obj,query: false})
       } else {
+        this.setState({query: false});
         ToastLong(desc);
       }
+
     }));
   }
 
@@ -155,7 +156,6 @@ class GoodsPriceDetails extends PureComponent {
 
   priceMaxMinImg(item) {
     let {is_max, is_min} = item;
-
     if (is_max) {
       return require('../../img/Goods/zuidajia_.png')
     } else if (is_min) {
@@ -167,60 +167,65 @@ class GoodsPriceDetails extends PureComponent {
 
   renderList() {
     let {storesList} = this.state;
-    return storesList.map((item, index) => {
-      let {fn_price_controlled, store_id, store_name, wm_goods, supply_price} = item || {};
-      return (
-          <Cells key={index}>
-            <Cell customStyle={content.store} style={{borderTopWidth: 0}} first={true}>
-              <CellHeader style={content.cell_header}>
-                <Text style={content.store_name}>{store_name}</Text>
+    console.log('storesList',storesList)
+    if(storesList){
+      return storesList.map((item, index) => {
+        let {fn_price_controlled, store_id, store_name, wm_goods, supply_price} = item || {};
+        return (
+            <Cells key={index}>
+              <Cell customStyle={content.store} style={{borderTopWidth: 0}} first={true}>
+                <CellHeader style={content.cell_header}>
+                  <Text style={content.store_name}>{store_name}</Text>
+                  {
+                    fn_price_controlled == 1 ? <Text style={content.store_type}>代运营店铺</Text> : <Text/>
+                  }
+                </CellHeader>
+                <CellBody/>
                 {
-                  fn_price_controlled == 1 ? <Text style={content.store_type}>代运营店铺</Text> : <Text/>
+                  fn_price_controlled == 1 ? <CellFooter>
+                    <Text style={content.store_price}>￥{tool.toFixed(supply_price)}</Text>
+                    <Image source={require('../../img/Goods/baojia_.png')}
+                           style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
+                  </CellFooter> : <Text/>
                 }
-              </CellHeader>
-              <CellBody/>
+              </Cell>
               {
-                fn_price_controlled == 1 ? <CellFooter>
-                  <Text style={content.store_price}>￥{tool.toFixed(supply_price)}</Text>
-                  <Image source={require('../../img/Goods/baojia_.png')}
-                         style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-                </CellFooter> : <Text/>
-              }
-            </Cell>
-            {
-              wm_goods.map((ite, key) => {
-                let {status, price, platform_id, before_price} = ite;
-                return (
-                    <Cell key={key} customStyle={content.store} style={{borderTopWidth: 0}}>
-                      <CellHeader style={content.cell_header}>
-                        <Image source={tool.platformsLogo(platform_id)} style={content.plat_img}/>
-                        <View>
-                          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={content.plat_price}>{tool.toFixed(price)}</Text>
-                            <Image style={content.price_status} source={this.priceMaxMinImg(ite)}/>
+                wm_goods.map((ite, key) => {
+                  let {status, price, platform_id, before_price} = ite;
+                  return (
+                      <Cell key={key} customStyle={content.store} style={{borderTopWidth: 0}}>
+                        <CellHeader style={content.cell_header}>
+                          <Image source={tool.platformsLogo(platform_id)} style={content.plat_img}/>
+                          <View>
+                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                              <Text style={content.plat_price}>{tool.toFixed(price)}</Text>
+                              <Image style={content.price_status} source={this.priceMaxMinImg(ite)}/>
+                            </View>
+                            {
+                              before_price ?
+                                  <Text style={content.plat_min_price}>{tool.toFixed(before_price)}</Text> : null
+                            }
                           </View>
+                        </CellHeader>
+                        <CellBody>
                           {
-                            before_price ?
-                                <Text style={content.plat_min_price}>{tool.toFixed(before_price)}</Text> : null
+                            this.price_status(ite, store_id)
                           }
-                        </View>
-                      </CellHeader>
-                      <CellBody>
-                        {
-                          this.price_status(ite, store_id)
-                        }
-                      </CellBody>
-                      <CellFooter>
-                        <Image source={tool.goodSoldStatusImg(status)}
-                               style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
-                      </CellFooter>
-                    </Cell>
-                )
-              })
-            }
-          </Cells>
-      )
-    })
+                        </CellBody>
+                        <CellFooter>
+                          <Image source={tool.goodSoldStatusImg(status)}
+                                 style={{height: pxToDp(28), width: pxToDp(28), marginLeft: pxToDp(20)}}/>
+                        </CellFooter>
+                      </Cell>
+                  )
+                })
+              }
+            </Cells>
+        )
+      })
+    }else {
+      return <View/>
+    }
   }
 
   render() {
