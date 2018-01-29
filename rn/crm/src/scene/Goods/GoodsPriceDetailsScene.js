@@ -99,10 +99,10 @@ class GoodsPriceDetails extends PureComponent {
     const {dispatch} = this.props;
     let _this = this;
     dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, async (ok, desc, obj) => {
-      this.setState({query: false,});
       if (ok) {
         let {price, upper_limit, lower_limit} = obj.refer_info || {};
         await _this.setState({
+          query: false,
           storesList: obj.store_list,
           referPrice: price,
           upperLimit: upper_limit,
@@ -114,6 +114,7 @@ class GoodsPriceDetails extends PureComponent {
         _this.listSort();
         this.forceUpdate()
       } else {
+        this.setState({query: false,});
         ToastLong(desc);
       }
     }));
@@ -194,10 +195,8 @@ class GoodsPriceDetails extends PureComponent {
         }
       }));
     }else {
-      console.log(7777)
       this.setState({uploading: false});
     }
-
   }
   reduce(str) {
     let num = this.state[str];
