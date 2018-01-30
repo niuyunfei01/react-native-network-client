@@ -1,4 +1,6 @@
 import React, {PureComponent} from 'react';
+import Autocomplete from 'react-native-autocomplete-input';
+
 import {
   View,
   Text,
@@ -59,7 +61,9 @@ class ActivitySelectGoodScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      checked: []
+      checked: [],
+      query:'1111'
+
     }
   }
 
@@ -70,6 +74,7 @@ class ActivitySelectGoodScene extends PureComponent {
 
 
   render() {
+    const { query } = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
@@ -103,6 +108,22 @@ class ActivitySelectGoodScene extends PureComponent {
                   this.setState({price: text})
                 }}
             />
+            {/*<Autocomplete*/}
+                {/*containerStyle={[styles.input_text]}*/}
+                {/*defaultValue={query}*/}
+                {/*underlineColorAndroid={'transparent'}*/}
+                {/*onChangeText={text => this.setState({query: text})}*/}
+                {/*inputContainerStyle={{borderColor:'transparent'}}*/}
+                {/*data={filteredProds.length === 1 && comp(query, filteredProds[0].name) ? [] : filteredProds}*/}
+                {/*placeholder='输入商品名称模糊搜索'*/}
+                {/*renderItem={({name, price, pid}) => (*/}
+                    {/*<TouchableOpacity onPress={() => this._onProdSelected(name, pid, price)}>*/}
+                      {/*<Text style={styles.itemText}>*/}
+                        {/*{name} ({price})*/}
+                      {/*</Text>*/}
+                    {/*</TouchableOpacity>*/}
+                {/*)}*/}
+            {/*/>*/}
             <Cell customStyle={[style.cell,styles.cell]}>
                 <Image style={styles.img} source={{uri:"https://www.cainiaoshicai.cn/files/201606/thumb_m/59b6a4a5de8_0623.jpg"}}/>
               <CellBody style={{paddingHorizontal:pxToDp(20)}}>

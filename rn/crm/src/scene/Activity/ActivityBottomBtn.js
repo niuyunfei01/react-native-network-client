@@ -45,7 +45,7 @@ const BottomBtn = ()=>{
            width: '100%',
            textAlignVertical: 'center',
            height: pxToDp(80),
-         }}>保存</Text>
+         }}>{this.props.content}</Text>
        </Cell>
      </View>
  )

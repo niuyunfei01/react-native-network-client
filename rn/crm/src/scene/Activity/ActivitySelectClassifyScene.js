@@ -14,11 +14,11 @@ import {
   Cells,
   Cell,
   CellHeader,
-  CheckboxCells,
   CellBody,
   CellFooter,
   Label,
 } from "../../weui/index";
+import CheckboxCells from './myChecks'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -105,11 +105,8 @@ class ActivitySelectClassifyScene extends PureComponent {
 
   dataToCheck(obj) {
     obj.forEach((item, index) => {
-      if (item.id == Cts.GOODS_CLASSIFY_ALL ) {
+      if (item.id == Cts.GOODS_CLASSIFY_ALL || item.id == Cts.GOODS_CLASSIFY_UNCLASSIFIED) {
         obj.splice(index, 1)
-      } else if(item.id == Cts.GOODS_CLASSIFY_UNCLASSIFIED) {
-        item.value = item.id;
-        item.label = item.name;
       }
     });
     return obj;
@@ -119,7 +116,7 @@ class ActivitySelectClassifyScene extends PureComponent {
     let name='';
     list.forEach((item) => {
       if(item.id==key){
-        name= item.label
+        name= item.name
       }
     });
     return name;
@@ -181,7 +178,9 @@ class ActivitySelectClassifyScene extends PureComponent {
             </Cells>
             <CheckboxCells
                 options={this.state.list}
-                value={this.state.checked}
+                values={this.state.checked}
+                label={'name'}
+                value={'id'}
                 onChange={(checked) => {
                   this.setState({checked: checked})
                 }}
@@ -191,8 +190,7 @@ class ActivitySelectClassifyScene extends PureComponent {
           {
             this.renderSelectBox()
           }
-          <Dialog onRequestClose={() => {
-          }}
+          <Dialog onRequestClose={() => {}}
                   visible={this.state.showDialog}
                   title={'已选店铺'}
                   titleStyle={{textAlign: 'center', color: colors.fontBlack}}

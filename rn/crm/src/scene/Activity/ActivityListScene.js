@@ -2,36 +2,31 @@ import React, {PureComponent} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
-  FlatList,
-  TouchableHighlight,
+
 } from 'react-native';
 import {
-  Cells,
   Cell,
   CellHeader,
-  CheckboxCells,
-  CellBody,
   CellFooter,
-  Label,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-
+import {fetchRuleList} from '../../reducers/activity/activityAction'
 import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
-import SelectBox from './SelectBox'
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import ModalSelector from "../../widget/ModalSelector/index";
+import ActivityItem from './ActivityItem'
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -41,6 +36,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      fetchRuleList,
       ...globalActions
     }, dispatch)
   }
@@ -59,17 +55,9 @@ class ActivityListScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      storeList: [
-        {value: 1, label: '大娃哈哈哈'},
-        {value: 2, label: '二娃哈哈哈'},
-        {value: 3, label: '三娃娃哈哈哈'},
-        {value: 4, label: '四娃哈哈哈'},
-        {value: 5, label: '五娃哈哈哈'},
-
-      ],
       checked: [],
       hide: false,
-      vendorId: 0,
+      vendorId: Cts.STORE_TYPE_SELF,
       platList: [
         Cts.WM_PLAT_ID_WX,
         Cts.WM_PLAT_ID_BD,
@@ -79,13 +67,47 @@ class ActivityListScene extends PureComponent {
       ],
       platId: Cts.WM_PLAT_ID_WX,
       showDialog: false,
-      down: false
+      down: false,
+      startTime: '开始时间',
+      endTime: '结束时间',
+      vendorList: [
+        {
+          key: Cts.STORE_TYPE_SELF,
+          label: '菜鸟食材',
+        },
+        {
+          key: Cts.STORE_TYPE_AFFILIATE,
+          label: '菜鸟',
+        },
+        {
+          key: Cts.STORE_TYPE_GZW,
+          label: '果知味',
+        },
+        {
+          key: Cts.STORE_TYPE_BLX,
+          label: '比邻鲜',
+        },
+        {
+          key: Cts.STORE_TYPE_XGJ,
+          label: '鲜果集',
+        }
+      ],
+      ruleList:[],
     }
   }
 
   componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setParams({toggle: this.toggle});
+    this.getRuleList()
+  }
+
+  getRuleList() {
+    let {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(fetchRuleList('active',accessToken,(ok, desc, obj)=>{
+      if(ok){
+        this.setState({ruleList:obj})
+      }
+    }))
   }
 
   toggle = () => {
@@ -93,7 +115,13 @@ class ActivityListScene extends PureComponent {
     this.setState({hide: !hide})
   };
 
+  setDateTime(date) {
+    let {timeKey} = this.state;
+    this.setState({[timeKey]: date, dataPicker: false})
+  }
+
   render() {
+    let {startTime, endTime, vendorId,ruleList} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <View style={manage.header}>
@@ -104,7 +132,7 @@ class ActivityListScene extends PureComponent {
                     this.setState({dataPicker: true, timeKey: 'startTime'})
                   }}
               >
-                <Text style={style.time}>开始时间</Text>
+                <Text style={style.time}>{startTime}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -113,148 +141,69 @@ class ActivityListScene extends PureComponent {
                     this.setState({dataPicker: true, timeKey: 'endTime'})
                   }}
               >
-                <Text style={[style.time]}>结束时间</Text>
+                <Text style={[style.time]}>{endTime}</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity
-                  style={{
-                    flex: 1,
-                    height: pxToDp(65),
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: pxToDp(20),
-                    justifyContent:'center',
-                    borderWidth:pxToDp(1),
-                    borderColor:colors.fontGray,
-                    borderRadius: pxToDp(5),
-                    backgroundColor:'#eee'
+              <ModalSelector
+                  style={{height: pxToDp(65)}}
+                  skin='customer'
+                  data={this.state.vendorList}
+                  onChange={(option) => {
+                    this.setState({vendorId: option.key});
+                    this.forceUpdate();
                   }}
               >
-                <Text style={{borderWidth: 0,textAlign:'center'}}>菜鸟食材</Text>
-                <Image style={[{width: pxToDp(28), height: pxToDp(18),marginLeft:pxToDp(8)}]}
-                       source={this.state.down ? require('../../img/Public/xiangxialv_.png') : require('../../img/Public/xiangxialv_.png')}
-                />
-              </TouchableOpacity>
+                <View style={{
+                  minWidth: pxToDp(160),
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  height: pxToDp(65),
+                  backgroundColor: '#dadada',
+                  borderRadius: pxToDp(5),
+                  marginLeft: pxToDp(30),
+                  paddingHorizontal: pxToDp(15),
+                }}>
+                  <Text style={{color: colors.main_color}}>{tool.getVendorName(vendorId)}</Text>
+                  <Image style={[{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(8)}]}
+                         source={this.state.down ? require('../../img/Public/xiangxialv_.png') : require('../../img/Public/xiangxialv_.png')}
+                  />
+                </View>
+              </ModalSelector>
             </Cell>
           </View>
-          <ScrollView>
-            <View style={manage.cells}>
-              <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
-                <CellHeader>
-                  <Text style={{fontSize: pxToDp(36), color: colors.fontBlack, fontWeight: '900'}}>满49减20</Text>
-                </CellHeader>
-                <View>
-                  <Text style={manage.cell_footer_text}>2017-01-18 <Text
-                      style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
-                  <Text style={manage.cell_footer_text}>至2017-01-18 <Text
-                      style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
-                </View>
-              </Cell>
-              <Cell customStyle={[style.cell, manage.cell]}>
-                <CellHeader>
-                  <Text style={style.cell_header_text}>店铺(菜鸟食材)</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text>美团回龙观等8家</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[style.cell, manage.cell]}>
-                <CellHeader>
-                  <Text style={style.cell_header_text}>通用加价规则</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text>0元-5元(160)等</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[style.cell, manage.cell]}>
-                <CellHeader>
-                  <Text style={style.cell_header_text}>特殊分类规则</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text>2组分类</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[style.cell, manage.cell]}>
-                <CellHeader>
-                  <Text style={style.cell_header_text}>特殊商品规则</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text>12组商品</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
-                <Text style={manage.edit_btn}>复制使用</Text>
-              </Cell>
-              <View/>
-            </View>
+          <ScrollView style={{backgroundColor: '#fff'}}>
+            {
+              ruleList.map((item,key)=>{
+                return(
+                    <ActivityItem
+                        key={key}
+                        customStyle={{marginLeft: pxToDp(15)}}
+                        textStyle={{color:colors.fontGray}}
+                        item={item}
+                    />
+                )
+              })
+
+            }
           </ScrollView>
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.showDialog}
-                  title={'已选店铺'}
-                  titleStyle={{textAlign: 'center', color: colors.fontBlack}}
-                  headerStyle={{
-                    backgroundColor: colors.main_back,
-                    paddingTop: pxToDp(20),
-                    justifyContent: 'center',
-                    paddingBottom: pxToDp(20),
-                  }}
-                  buttons={[{
-                    type: 'primary',
-                    label: '确定',
-                    onPress: () => {
-                      this.setState({showDialog: false,});
-                    }
-                  }]}
-                  footerStyle={{
-                    borderTopWidth: pxToDp(1),
-                    borderTopColor: colors.fontGray,
-                  }}
-                  bodyStyle={{
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontGray,
-                    marginLeft: pxToDp(15),
-                    marginRight: pxToDp(15),
-                    height: pxToDp(800),
-                    marginTop: 0
-                  }}
-          >
-            <ScrollView style={{height: pxToDp(700),}}>
-              <Cell customStyle={[style.cell]}>
-                <CellHeader>
-                  <Text>回龙观店(微信)</Text>
-                </CellHeader>
-                <TouchableOpacity>
-                  <Text style={{
-                    fontSize: pxToDp(30),
-                    color: colors.white,
-                    height: pxToDp(60),
-                    backgroundColor: colors.main_color,
-                  }}>移除</Text>
-                </TouchableOpacity>
-              </Cell>
-            </ScrollView>
-          </Dialog>
+          <DateTimePicker
+              date={new Date()}
+              minimumDate={new Date()}
+              mode='datetime'
+              isVisible={this.state.dataPicker}
+              onConfirm={async (date) => {
+                let confirm_data = tool.fullDate(date);
+                this.setDateTime(confirm_data);
+              }}
+              onCancel={() => {
+                this.setState({dataPicker: false});
+              }}
+          />
         </View>
     )
   }
 }
+
 
 const manage = {
   cell_footer_text: {

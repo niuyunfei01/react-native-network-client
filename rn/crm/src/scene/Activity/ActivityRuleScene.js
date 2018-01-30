@@ -32,7 +32,7 @@ import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
 import style from './commonStyle'
-
+import ImgBtn from "./imgBtn";
 function mapStateToProps(state) {
   const {mine, global, activity, product} = state;
   return {mine: mine, global: global, activity: activity, product: product}
@@ -654,23 +654,6 @@ class Percentage extends PureComponent {
 }
 
 
-class ImgBtn extends PureComponent {
-  onPress() {
-    this.props.onPress()
-  }
-
-  render() {
-    let {require} = this.props
-    return (
-        <TouchableOpacity
-            onPress={() => this.onPress()}
-        >
-          <Image style={{height: pxToDp(42), width: pxToDp(42)}}
-                 source={require}/>
-        </TouchableOpacity>
-    )
-  }
-}
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityRuleScene)

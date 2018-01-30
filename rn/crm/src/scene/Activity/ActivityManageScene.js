@@ -19,6 +19,7 @@ import {
   CellFooter,
   Label,
 } from "../../weui/index";
+import ActivityDialog from './ActivityDialog'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -32,6 +33,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
 import SelectBox from './SelectBox'
+import ImgBtn from "./imgBtn";
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -56,18 +58,20 @@ class ActivityManageScene extends PureComponent {
       headerRight: (
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
             <TouchableOpacity
-                onPress={()=>{
+                onPress={() => {
                   navigation.navigate(Config.ROUTE_ACTIVITY_LIST)
                 }}
             >
-              <Image style={{width: pxToDp(42), height: pxToDp(42),marginHorizontal:pxToDp(30)}} source={require('../../img/Activity/lishijilu_.png')}/>
+              <Image style={{width: pxToDp(42), height: pxToDp(42), marginHorizontal: pxToDp(30)}}
+                     source={require('../../img/Activity/lishijilu_.png')}/>
             </TouchableOpacity>
             <TouchableOpacity
-                onPress={()=>{
+                onPress={() => {
                   navigation.navigate(Config.ROUTE_ACTIVITY_RULE)
                 }}
             >
-              <Image style={{width: pxToDp(42), height: pxToDp(42),marginHorizontal:pxToDp(30)}} source={require('../../img/Activity/xinjian_.png')}/>
+              <Image style={{width: pxToDp(42), height: pxToDp(42), marginHorizontal: pxToDp(30)}}
+                     source={require('../../img/Activity/xinjian_.png')}/>
             </TouchableOpacity>
           </TouchableOpacity>
       )
@@ -81,7 +85,7 @@ class ActivityManageScene extends PureComponent {
       hide: false,
       vendorId: 0,
       showDialog: false,
-      list:[{
+      list: [{
         "price_rules": {
           "id": "1",
           "rule_name": "满49减20",
@@ -185,7 +189,10 @@ class ActivityManageScene extends PureComponent {
           "created": "2018-01-25 17:00:31",
           "updated": "2018-01-25 17:00:31"
         }]
-      }]
+      }],
+      title: '',
+      operating: false,
+      wait: false,
     }
   }
 
@@ -198,10 +205,11 @@ class ActivityManageScene extends PureComponent {
     let {hide} = this.state;
     this.setState({hide: !hide})
   };
-  renderOperatingList(){
-    let {list} =this.state;
-    return list.map((item,index)=>{
-      let {id}=item;
+
+  renderOperatingList() {
+    let {list} = this.state;
+    return list.map((item, index) => {
+      let {id} = item;
       return (
           <View style={manage.cells}>
             <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
@@ -263,7 +271,11 @@ class ActivityManageScene extends PureComponent {
                 />
               </CellFooter>
             </Cell>
-            <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
+            <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}
+                  onPress={() => {
+                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE)
+                  }}
+            >
               <Text style={manage.edit_btn}>修改</Text>
             </Cell>
             <View style={[manage.ball, manage.ball_left, manage.ball_main_color]}/>
@@ -275,92 +287,114 @@ class ActivityManageScene extends PureComponent {
 
   }
 
+  dialogToggle(title) {
+    this.setState({
+      showDialog: true,
+      title: title
+    })
+  }
+
   render() {
+    let {operating, wait} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
             <View style={{backgroundColor: '#a3d0ac', marginBottom: pxToDp(30)}}>
-              <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}>
+              <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}
+                    onPress={() => {
+                      this.setState({operating: !operating})
+                    }}
+              >
                 <CellHeader style={{flexDirection: 'row'}}>
                   <Image source={require('../../img/Activity/yunxingzhong_.png')}
                          style={{height: pxToDp(40), width: pxToDp(40)}}/>
                   <Text style={style.cell_header_text_white}>运行中(2)</Text>
                 </CellHeader>
-                <Image style={manage.down} source={require('../../img/Public/xiangxiabai_.png')}/>
+                <Image style={operating ? [manage.down, {transform: [{rotate: '180deg'}]}] : [manage.down]}
+                       source={require('../../img/Public/xiangxiabai_.png')}/>
               </Cell>
-              <View style={manage.cells}>
-                <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
-                  <CellHeader>
-                    <Text style={{fontSize: pxToDp(36), color: colors.main_color, fontWeight: '900'}}>满49减20</Text>
-                  </CellHeader>
-                  <View>
-                    <Text style={manage.cell_footer_text}>2017-01-18 <Text
-                        style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
-                    <Text style={manage.cell_footer_text}>至2017-01-18 <Text
-                        style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
-                  </View>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>店铺(菜鸟食材)</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>美团回龙观等8家</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>通用加价规则</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>0元-5元(160)等</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>特殊分类规则</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>2组分类</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>特殊商品规则</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>12组商品</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
-                  <Text style={manage.edit_btn}>修改</Text>
-                </Cell>
-                <View style={[manage.ball, manage.ball_left, manage.ball_main_color]}/>
-                <View style={[manage.ball, manage.ball_right, manage.ball_main_color]}/>
-                <View/>
-              </View>
-
+              {
+                operating ?
+                    <View style={manage.cells}>
+                  <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
+                    <CellHeader>
+                      <Text style={{fontSize: pxToDp(36), color: colors.main_color, fontWeight: '900'}}>满49减20</Text>
+                    </CellHeader>
+                    <View>
+                      <Text style={manage.cell_footer_text}>2017-01-18 <Text
+                          style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
+                      <Text style={manage.cell_footer_text}>至2017-01-18 <Text
+                          style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
+                    </View>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('店铺(菜鸟食材)')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>店铺(菜鸟食材)</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>美团回龙观等8家</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('通用加价规则')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>通用加价规则</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>0元-5元(160)等</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('特殊分类规则')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>特殊分类规则</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>2组分类</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('特殊商品规则')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>特殊商品规则</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>12组商品</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}
+                        onPress={() => {
+                          this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE)
+                        }}>
+                    <Text style={manage.edit_btn}>修改</Text>
+                  </Cell>
+                  <View style={[manage.ball, manage.ball_left, manage.ball_main_color]}/>
+                  <View style={[manage.ball, manage.ball_right, manage.ball_main_color]}/>
+                  <View/>
+                </View> : null
+              }
 
             </View>
 
             <View style={{backgroundColor: '#f1c377', paddingBottom: pxToDp(30)}}>
-              <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}>
+              <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}
+                    onPress={() => {
+                      this.setState({wait: !wait})
+                    }}
+              >
                 <CellHeader style={{flexDirection: 'row'}}>
                   <Image source={require('../../img/Activity/daizhixing_.png')}
                          style={{height: pxToDp(40), width: pxToDp(40)}}/>
@@ -369,123 +403,100 @@ class ActivityManageScene extends PureComponent {
                 <Image style={manage.down} source={require('../../img/Public/xiangxiabai_.png')}/>
               </Cell>
               {/**/}
-              <View style={manage.cells}>
-                <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
-                  <CellHeader>
-                    <Text style={{fontSize: pxToDp(36), color: colors.fontOrange, fontWeight: '900'}}>满19减20</Text>
-                  </CellHeader>
-                  <View>
-                    <Text style={manage.cell_footer_text}>2017-01-18 <Text
-                        style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
-                    <Text style={manage.cell_footer_text}>至2017-01-18 <Text
-                        style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
-                  </View>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>店铺(菜鸟食材)</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>美团回龙观等8家</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>通用加价规则</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>0元-5元(160)等</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>特殊分类规则</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>2组分类</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell]}>
-                  <CellHeader>
-                    <Text style={style.cell_header_text}>特殊商品规则</Text>
-                  </CellHeader>
-                  <CellFooter>
-                    <Text>12组商品</Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-                <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
-                  <Text style={manage.edit_btn}>修改</Text>
-                </Cell>
-                <View style={[manage.ball, manage.ball_left, manage.ball_main_yellow]}/>
-                <View style={[manage.ball, manage.ball_right, manage.ball_main_yellow]}/>
-                <View/>
-              </View>
+              {
+                wait ? <View style={manage.cells}>
+                  <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
+                    <CellHeader>
+                      <Text style={{fontSize: pxToDp(36), color: colors.main_color, fontWeight: '900'}}>满49减20</Text>
+                    </CellHeader>
+                    <View>
+                      <Text style={manage.cell_footer_text}>2017-01-18 <Text
+                          style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
+                      <Text style={manage.cell_footer_text}>至2017-01-18 <Text
+                          style={{paddingLeft: pxToDp(10)}}>06:00</Text></Text>
+                    </View>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('店铺(菜鸟食材)')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>店铺(菜鸟食材)</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>美团回龙观等8家</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('通用加价规则')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>通用加价规则</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>0元-5元(160)等</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('特殊分类规则')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>特殊分类规则</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>2组分类</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell]} onPress={() => this.dialogToggle('特殊商品规则')}>
+                    <CellHeader>
+                      <Text style={style.cell_header_text}>特殊商品规则</Text>
+                    </CellHeader>
+                    <CellFooter>
+                      <Text>12组商品</Text>
+                      <Image
+                          style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                          source={require('../../img/Public/xiangxia_.png')}
+                      />
+                    </CellFooter>
+                  </Cell>
+                  <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
+                    <Text style={manage.edit_btn}>修改</Text>
+                  </Cell>
+                  <View style={[manage.ball, manage.ball_left, manage.ball_main_color]}/>
+                  <View style={[manage.ball, manage.ball_right, manage.ball_main_color]}/>
+                  <View/>
+                </View> : null
+              }
               {/**/}
             </View>
           </ScrollView>
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.showDialog}
-                  title={'已选店铺'}
-                  titleStyle={{textAlign: 'center', color: colors.fontBlack}}
-                  headerStyle={{
-                    backgroundColor: colors.main_back,
-                    paddingTop: pxToDp(20),
-                    justifyContent: 'center',
-                    paddingBottom: pxToDp(20),
-                  }}
-                  buttons={[{
-                    type: 'primary',
-                    label: '确定',
-                    onPress: () => {
-                      this.setState({showDialog: false,});
-                    }
-                  }]}
-                  footerStyle={{
-                    borderTopWidth: pxToDp(1),
-                    borderTopColor: colors.fontGray,
-                  }}
-                  bodyStyle={{
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.fontGray,
-                    marginLeft: pxToDp(15),
-                    marginRight: pxToDp(15),
-                    height: pxToDp(800),
-                    marginTop: 0
-                  }}
+          <ActivityDialog
+              showDialog={this.state.showDialog}
+              title={this.state.title}
+              buttons={[{
+                type: 'primary',
+                label: '确定',
+                onPress: () => {
+                  this.setState({showDialog: false,});
+                }
+              }]}
           >
-            <ScrollView style={{height: pxToDp(700),}}>
-              <Cell customStyle={[style.cell]}>
-                <CellHeader>
-                  <Text>回龙观店(微信)</Text>
-                </CellHeader>
-                <TouchableOpacity>
-                  <Text style={{
-                    fontSize: pxToDp(30),
-                    color: colors.white,
-                    height: pxToDp(60),
-                    backgroundColor: colors.main_color,
-                  }}>移除</Text>
-                </TouchableOpacity>
-              </Cell>
-            </ScrollView>
-          </Dialog>
+            <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
+              <CellHeader>
+                <Text>回龙观店(微信)</Text>
+              </CellHeader>
+            </Cell>
+            <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
+              <CellHeader>
+                <Text>回龙观店(微信)</Text>
+              </CellHeader>
+            </Cell>
+          </ActivityDialog>
         </View>
     )
   }
@@ -501,7 +512,7 @@ const manage = {
     position: 'relative',
     borderRadius: pxToDp(10),
     backgroundColor: colors.white,
-    marginBottom:pxToDp(20),
+    marginBottom: pxToDp(20),
   },
   cell: {
     marginLeft: 0,
@@ -537,9 +548,9 @@ const manage = {
   ball_main_yellow: {
     backgroundColor: '#f1c377',
   },
-  down:{
-    height:pxToDp(22),
-    width:pxToDp(40),
+  down: {
+    height: pxToDp(22),
+    width: pxToDp(40),
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityManageScene)
