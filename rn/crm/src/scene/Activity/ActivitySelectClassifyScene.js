@@ -79,9 +79,9 @@ class ActivitySelectClassifyScene extends PureComponent {
     }
   }
 
-  componentDidMount() {
-    let {navigation} = this.props;
-
+  componentWillMount() {
+    let {categories}=this.props.navigation.state.params;
+    this.setState({checked:categories})
     this.getListVendorTags()
   }
 
@@ -259,9 +259,12 @@ class ActivitySelectClassifyScene extends PureComponent {
             </ScrollView>
           </Dialog>
           <BottomBtn onPress={() => {
-            let {checked}=this.state;
-            this.props.navigation.state.params.nextSetBeforeCategories(checked,this.props.navigation.state.params.index);
-            this.props.navigation.goBack();
+            let {specialRuleList,index} = this.props.navigation.state.params;
+            specialRuleList[index].forEach((item)=>{
+              item.categories=this.state.checked;
+            })
+            this.props.navigation.state.params.nextSetBeforeCategories(specialRuleList);
+            this.props.navigation.goBack()
           }}/>
         </View>
     )

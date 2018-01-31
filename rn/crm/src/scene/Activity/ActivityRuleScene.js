@@ -253,13 +253,10 @@ class ActivityRuleScene extends PureComponent {
       this.state.specialRuleList[key]=obj
     }
   }
-  nextSetBeforeCategories(categories,index) {
-    let {specialRuleList} = this.state;
-    specialRuleList[index].map((ite)=>{
-      ite.categories=categories;
-    });
-    console.log(categories);
-    this.forceUpdate();
+  nextSetBeforeCategories(specialRuleList) {
+    console.log(specialRuleList);
+   this.setState({specialRuleList:specialRuleList})
+   this.forceUpdate();
   }
   renderSpecial() {
     let {specialRuleList, vendorId} = this.state;
@@ -277,16 +274,18 @@ class ActivityRuleScene extends PureComponent {
                   onPress={() => {
                     this.props.navigation.navigate(Config.ROUTE_ACTIVITY_CLASSIFY, {
                       vendorId: 4,
-                      nextSetBeforeCategories:(categories,index)=>{
-                        this.nextSetBeforeCategories(categories,index)
+                      nextSetBeforeCategories:(specialRuleList,index)=>{
+                        this.nextSetBeforeCategories(specialRuleList,index)
                       },
-                      index:inex
+                      index:inex,
+                      specialRuleList:specialRuleList,
+                      categories:item[0]['categories']
                     })
                   }}
             >
               <CellHeader><Text style={style.cell_header_text}>选择分类</Text></CellHeader>
               <CellFooter>
-                <Text style={style.cell_footer_text}>已选({tool.length(item.categories)})</Text>
+                <Text style={style.cell_footer_text}>已选({tool.length(item[0]['categories'])})</Text>
                 <Image
                     style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                     source={require('../../img/Public/xiangxia_.png')}
