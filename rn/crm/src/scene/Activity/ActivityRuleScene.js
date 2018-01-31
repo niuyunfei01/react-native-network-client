@@ -33,6 +33,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
 import style from './commonStyle'
 import ImgBtn from "./imgBtn";
+
 function mapStateToProps(state) {
   const {mine, global, activity, product} = state;
   return {mine: mine, global: global, activity: activity, product: product}
@@ -93,62 +94,43 @@ class ActivityRuleScene extends PureComponent {
         }
       ],
       specialRuleList: [
-        {
-          "categories": [
-            "81898589",
-            "81898625"
-          ],
-          "rules": {
-            "24": {
-              "id": "24",
-              "rule_id": "1",
-              "type_id": "2",
-              "status": "1",
-              "categories": "81898589,81898625",
-              "min_price": "0",
-              "max_price": "30",
-              "percent": "123",
-              "created": "2018-01-25 17:00:31",
-              "updated": "2018-01-25 17:00:31"
-            },
-            "25": {
-              "id": "25",
-              "rule_id": "1",
-              "type_id": "2",
-              "status": "1",
-              "categories": "81898589,81898625",
-              "min_price": "30",
-              "max_price": "10000",
-              "percent": "111",
-              "created": "2018-01-25 17:00:31",
-              "updated": "2018-01-25 17:00:31"
-            }
+        [
+          {
+            "type_id": 2,
+            "categories": [],
+            "min_price": "0",
+            "max_price": "30",
+            "percent": "123"
+          },
+          {
+            "type_id": 2,
+            "categories": [],
+            "min_price": "30",
+            "max_price": "10000",
+            "percent": "111"
           }
-        }
+        ]
 
       ],
-      specialRule: {
-        categories: [],
-        rules: {
-          1: {
-            type_id: 2,
-            status: 1,
-            categories: [],
-            min_price: 0,
-            max_price: 30,
-            percent: 123,
-
+      specialRule: [
+        [
+          {
+            "type_id": 2,
+            "categories": [],
+            "min_price": "0",
+            "max_price": "30",
+            "percent": "123"
           },
-          2: {
-            type_id: 2,
-            status: 1,
-            categories: [],
-            min_price: 30,
-            max_price: 10000,
-            percent: 111,
+          {
+            "type_id": 2,
+            "categories": [],
+            "min_price": "30",
+            "max_price": "10000",
+            "percent": "111"
           }
-        }
-      },
+        ]
+      ]
+      ,
       dataPicker: false,
       startTime: '开始时间',
       endTime: '结束时间',
@@ -196,11 +178,12 @@ class ActivityRuleScene extends PureComponent {
         ],
         percent: 140
       },
-      rule_name:'',
-      ext_store_id:[],
-      key:'',
+      rule_name: '',
+      ext_store_id: [],
+      key: '',
     }
   }
+
   dataToCommon(obj) {
     let arr = [];
     tool.objectMap(obj, (item, key) => {
@@ -214,15 +197,17 @@ class ActivityRuleScene extends PureComponent {
     });
     return arr;
   }
+
   setDateTime(date) {
     let {timeKey} = this.state;
     this.setState({[timeKey]: date, dataPicker: false})
   }
-  componentWillReceiveProps(){
-    let{ext_store_id}=this.props.activity;
-    console.log(ext_store_id)
+
+  componentWillReceiveProps() {
+    let {ext_store_id} = this.props.activity;
     this.setState({ext_store_id})
   }
+
   renderCommon() {
     let {commonRule, price_rules} = this.state;
     return (
@@ -231,7 +216,7 @@ class ActivityRuleScene extends PureComponent {
             <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
             <ImgBtn require={require('../../img/Activity/bianji_.png')}
                     onPress={() =>
-                        this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {rule: commonRule})
+                        this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {rule: commonRule, key: commonRule})
                     }/>
           </Cell>
           {
@@ -245,11 +230,11 @@ class ActivityRuleScene extends PureComponent {
                       percent={percent}
                       tail={index == (commonRule.length - 1)}
                       text={true}
-                      onPressReduce={()=>{
+                      onPressReduce={() => {
                         item.percent--;
                         this.forceUpdate();
                       }}
-                      onPressAdd={()=>{
+                      onPressAdd={() => {
                         item.percent++;
                         this.forceUpdate();
                       }}
@@ -261,25 +246,47 @@ class ActivityRuleScene extends PureComponent {
     )
   }
 
+  nextSetBefore(key, obj, index = -1) {
+    if(index <0){
+      this.setState({[key]: obj})
+    }else{
+      this.state.specialRuleList[key]=obj
+    }
+  }
+  nextSetBeforeCategories(categories,index) {
+    let {specialRuleList} = this.state;
+    specialRuleList[index].map((ite)=>{
+      ite.categories=categories;
+    });
+    console.log(categories);
+    this.forceUpdate();
+  }
   renderSpecial() {
     let {specialRuleList, vendorId} = this.state;
     return specialRuleList.map((item, inex) => {
-      let {categories, rules} = item;
       return (
           <View key={inex}>
             <Cell customStyle={style.cell} first={true}>
               <CellHeader><Text style={[style.cell_header_text, {}]}>加价比例设置</Text></CellHeader>
               <ImgBtn require={require('../../img/Activity/bianji_.png')}
-                      onPress={() => this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {rule: rules})}/>
+                      onPress={() =>
+                          this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {rule: item, key: inex,categories:item.categories})}
+              />
             </Cell>
             <Cell customStyle={style.cell}
                   onPress={() => {
-                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_CLASSIFY, {vendorId: vendorId})
+                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_CLASSIFY, {
+                      vendorId: 4,
+                      nextSetBeforeCategories:(categories,index)=>{
+                        this.nextSetBeforeCategories(categories,index)
+                      },
+                      index:inex
+                    })
                   }}
             >
               <CellHeader><Text style={style.cell_header_text}>选择分类</Text></CellHeader>
               <CellFooter>
-                <Text style={style.cell_footer_text}>已选({categories.length})</Text>
+                <Text style={style.cell_footer_text}>已选({tool.length(item.categories)})</Text>
                 <Image
                     style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                     source={require('../../img/Public/xiangxia_.png')}
@@ -287,7 +294,7 @@ class ActivityRuleScene extends PureComponent {
               </CellFooter>
             </Cell>
             {
-              tool.objectMap(rules, (ite, index) => {
+              tool.objectMap(item, (ite, index) => {
                 let {min_price, max_price, percent} = ite;
                 return (
                     <Percentage
@@ -296,11 +303,11 @@ class ActivityRuleScene extends PureComponent {
                         max_price={max_price}
                         percent={percent}
                         tail={index == (item.length - 1)}
-                        onPressReduce={()=>{
+                        onPressReduce={() => {
                           ite.percent--;
                           this.forceUpdate();
                         }}
-                        onPressAdd={()=>{
+                        onPressAdd={() => {
                           ite.percent++;
                           this.forceUpdate();
                         }}
@@ -346,11 +353,11 @@ class ActivityRuleScene extends PureComponent {
                     percent={percent}
                     tail={index == (item.length - 1)}
                     text={false}
-                    onPressReduce={()=>{
+                    onPressReduce={() => {
                       item.percent--;
                       this.forceUpdate();
                     }}
-                    onPressAdd={()=>{
+                    onPressAdd={() => {
                       item.percent++;
                       this.forceUpdate();
                     }}
@@ -362,13 +369,19 @@ class ActivityRuleScene extends PureComponent {
     })
 
   }
+
   toSonPage(route, item) {
+    let {key} = this.state;
     let {navigate} = this.props.navigation;
-    navigate(route, {key,...item})
+    navigate(route, {
+      nextSetBefore: (key, obj) => {
+        this.nextSetBefore(key, obj)
+      }, key, ...item
+    })
   }
 
   render() {
-    let {startTime, endTime, vendorId,rule_name,ext_store_id} = this.state;
+    let {startTime, endTime, vendorId, rule_name, ext_store_id} = this.state;
     return (
         <View style={{flex: 1}}>
           <ScrollView>
@@ -425,7 +438,7 @@ class ActivityRuleScene extends PureComponent {
                 </TouchableOpacity>
               </Cell>
               <Cell customStyle={style.cell} onPress={() => {
-                this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE, {vendorId: vendorId,ext_store_id:ext_store_id})
+                this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE, {vendorId: vendorId, ext_store_id: ext_store_id})
               }}>
                 <CellHeader><Text style={style.cell_header_text}>选择店铺</Text></CellHeader>
                 <CellFooter>
@@ -447,8 +460,9 @@ class ActivityRuleScene extends PureComponent {
                   <TouchableOpacity
                       onPress={() => {
                         let {specialRuleList, specialRule} = this.state;
-                        specialRuleList.push(specialRule);
+                        specialRuleList.push(...specialRule);
                         this.forceUpdate()
+                        console.log(specialRuleList)
                       }}
                   >
                     <Image style={{height: pxToDp(42), width: pxToDp(42)}}
@@ -522,29 +536,29 @@ class ActivityRuleScene extends PureComponent {
 
 class Percentage extends PureComponent {
   render() {
-    let {min_price, max_price, percent, tail,text} = this.props||{};
+    let {min_price, max_price, percent, tail, text} = this.props || {};
     return (
         <Cell customStyle={style.cell} first={false}>
           {
-            text?<CellHeader>
+            text ? <CellHeader>
               {
                 tail ? <Text style={style.cell_header_text}>{min_price}元以上</Text>
                     : <Text style={style.cell_header_text}>{min_price}元--{max_price}元</Text>
               }
-            </CellHeader>:<CellHeader/>
+            </CellHeader> : <CellHeader/>
           }
           <CellFooter>
             <TouchableOpacity
-                onPress={()=> this.props.onPressReduce(percent)
+                onPress={() => this.props.onPressReduce(percent)
                 }
             >
               <Image style={style.operation}
-                     source={percent<=100?require('../../img/Activity/jianshaohui_.png'):require('../../img/Activity/jianshao_.png')}
+                     source={percent <= 100 ? require('../../img/Activity/jianshaohui_.png') : require('../../img/Activity/jianshao_.png')}
               />
             </TouchableOpacity>
             <Text style={style.percentage_text}>{percent}%</Text>
             <TouchableOpacity
-                onPress={()=> this.props.onPressAdd()}
+                onPress={() => this.props.onPressAdd()}
             >
               <Image style={style.operation} source={require('../../img/Activity/zengjia_.png')}/>
             </TouchableOpacity>
@@ -553,8 +567,6 @@ class Percentage extends PureComponent {
     )
   }
 }
-
-
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityRuleScene)

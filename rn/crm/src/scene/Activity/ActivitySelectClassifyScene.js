@@ -33,7 +33,7 @@ import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
 import SelectBox from './SelectBox'
 import {fetchListVendorTags} from "../../reducers/product/productActions";
-
+import BottomBtn from './ActivityBottomBtn';
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
   return {mine: mine, global: global, activity: activity}
@@ -81,6 +81,7 @@ class ActivitySelectClassifyScene extends PureComponent {
 
   componentDidMount() {
     let {navigation} = this.props;
+
     this.getListVendorTags()
   }
 
@@ -257,6 +258,11 @@ class ActivitySelectClassifyScene extends PureComponent {
               }
             </ScrollView>
           </Dialog>
+          <BottomBtn onPress={() => {
+            let {checked}=this.state;
+            this.props.navigation.state.params.nextSetBeforeCategories(checked,this.props.navigation.state.params.index);
+            this.props.navigation.goBack();
+          }}/>
         </View>
     )
   }

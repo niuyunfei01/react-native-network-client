@@ -94,7 +94,7 @@ class ActivitySelectStoreScene extends PureComponent {
 
   async componentWillMount() {
     let {navigation} = this.props;
-    let {vendorId,ext_store_id,nextState} = navigation.state.params;
+    let {vendorId,ext_store_id} = navigation.state.params;
     await this.setState({vendorId: vendorId,ext_store_id:ext_store_id});
     this.getStoreList();
     navigation.setParams({toggle: this.toggle});
@@ -296,19 +296,11 @@ class ActivitySelectStoreScene extends PureComponent {
             </ScrollView>
           </Dialog>
           <View>
-            <TouchableOpacity
-                onPress={() => {
-                  let {ext_store_id}=this.state;
-                  let {navigation}=this.props
-                  const {dispatch} = this.props;
-                  dispatch(saveExtStoreId(ext_store_id));
-                  setTimeout(()=>{
-                    navigation.goBack();
-                  },500)
-                }}
-            >
-              <BottomBtn/>
-            </TouchableOpacity>
+              <BottomBtn onPress={() => {
+                let {ext_store_id}=this.state;
+                this.props.navigation.state.params.nextSetBefore('ext_store_id',ext_store_id);
+                this.props.navigation.goBack();
+              }}/>
           </View>
         </View>
     )

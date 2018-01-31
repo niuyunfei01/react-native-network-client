@@ -22,7 +22,7 @@ import {
 } from "../../weui/index";
 import tool from "../../common/tool";
 
-const BottomBtn = ()=>{
+const BottomBtn = (props)=>{
  return(
      <View style={{
        height: pxToDp(120),
@@ -37,6 +37,9 @@ const BottomBtn = ()=>{
          alignItems: 'center',
          borderRadius: pxToDp(5),
        }} first={true}
+             onPress={()=>{
+               props.onPress()
+             }}
        >
          <Text style={{
            fontSize: pxToDp(32),

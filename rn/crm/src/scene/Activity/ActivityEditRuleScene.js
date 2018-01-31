@@ -55,30 +55,20 @@ class ActivityEditRuleScene extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      rule: []
+      rule: [],
+      key:'',
+      categories:[]
     }
   }
 
   componentWillMount() {
-    let {rule} = this.props.navigation.state.params;
-    this.setState({rule: this.dataToCommon(rule)})
+    let {rule,key,categories} = this.props.navigation.state.params;
+    this.setState({rule: rule,key:key,categories:categories})
   }
-  dataToCommon(obj) {
-    let arr = [];
-    tool.objectMap(obj, (item, key) => {
-      let {type_id, min_price, max_price, percent} = item
-      arr.push({
-        "type_id": type_id,
-        "min_price": min_price,
-        "max_price": max_price,
-        "percent": percent
-      })
-    });
-    return arr;
-  }
+
   renderList() {
-    let {rule} = this.state;
-    let length = rule.length
+    let {rule,categories} = this.state;
+    let length = rule.length;
     return rule.map((item, index) => {
       let {min_price, max_price} = item;
       return (
@@ -96,6 +86,8 @@ class ActivityEditRuleScene extends PureComponent {
                     rule.push({
                       min_price: text,
                       max_price: '',
+                      percent:100,
+                      categories:categories,
                     })
                     this.forceUpdate()
                   } else {
@@ -144,13 +136,12 @@ class ActivityEditRuleScene extends PureComponent {
         <View style={{flex: 1}}>
           <ScrollView>
             {this.renderList()}
-            <TouchableOpacity
-                onPress={() => {
 
-                }}
-            >
-              <BottomBtn />
-            </TouchableOpacity>
+              <BottomBtn onPress={() => {
+                let {rule,key}=this.state;
+                this.props.navigation.state.params.nextSetBefore(key,rule,index=1);
+                this.props.navigation.goBack();
+              }}/>
           </ScrollView>
         </View>
     )

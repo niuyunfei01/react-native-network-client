@@ -24,6 +24,8 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+
+import {fetchStoresProdList} from '../../reducers/activity/activityAction'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 
@@ -43,6 +45,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
+      fetchStoresProdList,
       ...globalActions
     }, dispatch)
   }
@@ -70,8 +73,15 @@ class ActivitySelectGoodScene extends PureComponent {
   componentDidMount() {
     let {navigation} = this.props;
     navigation.setParams({toggle: this.toggle});
+    this.getStoresProdList();
   }
-
+  getStoresProdList(){
+    let {accessToken}=this.props.global;
+    let{dispatch}=this.props;
+    dispatch(fetchStoresProdList({vendor_id:4,store_ids:[113,120]},accessToken,(ok,reason,obj)=>{
+      console.log(ok,reason,obj);
+    }))
+  }
 
   render() {
     const { query } = this.state;

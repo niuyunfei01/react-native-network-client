@@ -1,4 +1,8 @@
 'use strict';
+import {
+  jsonWithTpl,
+  jsonWithTpl2
+} from "../../util/common";
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../util/ToastUtils';
@@ -55,4 +59,15 @@ export function fetchRuleList(is_active='',token,callback) {
         }
     );
   }
+}
+export function fetchStoresProdList(data, token, callback) {
+  let url = `api/stores_prod_list.json?access_token=${token}`;
+  return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
 }
