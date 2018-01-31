@@ -93,6 +93,8 @@ class ActivityListScene extends PureComponent {
         }
       ],
       ruleList:[],
+      query:true,
+      renderList:[],
     }
   }
 
@@ -103,17 +105,29 @@ class ActivityListScene extends PureComponent {
   getRuleList() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    let {vendorId}=this.state;
     dispatch(fetchRuleList('active',accessToken,(ok, desc, obj)=>{
       if(ok){
-        this.setState({ruleList:obj})
+        this.setState({
+          ruleList:obj,
+          query:false,
+          renderList:this.arrFilter(obj,vendorId),
+        })
       }
     }))
   }
 
-  toggle = () => {
-    let {hide} = this.state;
-    this.setState({hide: !hide})
-  };
+  arrFilter(arr, id) {
+    console.log(arr);
+    let list = [];
+    arr.forEach((item) => {
+      if (item.price_rules.vendor_id == id) {
+        list.push(item)
+      }
+    });
+    console.log(list);
+    return list;
+  }
 
   setDateTime(date) {
     let {timeKey} = this.state;
@@ -121,7 +135,7 @@ class ActivityListScene extends PureComponent {
   }
 
   render() {
-    let {startTime, endTime, vendorId,ruleList} = this.state;
+    let {startTime, endTime, vendorId,ruleList,renderList} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <View style={manage.header}>
@@ -147,9 +161,11 @@ class ActivityListScene extends PureComponent {
                   style={{height: pxToDp(65)}}
                   skin='customer'
                   data={this.state.vendorList}
-                  onChange={(option) => {
-                    this.setState({vendorId: option.key});
-                    this.forceUpdate();
+                  onChange={async(option) => {
+                    await this.setState({
+                      vendorId: option.key,
+                      renderList:this.arrFilter(ruleList,option.key)
+                    });
                   }}
               >
                 <View style={{
@@ -173,7 +189,7 @@ class ActivityListScene extends PureComponent {
           </View>
           <ScrollView style={{backgroundColor: '#fff'}}>
             {
-              ruleList.map((item,key)=>{
+              renderList.map((item,key)=>{
                 return(
                     <ActivityItem
                         key={key}
@@ -199,6 +215,12 @@ class ActivityListScene extends PureComponent {
                 this.setState({dataPicker: false});
               }}
           />
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }

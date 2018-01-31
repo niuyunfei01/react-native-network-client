@@ -7,6 +7,7 @@ import Cts from "../../Cts";
 const {
   ACTIVITY_COMMON_RULE,
   ACTIVITY_SPECIAL_RULE,
+  ACTIVITY_EXT_STORE_ID
 } = require('../../common/constants').default;
 
 export function updateCommonRule(arr) {
@@ -16,12 +17,18 @@ export function updateCommonRule(arr) {
   }
 }
 
-// export function updateCommonRule(arr) {
-//   return {
-//     type: ACTIVITY_COMMON_RULE,
-//     arr:arr
-//   }
-// }
+export function updateSpecialRule(arr) {
+  return {
+    type: ACTIVITY_SPECIAL_RULE,
+    arr:arr,
+  }
+}
+export function saveExtStoreId(arr) {
+  return {
+    type: ACTIVITY_EXT_STORE_ID,
+    arr:arr,
+  }
+}
 export function fetchWmStores(vendor_id,token,callback) {
   return dispatch => {
     const url = `api/get_wm_stores/${vendor_id}.json?access_token=${token}`;

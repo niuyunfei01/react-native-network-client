@@ -131,6 +131,7 @@ const tabDef = {
     }),
   },
 
+
   Mine: {
     screen: MineScene,
     navigationOptions: ({navigation}) => ({

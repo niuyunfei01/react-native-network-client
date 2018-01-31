@@ -149,7 +149,7 @@ class ActivityEditRuleScene extends PureComponent {
 
                 }}
             >
-              <BottomBtn/>
+              <BottomBtn />
             </TouchableOpacity>
           </ScrollView>
         </View>

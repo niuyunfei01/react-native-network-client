@@ -44,7 +44,7 @@ class ActivityDialog extends PureComponent{
                   marginTop: 0
                 }}
         >
-          <ScrollView style={{maxHeight: pxToDp(700),minHeight:pxToDp(400)}}>
+          <ScrollView style={{minHeight:pxToDp(400)}}>
             {
               this.props.children
             }

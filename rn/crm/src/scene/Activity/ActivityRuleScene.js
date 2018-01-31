@@ -196,114 +196,11 @@ class ActivityRuleScene extends PureComponent {
         ],
         percent: 140
       },
+      rule_name:'',
+      ext_store_id:[],
+      key:'',
     }
   }
-
-  componentWillMount() {
-    let obj = {
-      "price_rules": {
-        "id": "1",
-        "rule_name": "满49减20",
-        "vendor_id": "1",
-        "status": "1",
-        "start_time": "2018-01-25 00:00:00",
-        "end_time": "2018-01-26 00:00:00",
-        "ext_store_id": [
-          "1",
-          "2",
-          "3",
-          "4",
-          "5"
-        ]
-
-      },
-      "interval_rules": {
-        "1": {
-          "21": {
-            "id": "21",
-            "rule_id": "1",
-            "type_id": "1",
-            "status": "1",
-            "categories": null,
-            "min_price": "0",
-            "max_price": "20",
-            "percent": "120",
-
-          },
-          "22": {
-            "id": "22",
-            "rule_id": "1",
-            "type_id": "1",
-            "status": "1",
-            "categories": null,
-            "min_price": "20",
-            "max_price": "50",
-            "percent": "130"
-          },
-          "23": {
-            "id": "23",
-            "rule_id": "1",
-            "type_id": "1",
-            "status": "1",
-            "categories": null,
-            "min_price": "50",
-            "max_price": "10000",
-            "percent": "110"
-          }
-        },
-        "2": [{
-          "categories": [
-            "81898589",
-            "81898625"
-          ],
-          "rules": {
-            "24": {
-              "id": "24",
-              "rule_id": "1",
-              "type_id": "2",
-              "status": "1",
-              "categories": "81898589,81898625",
-              "min_price": "0",
-              "max_price": "30",
-              "percent": "123"
-            },
-            "25": {
-              "id": "25",
-              "rule_id": "1",
-              "type_id": "2",
-              "status": "1",
-              "categories": "81898589,81898625",
-              "min_price": "30",
-              "max_price": "10000",
-              "percent": "111"
-            }
-          }
-        }]
-      },
-      "goods_rules": [{
-        "id": "9",
-        "rule_id": "1",
-        "status": "1",
-        "product_id": [
-          "1121",
-          "1122",
-          "1123",
-          "1124"
-        ],
-        "percent": "140"
-
-      }]
-    };
-    let {price_rules, interval_rules, goods_rules} = obj;
-    this.setState({
-      price_rules: price_rules,
-      interval_rules: interval_rules,
-      goods_rules: goods_rules,
-      commonRule: this.dataToCommon(interval_rules[Cts.RULE_TYPE_GENERAL]),
-    })
-
-  }
-
   dataToCommon(obj) {
     let arr = [];
     tool.objectMap(obj, (item, key) => {
@@ -317,12 +214,15 @@ class ActivityRuleScene extends PureComponent {
     });
     return arr;
   }
-
   setDateTime(date) {
     let {timeKey} = this.state;
     this.setState({[timeKey]: date, dataPicker: false})
   }
-
+  componentWillReceiveProps(){
+    let{ext_store_id}=this.props.activity;
+    console.log(ext_store_id)
+    this.setState({ext_store_id})
+  }
   renderCommon() {
     let {commonRule, price_rules} = this.state;
     return (
@@ -462,14 +362,13 @@ class ActivityRuleScene extends PureComponent {
     })
 
   }
-
   toSonPage(route, item) {
     let {navigate} = this.props.navigation;
-    navigate(route, item)
+    navigate(route, {key,...item})
   }
 
   render() {
-    let {startTime, endTime, vendorId} = this.state;
+    let {startTime, endTime, vendorId,rule_name,ext_store_id} = this.state;
     return (
         <View style={{flex: 1}}>
           <ScrollView>
@@ -503,7 +402,7 @@ class ActivityRuleScene extends PureComponent {
               <Cell customStyle={style.cell} first={true}>
                 <CellHeader><Text style={style.cell_header_text}>活动加价名称</Text></CellHeader>
                 <CellFooter>
-                  <Text style={style.cell_footer_text}>如满49减20</Text>
+                  <Text style={style.cell_footer_text}>{rule_name}</Text>
                 </CellFooter>
               </Cell>
               <Cell customStyle={style.cell} first={false}>
@@ -526,11 +425,11 @@ class ActivityRuleScene extends PureComponent {
                 </TouchableOpacity>
               </Cell>
               <Cell customStyle={style.cell} onPress={() => {
-                this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE, {vendorId: vendorId})
+                this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE, {vendorId: vendorId,ext_store_id:ext_store_id})
               }}>
                 <CellHeader><Text style={style.cell_header_text}>选择店铺</Text></CellHeader>
                 <CellFooter>
-                  <Text style={style.cell_footer_text}>已选(0)</Text>
+                  <Text style={style.cell_footer_text}>已选({tool.length(ext_store_id)})</Text>
                   <Image
                       style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                       source={require('../../img/Public/xiangxia_.png')}
@@ -636,10 +535,12 @@ class Percentage extends PureComponent {
           }
           <CellFooter>
             <TouchableOpacity
-                onPress={()=> this.props.onPressReduce()
+                onPress={()=> this.props.onPressReduce(percent)
                 }
             >
-              <Image style={style.operation} source={require('../../img/Activity/jianshao_.png')}/>
+              <Image style={style.operation}
+                     source={percent<=100?require('../../img/Activity/jianshaohui_.png'):require('../../img/Activity/jianshao_.png')}
+              />
             </TouchableOpacity>
             <Text style={style.percentage_text}>{percent}%</Text>
             <TouchableOpacity

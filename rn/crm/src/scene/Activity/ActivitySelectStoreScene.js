@@ -22,7 +22,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchWmStores} from '../../reducers/activity/activityAction';
+import {fetchWmStores,saveExtStoreId} from '../../reducers/activity/activityAction';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 
@@ -34,6 +34,7 @@ import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
 import SelectBox from './SelectBox'
 import {fetchListVendorTags} from "../../reducers/product/productActions";
+import BottomBtn from './ActivityBottomBtn'
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -44,6 +45,7 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       fetchWmStores,
+      saveExtStoreId,
       ...globalActions
     }, dispatch)
   }
@@ -84,17 +86,17 @@ class ActivitySelectStoreScene extends PureComponent {
         Cts.WM_PLAT_ID_ELE,
         Cts.WM_PLAT_ID_JD,],
       showDialog: false,
-      checkedAll: [],
+      ext_store_id: [],
       checkList: [],
-      listJson:{}
+      listJson: {}
     }
   }
 
-  async componentDidMount() {
+  async componentWillMount() {
     let {navigation} = this.props;
-    let {vendorId} = navigation.state.params;
-    await this.setState({vendorId: vendorId});
-    this.getStoreList()
+    let {vendorId,ext_store_id,nextState} = navigation.state.params;
+    await this.setState({vendorId: vendorId,ext_store_id:ext_store_id});
+    this.getStoreList();
     navigation.setParams({toggle: this.toggle});
   }
 
@@ -111,9 +113,8 @@ class ActivitySelectStoreScene extends PureComponent {
       if (ok) {
         this.setState({
           storeList: this.dataToCheck(obj),
-          checkList: this.getRenderArr(obj,0),
-          listJson: this.getRenderArr(obj,1),
-
+          checkList: this.getRenderArr(obj, 0),
+          listJson: this.getRenderArr(obj, 1),
         });
       } else {
         ToastLong(desc);
@@ -130,16 +131,16 @@ class ActivitySelectStoreScene extends PureComponent {
     return arr;
   }
 
-  getRenderArr(arr,type) {
+  getRenderArr(arr, type) {
     let {platId} = this.state;
-    let json = {}
+    let json = {};
     let list = [];
-    if(type){
+    if (type) {
       arr.forEach((item) => {
-        json[item.id]=item.name
+        json[item.id] = item.name
       });
       return json;
-    }else {
+    } else {
       arr.forEach((item) => {
         if (platId.indexOf(parseInt(item.platform)) >= 0) {
           list.push(item)
@@ -150,7 +151,7 @@ class ActivitySelectStoreScene extends PureComponent {
   }
 
   renderSelectBox() {
-    let {hide, vendorId, platList, platId,storeList,checkList} = this.state;
+    let {hide, vendorId, platList, platId, storeList, checkList} = this.state;
     if (hide) {
       return (
           <SelectBox toggle={() => this.toggle()}>
@@ -160,16 +161,16 @@ class ActivitySelectStoreScene extends PureComponent {
                     <TouchableOpacity
                         key={key}
                         onPress={async () => {
-                          if(platId.indexOf(item)<0){
+                          if (platId.indexOf(item) < 0) {
                             this.setState({
                               platId: [item, ...platId],
-                              checkList:this.getRenderArr(storeList)
+                              checkList: this.getRenderArr(storeList)
                             })
 
-                          }else {
-                            platId.splice(platId.indexOf(item),1);
-                          await  this.setState({
-                            checkList:this.getRenderArr(storeList)
+                          } else {
+                            platId.splice(platId.indexOf(item), 1);
+                            await  this.setState({
+                              checkList: this.getRenderArr(storeList)
                             });
                             this.forceUpdate()
                           }
@@ -194,7 +195,7 @@ class ActivitySelectStoreScene extends PureComponent {
   }
 
   render() {
-    let {checked, checkList,checkedAll,listJson} = this.state;
+    let {checked, checkList, ext_store_id, listJson} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
@@ -208,7 +209,7 @@ class ActivitySelectStoreScene extends PureComponent {
                   <Text>已选店铺</Text>
                 </CellHeader>
                 <CellFooter>
-                  <Text> {this.state.checkedAll.length}</Text>
+                  <Text> {this.state.ext_store_id.length}</Text>
                   <Image
                       style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                       source={require('../../img/Public/xiangxia_.png')}
@@ -218,11 +219,11 @@ class ActivitySelectStoreScene extends PureComponent {
             </Cells>
             <CheckboxCells
                 options={checkList}
-                value={this.state.checkedAll}
+                value={this.state.ext_store_id}
                 onChange={async (checked) => {
-                 await this.setState({
-                   checkedAll:checked
-                 });
+                  await this.setState({
+                    ext_store_id: checked
+                  });
                 }}
                 style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
             />
@@ -262,7 +263,7 @@ class ActivitySelectStoreScene extends PureComponent {
           >
             <ScrollView style={{height: pxToDp(700),}}>
               {
-                checkedAll.map((item, index) => {
+                ext_store_id.map((item, index) => {
                   return (
                       <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}
                             first={index == 0}
@@ -273,7 +274,7 @@ class ActivitySelectStoreScene extends PureComponent {
                         </CellHeader>
                         <TouchableOpacity
                             onPress={() => {
-                              checkedAll.splice(index, 1);
+                              ext_store_id.splice(index, 1);
                               this.forceUpdate();
                             }}
                         >
@@ -294,6 +295,21 @@ class ActivitySelectStoreScene extends PureComponent {
               }
             </ScrollView>
           </Dialog>
+          <View>
+            <TouchableOpacity
+                onPress={() => {
+                  let {ext_store_id}=this.state;
+                  let {navigation}=this.props
+                  const {dispatch} = this.props;
+                  dispatch(saveExtStoreId(ext_store_id));
+                  setTimeout(()=>{
+                    navigation.goBack();
+                  },500)
+                }}
+            >
+              <BottomBtn/>
+            </TouchableOpacity>
+          </View>
         </View>
     )
   }

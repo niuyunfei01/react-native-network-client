@@ -92,4 +92,5 @@ export default keyMirror({
 
   ACTIVITY_COMMON_RULE:null,
   ACTIVITY_SPECIAL_RULE:null,
+  ACTIVITY_EXT_STORE_ID:null,
 })

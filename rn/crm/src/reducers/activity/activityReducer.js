@@ -2,6 +2,7 @@
 const {
   ACTIVITY_COMMON_RULE,
   ACTIVITY_SPECIAL_RULE,
+  ACTIVITY_EXT_STORE_ID,
 } = require('../../common/constants').default;
 const initialState = {
   commonRule: [
@@ -58,6 +59,7 @@ const initialState = {
       percentage: 100,
     }
   ],
+  ext_store_id:[]
 };
 
 export default function activity(state = initialState, action) {
@@ -71,6 +73,11 @@ export default function activity(state = initialState, action) {
       return {
         ...state,
         specialRule: action.arr
+      };
+    case ACTIVITY_EXT_STORE_ID :
+      return {
+        ...state,
+        ext_store_id: action.arr
       };
     default:
       return state;
