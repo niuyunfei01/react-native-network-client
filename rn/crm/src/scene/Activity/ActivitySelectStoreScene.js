@@ -125,7 +125,7 @@ class ActivitySelectStoreScene extends PureComponent {
 
   dataToCheck(arr) {
     arr.forEach((item) => {
-      item.value = item.id;
+      item.value = item.store_id;
       item.label = item.name;
     });
     return arr;
@@ -299,7 +299,7 @@ class ActivitySelectStoreScene extends PureComponent {
               <BottomBtn onPress={() => {
                 let {ext_store_id}=this.state;
                 this.props.navigation.state.params.nextSetBefore('ext_store_id',ext_store_id);
-                this.props.navigation.goBack();
+                // this.props.navigation.goBack();
               }}/>
           </View>
         </View>

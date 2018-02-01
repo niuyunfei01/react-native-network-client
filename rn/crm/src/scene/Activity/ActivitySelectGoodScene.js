@@ -1,17 +1,15 @@
-import React, {PureComponent} from 'react';
 import Autocomplete from 'react-native-autocomplete-input';
-
+import React, {Component} from 'react';
+import tool from '../../common/tool'
 import {
-  View,
-  Text,
   StyleSheet,
-  Image,
+  Text,
   TouchableOpacity,
-  ScrollView,
-  TextInput,
-  FlatList,
-  TouchableHighlight,
+  View,
+  Platform,
+  Image,
 } from 'react-native';
+
 import {
   Cells,
   Cell,
@@ -21,195 +19,312 @@ import {
   CellFooter,
   Label,
 } from "../../weui/index";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from '../../reducers/global/globalActions';
-
-import {fetchStoresProdList} from '../../reducers/activity/activityAction'
+import InputNumber from 'rc-input-number';
+import common from './commonStyle';
 import pxToDp from "../../util/pxToDp";
+import {fetchStoresProdList} from '../../reducers/activity/activityAction'
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
 import colors from "../../styles/colors";
-
-import Config from "../../config";
-import tool from '../../common/tool';
-import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Icon, Dialog} from "../../weui/index";
-import style from './commonStyle'
-import SelectBox from './SelectBox'
+import ActivityDialog from './ActivityDialog'
+import BottomBtn from './ActivityBottomBtn'
+const numeral = require('numeral');
 
 function mapStateToProps(state) {
-  const {mine, global, activity} = state;
-  return {mine: mine, global: global, activity: activity}
+  return {
+    global: state.global,
+    product: state.product,
+  }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchStoresProdList,
-      ...globalActions
+      fetchStoresProdList
     }, dispatch)
   }
 }
 
-class ActivitySelectGoodScene extends PureComponent {
+class ProductAutocomplete extends Component {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
-    let {backPage} = params;
     return {
       headerTitle: '选择商品',
+
     }
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      checked: [],
-      query:'1111'
-
-    }
+      query: '',
+      pid: 0,
+      itemNumber: 0,
+      numOfPid: [],
+      prodInfos: {},
+      loadingInfoError: '',
+      loadingProds: false,
+      hideResults: false,
+      rendertList: [],
+      selectList:[],
+      showDialog: false,
+    };
   }
 
   componentDidMount() {
-    let {navigation} = this.props;
-    navigation.setParams({toggle: this.toggle});
-    this.getStoresProdList();
-  }
-  getStoresProdList(){
-    let {accessToken}=this.props.global;
-    let{dispatch}=this.props;
-    dispatch(fetchStoresProdList({vendor_id:4,store_ids:[113,120]},accessToken,(ok,reason,obj)=>{
-      console.log(ok,reason,obj);
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(fetchStoresProdList({vendor_id: 1, store_ids: ["2", "1"]}, accessToken, (ok, reason, obj) => {
+      this.setState({prodInfos: obj})
+      console.log(obj);
     }))
   }
 
-  render() {
-    const { query } = this.state;
-    return (
-        <View style={{flex: 1, position: 'relative'}}>
-          <ScrollView>
-            <Cells style={style.cells}>
-              <Cell customStyle={[style.cell, {paddingRight: pxToDp(10)}]}
-                    onPress={() => {
-                      this.setState({showDialog: true})
-                    }}
-              >
-                <CellHeader>
-                  <Text>已选商品</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text> {this.state.checked.length}</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-            </Cells>
+  findFilm(query) {
+    if (query === '' || query === '[上架]' || query === '[下架]' || query === '[' || query === ']') {
+      return [];
+    }
+    const {prodInfos} = this.state;
+    try {
+      query = query.replace(/\[上架\]|\[下架\]|\[上架|\[下架|\[上|\[下/, '');
+      const regex = new RegExp(`${query.trim()}`, 'i');
+      return Object.keys(prodInfos).map((k) => prodInfos[k]).filter(prod => prod.name.search(regex) >= 0);
+    } catch (ex) {
+      console.log('ex:', ex);
+      return [];
+    }
+  }
 
-            <TextInput
-                placeholder='输入商品名称模糊搜索'
-                underlineColorAndroid='transparent'
-                style={[styles.input_text]}
-                placeholderTextColor={"#7A7A7A"}
-                keyboardType='numeric'
-                value={this.state.price}
-                onChangeText={(text) => {
-                  this.setState({price: text})
-                }}
-            />
-            {/*<Autocomplete*/}
-                {/*containerStyle={[styles.input_text]}*/}
-                {/*defaultValue={query}*/}
-                {/*underlineColorAndroid={'transparent'}*/}
-                {/*onChangeText={text => this.setState({query: text})}*/}
-                {/*inputContainerStyle={{borderColor:'transparent'}}*/}
-                {/*data={filteredProds.length === 1 && comp(query, filteredProds[0].name) ? [] : filteredProds}*/}
-                {/*placeholder='输入商品名称模糊搜索'*/}
-                {/*renderItem={({name, price, pid}) => (*/}
-                    {/*<TouchableOpacity onPress={() => this._onProdSelected(name, pid, price)}>*/}
-                      {/*<Text style={styles.itemText}>*/}
-                        {/*{name} ({price})*/}
-                      {/*</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                {/*)}*/}
-            {/*/>*/}
-            <Cell customStyle={[style.cell,styles.cell]}>
-                <Image style={styles.img} source={{uri:"https://www.cainiaoshicai.cn/files/201606/thumb_m/59b6a4a5de8_0623.jpg"}}/>
-              <CellBody style={{paddingHorizontal:pxToDp(20)}}>
-                <Text numberOfLines={2} style={style.default_text}>数控技术担惊受恐红色经典哈萨克 回家时候定价说的就是</Text>
-                <Text style={style.default_text}>#1313</Text>
-              </CellBody>
-              <Text style={style.text_btn}>添加</Text>
+  renderBtn(obj) {
+    let{selectList}= this.state;
+    let length = tool.length(selectList.filter(({id}) => {
+      return id == obj.id
+    }));
+    if (!length) {
+      return (
+        <TouchableOpacity
+            onPress={()=>{
+              this.state.selectList.push(obj);
+              this.forceUpdate()
+            }}
+        >
+          <Text style={{
+            width: pxToDp(130),
+            textAlign: 'center',
+            color: colors.white,
+            backgroundColor: colors.main_color,
+            height: pxToDp(60),
+            textAlignVertical: 'center',
+            borderRadius: pxToDp(5)
+          }}>添加</Text>
+        </TouchableOpacity>
+      )
+    } else {
+      return (
+          <Text style={{
+            width: pxToDp(130),
+            textAlign: 'center',
+            color: colors.white,
+            backgroundColor: '#dcdcdc',
+            height: pxToDp(60),
+            textAlignVertical: 'center',
+            borderRadius: pxToDp(5)
+          }}>已添加</Text>
+      )
+    }
+  }
+
+
+  render() {
+
+    const {query,selectList} = this.state;
+    const filteredProds = this.findFilm(query);
+    const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
+    return (
+        <View style={{flex: 1, position: 'relative',}}>
+          <Cells style={common.cells}>
+            <Cell customStyle={[common.cell, {paddingHorizontal: pxToDp(30)}]}
+                  onPress={() => {
+                    this.setState({showDialog: true})
+                  }}
+            >
+              <CellHeader>
+                <Text>已选商品</Text>
+              </CellHeader>
+              <CellFooter>
+                <Text> {tool.length(selectList)}</Text>
+                <Image
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
             </Cell>
-          </ScrollView>
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.showDialog}
-                  title={'已选商品'}
-                  titleStyle={{textAlign: 'center', color: colors.fontBlack}}
-                  headerStyle={{
-                    backgroundColor: colors.main_back,
-                    paddingTop: pxToDp(20),
-                    justifyContent: 'center',
-                    paddingBottom: pxToDp(20),
-                  }}
-                  buttons={[{
-                    type: 'primary',
-                    label: '确定',
-                    onPress: () => {
-                      this.setState({showDialog: false,});
+          </Cells>
+          <View style={styles.container}>
+            <Autocomplete
+                autoCapitalize="none"
+                containerStyle={[styles.autocompleteContainer]}
+                inputContainerStyle={{borderColor: colors.main_color, borderWidth: pxToDp(1), borderRadius: pxToDp(5)}}
+                autoCorrect={false}
+                data={filteredProds.length === 1 && comp(query, filteredProds[0].name) ? [] : filteredProds}
+                defaultValue={query}
+                onChangeText={text => this.setState({query: text, hideResults: false})}
+                hideResults={this.state.hideResults}
+                placeholder="输入商品名模糊查找"
+                renderItem={(obj) => (
+                    <TouchableOpacity onPress={() => {
+                      this.setState({
+                        hideResults: true,
+                        rendertList: [obj]
+                      })
                     }
-                  }]}
-                  footerStyle={{
-                    borderTopWidth: pxToDp(1),
-                  }}
-                  bodyStyle={{
-                    borderRadius: pxToDp(10),
-                    marginLeft: pxToDp(15),
-                    marginRight: pxToDp(15),
-                    height: pxToDp(800),
-                    marginTop: 0
-                  }}
+                    }>
+                      <Text style={[styles.itemText,{zIndex:101}]}>
+                        {obj.name}
+                      </Text>
+                    </TouchableOpacity>
+                )}
+                underlineColorAndroid={'transparent'}
+            />
+            {
+              this.state.hideResults?<View style={{marginTop: pxToDp(60),zIndex:100}}>
+
+              {
+                this.state.rendertList.map((item, index) => {
+                  let {name, id, listimg} = item;
+                  return (
+                      <Cell key={index} customStyle={{
+                        height: pxToDp(150),
+                        marginLeft: pxToDp(30),
+                        marginHorizontal: pxToDp(30),
+                        borderBottomWidth: pxToDp(1),
+                        borderBottomColor: colors.fontGray,
+                      }}
+                            first
+                      >
+                        <Image source={!!listimg ? {uri: listimg} : require('../../img/Order/zanwutupian_.png')}
+                               style={{height: pxToDp(90), width: pxToDp(90)}}/>
+                        <CellBody style={{paddingLeft: pxToDp(10), marginRight: pxToDp(60)}}>
+                          <Text numberOfLines={2}>{name}</Text>
+                          <Text>#{id}</Text>
+                        </CellBody>
+                        <CellFooter>
+                          {
+                            this.renderBtn(item)
+                          }
+                        </CellFooter>
+                      </Cell>
+                  )
+                })
+              }
+              </View>:null
+            }
+          </View>
+          <Toast
+              icon="loading"
+              show={this.state.loadingProds}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
+
+          <ActivityDialog
+              showDialog={this.state.showDialog}
+              title={'已选商品'}
+              buttons={[{
+                type: 'primary',
+                label: '确定',
+                onPress: () => {
+                  this.setState({showDialog: false,});
+                }
+              }]}
           >
-            <ScrollView style={{height: pxToDp(700),}}>
-              <Cell customStyle={[style.cell,styles.cell,{borderBottomColor:'#d4d4d4',}]}>
-                <Image style={styles.img} source={{uri:"https://www.cainiaoshicai.cn/files/201606/thumb_m/59b6a4a5de8_0623.jpg"}}/>
-                <CellBody style={{paddingHorizontal:pxToDp(20)}}>
-                  <Text numberOfLines={2} style={style.default_text}>数控技术担惊受恐红色经典哈萨克 回家时候定价说的就是</Text>
-                  <Text style={style.default_text}>#1313</Text>
-                </CellBody>
-                <Text style={style.text_btn}>移除</Text>
-              </Cell>
-            </ScrollView>
-          </Dialog>
+            {
+              this.state.selectList.map((item, index) => {
+                let {name, id, listimg} = item;
+                return (
+                    <Cell key={index} customStyle={{
+                      height: pxToDp(150),
+                      marginLeft: pxToDp(30),
+                      marginHorizontal: pxToDp(30),
+                      borderBottomWidth: pxToDp(1),
+                      borderBottomColor: colors.fontGray,
+                    }}
+                          first
+                    >
+                      <Image source={!!listimg ? {uri: listimg} : require('../../img/Order/zanwutupian_.png')}
+                             style={{height: pxToDp(90), width: pxToDp(90)}}/>
+                      <CellBody style={{paddingLeft: pxToDp(10), marginRight: pxToDp(60),flex:1}}>
+                        <Text numberOfLines={2} style={{width:'100%'}}>{name}</Text>
+                        <Text>#{id}</Text>
+                      </CellBody>
+                      <CellFooter>
+                        <TouchableOpacity
+                        onPress={()=>{
+                          this.state.selectList.splice(index,1);
+                          this.forceUpdate();
+                        }}
+                        >
+                          <Text>移除</Text>
+                        </TouchableOpacity>
+                      </CellFooter>
+                    </Cell>
+                )
+              })
+            }
+          </ActivityDialog>
+          <BottomBtn onPress={()=>{
+            console.log(99999);
+          }}/>
+
         </View>
-    )
+
+    );
   }
 }
 
-const styles = {
-  input_text: {
-    borderWidth: pxToDp(2),
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 25,
+    flex: 1,
+  },
+  autocompleteContainer: {
+    left: 0,
+    position: 'absolute',
+    right: pxToDp(30),
+    top: 0,
+    paddingLeft: pxToDp(30),
+    paddingTop: pxToDp(20),
+    zIndex: 1,
+    maxHeight: '90%',
     borderColor: colors.main_color,
-    marginVertical:pxToDp(30),
-    marginHorizontal:pxToDp(30),
-    borderRadius:pxToDp(5),
   },
-  img:{
-    height:pxToDp(90),
-    width:pxToDp(90),
+  moneyLabel: {fontSize: pxToDp(30), fontWeight: 'bold'},
+  moneyText: {fontSize: pxToDp(40), color: colors.color999},
+  itemText: {
+    fontSize: 15,
+    margin: 2
   },
-  cell:{
-    borderBottomWidth:pxToDp(1),
-    height:pxToDp(150),
-    backgroundColor:'transparent',
-    borderBottomColor:'#999999',
-    paddingLeft:0,
-    paddingRight:0,
-    marginHorizontal:pxToDp(30),
-    marginLeft:pxToDp(30),
+  infoText: {
+    textAlign: 'center'
+  },
+  titleText: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginBottom: 10,
+    marginTop: 10,
+    textAlign: 'center'
+  },
+  directorText: {
+    color: 'grey',
+    fontSize: 12,
+    marginBottom: 10,
+    textAlign: 'center'
+  },
+  openingText: {
+    textAlign: 'center'
   }
-};
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActivitySelectGoodScene)
+export default connect(mapStateToProps, mapDispatchToProps)(ProductAutocomplete)
