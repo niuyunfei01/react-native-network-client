@@ -88,7 +88,7 @@ class ActivitySelectStoreScene extends PureComponent {
       showDialog: false,
       ext_store_id: [],
       checkList: [],
-      listJson: {}
+      listJson: {},
     }
   }
 
@@ -110,6 +110,7 @@ class ActivitySelectStoreScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(fetchWmStores(vendorId, accessToken, (ok, desc, obj) => {
+      console.log(obj);
       if (ok) {
         this.setState({
           storeList: this.dataToCheck(obj),
@@ -125,7 +126,7 @@ class ActivitySelectStoreScene extends PureComponent {
 
   dataToCheck(arr) {
     arr.forEach((item) => {
-      item.value = item.store_id;
+      item.value = item.id;
       item.label = item.name;
     });
     return arr;
@@ -149,7 +150,19 @@ class ActivitySelectStoreScene extends PureComponent {
       return list;
     }
   }
+  getStoreIds(){
+    let{ext_store_id,storeList}=this.state;
+    let arr=[];
+    ext_store_id.forEach((item)=>{
+      storeList.forEach((ite)=>{
+        if(item==ite.id){
+          arr.push(ite.store_id)
+        }
+      })
 
+    })
+    return arr;
+  }
   renderSelectBox() {
     let {hide, vendorId, platList, platId, storeList, checkList} = this.state;
     if (hide) {
@@ -195,7 +208,7 @@ class ActivitySelectStoreScene extends PureComponent {
   }
 
   render() {
-    let {checked, checkList, ext_store_id, listJson} = this.state;
+    let {checkList, ext_store_id, listJson} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView>
@@ -298,8 +311,10 @@ class ActivitySelectStoreScene extends PureComponent {
           <View>
               <BottomBtn onPress={() => {
                 let {ext_store_id}=this.state;
-                this.props.navigation.state.params.nextSetBefore('ext_store_id',ext_store_id);
-                // this.props.navigation.goBack();
+                let {nextSetBefore} = this.props.navigation.state.params;
+                nextSetBefore('ext_store_id',ext_store_id);
+                nextSetBefore('store_id',this.getStoreIds());
+                this.props.navigation.goBack();
               }}/>
           </View>
         </View>

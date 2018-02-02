@@ -16,6 +16,7 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import tool from '../../common/tool'
 import Cts from '../../Cts'
+
 import ActivityDialog from './ActivityDialog'
 
 class ActivityItem extends PureComponent {
@@ -34,7 +35,8 @@ class ActivityItem extends PureComponent {
       ext_store_id: [],
       rule_name: '',
       start_time: '',
-      end_time: []
+      end_time: [],
+      btn_text: '复制使用',
 
     }
   }
@@ -42,6 +44,7 @@ class ActivityItem extends PureComponent {
   componentWillMount() {
     let _this = this;
     try {
+      let {btn_text} = _this.props;
       let {price_rules, interval_rules, goods_rules} = _this.props.item;
       let {min_price, max_price, percent} = interval_rules[Cts.RULE_TYPE_GENERAL][Object.keys(interval_rules[Cts.RULE_TYPE_GENERAL])[0]];
       let {ext_store, vendor_id, rule_name, ext_store_id, start_time, end_time} = price_rules;
@@ -56,6 +59,7 @@ class ActivityItem extends PureComponent {
         rule_name: rule_name,
         start_time: start_time,
         end_time: end_time,
+        btn_text: btn_text
       })
     } catch (e) {
       console.log(e)
@@ -135,11 +139,15 @@ class ActivityItem extends PureComponent {
         });
         break;
       case constant.GOOD_RULE:
-        return goods_rules.map((item,index) => {
-          let {percent,prod_list}=item;
+        return goods_rules.map((item, index) => {
+          let {percent, prod_list} = item;
           return (
               <View key={index}>
-                <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15),minHeight:pxToDp(100)}]}>
+                <Cell customStyle={[style.cell, {
+                  paddingLeft: pxToDp(15),
+                  paddingRight: pxToDp(15),
+                  minHeight: pxToDp(100)
+                }]}>
                   <CellHeader>
                     <Text>
                       {percent}%
@@ -153,7 +161,9 @@ class ActivityItem extends PureComponent {
                         <Cell key={index}
                               customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
                           <CellHeader>
-                            <Image style={{height:pxToDp(90),width:pxToDp(90)}} source={{uri:listimg}}/>
+                            <Image style={{height: pxToDp(90), width: pxToDp(90)}}
+                                   source={!!listimg ? {uri: listimg} : require('../../img/Order/zanwutupian_.png')}
+                            />
                           </CellHeader>
                           <CellBody>
                             <View>
@@ -187,21 +197,27 @@ class ActivityItem extends PureComponent {
       start_time,
       end_time,
       price_rules_str,
+      btn_text,
     } = this.state;
     return (
         <View style={[manage.cells, customStyle]}>
-          <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]} first={true}>
+          <Cell customStyle={[style.cell, manage.cell]} first={true}>
             <CellHeader>
-              <Text style={{
+              <Text style={[{
                 fontSize: pxToDp(36),
                 color: colors.fontBlack,
-                width: pxToDp(300),
-                fontWeight: '900'
-              }}>{rule_name}</Text>
+                width: pxToDp(400),
+                fontWeight: '900',
+                height: pxToDp(120),
+              }, textStyle]}
+                    numberOfLines={2}
+              >
+                {rule_name}
+              </Text>
             </CellHeader>
             <View>
-              <Text style={[manage.cell_footer_text, textStyle]}>{start_time}</Text>
-              <Text style={[manage.cell_footer_text, textStyle]}>{end_time}</Text>
+              <Text style={[manage.cell_footer_text, textStyle]}>{start_time} </Text>
+              <Text style={[manage.cell_footer_text, textStyle]}>{end_time} </Text>
             </View>
           </Cell>
           <Cell customStyle={[style.cell, manage.cell]}
@@ -264,8 +280,12 @@ class ActivityItem extends PureComponent {
               />
             </CellFooter>
           </Cell>
-          <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}>
-            <Text style={manage.edit_btn}>复制使用</Text>
+          <Cell customStyle={[style.cell, manage.cell, {height: pxToDp(120)}]}
+                onPress={() => {
+                  this.props.onPress();
+                }}
+          >
+            <Text style={manage.edit_btn}>{btn_text}</Text>
           </Cell>
           <View/>
           <ActivityDialog
@@ -309,7 +329,7 @@ const manage = {
     paddingLeft: pxToDp(15),
     paddingRight: pxToDp(15),
     backgroundColor: 'rgba(0,0,0,0)',
-    minHeight: pxToDp(100),
+    height: pxToDp(120),
   },
   edit_btn: {
     height: pxToDp(80),

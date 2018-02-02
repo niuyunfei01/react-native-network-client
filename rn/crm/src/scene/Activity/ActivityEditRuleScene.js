@@ -56,18 +56,20 @@ class ActivityEditRuleScene extends PureComponent {
     super(props);
     this.state = {
       rule: [],
-      key:'',
-      categories:[]
+      key: '',
+      categories: [],
+      type_id:0
     }
   }
 
   componentWillMount() {
-    let {rule,key,categories} = this.props.navigation.state.params;
-    this.setState({rule: rule,key:key,categories:categories})
+    let {rule, key, categories, type_id} = this.props.navigation.state.params;
+    console.log(rule, key, categories, type_id);
+    this.setState({rule: rule, key: key, categories: categories, type_id: type_id})
   }
 
   renderList() {
-    let {rule,categories} = this.state;
+    let {rule, categories, type_id} = this.state;
     let length = rule.length;
     return rule.map((item, index) => {
       let {min_price, max_price} = item;
@@ -83,12 +85,16 @@ class ActivityEditRuleScene extends PureComponent {
                 onChangeText={(text) => {
                   item.max_price = text;
                   if (index == length - 1) {
-                    rule.push({
+                    let json = {
                       min_price: text,
-                      max_price: '',
-                      percent:100,
-                      categories:categories,
-                    })
+                      max_price: 10000,
+                      percent: 100,
+                      type_id: type_id,
+                    };
+                    if (type_id == Cts.RULE_TYPE_SPECIAL) {
+                      json.categories=categories
+                    }
+                    rule.push(json);
                     this.forceUpdate()
                   } else {
                     rule[index + 1].min_price = text;
@@ -137,11 +143,11 @@ class ActivityEditRuleScene extends PureComponent {
           <ScrollView>
             {this.renderList()}
 
-              <BottomBtn onPress={() => {
-                let {rule,key}=this.state;
-                this.props.navigation.state.params.nextSetBefore(key,rule,index=1);
-                this.props.navigation.goBack();
-              }}/>
+            <BottomBtn onPress={() => {
+              let {rule, key} = this.state;
+              this.props.navigation.state.params.nextSetBefore(key, rule, index = 1);
+              this.props.navigation.goBack();
+            }}/>
           </ScrollView>
         </View>
     )

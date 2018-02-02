@@ -81,7 +81,8 @@ class ActivitySelectClassifyScene extends PureComponent {
 
   componentWillMount() {
     let {categories}=this.props.navigation.state.params;
-    this.setState({checked:categories})
+    console.log(categories);
+    this.setState({checked:categories});
     this.getListVendorTags()
   }
 
@@ -262,9 +263,9 @@ class ActivitySelectClassifyScene extends PureComponent {
             let {specialRuleList,index} = this.props.navigation.state.params;
             specialRuleList[index].forEach((item)=>{
               item.categories=this.state.checked;
-            })
+            });
             this.props.navigation.state.params.nextSetBeforeCategories(specialRuleList);
-            this.props.navigation.goBack()
+            this.props.navigation.goBack();
           }}/>
         </View>
     )

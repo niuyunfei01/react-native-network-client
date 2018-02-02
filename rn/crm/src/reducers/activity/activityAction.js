@@ -71,3 +71,14 @@ export function fetchStoresProdList(data, token, callback) {
   )
 
 }
+export function fetchSavePriceRule(data, token, callback) {
+  let url = `api/save_price_rule.json?access_token=${token}`;
+  return jsonWithTpl2(url, data, (json) => {
+        callback(json.ok, json.reason, json.obj);
+      },
+      (error) => {
+        callback(error, "网络错误, 请稍后重试")
+      }
+  )
+
+}

@@ -70,15 +70,31 @@ class ProductAutocomplete extends Component {
       rendertList: [],
       selectList:[],
       showDialog: false,
+      selectListId:[],
+      vendorId:0,
+      store_ids:[],
+      loading:true,
     };
   }
 
-  componentDidMount() {
+  async componentWillMount() {
+    let {vendorId,store_ids,index,product_id}=this.props.navigation.state.params
+    await this.setState({
+      selectListId:product_id,
+      vendorId:vendorId,
+      store_ids:store_ids,
+    });
+    this.getStoresProdList();
+  }
+  getStoresProdList(){
+    let {vendorId,store_ids}=this.state
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchStoresProdList({vendor_id: 1, store_ids: ["2", "1"]}, accessToken, (ok, reason, obj) => {
-      this.setState({prodInfos: obj})
-      console.log(obj);
+    console.log({vendorId ,store_ids})
+    dispatch(fetchStoresProdList({vendorId ,store_ids}, accessToken, (ok, reason, obj) => {
+      if(ok){
+        this.setState({prodInfos: obj,loading:false})
+      }
     }))
   }
 
@@ -107,6 +123,7 @@ class ProductAutocomplete extends Component {
         <TouchableOpacity
             onPress={()=>{
               this.state.selectList.push(obj);
+              this.state.selectListId.push(obj.id);
               this.forceUpdate()
             }}
         >
@@ -135,11 +152,8 @@ class ProductAutocomplete extends Component {
       )
     }
   }
-
-
   render() {
-
-    const {query,selectList} = this.state;
+    const {query,selectListId,prodInfos} = this.state;
     const filteredProds = this.findFilm(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
     return (
@@ -154,7 +168,7 @@ class ProductAutocomplete extends Component {
                 <Text>已选商品</Text>
               </CellHeader>
               <CellFooter>
-                <Text> {tool.length(selectList)}</Text>
+                <Text> {tool.length(selectListId)}</Text>
                 <Image
                     style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
                     source={require('../../img/Public/xiangxia_.png')}
@@ -241,8 +255,8 @@ class ProductAutocomplete extends Component {
               }]}
           >
             {
-              this.state.selectList.map((item, index) => {
-                let {name, id, listimg} = item;
+            tool.length(prodInfos)>0?this.state.selectListId.map((item, index) => {
+                let {name, id, listimg} =prodInfos[item];
                 return (
                     <Cell key={index} customStyle={{
                       height: pxToDp(150),
@@ -261,21 +275,36 @@ class ProductAutocomplete extends Component {
                       </CellBody>
                       <CellFooter>
                         <TouchableOpacity
-                        onPress={()=>{
-                          this.state.selectList.splice(index,1);
-                          this.forceUpdate();
-                        }}
+                            onPress={()=>{
+                              this.state.selectListId.splice(index,1);
+                              this.forceUpdate();
+                            }}
                         >
-                          <Text>移除</Text>
+                          <Text style={{
+                            fontSize: pxToDp(30),
+                            color: colors.white,
+                            height: pxToDp(60),
+                            backgroundColor: colors.main_color,
+                            width: pxToDp(130),
+                            textAlign: 'center',
+                            textAlignVertical: 'center',
+                            borderRadius: pxToDp(5),
+                          }}>移除</Text>
                         </TouchableOpacity>
                       </CellFooter>
                     </Cell>
                 )
-              })
+              }):null
+
             }
           </ActivityDialog>
           <BottomBtn onPress={()=>{
-            console.log(99999);
+            let{goods_data,index,nextSetBeforeGoods} =this.props.navigation.state.params;
+            let {selectListId}=this.state;
+            goods_data[index]['product_id']=selectListId;
+            nextSetBeforeGoods(goods_data);
+            this.props.navigation.goBack();
+
           }}/>
 
         </View>
