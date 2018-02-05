@@ -57,7 +57,7 @@ class ActivityListScene extends PureComponent {
     this.state = {
       checked: [],
       hide: false,
-      vendorId: Cts.STORE_TYPE_SELF,
+      vendorId: Cts.STORE_TYPE_GZW,
       platList: [
         Cts.WM_PLAT_ID_WX,
         Cts.WM_PLAT_ID_BD,
@@ -118,14 +118,13 @@ class ActivityListScene extends PureComponent {
   }
 
   arrFilter(arr, id) {
-    console.log(arr);
     let list = [];
     arr.forEach((item) => {
       if (item.price_rules.vendor_id == id) {
         list.push(item)
       }
     });
-    console.log(list);
+    console.log(list)
     return list;
   }
 
@@ -133,7 +132,6 @@ class ActivityListScene extends PureComponent {
     let {timeKey} = this.state;
     this.setState({[timeKey]: date, dataPicker: false})
   }
-
   render() {
     let {startTime, endTime, vendorId,ruleList,renderList} = this.state;
     return (
@@ -190,16 +188,19 @@ class ActivityListScene extends PureComponent {
           <ScrollView style={{backgroundColor: '#fff'}}>
             {
               renderList.map((item,key)=>{
+                console.log(item)
                 return(
                     <ActivityItem
                         key={key}
                         customStyle={{marginLeft: pxToDp(15)}}
                         textStyle={{color:colors.fontGray}}
                         item={item}
+                        onPress={()=>{
+                          this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:'use'})
+                        }}
                     />
                 )
               })
-
             }
           </ScrollView>
           <DateTimePicker

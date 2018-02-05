@@ -63,34 +63,34 @@ class ActivityRuleScene extends PureComponent {
       commonRule: [
         {
           min_price: 0,
-          max_price: 5,
+          max_price: 500,
           percent: 100,
           type_id: 1,
         },
         {
-          min_price: 5,
-          max_price: 10,
-          percent: 100,
-          type_id: 1,
-
-        },
-        {
-          min_price: 10,
-          max_price: 20,
+          min_price: 500,
+          max_price: 1000,
           percent: 100,
           type_id: 1,
 
         },
         {
-          min_price: 20,
-          max_price: 40,
+          min_price: 1000,
+          max_price: 2000,
           percent: 100,
           type_id: 1,
 
         },
         {
-          min_price: 40,
-          max_price: 10000,
+          min_price: 2000,
+          max_price: 4000,
+          percent: 100,
+          type_id: 1,
+
+        },
+        {
+          min_price: 4000,
+          max_price: 1000000,
           percent: 100,
           type_id: 1,
 
@@ -103,13 +103,13 @@ class ActivityRuleScene extends PureComponent {
             "type_id": 2,
             "categories": [],
             "min_price": "0",
-            "max_price": "30",
+            "max_price": "3000",
             "percent": "100"
           },
           {
             "type_id": 2,
             "categories": [],
-            "min_price": "30",
+            "min_price": "3000",
             "max_price": "10000",
             "percent": "100"
           }
@@ -179,10 +179,11 @@ class ActivityRuleScene extends PureComponent {
   componentWillMount() {
     try {
       let {rules, type} = this.props.navigation.state.params;
+      console.log(rules);
       let {price_rules, interval_rules, goods_rules} = rules;
       let {vendor_id, rule_name, ext_store_id, start_time, end_time, store_id, id} = price_rules;
       let commonRule = Object.values(interval_rules[Cts.RULE_TYPE_GENERAL]);
-      let specialRuleList = interval_rules[Cts.RULE_TYPE_SPECIAL];
+      let specialRuleList = interval_rules[Cts.RULE_TYPE_SPECIAL] || [];
       let arr = [];
       specialRuleList.map((item, key) => {
         arr.push(Object.values(item.rules))
@@ -199,16 +200,12 @@ class ActivityRuleScene extends PureComponent {
         goods_data: goods_rules,
         id: id,
         type: type,
-
       })
     } catch (e) {
       console.log(e)
     }
   }
 
-  // componentWillReceiveProps() {
-  //   let {rules, type} = this.props.navigation.state.params;
-  // }
   renderCommon() {
     let {commonRule, price_rules} = this.state;
     return (
@@ -219,7 +216,7 @@ class ActivityRuleScene extends PureComponent {
                     onPress={() =>
                         this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
                           rule: commonRule,
-                          key: commonRule,
+                          key: 'commonRule',
                           type_id: Cts.RULE_TYPE_GENERAL,
                         })
                     }/>
@@ -254,7 +251,10 @@ class ActivityRuleScene extends PureComponent {
   nextSetBefore(key, obj, index = -1) {
     if (index < 0) {
       this.setState({[key]: obj})
+    } else {
+      this.state.specialRuleList[key] = obj
     }
+    this.forceUpdate();
   }
 
   nextSetBeforeCategories(specialRuleList) {
@@ -342,7 +342,7 @@ class ActivityRuleScene extends PureComponent {
           <View key={index}>
             <Cell customStyle={style.cell}
                   onPress={() => {
-                    if ((tool.length(store_id)<=0) && (vendorId<=0)) {
+                    if ((tool.length(store_id) <= 0) && (vendorId <= 0)) {
                       ToastLong('请选择品牌,店铺')
                       return false
                     }
@@ -406,9 +406,69 @@ class ActivityRuleScene extends PureComponent {
     })
   }
 
-  uploadData() {
+  checkContinuity(arr, type) {
+    let flag = true;
+    if (type == Cts.RULE_TYPE_GENERAL) {
+      try {
+        arr.forEach((item, index) => {
+          if (item['max_price'] != arr[index + 1]['min_price'] ) {
+            flag = false
+          }
+        });
+
+      } catch (e) {
+      }
+    } else {
+      try{
+        arr.forEach((item) => {
+          item.forEach((ite, i) => {
+            if(ite['max_price'] != item[i + 1]['min_price'] || ite['categories'] != item[i + 1]['categories']){
+              flag = false
+            }
+          })
+        })
+      }catch(e){}
+    }
+    return flag
+  }
+
+  checkData() {
     let {rule_name, vendorId, startTime, endTime, ext_store_id, commonRule, specialRuleList, goods_data} = this.state;
-    let interval_data = [...commonRule];
+    let commonFlag = this.checkContinuity(commonRule, Cts.RULE_TYPE_GENERAL);
+    let specialFlag = this.checkContinuity(specialRuleList, Cts.RULE_TYPE_SPECIAL);
+    if (vendorId <= 0) {
+      ToastLong('请选择品牌');
+      return false;
+    }
+    if (tool.length(rule_name.replace(/\s/g, "")) <= 0) {
+      ToastLong('请输入有活动名称');
+      return false;
+    }
+    if ((tool.getTimeStamp(startTime) - tool.getTimeStamp(endTime)) >= 0 || isNaN(tool.getTimeStamp(startTime) - tool.getTimeStamp(endTime))) {
+      ToastLong('活动结束时间必须大于开始时间')
+      return false;
+    }
+    if (tool.length(ext_store_id) <= 0) {
+      ToastLong('请选择店铺!')
+      return false;
+    }
+    if (tool.length(commonRule.length) < 0 || !commonFlag) {
+      ToastLong('请检查通用加价规则是否连续');
+      return false;
+    }
+    if (tool.length(specialRuleList.length) > 0 && !specialFlag) {
+      ToastLong('请检查特殊加价规则的连续性');
+      return false;
+    }
+    return true;
+  }
+  uploadData() {
+    let {rule_name, vendorId, startTime, endTime, ext_store_id, commonRule, specialRuleList, goods_data,type,id} = this.state;
+    let interval_data = [];
+    commonRule.forEach((item)=>{
+      let {type_id,min_price,max_price,percent}=item;
+      interval_data.push({type_id,min_price,max_price,percent});
+    });
     let price_data = {
       rule_name: rule_name,
       vendor_id: vendorId,
@@ -416,10 +476,13 @@ class ActivityRuleScene extends PureComponent {
       end_time: endTime,
       ext_store_id: ext_store_id,
     };
+    if(type=='edit'){
+      price_data.id=id
+    }
     specialRuleList.map((item) => {
       item.map((ite) => {
-        interval_data.push(ite);
-
+        let {type_id,categories,min_price,max_price,percent}=ite;
+        interval_data.push({type_id,categories,min_price,max_price,percent});
       })
     });
     let all = {
@@ -427,14 +490,19 @@ class ActivityRuleScene extends PureComponent {
       interval_data: interval_data,
       goods_data: goods_data,
     };
-    if(false){
+
+    if (this.checkData()) {
       const {dispatch} = this.props;
-      const {accessToken}=this.props.global;
-      dispatch(fetchSavePriceRule(all,accessToken,(ok,reason,obj)=>{
-        console.log(ok);
+      const {accessToken} = this.props.global;
+      dispatch(fetchSavePriceRule(all, accessToken, (ok, reason, obj) => {
+        this.setState({uploading:false});
+        if (ok) {
+          ToastLong('提交成功');
+        }else {
+          ToastLong(reason);
+        }
       }))
     }
-
   }
 
   render() {
@@ -481,7 +549,7 @@ class ActivityRuleScene extends PureComponent {
                   <TextInput
                       multiline={true}
                       underlineColorAndroid='transparent'
-                      style={{minWidth: pxToDp(400)}}
+                      style={{minWidth: pxToDp(400), textAlign: 'right'}}
                       placeholderTextColor={"#7A7A7A"}
                       placeholder={'请输入活动名称'}
                       value={rule_name}
@@ -546,7 +614,6 @@ class ActivityRuleScene extends PureComponent {
                     <Image style={{height: pxToDp(42), width: pxToDp(42)}}
                            source={require('../../img/Activity/xinjian_.png')}/>
                   </TouchableOpacity>
-
                 </CellFooter>
               </Cell>
               {
@@ -569,7 +636,8 @@ class ActivityRuleScene extends PureComponent {
                 this.renderGoods()
               }
             </Cells>
-            <BottomBtn onPress={() => {
+            <BottomBtn onPress={async() => {
+              await this.state({uploading:true});
               this.uploadData()
             }}/>
           </ScrollView>
@@ -587,6 +655,12 @@ class ActivityRuleScene extends PureComponent {
                 this.setState({dataPicker: false});
               }}
           />
+          <Toast
+              icon="loading"
+              show={this.state.uploading}
+              onRequestClose={() => {
+              }}
+          >提交中</Toast>
         </View>
     )
   }
@@ -600,14 +674,22 @@ class Percentage extends PureComponent {
           {
             text ? <CellHeader>
               {
-                tail ? <Text style={style.cell_header_text}>{min_price}元以上</Text>
-                    : <Text style={style.cell_header_text}>{min_price}元--{max_price}元</Text>
+                tail ? <Text style={style.cell_header_text}>{tool.toFixed(min_price, 'int')}元以上</Text>
+                    : <Text
+                        style={style.cell_header_text}>{tool.toFixed(min_price, 'int')}元--{tool.toFixed(max_price, 'int')}元</Text>
               }
             </CellHeader> : <CellHeader/>
           }
           <CellFooter>
             <TouchableOpacity
-                onPress={() => this.props.onPressReduce(percent)
+                onPress={() => {
+                  if (percent > 100) {
+                    this.props.onPressReduce()
+                  } else {
+                    ToastLong('加价比例不能小于100%')
+                  }
+
+                }
                 }
             >
               <Image style={style.operation}

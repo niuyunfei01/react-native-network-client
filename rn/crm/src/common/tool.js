@@ -368,8 +368,13 @@ export function first_store_id(canReadStores) {
   }
   return first_store_id;
 }
-export function toFixed(num) {
-  return (parseInt(num)/100).toFixed(2)
+export function toFixed(num,type='') {
+
+  if(type=='int'){
+    return (parseInt(num)/100)
+  }else {
+    return (parseInt(num)/100).toFixed(2)
+  }
 
 }
 export  function billStatus(status) {
@@ -488,6 +493,10 @@ function goodSoldStatusImg(status){
   map[Cts.STORE_PROD_SOLD_OUT] = require('../img/Goods/quehuo.png');
   return map[status];
 }
+function getTimeStamp(str) {
+
+  return new Date(str).getTime()
+}
 
 export default {
   urlByAppendingParams,
@@ -525,5 +534,6 @@ export default {
   getVendorName,
   getSortName,
   platformsLogo,
-  goodSoldStatusImg
+  goodSoldStatusImg,
+  getTimeStamp,
 }

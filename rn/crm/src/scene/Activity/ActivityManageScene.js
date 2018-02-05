@@ -92,11 +92,11 @@ class ActivityManageScene extends PureComponent {
       wait: false,
       operatingList:[],
       willOperatingList:[],
+      query:true,
     }
   }
 
   componentWillMount() {
-
     this.getRuleList()
   }
 componentDidMount(){
@@ -109,9 +109,12 @@ componentDidMount(){
     dispatch(fetchRuleList('active',accessToken,(ok, desc, obj)=>{
       if(ok){
         this.setState({
+          query:false,
           operatingList:this.differentiateList(obj,0),
           willOperatingList:this.differentiateList(obj,1),
         })
+      }else {
+        this.setState({query:false})
       }
     }))
   }
@@ -129,7 +132,7 @@ componentDidMount(){
         arr.push(item);
       }
     });
-    return obj;
+    return arr;
   }
 
   render() {
@@ -160,10 +163,12 @@ componentDidMount(){
                               customStyle={{marginLeft: pxToDp(15),marginRight:pxToDp(15)}}
                               textStyle={{color:colors.main_color}}
                               item={item}
+                              edit={true}
                               btn_text={'修改'}
                               onPress={()=>{
-                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:0})
+                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:'edit'})
                               }}
+                              ballColor={'#a3d0ac'}
                           />
                       )
                     }) : null
@@ -190,38 +195,24 @@ componentDidMount(){
                               customStyle={{marginLeft: pxToDp(15),marginRight:pxToDp(15)}}
                               textStyle={{color:colors.fontOrange}}
                               item={item}
-                              btn_text={'修改'}
+                              edit={true}
                               onPress={()=>{
-                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:0})
+                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:'edit'})
                               }}
+                              ballColor={'#f1c377'}
                           />
                       )
                     }) : null
               }
             </View>
           </ScrollView>
-          <ActivityDialog
-              showDialog={this.state.showDialog}
-              title={this.state.title}
-              buttons={[{
-                type: 'primary',
-                label: '确定',
-                onPress: () => {
-                  this.setState({showDialog: false,});
-                }
-              }]}
-          >
-            <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
-              <CellHeader>
-                <Text>回龙观店(微信)</Text>
-              </CellHeader>
-            </Cell>
-            <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
-              <CellHeader>
-                <Text>回龙观店(微信)</Text>
-              </CellHeader>
-            </Cell>
-          </ActivityDialog>
+
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }

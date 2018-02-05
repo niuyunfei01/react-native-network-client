@@ -36,7 +36,7 @@ class ActivityItem extends PureComponent {
       rule_name: '',
       start_time: '',
       end_time: [],
-      btn_text: '复制使用',
+      edit: false,
 
     }
   }
@@ -44,7 +44,7 @@ class ActivityItem extends PureComponent {
   componentWillMount() {
     let _this = this;
     try {
-      let {btn_text} = _this.props;
+      let {edit} = _this.props;
       let {price_rules, interval_rules, goods_rules} = _this.props.item;
       let {min_price, max_price, percent} = interval_rules[Cts.RULE_TYPE_GENERAL][Object.keys(interval_rules[Cts.RULE_TYPE_GENERAL])[0]];
       let {ext_store, vendor_id, rule_name, ext_store_id, start_time, end_time} = price_rules;
@@ -59,7 +59,7 @@ class ActivityItem extends PureComponent {
         rule_name: rule_name,
         start_time: start_time,
         end_time: end_time,
-        btn_text: btn_text
+        edit: edit
       })
     } catch (e) {
       console.log(e)
@@ -177,7 +177,6 @@ class ActivityItem extends PureComponent {
                 }
               </View>)
         })
-
     }
 
   }
@@ -197,7 +196,7 @@ class ActivityItem extends PureComponent {
       start_time,
       end_time,
       price_rules_str,
-      btn_text,
+      edit,
     } = this.state;
     return (
         <View style={[manage.cells, customStyle]}>
@@ -207,6 +206,7 @@ class ActivityItem extends PureComponent {
                 fontSize: pxToDp(36),
                 color: colors.fontBlack,
                 width: pxToDp(400),
+                textAlignVertical:'center',
                 fontWeight: '900',
                 height: pxToDp(120),
               }, textStyle]}
@@ -285,7 +285,7 @@ class ActivityItem extends PureComponent {
                   this.props.onPress();
                 }}
           >
-            <Text style={manage.edit_btn}>{btn_text}</Text>
+            <Text style={manage.edit_btn}>{edit ? '修改' : '复制使用'}</Text>
           </Cell>
           <View/>
           <ActivityDialog
@@ -303,6 +303,9 @@ class ActivityItem extends PureComponent {
               this.renderSelect()
             }
           </ActivityDialog>
+
+          <View style={[manage.ball, manage.ball_left, {backgroundColor: this.props.ballColor}]}/>
+          <View style={[manage.ball, manage.ball_right, {backgroundColor: this.props.ballColor}]}/>
         </View>
     )
   }

@@ -3,33 +3,19 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   ScrollView,
   TextInput,
-  FlatList,
-  TouchableHighlight,
 } from 'react-native';
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label,
-} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import DateTimePicker from 'react-native-modal-datetime-picker';
-
-import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Icon} from "../../weui/index";
+import {Icon} from "../../weui/index";
 import BottomBtn from './ActivityBottomBtn';
 
 function mapStateToProps(state) {
@@ -58,14 +44,34 @@ class ActivityEditRuleScene extends PureComponent {
       rule: [],
       key: '',
       categories: [],
-      type_id:0
+      type_id: 0
     }
   }
 
   componentWillMount() {
     let {rule, key, categories, type_id} = this.props.navigation.state.params;
-    console.log(rule, key, categories, type_id);
-    this.setState({rule: rule, key: key, categories: categories, type_id: type_id})
+    this.setState({
+      rule: this.toRuleEdit(rule),
+      key: key,
+      categories:
+      categories,
+      type_id: type_id
+    })
+  }
+
+  toRuleEdit(arr,type='down') {
+    if(type=='down'){
+      arr.forEach((item, index) => {
+        item.min_price = tool.toFixed(item.min_price, 'int');
+        item.max_price = tool.toFixed(item.max_price, 'int');
+      });
+    }else {
+      arr.forEach((item, index) => {
+        item.min_price = item.min_price*100;
+        item.max_price = item.max_price*100;
+      });
+    }
+    return arr;
   }
 
   renderList() {
@@ -81,18 +87,18 @@ class ActivityEditRuleScene extends PureComponent {
                 style={style.max_price}
                 underlineColorAndroid='transparent'
                 keyboardType='numeric'
-                value={max_price == Cts.Rule_PRICE_UPPER ? '' : `${max_price}`}
+                value={max_price == Cts.Rule_PRICE_UPPER / 100 ? '' : `${max_price}`}
                 onChangeText={(text) => {
                   item.max_price = text;
                   if (index == length - 1) {
                     let json = {
                       min_price: text,
-                      max_price: 10000,
+                      max_price: Cts.Rule_PRICE_UPPER / 100,
                       percent: 100,
                       type_id: type_id,
                     };
                     if (type_id == Cts.RULE_TYPE_SPECIAL) {
-                      json.categories=categories
+                      json.categories = categories
                     }
                     rule.push(json);
                     this.forceUpdate()
@@ -128,23 +134,19 @@ class ActivityEditRuleScene extends PureComponent {
                       />
                 }
               </TouchableOpacity>
-              {/*{*/}
-              {/*this.renderDelete(index)*/}
-              {/*}*/}
             </View>
           </View>
       )
     })
   }
-
   render() {
     return (
         <View style={{flex: 1}}>
           <ScrollView>
             {this.renderList()}
-
             <BottomBtn onPress={() => {
               let {rule, key} = this.state;
+              rule=this.toRuleEdit(rule,'up')
               this.props.navigation.state.params.nextSetBefore(key, rule, index = 1);
               this.props.navigation.goBack();
             }}/>
