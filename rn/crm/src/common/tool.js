@@ -494,7 +494,6 @@ function goodSoldStatusImg(status){
   return map[status];
 }
 function getTimeStamp(str) {
-
   return new Date(str).getTime()
 }
 

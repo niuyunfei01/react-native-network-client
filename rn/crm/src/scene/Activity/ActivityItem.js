@@ -18,6 +18,7 @@ import tool from '../../common/tool'
 import Cts from '../../Cts'
 
 import ActivityDialog from './ActivityDialog'
+import RenderEmpty from '../OperateProfit/RenderEmpty'
 
 class ActivityItem extends PureComponent {
   constructor(props) {
@@ -37,7 +38,6 @@ class ActivityItem extends PureComponent {
       start_time: '',
       end_time: [],
       edit: false,
-
     }
   }
 
@@ -66,6 +66,10 @@ class ActivityItem extends PureComponent {
     }
   }
 
+  componentDidMount() {
+    console.log(this.props.item)
+  }
+
   dialogToggle(type, title) {
     this.setState({
       showDialog: true,
@@ -90,7 +94,11 @@ class ActivityItem extends PureComponent {
         });
         break;
       case Cts.RULE_TYPE_GENERAL:
-        return tool.objectMap(interval_rules[Cts.RULE_TYPE_GENERAL], (ite, index) => {
+        let arr = Object.values(interval_rules[Cts.RULE_TYPE_GENERAL]) || [];
+        arr.sort(function (a, b) {
+          return a.min_price - b.min_price;
+        });
+        return arr.map((ite, index) => {
           let {min_price, max_price, percent} = ite;
           return (
               <Cell key={index} customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
@@ -105,38 +113,42 @@ class ActivityItem extends PureComponent {
         });
         break;
       case Cts.RULE_TYPE_SPECIAL:
-        return tool.objectMap(interval_rules[Cts.RULE_TYPE_SPECIAL], (item, index) => {
-          let {category_list, rules} = item;
-          return (
-              <View key={index}>
-                <Cell key={index} customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
-                  <CellHeader>
-                    <Text>
-                      {
-                        Object.values(category_list).join(',')
-                      }
-                    </Text>
-                  </CellHeader>
-                </Cell>
-                {
-                  tool.objectMap(rules, (ite, index) => {
-                    let {min_price, max_price, percent} = ite;
-                    return (
-                        <Cell key={index}
-                              customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
-                          <CellHeader>
-                            <Text>{min_price / 100}元-{max_price / 100}元</Text>
-                          </CellHeader>
-                          <CellFooter>
-                            <Text>{percent}%</Text>
-                          </CellFooter>
-                        </Cell>
-                    )
-                  })
-                }
-              </View>
-          )
-        });
+        if (tool.length(interval_rules[Cts.RULE_TYPE_SPECIAL])<=0) {
+          return <RenderEmpty/>
+        } else {
+          return tool.objectMap(interval_rules[Cts.RULE_TYPE_SPECIAL], (item, index) => {
+            let {category_list, rules} = item;
+            return (
+                <View key={index}>
+                  <Cell key={index} customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
+                    <CellHeader>
+                      <Text>
+                        {
+                          Object.values(category_list).join(',')
+                        }
+                      </Text>
+                    </CellHeader>
+                  </Cell>
+                  {
+                    tool.objectMap(rules, (ite, index) => {
+                      let {min_price, max_price, percent} = ite;
+                      return (
+                          <Cell key={index}
+                                customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
+                            <CellHeader>
+                              <Text>{min_price / 100}元-{max_price / 100}元</Text>
+                            </CellHeader>
+                            <CellFooter>
+                              <Text>{percent}%</Text>
+                            </CellFooter>
+                          </Cell>
+                      )
+                    })
+                  }
+                </View>
+            )
+          });
+        }
         break;
       case constant.GOOD_RULE:
         return goods_rules.map((item, index) => {
@@ -206,7 +218,7 @@ class ActivityItem extends PureComponent {
                 fontSize: pxToDp(36),
                 color: colors.fontBlack,
                 width: pxToDp(400),
-                textAlignVertical:'center',
+                textAlignVertical: 'center',
                 fontWeight: '900',
                 height: pxToDp(120),
               }, textStyle]}
@@ -314,7 +326,7 @@ class ActivityItem extends PureComponent {
 const constant = {
   VENDOR: 3,
   GOOD_RULE: 4,
-}
+};
 const manage = {
   cell_footer_text: {
     textAlign: 'right',

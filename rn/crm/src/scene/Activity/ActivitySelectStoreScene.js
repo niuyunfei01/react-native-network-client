@@ -153,14 +153,19 @@ class ActivitySelectStoreScene extends PureComponent {
   getStoreIds(){
     let{ext_store_id,storeList}=this.state;
     let arr=[];
-    ext_store_id.forEach((item)=>{
-      storeList.forEach((ite)=>{
-        if(item==ite.id){
-          arr.push(ite.store_id)
-        }
-      })
+    try {
+      ext_store_id.forEach((item) => {
+        storeList.forEach((ite) => {
+          if (item == ite.id) {
+            arr.push(ite.store_id)
+          }
+        })
 
-    })
+      })
+    } catch (e) {
+      console.log(e)
+    }
+
     return arr;
   }
   renderSelectBox() {

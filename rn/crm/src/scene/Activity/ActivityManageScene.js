@@ -185,7 +185,8 @@ componentDidMount(){
                          style={{height: pxToDp(40), width: pxToDp(40)}}/>
                   <Text style={style.cell_header_text_white}>待执行({tool.length(willOperatingList)})</Text>
                 </CellHeader>
-                <Image style={manage.down} source={require('../../img/Public/xiangxiabai_.png')}/>
+                <Image style={wait ? [manage.down, {transform: [{rotate: '180deg'}]}] : [manage.down]}
+                       source={require('../../img/Public/xiangxiabai_.png')}/>
               </Cell>
               {
                 wait ? willOperatingList.map((item,key)=>{

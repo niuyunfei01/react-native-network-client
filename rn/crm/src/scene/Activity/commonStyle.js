@@ -17,6 +17,7 @@ const style = {
   cell_header_text: {
     fontSize: pxToDp(30),
     color: colors.fontBlack,
+    marginRight:pxToDp(10),
   },
   cell_header_text_white: {
     fontSize: pxToDp(30),

@@ -31,7 +31,7 @@ import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast} from "../../weui/index";
+import {Toast,Icon} from "../../weui/index";
 import style from './commonStyle'
 import ImgBtn from "./imgBtn";
 import BottomBtn from './ActivityBottomBtn'
@@ -100,18 +100,18 @@ class ActivityRuleScene extends PureComponent {
       specialRule: [
         [
           {
-            "type_id": 2,
-            "categories": [],
-            "min_price": "0",
-            "max_price": "3000",
-            "percent": "100"
+            type_id: 2,
+            categories: [],
+            min_price: 0,
+            max_price: 3000,
+            percent: 100
           },
           {
-            "type_id": 2,
-            "categories": [],
-            "min_price": "3000",
-            "max_price": "10000",
-            "percent": "100"
+            type_id: 2,
+            categories: [],
+            min_price: 3000,
+            max_price: 1000000,
+            percent: 100
           }
         ]
       ],
@@ -179,15 +179,20 @@ class ActivityRuleScene extends PureComponent {
   componentWillMount() {
     try {
       let {rules, type} = this.props.navigation.state.params;
-      console.log(rules);
       let {price_rules, interval_rules, goods_rules} = rules;
       let {vendor_id, rule_name, ext_store_id, start_time, end_time, store_id, id} = price_rules;
       let commonRule = Object.values(interval_rules[Cts.RULE_TYPE_GENERAL]);
       let specialRuleList = interval_rules[Cts.RULE_TYPE_SPECIAL] || [];
       let arr = [];
-      specialRuleList.map((item, key) => {
+      let goods_data=[];
+      specialRuleList.map((item) => {
+        console.log(Object.values(item.rules));
         arr.push(Object.values(item.rules))
       });
+      goods_rules.forEach((item) => {
+        let {product_id, percent} = item;
+        goods_data.push({product_id, percent})
+      })
       this.setState({
         ext_store_id: ext_store_id,
         vendorId: vendor_id,
@@ -197,7 +202,7 @@ class ActivityRuleScene extends PureComponent {
         commonRule: commonRule,
         specialRuleList: arr,
         store_id: store_id,
-        goods_data: goods_rules,
+        goods_data: goods_data,
         id: id,
         type: type,
       })
@@ -273,7 +278,23 @@ class ActivityRuleScene extends PureComponent {
       return (
           <View key={inex}>
             <Cell customStyle={style.cell} first={true}>
-              <CellHeader><Text style={[style.cell_header_text, {}]}>加价比例设置</Text></CellHeader>
+              <CellHeader style={{flexDirection:'row'}}>
+                <Text style={[style.cell_header_text, {}]}>加价比例设置 </Text>
+                <TouchableOpacity
+                    onPress={()=>{
+                      specialRuleList.splice(inex,1);
+                      this.forceUpdate()
+                    }}
+                >
+                  <Icon
+                      name={'clear'}
+                      size={pxToDp(40)}
+                      style={{backgroundColor: '#fff'}}
+                      color={'#d81e06'}
+                      msg={false}
+                  />
+                </TouchableOpacity>
+              </CellHeader>
               <ImgBtn require={require('../../img/Activity/bianji_.png')}
                       onPress={() =>
                           this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
@@ -342,7 +363,8 @@ class ActivityRuleScene extends PureComponent {
           <View key={index}>
             <Cell customStyle={style.cell}
                   onPress={() => {
-                    if ((tool.length(store_id) <= 0) && (vendorId <= 0)) {
+                    console.log(tool.length(store_id),vendorId)
+                    if ((tool.length(store_id) <= 0) || (vendorId <= 0)) {
                       ToastLong('请选择品牌,店铺')
                       return false
                     }
@@ -358,7 +380,23 @@ class ActivityRuleScene extends PureComponent {
                     })
                   }}
             >
-              <CellHeader><Text style={style.cell_header_text}>选择商品</Text></CellHeader>
+              <CellHeader style={{flexDirection:'row'}}>
+                <Text style={style.cell_header_text}>选择商品</Text>
+                <TouchableOpacity
+                    onPress={()=>{
+                      specialRuleList.splice(inex,1);
+                      this.forceUpdate()
+                    }}
+                >
+                  <Icon
+                      name={'clear'}
+                      size={pxToDp(40)}
+                      style={{backgroundColor: '#fff'}}
+                      color={'#d81e06'}
+                      msg={false}
+                  />
+                </TouchableOpacity>
+              </CellHeader>
               <CellFooter>
                 <Text style={style.cell_footer_text}>已选({product_id.length}个)</Text>
                 <Image
@@ -490,19 +528,18 @@ class ActivityRuleScene extends PureComponent {
       interval_data: interval_data,
       goods_data: goods_data,
     };
-
-    if (this.checkData()) {
-      const {dispatch} = this.props;
-      const {accessToken} = this.props.global;
-      dispatch(fetchSavePriceRule(all, accessToken, (ok, reason, obj) => {
-        this.setState({uploading:false});
-        if (ok) {
-          ToastLong('提交成功');
-        }else {
-          ToastLong(reason);
-        }
-      }))
-    }
+    // if (this.checkData()) {
+    //   const {dispatch} = this.props;
+    //   const {accessToken} = this.props.global;
+    //   dispatch(fetchSavePriceRule(all, accessToken, (ok, reason, obj) => {
+    //     this.setState({uploading:false});
+    //     if (ok) {
+    //       ToastLong('提交成功');
+    //     }else {
+    //       ToastLong(reason);
+    //     }
+    //   }))
+    // }
   }
 
   render() {
@@ -518,6 +555,7 @@ class ActivityRuleScene extends PureComponent {
                     if (vendorId != option.key) {
                       this.setState({
                         ext_store_id: [],
+                        store_id: [],
                         goods_data: [],
                         vendorId: option.key,
                         specialRuleList: [],
@@ -637,7 +675,7 @@ class ActivityRuleScene extends PureComponent {
               }
             </Cells>
             <BottomBtn onPress={async() => {
-              await this.state({uploading:true});
+              // await this.setState({uploading:true});
               this.uploadData()
             }}/>
           </ScrollView>
