@@ -106,7 +106,7 @@ class ActivityListScene extends PureComponent {
   getRuleList() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchRuleList('active', accessToken, async (ok, desc, obj) => {
+    dispatch(fetchRuleList('', accessToken, async (ok, desc, obj) => {
       if (ok) {
         await this.setState({
           ruleList: obj,
@@ -130,25 +130,31 @@ class ActivityListScene extends PureComponent {
   }
   renderList() {
     let {ruleList, vendorId,startTime,endTime} = this.state;
-    return ruleList.map((item, key) => {
-      let {vendor_id, end_time, start_time} = item.price_rules;
-      if ((vendor_id == vendorId) && this.timeFlag(start_time,end_time)) {
-        return (
-            <ActivityItem
-                key={key}
-                customStyle={{marginLeft: pxToDp(15)}}
-                textStyle={{color: colors.fontGray}}
-                item={item}
-                onPress={() => {
-                  this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE, {rules: item, type: 'use'})
-                }}
-            />
-        )
-      } else {
-        return RenderEmpty
-      }
+    console.log('ruleList->',ruleList)
+    if(ruleList.length>0){
+      return ruleList.map((item, key) => {
+        let {vendor_id, end_time, start_time} = item.price_rules;
+        if ((vendor_id == vendorId) && this.timeFlag(start_time,end_time)) {
+          return (
+              <ActivityItem
+                  key={key}
+                  customStyle={{marginLeft: pxToDp(15)}}
+                  textStyle={{color: colors.fontGray}}
+                  item={item}
+                  onPress={() => {
+                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE, {rules: item, type: 'use'})
+                  }}
+              />
+          )
+        } else {
+          return RenderEmpty
+        }
 
-    })
+      })
+    }else{
+      return RenderEmpty
+    }
+
   }
 
   setDateTime(date) {
@@ -171,8 +177,7 @@ class ActivityListScene extends PureComponent {
   }
 
   render() {
-    console.log(1)
-    let {startTime, endTime, vendorId,} = this.state;
+    let {startTime, endTime, vendorId,ruleList} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <View style={manage.header}>

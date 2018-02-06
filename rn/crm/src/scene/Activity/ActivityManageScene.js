@@ -34,6 +34,7 @@ import SelectBox from './SelectBox'
 import ImgBtn from "./imgBtn";
 import {fetchRuleList} from "../../reducers/activity/activityAction";
 import ActivityItem from './ActivityItem'
+
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
   return {mine: mine, global: global, activity: activity}
@@ -88,53 +89,56 @@ class ActivityManageScene extends PureComponent {
       title: '',
       operating: false,
       wait: false,
-      operatingList:[],
-      willOperatingList:[],
-      query:true,
+      operatingList: [],
+      willOperatingList: [],
+      query: true,
     }
+    this.getRuleList = this.getRuleList.bind(this);
+    this.differentiateList = this.differentiateList.bind(this);
   }
 
+  differentiateList(obj, type) {
+    let ts = new Date().getTime();
+    return tool.objectMap(obj, (item) => {
+      let {start_time, end_time} = item.price_rules;
+      return type === 1
+      && ts > new Date(start_time).getTime()
+      && ts < new Date(end_time).getTime() ? item : false;
+    }).filter((item) => {
+      return item !== false
+    });
+  }
+
+//   if ((type == 0) && (time > startTime) && (time < endTime)) {
+//   arr.push(item);
+// } else if ((type == 1) && (time < startTime)) {
+//   arr.push(item);
+// }
   componentWillMount() {
     this.getRuleList()
   }
-componentDidMount(){
-  let {navigation} = this.props;
-  navigation.setParams({toggle: this.toggle});
-}
+
   getRuleList() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchRuleList('active',accessToken,(ok, desc, obj)=>{
-      if(ok){
+    dispatch(fetchRuleList('active', accessToken, (ok, desc, obj) => {
+      if (ok) {
+        let operatingList = this.differentiateList(obj,true)
+        // let willOperatingList = this.differentiateList(obj)
         this.setState({
-          query:false,
-          operatingList:this.differentiateList(obj,0),
-          willOperatingList:this.differentiateList(obj,1),
+          query: false,
+          operatingList: operatingList,
+          // willOperatingList: willOperatingList
         })
-      }else {
-        this.setState({query:false})
+      } else {
+        this.setState({query: false})
       }
     }))
   }
 
-  differentiateList(obj, type) {
-    let arr = [];
-    let time = new Date().getTime();
-    obj.map((item) => {
-      let {start_time, end_time} = item.price_rules;
-      let startTime = new Date(start_time).getTime();
-      let endTime = new Date(end_time).getTime();
-      if ((type == 0) && (time > startTime) && (time < endTime)) {
-        arr.push(item);
-      } else if ((type == 1) && (time < startTime)) {
-        arr.push(item);
-      }
-    });
-    return arr;
-  }
 
   render() {
-    let {operating, wait,operatingList,willOperatingList} = this.state;
+    let {operating, wait, operatingList, willOperatingList} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <ScrollView
@@ -142,7 +146,7 @@ componentDidMount(){
                 <RefreshControl
                     refreshing={this.state.query}
                     onRefresh={() => {
-                      this.setState({query:true})
+                      this.setState({query: true})
                       this.getRuleList()
                     }}
                     tintColor='gray'
@@ -165,17 +169,17 @@ componentDidMount(){
               </Cell>
               {
                 operating ?
-                    operatingList.map((item,key)=>{
-                      return(
+                    operatingList.map((item, key) => {
+                      return (
                           <ActivityItem
                               key={key}
-                              customStyle={{marginLeft: pxToDp(15),marginRight:pxToDp(15)}}
-                              textStyle={{color:colors.main_color}}
+                              customStyle={{marginLeft: pxToDp(15), marginRight: pxToDp(15)}}
+                              textStyle={{color: colors.main_color}}
                               item={item}
                               edit={true}
                               btn_text={'修改'}
-                              onPress={()=>{
-                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:'edit'})
+                              onPress={() => {
+                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE, {rules: item, type: 'edit'})
                               }}
                               ballColor={'#a3d0ac'}
                           />
@@ -183,7 +187,7 @@ componentDidMount(){
                     }) : null
               }
             </View>
-            <View style={{backgroundColor: '#f1c377',marginBottom:pxToDp(30)}}>
+            <View style={{backgroundColor: '#f1c377', marginBottom: pxToDp(30)}}>
               <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}
                     onPress={() => {
                       this.setState({wait: !wait})
@@ -198,21 +202,21 @@ componentDidMount(){
                        source={require('../../img/Public/xiangxiabai_.png')}/>
               </Cell>
               {
-                wait ? willOperatingList.map((item,key)=>{
-                      return(
-                          <ActivityItem
-                              key={key}
-                              customStyle={{marginLeft: pxToDp(15),marginRight:pxToDp(15)}}
-                              textStyle={{color:colors.fontOrange}}
-                              item={item}
-                              edit={true}
-                              onPress={()=>{
-                                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE,{rules:item,type:'edit'})
-                              }}
-                              ballColor={'#f1c377'}
-                          />
-                      )
-                    }) : null
+                wait ? willOperatingList.map((item, key) => {
+                  return (
+                      <ActivityItem
+                          key={key}
+                          customStyle={{marginLeft: pxToDp(15), marginRight: pxToDp(15)}}
+                          textStyle={{color: colors.fontOrange}}
+                          item={item}
+                          edit={true}
+                          onPress={() => {
+                            this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE, {rules: item, type: 'edit'})
+                          }}
+                          ballColor={'#f1c377'}
+                      />
+                  )
+                }) : null
               }
             </View>
           </ScrollView>
