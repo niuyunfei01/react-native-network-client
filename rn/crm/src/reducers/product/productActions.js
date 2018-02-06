@@ -13,8 +13,14 @@ const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
   GET_VENDOR_TAGS,
+  ACTIVITY_VENDOR_TAGS,
 } = require('../../common/constants').default;
-
+export function saveVendorTags(json) {
+  return {
+    type: ACTIVITY_VENDOR_TAGS,
+    json:json,
+  }
+}
 
 export function getProdPricesList(token, esId, platform, storeId, callback) {
   return dispatch => {
@@ -309,6 +315,7 @@ export function fetchListVendorTags(vendor_id,token,callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {
+          dispatch(saveVendorTags({[vendor_id]:resp.obj}))
           callback(resp.ok,resp.desc,resp.obj);
         }).catch((error) => {
           callback({ok: false, desc: error.message});

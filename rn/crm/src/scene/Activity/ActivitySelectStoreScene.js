@@ -6,9 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
-  FlatList,
-  TouchableHighlight,
+  RefreshControl,
 } from 'react-native';
 import {
   Cells,
@@ -89,6 +87,7 @@ class ActivitySelectStoreScene extends PureComponent {
       ext_store_id: [],
       checkList: [],
       listJson: {},
+      query:true,
     }
   }
 
@@ -96,7 +95,17 @@ class ActivitySelectStoreScene extends PureComponent {
     let {navigation} = this.props;
     let {vendorId,ext_store_id} = navigation.state.params;
     await this.setState({vendorId: vendorId,ext_store_id:ext_store_id});
-    this.getStoreList();
+    let {storesList}=this.props.activity;
+    if(tool.length(storesList[vendorId])>0){
+      this.setState({
+        storeList: this.dataToCheck(storesList[vendorId]),
+        checkList: this.getRenderArr(storesList[vendorId], 0),
+        listJson: this.getRenderArr(storesList[vendorId], 1),
+        query:false
+      });
+    }else {
+      this.getStoreList();
+    }
     navigation.setParams({toggle: this.toggle});
   }
 
@@ -110,9 +119,9 @@ class ActivitySelectStoreScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(fetchWmStores(vendorId, accessToken, (ok, desc, obj) => {
-      console.log(obj);
       if (ok) {
         this.setState({
+          query:false,
           storeList: this.dataToCheck(obj),
           checkList: this.getRenderArr(obj, 0),
           listJson: this.getRenderArr(obj, 1),
@@ -121,7 +130,6 @@ class ActivitySelectStoreScene extends PureComponent {
         ToastLong(desc);
       }
     }));
-
   }
 
   dataToCheck(arr) {
@@ -160,7 +168,6 @@ class ActivitySelectStoreScene extends PureComponent {
             arr.push(ite.store_id)
           }
         })
-
       })
     } catch (e) {
       console.log(e)
@@ -216,7 +223,18 @@ class ActivitySelectStoreScene extends PureComponent {
     let {checkList, ext_store_id, listJson} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
-          <ScrollView>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={false}
+                    onRefresh={() => {
+                      this.setState({query:true})
+                      this.getStoreList()
+                    }}
+                    tintColor='gray'
+                />
+              }
+          >
             <Cells style={style.cells}>
               <Cell customStyle={[style.cell, {paddingRight: pxToDp(10)}]}
                     onPress={() => {
@@ -322,6 +340,12 @@ class ActivitySelectStoreScene extends PureComponent {
                 this.props.navigation.goBack();
               }}/>
           </View>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }

@@ -1,83 +1,24 @@
 'use strict';
 const {
-  ACTIVITY_COMMON_RULE,
-  ACTIVITY_SPECIAL_RULE,
-  ACTIVITY_EXT_STORE_ID,
+  ACTIVITY_STORE_LIST,
+  ACTIVITY_VENDOR_TAGS,
 } = require('../../common/constants').default;
 const initialState = {
-  commonRule: [
-    {
-      lower: 0,
-      upper: 5,
-      percentage: 100,
-    },
-    {
-      lower: 5,
-      upper: 10,
-      percentage: 100,
-    },
-    {
-      lower: 10,
-      upper: 20,
-      percentage: 100,
-    },
-    {
-      lower: 20,
-      upper: 40,
-      percentage: 100,
-    },
-    {
-      lower: 40,
-      upper: 10000,
-      percentage: 100,
-    }
-  ],
-  specialRule: [
-    {
-      lower: 0,
-      upper: 5,
-      percentage: 100,
-    },
-    {
-      lower: 5,
-      upper: 10,
-      percentage: 100,
-    },
-    {
-      lower: 10,
-      upper: 20,
-      percentage: 100,
-    },
-    {
-      lower: 20,
-      upper: 40,
-      percentage: 100,
-    },
-    {
-      lower: 40,
-      upper: 10000,
-      percentage: 100,
-    }
-  ],
-  ext_store_id:[]
+  storesList: {},
+  vendorTags:{},
 };
 
 export default function activity(state = initialState, action) {
   switch (action.type) {
-    case ACTIVITY_COMMON_RULE :
+    case ACTIVITY_STORE_LIST :
       return {
         ...state,
-        commonRule: action.arr
+        storesList: action.json
       };
-    case ACTIVITY_SPECIAL_RULE :
+    case ACTIVITY_VENDOR_TAGS :
       return {
         ...state,
-        specialRule: action.arr
-      };
-    case ACTIVITY_EXT_STORE_ID :
-      return {
-        ...state,
-        ext_store_id: action.arr
+        vendorTags: action.json
       };
     default:
       return state;

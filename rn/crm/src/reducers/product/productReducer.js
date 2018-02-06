@@ -8,6 +8,7 @@ const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
   GET_VENDOR_TAGS,
+  ACTIVITY_VENDOR_TAGS
 } = require('../../common/constants').default;
 
 const initialState = {
@@ -15,6 +16,7 @@ const initialState = {
   product_detail: {},
   store_tags: {},
   basic_category: {},
+  vendorTags:{}
 };
 
 /**
@@ -47,6 +49,11 @@ export default function productReducer(state = initialState, action) {
         ...state,
         store_tags: store_tags(state, action),
         basic_category: basic_category(state, action),
+      };
+      case ACTIVITY_VENDOR_TAGS:
+      return {
+        ...state,
+        vendorTags:action.json
       };
     default:
       return state;

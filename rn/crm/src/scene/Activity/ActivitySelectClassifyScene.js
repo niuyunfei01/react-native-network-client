@@ -6,17 +6,13 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
-  FlatList,
-  TouchableHighlight,
+  RefreshControl,
 } from 'react-native';
 import {
   Cells,
   Cell,
   CellHeader,
-  CellBody,
   CellFooter,
-  Label,
 } from "../../weui/index";
 import CheckboxCells from './myChecks'
 import {connect} from "react-redux";
@@ -34,9 +30,10 @@ import style from './commonStyle'
 import SelectBox from './SelectBox'
 import {fetchListVendorTags} from "../../reducers/product/productActions";
 import BottomBtn from './ActivityBottomBtn';
+
 function mapStateToProps(state) {
-  const {mine, global, activity} = state;
-  return {mine: mine, global: global, activity: activity}
+  const {mine, global, product} = state;
+  return {mine: mine, global: global, product: product}
 }
 
 function mapDispatchToProps(dispatch) {
@@ -75,17 +72,21 @@ class ActivitySelectClassifyScene extends PureComponent {
       ],
       platId: Cts.WM_PLAT_ID_WX,
       showDialog: false,
-      listJson:{}
+      listJson: {},
+      query: true,
     }
   }
 
   componentWillMount() {
-    let {categories}=this.props.navigation.state.params;
-    console.log(categories);
-    this.setState({checked:categories});
-    this.getListVendorTags()
+    let {categories, vendorId} = this.props.navigation.state.params;
+    let {vendorTags} = this.props.product;
+    if (tool.length(vendorTags[vendorId])>0) {
+      this.setState({list: this.dataToCheck(vendorTags[vendorId]), query: false});
+    }else {
+      this.getListVendorTags()
+    }
+    this.setState({checked: categories});
   }
-
   toggle = () => {
     let {hide} = this.state;
     this.setState({hide: !hide})
@@ -98,7 +99,7 @@ class ActivitySelectClassifyScene extends PureComponent {
     this.setState({query: true});
     dispatch(fetchListVendorTags(vendorId, accessToken, (ok, desc, obj) => {
       if (ok) {
-        this.setState({list: this.dataToCheck(obj)});
+        this.setState({list: this.dataToCheck(obj), query: false});
       } else {
         ToastLong(desc);
       }
@@ -113,53 +114,34 @@ class ActivitySelectClassifyScene extends PureComponent {
     });
     return obj;
   }
+
   getClassName(key) {
     let {list} = this.state;
-    let name='';
+    let name = '';
     list.forEach((item) => {
-      if(item.id==key){
-        name= item.name
+      if (item.id == key) {
+        name = item.name
       }
     });
     return name;
   }
-  renderSelectBox() {
-    let {hide, vendorId, platList, platId,} = this.state;
-    if (hide) {
-      return (
-          <SelectBox toggle={() => this.toggle()}>
-            {
-              platList.map((item, key) => {
-                return (
-                    <TouchableOpacity
-                        key={key}
-                        onPress={async () => {
-                          this.setState({platId: item})
-                        }}
-                    >
-                      <Text
-                          style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-                        {tool.get_platform_name(item)}
-                      </Text>
-                    </TouchableOpacity>
-                )
-              })
-            }
-            {
-              platList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
-            }
-          </SelectBox>
-      )
-    } else {
-    }
-    return null;
-  }
 
   render() {
-    let {checked,listJson} = this.state;
+    let {checked, listJson} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
-          <ScrollView>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.query}
+                    onRefresh={() => {
+                      this.setState({query:true})
+                      this.getListVendorTags()
+                    }}
+                    tintColor='gray'
+                />
+              }
+          >
             <Cells style={style.cells}>
               <Cell customStyle={[style.cell, {paddingRight: pxToDp(10)}]}
                     onPress={() => {
@@ -189,10 +171,8 @@ class ActivitySelectClassifyScene extends PureComponent {
                 style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
             />
           </ScrollView>
-          {
-            this.renderSelectBox()
-          }
-          <Dialog onRequestClose={() => {}}
+          <Dialog onRequestClose={() => {
+          }}
                   visible={this.state.showDialog}
                   title={'已选店铺'}
                   titleStyle={{textAlign: 'center', color: colors.fontBlack}}
@@ -238,7 +218,7 @@ class ActivitySelectClassifyScene extends PureComponent {
                         </CellHeader>
                         <TouchableOpacity
                             onPress={() => {
-                              checked.splice(index,1)
+                              checked.splice(index, 1)
                               this.forceUpdate();
                             }}
                         >
@@ -260,13 +240,19 @@ class ActivitySelectClassifyScene extends PureComponent {
             </ScrollView>
           </Dialog>
           <BottomBtn onPress={() => {
-            let {specialRuleList,index} = this.props.navigation.state.params;
-            specialRuleList[index].forEach((item)=>{
-              item.categories=this.state.checked;
+            let {specialRuleList, index} = this.props.navigation.state.params;
+            specialRuleList[index].forEach((item) => {
+              item.categories = this.state.checked;
             });
             this.props.navigation.state.params.nextSetBeforeCategories(specialRuleList);
             this.props.navigation.goBack();
           }}/>
+          <Toast
+              icon="loading"
+              show={this.state.query}
+              onRequestClose={() => {
+              }}
+          >加载中</Toast>
         </View>
     )
   }

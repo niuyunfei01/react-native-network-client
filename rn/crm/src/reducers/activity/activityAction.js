@@ -9,36 +9,25 @@ import {ToastLong} from '../../util/ToastUtils';
 import Cts from "../../Cts";
 
 const {
-  ACTIVITY_COMMON_RULE,
-  ACTIVITY_SPECIAL_RULE,
-  ACTIVITY_EXT_STORE_ID
+  ACTIVITY_STORE_LIST,
+  ACTIVITY_VENDOR_TAGS
 } = require('../../common/constants').default;
 
-export function updateCommonRule(arr) {
+
+export function saveStoreList(json) {
   return {
-    type: ACTIVITY_COMMON_RULE,
-    arr:arr
+    type: ACTIVITY_STORE_LIST,
+    json:json,
   }
 }
 
-export function updateSpecialRule(arr) {
-  return {
-    type: ACTIVITY_SPECIAL_RULE,
-    arr:arr,
-  }
-}
-export function saveExtStoreId(arr) {
-  return {
-    type: ACTIVITY_EXT_STORE_ID,
-    arr:arr,
-  }
-}
 export function fetchWmStores(vendor_id,token,callback) {
   return dispatch => {
     const url = `api/get_wm_stores/${vendor_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {
+          dispatch(saveStoreList({[vendor_id]:resp.obj}));
           callback(resp.ok,resp.desc,resp.obj);
         }).catch((error) => {
           callback({ok: false, desc: error.message});

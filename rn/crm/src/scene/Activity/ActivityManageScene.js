@@ -6,9 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
-  FlatList,
-  TouchableHighlight,
+  RefreshControl,
 } from 'react-native';
 import {
   Cells,
@@ -139,7 +137,18 @@ componentDidMount(){
     let {operating, wait,operatingList,willOperatingList} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
-          <ScrollView>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.query}
+                    onRefresh={() => {
+                      this.setState({query:true})
+                      this.getRuleList()
+                    }}
+                    tintColor='gray'
+                />
+              }
+          >
             <View style={{backgroundColor: '#a3d0ac', marginBottom: pxToDp(30)}}>
               <Cell customStyle={[style.cell, {backgroundColor: 'rgba(0,0,0,0)'}]} first={true}
                     onPress={() => {
