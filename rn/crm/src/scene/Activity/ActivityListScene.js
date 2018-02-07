@@ -117,11 +117,11 @@ class ActivityListScene extends PureComponent {
   }
 
   timeFlag(start_time, end_time,) {
-    start_time = new Date(start_time).getTime();
-    end_time = new Date(end_time).getTime();
+    start_time = new Date(start_time.replace(/-/g, "/")).getTime();
+    end_time = new Date(end_time.replace(/-/g, "/")).getTime();
     let {startTime, endTime} = this.state;
-    startTime = startTime == '' ? new Date().getTime() : new Date(startTime).getTime();
-    endTime = endTime == '' ? new Date().getTime() : new Date(endTime).getTime();
+    startTime = startTime == '' ? new Date().getTime() : new Date(startTime.replace(/-/g, "/")).getTime();
+    endTime = endTime == '' ? new Date().getTime() : new Date(endTime.replace(/-/g, "/")).getTime();
     if (endTime < start_time || startTime > end_time) {
       return false
     } else {
@@ -147,27 +147,25 @@ class ActivityListScene extends PureComponent {
               />
           )
         } else {
-          return RenderEmpty
+          return <RenderEmpty/>
         }
-
       })
     }else{
-      return RenderEmpty
+      return <RenderEmpty/>
     }
-
   }
 
   setDateTime(date) {
     let {timeKey,startTime,endTime} = this.state;
     if(timeKey=='endTime'){
-      if(new Date(date).getTime()< new Date(startTime).getTime()){
+      if(new Date(date.replace(/-/g, "/")).getTime()< new Date(startTime.replace(/-/g, "/")).getTime()){
         ToastLong('结束时间必须大于开始时间')
         this.setState({dataPicker: false})
       }else {
         this.setState({[timeKey]: date, dataPicker: false})
       }
     }else {
-      if(new Date(date).getTime()> new Date(endTime).getTime()){
+      if(new Date(date.replace(/-/g, "/")).getTime()> new Date(endTime.replace(/-/g, "/")).getTime()){
         ToastLong('结束时间必须大于开始时间')
         this.setState({dataPicker: false})
       }else {

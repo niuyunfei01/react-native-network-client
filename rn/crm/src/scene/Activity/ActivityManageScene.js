@@ -98,22 +98,19 @@ class ActivityManageScene extends PureComponent {
   }
 
   differentiateList(obj, type) {
-    let ts = new Date().getTime();
-    return tool.objectMap(obj, (item) => {
+    let arr = [];
+    let time = new Date().getTime();
+    obj.map((item) => {
       let {start_time, end_time} = item.price_rules;
-      return type === 1
-      && ts > new Date(start_time).getTime()
-      && ts < new Date(end_time).getTime() ? item : false;
-    }).filter((item) => {
-      return item !== false
+      if (type && (time > new Date(start_time.replace(/-/g, "/")).getTime()) && (time < new Date(end_time.replace(/-/g, "/")).getTime())) {
+        arr.push(item);
+      } else if (type == false && (time < new Date(start_time.replace(/-/g, "/")).getTime())) {
+        arr.push(item);
+      }
     });
+    return arr;
   }
 
-//   if ((type == 0) && (time > startTime) && (time < endTime)) {
-//   arr.push(item);
-// } else if ((type == 1) && (time < startTime)) {
-//   arr.push(item);
-// }
   componentWillMount() {
     this.getRuleList()
   }
@@ -123,19 +120,18 @@ class ActivityManageScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(fetchRuleList('active', accessToken, (ok, desc, obj) => {
       if (ok) {
-        let operatingList = this.differentiateList(obj,true)
-        // let willOperatingList = this.differentiateList(obj)
+        let operatingList = this.differentiateList(obj, true);
+        let willOperatingList = this.differentiateList(obj, false);
         this.setState({
           query: false,
           operatingList: operatingList,
-          // willOperatingList: willOperatingList
+          willOperatingList: willOperatingList
         })
       } else {
         this.setState({query: false})
       }
     }))
   }
-
 
   render() {
     let {operating, wait, operatingList, willOperatingList} = this.state;
