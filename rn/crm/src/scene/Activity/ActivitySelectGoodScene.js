@@ -209,7 +209,7 @@ class ProductAutocomplete extends Component {
                             refreshing={this.state.loading}
                             onRefresh={() => {
                               this.setState({loading: true})
-                              this.getRuleList()
+                              this.getStoresProdList()
                             }}
                             tintColor='gray'
                         />
@@ -381,7 +381,7 @@ class ProductAutocomplete extends Component {
                 }
               ]}
           >
-            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会呗保存,确认要离开吗?</Text>
+            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会被保存,确认要离开吗?</Text>
           </ActivityAlert>
           <Toast
               icon="loading"

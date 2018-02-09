@@ -42,7 +42,7 @@ class ActivityAlert extends PureComponent{
                   marginTop: 0
                 }}
         >
-          <ScrollView style={{minHeight:pxToDp(400)}}>
+          <ScrollView style={{minHeight:pxToDp(200)}}>
             {
               this.props.children
             }

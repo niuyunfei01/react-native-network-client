@@ -75,14 +75,15 @@ class GoodsMangerScene extends PureComponent {
         Cts.STORE_TYPE_AFFILIATE,
         Cts.STORE_TYPE_GZW,
         Cts.STORE_TYPE_BLX,
-        Cts.STORE_TYPE_XGJ
+        Cts.STORE_TYPE_XGJ,
       ],
       sortId: Cts.GOODS_MANAGE_SOLD_SORT,
       sortList: [
         Cts.GOODS_MANAGE_DEFAULT_SORT,
         Cts.GOODS_MANAGE_SOLD_SORT,
       ],
-      query: true
+      query: true,
+      queryTags:true,
 
     }
   }
@@ -117,9 +118,9 @@ class GoodsMangerScene extends PureComponent {
     const {vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    this.setState({query: true});
+    this.setState({queryTags: true});
     dispatch(fetchListVendorTags(vendorId, accessToken, (ok, desc, obj) => {
-      this.setState({query: false});
+      this.setState({queryTags: false});
       if (ok) {
         this.setState({tagList: obj});
       } else {
@@ -427,6 +428,13 @@ class GoodsMangerScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <Toast
+            icon="loading"
+            show={this.state.queryTags}
+            onRequestClose={() => {
+            }}
+        >加载中</Toast>
+
         </View>
     )
   }

@@ -213,16 +213,20 @@ class ActivityRuleScene extends PureComponent {
             <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
             <ImgBtn require={require('../../img/Activity/bianji_.png')}
                     onPress={() =>
-                        this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
-                          rule: tool.deepClone(commonRule),
-                          key: 'commonRule',
-                          type_id: Cts.RULE_TYPE_GENERAL,
-                        })
+                    {
+                      console.log(commonRule);
+                      console.log(tool.deepClone(commonRule));
+                      this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
+                        rule: tool.deepClone(commonRule),
+                        key: 'commonRule',
+                        type_id: Cts.RULE_TYPE_GENERAL,
+                      })
+                    }
                     }/>
           </Cell>
           {
             commonRule.map((item, index) => {
-              let {min_price, max_price, percent} = item;
+              let {min_price, max_price, percent} = tool.deepClone(item);
               return (
                   <Percentage
                       key={index}
@@ -251,8 +255,9 @@ class ActivityRuleScene extends PureComponent {
     if (index < 0) {
       this.setState({[key]: obj})
     } else {
-      this.state.specialRuleList[key] = obj
+       this.state.specialRuleList[key] = obj
     }
+    console.log(obj);
     this.forceUpdate();
   }
 
@@ -265,7 +270,7 @@ class ActivityRuleScene extends PureComponent {
     this.setState({goods_data: goods_data});
     this.forceUpdate();
   }
-
+//类别加价
   renderSpecial() {
     let {specialRuleList, vendorId} = this.state;
     return specialRuleList.map((item, inex) => {
@@ -273,7 +278,7 @@ class ActivityRuleScene extends PureComponent {
           <View key={inex}>
             <Cell customStyle={style.cell} >
               <CellHeader style={{flexDirection: 'row'}}>
-                <Text style={[style.cell_header_text, {}]}>加价比例设置 </Text>
+                <Text style={[style.cell_header_text]}>加价比例设置 </Text>
                 <TouchableOpacity
                     onPress={() => {
                       specialRuleList.splice(inex, 1);
@@ -296,6 +301,7 @@ class ActivityRuleScene extends PureComponent {
                             key: inex,
                             categories: item[0].categories,
                             type_id: Cts.RULE_TYPE_SPECIAL,
+                            specialRuleList:specialRuleList
                           })}
               />
             </Cell>
@@ -570,7 +576,6 @@ class ActivityRuleScene extends PureComponent {
       interval_data: interval_data,
       goods_data: goods_data,
     };
-    this.checkData(interval_data);
     if (this.checkData()) {
       const {dispatch} = this.props;
       const {accessToken} = this.props.global;
@@ -658,7 +663,7 @@ class ActivityRuleScene extends PureComponent {
                 <TouchableOpacity
                     style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(40)}}
                     onPress={() => {
-                      if(this.state.startTime==''){
+                      if(startTime==''){
                         ToastLong('请先选择开始时间')
                         return false
                       }
@@ -669,8 +674,12 @@ class ActivityRuleScene extends PureComponent {
                 </TouchableOpacity>
               </Cell>
               <Cell customStyle={style.cell} onPress={() => {
-                if (vendorId < 1) {
+                if (vendorId < 1 ) {
                   ToastLong("请选择品牌");
+                  return false;
+                }
+                if(endTime ===''|| startTime ===''){
+                  ToastLong("请选择时间");
                   return false;
                 }
 
@@ -696,8 +705,8 @@ class ActivityRuleScene extends PureComponent {
                   <TouchableOpacity
                       onPress={() => {
                         let {specialRuleList, specialRule} = this.state;
-                        let aaa = tool.deepClone(specialRule)
-                        specialRuleList.push(...aaa);
+                        let newSpecial = tool.deepClone(specialRule)
+                        specialRuleList.push(...newSpecial);
                         this.forceUpdate();
                       }}
                   >

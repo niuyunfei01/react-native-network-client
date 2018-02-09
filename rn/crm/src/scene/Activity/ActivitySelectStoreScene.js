@@ -395,7 +395,7 @@ class ActivitySelectStoreScene extends PureComponent {
                 }
               ]}
           >
-            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会呗保存,确认要离开吗?</Text>
+            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会被保存,确认要离开吗?</Text>
           </ActivityAlert>
           <View>
             <BottomBtn onPress={() => {

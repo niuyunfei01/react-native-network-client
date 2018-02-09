@@ -121,6 +121,7 @@ class ActivityManageScene extends PureComponent {
       if (ok) {
         let operatingList = this.differentiateList(obj, true);
         let willOperatingList = this.differentiateList(obj, false);
+        console.log(obj);
         this.setState({
           query: false,
           operatingList: operatingList,
@@ -218,7 +219,7 @@ class ActivityManageScene extends PureComponent {
 
           <Toast
               icon="loading"
-              show={this.state.loading}
+              show={this.state.query}
               onRequestClose={() => {
               }}
           >加载中</Toast>

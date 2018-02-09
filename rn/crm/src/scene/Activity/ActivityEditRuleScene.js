@@ -20,6 +20,7 @@ import {Icon} from "../../weui/index";
 import BottomBtn from './ActivityBottomBtn';
 import {NavigationItem} from '../../widget';
 import ActivityAlert from './ActivityAlert'
+
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
   return {mine: mine, global: global, activity: activity}
@@ -50,11 +51,12 @@ class ActivityEditRuleScene extends PureComponent {
     };
   };
 
+
   constructor(props) {
     super(props);
     this.state = {
       rule: [],
-      key: '',
+      key: 0,
       categories: [],
       type_id: 0,
       confimBack: false,
@@ -64,49 +66,56 @@ class ActivityEditRuleScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {rule, key, categories, type_id} = this.props.navigation.state.params;
+    let {rule, key, categories, type_id,} = this.props.navigation.state.params;
+    let arr = tool.deepClone(this.toRuleEdit(rule))
     this.setState({
-      rule: tool.deepClone(this.toRuleEdit(rule)),
+      rule:arr ,
       key: key,
-      categories:categories,
+      categories: categories,
       type_id: type_id,
-      beforeList:tool.deepClone(this.toRuleEdit(rule)),
+      beforeList: tool.deepClone(arr),
     });
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
+
   componentDidMount() {
     this.props.navigation.setParams({
-      confimBack:()=>{
-        console.log(this.identical());
-        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
+      confimBack: () => {
+        this.identical() ? this.props.navigation.goBack() : this.setState({confimBack: true})
       }
     })
   }
+
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
   }
+
   onBackAndroid = () => {
     !this.identical() ? ToastLong('尚未保存数据') : '';
     return !this.identical()
   };
+
   identical() {
     let {beforeList, rule} = this.state;
+    console.log(beforeList, rule);
     if (beforeList.sort().toString() == rule.sort().toString()) {
       return true
     } else {
       return false
     }
   }
-  toRuleEdit(arr,type='down') {
-    if(type=='down'){
-      arr.forEach((item, index) => {
-        item.min_price = tool.toFixed(item.min_price, 'int');
-        item.max_price = tool.toFixed(item.max_price, 'int');
+
+  toRuleEdit(arr, type = 'down') {
+    console.log('toRuleEdit',arr);
+    if (type == 'down') {
+      arr.forEach((item) => {
+        item.min_price = tool.toFixed(parseInt(item.min_price), 'int');
+        item.max_price = tool.toFixed(parseInt(item.max_price), 'int');
       });
-    }else {
-      arr.forEach((item, index) => {
-        item.min_price = item.min_price*100;
-        item.max_price = item.max_price*100;
+    } else {
+      arr.forEach((item) => {
+        item.min_price = item.min_price * 100;
+        item.max_price = item.max_price * 100;
       });
     }
 
@@ -126,7 +135,7 @@ class ActivityEditRuleScene extends PureComponent {
                 style={style.max_price}
                 underlineColorAndroid='transparent'
                 keyboardType='numeric'
-                value={max_price == Cts.Rule_PRICE_UPPER / 100 ? '' : `${max_price}`}
+                value={parseInt(max_price) === Cts.Rule_PRICE_UPPER / 100 ? '' : `${max_price}`}
                 onChangeText={(text) => {
                   item.max_price = text;
                   if (index == length - 1) {
@@ -178,6 +187,7 @@ class ActivityEditRuleScene extends PureComponent {
       )
     })
   }
+
   render() {
     return (
         <View style={{flex: 1}}>
@@ -185,8 +195,15 @@ class ActivityEditRuleScene extends PureComponent {
             {this.renderList()}
             <BottomBtn onPress={() => {
               let {rule, key} = this.state;
-              rule=this.toRuleEdit(rule,'up')
-              this.props.navigation.state.params.nextSetBefore(key, rule, index = 1);
+              let {nextSetBefore,specialRuleList} = this.props.navigation.state.params;
+              if(specialRuleList){
+                rule = this.toRuleEdit(rule, 'up');
+                specialRuleList[key]=rule;
+                nextSetBefore('specialRuleList', specialRuleList);
+              }else {
+                rule = this.toRuleEdit(rule, 'up');
+                nextSetBefore(key, rule,);
+              }
               this.props.navigation.goBack();
             }}/>
           </ScrollView>
@@ -210,7 +227,7 @@ class ActivityEditRuleScene extends PureComponent {
                 }
               ]}
           >
-            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会呗保存,确认要离开吗?</Text>
+            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会被保存,确认要离开吗?</Text>
           </ActivityAlert>
         </View>
     )
