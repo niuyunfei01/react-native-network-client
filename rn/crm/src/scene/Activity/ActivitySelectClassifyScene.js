@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  BackHandler,
 } from 'react-native';
 import {
   Cells,
@@ -20,16 +21,16 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-
-import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Icon, Dialog} from "../../weui/index";
+import {Toast, Dialog} from "../../weui/index";
 import style from './commonStyle'
-import SelectBox from './SelectBox'
 import {fetchListVendorTags} from "../../reducers/product/productActions";
 import BottomBtn from './ActivityBottomBtn';
+import {NavigationItem} from '../../widget';
+import RenderEmpty from '../OperateProfit/RenderEmpty'
+import ActivityAlert from './ActivityAlert'
 
 function mapStateToProps(state) {
   const {mine, global, product} = state;
@@ -52,10 +53,17 @@ class ActivitySelectClassifyScene extends PureComponent {
     let {backPage} = params;
     return {
       headerTitle: '选择分类',
-
+      headerLeft: (
+          <NavigationItem
+              icon={require('../../img/Register/back_.png')}
+              iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+              onPress={() => {
+                params.confimBack()
+              }}
+          />
+      ),
     }
   };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -74,6 +82,8 @@ class ActivitySelectClassifyScene extends PureComponent {
       showDialog: false,
       listJson: {},
       query: true,
+      beforeList: [],
+      confimBack: false,
     }
   }
 
@@ -81,17 +91,37 @@ class ActivitySelectClassifyScene extends PureComponent {
     let {categories, vendorId} = this.props.navigation.state.params;
     let {vendorTags} = this.props.product;
     if (tool.length(vendorTags[vendorId])>0) {
-      this.setState({list: this.dataToCheck(vendorTags[vendorId]), query: false});
+      this.setState({
+        list: this.dataToCheck(vendorTags[vendorId]),
+        query: false});
     }else {
       this.getListVendorTags()
     }
-    this.setState({checked: categories});
+    this.setState({
+      checked: categories,
+      beforeList:categories,
+    });
+    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
-  toggle = () => {
-    let {hide} = this.state;
-    this.setState({hide: !hide})
+  componentDidMount() {
+    this.props.navigation.setParams({
+      confimBack:()=>{
+        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
+      }
+    })
+  }
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+  onBackAndroid = () => {
+    !this.identical() ? ToastLong('尚未保存数据') : '';
+    return !this.identical()
   };
-
+  identical() {
+    let {beforeList, checked} = this.state;
+    console.log(beforeList, checked);
+    return beforeList.sort().toString() == checked.sort().toString()?true:false
+  }
   async getListVendorTags() {
     const {vendorId} = this.props.navigation.state.params;
     const {accessToken} = this.props.global;
@@ -253,6 +283,28 @@ class ActivitySelectClassifyScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <ActivityAlert
+              showDialog={this.state.confimBack}
+              buttons={[
+                {
+                  type: 'default',
+                  label: '确认离开',
+                  onPress: () => {
+                    this.setState({confimBack: false,});
+                    this.props.navigation.goBack()
+                  }
+                },
+                {
+                  type: 'primary',
+                  label: '继续编辑',
+                  onPress: () => {
+                    this.setState({confimBack: false,});
+                  }
+                }
+              ]}
+          >
+            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会呗保存,确认要离开吗?</Text>
+          </ActivityAlert>
         </View>
     )
   }

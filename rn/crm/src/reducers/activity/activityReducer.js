@@ -1,11 +1,15 @@
 'use strict';
 const {
   ACTIVITY_STORE_LIST,
+  ACTIVITY_GOODS_LIST,
   ACTIVITY_VENDOR_TAGS,
 } = require('../../common/constants').default;
 const initialState = {
   storesList: {},
   vendorTags:{},
+  stores:[],
+  goodsList:{},
+
 };
 
 export default function activity(state = initialState, action) {
@@ -15,10 +19,11 @@ export default function activity(state = initialState, action) {
         ...state,
         storesList: action.json
       };
-    case ACTIVITY_VENDOR_TAGS :
+    case ACTIVITY_GOODS_LIST :
       return {
         ...state,
-        vendorTags: action.json
+        stores: action.stores,
+        goodsList:action.json,
       };
     default:
       return state;

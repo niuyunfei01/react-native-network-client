@@ -7,32 +7,31 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  BackHandler,
 } from 'react-native';
 import {
   Cells,
   Cell,
   CellHeader,
   CheckboxCells,
-  CellBody,
   CellFooter,
-  Label,
 } from "../../weui/index";
+import {NavigationItem} from '../../widget';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchWmStores,saveExtStoreId} from '../../reducers/activity/activityAction';
+import {fetchWmStores, saveExtStoreId} from '../../reducers/activity/activityAction';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-
-import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Icon, Dialog} from "../../weui/index";
 import style from './commonStyle'
 import SelectBox from './SelectBox'
-import {fetchListVendorTags} from "../../reducers/product/productActions";
 import BottomBtn from './ActivityBottomBtn'
+import RenderEmpty from '../OperateProfit/RenderEmpty'
+import ActivityAlert from './ActivityAlert'
 
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
@@ -52,10 +51,17 @@ function mapDispatchToProps(dispatch) {
 class ActivitySelectStoreScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
-    let {backPage} = params;
     return {
       headerTitle: '选择店铺',
+      headerLeft: (
+          <NavigationItem
+              icon={require('../../img/Register/back_.png')}
+              iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+              onPress={() => {
+                params.confimBack()
+              }}
+          />
+      ),
       headerRight: (
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
             <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>品牌</Text>
@@ -86,45 +92,78 @@ class ActivitySelectStoreScene extends PureComponent {
       showDialog: false,
       ext_store_id: [],
       checkList: [],
+      beforeList: [],
       listJson: {},
-      query:true,
-    }
+      query: true,
+      confimBack: false,
+    };
+    this.identical = this.identical.bind(this);
   }
 
   async componentWillMount() {
+    let {platId} = this.state;
     let {navigation} = this.props;
-    let {vendorId,ext_store_id} = navigation.state.params;
-    await this.setState({vendorId: vendorId,ext_store_id:ext_store_id});
-    let {storesList}=this.props.activity;
-    if(tool.length(storesList[vendorId])>0){
+    let {vendorId, ext_store_id} = navigation.state.params;
+    await this.setState({
+      vendorId: vendorId,
+      ext_store_id: ext_store_id,
+      beforeList: ext_store_id
+    });
+    let {storesList} = this.props.activity;
+    if (tool.length(storesList[vendorId]) > 0) {
       this.setState({
         storeList: this.dataToCheck(storesList[vendorId]),
-        checkList: this.getRenderArr(storesList[vendorId], 0),
-        listJson: this.getRenderArr(storesList[vendorId], 1),
-        query:false
+        checkList: this.getRenderArr(platId, storesList[vendorId], 0),
+        listJson: this.getRenderArr(platId, storesList[vendorId], 1),
+        query: false,
       });
-    }else {
+    } else {
       this.getStoreList();
     }
     navigation.setParams({toggle: this.toggle});
+    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+  componentDidMount() {
+    this.props.navigation.setParams({
+      confimBack:()=>{
+        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
+      }
+    })
   }
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+
+  onBackAndroid = () => {
+    !this.identical() ? ToastLong('尚未保存数据') : '';
+    return !this.identical()
+  };
   toggle = () => {
     let {hide} = this.state;
     this.setState({hide: !hide})
   };
 
+  identical() {
+    let {beforeList, ext_store_id} = this.state;
+    if (beforeList.sort().toString() == ext_store_id.sort().toString()) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   getStoreList() {
-    const {vendorId} = this.state;
+    const {vendorId, platId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(fetchWmStores(vendorId, accessToken, (ok, desc, obj) => {
       if (ok) {
         this.setState({
-          query:false,
+          query: false,
           storeList: this.dataToCheck(obj),
-          checkList: this.getRenderArr(obj, 0),
-          listJson: this.getRenderArr(obj, 1),
+          checkList: this.getRenderArr(platId, obj, 0),
+          listJson: this.getRenderArr(platId, obj, 1),
         });
       } else {
         ToastLong(desc);
@@ -140,8 +179,7 @@ class ActivitySelectStoreScene extends PureComponent {
     return arr;
   }
 
-  getRenderArr(arr, type) {
-    let {platId} = this.state;
+  getRenderArr(platId = [], arr, type) {
     let json = {};
     let list = [];
     if (type) {
@@ -155,16 +193,19 @@ class ActivitySelectStoreScene extends PureComponent {
           list.push(item)
         }
       });
-      return list;
+      return list.sort((a, b) => {
+        return a.platform - b.platform
+      });
     }
   }
-  getStoreIds(){
-    let{ext_store_id,storeList}=this.state;
-    let arr=[];
+
+  getStoreIds() {
+    let {ext_store_id, storeList} = this.state;
+    let arr = [];
     try {
       ext_store_id.forEach((item) => {
         storeList.forEach((ite) => {
-          if (item == ite.id) {
+          if (item == ite.id && (arr.indexOf(ite.store_id) < 0)) {
             arr.push(ite.store_id)
           }
         })
@@ -172,11 +213,11 @@ class ActivitySelectStoreScene extends PureComponent {
     } catch (e) {
       console.log(e)
     }
-
     return arr;
   }
+
   renderSelectBox() {
-    let {hide, vendorId, platList, platId, storeList, checkList} = this.state;
+    let {hide, vendorId, platList, platId, storeList} = this.state;
     if (hide) {
       return (
           <SelectBox toggle={() => this.toggle()}>
@@ -189,13 +230,12 @@ class ActivitySelectStoreScene extends PureComponent {
                           if (platId.indexOf(item) < 0) {
                             this.setState({
                               platId: [item, ...platId],
-                              checkList: this.getRenderArr(storeList)
+                              checkList: this.getRenderArr([item, ...platId], storeList, 0)
                             })
-
                           } else {
                             platId.splice(platId.indexOf(item), 1);
                             await  this.setState({
-                              checkList: this.getRenderArr(storeList)
+                              checkList: this.getRenderArr(platId, storeList, 0)
                             });
                             this.forceUpdate()
                           }
@@ -228,7 +268,7 @@ class ActivitySelectStoreScene extends PureComponent {
                 <RefreshControl
                     refreshing={false}
                     onRefresh={() => {
-                      this.setState({query:true})
+                      this.setState({query: true})
                       this.getStoreList()
                     }}
                     tintColor='gray'
@@ -253,16 +293,20 @@ class ActivitySelectStoreScene extends PureComponent {
                 </CellFooter>
               </Cell>
             </Cells>
-            <CheckboxCells
-                options={checkList}
-                value={this.state.ext_store_id}
-                onChange={async (checked) => {
-                  await this.setState({
-                    ext_store_id: checked
-                  });
-                }}
-                style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
-            />
+            {
+              tool.length(checkList) ?
+                  <CheckboxCells
+                      options={checkList}
+                      value={this.state.ext_store_id}
+                      onChange={async (checked) => {
+                        await this.setState({
+                          ext_store_id: checked
+                        });
+                        this.identical()
+                      }}
+                      style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
+                  /> : <RenderEmpty/>
+            }
           </ScrollView>
           {
             this.renderSelectBox()
@@ -331,14 +375,37 @@ class ActivitySelectStoreScene extends PureComponent {
               }
             </ScrollView>
           </Dialog>
+          <ActivityAlert
+              showDialog={this.state.confimBack}
+              buttons={[
+                {
+                  type: 'default',
+                  label: '确认离开',
+                  onPress: () => {
+                    this.setState({confimBack: false,});
+                    this.props.navigation.goBack()
+                  }
+                },
+                {
+                  type: 'primary',
+                  label: '继续编辑',
+                  onPress: () => {
+                    this.setState({confimBack: false,});
+                  }
+                }
+              ]}
+          >
+            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会呗保存,确认要离开吗?</Text>
+          </ActivityAlert>
           <View>
-              <BottomBtn onPress={() => {
-                let {ext_store_id}=this.state;
-                let {nextSetBefore} = this.props.navigation.state.params;
-                nextSetBefore('ext_store_id',ext_store_id);
-                nextSetBefore('store_id',this.getStoreIds());
-                this.props.navigation.goBack();
-              }}/>
+            <BottomBtn onPress={() => {
+              let {ext_store_id,} = this.state;
+              let {nextSetBefore} = this.props.navigation.state.params;
+              nextSetBefore('ext_store_id', ext_store_id);
+              nextSetBefore('store_id', this.getStoreIds());
+              nextSetBefore('goods_data', []);
+              this.props.navigation.goBack();
+            }}/>
           </View>
           <Toast
               icon="loading"
@@ -346,6 +413,7 @@ class ActivitySelectStoreScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+
         </View>
     )
   }
@@ -387,6 +455,7 @@ const select = StyleSheet.create({
   select_item_cancel: {
     borderWidth: pxToDp(1),
     borderColor: colors.fontGray
+
   }
 });
 

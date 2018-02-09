@@ -17,7 +17,6 @@ import {
   CellFooter,
   Label,
 } from "../../weui/index";
-import ActivityDialog from './ActivityDialog'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -99,12 +98,12 @@ class ActivityManageScene extends PureComponent {
 
   differentiateList(obj, type) {
     let arr = [];
-    let time = new Date().getTime();
+    let time =  Date.now()
     obj.map((item) => {
       let {start_time, end_time} = item.price_rules;
-      if (type && (time > new Date(start_time.replace(/-/g, "/")).getTime()) && (time < new Date(end_time.replace(/-/g, "/")).getTime())) {
+      if (type && (time > tool.getTimeStamp(start_time)) && (time < tool.getTimeStamp(end_time))) {
         arr.push(item);
-      } else if (type == false && (time < new Date(start_time.replace(/-/g, "/")).getTime())) {
+      } else if (type == false && (time < tool.getTimeStamp(start_time))){
         arr.push(item);
       }
     });
@@ -142,7 +141,7 @@ class ActivityManageScene extends PureComponent {
                 <RefreshControl
                     refreshing={this.state.query}
                     onRefresh={() => {
-                      this.setState({query: true})
+                      this.setState({query: true});
                       this.getRuleList()
                     }}
                     tintColor='gray'
@@ -219,7 +218,7 @@ class ActivityManageScene extends PureComponent {
 
           <Toast
               icon="loading"
-              show={this.state.query}
+              show={this.state.loading}
               onRequestClose={() => {
               }}
           >加载中</Toast>

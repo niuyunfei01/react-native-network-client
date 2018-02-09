@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  BackHandler,
 } from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -17,7 +18,8 @@ import Cts from '../../Cts';
 import {ToastLong} from "../../util/ToastUtils";
 import {Icon} from "../../weui/index";
 import BottomBtn from './ActivityBottomBtn';
-
+import {NavigationItem} from '../../widget';
+import ActivityAlert from './ActivityAlert'
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
   return {mine: mine, global: global, activity: activity}
@@ -33,8 +35,18 @@ function mapDispatchToProps(dispatch) {
 
 class ActivityEditRuleScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
       headerTitle: '修改加价阶梯',
+      headerLeft: (
+          <NavigationItem
+              icon={require('../../img/Register/back_.png')}
+              iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+              onPress={() => {
+                params.confimBack()
+              }}
+          />
+      ),
     };
   };
 
@@ -44,21 +56,47 @@ class ActivityEditRuleScene extends PureComponent {
       rule: [],
       key: '',
       categories: [],
-      type_id: 0
-    }
+      type_id: 0,
+      confimBack: false,
+      beforeList: [],
+    };
+    this.identical = this.identical.bind(this);
   }
 
   componentWillMount() {
     let {rule, key, categories, type_id} = this.props.navigation.state.params;
     this.setState({
-      rule: this.toRuleEdit(rule),
+      rule: tool.deepClone(this.toRuleEdit(rule)),
       key: key,
-      categories:
-      categories,
-      type_id: type_id
+      categories:categories,
+      type_id: type_id,
+      beforeList:tool.deepClone(this.toRuleEdit(rule)),
+    });
+    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+  componentDidMount() {
+    this.props.navigation.setParams({
+      confimBack:()=>{
+        console.log(this.identical());
+        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
+      }
     })
   }
-
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+  onBackAndroid = () => {
+    !this.identical() ? ToastLong('尚未保存数据') : '';
+    return !this.identical()
+  };
+  identical() {
+    let {beforeList, rule} = this.state;
+    if (beforeList.sort().toString() == rule.sort().toString()) {
+      return true
+    } else {
+      return false
+    }
+  }
   toRuleEdit(arr,type='down') {
     if(type=='down'){
       arr.forEach((item, index) => {
@@ -71,6 +109,7 @@ class ActivityEditRuleScene extends PureComponent {
         item.max_price = item.max_price*100;
       });
     }
+
     return arr;
   }
 
@@ -151,6 +190,28 @@ class ActivityEditRuleScene extends PureComponent {
               this.props.navigation.goBack();
             }}/>
           </ScrollView>
+          <ActivityAlert
+              showDialog={this.state.confimBack}
+              buttons={[
+                {
+                  type: 'default',
+                  label: '确认离开',
+                  onPress: () => {
+                    this.setState({confimBack: false,});
+                    this.props.navigation.goBack()
+                  }
+                },
+                {
+                  type: 'primary',
+                  label: '继续编辑',
+                  onPress: () => {
+                    this.setState({confimBack: false,});
+                  }
+                }
+              ]}
+          >
+            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会呗保存,确认要离开吗?</Text>
+          </ActivityAlert>
         </View>
     )
   }

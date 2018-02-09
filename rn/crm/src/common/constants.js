@@ -95,4 +95,5 @@ export default keyMirror({
   ACTIVITY_EXT_STORE_ID:null,
   ACTIVITY_STORE_LIST:null,
   ACTIVITY_VENDOR_TAGS:null,
+  ACTIVITY_GOODS_LIST:null,
 })

@@ -9,6 +9,7 @@ import {
   TextInput,
   FlatList,
   TouchableHighlight,
+  Alert,
 } from 'react-native';
 import {
   Cells,
@@ -23,7 +24,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchSavePriceRule} from '../../reducers/activity/activityAction';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 
@@ -36,6 +36,7 @@ import style from './commonStyle'
 import ImgBtn from "./imgBtn";
 import BottomBtn from './ActivityBottomBtn'
 import {setAccessToken} from "../../reducers/global/globalActions";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {mine, global, activity, product} = state;
@@ -115,10 +116,10 @@ class ActivityRuleScene extends PureComponent {
           }
         ]
       ],
-      dataPicker: false,
-      startTime: '开始时间',
-      endTime: '结束时间',
-      timeKey: '',
+      stPicker: false,
+      edPicker:false,
+      startTime: '',
+      endTime: '',
       vendorId: 0,
       vendorList: [
         {
@@ -131,16 +132,12 @@ class ActivityRuleScene extends PureComponent {
         },
         {
           key: Cts.STORE_TYPE_GZW,
-          label: '果知味',
+          label: '鲜果集',
         },
         {
           key: Cts.STORE_TYPE_BLX,
           label: '比邻鲜',
         },
-        {
-          key: Cts.STORE_TYPE_XGJ,
-          label: '鲜果集',
-        }
       ],
       price_rules: {},
       interval_rules: {},
@@ -171,10 +168,6 @@ class ActivityRuleScene extends PureComponent {
     return arr;
   }
 
-  setDateTime(date) {
-    let {timeKey} = this.state;
-    this.setState({[timeKey]: date, dataPicker: false})
-  }
 
   componentWillMount() {
     try {
@@ -188,7 +181,6 @@ class ActivityRuleScene extends PureComponent {
       let arr = [];
       let goods_data = [];
       specialRuleList.map((item) => {
-        console.log(Object.values(item.rules));
         arr.push(Object.values(item.rules))
       });
       goods_rules.forEach((item) => {
@@ -215,15 +207,14 @@ class ActivityRuleScene extends PureComponent {
 
   renderCommon() {
     let {commonRule, price_rules} = this.state;
-    console.log(commonRule);
     return (
         <Cells style={style.cells}>
-          <Cell customStyle={style.cell} first={true}>
+          <Cell customStyle={style.cell} >
             <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
             <ImgBtn require={require('../../img/Activity/bianji_.png')}
                     onPress={() =>
                         this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
-                          rule: commonRule,
+                          rule: tool.deepClone(commonRule),
                           key: 'commonRule',
                           type_id: Cts.RULE_TYPE_GENERAL,
                         })
@@ -280,7 +271,7 @@ class ActivityRuleScene extends PureComponent {
     return specialRuleList.map((item, inex) => {
       return (
           <View key={inex}>
-            <Cell customStyle={style.cell} first={true}>
+            <Cell customStyle={style.cell} >
               <CellHeader style={{flexDirection: 'row'}}>
                 <Text style={[style.cell_header_text, {}]}>加价比例设置 </Text>
                 <TouchableOpacity
@@ -362,6 +353,27 @@ class ActivityRuleScene extends PureComponent {
     })
   }
 
+  initDate(date) {
+    if (date) {
+      return new Date(date.replace(/-/g, "/"))
+    } else {
+      return new Date()
+    }
+  }
+  initMinDate(date){
+    if (date) {
+      return new Date(date.replace(/-/g, "/"))
+    } else {
+      return new Date()
+    }
+  }
+  initMaxDate(date){
+    if (date) {
+      return new Date(date.replace(/-/g, "/"))
+    } else {
+      return new Date(Date.now()+ 180*86400000);
+    }
+  }
   renderGoods() {
     let {goods_data, vendorId, store_id} = this.state;
     return goods_data.map((item, index) => {
@@ -371,7 +383,7 @@ class ActivityRuleScene extends PureComponent {
             <Cell customStyle={style.cell}
                   onPress={() => {
                     if ((tool.length(store_id) <= 0) || (vendorId <= 0)) {
-                      ToastLong('请选择品牌,店铺')
+                      ToastLong('请选择品牌,店铺');
                       return false
                     }
                     this.props.navigation.navigate(Config.ROUTE_ACTIVITY_SELECT_GOOD, {
@@ -573,11 +585,13 @@ class ActivityRuleScene extends PureComponent {
           ToastLong(reason);
         }
       }))
+    }else{
+      this.setState({uploading:false});
     }
   }
 
   render() {
-    let {startTime, endTime, vendorId, rule_name, ext_store_id} = this.state;
+    let {startTime, endTime, vendorId, rule_name, ext_store_id,timeKey} = this.state;
     return (
         <View style={{flex: 1}}>
           <ScrollView >
@@ -621,7 +635,7 @@ class ActivityRuleScene extends PureComponent {
                   <TextInput
                       multiline={true}
                       underlineColorAndroid='transparent'
-                      style={{minWidth: pxToDp(400), textAlign: 'right'}}
+                      style={{minWidth: pxToDp(400), textAlign: 'right',minHeight:pxToDp(100)}}
                       placeholderTextColor={"#7A7A7A"}
                       placeholder={'请输入活动名称'}
                       value={rule_name}
@@ -635,19 +649,23 @@ class ActivityRuleScene extends PureComponent {
                 <TouchableOpacity
                     style={{flex: 1, height: pxToDp(65)}}
                     onPress={() => {
-                      this.setState({dataPicker: true, timeKey: 'startTime'})
+                      this.setState({stPicker: true,})
                     }}
                 >
-                  <Text style={style.time}>{startTime}</Text>
+                  <Text style={style.time}>{startTime == '' ? '开始时间' : startTime}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(40)}}
                     onPress={() => {
-                      this.setState({dataPicker: true, timeKey: 'endTime'})
+                      if(this.state.startTime==''){
+                        ToastLong('请先选择开始时间')
+                        return false
+                      }
+                      this.setState({edPicker:true})
                     }}
                 >
-                  <Text style={[style.time]}>{endTime}</Text>
+                  <Text style={[style.time]}>{endTime == '' ? '结束时间' : endTime}</Text>
                 </TouchableOpacity>
               </Cell>
               <Cell customStyle={style.cell} onPress={() => {
@@ -709,22 +727,47 @@ class ActivityRuleScene extends PureComponent {
               }
             </Cells>
             <BottomBtn onPress={async () => {
+              let {uploading}=this.state
+              if(uploading){
+                return false
+              }
+
               await this.setState({uploading:true});
+
               this.uploadData()
             }}/>
           </ScrollView>
-
           <DateTimePicker
-              date={new Date()}
-              minimumDate={new Date()}
+              date={this.initDate(this.state.startTime)}
               mode='datetime'
-              isVisible={this.state.dataPicker}
+              minimumDate={new Date()}
+              maximumDate={this.initMaxDate(this.state.endTime)}
+              isVisible={this.state.stPicker}
               onConfirm={async (date) => {
                 let confirm_data = tool.fullDate(date);
-                this.setDateTime(confirm_data);
+                this.setState({
+                  startTime:confirm_data,
+                  stPicker:false,
+                })
               }}
               onCancel={() => {
-                this.setState({dataPicker: false});
+                this.setState({stPicker: false});
+              }}
+          />
+          <DateTimePicker
+              date={this.initDate(this.state.endTime)}
+              mode='datetime'
+              minimumDate={this.initMinDate(this.state.startTime)}
+              isVisible={this.state.edPicker}
+              onConfirm={async (date) => {
+                let confirm_data = tool.fullDate(date);
+                this.setState({
+                  endTime:confirm_data,
+                  edPicker:false,
+                })
+              }}
+              onCancel={() => {
+                this.setState({edPicker: false});
               }}
           />
           <Toast
