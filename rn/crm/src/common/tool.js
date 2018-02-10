@@ -462,9 +462,9 @@ function getVendorName(vendorId){
   let map={};
   map[Cts.STORE_TYPE_SELF]='菜鸟食材';
   map[Cts.STORE_TYPE_AFFILIATE]='菜鸟';
-  map[Cts.STORE_TYPE_GZW]='果知味';
+  map[Cts.STORE_TYPE_GZW]='鲜果集';
   map[Cts.STORE_TYPE_BLX]='比邻鲜';
-  map[Cts.STORE_TYPE_XGJ]='鲜果集';
+  map[0]='全部';
   return map[vendorId];
 }
 function getSortName(sortId){

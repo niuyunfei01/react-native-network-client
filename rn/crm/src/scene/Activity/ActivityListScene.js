@@ -58,20 +58,14 @@ class ActivityListScene extends PureComponent {
     this.state = {
       checked: [],
       hide: false,
-      vendorId: Cts.STORE_TYPE_GZW,
-      platList: [
-        Cts.WM_PLAT_ID_WX,
-        Cts.WM_PLAT_ID_BD,
-        Cts.WM_PLAT_ID_MT,
-        Cts.WM_PLAT_ID_ELE,
-        Cts.WM_PLAT_ID_JD,
-      ],
-      platId: Cts.WM_PLAT_ID_WX,
+      vendorId: 0,
       showDialog: false,
       down: false,
-      startTime: '',
-      endTime: '',
       vendorList: [
+        {
+          key: 0,
+          label: '全部',
+        },
         {
           key: Cts.STORE_TYPE_SELF,
           label: '菜鸟食材',
@@ -82,20 +76,21 @@ class ActivityListScene extends PureComponent {
         },
         {
           key: Cts.STORE_TYPE_GZW,
-          label: '果知味',
+          label: '鲜果集',
         },
         {
           key: Cts.STORE_TYPE_BLX,
           label: '比邻鲜',
         },
-        {
-          key: Cts.STORE_TYPE_XGJ,
-          label: '鲜果集',
-        }
+
       ],
       ruleList: [],
       query: true,
       renderList: [],
+      stPicker: false,
+      edPicker:false,
+      startTime: '',
+      endTime: '',
     }
   }
 
@@ -115,67 +110,60 @@ class ActivityListScene extends PureComponent {
       }
     }))
   }
+  initDate(date) {
+    if (date) {
+      return new Date(date.replace(/-/g, "/"))
+    } else {
+      return new Date()
+    }
+  }
 
   timeFlag(start_time, end_time,) {
     start_time = new Date(start_time.replace(/-/g, "/")).getTime();
     end_time = new Date(end_time.replace(/-/g, "/")).getTime();
     let {startTime, endTime} = this.state;
-    startTime = startTime == '' ? new Date().getTime() : new Date(startTime.replace(/-/g, "/")).getTime();
-    endTime = endTime == '' ? new Date().getTime() : new Date(endTime.replace(/-/g, "/")).getTime();
-    if (endTime < start_time || startTime > end_time) {
-      return false
-    } else {
-      return true
-    }
-  }
-  renderList() {
-    let {ruleList, vendorId,startTime,endTime} = this.state;
-    console.log('ruleList->',ruleList)
-    if(ruleList.length>0){
-      return ruleList.map((item, key) => {
-        let {vendor_id, end_time, start_time} = item.price_rules;
-        if ((vendor_id == vendorId) && this.timeFlag(start_time,end_time)) {
-          return (
-              <ActivityItem
-                  key={key}
-                  customStyle={{marginLeft: pxToDp(15)}}
-                  textStyle={{color: colors.fontGray}}
-                  item={item}
-                  onPress={() => {
-                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE, {rules: item, type: 'use'})
-                  }}
-              />
-          )
-        } else {
-          return <RenderEmpty/>
-        }
-      })
-    }else{
-      return <RenderEmpty/>
-    }
+    startTime = startTime == '' ? Date.now() : tool.getTimeStamp(startTime);
+    endTime = endTime == '' ?  Date.now() : tool.getTimeStamp(`${endTime} 23:59:59`);
+    return (endTime < start_time || startTime > end_time)? false:true
   }
 
-  setDateTime(date) {
-    let {timeKey,startTime,endTime} = this.state;
-    if(timeKey=='endTime'){
-      if(new Date(date.replace(/-/g, "/")).getTime()< new Date(startTime.replace(/-/g, "/")).getTime()){
-        ToastLong('结束时间必须大于开始时间')
-        this.setState({dataPicker: false})
-      }else {
-        this.setState({[timeKey]: date, dataPicker: false})
-      }
+  renderList() {
+    let {ruleList, vendorId,startTime,endTime } = this.state;
+    let arr = [];
+    if (vendorId === 0 && (startTime === '') && (endTime === '')) {
+      arr = ruleList
+    } else if(vendorId === 0) {
+      arr = ruleList.filter((item) => {
+        let { end_time, start_time} = item.price_rules;
+        return this.timeFlag(start_time, end_time)
+      });
+    }else if(vendorId != 0 &&(startTime === '') && (endTime === '')){
+      arr = ruleList.filter((item) => {
+        return item.price_rules.vendor_id == vendorId
+      });
     }else {
-      if(new Date(date.replace(/-/g, "/")).getTime()> new Date(endTime.replace(/-/g, "/")).getTime()){
-        ToastLong('结束时间必须大于开始时间')
-        this.setState({dataPicker: false})
-      }else {
-        this.setState({[timeKey]: date, dataPicker: false})
-      }
+      arr = ruleList.filter((item) => {
+        let { vendor_id,end_time, start_time} = item.price_rules;
+        return vendorId==vendor_id && this.timeFlag(start_time, end_time)
+      });
     }
+  return  tool.length(arr)>0?arr.map((item, key) => {
+      return (
+          <ActivityItem
+              key={key}
+              customStyle={{marginLeft: pxToDp(15)}}
+              textStyle={{color: colors.fontGray}}
+              item={item}
+              onPress={() => {
+                this.props.navigation.navigate(Config.ROUTE_ACTIVITY_RULE, {rules: item, type: 'use'})
+              }}
+          />
+      )
+    }):<RenderEmpty/>
   }
 
   render() {
-    let {startTime, endTime, vendorId,ruleList} = this.state;
+    let {startTime, endTime, vendorId} = this.state;
     return (
         <View style={{flex: 1, position: 'relative'}}>
           <View style={manage.header}>
@@ -183,19 +171,22 @@ class ActivityListScene extends PureComponent {
               <TouchableOpacity
                   style={{flex: 1, height: pxToDp(65)}}
                   onPress={() => {
-                    this.setState({dataPicker: true, timeKey: 'startTime'})
+                    this.setState({stPicker: true,})
                   }}
               >
-                <Text style={style.time}>{startTime==''?'开始时间':startTime}</Text>
+                <Text style={style.time}>{startTime == '' ? '开始时间' : startTime}</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                   style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(20)}}
                   onPress={() => {
-                    this.setState({dataPicker: true, timeKey: 'endTime'})
+                    if(startTime==''){
+                      ToastLong('请先选择开始时间');
+                      return false
+                    }
+                    this.setState({edPicker:true})
                   }}
               >
-                <Text style={[style.time]}>{endTime==''?'结束时间':endTime}</Text>
+                <Text style={[style.time]}>{endTime == '' ? '结束时间' : endTime}</Text>
               </TouchableOpacity>
               <ModalSelector
                   style={{height: pxToDp(65)}}
@@ -232,15 +223,36 @@ class ActivityListScene extends PureComponent {
             }
           </ScrollView>
           <DateTimePicker
-              date={new Date()}
+              date={this.initDate(this.state.startTime)}
               mode='date'
-              isVisible={this.state.dataPicker}
+              maximumDate={this.initDate(this.state.endTime)}
+              isVisible={this.state.stPicker}
               onConfirm={async (date) => {
                 let confirm_data = tool.fullDay(date);
-                this.setDateTime(confirm_data);
+                this.setState({
+                  startTime:confirm_data,
+                  stPicker:false,
+                })
               }}
               onCancel={() => {
-                this.setState({dataPicker: false});
+                this.setState({stPicker: false});
+              }}
+          />
+          <DateTimePicker
+              date={this.initDate(this.state.endTime)}
+              mode='date'
+              minimumDate={this.initDate(this.state.startTime)}
+              maximumDate={new Date()}
+              isVisible={this.state.edPicker}
+              onConfirm={async (date) => {
+                let confirm_data = tool.fullDay(date);
+                this.setState({
+                  endTime:confirm_data,
+                  edPicker:false,
+                })
+              }}
+              onCancel={() => {
+                this.setState({edPicker: false});
               }}
           />
           <Toast
