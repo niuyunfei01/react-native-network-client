@@ -87,15 +87,6 @@ export function diffDesc(dt) {
   return diff_desc;
 }
 
-export function diffMinutes(dt) {
-  let old_time = Moment(dt);
-  let now_time = Moment(new Date());
-  let diff_time = Math.abs(Math.floor(now_time.diff(old_time, 'seconds', true)));
-  let diff_minutes = Math.floor(diff_time / 60);
-  console.log('diff_minutes -> ', diff_minutes);
-  return diff_minutes;
-}
-
 export function vendorOfStoreId(storeId, global) {
   const {
     canReadStores,
@@ -536,7 +527,6 @@ export default {
   shortTimestampDesc,
   shortOrderDay,
   diffDesc,
-  diffMinutes,
   fullDate,
   orderOrderTimeShort,
   orderExpectTime,
