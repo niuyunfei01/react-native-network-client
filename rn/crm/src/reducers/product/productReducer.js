@@ -1,5 +1,7 @@
 'use strict';
 
+import Cts from "../../Cts";
+
 /**
  * ## Actions
  *
@@ -8,6 +10,8 @@ const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
   GET_VENDOR_TAGS,
+  ACTIVITY_VENDOR_TAGS,
+  GET_MANAGE_SELECT,
 } = require('../../common/constants').default;
 
 const initialState = {
@@ -15,6 +19,9 @@ const initialState = {
   product_detail: {},
   store_tags: {},
   basic_category: {},
+  vendorTags:{},
+  selectId:Cts.STORE_TYPE_SELF,
+  selectPlatformId:Cts.WM_PLAT_ID_WX
 };
 
 /**
@@ -47,6 +54,17 @@ export default function productReducer(state = initialState, action) {
         ...state,
         store_tags: store_tags(state, action),
         basic_category: basic_category(state, action),
+      };
+      case ACTIVITY_VENDOR_TAGS:
+      return {
+        ...state,
+        vendorTags:action.json
+      };
+      case GET_MANAGE_SELECT:
+      return {
+        ...state,
+        selectId:action.selectId,
+        selectPlatformId:action.platformId
       };
     default:
       return state;

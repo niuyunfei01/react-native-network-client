@@ -368,9 +368,12 @@ export function first_store_id(canReadStores) {
   }
   return first_store_id;
 }
-export function toFixed(num) {
-  return (parseInt(num)/100).toFixed(2)
-
+export function toFixed(num,type='') {
+  if(type=='int'){
+    return (parseInt(num)/100)
+  }else {
+    return (parseInt(num)/100).toFixed(2)
+  }
 }
 export  function billStatus(status) {
  let map = {};
@@ -459,18 +462,16 @@ function getVendorName(vendorId){
   let map={};
   map[Cts.STORE_TYPE_SELF]='菜鸟食材';
   map[Cts.STORE_TYPE_AFFILIATE]='菜鸟';
-  map[Cts.STORE_TYPE_GZW]='果知味';
+  map[Cts.STORE_TYPE_GZW]='鲜果集';
   map[Cts.STORE_TYPE_BLX]='比邻鲜';
-  map[Cts.STORE_TYPE_XGJ]='鲜果集';
+  map[0]='全部';
   return map[vendorId];
 }
 function getSortName(sortId){
   let map ={};
   map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
   map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
-
   return map[sortId];
-
 }
 function platformsLogo(plat_id) {
   let map = {};
@@ -487,6 +488,9 @@ function goodSoldStatusImg(status){
   map[Cts.STORE_PROD_OFF_SALE] = require('../img/Goods/xiajia_.png');
   map[Cts.STORE_PROD_SOLD_OUT] = require('../img/Goods/quehuo.png');
   return map[status];
+}
+function getTimeStamp(str) {
+  return new Date(str.replace(/-/g, "/")).getTime()
 }
 
 export default {
@@ -525,5 +529,6 @@ export default {
   getVendorName,
   getSortName,
   platformsLogo,
-  goodSoldStatusImg
+  goodSoldStatusImg,
+  getTimeStamp,
 }

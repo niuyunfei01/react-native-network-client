@@ -89,4 +89,12 @@ export default keyMirror({
   GET_SHIP_WORKERS: null,
 
   GET_VENDOR_TAGS: null,
+
+  ACTIVITY_COMMON_RULE:null,
+  ACTIVITY_SPECIAL_RULE:null,
+  ACTIVITY_EXT_STORE_ID:null,
+  ACTIVITY_STORE_LIST:null,
+  ACTIVITY_VENDOR_TAGS:null,
+  ACTIVITY_GOODS_LIST:null,
+  GET_MANAGE_SELECT:null,
 })

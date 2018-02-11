@@ -26,7 +26,7 @@ const CellHeader = (props) => {
       return React.cloneElement(child, { style: [child.props.style, styles.error] })
     }
     return child
-  })
+  });
   return <View style={[styles.cellHeader, style]} {...others}>{childrenWithProps}</View>
 }
 CellHeader.propTypes = {
