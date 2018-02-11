@@ -82,15 +82,14 @@ export default {
   ID_DADA_SHIP_WORKER: -999,
   ID_DADA_MANUAL_WORKER: -998,
 
-  // 新达达：状态编码(待接单＝1 待取货＝2 配送中＝3 已完成＝4 已取消＝5 已过期＝7 指派单=8)
   DADA_STATUS_NEVER_START: 0,
-  DADA_STATUS_TO_ACCEPT: 1,
-  DADA_STATUS_TO_FETCH: 2,
-  DADA_STATUS_SHIPPING: 3,
-  DADA_STATUS_ARRIVED: 4,
-  DADA_STATUS_CANCEL: 5,
-  DADA_STATUS_TIMEOUT: 7,
-  DADA_STATUS_ABNORMAL: 8,
+  DADA_STATUS_TO_ACCEPT: 1,//待接单
+  DADA_STATUS_TO_FETCH: 2,//待取货
+  DADA_STATUS_SHIPPING: 3,//配送中
+  DADA_STATUS_ARRIVED: 4,//已完成
+  DADA_STATUS_CANCEL: 5,//已取消
+  DADA_STATUS_TIMEOUT: 7,//已过期
+  DADA_STATUS_ABNORMAL: 8,//指派单
   // 蜂鸟
   FN_STATUS_ACCEPTED: 1,//	系统已接单	蜂鸟配送开放平台接单后,商户接收到系统已接单状态, 支持取消
   FN_STATUS_ASSIGNED: 20,//	已分配骑手	蜂鸟配送开放平台接单后,商户接收到已分配骑手状态, 支持取消
@@ -106,13 +105,16 @@ export default {
   ZS_STATUS_ON_WAY: 3,//在途
   ZS_STATUS_ARRIVED: 4,//送达
   ZS_STATUS_CANCEL: 5,//取消
+  ZS_STATUS_ABNORMAL: 6,//异常
   ZS_STATUS_TO_ACCEPT_EX: 21,//选自送状态
 
-  //
+  //专送方式
   SHIP_ZS_JD: 21,//京东专送
   SHIP_ZS_MT: 22, //美团专送
   SHIP_ZS_ELE: 23, //饿了专送
   SHIP_ZS_BD: 24, //百度专送
+  SHIP_KS_MT: 25, //美团快送
+  SHIP_KS_ELE: 26, //饿了么快送
 
   TAG_HIDE: '74911547', //列表中隐藏tag_id
   ORDER_CANCEL_SHIP_REASON: 10000,
@@ -132,7 +134,7 @@ export default {
   STORE_TYPE_GZW: 4,//果知味
   STORE_TYPE_BLX: 5,//比邻鲜
   STORE_TYPE_XGJ: 6,//鲜果集
-// 商品管理的排序值
+  // 商品管理的排序值
   GOODS_MANAGE_DEFAULT_SORT: '',
   GOODS_MANAGE_SOLD_SORT: 'sold',
   GOODS_CLASSIFY_ALL: '999999999',

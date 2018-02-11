@@ -96,7 +96,7 @@ export function clearLocalOrder(id) {
 }
 
 /**
- * 
+ *
  * @param sessionToken
  * @param orderId
  * @param callback (ok, msg|order) => {}
@@ -142,7 +142,7 @@ export function orderSetReady(token, id, workerIdList, callback) {
 }
 
 /**
- * 
+ *
  * @param token
  * @param id
  * @param oldWorkerId
@@ -182,6 +182,11 @@ export function orderToInvalid(token, id, reason_key, custom, callback) {
 
 export function orderCallShip(token, id, way, callback) {
   const url = `api/order_dada_start/${id}/${way}.json?access_token=${token}`;
+  return getReqThenInvalidate(url, id, callback);
+}
+
+export function orderCancelZsDelivery(token, id, callback) {
+  const url = `api/cancel_zs_delivery/${id}.json?access_token=${token}`;
   return getReqThenInvalidate(url, id, callback);
 }
 

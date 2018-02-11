@@ -58,7 +58,7 @@ class OrderStatusCell extends PureComponent {
         <Text style={[invalidStyle, {color: colors.color666}]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
       </View>
 
-      <View style={{ backgroundColor: colors.white, flexDirection: 'row',
+      <View style={{ backgroundColor: colors.white, flexDirection: 'row', paddingBottom: pxToDp(10),
         justifyContent:'space-around'}}>
         <OrderStep statusTxt="已收单" bgColor={this._validStepColor(order.orderTime)} timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
         <OrderStep statusTxt="已分拣" bgColor={this._validStepColor(order.time_ready)} workerNames={packWorkers} loggerName={packLoggerName}
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     marginLeft: pxToDp(30),
     marginRight: pxToDp(40),
     alignContent: 'center',
-    marginTop: pxToDp(14)
+    marginTop: pxToDp(14),
   },
   stepCircle: {
     borderRadius: pxToDp(10),

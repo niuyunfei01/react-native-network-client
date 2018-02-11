@@ -60,7 +60,7 @@ class TakeOutScene extends PureComponent {
               styles.right_btn,
           ]}
           onPress={() => {
-            if(params.is_service_mgr){
+            if(params.is_service_mgr || params.is_helper){
               params.setOperating(set_val);
               navigation.setParams({
                 isOperating: set_val,
@@ -89,6 +89,7 @@ class TakeOutScene extends PureComponent {
     let server_info = tool.server_info(this.props);
 
     this.state = {
+      isSearching: false,
       isRefreshing: false,
       isOperating: false,
       isToggleSubmitting: false,
@@ -99,16 +100,24 @@ class TakeOutScene extends PureComponent {
     this.getWmStores = this.getWmStores.bind(this);
     this.setWmStoreStatus = this.setWmStoreStatus.bind(this);
 
+
+  }
+
+  componentWillMount() {
+    let {currStoreId} = this.props.global;
+    const {wm_list} = this.props.mine;
+    let curr_wm_list = wm_list[currStoreId];
     if (curr_wm_list === undefined) {
       this.getWmStores();
     }
   }
 
   componentDidMount() {
-    let {is_service_mgr} = tool.vendor(this.props.global);
+    let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
 
     this.props.navigation.setParams({
       is_service_mgr: is_service_mgr,
+      is_helper: is_helper,
       isOperating: this.state.isOperating,
       setOperating: (isOperating) => this.setOperating(isOperating),
     });
@@ -121,9 +130,12 @@ class TakeOutScene extends PureComponent {
   }
 
   getWmStores() {
+    if (this.state.isSearching) {
+      return;
+    }
+    this.setState({isSearching: true});
     const {dispatch} = this.props;
     const {currStoreId, accessToken} = this.props.global;
-
     let _this = this;
     let cache = 0;//不使用缓存
     dispatch(fetchWmStore(currStoreId, cache, accessToken, (resp) => {
@@ -134,7 +146,7 @@ class TakeOutScene extends PureComponent {
           wm_list: wm_list,
         });
       }
-      _this.setState({isRefreshing: false});
+      _this.setState({isRefreshing: false, isSearching: false});
     }));
   }
 
@@ -182,7 +194,7 @@ class TakeOutScene extends PureComponent {
     if (tool.length(wm_list) === 0) {
       return (
         <View style={styles.service}>
-          <Text style={styles.service_text}>暂无已关联的外卖平台</Text>
+          <Text style={styles.service_text}>{this.state.isSearching ? '查询中外卖店铺中...' : '暂无已关联的外卖平台'}</Text>
         </View>
       );
     }
@@ -211,7 +223,7 @@ class TakeOutScene extends PureComponent {
             <CellFooter>
               {isOperating ? <Switch
                   style={styles.switch_right}
-                  value={store.wm_status == '正在营业' ? true : false}
+                  value={store.wm_status === '正在营业' ? true : false}
                   onValueChange={(val) => {
                     _this.setWmStoreStatus(store.platform, store.wid, val);
                   }}/> :
@@ -244,6 +256,13 @@ class TakeOutScene extends PureComponent {
           }}
         >提交中</Toast>
 
+        <Toast
+          icon="loading"
+          show={this.state.isSearching}
+          onRequestClose={() => {
+          }}
+        >查询中外卖店铺中...</Toast>
+
         <View style={styles.service}>
           <CallBtn style={styles.service_text} label='如需新增外卖店铺, 请联系服务经理' mobile={this.state.server_mobile}/>
         </View>
@@ -253,8 +272,6 @@ class TakeOutScene extends PureComponent {
 
 }
 
-
-// define your styles
 const styles = StyleSheet.create({
   cell_title: {
     marginTop: pxToDp(30),

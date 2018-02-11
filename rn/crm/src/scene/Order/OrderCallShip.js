@@ -8,6 +8,8 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Button, RadioCells, ButtonArea,Toast, Dialog, CellsTitle} from "../../weui/index";
 import S from '../../stylekit'
+import Cts from "../../Cts";
+import tool from "../../common/tool";
 
 function mapStateToProps(state) {
   return {
@@ -22,7 +24,7 @@ function mapDispatchToProps(dispatch) {
 class OrderCallShip extends Component {
 
   static navigationOptions = {
-    headerTitle: '呼叫配送',
+    headerTitle: '发配送',
   };
 
   constructor(props: Object) {
@@ -32,11 +34,13 @@ class OrderCallShip extends Component {
       option: -1,
       doneSubmitting: false,
       onSubmitting: false,
+      alert_msg: '',
     };
 
     this._onTypeSelected = this._onTypeSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+    this._onClick = this._onClick.bind(this);
   }
 
   _onTypeSelected(idx) {
@@ -45,6 +49,23 @@ class OrderCallShip extends Component {
 
   _checkDisableSubmit() {
     return !this.state.option;
+  }
+
+  _onClick() {
+    if(this.state.option === Cts.SHIP_AUTO_FN){
+      const {order} = (this.props.navigation.state.params || {});
+      let {expectTime} = order;
+      let diffMinutes = tool.diffMinutes(expectTime);
+      let diffHours = Math.floor(diffMinutes / 60);
+      if(diffHours > 1){
+        diffHours = diffHours - 1;
+        this.setState({alert_msg: `该订单是预订单, 配送员将在大约 ${diffHours}小时 后前来取单`});
+      } else {
+        this._doReply();
+      }
+    } else {
+      this._doReply();
+    }
   }
 
   _doReply() {
@@ -85,6 +106,21 @@ class OrderCallShip extends Component {
                 }
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
+      <Dialog
+        onRequestClose={() => {
+        }}
+        visible={!!this.state.alert_msg}
+        buttons={[{
+          type: 'default',
+          label: '知道了',
+          onPress: () => {
+            this.setState({alert_msg: ''});
+            this._doReply();
+          }
+        }]}
+      >
+        <Text style={{color: 'red'}}>{this.state.alert_msg}</Text>
+      </Dialog>
 
       <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
         <Text style={{ fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>
@@ -100,7 +136,7 @@ class OrderCallShip extends Component {
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>呼叫配送</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._onClick} style={[S.mlr15]}>发配送</Button>
       </ButtonArea>
 
       <Toast

@@ -72,6 +72,30 @@ export function storeTime(dt) {
   return Moment(dt).format('H:mm');
 }
 
+export function diffDesc(dt) {
+  let old_time = Moment(dt);
+  let now_time = Moment(new Date());
+  let diff_time = Math.floor(now_time.diff(old_time, 'seconds', true));
+  let diff_minutes = Math.floor(diff_time / 60);
+  let diff_seconds = diff_time % 60;
+  let diff_desc = '';
+  if (diff_minutes > 0) {
+    diff_desc = `${diff_minutes}分${diff_seconds}秒`;
+  } else {
+    diff_desc = `${diff_seconds}秒`;
+  }
+  return diff_desc;
+}
+
+export function diffMinutes(dt) {
+  let old_time = Moment(dt);
+  let now_time = Moment(new Date());
+  let diff_time = Math.abs(Math.floor(now_time.diff(old_time, 'seconds', true)));
+  let diff_minutes = Math.floor(diff_time / 60);
+  console.log('diff_minutes -> ', diff_minutes);
+  return diff_minutes;
+}
+
 export function vendorOfStoreId(storeId, global) {
   const {
     canReadStores,
@@ -288,23 +312,23 @@ export function disWayStatic(index) {
 
   if (index == 1) {
     let map = {};
-    map[Cts.FN_STATUS_ACCEPTED] = '系统已接单'
-    map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手'
-    map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店'
-    map[Cts.FN_STATUS_ON_WAY] = '配送中'
-    map[Cts.FN_STATUS_ARRIVED] = '已送达'
-    map[Cts.FN_STATUS_CANCELED] = '已取消'
-    map[Cts.FN_STATUS_ABNORMAL] = '异常'
+    map[Cts.FN_STATUS_ACCEPTED] = '系统已接单';
+    map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手';
+    map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店';
+    map[Cts.FN_STATUS_ON_WAY] = '配送中';
+    map[Cts.FN_STATUS_ARRIVED] = '已送达';
+    map[Cts.FN_STATUS_CANCELED] = '已取消';
+    map[Cts.FN_STATUS_ABNORMAL] = '异常';
     return map;
   } else {
     let map = {};
-    map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单'
-    map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
-    map[Cts.DADA_STATUS_SHIPPING] = '配送中'
-    map[Cts.DADA_STATUS_ARRIVED] = '已完成'
-    map[Cts.DADA_STATUS_CANCEL] = '已取消'
-    map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
-    map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
+    map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单';
+    map[Cts.DADA_STATUS_TO_FETCH] = '待取货';
+    map[Cts.DADA_STATUS_SHIPPING] = '配送中';
+    map[Cts.DADA_STATUS_ARRIVED] = '已完成';
+    map[Cts.DADA_STATUS_CANCEL] = '已取消';
+    map[Cts.DADA_STATUS_TIMEOUT] = '已过期';
+    map[Cts.DADA_STATUS_ABNORMAL] = '指派单';
     return map;
   }
 }
@@ -383,22 +407,33 @@ export  function billStatus(status) {
  return map[status]
 
 }
-export function autoPlat(type,status) {
+
+export function autoPlat(type, status) {
+  return `${this.ship_name(type)}: ${this.zs_status(status)}`;
+}
+
+export function ship_name(type) {
   let plat = {};
-  let znMap = {};
   plat[Cts.SHIP_ZS_JD] = '京东专送';
-  plat[Cts.SHIP_ZS_MT] = '美团转送';
+  plat[Cts.SHIP_ZS_MT] = '美团专送';
+  plat[Cts.SHIP_KS_MT] = '美团快送';
   plat[Cts.SHIP_ZS_ELE] = '饿了么专送';
   plat[Cts.SHIP_ZS_BD] = '百度专送';
 
+  return plat[type] === undefined ? '未知配送' : plat[type];
+}
+
+export function zs_status(status) {
+  let znMap = {};
   znMap[Cts.ZS_STATUS_NEVER_START] = '待召唤';
   znMap[Cts.ZS_STATUS_TO_ACCEPT] = '待接单';
   znMap[Cts.ZS_STATUS_TO_FETCH] = '待取货';
-  znMap[Cts.ZS_STATUS_ON_WAY] = '在途';
-  znMap[Cts.ZS_STATUS_ARRIVED] = '送达';
-  znMap[Cts.ZS_STATUS_CANCEL] = '取消';
-return `${plat[type]}:${znMap[status]}`;
+  znMap[Cts.ZS_STATUS_ON_WAY] = '已在途';
+  znMap[Cts.ZS_STATUS_ARRIVED] = '已送达';
+  znMap[Cts.ZS_STATUS_CANCEL] = '已取消';
+  znMap[Cts.ZS_STATUS_ABNORMAL] = '异常';
 
+  return znMap[status] === undefined ? '未知状态' : znMap[status];
 }
 
 export function sellingStatus(sell_status) {
@@ -500,6 +535,8 @@ export default {
   shortTimeDesc,
   shortTimestampDesc,
   shortOrderDay,
+  diffDesc,
+  diffMinutes,
   fullDate,
   orderOrderTimeShort,
   orderExpectTime,
@@ -522,6 +559,8 @@ export default {
   billStatus,
   get_platform_name,
   autoPlat,
+  ship_name,
+  zs_status,
   sellingStatus,
   headerSupply,
   deepClone,

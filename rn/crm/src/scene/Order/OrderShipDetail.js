@@ -100,7 +100,7 @@ class OrderShipDetail extends Component {
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>呼叫配送</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>发配送</Button>
       </ButtonArea>
 
       <Toast
