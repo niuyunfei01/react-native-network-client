@@ -18,6 +18,7 @@ import remind from './remind/remindReducer';
 import store from './store/storeReducer';
 import mine from './mine/mineReducer';
 import user from './user/userReducer';
+import activity from './activity/activityReducer';
 
 import {combineReducers} from 'redux';
 
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   mine,
   product,
   user,
+  activity,
 });
 
 export default rootReducer

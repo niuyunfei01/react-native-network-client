@@ -85,7 +85,13 @@ class SettlementGatherScene extends PureComponent {
       this.setState({query: false})
     }));
   }
-
+arraySum(item){
+    num=0;
+    item.forEach((item)=>{
+      num+=parseInt(item.total_price);
+    });
+  return num;
+}
   renderHeader() {
     let {dateList,date} = this.state;
     return (
@@ -136,7 +142,11 @@ class SettlementGatherScene extends PureComponent {
                     }}
                     style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
                 >
-                  <Text style={styles.name}>{key}</Text>
+                  <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <Text style={styles.name}>{key}</Text>
+                      <Text style ={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}</Text>
+
+                  </View>
                   <Image style={[{width: pxToDp(80), height: pxToDp(80)}]}
                          source={item.down ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
                   />
@@ -233,10 +243,10 @@ const styles = StyleSheet.create({
 
   },
   name: {
-    minWidth: pxToDp(200),
     fontSize: pxToDp(32),
     color: colors.main_color,
     fontWeight: '900',
+    marginRight:pxToDp(10)
 
   },
   status: {
@@ -291,7 +301,6 @@ const header = StyleSheet.create({
   money: {
     fontSize: pxToDp(30)
   }
-
 });
 
 const title = StyleSheet.create({
@@ -309,7 +318,12 @@ const title = StyleSheet.create({
   comm: {
     width: pxToDp(110),
     textAlign: "center"
-
+  },
+  total_sum:{
+    color:colors.color666,
+    fontSize:pxToDp(28),
+    fontWeight:'100',
+    marginLeft:pxToDp(20)
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementGatherScene)

@@ -129,14 +129,17 @@ export default {
   OPERATE_OUT_PLAT_FEE: 9,  //外卖平台服务费
   OPERATE_OTHER_OUT: 6, //其他支出
   //品牌常量
-  STORE_TYPE_SELF: 1,//菜鸟
-  STORE_TYPE_AFFILIATE: 2,//菜鸟食材
+  STORE_TYPE_SELF: 1,//菜鸟食材
+  STORE_TYPE_AFFILIATE: 2,//菜鸟
   STORE_TYPE_GZW: 4,//果知味
   STORE_TYPE_BLX: 5,//比邻鲜
   STORE_TYPE_XGJ: 6,//鲜果集
-// 商品管理的排序值
+  // 商品管理的排序值
   GOODS_MANAGE_DEFAULT_SORT: '',
   GOODS_MANAGE_SOLD_SORT: 'sold',
   GOODS_CLASSIFY_ALL: '999999999',
-
+  GOODS_CLASSIFY_UNCLASSIFIED: '11111111',
+  RULE_TYPE_GENERAL : 1,//1-通用规则
+  RULE_TYPE_SPECIAL : 2,//2-特殊分类规则
+  Rule_PRICE_UPPER:1000000,
 }

@@ -6,18 +6,8 @@ import {
   Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  ScrollView,
-  TextInput,
   FlatList,
 } from 'react-native';
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label,
-} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -75,17 +65,17 @@ class GoodsMangerScene extends PureComponent {
         Cts.STORE_TYPE_AFFILIATE,
         Cts.STORE_TYPE_GZW,
         Cts.STORE_TYPE_BLX,
-        Cts.STORE_TYPE_XGJ
       ],
       sortId: Cts.GOODS_MANAGE_SOLD_SORT,
       sortList: [
         Cts.GOODS_MANAGE_DEFAULT_SORT,
         Cts.GOODS_MANAGE_SOLD_SORT,
       ],
-      query: true
-
+      query: true,
+      queryTags:true,
     }
   }
+
 
   toggleSelectBox() {
     let {toggle} = this.state;
@@ -95,10 +85,12 @@ class GoodsMangerScene extends PureComponent {
   showSelectBox() {
     this.setState({toggle: true})
   }
-
   async componentWillMount() {
-    let {currVendorId, } = tool.vendor(this.props.global);
-    await this.setState({vendorId:currVendorId});
+    let {selectId,selectPlatformId} = this.props.product;
+    await this.setState({
+      vendorId: selectId,
+      platId: selectPlatformId,
+    });
     await this.getListVendorTags();
     await this.getListVendorGoods();
   }
@@ -117,9 +109,9 @@ class GoodsMangerScene extends PureComponent {
     const {vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    this.setState({query: true});
+    this.setState({queryTags: true});
     dispatch(fetchListVendorTags(vendorId, accessToken, (ok, desc, obj) => {
-      this.setState({query: false});
+      this.setState({queryTags: false});
       if (ok) {
         this.setState({tagList: obj});
       } else {
@@ -364,7 +356,6 @@ class GoodsMangerScene extends PureComponent {
                   <TouchableOpacity
                       key={key}
                       onPress={() => {
-
                         this.setState({selectedTag: item.id})
                       }}
                   >
@@ -428,6 +419,13 @@ class GoodsMangerScene extends PureComponent {
               onRequestClose={() => {
               }}
           >加载中</Toast>
+          <Toast
+            icon="loading"
+            show={this.state.queryTags}
+            onRequestClose={() => {
+            }}
+        >加载中</Toast>
+
         </View>
     )
   }
