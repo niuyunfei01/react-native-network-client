@@ -297,22 +297,13 @@ class OrderBottom extends PureComponent {
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     } else {
-      if ((zs_way === Cts.SHIP_ZS_JD ||
-          zs_way === Cts.SHIP_KS_MT ||
-          zs_way === Cts.SHIP_ZS_MT ||
-          zs_way === Cts.SHIP_ZS_ELE ||
-          zs_way === Cts.SHIP_ZS_BD) || (
-            zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
-            zs_status === Cts.ZS_STATUS_TO_FETCH ||
-            zs_status === Cts.ZS_STATUS_ON_WAY ||
-            zs_status === Cts.ZS_STATUS_ARRIVED
+      if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
+          dada_status === Cts.DADA_STATUS_NEVER_START ||
+          auto_ship_type === Cts.SHIP_AUTO_FN ||
+          auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
+          auto_ship_type === Cts.SHIP_AUTO_BD ||
+          auto_ship_type === Cts.SHIP_AUTO_SX
         )) {
-        label = tool.autoPlat(zs_way, zs_status)
-      } else if (
-        auto_ship_type === Cts.SHIP_AUTO_FN ||
-        auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
-        auto_ship_type === Cts.SHIP_AUTO_BD ||
-        auto_ship_type === Cts.SHIP_AUTO_SX) {
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
             label = "自动:待接单";
@@ -341,6 +332,18 @@ class OrderBottom extends PureComponent {
           default:
             label = dada_status;
         }
+      } else if ((
+          zs_way === Cts.SHIP_ZS_JD ||
+          zs_way === Cts.SHIP_KS_MT ||
+          zs_way === Cts.SHIP_ZS_MT ||
+          zs_way === Cts.SHIP_ZS_ELE ||
+          zs_way === Cts.SHIP_ZS_BD) || (
+          zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+          zs_status === Cts.ZS_STATUS_TO_FETCH ||
+          zs_status === Cts.ZS_STATUS_ON_WAY ||
+          zs_status === Cts.ZS_STATUS_ARRIVED
+        )) {
+        label = tool.autoPlat(zs_way, zs_status)
       }
     }
     return label;
@@ -437,9 +440,9 @@ class OrderBottom extends PureComponent {
         shadowRadius: 4,
         height: pxToDp(90),
       }}>
-      {this._visibleProviding() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'}
+      {this._visibleProviding() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'} size={'small'}
                                            onPress={this._onToProvide}>备货</Button>}
-      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
+      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
                                            onPress={this._onActionBtnClicked}>{this._actionBtnText()}</Button>}
       {this._visibleShipInfoBtn() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
                                              onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
