@@ -329,7 +329,7 @@ public class OrderAdapter extends BaseAdapter {
         if (context == null) {
             return;
         }
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -337,9 +337,9 @@ public class OrderAdapter extends BaseAdapter {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            Toast.makeText(context, "没有呼叫权限", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//            Toast.makeText(context, "没有呼叫权限", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
         context.startActivity(callIntent);
     }
 
