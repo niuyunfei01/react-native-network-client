@@ -1064,19 +1064,25 @@ class OrderScene extends Component {
 
   cancelZsDelivery(){
     const {dispatch, global, order} = this.props;
-    let {zs_status} = order;
+    let {zs_status, id} = order.order;
     zs_status = parseInt(zs_status);
-    if (zs_status === Cts.ZS_STATUS_CANCEL || zs_status === Cts.ZS_STATUS_ABNORMAL) {
-      this._callShip();
+    let wm_id = id;
+    console.log('wm_id -> ', wm_id);
+    if (wm_id > 0) {
+      if (zs_status === Cts.ZS_STATUS_CANCEL || zs_status === Cts.ZS_STATUS_ABNORMAL) {
+        this._callShip();
+      } else {
+        dispatch(orderCancelZsDelivery(global.accessToken, wm_id, (ok, msg) => {
+          this.setState({onSubmitting: false});
+          if (ok) {
+            this._callShip();
+          } else {
+            this.setState({errorHints: msg});
+          }
+        }));
+      }
     } else {
-      dispatch(orderCancelZsDelivery(global.accessToken, order.id, (ok, msg) => {
-        this.setState({onSubmitting: false});
-        if (ok) {
-          this._callShip();
-        } else {
-          this.setState({errorHints: msg});
-        }
-      }));
+      this.setState({errorHints: '错误的订单ID'});
     }
   }
 

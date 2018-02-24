@@ -10,6 +10,7 @@ import {Button, RadioCells, ButtonArea,Toast, Dialog, CellsTitle} from "../../we
 import S from '../../stylekit'
 import Cts from "../../Cts";
 import tool from "../../common/tool";
+import Moment from "moment/moment";
 
 function mapStateToProps(state) {
   return {
@@ -55,8 +56,13 @@ class OrderCallShip extends Component {
     if(this.state.option === Cts.SHIP_AUTO_FN){
       const {order} = (this.props.navigation.state.params || {});
       let {expectTime} = order;
-      let diffMinutes = tool.diffMinutes(expectTime);
-      let diffHours = Math.floor(diffMinutes / 60);
+      const nowMoment = Moment(new Date()).unix();
+      const dSeconds = (Moment(expectTime).unix() - nowMoment);
+      let diffHours = 0;
+      if(dSeconds > 0){
+        diffHours = Math.floor(dSeconds / 3600);
+      }
+
       if(diffHours > 1){
         diffHours = diffHours - 1;
         this.setState({alert_msg: `该订单是预订单, 配送员将在大约 ${diffHours}小时 后前来取单`});
