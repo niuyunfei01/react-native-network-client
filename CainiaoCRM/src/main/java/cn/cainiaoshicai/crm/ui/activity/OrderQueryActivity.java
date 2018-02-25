@@ -44,8 +44,8 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
 
             this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            RadioGroup rg = (RadioGroup) findViewById(R.id.order_q_store_filter);
-            Button queryBtn = (Button) findViewById(R.id.order_query_search);
+            RadioGroup rg = findViewById(R.id.order_q_store_filter);
+            Button queryBtn = findViewById(R.id.order_query_search);
             queryBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -53,7 +53,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 }
             });
 
-            ListView listView = (ListView) findViewById(R.id.order_query_list_view);
+            ListView listView = findViewById(R.id.order_query_list_view);
             adapter = new OrderAdapter(this, data, this.listType.getValue());
             listView.setAdapter(adapter);
 
@@ -73,7 +73,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 }
             });
 
-            swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.order_query_swipe);
+            swipeRefreshLayout = findViewById(R.id.order_query_swipe);
             swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                     android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
