@@ -74,7 +74,7 @@ public class OrderListFragment extends Fragment {
     }
 
     private void init(View v) {
-        ListView listView = (ListView) v.findViewById(R.id.orderListView);
+        ListView listView = v.findViewById(R.id.orderListView);
         if (this.listType == null) {
             AppLogger.e("null list type!");
             return;

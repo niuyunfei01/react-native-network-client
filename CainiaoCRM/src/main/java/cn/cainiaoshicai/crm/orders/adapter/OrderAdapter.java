@@ -1,6 +1,5 @@
 package cn.cainiaoshicai.crm.orders.adapter;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,11 +7,9 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,10 +26,10 @@ import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Worker;
-import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -81,18 +78,18 @@ public class OrderAdapter extends BaseAdapter {
         if (vi == null)
             vi = inflater.inflate(R.layout.order_list_one, null);
 
-        TextView expect_time = (TextView) vi.findViewById(R.id.fb_reported_at);
-        TextView orderAddr = (TextView) vi.findViewById(R.id.fb_content);
-        TextView userName = (TextView) vi.findViewById(R.id.userName);
-        TextView phone = (TextView) vi.findViewById(R.id.phone_text);
-        TextView genderText = (TextView) vi.findViewById(R.id.gender_text);
-        TextView orderMoney = (TextView) vi.findViewById(R.id.total_money);
-        TextView orderTime = (TextView) vi.findViewById(R.id.orderTime);
-        TextView dayNo = (TextView) vi.findViewById(R.id.feedbackId);
+        TextView expect_time = vi.findViewById(R.id.fb_reported_at);
+        TextView orderAddr = vi.findViewById(R.id.fb_content);
+        TextView userName = vi.findViewById(R.id.userName);
+        TextView phone = vi.findViewById(R.id.phone_text);
+        TextView genderText = vi.findViewById(R.id.gender_text);
+        TextView orderMoney = vi.findViewById(R.id.total_money);
+        TextView orderTime = vi.findViewById(R.id.orderTime);
+        TextView dayNo = vi.findViewById(R.id.feedbackId);
         TextView sourcePlatform = vi.findViewById(R.id.source_platform);
         TextView orderTimesTxt = vi.findViewById(R.id.user_order_times);
         TextView paidWayTxt = vi.findViewById(R.id.fb_status);
-        TextView labelExpectTxt = (TextView)vi.findViewById(R.id.fb_from_user);
+        TextView labelExpectTxt = vi.findViewById(R.id.fb_from_user);
 
         TextView ship_schedule = vi.findViewById(R.id.ship_schedule);
         ship_schedule.setVisibility(View.GONE);
@@ -159,7 +156,7 @@ public class OrderAdapter extends BaseAdapter {
             } else {
                 direction = " [ " + order.getDirection() + " ]";
             }
-            orderAddr.setText((isInvalid ? "[已无效]" : "") + order.getAddress() + direction);
+            orderAddr.setText((isInvalid ? "[已无效]" : "") + (listType == ListType.NONE.getValue() ? "["+order.getStore_name()+"]":"") + order.getAddress() + direction);
             userName.setText(order.getUserName());
             phone.setText(order.getMobile());
             phone.setOnClickListener(new View.OnClickListener() {
@@ -199,22 +196,23 @@ public class OrderAdapter extends BaseAdapter {
             });
 
             if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_INVALID) {
-                LinearLayout ll = (LinearLayout) vi.findViewById(R.id.order_status_state);
+                LinearLayout ll = vi.findViewById(R.id.order_status_state);
                 ShipWorkerOnClickListener shipWorkerClicked = new ShipWorkerOnClickListener(order);
 
-                TextView workerText = (TextView) vi.findViewById(R.id.ship_worker_text);
-                View shipTextView = vi.findViewById(R.id.start_ship_text);
+                TextView workerText = vi.findViewById(R.id.ship_worker_text);
+                TextView shipTextView = vi.findViewById(R.id.start_ship_text);
                 if (!TextUtils.isEmpty(order.getShip_worker_name())) {
                     workerText.setText(order.getShip_worker_name());
                     workerText.setOnClickListener(shipWorkerClicked);
                     workerText.setVisibility(View.VISIBLE);
+                    shipTextView.setText(order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP ? "接单": "出发");
                     shipTextView.setVisibility(View.VISIBLE);
                 } else {
                     workerText.setVisibility(View.GONE);
                     shipTextView.setVisibility(View.GONE);
                 }
 
-                TextView packTime = (TextView) vi.findViewById(R.id.start_ship_time);
+                TextView packTime = vi.findViewById(R.id.start_ship_time);
                 if (order.getTime_start_ship() != null) {
                     packTime.setText(DateTimeUtils.hourMin(order.getTime_start_ship()));
                     packTime.setVisibility(View.VISIBLE);
@@ -223,10 +221,10 @@ public class OrderAdapter extends BaseAdapter {
                 }
                 packTime.setOnClickListener(shipWorkerClicked);
 
-                TextView shipTimeText = (TextView) vi.findViewById(R.id.ship_time_text);
-                TextView text_ship_start = (TextView) vi.findViewById(R.id.text_ship_start);
-                TextView text_ship_end = (TextView) vi.findViewById(R.id.text_ship_end);
-                TextView shipTimeCost = (TextView) vi.findViewById(R.id.ship_time_cost);
+                TextView shipTimeText = vi.findViewById(R.id.ship_time_text);
+                TextView text_ship_start = vi.findViewById(R.id.text_ship_start);
+                TextView text_ship_end = vi.findViewById(R.id.text_ship_end);
+                TextView shipTimeCost = vi.findViewById(R.id.ship_time_cost);
 
                 shipTimeCost.setOnClickListener(shipWorkerClicked);
                 text_ship_start.setOnClickListener(shipWorkerClicked);
@@ -253,9 +251,9 @@ public class OrderAdapter extends BaseAdapter {
                 ll.setVisibility(View.VISIBLE);
             }
 
-            TextView inTimeView = (TextView) vi.findViewById(R.id.is_in_time);
-            TextView print_times = (TextView) vi.findViewById(R.id.print_times);
-            TextView readyDelayWarn = (TextView) vi.findViewById(R.id.ready_delay_warn);
+            TextView inTimeView = vi.findViewById(R.id.is_in_time);
+            TextView print_times = vi.findViewById(R.id.print_times);
+            TextView readyDelayWarn = vi.findViewById(R.id.ready_delay_warn);
             if (order.getExpectTime() != null ) {
                 if (order.getTime_arrived() != null) {
                     Cts.DeliverReview reviewDeliver = Cts.DeliverReview.find(order.getReview_deliver());

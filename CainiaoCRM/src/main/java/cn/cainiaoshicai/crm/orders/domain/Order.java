@@ -73,6 +73,7 @@ public class Order implements Serializable {
 
     private boolean remark_warning;
     private String fullStoreName = "";
+    private String store_name = "";
     private String printFooter1 = "";
     private String printFooter2 = "";
     private String printFooter3 = "";
@@ -644,6 +645,14 @@ public class Order implements Serializable {
 
     public void setLine_money_total(String line_money_total) {
         this.line_money_total = line_money_total;
+    }
+
+    public String getStore_name() {
+        return store_name;
+    }
+
+    public void setStore_name(String store_name) {
+        this.store_name = store_name;
     }
 }
 
