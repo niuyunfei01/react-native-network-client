@@ -651,6 +651,8 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
       navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
+    } else if (remindType === Cts.TASK_TYPE_DELIVERY_FAILED) {
+      navigation.navigate(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
 
       this.setState({onSubmitting: true});
@@ -669,7 +671,7 @@ class OrderScene extends Component {
         this.setState(state);
       }));
     } else {
-      this.setState({errorHints: '暂不支持的处理类型：' + remind})
+      this.setState({errorHints: '暂不支持该处理类型'})
     }
   }
 
@@ -1096,8 +1098,13 @@ class OrderScene extends Component {
     zs_status = parseInt(zs_status);
     zs_way = parseInt(zs_way);
     orderStatus = parseInt(orderStatus);
-    if (dada_status === Cts.DADA_STATUS_TO_ACCEPT || dada_status === Cts.DADA_STATUS_TO_FETCH ||
-      dada_status === Cts.DADA_STATUS_SHIPPING || dada_status === Cts.DADA_STATUS_ARRIVED) {//达达|蜂鸟等配送
+    // if (dada_status === Cts.DADA_STATUS_TO_ACCEPT || dada_status === Cts.DADA_STATUS_TO_FETCH ||
+    //   dada_status === Cts.DADA_STATUS_SHIPPING || dada_status === Cts.DADA_STATUS_ARRIVED) {//达达|蜂鸟等配送
+    if (auto_ship_type === Cts.SHIP_AUTO_FN ||
+        auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
+        auto_ship_type === Cts.SHIP_AUTO_BD ||
+        auto_ship_type === Cts.SHIP_AUTO_SX
+      ) {
       let ship_name = tool.disWay()[auto_ship_type];
       let dada_ship_status = tool.disWayStatic(Cts.SHIP_AUTO_NEW_DADA)[dada_status];
 
@@ -1624,19 +1631,21 @@ class OrderReminds extends PureComponent {
           {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
           <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
           {status === Cts.TASK_STATUS_WAITING &&
-          <TouchableOpacity style={{
-            backgroundColor: '#ea7575',
-            height: pxToDp(50),
-            paddingLeft: 5,
-            paddingRight: 5,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 4,
-            marginLeft: pxToDp(40)
-          }}
-                            onPress={() => {
-                              processRemind(remind)
-                            }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#ea7575',
+              height: pxToDp(50),
+              paddingLeft: 5,
+              paddingRight: 5,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 4,
+              marginLeft: pxToDp(40)
+            }}
+            onPress={() => {
+              processRemind(remind)
+            }}
+          >
             <Text style={{color: colors.white,}}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'}</Text>
           </TouchableOpacity>
           }

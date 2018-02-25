@@ -316,13 +316,12 @@ class OrderBottom extends PureComponent {
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     } else {
-      if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
-          dada_status === Cts.DADA_STATUS_NEVER_START ||
-          auto_ship_type === Cts.SHIP_AUTO_FN ||
+      //if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
+      if (auto_ship_type === Cts.SHIP_AUTO_FN ||
           auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
           auto_ship_type === Cts.SHIP_AUTO_BD ||
           auto_ship_type === Cts.SHIP_AUTO_SX
-        )) {
+        ) {
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
             label = "自动:待接单";
@@ -362,7 +361,7 @@ class OrderBottom extends PureComponent {
           zs_status === Cts.ZS_STATUS_ON_WAY ||
           zs_status === Cts.ZS_STATUS_ARRIVED
         )) {
-        label = tool.autoPlat(zs_way, zs_status)
+        label = tool.autoPlat(zs_way, zs_status);
       }
     }
     return label;
