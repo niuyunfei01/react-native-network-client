@@ -99,16 +99,17 @@ class GoodsEditScene extends PureComponent {
       isRefreshing: false,
       isUploadImg: false,
       basic_cat_list: [],
-      basic_categories: {},
+      basic_categories: [],
       store_tags: {},
       sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
       head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
       provided: 1,
       name: '',
       sku_having_unit: '',
-      content: '',
+      tag_info_nur: '',
       promote_name: '',
       list_img: {},
+      cover_img: '',
       upload_files: {},
       price: '',
       basic_category: 0,
@@ -124,7 +125,6 @@ class GoodsEditScene extends PureComponent {
         {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
       sale_status: -1,
       fnProviding: fnProviding,
-      store_product: [],
       vendor_stores: '',
       goBackValue: false,
       task_id: 0,
@@ -137,6 +137,7 @@ class GoodsEditScene extends PureComponent {
     this.back = this.back.bind(this);
     this.toModalData = this.toModalData.bind(this);
     this.dataValidate = this.dataValidate.bind(this);
+
   }
 
   componentWillMount() {
@@ -148,8 +149,7 @@ class GoodsEditScene extends PureComponent {
       //   return {id: img_id, name: img_data.name};
       // });
       let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
-      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img} = product_detail
-
+      const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img, coverimg} = product_detail;
       let upload_files = {};
       if (tool.length(mid_list_img) > 0) {
         for (let img_id in mid_list_img) {
@@ -163,9 +163,10 @@ class GoodsEditScene extends PureComponent {
       this.setState({
         name: name,
         sku_having_unit: sku_having_unit,
-        content: tag_info_nur,
-        promote_name: promote_name,
+        tag_info_nur: tag_info_nur || '',
+        promote_name: promote_name || '',
         list_img: mid_list_img,
+        cover_img: coverimg,
         upload_files: upload_files,
         basic_category: basic_category,
         store_categories: tag_list_id,
@@ -298,7 +299,7 @@ class GoodsEditScene extends PureComponent {
     }
     let {
       id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name,
-      content, upload_files, price, sale_status, provided, task_id
+      tag_info_nur, upload_files, price, sale_status, provided, task_id
     } = this.state;
     let formData = {
       id,
@@ -310,7 +311,7 @@ class GoodsEditScene extends PureComponent {
       basic_category,
       store_categories,
       promote_name,
-      content,
+      tag_info_nur,
       upload_files,
       task_id,
     };
@@ -346,7 +347,7 @@ class GoodsEditScene extends PureComponent {
 
   dataValidate(formData) {
     let type = this.props.navigation.state.params.type;
-    const {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, content, upload_files} = formData;
+    const {id, name, vendor_id, sku_unit, weight, sku_having_unit, basic_category, store_categories, promote_name, tag_info_nur, upload_files} = formData;
     let err_msg = '';
     if (type === 'edit' && id <= 0) {
       err_msg = '数据异常, 无法保存';
@@ -377,9 +378,9 @@ class GoodsEditScene extends PureComponent {
       err_msg = '请勿将基础分类放入列表中隐藏';
     } else if (store_categories.length <= 0) {
       err_msg = '请选择门店分类';
-    } else if (Object.keys(upload_files).length < 1) {
+    }/* else if (Object.keys(upload_files).length < 1) {
       err_msg = '请添加商品图片';
-    }
+    }*/
 
 
     if (err_msg === '') {
@@ -635,7 +636,6 @@ class GoodsEditScene extends PureComponent {
                   </CellHeader>
                   <CellBody>
                     <Text>
-
                       {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
                     </Text>
                   </CellBody>
@@ -680,7 +680,7 @@ class GoodsEditScene extends PureComponent {
                         this.setState({promote_name: text})
                       }}
                   />
-                  <Text>{this.state.promote_name.length}/20</Text>
+                  <Text>{tool.length(this.state.promote_name)}/20</Text>
                 </View>
               </View>
               <View style={[styles.area_cell, {height: pxToDp(250)}]}>
@@ -694,12 +694,12 @@ class GoodsEditScene extends PureComponent {
                       placeholder='请输入商品介绍'
                       placeholderTextColor={"#7A7A7A"}
                       style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
-                      value={this.state.content}
+                      value={this.state.tag_info_nur}
                       onChangeText={(text) => {
-                        this.setState({content: text})
+                        this.setState({tag_info_nur: text})
                       }}
                   />
-                  <Text style={{alignSelf: 'flex-end'}}>{this.state.content.length}/50</Text>
+                  <Text style={{alignSelf: 'flex-end'}}>{tool.length(this.state.tag_info_nur)}/50</Text>
                 </View>
               </View>
             </Cells>
@@ -712,7 +712,8 @@ class GoodsEditScene extends PureComponent {
             paddingHorizontal: pxToDp(20),
             paddingTop: pxToDp(10)
           }]}>
-            {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            {tool.length(this.state.list_img) > 0 ?
+              tool.objectMap(this.state.list_img, (img_data, img_id) => {
               let img_url = img_data['url'];
               let img_name = img_data['name'];
               return (
@@ -740,7 +741,28 @@ class GoodsEditScene extends PureComponent {
                     </TouchableOpacity>
                   </View>
               );
-            })}
+            }) : (this.state.cover_img ? (
+                <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'flex-end'}}>
+                  <Image
+                    style={styles.img_add}
+                    source={{uri: this.state.cover_img}}
+                  />
+                  <TouchableOpacity
+                    style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
+                    onPress={() => {
+                      this.setState({cover_img: ''});
+                    }}
+                  >
+                    <Icon
+                      name={'clear'}
+                      size={pxToDp(40)}
+                      style={{backgroundColor: '#fff'}}
+                      color={'#d81e06'}
+                      msg={false}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : null)}
             <View style={{
               height: pxToDp(170),
               width: pxToDp(170),

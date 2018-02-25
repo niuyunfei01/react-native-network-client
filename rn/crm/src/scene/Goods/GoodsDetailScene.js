@@ -1,13 +1,13 @@
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, InteractionManager} from 'react-native';
-import {Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Input, Label, Icon, Toast,} from "../../weui/index";
+import {Button, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Input, Label, Icon, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
-import {fetchProductDetail, fetchVendorProduct, fetchVendorTags} from "../../reducers/product/productActions";
+import {fetchProductDetail, fetchVendorProduct, fetchVendorTags, UpdateWMGoods} from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
@@ -15,9 +15,7 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from 'react-navigation';
-
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -30,6 +28,7 @@ function mapDispatchToProps(dispatch) {
       fetchProductDetail,
       fetchVendorProduct,
       fetchVendorTags,
+      UpdateWMGoods,
       ...globalActions
     }, dispatch)
   }
@@ -38,9 +37,10 @@ function mapDispatchToProps(dispatch) {
 class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
+    console.log('navigation',navigation)
     const {params = {}} = navigation.state;
-    console.log('params===',params);
-    let {backPage,store_product, product_detail} = params;
+    let {backPage, product_detail} = params;
+
     return {
       headerLeft: (
         <NavigationItem
@@ -52,26 +52,21 @@ class GoodsDetailScene extends PureComponent {
               console.log("backPage------------", backPage);
               native.nativeBack();
             }else {
-
+              navigation.goBack()
             }
           }}
         />),
       headerTitle: '商品详情',
-      headerRight: ( <View style={{flexDirection: 'row'}}>
+      headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => {
-            if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
               InteractionManager.runAfterInteractions(() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'edit',
-                  store_product,
                   product_detail,
                   detail_key:navigation.state.key
                 });
               });
-            } else {
-              ToastLong('请等待商品加载完成...')
-            }
           }}
         >
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
@@ -82,19 +77,26 @@ class GoodsDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {fnProviding} = tool.vendor(this.props.global);
+    let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
+      isLoading: false,
+      isSyncGoods: false,
       full_screen: false,
       product_detail: {},
       store_product: {},
-      fnProviding:fnProviding,
+      fnProviding: fnProviding,
+      is_service_mgr: is_service_mgr,
+      is_helper: is_helper,
+      sync_goods_info: false,
+      include_img: false,
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
     this.getVendorTags = this.getVendorTags.bind(this);
+    this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
   }
 
   componentWillMount() {
@@ -102,13 +104,14 @@ class GoodsDetailScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
-    if (product_detail[productId] === undefined) {
+    /*if (product_detail[productId] === undefined) {
       this.getProductDetail();
     } else {
       this.setState({
         product_detail: product_detail[productId],
       });
-    }
+    }*/
+    this.getProductDetail();
     this.getVendorProduct();
 
     if(store_tags[currVendorId] === undefined || basic_category[currVendorId] === undefined){
@@ -150,31 +153,24 @@ class GoodsDetailScene extends PureComponent {
     }
   }
 
-  setNavParams() {
-    let {product_detail, store_product} = this.state;
-    if(tool.length(product_detail) > 0 && tool.length(store_product) > 0){
-      let params = {
-        store_product: store_product,
-        product_detail: product_detail,
-      };
-      this.props.navigation.setParams(params);
-    }
-  }
-
   getProductDetail() {
     let product_id = this.productId;
+    console.log('product_id ---------------------> ', product_id);
     if (product_id > 0) {
+      let {currVendorId} = tool.vendor(this.props.global);
       const {accessToken} = this.props.global;
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
-        dispatch(fetchProductDetail(product_id, accessToken, (resp) => {
+        dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
           if (resp.ok) {
             let product_detail = resp.obj;
+            //console.log('product_detail -------->', product_detail);
             _this.setState({
               product_detail: product_detail,
               isRefreshing: false,
             });
+            _this.props.navigation.setParams({product_detail});
           } else {
             _this.setState({isRefreshing: false});
           }
@@ -184,7 +180,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   getVendorProduct() {
-    this.setState({isRefreshing: false});
+    this.setState({isLoading: true});
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
 
@@ -193,18 +189,16 @@ class GoodsDetailScene extends PureComponent {
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
-        dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-          // console.log('getVendorProduct -> ', resp.obj['1']);
+        dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async(resp) => {
           if (resp.ok) {
             let store_product = resp.obj;
-            _this.setState({
+          await _this.setState({
               store_product: store_product,
-              isRefreshing: false,
+              isLoading: false,
             });
           } else {
-            _this.setState({isRefreshing: false});
+            _this.setState({isLoading: false});
           }
-          _this.setNavParams();
 
         }));
       });
@@ -213,14 +207,41 @@ class GoodsDetailScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
+    let {currVendorId} = tool.vendor(this.props.global);
+    this.getVendorTags(currVendorId);
     this.getProductDetail();
     this.getVendorProduct();
   }
-  headerSupply(mode) {
+
+  headerSupply = (mode) => {
     let map = {};
     map[Cts.STORE_SELF_PROVIDED] = '否';
     map[Cts.STORE_COMMON_PROVIDED] = '是';
     return map[mode]
+  };
+
+  IncludeImg(include_img){
+    this.setState({include_img: !include_img});
+  }
+
+  onSyncWMGoods(){
+    this.setState({isSyncGoods: true});
+    let {include_img} = this.state;
+    let product_id = this.productId;
+
+    console.log('onSyncWMGoods -> ', product_id, include_img);
+    if (product_id > 0) {
+      const {accessToken} = this.props.global;
+      let _this = this;
+      const {dispatch} = this.props;
+      InteractionManager.runAfterInteractions(() => {
+        dispatch(UpdateWMGoods(product_id, include_img, accessToken, async(resp) => {
+          console.log('UpdateWMGoods -> ', resp);
+          ToastLong(resp.desc);
+          _this.setState({isSyncGoods: false});
+        }));
+      });
+    }
   }
 
   render() {
@@ -250,8 +271,9 @@ class GoodsDetailScene extends PureComponent {
           <View style={[styles.goods_view]}>
             <Text style={styles.goods_name}>
               {product_detail.name}
+              <Text style={styles.goods_id}> (#{product_detail.id})</Text>
             </Text>
-            {product_detail.tag_list.split(',').map(function(cat_name, idx) {
+            {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function(cat_name, idx) {
               return (
                 <Text key={idx} style={styles.goods_cats}>
                   {cat_name}
@@ -320,14 +342,90 @@ class GoodsDetailScene extends PureComponent {
           </View>) }
 
         {this.renderALlStore()}
+
+        {this.renderSyncGoods()}
       </ScrollView>
     );
   }
 
+  renderSyncGoods = () => {
+    let {isLoading, include_img, sync_goods_info, isSyncGoods, is_service_mgr, is_helper} = this.state;
+    if((!is_service_mgr && !is_helper) || isLoading){
+      return null;
+    }
+
+    return (
+      <View>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          padding: pxToDp(10),
+          backgroundColor: '#fff',
+          borderRadius: 4,
+          borderWidth: pxToDp(1),
+          borderColor: '#ddd',
+          height: pxToDp(90),
+        }}>
+          <Button
+            style={{height: pxToDp(70), flex: 1, alignItems: 'center', justifyContent: 'center'}}
+            type='primary'
+            onPress={() => {
+              this.setState({sync_goods_info: true});
+            }}
+          >同步商品信息至外卖平台</Button>
+        </View>
+        <Dialog
+          onRequestClose={() => {}}
+          visible={sync_goods_info}
+          title='商品信息同步'
+          buttons={[{
+            type: 'default',
+            label: '取消',
+            onPress: () => {
+              this.setState({sync_goods_info: false, include_img: false})
+            }
+          }, {
+            type: 'default',
+            label: '确定',
+            onPress: async () => {
+              this.onSyncWMGoods();
+              this.setState({sync_goods_info: false, include_img: false});
+            }
+          }]}
+        >
+          <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>
+            该操作会将该商品的 商品名称,广告词,
+            <Text style={{color: colors.default_theme}}>
+              ({!include_img && '不'}包含商品图片)
+            </Text>
+            同步至外卖平台
+          </Text>
+          <Cell
+            style={{borderColor: '#666', borderRadius: 10, borderWidth: pxToDp(1), marginTop: pxToDp(15)}}
+            onPress={() => this.IncludeImg(include_img)}
+            customStyle={{height: pxToDp(70), justifyContent: 'center', borderTopWidth: 0}}>
+            <CellBody>
+              <Text style={{fontSize: pxToDp(28)}}>是否同步商品图片</Text>
+            </CellBody>
+            <CellFooter>
+              <Icon name={include_img ? "success_circle" : "cancel"} style={{fontSize: 22}}/>
+            </CellFooter>
+          </Cell>
+        </Dialog>
+
+        <Toast
+          icon="loading"
+          show={isSyncGoods}
+          onRequestClose={() => {}}
+        >同步中</Toast>
+      </View>
+    );
+  };
+
   renderALlStore = () => {
-    let {store_product ,product_detail, isRefreshing} = this.state;
+    let {store_product ,product_detail, isLoading} = this.state;
     let {navigation} = this.props;
-    if (isRefreshing) {
+    if (isLoading) {
       return <LoadingView/>;
     }
 
@@ -387,7 +485,6 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderStoreProduct = (store_product) => {
-    console.log('store_product',store_product);
     let is_dark_bg = false;
     let _this = this;
 
@@ -526,9 +623,13 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(32),
     color: '#3e3e3e',
   },
+  goods_id: {
+    color: '#999',
+    fontSize: pxToDp(24),
+  },
   goods_cats: {
     marginLeft: pxToDp(20),
-    height: pxToDp(32),
+    height: pxToDp(35),
     borderRadius: 8,
     textAlign: 'center',
     textAlignVertical: 'center',
@@ -569,8 +670,6 @@ const styles = StyleSheet.create({
     width: pxToDp(126),
     fontSize: pxToDp(30),
     color: '#3e3e3e',
-    // borderRightWidth: pxToDp(1),
-    // borderColor: colors.color666,
   },
   cell_body: {
     textAlign: 'right',

@@ -40,17 +40,15 @@ function mapDispatchToProps(dispatch) {
 class GoodsRelatedScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '商品管理',
+      headerTitle: '商品关联',
     }
   };
 
   constructor(props) {
     super(props);
-    let {product_detail} = this.props.navigation.state.params;
-    console.log(this.props.navigation.state.params);
     this.state = {
       loading: false,
-      product_detail: '',
+      product_detail: {},
       msg: '加载中',
       isRefreshing:false,
       storesList:[]
@@ -60,18 +58,21 @@ class GoodsRelatedScene extends PureComponent {
 
   componentWillMount() {
     let {productId, product_detail} = this.props.navigation.state.params || {};
-    if (productId < 0 || product_detail) {
+    if (!(productId < 0 || product_detail)) {
       this.getProductDetail(productId)
+    } else {
+      this.setState({product_detail: product_detail})
     }
     this.getStoresList()
   }
   getProductDetail(productId) {
     const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     const {dispatch} = this.props;
     this.setState({loading: true, msg: '加载中'});
     InteractionManager.runAfterInteractions(() => {
-      dispatch(fetchProductDetail(productId, accessToken, (resp) => {
+      dispatch(fetchProductDetail(productId,currVendorId, accessToken, (resp) => {
         _this.setState({loading: false});
         if (resp.ok) {
           let product_detail = resp.obj;
@@ -79,7 +80,7 @@ class GoodsRelatedScene extends PureComponent {
             product_detail: product_detail,
           });
         } else {
-          ToastLong(resp.desc)
+          ToastLong(''+resp.desc)
         }
 
       }));

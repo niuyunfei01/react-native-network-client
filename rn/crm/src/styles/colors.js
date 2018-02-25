@@ -18,5 +18,7 @@ export default {
   new_back: '#dcdcdc',
   fontColor: '#b2b2b2',
   fontGray: '#bfbfbf',
-  fontBlack: '#000000',
+  fontBlack: '#3e3e3e',
+  fontBlue:'#00a2ff',
+  yellow:'#fff45c',
 };

@@ -21,6 +21,8 @@ export default StyleSheet.create({
     height: pxToDp(70),
     borderRadius: 6,
     backgroundColor: colors.main_color,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   stepText: {
     textAlign: 'center',

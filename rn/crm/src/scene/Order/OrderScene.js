@@ -36,7 +36,7 @@ import {
   orderChangeLog,
   clearLocalOrder,
   addTipMoney,
-
+  orderCancelZsDelivery, orderCallShip,
 } from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
@@ -79,6 +79,7 @@ function mapDispatchToProps(dispatch) {
       orderWayRecord,
       clearLocalOrder,
       addTipMoney,
+      orderCancelZsDelivery,
     }, dispatch)
   }
 }
@@ -88,12 +89,6 @@ const _editNum = function (edited, item) {
 };
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
-const supportEditGoods = (orderStatus) => {
-  orderStatus = parseInt(orderStatus);
-  return orderStatus === Cts.ORDER_STATUS_TO_SHIP ||
-    orderStatus === Cts.ORDER_STATUS_TO_READY ||
-    orderStatus === Cts.ORDER_STATUS_SHIPPING
-};
 
 const shouldShowItems = (orderStatus) => {
   orderStatus = parseInt(orderStatus);
@@ -158,8 +153,10 @@ class OrderScene extends Component {
       orderReloading: false,
 
       errorHints: '',
+      cancel_zs_hint: false,
 
       doingUpdate: false,
+      shipCallHided: true,
 
       //good items editing/display
       isEditing: false,
@@ -211,6 +208,7 @@ class OrderScene extends Component {
     this._fnProvidingOnway = this._fnProvidingOnway.bind(this);
     this._onToProvide = this._onToProvide.bind(this);
     this._callShip = this._callShip.bind(this);
+    this.cancelZsDelivery = this.cancelZsDelivery.bind(this);
   }
 
   componentDidMount() {
@@ -231,13 +229,11 @@ class OrderScene extends Component {
     //
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const {dispatch, global} = this.props;
-    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId);
+    this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
+
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
-
-    console.log('__getDataIfRequired', orderId);
-
     if (!orderId) {
       return;
     }
@@ -247,7 +243,7 @@ class OrderScene extends Component {
 
     if (!o || !o.id || o.id !== orderId) {
 
-      console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
+      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -260,15 +256,18 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
-            console.log('__getDataIfRequired refresh, isFetching');
+            //console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
-              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, data) => {
+              dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, desc, data) => {
+                console.log('getRemindForOrderPage -> ', ok, desc);
                 if (ok) {
                   this.setState({reminds: data, remindFetching: false})
+                  this._orderChangeLogQuery();
+                  this.wayRecordQuery();
                 } else {
-                  this.setState({errorHints: '获取提醒列表失败', remindFetching: false})
+                  this.setState({errorHints: desc, remindFetching: false})
                 }
               }));
             }
@@ -704,19 +703,14 @@ class OrderScene extends Component {
   wayRecordQuery() {
     const { dispatch, global ,navigation} = this.props;
     let {orderId} = navigation.state.params;
-    console.log('>>>>>>>>>>>>>>>wayRecordQuery',orderId)
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
-
         mg = contacts
-
       } else {
         Alert.alert(msg)
       }
       this.setState({ orderWayLogs: mg,wayLoadingShow:false})
-      console.log(this.state.orderWayLogs)
-
     }));
   }
 
@@ -761,7 +755,7 @@ class OrderScene extends Component {
       if (typeof orderWayLogs == 'object' && (tool.length(orderWayLogs) > 0)) {
         return tool.objectMap(this.state.orderWayLogs, (item, index) => {
           return (
-            <View key={index} style={{ flex: 1, backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30), flexDirection: 'row', paddingTop: pxToDp(20), width: '100%' }}>
+            <View key={index} style={{ flex: 1,flexDirection:"row", backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30),paddingTop: pxToDp(20), width: '100%' }}>
               <View style={{ width: pxToDp(124) }}>
                 <View style={wayRecord.expressName}>
                   <Text style={{ fontSize: pxToDp(24), textAlign: 'center', color: '#58B169' }}>{tool.disWay()[index]}</Text>
@@ -805,7 +799,6 @@ class OrderScene extends Component {
   _orderChangeLogQuery() {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = navigation.state.params;
-    console.log('>>>>>>>>>>>>>>>_orderChangeLogQuery', orderId)
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
@@ -818,21 +811,23 @@ class OrderScene extends Component {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
-          <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff'}}>
-            <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",height:pxToDp(150),justifyContent:'center'}}>
+          <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff',minHeight:pxToDp(180)}}>
+            <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",minHeight:pxToDp(150),justifyContent:'center'}}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35) }}>{item.updated_name}</Text>
                 <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35), marginLeft: pxToDp(24) }}>{item.modified}</Text>
               </View>
-              <View style={{ marginTop: pxToDp(20),width:'100%' }}>
-                <Text style={{ fontSize: pxToDp(24) }}>{item.what}</Text>
+              <View style={{ marginTop: pxToDp(20),width:'100%' ,height:'auto',marginBottom:pxToDp(20)}}>
+                <Text style={{ fontSize: pxToDp(24),height:'auto',lineHeight:pxToDp(28)}}>{item.what}</Text>
               </View>
             </View>
           </View>
         )
       })
     } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
-      return <LoadingView />
+      return <View style={{ height: pxToDp(50), backgroundColor: "#fff", paddingLeft: pxToDp(30), flexDirection: 'row', alignItems: 'center' }}>
+        <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
+      </View>
     }
   }
   upAddTip(){
@@ -855,6 +850,13 @@ class OrderScene extends Component {
       this.setState({addMoneyNum:''});
       ToastLong('加小费的金额必须大于0')
     }
+  }
+  total_goods_num(items){
+    let num=0
+    items.forEach((item)=>{
+      num += parseInt(item.num);
+    })
+    return num
   }
   render() {
     const order = this.props.order.order;
@@ -989,7 +991,7 @@ class OrderScene extends Component {
           >
             <View>
               <Text style={{color: '#000'}}>
-                1.达达加小费金额以
+                1.达达或美团快送加小费金额以
                 <Text style={{color: "red"}}>最新一次为准</Text>
                 ,新一次金额必须大于上次加小费的金额.
               </Text>
@@ -1002,7 +1004,7 @@ class OrderScene extends Component {
             show={this.state.onSubmitting}
             onRequestClose={() => {
             }}
-          >提交中</Toast>
+          >处理中</Toast>
 
           <Toast
             icon="loading"
@@ -1033,8 +1035,274 @@ class OrderScene extends Component {
               });
             }}
           />
+
+          <Dialog
+            onRequestClose={() => {
+            }}
+            visible={this.state.cancel_zs_hint}
+            title={'转配自送'}
+            buttons={[{
+              type: 'default',
+              label: '取消',
+              onPress: () => {
+                this.setState({cancel_zs_hint: false});
+              }
+            }, {
+              type: 'default',
+              label: '确定',
+              onPress: async () => {
+                await this.setState({cancel_zs_hint: false, onSubmitting: true});
+                this.cancelZsDelivery();
+              }
+            }]}
+          >
+            <Text style={{color: 'red'}}>专送订单转自送需先取消 专送配送 才可发 自配送, 确认取消专送配送吗?</Text>
+          </Dialog>
         </View>
       );
+  }
+
+  cancelZsDelivery(){
+    const {dispatch, global, order} = this.props;
+    let {zs_status, id} = order.order;
+    zs_status = parseInt(zs_status);
+    let wm_id = id;
+    console.log('wm_id -> ', wm_id);
+    if (wm_id > 0) {
+      if (zs_status === Cts.ZS_STATUS_CANCEL || zs_status === Cts.ZS_STATUS_ABNORMAL) {
+        this._callShip();
+      } else {
+        dispatch(orderCancelZsDelivery(global.accessToken, wm_id, (ok, msg) => {
+          this.setState({onSubmitting: false});
+          if (ok) {
+            this._callShip();
+          } else {
+            this.setState({errorHints: msg});
+          }
+        }));
+      }
+    } else {
+      this.setState({errorHints: '错误的订单ID'});
+    }
+  }
+
+  renderShipStatus(){
+    let {shipCallHided} = this.state;
+    let {ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
+      auto_ship_type, dada_status, dada_distance, dada_fee, dada_tips, dada_mobile = '', dada_dm_name} = this.props.order.order;
+    let {zs_way, ship_site_mobile = '', ship_site_tel = ''} = ext_store;
+    auto_ship_type = parseInt(auto_ship_type);
+    dada_status = parseInt(dada_status);
+    zs_status = parseInt(zs_status);
+    zs_way = parseInt(zs_way);
+    orderStatus = parseInt(orderStatus);
+    if (dada_status === Cts.DADA_STATUS_TO_ACCEPT || dada_status === Cts.DADA_STATUS_TO_FETCH ||
+      dada_status === Cts.DADA_STATUS_SHIPPING || dada_status === Cts.DADA_STATUS_ARRIVED) {//达达|蜂鸟等配送
+      let ship_name = tool.disWay()[auto_ship_type];
+      let dada_ship_status = tool.disWayStatic(Cts.SHIP_AUTO_NEW_DADA)[dada_status];
+
+      return (
+        <View>
+          <View style={ship_style.ship_box}>
+            <View style={ship_style.ship_info}>
+              <Text style={ship_style.ship_info_text}>
+                {dada_status === Cts.DADA_STATUS_TO_ACCEPT ?
+                  ship_name + ' - ' + dada_ship_status :
+                  (dada_status === Cts.DADA_STATUS_TO_FETCH ||
+                    dada_status === Cts.DADA_STATUS_SHIPPING ||
+                    dada_status === Cts.DADA_STATUS_ARRIVED) &&
+                  (tool.length(dada_mobile) > 0 ?
+                      `骑手 ${dada_dm_name} ${dada_ship_status}` : ship_name + dada_ship_status
+                  )}
+              </Text>
+              {tool.length(dada_mobile) > 0 &&
+              <Text style={ship_style.ship_diff_time}>
+                {ship_name}({dada_mobile})
+              </Text>}
+            </View>
+            {dada_status === Cts.DADA_STATUS_TO_ACCEPT && (
+              <View style={ship_style.ship_btn_view}>
+                {auto_ship_type === Cts.SHIP_AUTO_NEW_DADA && <ClickBtn
+                  btn_text={'加小费'}
+                  onPress={() => {
+                    this.setState({addTipDialog: true})
+                  }}
+                />}
+                {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                  <ClickBtn
+                    type={'full'}
+                    btn_text={'催单'}
+                    style={{marginLeft: pxToDp(30)}}
+                    onPress={() => {
+                      this.setState({shipCallHided: !shipCallHided});
+                    }}
+                  />
+                )}
+              </View>
+            )}
+            {(dada_status === Cts.DADA_STATUS_TO_FETCH ||
+              dada_status === Cts.DADA_STATUS_SHIPPING ||
+              dada_status === Cts.DADA_STATUS_ARRIVED) && dada_mobile &&
+            (<View style={ship_style.ship_btn_view}>
+              {!(zs_way > 0) && (ship_site_mobile !== '' || ship_site_tel !== '') && (
+                <ImageBtn
+                  source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                  onPress={() => {
+                    this.setState({shipCallHided: !shipCallHided});
+                  }}
+                  imageStyle={styles.pullImg}
+                />
+              )}
+              <ClickBtn
+                type={'full'}
+                btn_text={'呼叫'}
+                onPress={() => {
+                  native.dialNumber(dada_mobile)
+                }}
+              />
+            </View>)}
+          </View>
+          {!shipCallHided && ship_site_mobile !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点/客服 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {native.dialNumber(ship_site_mobile)}}
+                />
+              </View>
+            </View>
+          )}
+          {!shipCallHided && ship_site_tel !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点备用电话 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {native.dialNumber(ship_site_tel)}}
+                />
+              </View>
+            </View>
+          )}
+        </View>
+      );
+
+    } else if (zs_way === Cts.SHIP_ZS_JD ||
+      zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
+      zs_way === Cts.SHIP_ZS_ELE ||zs_way === Cts.SHIP_ZS_BD) {//专送配送
+      let zs_ship = tool.autoPlat(zs_way, zs_status);
+      let zs_ship_status = tool.zs_status(zs_status);
+      let zs_name = tool.ship_name(zs_way);
+
+      return (
+        <View>
+          <View style={ship_style.ship_box}>
+            <View style={ship_style.ship_info}>
+              <Text style={ship_style.ship_info_text}>
+                {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+                  zs_status === Cts.ZS_STATUS_CANCEL ||
+                  zs_status === Cts.ZS_STATUS_ABNORMAL) &&
+                tool.length(jd_ship_worker_mobile) > 0 ?
+                  `骑手 ${jd_ship_worker_name} ${zs_ship_status}` : zs_ship
+                }
+              </Text>
+              <Text style={ship_style.ship_diff_time}>
+                {zs_status === Cts.ZS_STATUS_TO_ACCEPT ? '已等待: '+tool.diffDesc(orderTime) : zs_name}
+                {tool.length(jd_ship_worker_mobile) > 0 &&
+                <Text style={ship_style.ship_diff_time}>
+                  ({jd_ship_worker_mobile})
+                </Text>}
+              </Text>
+            </View>
+            {zs_status === Cts.ZS_STATUS_TO_ACCEPT && <View style={ship_style.ship_btn_view}>
+              {zs_way === Cts.SHIP_KS_MT && <ClickBtn
+                btn_text={'加小费'}
+                onPress={() => {
+                  this.setState({addTipDialog: true})
+                }}
+              />}
+              <ClickBtn
+                type={'full'}
+                btn_text={'转自配送'}
+                style={{marginLeft: pxToDp(30)}}
+                onPress={() => {
+                  this.setState({cancel_zs_hint: true});
+                }}
+              />
+              {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                <ClickBtn
+                  type={'full'}
+                  btn_text={'催单'}
+                  style={{marginLeft: pxToDp(30)}}
+                  onPress={() => {
+                    this.setState({shipCallHided: !shipCallHided});
+                  }}
+                />
+              )}
+            </View>}
+            {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
+              zs_status === Cts.ZS_STATUS_ON_WAY ||
+              zs_status === Cts.ZS_STATUS_ARRIVED) && jd_ship_worker_mobile &&
+            (<View style={ship_style.ship_btn_view}>
+              {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                <ImageBtn
+                  source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                  onPress={() => {
+                    this.setState({shipCallHided: !shipCallHided});
+                  }}
+                  imageStyle={styles.pullImg}
+                />
+              )}
+              <ClickBtn
+                type={'full'}
+                btn_text={'呼叫'}
+                onPress={() => {native.dialNumber(jd_ship_worker_mobile)}}
+              />
+            </View>)}
+          </View>
+          {!shipCallHided && ship_site_mobile !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点/客服 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {native.dialNumber(ship_site_mobile)}}
+                />
+              </View>
+            </View>
+          )}
+          {!shipCallHided && ship_site_tel !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点备用电话 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {native.dialNumber(ship_site_tel)}}
+                />
+              </View>
+            </View>
+          )}
+        </View>
+      );
+    } else {
+      return null;
+    }
   }
 
   renderHeader() {
@@ -1046,8 +1314,7 @@ class OrderScene extends Component {
     const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
     const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit) / 100;
 
-    console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
-
+    //console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
     const task_types = this.props.global.config.task_types || {};
@@ -1110,6 +1377,7 @@ class OrderScene extends Component {
         </View>
 
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
+        {this.renderShipStatus()}
 
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
@@ -1128,19 +1396,23 @@ class OrderScene extends Component {
                 color: colors.color999,
                 fontSize: pxToDp(24),
                 marginLeft: pxToDp(20)
-              }}>{_items.length}种商品</Text>
+              }}>{
+                this.total_goods_num(_items)
+              }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
 
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
-              <ImageBtn source={require('../../img/Order/good/queren_.png')}
-                        imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
-              <ImageBtn source={require('../../img/Order/good/quxiao_.png')}
-                        imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
+              <ImageBtn
+                source={require('../../img/Order/good/queren_.png')}
+                imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
+              <ImageBtn
+                source={require('../../img/Order/good/quxiao_.png')}
+                imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
 
             {!this.state.isEditing && (
-              supportEditGoods(order.orderStatus) ?
+              order._op_edit_goods ?
                 <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={() => {
                   this.setState({isEditing: true, itemsHided: false})
                 }}/>
@@ -1148,24 +1420,24 @@ class OrderScene extends Component {
             }
 
             {!this.state.isEditing && (this.state.itemsHided ?
-              <ImageBtn source={require('../../img/Order/pull_down.png')} onPress={
+              <ImageBtn source={require('../../img/Order/pull_up.png')} onPress={
                 () => {
                   this.setState({itemsHided: false});
-                  console.log("after click pull_down", this.state)
+                  console.log("after click pull_up", this.state)
                 }
               } imageStyle={styles.pullImg}/>
-              : <ImageBtn source={require('../../img/Order/pull_up.png')} imageStyle={styles.pullImg} onPress={() => {
+              : <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={styles.pullImg} onPress={() => {
                 this.setState({itemsHided: true});
-                console.log("after click pull_up", this.state)
+                console.log("after click pull_down", this.state)
               }}/>)
             }
           </View>
           {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
             return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx}
-                             isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+              nav = {this.props.navigation} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
-            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} isEditing={this.state.isEditing}
+            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} nav = {this.props.navigation} isEditing={this.state.isEditing}
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
@@ -1253,24 +1525,37 @@ class OrderScene extends Component {
             height: pxToDp(65),
             marginRight: 0,
           }]}>
-            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold' }}>运单记录</Text>
-            <View style={{ flex: 1 }} />
-            <ImageBtn source={
-              this.state.shipHided ? require('../../img/Order/pull_down.png') : require('../../img/Order/pull_up.png')
-            } imageStyle={styles.pullImg}
+            <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
+            {order.dada_fee > 0 && (
+              <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(15)}}>
+                配送费: {order.dada_fee}元
+              </Text>
+            )}
+            {order.dada_tips > 0 && (
+              <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(20)}}>
+                小费: {order.dada_tips}元
+              </Text>
+            )}
+            <View style={{flex: 1}}/>
+            <ImageBtn
+              source={
+                this.state.shipHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
+              } imageStyle={styles.pullImg}
               onPress={() => {
                 this._getWayRecord()
-              }
-              } />
+              }}
+            />
           </View>
         </View>
-          <View style = {{flexDirection:'row',backgroundColor:'#fff',borderTopWidth:pxToDp(1),borderTopColor:"#D3D3D3"}}>
+          <View style = {{backgroundColor:'#fff',borderTopWidth:pxToDp(1),borderTopColor:"#D3D3D3",position:'relative'}}>
             {
               this.renderWayRecord()
             }
-            {
-              this.renderAddTip()
-            }
+           <View style = {{position:'absolute',right:pxToDp(0),top:pxToDp(0)}}>
+             {
+               this.renderAddTip()
+             }
+           </View>
           </View>
       </View>
 
@@ -1282,11 +1567,10 @@ class OrderScene extends Component {
             height: pxToDp(65),
             marginRight: 0,
           }]}>
-            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold' }}>修改记录</Text>
-
+            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold',marginBottom:pxToDp(1)}}>修改记录</Text>
             <View style={{ flex: 1 }} />
             <ImageBtn source={
-              this.state.changeHide ? require('../../img/Order/pull_down.png') : require('../../img/Order/pull_up.png')
+              this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
             }
               imageStyle={styles.pullImg} onPress={() => {
                 this._orderChangeLog()
@@ -1295,13 +1579,12 @@ class OrderScene extends Component {
 
           </View>
         </View>
-        {
-          this.renderChangeLogs()
-        }
+        <View style = {{marginTop:pxToDp(1)}}>
+          {
+            this.renderChangeLogs()
+          }
+        </View>
       </View>
-
-
-
 
     </View>
     )
@@ -1382,7 +1665,7 @@ class ItemRow extends PureComponent {
   render() {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
-      }, isEditing = false
+      }, isEditing = false,nav
     } = this.props;
 
     const editNum = _editNum(edited, item);
@@ -1395,19 +1678,29 @@ class ItemRow extends PureComponent {
       paddingTop: pxToDp(14),
       paddingBottom: pxToDp(14),
       borderBottomColor: colors.color999,
-      borderBottomWidth: screen.onePixel
+      borderBottomWidth: screen.onePixel,
     }]}>
       <View style={{flex: 1,flexDirection:'row',alignItems:'center'}}>
-        <Image
-            style={styles.product_img}
-            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
-        />
+        <TouchableOpacity
+            onPress = {()=>{
+              let {product_id} = item
+              nav.navigate(Config.ROUTE_GOODS_DETAIL,{productId:product_id})
+            }}
+        >
+          <Image
+              style={styles.product_img}
+              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+          />
+        </TouchableOpacity>
         <View>
           <Text style={{
             fontSize: pxToDp(26),
             color: colors.color333,
-            marginBottom: pxToDp(14)
-          }}>{item.name}</Text>
+            marginBottom: pxToDp(14),
+          }}>
+            {item.name}
+            <Text style={{fontSize: pxToDp(22),color: colors.fontGray}}>(#{item.product_id})</Text>
+          </Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
             {!isAdd &&
@@ -1417,30 +1710,27 @@ class ItemRow extends PureComponent {
         </View>
 
       </View>
-      {showEditAdded && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>已加{editNum}件</Text>
+      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
-      </View>
-      }
-      {isEditing && !isAdd && edited && edited.num < item.num && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>已减{-editNum}件</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end'}}>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
-      </View>
-      }
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
+      </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>加货{item.num}</Text>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
       </View>}
 
       {isPromotion &&
       <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
+      <Text style={item.num>1?{alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'}:{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
       <View style={[{marginLeft: 10}]}>
@@ -1466,6 +1756,7 @@ ItemRow.PropTypes = {
   isAdd: PropTypes.bool,
   edits: PropTypes.object,
   onInputNumberChange: PropTypes.func,
+  nav:PropTypes.object
 };
 
 class Remark extends PureComponent {
@@ -1496,6 +1787,65 @@ class ImageBtn extends PureComponent {
   }
 }
 
+class ClickBtn extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    let {style, type, onPress, btn_text, mobile} = this.props;
+    return (
+      <TouchableOpacity
+        onPress={() => onPress()}
+        style={[{
+          width: pxToDp(115),
+          height: pxToDp(56),
+          borderColor: '#59b26a',
+          borderWidth: pxToDp(1),
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: 4,
+          backgroundColor: type === 'full' ? '#59b26a' : '#fff',
+        }, style]}
+      >
+        <Text style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToDp(24)}}>{btn_text}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
+
+const ship_style = StyleSheet.create({
+  ship_box: {
+    height: pxToDp(120),
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: '#D3D3D3',
+  },
+  ship_info: {
+    marginLeft: pxToDp(30),
+    justifyContent: 'center'
+  },
+  ship_info_text: {
+    color: '#3e3e3e',
+    fontSize: pxToDp(32)
+  },
+  ship_tel_text: {
+    color: '#bfbfbf',
+    fontSize: pxToDp(24)
+  },
+  ship_diff_time: {
+    color: '#bfbfbf',
+    fontSize: pxToDp(24),
+    marginTop: pxToDp(5)
+  },
+  ship_btn_view: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flex: 1,
+    marginRight: pxToDp(30),
+  }
+});
 
 const top_styles = StyleSheet.create({
   icon_dropDown: {

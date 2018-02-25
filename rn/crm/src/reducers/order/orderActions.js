@@ -96,7 +96,7 @@ export function clearLocalOrder(id) {
 }
 
 /**
- * 
+ *
  * @param sessionToken
  * @param orderId
  * @param callback (ok, msg|order) => {}
@@ -142,7 +142,7 @@ export function orderSetReady(token, id, workerIdList, callback) {
 }
 
 /**
- * 
+ *
  * @param token
  * @param id
  * @param oldWorkerId
@@ -185,6 +185,11 @@ export function orderCallShip(token, id, way, callback) {
   return getReqThenInvalidate(url, id, callback);
 }
 
+export function orderCancelZsDelivery(token, id, callback) {
+  const url = `api/cancel_zs_delivery/${id}.json?access_token=${token}`;
+  return getReqThenInvalidate(url, id, callback);
+}
+
 export function orderAddTodo(token, id, taskType, remark, callback) {
   const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
   return getWithTpl2(url, (json) => {
@@ -209,12 +214,9 @@ export function orderUrgingReplyReasons(token, id, task_id, callback) {
 export function getRemindForOrderPage(token, orderId, callback) {
   return getWithTpl2(`api/list_notice_of_order/${orderId}?access_token=${token}`,
     (json) => {
-      if (json.ok) {
-        callback(true, json.obj)
-      } else {
-        callback(false, "数据获取失败");
-      }
-    }, (error) => callback(false, "网络错误, 请稍后重试")
+      let {ok, desc, obj} = json;
+      callback(ok, desc, obj);
+    }, (error) => callback(false, "网络错误, 请稍后重试", {})
   )
 }
 

@@ -150,8 +150,8 @@ class OrderBottom extends PureComponent {
 }
   _onShipInfoBtnClicked () {
     let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      auto_ship_type, zs_status,dada_call_at} = this.props.order;
-    zs_status=21;
+      auto_ship_type, zs_status = 21, dada_call_at
+    } = this.props.order;
     dada_status = parseInt(dada_status);
     zs_status = parseInt(zs_status);
     auto_ship_type = parseInt(auto_ship_type);
@@ -163,9 +163,9 @@ class OrderBottom extends PureComponent {
       ToastShort("请使用老版本修改送达时间");
     } else {
 
-      if (auto_ship_type === Cts.SHIP_ZS_JD || auto_ship_type === Cts.SHIP_ZS_MT
+      if (auto_ship_type === Cts.SHIP_ZS_JD || auto_ship_type === Cts.SHIP_ZS_MT || auto_ship_type === Cts.SHIP_KS_MT
           || auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD) {
-        switch (zs_status) {
+        /*switch (zs_status) {
           case Cts.ZS_STATUS_CANCEL:
           case Cts.ZS_STATUS_NEVER_START:
             title = '呼叫专送';
@@ -197,7 +197,12 @@ class OrderBottom extends PureComponent {
               this._defCloseBtn('关闭')
             ];
             break;
-        }
+        }*/
+        title = tool.autoPlat(auto_ship_type, zs_status);
+        msg = '专送如需转自送, 请通过订单状态下的 转自配送 按钮操作';
+        buttons = [
+          this._defCloseBtn(),
+        ];
       } else if (dada_status === Cts.DADA_STATUS_NEVER_START) {
         this._callShipDlg();
       } else {
@@ -236,7 +241,7 @@ class OrderBottom extends PureComponent {
             this._defCloseBtn(),
           ];
         } else if (dada_status === Cts.DADA_STATUS_CANCEL || dada_status === Cts.DADA_STATUS_TIMEOUT) {
-          title = "通过系统呼叫配送";
+          title = "通过系统发配送";
           msg = "订单已" + (dada_status === Cts.DADA_STATUS_TIMEOUT ? "超时" : "取消") + "，重新发单？";
           buttons = [
             {
@@ -282,22 +287,29 @@ class OrderBottom extends PureComponent {
 
   _shipInfoBtnText() {
     let label;
-    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status} = this.props.order;
+    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store} = this.props.order;
+    let {zs_way} = ext_store;
+    auto_ship_type = parseInt(auto_ship_type);
+    zs_status = parseInt(zs_status);
     dada_status = parseInt(dada_status);
     orderStatus = parseInt(orderStatus);
     ship_worker_id = parseInt(ship_worker_id);
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     } else {
-      if (auto_ship_type == Cts.SHIP_ZS_JD || auto_ship_type == Cts.SHIP_ZS_MT ||auto_ship_type == Cts.SHIP_ZS_ELE ||auto_ship_type == Cts.SHIP_ZS_BD) {
-        label = tool.autoPlat(auto_ship_type,zs_status)
-      } else {
+      if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
+          dada_status === Cts.DADA_STATUS_NEVER_START ||
+          auto_ship_type === Cts.SHIP_AUTO_FN ||
+          auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
+          auto_ship_type === Cts.SHIP_AUTO_BD ||
+          auto_ship_type === Cts.SHIP_AUTO_SX
+        )) {
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
             label = "自动:待接单";
             break;
           case Cts.DADA_STATUS_NEVER_START:
-            label = "待呼叫配送";
+            label = "待发配送";
             break;
           case Cts.DADA_STATUS_SHIPPING:
             label = "自动:已在途";
@@ -320,6 +332,18 @@ class OrderBottom extends PureComponent {
           default:
             label = dada_status;
         }
+      } else if ((
+          zs_way === Cts.SHIP_ZS_JD ||
+          zs_way === Cts.SHIP_KS_MT ||
+          zs_way === Cts.SHIP_ZS_MT ||
+          zs_way === Cts.SHIP_ZS_ELE ||
+          zs_way === Cts.SHIP_ZS_BD) || (
+          zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+          zs_status === Cts.ZS_STATUS_TO_FETCH ||
+          zs_status === Cts.ZS_STATUS_ON_WAY ||
+          zs_status === Cts.ZS_STATUS_ARRIVED
+        )) {
+        label = tool.autoPlat(zs_way, zs_status)
       }
     }
     return label;
@@ -416,11 +440,11 @@ class OrderBottom extends PureComponent {
         shadowRadius: 4,
         height: pxToDp(90),
       }}>
-      {this._visibleProviding() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'}
+      {this._visibleProviding() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'} size={'small'}
                                            onPress={this._onToProvide}>备货</Button>}
-      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
+      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
                                            onPress={this._onActionBtnClicked}>{this._actionBtnText()}</Button>}
-      {this._visibleShipInfoBtn() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'}
+      {this._visibleShipInfoBtn() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
                                              onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
     </View>}
       <Toast

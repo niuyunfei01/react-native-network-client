@@ -80,6 +80,7 @@ class ProductAutocomplete extends Component {
       dispatch(getProdPricesList(token, esId, platform, storeId, (ok, msg, data) => {
         if (ok && data) {
           this.setState({loadingProds: false, prodInfos: data})
+          console.log(prodInfos);
         } else {
           if (!data && ok) {
             msg = '本店下暂无产品';
@@ -147,8 +148,6 @@ class ProductAutocomplete extends Component {
     const { query } = this.state;
     const filteredProds = this.findFilm(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
-    console.log(this.state);
-    
     return (
       <View style={styles.container}>
         <Autocomplete

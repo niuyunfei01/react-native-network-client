@@ -1,6 +1,7 @@
 import Moment from 'moment';
 import {NavigationActions} from "react-navigation";
 import Cts from "../Cts";
+import pxToDp from "../util/pxToDp";
 
 export function urlByAppendingParams(url: string, params: Object) {
   let result = url
@@ -71,6 +72,21 @@ export function storeTime(dt) {
   return Moment(dt).format('H:mm');
 }
 
+export function diffDesc(dt) {
+  let old_time = Moment(dt);
+  let now_time = Moment(new Date());
+  let diff_time = Math.floor(now_time.diff(old_time, 'seconds', true));
+  let diff_minutes = Math.floor(diff_time / 60);
+  let diff_seconds = diff_time % 60;
+  let diff_desc = '';
+  if (diff_minutes > 0) {
+    diff_desc = `${diff_minutes}分${diff_seconds}秒`;
+  } else {
+    diff_desc = `${diff_seconds}秒`;
+  }
+  return diff_desc;
+}
+
 export function vendorOfStoreId(storeId, global) {
   const {
     canReadStores,
@@ -93,7 +109,7 @@ export function vendor(global) {
   let currVendorId = currStore['vendor_id'] || currStore['type'];
   let currVendorName = currStore['vendor'];
   let currStoreName = currStore['name'];
-  let fnPriceControlled = currStore['fn_price_controlled'];
+  let fnPriceControlled = parseInt(currStore['fn_price_controlled']);
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
@@ -167,7 +183,7 @@ export function store(store_id, global) {
 }
 
 export function length(obj) {
-  if (obj === undefined) {
+  if (obj === undefined || obj === null) {
     return 0;
   } else {
     if (typeof(obj) === 'object' && obj.length === undefined) {
@@ -287,23 +303,23 @@ export function disWayStatic(index) {
 
   if (index == 1) {
     let map = {};
-    map[Cts.FN_STATUS_ACCEPTED] = '系统已接单'
-    map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手'
-    map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店'
-    map[Cts.FN_STATUS_ON_WAY] = '配送中'
-    map[Cts.FN_STATUS_ARRIVED] = '已送达'
-    map[Cts.FN_STATUS_CANCELED] = '已取消'
-    map[Cts.FN_STATUS_ABNORMAL] = '异常'
+    map[Cts.FN_STATUS_ACCEPTED] = '系统已接单';
+    map[Cts.FN_STATUS_ASSIGNED] = '已分配骑手';
+    map[Cts.FN_STATUS_ARRIVED_STORE] = '骑手已到店';
+    map[Cts.FN_STATUS_ON_WAY] = '配送中';
+    map[Cts.FN_STATUS_ARRIVED] = '已送达';
+    map[Cts.FN_STATUS_CANCELED] = '已取消';
+    map[Cts.FN_STATUS_ABNORMAL] = '异常';
     return map;
   } else {
     let map = {};
-    map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单'
-    map[Cts.DADA_STATUS_TO_FETCH] = '待取货'
-    map[Cts.DADA_STATUS_SHIPPING] = '配送中'
-    map[Cts.DADA_STATUS_ARRIVED] = '已完成'
-    map[Cts.DADA_STATUS_CANCEL] = '已取消'
-    map[Cts.DADA_STATUS_TIMEOUT] = '已过期'
-    map[Cts.DADA_STATUS_ABNORMAL] = '指派单'
+    map[Cts.DADA_STATUS_TO_ACCEPT] = '待接单';
+    map[Cts.DADA_STATUS_TO_FETCH] = '待取货';
+    map[Cts.DADA_STATUS_SHIPPING] = '配送中';
+    map[Cts.DADA_STATUS_ARRIVED] = '已完成';
+    map[Cts.DADA_STATUS_CANCEL] = '已取消';
+    map[Cts.DADA_STATUS_TIMEOUT] = '已过期';
+    map[Cts.DADA_STATUS_ABNORMAL] = '指派单';
     return map;
   }
 }
@@ -367,9 +383,12 @@ export function first_store_id(canReadStores) {
   }
   return first_store_id;
 }
-export function toFixed(num) {
-  return (parseInt(num)/100).toFixed(2)
-
+export function toFixed(num,type='') {
+  if(type=='int'){
+    return (parseInt(num)/100)
+  }else {
+    return (parseInt(num)/100).toFixed(2)
+  }
 }
 export  function billStatus(status) {
  let map = {};
@@ -379,22 +398,33 @@ export  function billStatus(status) {
  return map[status]
 
 }
-export function autoPlat(type,status) {
+
+export function autoPlat(type, status) {
+  return `${this.ship_name(type)}: ${this.zs_status(status)}`;
+}
+
+export function ship_name(type) {
   let plat = {};
-  let znMap = {};
   plat[Cts.SHIP_ZS_JD] = '京东专送';
-  plat[Cts.SHIP_ZS_MT] = '美团转送';
+  plat[Cts.SHIP_ZS_MT] = '美团专送';
+  plat[Cts.SHIP_KS_MT] = '美团快送';
   plat[Cts.SHIP_ZS_ELE] = '饿了么专送';
   plat[Cts.SHIP_ZS_BD] = '百度专送';
 
+  return plat[type] === undefined ? '未知配送' : plat[type];
+}
+
+export function zs_status(status) {
+  let znMap = {};
   znMap[Cts.ZS_STATUS_NEVER_START] = '待召唤';
   znMap[Cts.ZS_STATUS_TO_ACCEPT] = '待接单';
   znMap[Cts.ZS_STATUS_TO_FETCH] = '待取货';
-  znMap[Cts.ZS_STATUS_ON_WAY] = '在途';
-  znMap[Cts.ZS_STATUS_ARRIVED] = '送达';
-  znMap[Cts.ZS_STATUS_CANCEL] = '取消';
-return `${plat[type]}:${znMap[status]}`;
+  znMap[Cts.ZS_STATUS_ON_WAY] = '已在途';
+  znMap[Cts.ZS_STATUS_ARRIVED] = '已送达';
+  znMap[Cts.ZS_STATUS_CANCEL] = '已取消';
+  znMap[Cts.ZS_STATUS_ABNORMAL] = '异常';
 
+  return znMap[status] === undefined ? '未知状态' : znMap[status];
 }
 
 export function sellingStatus(sell_status) {
@@ -418,7 +448,13 @@ if (map[mode]){
   return '选择供货方式'
 }
 }
-
+function getOperateDetailsType(type) {
+  let map ={};
+  map[Cts.OPERATE_DISTRIBUTION_TIPS] ='加小费详情';
+  map[Cts.OPERATE_REFUND_OUT] ='退款详情';
+  map[Cts.OPERATE_OTHER_OUT] = '其他支出流水';
+  return map[type]
+}
 
 function deepClone(obj){
   function isClass(o){
@@ -448,8 +484,40 @@ function deepClone(obj){
   }
 return result;
 }
-
-
+function getVendorName(vendorId){
+  let map={};
+  map[Cts.STORE_TYPE_SELF]='菜鸟食材';
+  map[Cts.STORE_TYPE_AFFILIATE]='菜鸟';
+  map[Cts.STORE_TYPE_GZW]='鲜果集';
+  map[Cts.STORE_TYPE_BLX]='比邻鲜';
+  map[0]='全部';
+  return map[vendorId];
+}
+function getSortName(sortId){
+  let map ={};
+  map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
+  map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
+  return map[sortId];
+}
+function platformsLogo(plat_id) {
+  let map = {};
+  map[Cts.WM_PLAT_ID_BD] = require('../img/Goods/baiduwaimai_.png');
+  map[Cts.WM_PLAT_ID_MT] = require('../img/Goods/meituanwaimai_.png');
+  map[Cts.WM_PLAT_ID_ELE] = require('../img/Goods/elmwaimai_.png');
+  map[Cts.WM_PLAT_ID_JD] = require('../img/Goods/jingdongdaojia_.png');
+  map[Cts.WM_PLAT_ID_WX] = require('../img/Goods/weixinjiage_.png');
+  return map[plat_id];
+}
+function goodSoldStatusImg(status){
+  let map = {};
+  map[Cts.STORE_PROD_ON_SALE] = require('../img/Goods/shangjia.png');
+  map[Cts.STORE_PROD_OFF_SALE] = require('../img/Goods/xiajia_.png');
+  map[Cts.STORE_PROD_SOLD_OUT] = require('../img/Goods/quehuo.png');
+  return map[status];
+}
+function getTimeStamp(str) {
+  return new Date(str.replace(/-/g, "/")).getTime()
+}
 
 export default {
   urlByAppendingParams,
@@ -458,6 +526,7 @@ export default {
   shortTimeDesc,
   shortTimestampDesc,
   shortOrderDay,
+  diffDesc,
   fullDate,
   orderOrderTimeShort,
   orderExpectTime,
@@ -480,7 +549,15 @@ export default {
   billStatus,
   get_platform_name,
   autoPlat,
+  ship_name,
+  zs_status,
   sellingStatus,
   headerSupply,
-  deepClone
+  deepClone,
+  getOperateDetailsType,
+  getVendorName,
+  getSortName,
+  platformsLogo,
+  goodSoldStatusImg,
+  getTimeStamp,
 }

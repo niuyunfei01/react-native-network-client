@@ -13,9 +13,22 @@ const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
   GET_VENDOR_TAGS,
+  ACTIVITY_VENDOR_TAGS,
+  GET_MANAGE_SELECT,
 } = require('../../common/constants').default;
-
-
+export function saveVendorTags(json) {
+  return {
+    type: ACTIVITY_VENDOR_TAGS,
+    json:json,
+  }
+}
+export function saveMangeSelect(id,platformId) {
+  return {
+    type: GET_MANAGE_SELECT,
+    selectId:id,
+    platformId:platformId
+  }
+}
 export function getProdPricesList(token, esId, platform, storeId, callback) {
   return dispatch => {
     const url = `api/on_sale_prod_prices/${esId}/${platform}/${storeId}.json?access_token=${token}`;
@@ -41,9 +54,9 @@ export function keyOfProdInfos(esId, platform, storeId) {
   return `${esId}_${platform}_${storeId}`;
 }
 
-export function fetchProductDetail(product_id, token, callback) {
+export function fetchProductDetail(product_id, _v_id, token, callback) {
   return dispatch => {
-    const url = `api/get_product_detail/${product_id}.json?access_token=${token}`;
+    const url = `api/get_product_detail/${product_id}/${_v_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -176,6 +189,14 @@ function receiveVendorTags(_v_id, vendor_tags = {}) {
     basic_category: vendor_tags.basic_category,
   }
 }
+function receiveVendorTags(_v_id, vendor_tags = {}) {
+  return {
+    type: GET_VENDOR_TAGS,
+    _v_id: _v_id,
+    store_tags: vendor_tags.store_tags,
+    basic_category: vendor_tags.basic_category,
+  }
+}
 
 /**
  *
@@ -286,4 +307,77 @@ export function RelateToStore(data, token, callback) {
       }
   )
 
+}
+
+export function UpdateWMGoods(product_id, include_img, token, callback) {
+  return dispatch => {
+    const url = `api/update_wm_sku/${product_id}/${include_img}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          ToastLong(error.message);
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
+export function fetchListVendorTags(vendor_id,token,callback) {
+  return dispatch => {
+    let url = `api/list_vendor_tags/${vendor_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          dispatch(saveVendorTags({[vendor_id]:resp.obj}));
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
+export function fetchListVendorGoods(vendor_id,platform_id,sortId,token,callback) {
+  return dispatch => {
+    let url = `api/list_vendor_goods/${vendor_id}/${platform_id}/${sortId}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          dispatch(saveMangeSelect(vendor_id,platform_id));
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+export function fetchListStoresGoods(vendor_id,product_id,token,callback) {
+  return dispatch => {
+    let url = `api/list_stores_goods/${vendor_id}/${product_id}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
+
+export function fetchStoreChgPrice(store_id,product_id,new_price_cents,token,callback) {
+  return dispatch => {
+    let url = `api/store_chg_price/${store_id}/${product_id}/${new_price_cents}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
 }

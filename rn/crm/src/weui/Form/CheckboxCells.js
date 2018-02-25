@@ -46,13 +46,13 @@ const CheckboxCells = (props) => {
       )}
     </Cells>
   )
-}
+};
 
 CheckboxCells.propTypes = {
   value: PropTypes.any,
   onChange: PropTypes.func,
   options: PropTypes.array.isRequired,
   style: Icon.propTypes.style,
-}
+};
 
 export default CheckboxCells

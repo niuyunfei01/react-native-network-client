@@ -8,7 +8,6 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 
 import {connect} from "react-redux";
@@ -16,11 +15,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import { get_supply_orders} from '../../reducers/settlement/settlementActions'
 import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import {NavigationActions} from "react-navigation";
-import {NavigationItem} from '../../widget';
 import tool from '../../common/tool.js'
 import {Toast} from "../../weui/index";
 import Cts from "../../Cts"
+import Config from '../../config'
+import colors from "../../styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -100,14 +99,21 @@ class SettlementScene extends PureComponent {
   renderList() {
     if (this.state.order_list.length > 0) {
       return (this.state.order_list.map((item, key) => {
+        let{orderTime,platform,dayId,total_goods_num,total_supply_price,id} = item
         return (
             <View key={key} style={{backgroundColor: '#fff',borderBottomWidth:pxToDp(1),borderColor:'#f2f2f2'}}>
               <View style={styles.item_title}>
-                <Text style={styles.name}>
-                  {`#${tool.get_platform_name(item.platform) + item.dayId}`}
-                </Text>
-                <Text style={styles.num}>商品数量:{item.total_goods_num}</Text>
-                <Text style={styles.price}>金额:{tool.toFixed(item.total_supply_price)}</Text>
+                <TouchableOpacity
+                  onPress = {()=>{
+                    this.props.navigation.navigate(Config.ROUTE_ORDER,{orderId:id})
+                  }}
+                >
+                  <Text style={styles.name}>
+                    {`${tool.shortOrderDay(orderTime)}#${dayId}`}
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.num}>商品数量:{total_goods_num}</Text>
+                <Text style={styles.price}>金额:{tool.toFixed(total_supply_price)}</Text>
                 <TouchableOpacity
                     onPress={() => {
                       this.state.order_list[key].down = !item.down
@@ -220,9 +226,10 @@ const styles = StyleSheet.create({
     paddingLeft: pxToDp(30)
   },
   name: {
-    width: pxToDp(200),
-    fontSize:pxToDp(30),
-    color:'#3e3e3e'
+    minWidth: pxToDp(200),
+    fontSize:pxToDp(32),
+    color:colors.main_color,
+    fontWeight:'900',
 
   },
   status:{
@@ -236,7 +243,7 @@ const styles = StyleSheet.create({
     marginTop:pxToDp(5),
   }
 
-})
+});
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)

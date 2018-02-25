@@ -5,7 +5,7 @@ import {addNavigationHelpers, NavigationActions, StackNavigator, TabNavigator, T
 import Config from '../config';
 import color from '../widget/color'
 import TabBarItem from '../widget/TabBarItem'
-
+import MyTabBarItem from './MyTabBarItem'
 import RemindScene from '../scene/Remind/RemindScene'
 import MineScene from '../scene/Mine/MineScene';
 import OrderScene from '../scene/Order/OrderScene';
@@ -49,17 +49,33 @@ import GoodsApplyRecordScene from '../scene/Goods/GoodsApplyRecordScene';
 import GoodsRelateScene from '../scene/Goods/GoodsRelateScene';
 import GoodsApplyNewProductScene from '../scene/Goods/GoodsApplyNewProductScene';
 import GoodsWorkNewProductScene from '../scene/Goods/GoodsWorkNewProductScene';
+import GoodsManageScene from '../scene/Goods/GoodsManageScene';
+import GoodsPriceDetailsScene from '../scene/Goods/GoodsPriceDetailsScene';
+
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
 import OrderCancelShip from "../scene/Order/OrderCancelShip";
 
 import  HelpScene from '../scene/Help/HelpScene';
-
 import SettlementScene from '../scene/Settlement/SettlementScene';
 import SettlementDetailsScene from '../scene/Settlement/SettlementDetailsScene';
 import SettlementOrderScene from '../scene/Settlement/settlementOrderScene';
+import SettlementGatherScene from '../scene/Settlement/SettlementGatherScene';
+
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
+import OperateProfitScene from "../scene/OperateProfit/OperateProfitScene";
+import OperateDetailScene from "../scene/OperateProfit/OperateDetailScene";
+import OperateIncomeDetailScene from "../scene/OperateProfit/OperateIncomeDetailScene";
+import OperateExpendDetailScene from "../scene/OperateProfit/OperateExpendDetailScene";
+import OperateOtherExpendDetailScene from "../scene/OperateProfit/OperateOtherExpendDetailScene";
+import ActivityRuleScene from "../scene/Activity/ActivityRuleScene";
+import ActivityEditRuleScene from "../scene/Activity/ActivityEditRuleScene";
+import ActivitySelectStoreScene from "../scene/Activity/ActivitySelectStoreScene";
+import ActivityManageScene from "../scene/Activity/ActivityManageScene";
+import ActivityListScene from "../scene/Activity/ActivityListScene";
+import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
+import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
 
 const tabDef = {
   Remind: {
@@ -67,7 +83,7 @@ const tabDef = {
     navigationOptions: ({navigation}) => ({
       tabBarLabel: '提醒',
       tabBarIcon: ({focused, tintColor}) => (
-        <TabBarItem
+        <MyTabBarItem
           tintColor={tintColor}
           focused={focused}
           normalImage={require('../img/tabbar/tab_warn.png')}
@@ -114,6 +130,7 @@ const tabDef = {
       }
     }),
   },
+
 
   Mine: {
     screen: MineScene,
@@ -246,7 +263,21 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
         [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},
         [Config.ROUTE_HELP]: {screen: HelpScene},
-
+        [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
+        [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
+        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
+        [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
+        [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
+        [Config.ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
+        [Config.ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
+        [Config.ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
+        [Config.ROUTE_ACTIVITY_RULE]: {screen: ActivityRuleScene},
+        [Config.ROUTE_ACTIVITY_EDIT_RULE]: {screen: ActivityEditRuleScene},
+        [Config.ROUTE_ACTIVITY_SELECT_STORE]: {screen: ActivitySelectStoreScene},
+        [Config.ROUTE_ACTIVITY_MANAGE]: {screen: ActivityManageScene},
+        [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
+        [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
+        [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
       },
       stackNavigatorConfigs
     );
@@ -256,4 +287,5 @@ class Navigator extends Component {
   }
 }
 
-export default Navigator
+export default Navigator;
+
