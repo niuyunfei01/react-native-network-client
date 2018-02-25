@@ -62,6 +62,7 @@ class OrderBottom extends PureComponent {
     this._cancelShip = this._cancelShip.bind(this);
 
     this._defCloseBtn = this._defCloseBtn.bind(this);
+    this._doReply = this._doReply.bind(this);
   }
 
   _viewShipDetail = () => {
@@ -134,8 +135,10 @@ class OrderBottom extends PureComponent {
       type: 'default',
       label: title,
       onPress: () => { this.setState({dlgShipVisible: false}) }
-    }};
-  _doReply(){
+    }
+  };
+
+  _doReply() {
     const {dispatch, global, order} = this.props;
     this.setState({onSubmitting: true});
     dispatch(orderCallShip(global.accessToken, order.id, order.auto_ship_type, (ok, msg, data) => {
@@ -145,12 +148,12 @@ class OrderBottom extends PureComponent {
       } else {
         this.setState({errorHints: msg});
       }
-    }))
+    }));
+  }
 
-}
   _onShipInfoBtnClicked () {
     let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      auto_ship_type, zs_status = 21, dada_call_at
+      auto_ship_type, zs_status = Cts.ZS_STATUS_TO_ACCEPT_EX, dada_call_at
     } = this.props.order;
     dada_status = parseInt(dada_status);
     zs_status = parseInt(zs_status);
@@ -198,11 +201,27 @@ class OrderBottom extends PureComponent {
             ];
             break;
         }*/
-        title = tool.autoPlat(auto_ship_type, zs_status);
-        msg = '专送如需转自送, 请通过订单状态下的 转自配送 按钮操作';
-        buttons = [
-          this._defCloseBtn(),
-        ];
+
+        if(auto_ship_type === Cts.SHIP_ZS_JD && zs_status === Cts.ZS_STATUS_NEVER_START){
+          title = tool.autoPlat(auto_ship_type, zs_status);
+          msg = '确认召唤京东专送?';
+          buttons = [
+            this._defCloseBtn(),
+            {
+              label: '召唤配送',
+              onPress: () => {
+                this._doReply();
+                this.setState({dlgShipVisible: false});
+              }
+            },
+          ];
+        } else {
+          title = tool.autoPlat(auto_ship_type, zs_status);
+          msg = '专送如需转自送, 请通过订单状态下的 转自配送 按钮操作';
+          buttons = [
+            this._defCloseBtn(),
+          ];
+        }
       } else if (dada_status === Cts.DADA_STATUS_NEVER_START) {
         this._callShipDlg();
       } else {
@@ -297,13 +316,12 @@ class OrderBottom extends PureComponent {
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     } else {
-      if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
-          dada_status === Cts.DADA_STATUS_NEVER_START ||
-          auto_ship_type === Cts.SHIP_AUTO_FN ||
+      //if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
+      if (auto_ship_type === Cts.SHIP_AUTO_FN ||
           auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
           auto_ship_type === Cts.SHIP_AUTO_BD ||
           auto_ship_type === Cts.SHIP_AUTO_SX
-        )) {
+        ) {
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
             label = "自动:待接单";
@@ -343,7 +361,7 @@ class OrderBottom extends PureComponent {
           zs_status === Cts.ZS_STATUS_ON_WAY ||
           zs_status === Cts.ZS_STATUS_ARRIVED
         )) {
-        label = tool.autoPlat(zs_way, zs_status)
+        label = tool.autoPlat(zs_way, zs_status);
       }
     }
     return label;

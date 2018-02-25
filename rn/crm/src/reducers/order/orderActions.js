@@ -359,13 +359,21 @@ export function cancelReasonsList(order_id,token,callback) {
   }
 }
 
-  export function cancelShip(order_id,reason_id,data,token,callback) {
-    const url = `api/order_dada_cancel/${order_id}/${reason_id}.json?access_token=${token}`;
-    return jsonWithTpl2(url, data, (json) => {
-          callback(json.ok);
-        },
-        (error) => {
-          callback(error, "网络错误, 请稍后重试")
-        }
-    )
-  }
+export function cancelShip(order_id,reason_id,data,token,callback) {
+  const url = `api/order_dada_cancel/${order_id}/${reason_id}.json?access_token=${token}`;
+  return jsonReqThenInvalidate(url, order_id, callback);
+  // return jsonWithTpl2(url, data, (json) => {
+  //       callback(json.ok);
+  //     },
+  //     (error) => {
+  //       callback(error, "网络错误, 请稍后重试")
+  //     }
+  // )
+}
+
+export function deliveryFailedAudit(token, id, data, callback) {
+  const url = `api/delivery_failed_audit.json?access_token=${token}`;
+  return jsonReqThenInvalidate(url, id, callback, data);
+}
+
+

@@ -76,6 +76,7 @@ import ActivityManageScene from "../scene/Activity/ActivityManageScene";
 import ActivityListScene from "../scene/Activity/ActivityListScene";
 import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
 import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
+import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 
 const tabDef = {
   Remind: {
@@ -278,6 +279,7 @@ class Navigator extends Component {
         [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
         [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
         [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
+        [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
       },
       stackNavigatorConfigs
     );
