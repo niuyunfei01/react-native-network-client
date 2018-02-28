@@ -1153,11 +1153,13 @@ class OrderScene extends Component {
     zs_status = parseInt(zs_status);
     zs_way = parseInt(zs_way);
     orderStatus = parseInt(orderStatus);
-    if (auto_ship_type === Cts.SHIP_AUTO_FN ||
+    if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
         auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
         auto_ship_type === Cts.SHIP_AUTO_BD ||
-        auto_ship_type === Cts.SHIP_AUTO_SX
-      ) {
+        auto_ship_type === Cts.SHIP_AUTO_SX) && (
+        dada_status !== Cts.DADA_STATUS_CANCEL &&
+        dada_status !== Cts.DADA_STATUS_TIMEOUT
+      )) {
       let ship_name = tool.disWay()[auto_ship_type];
       let dada_ship_status = tool.disWayStatic(Cts.SHIP_AUTO_NEW_DADA)[dada_status];
 
@@ -1188,16 +1190,6 @@ class OrderScene extends Component {
                     this.setState({addTipDialog: true})
                   }}
                 />}
-                {(ship_site_mobile !== '' || ship_site_tel !== '') && (
-                  <ClickBtn
-                    type={'full'}
-                    btn_text={'催单'}
-                    style={{marginLeft: pxToDp(30)}}
-                    onPress={() => {
-                      this.setState({shipCallHided: !shipCallHided});
-                    }}
-                  />
-                )}
               </View>
             )}
             {(dada_status === Cts.DADA_STATUS_TO_FETCH ||
@@ -1257,7 +1249,7 @@ class OrderScene extends Component {
 
     } else if (zs_way === Cts.SHIP_ZS_JD ||
       zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
-      zs_way === Cts.SHIP_ZS_ELE ||zs_way === Cts.SHIP_ZS_BD) {//专送配送
+      zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) {//专送配送
       let zs_ship = tool.autoPlat(zs_way, zs_status);
       let zs_ship_status = tool.zs_status(zs_status);
       let zs_name = tool.ship_name(zs_way);
@@ -1267,9 +1259,9 @@ class OrderScene extends Component {
           <View style={ship_style.ship_box}>
             <View style={ship_style.ship_info}>
               <Text style={ship_style.ship_info_text}>
-                {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
-                  zs_status === Cts.ZS_STATUS_CANCEL ||
-                  zs_status === Cts.ZS_STATUS_ABNORMAL) &&
+                {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
+                  zs_status === Cts.ZS_STATUS_ON_WAY ||
+                  zs_status === Cts.ZS_STATUS_ARRIVED) &&
                 tool.length(jd_ship_worker_mobile) > 0 ?
                   `骑手 ${jd_ship_worker_name} ${zs_ship_status}` : zs_ship
                 }
@@ -1282,32 +1274,41 @@ class OrderScene extends Component {
                 </Text>}
               </Text>
             </View>
-            {zs_status === Cts.ZS_STATUS_TO_ACCEPT && <View style={ship_style.ship_btn_view}>
-              {zs_way === Cts.SHIP_KS_MT && <ClickBtn
-                btn_text={'加小费'}
-                onPress={() => {
-                  this.setState({addTipDialog: true})
-                }}
-              />}
-              <ClickBtn
-                type={'full'}
-                btn_text={'转自配送'}
-                style={{marginLeft: pxToDp(30)}}
-                onPress={() => {
-                  this.setState({cancel_zs_hint: true});
-                }}
-              />
-              {(ship_site_mobile !== '' || ship_site_tel !== '') && (
-                <ClickBtn
+
+            {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+              zs_status === Cts.ZS_STATUS_CANCEL ||
+              zs_status === Cts.ZS_STATUS_ABNORMAL
+            ) && (
+              <View style={ship_style.ship_btn_view}>
+                {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && zs_way === Cts.SHIP_KS_MT) && <ClickBtn
+                  btn_text={'加小费'}
+                  onPress={() => {
+                    this.setState({addTipDialog: true})
+                  }}
+                />}
+                {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+                  zs_status === Cts.ZS_STATUS_CANCEL ||
+                  zs_status === Cts.ZS_STATUS_ABNORMAL
+                ) && <ClickBtn
                   type={'full'}
-                  btn_text={'催单'}
+                  btn_text={'转自配送'}
                   style={{marginLeft: pxToDp(30)}}
                   onPress={() => {
-                    this.setState({shipCallHided: !shipCallHided});
+                    this.setState({cancel_zs_hint: true});
                   }}
-                />
-              )}
-            </View>}
+                />}
+                {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                  <ClickBtn
+                    type={'full'}
+                    btn_text={'催单'}
+                    style={{marginLeft: pxToDp(30)}}
+                    onPress={() => {
+                      this.setState({shipCallHided: !shipCallHided});
+                    }}
+                  />
+                )}
+              </View>
+            )}
             {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
               zs_status === Cts.ZS_STATUS_ON_WAY ||
               zs_status === Cts.ZS_STATUS_ARRIVED) && jd_ship_worker_mobile &&

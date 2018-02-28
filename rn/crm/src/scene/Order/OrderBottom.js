@@ -318,11 +318,13 @@ class OrderBottom extends PureComponent {
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     } else {
-      if (auto_ship_type === Cts.SHIP_AUTO_FN ||
+      if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
           auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
           auto_ship_type === Cts.SHIP_AUTO_BD ||
-          auto_ship_type === Cts.SHIP_AUTO_SX
-        ) {
+          auto_ship_type === Cts.SHIP_AUTO_SX) && (
+          dada_status !== Cts.DADA_STATUS_CANCEL &&
+          dada_status !== Cts.DADA_STATUS_TIMEOUT
+        )) {
         let ship_name = tool.disWay()[auto_ship_type];
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
