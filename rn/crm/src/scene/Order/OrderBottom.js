@@ -308,60 +308,72 @@ class OrderBottom extends PureComponent {
     let label;
     let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store} = this.props.order;
     let {zs_way} = ext_store;
+    zs_way = parseInt(zs_way);
     auto_ship_type = parseInt(auto_ship_type);
     zs_status = parseInt(zs_status);
     dada_status = parseInt(dada_status);
     orderStatus = parseInt(orderStatus);
     ship_worker_id = parseInt(ship_worker_id);
+
     if (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER) {
       label = '修改到达时间';
     } else {
-      //if (zs_status !== Cts.ZS_STATUS_TO_ACCEPT && (
       if (auto_ship_type === Cts.SHIP_AUTO_FN ||
           auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
           auto_ship_type === Cts.SHIP_AUTO_BD ||
           auto_ship_type === Cts.SHIP_AUTO_SX
         ) {
+        let ship_name = tool.disWay()[auto_ship_type];
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
-            label = "自动:待接单";
+            label = `${ship_name}:待接单`;
             break;
           case Cts.DADA_STATUS_NEVER_START:
-            label = "待发配送";
+            label = `待发配送`;
             break;
           case Cts.DADA_STATUS_SHIPPING:
-            label = "自动:已在途";
+            label = `${ship_name}:已在途`;
             break;
           case Cts.DADA_STATUS_ARRIVED:
-            label = "自动:已送达";
+            label = `${ship_name}:已送达`;
             break;
           case Cts.DADA_STATUS_CANCEL:
-            label = "自动:已取消";
+            label = `${ship_name}:已取消`;
             break;
           case Cts.DADA_STATUS_TO_FETCH:
-            label = "自动:已接单";
+            label = `${ship_name}:已接单`;
             break;
           case Cts.DADA_STATUS_ABNORMAL:
-            label = "自动:配送异常";
+            label = `${ship_name}:配送异常`;
             break;
           case Cts.DADA_STATUS_TIMEOUT:
-            label = "自动:呼叫超时";
+            label = `${ship_name}:呼叫超时`;
             break;
           default:
             label = dada_status;
         }
-      } else if ((
+      } else if (
           zs_way === Cts.SHIP_ZS_JD ||
           zs_way === Cts.SHIP_KS_MT ||
           zs_way === Cts.SHIP_ZS_MT ||
           zs_way === Cts.SHIP_ZS_ELE ||
-          zs_way === Cts.SHIP_ZS_BD) || (
-          zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
-          zs_status === Cts.ZS_STATUS_TO_FETCH ||
-          zs_status === Cts.ZS_STATUS_ON_WAY ||
-          zs_status === Cts.ZS_STATUS_ARRIVED
-        )) {
+          zs_way === Cts.SHIP_ZS_BD
+        ) {
         label = tool.autoPlat(zs_way, zs_status);
+      } else if (
+          auto_ship_type === Cts.SHIP_ZS_JD ||
+          auto_ship_type === Cts.SHIP_KS_MT ||
+          auto_ship_type === Cts.SHIP_ZS_MT ||
+          auto_ship_type === Cts.SHIP_ZS_ELE ||
+          auto_ship_type === Cts.SHIP_ZS_BD
+        ) {
+        label = tool.autoPlat(auto_ship_type, zs_status);
+      } else {
+        if (dada_status === Cts.DADA_STATUS_NEVER_START || zs_status === Cts.ZS_STATUS_NEVER_START) {
+          label = '待发配送';
+        } else {
+          label = '未知配送';
+        }
       }
     }
     return label;

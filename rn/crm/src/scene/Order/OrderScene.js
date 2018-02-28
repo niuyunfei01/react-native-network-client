@@ -43,7 +43,12 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon ,Input} from "../../weui/index";
+import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon, Input,
+  Cells,
+  Cell,
+  CellBody,
+  CellFooter,
+} from "../../weui/index";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {StatusBar} from "react-native";
 import Cts from '../../Cts'
@@ -105,6 +110,9 @@ const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 
+const ZS_LABEL_SEND = 'send_ship';
+const ZS_LABEL_CANCEL = 'cancel';
+
 class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
@@ -153,6 +161,7 @@ class OrderScene extends Component {
       orderReloading: false,
 
       errorHints: '',
+      select_zs_label: '',
       cancel_zs_hint: false,
 
       doingUpdate: false,
@@ -936,60 +945,62 @@ class OrderScene extends Component {
           </ScrollView>
             <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip} fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
-          <Dialog onRequestClose={() => {}}
-                  visible={!!this.state.errorHints}
-                  buttons={[{
-                    type: 'default',
-                    label: '知道了',
-                    onPress: () => {
-                      this.setState({errorHints: ''})
-                    }
-                  }]}
+          <Dialog
+            onRequestClose={() => {}}
+            visible={!!this.state.errorHints}
+            buttons={[{
+              type: 'default',
+              label: '知道了',
+              onPress: () => {
+                this.setState({errorHints: ''})
+              }
+            }]}
           >
             <Text>{this.state.errorHints}</Text>
           </Dialog>
 
 
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.addTipMoney}
-                  title = {'加小费'}
-                  buttons={[{
-                    type: 'default',
-                    label: '取消',
-                    onPress: () => {
-                      this.setState({addTipMoney:false,addMoneyNum:''})
-                    }
-                  },
-                    {
-                      type: 'default',
-                      label: '确定',
-                      onPress: async() => {
-                          await this.setState({addTipMoney:false});
-                          this.upAddTip()
-                      }
-                    }
-                  ]}
+          <Dialog
+            onRequestClose={() => {}}
+            visible={this.state.addTipMoney}
+            title={'加小费'}
+            buttons={[{
+              type: 'default',
+              label: '取消',
+              onPress: () => {
+                this.setState({addTipMoney: false, addMoneyNum: ''})
+              }
+            },
+              {
+                type: 'default',
+                label: '确定',
+                onPress: async () => {
+                  await this.setState({addTipMoney: false});
+                  this.upAddTip()
+                }
+              }
+            ]}
           >
-            <Input placeholder = {'请输入金额，金额只能大于0'}
-                   value={`${this.state.addMoneyNum}`}
-                   keyboardType='numeric'
-                   onChangeText={(text)=>{
-                     this.setState({addMoneyNum:text})
-                   }}
+            <Input
+              placeholder={'请输入金额，金额只能大于0'}
+              value={`${this.state.addMoneyNum}`}
+              keyboardType='numeric'
+              onChangeText={(text) => {
+                this.setState({addMoneyNum: text})
+              }}
             />
           </Dialog>
 
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.addTipDialog}
-                  buttons={[{
-                    type: 'default',
-                    label: '知道了',
-                    onPress: () => {
-                      this.setState({addTipDialog :false,addTipMoney:true})
-                    }
-                  }]}
+          <Dialog
+            onRequestClose={() => {}}
+            visible={this.state.addTipDialog}
+            buttons={[{
+              type: 'default',
+              label: '知道了',
+              onPress: () => {
+                this.setState({addTipDialog: false, addTipMoney: true})
+              }
+            }]}
           >
             <View>
               <Text style={{color: '#000'}}>
@@ -1039,26 +1050,65 @@ class OrderScene extends Component {
           />
 
           <Dialog
-            onRequestClose={() => {
-            }}
+            onRequestClose={() => {}}
+            style={{backgroundColor: '#fff'}}
             visible={this.state.cancel_zs_hint}
-            title={'转配自送'}
+            title={'干预配送'}
             buttons={[{
               type: 'default',
-              label: '取消',
+              label: '关闭',
               onPress: () => {
-                this.setState({cancel_zs_hint: false});
+                this.setState({cancel_zs_hint: false, select_zs_label: ''});
               }
             }, {
-              type: 'default',
-              label: '确定',
-              onPress: async () => {
-                await this.setState({cancel_zs_hint: false, onSubmitting: true});
-                this.cancelZsDelivery();
+              type: 'primary',
+              label: '确认',
+              onPress: () => {
+                if(this.state.select_zs_label === ZS_LABEL_CANCEL){//取消
+                  this.setState({cancel_zs_hint: false});
+                  this.cancelZsDelivery();
+                } else if (this.state.select_zs_label === ZS_LABEL_SEND){//发配送
+                  this.setState({cancel_zs_hint: false});
+                  this._callShip();
+                } else {
+                  ToastLong('请选择干预方式');
+                }
+                this.setState({select_zs_label: ''});
               }
             }]}
           >
-            <Text style={{color: 'red'}}>专送订单转自送需先取消 专送配送 才可发 自配送, 确认取消专送配送吗?</Text>
+            <Cells style={ship_style.cell_box}>
+              <Cell
+                onPress={() => {
+                  this.setState({select_zs_label: ZS_LABEL_SEND});
+                }}
+                customStyle={[ship_style.cell_row]}>
+                <CellBody style={{flexDirection: 'column'}}>
+                  <Text style={[ship_style.cell_body,
+                    (this.state.select_zs_label === ZS_LABEL_SEND && {color: colors.main_color})
+                  ]}>发自配送并保留专送</Text>
+                  <Text style={ship_style.cell_tips}>一方先接单后,另一方会被取消</Text>
+                </CellBody>
+                {this.state.select_zs_label === ZS_LABEL_SEND &&<CellFooter>
+                  <Icon name="success_no_circle" style={ship_style.icon_size}/>
+                </CellFooter>}
+              </Cell>
+              <Cell
+                onPress={() => {
+                  this.setState({select_zs_label: ZS_LABEL_CANCEL});
+                }}
+                customStyle={ship_style.cell_row}>
+                <CellBody style={{flexDirection: 'column'}}>
+                  <Text style={[ship_style.cell_body,
+                    (this.state.select_zs_label === ZS_LABEL_CANCEL && {color: colors.main_color})
+                  ]}>取消专送</Text>
+                  <Text style={ship_style.cell_tips}>只取消专送配送,不做其他操作</Text>
+                </CellBody>
+                {this.state.select_zs_label === ZS_LABEL_CANCEL && <CellFooter>
+                  <Icon name="success_no_circle" style={ship_style.icon_size}/>
+                </CellFooter>}
+              </Cell>
+            </Cells>
           </Dialog>
         </View>
       );
@@ -1069,15 +1119,20 @@ class OrderScene extends Component {
     let {zs_status, id} = order.order;
     zs_status = parseInt(zs_status);
     let wm_id = id;
+    if (this.state.onSubmitting) {
+      return false;
+    }
+
     console.log('wm_id -> ', wm_id);
     if (wm_id > 0) {
       if (zs_status === Cts.ZS_STATUS_CANCEL || zs_status === Cts.ZS_STATUS_ABNORMAL) {
-        this._callShip();
+        this.setState({errorHints: '专送已是取消状态'});
       } else {
+        this.setState({onSubmitting: true});
         dispatch(orderCancelZsDelivery(global.accessToken, wm_id, (ok, msg) => {
           this.setState({onSubmitting: false});
           if (ok) {
-            this._callShip();
+            //this._callShip();
           } else {
             this.setState({errorHints: msg});
           }
@@ -1098,8 +1153,6 @@ class OrderScene extends Component {
     zs_status = parseInt(zs_status);
     zs_way = parseInt(zs_way);
     orderStatus = parseInt(orderStatus);
-    // if (dada_status === Cts.DADA_STATUS_TO_ACCEPT || dada_status === Cts.DADA_STATUS_TO_FETCH ||
-    //   dada_status === Cts.DADA_STATUS_SHIPPING || dada_status === Cts.DADA_STATUS_ARRIVED) {//达达|蜂鸟等配送
     if (auto_ship_type === Cts.SHIP_AUTO_FN ||
         auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
         auto_ship_type === Cts.SHIP_AUTO_BD ||
@@ -1853,7 +1906,31 @@ const ship_style = StyleSheet.create({
     justifyContent: 'flex-end',
     flex: 1,
     marginRight: pxToDp(30),
-  }
+  },
+  cell_box: {
+    marginTop: 0,
+    borderTopWidth: pxToDp(1),
+    borderBottomWidth: pxToDp(1),
+    borderColor: colors.color999,
+  },
+  cell_row: {
+    marginLeft: 0,
+    paddingLeft: pxToDp(10),
+    height: pxToDp(130),
+    justifyContent: 'center',
+  },
+  cell_body: {
+    fontSize: pxToDp(36),
+    color: '#515151',
+  },
+  cell_tips: {
+    marginTop: pxToDp(5),
+    fontSize: pxToDp(24),
+    color: '#a4a4a4',
+  },
+  icon_size: {
+    fontSize: 20,
+  },
 });
 
 const top_styles = StyleSheet.create({
@@ -1907,6 +1984,6 @@ const wayRecord = StyleSheet.create({
     backgroundColor: '#EEEEEE',
     borderRadius: pxToDp(10)
   }
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderScene)
