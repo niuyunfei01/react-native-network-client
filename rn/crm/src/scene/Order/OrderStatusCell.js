@@ -21,7 +21,7 @@ class OrderStatusCell extends PureComponent {
   _validStepColor(datetimeStr, orderStatus, shouldStatus) {
     //return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
     if(orderStatus && shouldStatus){
-      return (orderStatus >= shouldStatus) ? colors.main_color : '#ccc';
+      return (orderStatus >= shouldStatus && orderStatus !== Cts.ORDER_STATUS_INVALID) ? colors.main_color : '#ccc';
     } else {
       return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
     }
