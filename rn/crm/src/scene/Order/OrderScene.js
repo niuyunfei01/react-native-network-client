@@ -1194,7 +1194,7 @@ class OrderScene extends Component {
             )}
             {(dada_status === Cts.DADA_STATUS_TO_FETCH ||
               dada_status === Cts.DADA_STATUS_SHIPPING ||
-              dada_status === Cts.DADA_STATUS_ARRIVED) && dada_mobile &&
+              dada_status === Cts.DADA_STATUS_ARRIVED) && tool.length(dada_mobile) > 0 &&
             (<View style={ship_style.ship_btn_view}>
               {!(zs_way > 0) && (ship_site_mobile !== '' || ship_site_tel !== '') && (
                 <ImageBtn
@@ -1311,7 +1311,7 @@ class OrderScene extends Component {
             )}
             {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
               zs_status === Cts.ZS_STATUS_ON_WAY ||
-              zs_status === Cts.ZS_STATUS_ARRIVED) && jd_ship_worker_mobile &&
+              zs_status === Cts.ZS_STATUS_ARRIVED) && tool.length(jd_ship_worker_mobile) > 0 &&
             (<View style={ship_style.ship_btn_view}>
               {(ship_site_mobile !== '' || ship_site_tel !== '') && (
                 <ImageBtn

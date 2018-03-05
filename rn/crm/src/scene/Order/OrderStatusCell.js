@@ -18,8 +18,13 @@ class OrderStatusCell extends PureComponent {
     this._callShip = this._callShip.bind(this);
   }
 
-  _validStepColor(datetimeStr) {
-    return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
+  _validStepColor(datetimeStr, orderStatus, shouldStatus) {
+    //return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
+    if(orderStatus && shouldStatus){
+      return (orderStatus >= shouldStatus && orderStatus !== Cts.ORDER_STATUS_INVALID) ? colors.main_color : '#ccc';
+    } else {
+      return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
+    }
   }
 
   _callShip = () => {
@@ -38,6 +43,7 @@ class OrderStatusCell extends PureComponent {
     const packLoggerName = Object.assign({}, order.workers[order.pack_done_logger]).nickname;
 
     const invalidStyle = parseInt(order.orderStatus) === Cts.ORDER_STATUS_INVALID ?  {textDecorationLine: 'line-through'} : {};
+    let orderStatus = parseInt(order.orderStatus);
 
     return <View style={[Styles.topBottomLine, {marginTop: pxToDp(10), backgroundColor:'#f0f9ef'}]}>
       <View style={styles.row}>
@@ -60,12 +66,24 @@ class OrderStatusCell extends PureComponent {
 
       <View style={{ backgroundColor: colors.white, flexDirection: 'row', paddingBottom: pxToDp(10),
         justifyContent:'space-around'}}>
-        <OrderStep statusTxt="已收单" bgColor={this._validStepColor(order.orderTime)} timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
-        <OrderStep statusTxt="已分拣" bgColor={this._validStepColor(order.time_ready)} workerNames={packWorkers} loggerName={packLoggerName}
-                   timeAtStr={tool.shortTimeDesc(order.time_ready)} onPress={onPressCall}/>
-        <OrderStep statusTxt="已出发" bgColor={this._validStepColor(order.time_start_ship)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}
+        <OrderStep
+          statusTxt="已收单"
+          bgColor={this._validStepColor(order.orderTime, orderStatus, Cts.ORDER_STATUS_TO_READY)}
+          timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
+        <OrderStep
+          statusTxt="已分拣"
+          bgColor={this._validStepColor(order.time_ready, orderStatus, Cts.ORDER_STATUS_TO_SHIP)}
+          workerNames={packWorkers} loggerName={packLoggerName}
+          timeAtStr={tool.shortTimeDesc(order.time_ready)} onPress={onPressCall}/>
+        <OrderStep
+          statusTxt="已出发"
+          bgColor={this._validStepColor(order.time_start_ship, orderStatus, Cts.ORDER_STATUS_SHIPPING)}
+          workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}
           onPress={this._callShip}/>
-        <OrderStep statusTxt="已送达" bgColor={this._validStepColor(order.time_arrived)} workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}
+        <OrderStep
+          statusTxt="已送达"
+          bgColor={this._validStepColor(order.time_arrived, orderStatus, Cts.ORDER_STATUS_ARRIVED)}
+          workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}
           onPress={this._callShip}/>
       </View>
       {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.orderTime), left: (screen.width/8-5)}]}/>*/}
