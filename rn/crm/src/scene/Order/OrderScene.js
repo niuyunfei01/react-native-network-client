@@ -1153,6 +1153,8 @@ class OrderScene extends Component {
     zs_status = parseInt(zs_status);
     zs_way = parseInt(zs_way);
     orderStatus = parseInt(orderStatus);
+
+    let auto_ship_view = null;
     if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
         auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
         auto_ship_type === Cts.SHIP_AUTO_BD ||
@@ -1163,7 +1165,7 @@ class OrderScene extends Component {
       let ship_name = tool.disWay()[auto_ship_type];
       let dada_ship_status = tool.disWayStatic(Cts.SHIP_AUTO_NEW_DADA)[dada_status];
 
-      return (
+      auto_ship_view = (
         <View>
           <View style={ship_style.ship_box}>
             <View style={ship_style.ship_info}>
@@ -1247,14 +1249,20 @@ class OrderScene extends Component {
         </View>
       );
 
-    } else if (zs_way === Cts.SHIP_ZS_JD ||
-      zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
-      zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) {//专送配送
+    }
+    let zs_ship_view = null;
+    if ((zs_way === Cts.SHIP_ZS_JD ||
+        zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
+        zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
+        auto_ship_type === Cts.SHIP_ZS_JD ||
+        auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
+        auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD
+      )) {//专送配送
       let zs_ship = tool.autoPlat(zs_way, zs_status);
       let zs_ship_status = tool.zs_status(zs_status);
       let zs_name = tool.ship_name(zs_way);
 
-      return (
+      zs_ship_view = (
         <View>
           <View style={ship_style.ship_box}>
             <View style={ship_style.ship_info}>
@@ -1286,9 +1294,9 @@ class OrderScene extends Component {
                     this.setState({addTipDialog: true})
                   }}
                 />}
-                {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
-                  zs_status === Cts.ZS_STATUS_CANCEL ||
-                  zs_status === Cts.ZS_STATUS_ABNORMAL
+                {(zs_status !== Cts.ZS_STATUS_NEVER_START &&
+                  zs_status !== Cts.ZS_STATUS_CANCEL &&
+                  zs_status !== Cts.ZS_STATUS_ABNORMAL
                 ) && <ClickBtn
                   type={'full'}
                   btn_text={'转自配送'}
@@ -1359,6 +1367,15 @@ class OrderScene extends Component {
               </View>
             </View>
           )}
+        </View>
+      );
+    }
+
+    if(zs_ship_view !== null || auto_ship_view !== null){
+      return (
+        <View>
+          {zs_ship_view}
+          {auto_ship_view}
         </View>
       );
     } else {

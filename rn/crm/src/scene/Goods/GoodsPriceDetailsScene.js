@@ -534,7 +534,7 @@ class GoodsPriceDetails extends PureComponent {
                   keyboardType={'numeric'}
                   underlineColorAndroid={'transparent'}
                   onChangeText={(text) => {
-                    console.log(text);
+                    //console.log(text);
                     this.setState({new_price_cents: text})
                   }}
               />
@@ -556,7 +556,7 @@ class GoodsPriceDetails extends PureComponent {
                     type: 'default',
                     label: '取消',
                     onPress: () => {
-                      this.setState({showDialogRefer: false,})
+                      this.setState({showDialogRefer: false, setReferPrice: ''});
                     }
                   }, {
                     type: 'primary',
@@ -581,7 +581,7 @@ class GoodsPriceDetails extends PureComponent {
                   }}
                   value={''+setReferPrice}
                   onChangeText={(text)=>{
-                    console.log(text)
+                    //console.log(text)
                     this.setState({setReferPrice:text})
                   }}
                   keyboardType={'numeric'}
