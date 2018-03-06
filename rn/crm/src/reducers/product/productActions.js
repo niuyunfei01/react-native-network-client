@@ -180,15 +180,6 @@ export function fetchApplyRocordList(viewStoreId, audit_status,page,token,callba
   }
 }
 
-
-function receiveVendorTags(_v_id, vendor_tags = {}) {
-  return {
-    type: GET_VENDOR_TAGS,
-    _v_id: _v_id,
-    store_tags: vendor_tags.store_tags,
-    basic_category: vendor_tags.basic_category,
-  }
-}
 function receiveVendorTags(_v_id, vendor_tags = {}) {
   return {
     type: GET_VENDOR_TAGS,
@@ -381,3 +372,17 @@ export function fetchStoreChgPrice(store_id,product_id,new_price_cents,token,cal
     );
   }
 }
+
+export function editProdReferPrice(data, token, callback) {
+  let url = `api/edit_prod_refer_price.json?access_token=${token}`;
+  return jsonWithTpl2(url, data, (json) => {
+      callback(json.ok, json.reason, json.obj);
+    },
+    (error) => {
+      callback(error, "网络错误, 请稍后重试")
+    }
+  )
+}
+
+
+
