@@ -595,7 +595,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>业绩</Text>
         </TouchableOpacity>)}
 
-        {fnPriceControlled > 0 && is_service_mgr &&
+        {fnPriceControlled > 0 ?
         (<TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
@@ -603,7 +603,7 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/yunyingshouyi_.png')}/>
           <Text style={[block_styles.block_name]}>运营收益</Text>
-        </TouchableOpacity>)}
+        </TouchableOpacity>):<View/>}
 
         {fnPriceControlled > 0 && is_service_mgr &&
         (<TouchableOpacity

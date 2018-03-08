@@ -26,7 +26,7 @@ import Config from "../../config";
 import {uploadImg, newProductSave} from "../../reducers/product/productActions";
 import tool, {toFixed} from '../../common/tool';
 import Cts from '../../Cts';
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong ,ToastShort} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button, Input} from "../../weui/index";
 import {fetchProfitDaily, fetchProfitOtherAdd} from '../../reducers/operateProfit/operateProfitActions'
@@ -75,20 +75,23 @@ class OperateDetailScene extends PureComponent {
       remark: '',
       name: '',
       money: '',
+      total_balanced:''
     }
   }
 
   toOperateDetail(url, params = {}) {
     params.day = this.props.navigation.state.params.day;
-    // if(this.state.check_detail){
+    if(this.state.check_detail){
     this.props.navigation.navigate(url, params)
-    // }else {
-    //   ToastLong('您没有权限!')
-    // }
+    }else {
+      ToastLong('您没有权限!')
+    }
   }
 
 
   componentWillMount() {
+    console.log('total_balanced',this.props.navigation.state.params.total_balanced)
+    this.setState({total_balanced:this.props.navigation.state.params.total_balanced})
     this.getProfitDaily();
   }
 
@@ -105,7 +108,6 @@ class OperateDetailScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(fetchProfitOtherAdd(data, accessToken, async (ok, obj, desc) => {
       await this.setState({uploading: false,});
-      console.log(ok, obj, desc)
       if (ok) {
         if(type ===Config.ROUTE_OPERATE_INCOME_DETAIL){
           this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL,{
@@ -143,12 +145,13 @@ class OperateDetailScene extends PureComponent {
   }
 
   renderTitle(title, type = 0, add = '') {
+    let {editable} = this.state;
     return (
         <View style={content.item}>
           <Text style={content.left}>{title}</Text>
           <TouchableOpacity
               onPress={() => {
-                this.setState({type: type, dlgShipVisible: true})
+                editable? this.setState({type: type, dlgShipVisible: true}):ToastShort('您没有权限')
               }}
           >
             <Text style={content.right}>{add}</Text>
@@ -192,10 +195,6 @@ class OperateDetailScene extends PureComponent {
                       money={outcome_normal[Cts.OPERATE_REFUND_OUT]['num']}
                       toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_REFUND_OUT})}
           />
-          <CellAccess title={`配送小费(${outcome_normal[Cts.OPERATE_DISTRIBUTION_TIPS]['order_num']}单)`}
-                      money={outcome_normal[Cts.OPERATE_DISTRIBUTION_TIPS]['num']}
-                      toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {type: Cts.OPERATE_DISTRIBUTION_TIPS})}
-          />
           <CellAccess title={'保底结算'} money={outcome_normal[Cts.OPERATE_OUT_BASIC]['num']}
                       toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
           />
@@ -203,21 +202,22 @@ class OperateDetailScene extends PureComponent {
                       money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]['num']}/>
           <CellAccess title={'CRM平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_BLX]['num']}/>
           <CellAccess title={'外卖平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]['num']}/>
-          {
-            this.renderTitle('其他支出流水', Cts.OPERATE_OTHER_OUT, '添加支出项')
-          }
-          {
-            _this.renderOtherOut()
-          }
+          {/*{*/}
+            {/*this.renderTitle('其他支出流水', Cts.OPERATE_OTHER_OUT, '添加支出项')*/}
+          {/*}*/}
+          {/*{*/}
+            {/*_this.renderOtherOut()*/}
+          {/*}*/}
         </View>
     )
   }
 
   render() {
-    let {sum, income, editable, remark, money, type, name} = this.state;
+    let {sum, income, editable, remark, money, type, name,total_balanced} = this.state;
     return (
         <View style={{flex: 1}}>
           <Header text={'今日运营收益'} money={toFixed(sum)}/>
+          <Header text={'待结算运营收益总额'} money={toFixed(total_balanced)} customStyle = {{height:pxToDp(60),alignItems:'flex-start'}}/>
           <ScrollView style={{paddingBottom: pxToDp(50)}}>
             <View style={content.in_box}>
               {
@@ -233,6 +233,7 @@ class OperateDetailScene extends PureComponent {
               />
               <CellAccess title={'其他收入'} money={income[Cts.OPERATE_OTHER_IN].num}
                           toOperateDetail={() => this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {type: Cts.OPERATE_OTHER_IN})}
+                          bottom
               />
             </View>
             {
@@ -399,7 +400,7 @@ class CellAccess extends PureComponent {
   }
 
   render() {
-    let {title, money} = this.props || {};
+    let {title, money,bottom} = this.props || {};
     return (
         <TouchableOpacity
             onPress={() => {
@@ -410,7 +411,7 @@ class CellAccess extends PureComponent {
               }
             }}
         >
-          <View style={content.item}>
+          <View style={ bottom ?[content.item,{borderBottomWidth: 0}] : [content.item]} >
             <Text style={content.text}>{title}</Text>
             <View style={content.item_img}>
               <Text style={content.money}>{toFixed(money)}</Text>
