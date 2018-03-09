@@ -252,7 +252,7 @@ class OrderScene extends Component {
 
     if (!o || !o.id || o.id !== orderId) {
 
-      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);
+      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);`
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -1144,6 +1144,7 @@ class OrderScene extends Component {
   }
 
   renderShipStatus(){
+    console.log('order',this.props.order.order);
     let {shipCallHided} = this.state;
     let {ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
       auto_ship_type, dada_status, dada_distance, dada_fee, dada_tips, dada_mobile = '', dada_dm_name} = this.props.order.order;
@@ -1167,7 +1168,8 @@ class OrderScene extends Component {
 
       auto_ship_view = (
         <View>
-          <View style={ship_style.ship_box}>
+          <View style={[ship_style.ship_box,{flexDirection:'column'}]}>
+            <View style={[ship_style.ship_box,{borderBottomWidth:0}]}>
             <View style={ship_style.ship_info}>
               <Text style={ship_style.ship_info_text}>
                 {dada_status === Cts.DADA_STATUS_TO_ACCEPT ?
@@ -1216,6 +1218,21 @@ class OrderScene extends Component {
               />
             </View>)}
           </View>
+         <View style={{
+           marginHorizontal:pxToDp(30),
+           flexDirection:"row",
+           alignItems:'center',
+           height:pxToDp(80),
+           borderTopWidth:pxToDp(1),
+           borderColor:colors.back_color,
+           borderStyle : 'dashed'
+         }}>
+           <Text style={[ship_style.ship_diff_time]}>
+             距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
+           </Text>
+         </View>
+          </View>
+
           {!shipCallHided && ship_site_mobile !== '' && (
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
@@ -1264,7 +1281,8 @@ class OrderScene extends Component {
 
       zs_ship_view = (
         <View>
-          <View style={ship_style.ship_box}>
+          <View style={[ship_style.ship_box,{flexDirection:"column"}]}>
+            <View style={[ship_style.ship_box,{borderBottomWidth:0}]}>
             <View style={ship_style.ship_info}>
               <Text style={ship_style.ship_info_text}>
                 {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
@@ -1337,6 +1355,21 @@ class OrderScene extends Component {
               />
             </View>)}
           </View>
+            <View style={{
+              marginHorizontal:pxToDp(30),
+              flexDirection:"row",
+              alignItems:'center',
+              height:pxToDp(80),
+              borderTopWidth:pxToDp(1),
+              borderColor:colors.back_color,
+              borderStyle : 'dashed'
+            }}>
+              <Text style={[ship_style.ship_diff_time]}>
+                距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
+              </Text>
+            </View>
+        </View>
+
           {!shipCallHided && ship_site_mobile !== '' && (
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
@@ -1872,7 +1905,7 @@ class ClickBtn extends PureComponent {
     super(props)
   }
   render() {
-    let {style, type, onPress, btn_text, mobile} = this.props;
+    let {style, type, onPress, btn_text, mobile,text_style} = this.props;
     return (
       <TouchableOpacity
         onPress={() => onPress()}
@@ -1887,7 +1920,7 @@ class ClickBtn extends PureComponent {
           backgroundColor: type === 'full' ? '#59b26a' : '#fff',
         }, style]}
       >
-        <Text style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToDp(24)}}>{btn_text}</Text>
+        <Text style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToDp(24),...text_style}}>{btn_text}</Text>
       </TouchableOpacity>
     );
   }
@@ -1895,7 +1928,7 @@ class ClickBtn extends PureComponent {
 
 const ship_style = StyleSheet.create({
   ship_box: {
-    height: pxToDp(120),
+    minHeight: pxToDp(120),
     backgroundColor: '#fff',
     flexDirection: 'row',
     borderBottomWidth: pxToDp(1),
