@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     width: null,
   },
   container: {
-    flexDirection: 'column',
     flex: 1,
     marginTop: 10
   },
@@ -274,15 +273,24 @@ class LoginScene extends PureComponent {
   }
 
   render() {
-    return (<Image style={[styles.backgroundImage, {backgroundColor: colors.white}]}
-                   source={require('../../img/Login/login_bg.png')}>
-      <View style={styles.container}>
+    return (
+      <View style={{backgroundColor: '#e4ecf7',width:width,height:height}}>
         <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
         }}>正在登录...</Toast>
-        <ScrollView horizontal={false} width={width} height={height}>
-          <View style={{marginTop: 100}}>
+        <ScrollView  style={{zIndex:10,flex:1}}>
+          <View >
+            <View style={{alignItems:"center"}}>
+              <Image
+                  style={{
+                    height:pxToDp(134),
+                    width:pxToDp(134),
+                    borderRadius:pxToDp(20),
+                    marginVertical:pxToDp(50),
+                    marginHorizontal:'auto'
+                  }}
+                  source = {require('../../img/Login/login_logo.jpg')}/>
+            </View>
             <View>
-
               <TextInput
                   underlineColorAndroid='transparent'
                   placeholder="请输入手机号"
@@ -296,7 +304,8 @@ class LoginScene extends PureComponent {
                     borderColor: colors.main_color,
                     borderRadius: pxToDp(52),
                     marginHorizontal: pxToDp(50),
-                    paddingLeft:pxToDp(40)
+                    paddingLeft:pxToDp(45),
+                    height:pxToDp(90)
                   }}
               />
             </View>
@@ -346,7 +355,7 @@ class LoginScene extends PureComponent {
                       borderRadius:pxToDp(45),
                       justifyContent:'center',
                       alignItems:'center',
-                      marginTop:pxToDp(45),
+                      marginTop:pxToDp(40),
                       borderColor:colors.main_color
                     }} onPress={this.onRequestSmsCode}>
                     <Text
@@ -357,7 +366,7 @@ class LoginScene extends PureComponent {
             </View>
 
             <View style={{marginLeft: 15, marginRight: 15}}>
-              {/*<TouchableOpacity>*/}
+              {/*<>*/}
                 {/*<Text>比邻鲜使用协议</Text>*/}
               {/*</TouchableOpacity>*/}
 
@@ -381,11 +390,27 @@ class LoginScene extends PureComponent {
                 </TouchableOpacity>
               </View>
             </View>
-
           </View>
         </ScrollView>
+        <Text style={{
+          textAlign:'center',
+          position:'absolute',
+          width:'100%',
+          bottom:pxToDp(80),
+          zIndex:100}}>登录即表示您已同意
+          <Text style={{color:colors.main_color}}>比邻鲜使用协议</Text>
+        </Text>
+        <Image style={{
+          bottom: pxToDp(40),
+          width: pxToDp(684),
+          height: pxToDp(612),
+          zIndex: 1,
+          position: 'absolute',
+          marginLeft:pxToDp(18)
+        }}
+               source={require('../../img/Login/login_bird.jpg')}/>
       </View>
-    </Image>)
+)
   }
 }
 
