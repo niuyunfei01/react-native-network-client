@@ -201,7 +201,7 @@ class OperateDetailScene extends PureComponent {
           <CellAccess title={`呼叫配送费(${outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]['order_num']}单)`}
                       money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]['num']}/>
           <CellAccess title={'CRM平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_BLX]['num']}/>
-          <CellAccess title={'外卖平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]['num']}/>
+          <CellAccess title={'外卖平台服务费(已扣除,支出不含此项)'} money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]['num']}/>
           {/*{*/}
             {/*this.renderTitle('其他支出流水', Cts.OPERATE_OTHER_OUT, '添加支出项')*/}
           {/*}*/}

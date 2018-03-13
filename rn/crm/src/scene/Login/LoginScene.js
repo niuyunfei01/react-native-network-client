@@ -374,6 +374,7 @@ class LoginScene extends PureComponent {
                 height:pxToDp(90),
                 borderRadius:pxToDp(45),
                 marginTop:pxToDp(50),
+                marginHorizontal:pxToDp(20),
               }}
                       type={'primary'}
                       onPress={this.onLogin}>登录</Button>
@@ -396,7 +397,7 @@ class LoginScene extends PureComponent {
           textAlign:'center',
           position:'absolute',
           width:'100%',
-          bottom:pxToDp(80),
+          bottom:pxToDp(100),
           zIndex:100}}>登录即表示您已同意
           <Text style={{color:colors.main_color}}>比邻鲜使用协议</Text>
         </Text>
