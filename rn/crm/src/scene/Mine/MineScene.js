@@ -552,7 +552,6 @@ class MineScene extends PureComponent {
 
   onPress(route, params = {}) {
     let _this = this;
-
     if (route === Config.ROUTE_SETTING) {
       native.toSettings();
       return;
@@ -742,11 +741,14 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>活动加价</Text>
         </TouchableOpacity>)}
 
-        {/*{is_service_mgr && (fnPriceControlled > 0 && is_helper ? (<View style={[block_styles.block_box]}/>) :*/}
-            {/*(fnPriceControlled > 0 || is_helper) && (<View style={[block_styles.empty_box]}/>) )}*/}
-        {/*{fnPriceControlled > 0 && is_service_mgr && <View style={[block_styles.block_box]}/>}*/}
-        {/*{(is_helper || is_service_mgr) && <View style={[block_styles.block_box]}/>}*/}
-
+        {(is_helper || is_service_mgr) && (<TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_SCAN)}
+            activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/My/jiagejianguan_.png')}/>
+          <Text style={[block_styles.block_name]}>扫码</Text>
+        </TouchableOpacity>)}
       </View>
     )
   }
