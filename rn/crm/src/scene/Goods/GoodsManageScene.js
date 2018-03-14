@@ -333,7 +333,7 @@ class GoodsMangerScene extends PureComponent {
                           <Text style={content.cankao}>参考价范围 :
                             {
                               refer_price ?
-                                  tool.toFixed(refer_upper) +' - '+ tool.toFixed(refer_lower)
+                                  tool.toFixed(refer_lower) +' - '+ tool.toFixed(refer_upper)
                                   :' 无'
                             }
                             </Text>
