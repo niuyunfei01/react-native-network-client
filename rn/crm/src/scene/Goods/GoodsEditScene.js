@@ -35,6 +35,7 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon} from "../../weui/index";
+import BarcodeScanner from 'react-native-barcodescanner';
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -57,7 +58,25 @@ class GoodsEditScene extends PureComponent {
     let {type} = params;
     let {backPage} = params;
     return {
-      headerTitle: type === 'edit' ? '修改商品' : '新增商品',
+      // headerTitle:
+      headerTitle: (
+          <View style={{
+            flexDirection:'row',
+            justifyContent:'center',
+            width:pxToDp(600),
+            height:'100%',
+          }}>
+            <TouchableOpacity onPress={()=>params.setScanflag(true)}>
+              <Text style={styles.headerText}>
+                {type === 'edit' ? '修改商品' : '直接上新'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={()=>params.setScanflag(false)}>
+              <Text style={[styles.headerText,{marginLeft:pxToDp(40)}]}>扫码上新</Text>
+            </TouchableOpacity>
+          </View>
+      ),
       headerLeft: (<NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
@@ -69,24 +88,6 @@ class GoodsEditScene extends PureComponent {
             }
           }}
       />),
-      headerRight: (
-          <View style={
-            {
-              flexDirection: 'row',
-              paddingRight: pxToDp(30)
-            }
-          }>
-            <TouchableOpacity
-                onPress={() => {
-                  params.upLoad();
-                }}
-            >
-              <Text style={{
-                fontSize: pxToDp(32),
-                color: '#59b26a'
-              }}>保存</Text>
-            </TouchableOpacity>
-          </View>),
     }
   };
 
@@ -129,7 +130,9 @@ class GoodsEditScene extends PureComponent {
       goBackValue: false,
       task_id: 0,
       selectToWhere: false,
-
+      torchMode: 'on',
+      cameraType: 'back',
+      scanBoolean:false,
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -145,9 +148,6 @@ class GoodsEditScene extends PureComponent {
     let {params} = this.props.navigation.state;
     let {type} = params;
     if (type === 'edit') {
-      // let upload_files = tool.objectMap(mid_list_img, (img_data, img_id) => {
-      //   return {id: img_id, name: img_data.name};
-      // });
       let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
       const {basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur, promote_name, list_img, mid_list_img, coverimg} = product_detail;
       let upload_files = {};
@@ -230,7 +230,7 @@ class GoodsEditScene extends PureComponent {
 
   componentDidMount() {
     let {navigation} = this.props;
-    navigation.setParams({upLoad: this.upLoad});
+    navigation.setParams({upLoad: this.upLoad,setScanflag:this.setScanflag});
   }
 
   componentDidUpdate() {
@@ -242,6 +242,9 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
+  setScanflag = (flag) => {
+    this.setState({scanBoolean:flag})
+  }
   back(type) {
     if (type === 'add') {
       native.gotoPage(type);
@@ -540,285 +543,310 @@ class GoodsEditScene extends PureComponent {
     if (obj) {
       tool.objectMap(obj, (item, id) => {
         arr.push(item.name);
-      })
+      });
       return arr.join(' , ')
     }
   }
-
+  barcodeReceived(e) {
+    console.warn('Barcode: ' + e.data);
+  }
   render() {
+    let {scanBoolean} = this.state;
     return (
-        <ScrollView>
-          <GoodAttrs name="基本信息"/>
-          <View>
-            <Cells style={styles.my_cells}>
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>商品名称</Label>
-                </CellHeader>
-                <CellBody>
-                  <TextInput
-                      placeholder='输入商品名(不超过20个字)'
-                      underlineColorAndroid='transparent'
-                      placeholderTextColor={"#7A7A7A"}
-                      maxLength={20}
-                      style={[styles.input_text]}
-                      value={this.state.name}
-                      onChangeText={(text) => {
-                        this.setState({name: text})
-                      }}
-                  />
-                </CellBody>
-              </Cell>
-              <ModalSelector
-                  skin='customer'
-                  data={this.state.sku_units}
-                  onChange={(option) => {
-                    this.setState({sku_unit: option.label})
-                  }}>
-                <Cell customStyle={[styles.my_cell]} access>
-                  <CellHeader style={styles.attr_name}>
-                    <Label style={[styles.cell_label]}>SKU单位</Label>
-                  </CellHeader>
-                  <CellBody>
-                    <Text>{this.state.sku_unit}</Text>
-                  </CellBody>
-                  <CellFooter/>
-                </Cell>
-              </ModalSelector>
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>份含量</Label>
-                </CellHeader>
-                <CellBody>
-                  <TextInput
-                      placeholder='请输入商品份含量'
-                      underlineColorAndroid='transparent'
-                      placeholderTextColor={"#7A7A7A"}
-                      style={[styles.input_text]}
-                      keyboardType='numeric'
-                      value={`${this.state.sku_having_unit}`}
-                      onChangeText={(text) => {
-                        this.setState({sku_having_unit: text})
-                      }}
-                  />
-                </CellBody>
-                <CellFooter/>
-              </Cell>
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>平均重量</Label>
-                </CellHeader>
-                <CellBody>
-                  <TextInput
-                      placeholder='请输入商品重量'
-                      underlineColorAndroid='transparent'
-                      placeholderTextColor={"#7A7A7A"}
-                      style={[styles.input_text]}
-                      value={'' + this.state.weight}
-                      keyboardType='numeric'
-                      onChangeText={(text) => {
-                        this.setState({weight: text})
-                      }}
-                  />
-                </CellBody>
-                <CellFooter>克</CellFooter>
-              </Cell>
-
-              <ModalSelector
-                  skin='customer'
-                  data={this.state.basic_cat_list}
-                  onChange={(option) => {
-                    this.setState({basic_category: option.key})
-                  }}>
-                <Cell customStyle={[styles.my_cell]} access>
-                  <CellHeader style={styles.attr_name}>
-                    <Label style={[styles.cell_label]}>基础分类</Label>
-                  </CellHeader>
-                  <CellBody>
-                    <Text>
-                      {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
-                    </Text>
-                  </CellBody>
-                  <CellFooter/>
-                </Cell>
-              </ModalSelector>
-              <Cell
-                  customStyle={[styles.my_cell]}
-                  access
-                  onPress={() => {
-                    let {state, navigate} = this.props.navigation;
-                    navigate(Config.ROUTE_GOODS_CLASSIFY, {
-                      nav_key: state.key,
-                      store_categories: this.state.store_categories,
-                      vendor_id: this.state.vendor_id
-                    });
-                  }}
-              >
-                <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>门店分类</Label>
-                </CellHeader>
-                <CellBody>
-                  <Text>
-                    {this.state.tag_list}
-                  </Text>
-                </CellBody>
-                <CellFooter/>
-              </Cell>
-              <View style={[styles.area_cell, {height: pxToDp(154)}]}>
-                <View>
-                  <Text style={[styles.area_input_title]}>广告词</Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: "center"}}>
-                  <TextInput
-                      placeholder='输入广告词'
-                      underlineColorAndroid='transparent'
-                      maxLength={20}
-                      placeholderTextColor={"#7A7A7A"}
-                      style={[styles.input_text, {fontSize: pxToDp(30), flex: 1}]}
-                      value={this.state.promote_name}
-                      onChangeText={(text) => {
-                        this.setState({promote_name: text})
-                      }}
-                  />
-                  <Text>{tool.length(this.state.promote_name)}/20</Text>
-                </View>
-              </View>
-              <View style={[styles.area_cell, {height: pxToDp(250)}]}>
-                <View>
-                  <Text style={[styles.area_input_title]}>商品介绍</Text>
-                </View>
-                <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
-                  <TextInput
-
-                      underlineColorAndroid='transparent'
-                      placeholder='请输入商品介绍'
-                      placeholderTextColor={"#7A7A7A"}
-                      style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
-                      value={this.state.tag_info_nur}
-                      onChangeText={(text) => {
-                        this.setState({tag_info_nur: text})
-                      }}
-                  />
-                  <Text style={{alignSelf: 'flex-end'}}>{tool.length(this.state.tag_info_nur)}/50</Text>
-                </View>
-              </View>
-            </Cells>
-          </View>
-          <GoodAttrs name="上传图片"/>
-          <View style={[styles.area_cell, {
-            minHeight: pxToDp(215),
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            paddingHorizontal: pxToDp(20),
-            paddingTop: pxToDp(10)
-          }]}>
-            {tool.length(this.state.list_img) > 0 ?
-              tool.objectMap(this.state.list_img, (img_data, img_id) => {
-              let img_url = img_data['url'];
-              let img_name = img_data['name'];
-              return (
-                  <View key={img_id}
-                        style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'flex-end'}}>
-                    <Image
-                        style={styles.img_add}
-                        source={{uri: img_url}}
-                    />
-                    <TouchableOpacity
-                        style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
-                        onPress={() => {
-                          delete  this.state.list_img[img_id]
-                          delete  this.state.upload_files[img_id]
-                          this.forceUpdate()
-                        }}
-                    >
-                      <Icon
-                          name={'clear'}
-                          size={pxToDp(40)}
-                          style={{backgroundColor: '#fff'}}
-                          color={'#d81e06'}
-                          msg={false}
+        scanBoolean ?
+            <ScrollView>
+              <GoodAttrs name="基本信息"/>
+              <View>
+                <Cells style={styles.my_cells}>
+                  <Cell customStyle={[styles.my_cell]}>
+                    <CellHeader style={styles.attr_name}>
+                      <Label style={[styles.cell_label]}>商品名称</Label>
+                    </CellHeader>
+                    <CellBody>
+                      <TextInput
+                          placeholder='输入商品名(不超过20个字)'
+                          underlineColorAndroid='transparent'
+                          placeholderTextColor={"#7A7A7A"}
+                          maxLength={20}
+                          style={[styles.input_text]}
+                          value={this.state.name}
+                          onChangeText={(text) => {
+                            this.setState({name: text})
+                          }}
                       />
-                    </TouchableOpacity>
-                  </View>
-              );
-            }) : (this.state.cover_img ? (
-                <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'flex-end'}}>
-                  <Image
-                    style={styles.img_add}
-                    source={{uri: this.state.cover_img}}
-                  />
-                  <TouchableOpacity
-                    style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
-                    onPress={() => {
-                      this.setState({cover_img: ''});
-                    }}
+                    </CellBody>
+                  </Cell>
+                  <ModalSelector
+                      skin='customer'
+                      data={this.state.sku_units}
+                      onChange={(option) => {
+                        this.setState({sku_unit: option.label})
+                      }}>
+                    <Cell customStyle={[styles.my_cell]} access>
+                      <CellHeader style={styles.attr_name}>
+                        <Label style={[styles.cell_label]}>SKU单位</Label>
+                      </CellHeader>
+                      <CellBody>
+                        <Text>{this.state.sku_unit}</Text>
+                      </CellBody>
+                      <CellFooter/>
+                    </Cell>
+                  </ModalSelector>
+                  <Cell customStyle={[styles.my_cell]}>
+                    <CellHeader style={styles.attr_name}>
+                      <Label style={[styles.cell_label]}>份含量</Label>
+                    </CellHeader>
+                    <CellBody>
+                      <TextInput
+                          placeholder='请输入商品份含量'
+                          underlineColorAndroid='transparent'
+                          placeholderTextColor={"#7A7A7A"}
+                          style={[styles.input_text]}
+                          keyboardType='numeric'
+                          value={`${this.state.sku_having_unit}`}
+                          onChangeText={(text) => {
+                            this.setState({sku_having_unit: text})
+                          }}
+                      />
+                    </CellBody>
+                    <CellFooter/>
+                  </Cell>
+                  <Cell customStyle={[styles.my_cell]}>
+                    <CellHeader style={styles.attr_name}>
+                      <Label style={[styles.cell_label]}>平均重量</Label>
+                    </CellHeader>
+                    <CellBody>
+                      <TextInput
+                          placeholder='请输入商品重量'
+                          underlineColorAndroid='transparent'
+                          placeholderTextColor={"#7A7A7A"}
+                          style={[styles.input_text]}
+                          value={'' + this.state.weight}
+                          keyboardType='numeric'
+                          onChangeText={(text) => {
+                            this.setState({weight: text})
+                          }}
+                      />
+                    </CellBody>
+                    <CellFooter>克</CellFooter>
+                  </Cell>
+
+                  <ModalSelector
+                      skin='customer'
+                      data={this.state.basic_cat_list}
+                      onChange={(option) => {
+                        this.setState({basic_category: option.key})
+                      }}>
+                    <Cell customStyle={[styles.my_cell]} access>
+                      <CellHeader style={styles.attr_name}>
+                        <Label style={[styles.cell_label]}>基础分类</Label>
+                      </CellHeader>
+                      <CellBody>
+                        <Text>
+                          {!this.state.basic_categories[this.state.basic_category] ? '选择基础分类' : this.state.basic_categories[this.state.basic_category]}
+                        </Text>
+                      </CellBody>
+                      <CellFooter/>
+                    </Cell>
+                  </ModalSelector>
+                  <Cell
+                      customStyle={[styles.my_cell]}
+                      access
+                      onPress={() => {
+                        let {state, navigate} = this.props.navigation;
+                        navigate(Config.ROUTE_GOODS_CLASSIFY, {
+                          nav_key: state.key,
+                          store_categories: this.state.store_categories,
+                          vendor_id: this.state.vendor_id
+                        });
+                      }}
                   >
-                    <Icon
-                      name={'clear'}
-                      size={pxToDp(40)}
-                      style={{backgroundColor: '#fff'}}
-                      color={'#d81e06'}
-                      msg={false}
-                    />
+                    <CellHeader style={styles.attr_name}>
+                      <Label style={[styles.cell_label]}>门店分类</Label>
+                    </CellHeader>
+                    <CellBody>
+                      <Text>
+                        {this.state.tag_list}
+                      </Text>
+                    </CellBody>
+                    <CellFooter/>
+                  </Cell>
+                  <View style={[styles.area_cell, {height: pxToDp(154)}]}>
+                    <View>
+                      <Text style={[styles.area_input_title]}>广告词</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', alignItems: "center"}}>
+                      <TextInput
+                          placeholder='输入广告词'
+                          underlineColorAndroid='transparent'
+                          maxLength={20}
+                          placeholderTextColor={"#7A7A7A"}
+                          style={[styles.input_text, {fontSize: pxToDp(30), flex: 1}]}
+                          value={this.state.promote_name}
+                          onChangeText={(text) => {
+                            this.setState({promote_name: text})
+                          }}
+                      />
+                      <Text>{tool.length(this.state.promote_name)}/20</Text>
+                    </View>
+                  </View>
+                  <View style={[styles.area_cell, {height: pxToDp(250)}]}>
+                    <View>
+                      <Text style={[styles.area_input_title]}>商品介绍</Text>
+                    </View>
+                    <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
+                      <TextInput
+
+                          underlineColorAndroid='transparent'
+                          placeholder='请输入商品介绍'
+                          placeholderTextColor={"#7A7A7A"}
+                          style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
+                          value={this.state.tag_info_nur}
+                          onChangeText={(text) => {
+                            this.setState({tag_info_nur: text})
+                          }}
+                      />
+                      <Text style={{alignSelf: 'flex-end'}}>{tool.length(this.state.tag_info_nur)}/50</Text>
+                    </View>
+                  </View>
+                </Cells>
+              </View>
+              <GoodAttrs name="上传图片"/>
+              <View style={[styles.area_cell, {
+                minHeight: pxToDp(215),
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                paddingHorizontal: pxToDp(20),
+                paddingTop: pxToDp(10)
+              }]}>
+                {tool.length(this.state.list_img) > 0 ?
+                    tool.objectMap(this.state.list_img, (img_data, img_id) => {
+                      let img_url = img_data['url'];
+                      let img_name = img_data['name'];
+                      return (
+                          <View key={img_id}
+                                style={{
+                                  height: pxToDp(170),
+                                  width: pxToDp(170),
+                                  flexDirection: 'row',
+                                  alignItems: 'flex-end'
+                                }}>
+                            <Image
+                                style={styles.img_add}
+                                source={{uri: img_url}}
+                            />
+                            <TouchableOpacity
+                                style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
+                                onPress={() => {
+                                  delete  this.state.list_img[img_id]
+                                  delete  this.state.upload_files[img_id]
+                                  this.forceUpdate()
+                                }}
+                            >
+                              <Icon
+                                  name={'clear'}
+                                  size={pxToDp(40)}
+                                  style={{backgroundColor: '#fff'}}
+                                  color={'#d81e06'}
+                                  msg={false}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                      );
+                    }) : (this.state.cover_img ? (
+                        <View style={{
+                          height: pxToDp(170),
+                          width: pxToDp(170),
+                          flexDirection: 'row',
+                          alignItems: 'flex-end'
+                        }}>
+                          <Image
+                              style={styles.img_add}
+                              source={{uri: this.state.cover_img}}
+                          />
+                          <TouchableOpacity
+                              style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
+                              onPress={() => {
+                                this.setState({cover_img: ''});
+                              }}
+                          >
+                            <Icon
+                                name={'clear'}
+                                size={pxToDp(40)}
+                                style={{backgroundColor: '#fff'}}
+                                color={'#d81e06'}
+                                msg={false}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                    ) : null)}
+                <View style={{
+                  height: pxToDp(170),
+                  width: pxToDp(170),
+                  flexDirection: 'row',
+                  alignItems: 'flex-end'
+                }}>
+                  <TouchableOpacity
+                      style={[styles.img_add, styles.img_add_box, {flexWrap: 'wrap'}]}
+                      onPress={() => this.pickSingleImg()}
+                  >
+                    <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
                   </TouchableOpacity>
                 </View>
-              ) : null)}
-            <View style={{
-              height: pxToDp(170),
-              width: pxToDp(170),
-              flexDirection: 'row',
-              alignItems: 'flex-end'
-            }}>
-              <TouchableOpacity
-                  style={[styles.img_add, styles.img_add_box, {flexWrap: 'wrap'}]}
-                  onPress={() => this.pickSingleImg()}
-              >
-                <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {
-            this.renderAddGood()
-          }
-          <Toast
-              icon="loading"
-              show={this.state.isUploadImg}
-          >图片上传中...</Toast>
+              </View>
+              {
+                this.renderAddGood()
+              }
+              <Toast
+                  icon="loading"
+                  show={this.state.isUploadImg}
+              >图片上传中...</Toast>
 
-          <Toast
-              icon="loading"
-              show={this.state.uploading}
-              onRequestClose={() => {
+              <Toast
+                  icon="loading"
+                  show={this.state.uploading}
+                  onRequestClose={() => {
+                  }}
+              >提交中</Toast>
+              <Dialog onRequestClose={() => {
               }}
-          >提交中</Toast>
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.selectToWhere}
-                  buttons={[{
-                    type: 'default',
-                    label: '回申请页面',
-                    onPress: () => {
-                      this.setState({selectToWhere: false});
-                      this.props.navigation.navigate('Remind')
-                    }
-                  }, {
-                    type: 'primary',
-                    label: '去商品页面',
-                    onPress: () => {
-                      this.setState({selectToWhere: false});
-                      native.toGoods()
-                    }
-                  }]}
-          >
-            <Text style={{width: '100%', textAlign: 'center', fontSize: pxToDp(30), color: colors.color333}}>上传成功</Text>
-            <Text style={{width: '100%', textAlign: 'center'}}>商品已成功添加到门店</Text>
+                      visible={this.state.selectToWhere}
+                      buttons={[{
+                        type: 'default',
+                        label: '回申请页面',
+                        onPress: () => {
+                          this.setState({selectToWhere: false});
+                          this.props.navigation.navigate('Remind')
+                        }
+                      }, {
+                        type: 'primary',
+                        label: '去商品页面',
+                        onPress: () => {
+                          this.setState({selectToWhere: false});
+                          native.toGoods()
+                        }
+                      }]}
+              >
+                <Text style={{
+                  width: '100%',
+                  textAlign: 'center',
+                  fontSize: pxToDp(30),
+                  color: colors.color333
+                }}>上传成功</Text>
+                <Text style={{width: '100%', textAlign: 'center'}}>商品已成功添加到门店</Text>
 
-          </Dialog>
-        </ScrollView>
+              </Dialog>
+            </ScrollView> :
+            <BarcodeScanner
+                onBarCodeRead={this.barcodeReceived}
+                style={{flex: 1}}
+                torchMode={'off'}
+                showViewFinder={false}
+                cameraType={this.state.cameraType}
+            />
     )
   }
 }
-
 
 class GoodAttrs extends PureComponent {
   constructor(props) {
@@ -901,9 +929,12 @@ const styles = StyleSheet.create({
   input_text: {
     marginLeft: 0,
     paddingLeft: 0
+  },
+  headerText: {
+    height: '100%',
+    color: colors.main_color,
+    textAlignVertical: 'center',
   }
-
-
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsEditScene)
