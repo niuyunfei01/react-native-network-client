@@ -175,6 +175,14 @@
 
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
 
+        <activity android:name=".ui.scanner.FullScannerActivity"
+            android:theme="@style/AppOverlayTheme"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:label="@string/scanner_activity">
+            <meta-data android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
+
         <service
             android:name="cn.jpush.android.service.DownloadService"
             android:enabled="true"

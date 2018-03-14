@@ -913,6 +913,16 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
+          <Text style={[block_styles.block_name]}>扫码上货</Text>
+        </TouchableOpacity>
       </View>
     )
   }
