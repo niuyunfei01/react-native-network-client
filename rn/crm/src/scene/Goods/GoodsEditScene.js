@@ -35,6 +35,7 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon} from "../../weui/index";
+
 import BarcodeScanner from 'react-native-barcodescanner';
 
 function mapStateToProps(state) {
@@ -58,25 +59,7 @@ class GoodsEditScene extends PureComponent {
     let {type} = params;
     let {backPage} = params;
     return {
-      // headerTitle:
-      headerTitle: (
-          <View style={{
-            flexDirection:'row',
-            justifyContent:'center',
-            width:pxToDp(600),
-            height:'100%',
-          }}>
-            <TouchableOpacity onPress={()=>params.setScanflag(true)}>
-              <Text style={styles.headerText}>
-                {type === 'edit' ? '修改商品' : '直接上新'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={()=>params.setScanflag(false)}>
-              <Text style={[styles.headerText,{marginLeft:pxToDp(40)}]}>扫码上新</Text>
-            </TouchableOpacity>
-          </View>
-      ),
+      headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerLeft: (<NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
@@ -88,6 +71,35 @@ class GoodsEditScene extends PureComponent {
             }
           }}
       />),
+      headerRight: (
+          <View style={
+            {
+              flexDirection: 'row',
+              paddingRight: pxToDp(30)
+            }
+          }>
+            <TouchableOpacity
+                onPress={() => {
+                  native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity")
+                }}
+            >
+              <Text style={{
+                fontSize: pxToDp(32),
+                color: '#59b26a',
+                marginRight:pxToDp(30)
+              }}>扫码上传</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => {
+                  params.upLoad();
+                }}
+            >
+              <Text style={{
+                fontSize: pxToDp(32),
+                color: '#59b26a'
+              }}>保存</Text>
+            </TouchableOpacity>
+          </View>),
     }
   };
 
@@ -132,7 +144,7 @@ class GoodsEditScene extends PureComponent {
       selectToWhere: false,
       torchMode: 'on',
       cameraType: 'back',
-      scanBoolean:false,
+      scanBoolean:true,
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -181,7 +193,7 @@ class GoodsEditScene extends PureComponent {
       if (vendor_store) {
         this.setState({vendor_stores: vendor_store})
       } else {
-        _this.getVendorStore()
+        _this.getVendorStore();
       }
       if (task_id && name) {
         this.setState({
@@ -553,7 +565,6 @@ class GoodsEditScene extends PureComponent {
   render() {
     let {scanBoolean} = this.state;
     return (
-        scanBoolean ?
             <ScrollView>
               <GoodAttrs name="基本信息"/>
               <View>
@@ -836,14 +847,7 @@ class GoodsEditScene extends PureComponent {
                 <Text style={{width: '100%', textAlign: 'center'}}>商品已成功添加到门店</Text>
 
               </Dialog>
-            </ScrollView> :
-            <BarcodeScanner
-                onBarCodeRead={this.barcodeReceived}
-                style={{flex: 1}}
-                torchMode={'off'}
-                showViewFinder={false}
-                cameraType={this.state.cameraType}
-            />
+            </ScrollView>
     )
   }
 }
