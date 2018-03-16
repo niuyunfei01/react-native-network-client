@@ -52,6 +52,42 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
+let configState = {
+  isRefreshing: false,
+  isUploadImg: false,
+  basic_cat_list: [],
+  basic_categories: [],
+  store_tags: {},
+  sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
+  head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
+  provided: 1,
+  name: '',
+  sku_having_unit: '',
+  tag_info_nur: '',
+  promote_name: '',
+  list_img: {},
+  cover_img: '',
+  upload_files: {},
+  price: '',
+  basic_category: 0,
+  store_categories: [],
+  tag_list: '选择门店分类',
+  id: 0,
+  sku_unit: '请选择SKU单位',
+  weight: '',
+  selling_categories: [
+    {label: '上架', key: Cts.STORE_PROD_ON_SALE},
+    {label: '下架', key: Cts.STORE_PROD_OFF_SALE},
+    {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
+  sale_status: -1,
+  vendor_stores: '',
+  goBackValue: false,
+  task_id: 0,
+  selectToWhere: false,
+  torchMode: 'on',
+  cameraType: 'back',
+  scanBoolean:true,
+}
 
 class GoodsEditScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
@@ -109,42 +145,9 @@ class GoodsEditScene extends PureComponent {
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
 
     this.state = {
-      isRefreshing: false,
-      isUploadImg: false,
-      basic_cat_list: [],
-      basic_categories: [],
-      store_tags: {},
-      sku_units: [{label: '斤', key: 0}, {label: '个', key: 1}],
-      head_supplies: [{label: '门店自采', key: Cts.STORE_SELF_PROVIDED}, {label: '总部供货', key: Cts.STORE_COMMON_PROVIDED}],
-      provided: 1,
-      name: '',
-      sku_having_unit: '',
-      tag_info_nur: '',
-      promote_name: '',
-      list_img: {},
-      cover_img: '',
-      upload_files: {},
-      price: '',
-      basic_category: 0,
+        ...configState,
       vendor_id: currVendorId,
-      store_categories: [],
-      tag_list: '选择门店分类',
-      id: 0,
-      sku_unit: '请选择SKU单位',
-      weight: '',
-      selling_categories: [
-        {label: '上架', key: Cts.STORE_PROD_ON_SALE},
-        {label: '下架', key: Cts.STORE_PROD_OFF_SALE},
-        {label: '缺货', key: Cts.STORE_PROD_SOLD_OUT}],
-      sale_status: -1,
       fnProviding: fnProviding,
-      vendor_stores: '',
-      goBackValue: false,
-      task_id: 0,
-      selectToWhere: false,
-      torchMode: 'on',
-      cameraType: 'back',
-      scanBoolean:true,
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -158,6 +161,7 @@ class GoodsEditScene extends PureComponent {
   componentWillMount() {
     let _this = this;
     let {params} = this.props.navigation.state;
+    console.log('params>>>',params)
     let {type} = params;
     if (type === 'edit') {
       let product_detail = tool.deepClone(this.props.navigation.state.params.product_detail)
@@ -171,7 +175,8 @@ class GoodsEditScene extends PureComponent {
           }
         }
       }
-
+      console.log('mid_list_img>>>>',mid_list_img)
+      console.log('upload_files>>>>',upload_files)
       this.setState({
         name: name,
         sku_having_unit: sku_having_unit,
@@ -199,6 +204,24 @@ class GoodsEditScene extends PureComponent {
         this.setState({
           task_id: task_id,
           name: name,
+        })
+      }else if(type === 'scan') {
+        console.log('>>>>',this.props.navigation.state.params.product_detail)
+        let {name,weight,img} = this.props.navigation.state.params.product_detail;
+        let upload_files = {};
+        if (tool.length(img) > 0) {
+          for (let img_id in img) {
+            if (img.hasOwnProperty(img_id)) {
+              let img_data = img[img_id];
+              upload_files[img_id] = {id: img_id, name: img_data.name}
+            }
+          }
+        }
+        this.setState({
+          name:name,
+          list_img :img,
+          weight:weight,
+          upload_files: upload_files,
         })
       }
     }
@@ -256,7 +279,7 @@ class GoodsEditScene extends PureComponent {
 
   setScanflag = (flag) => {
     this.setState({scanBoolean:flag})
-  }
+  };
   back(type) {
     if (type === 'add') {
       native.gotoPage(type);
@@ -330,7 +353,7 @@ class GoodsEditScene extends PureComponent {
       upload_files,
       task_id,
     };
-    if (type === 'add') {
+    if ((type === 'add') || (type === 'scan')) {
       formData.store_goods_status = {price: price, sale_status: sale_status, provided: provided};
     }
     const {dispatch} = this.props;
@@ -348,7 +371,10 @@ class GoodsEditScene extends PureComponent {
         if (ok) {
           if (task_id > 0) {
             this.setState({selectToWhere: true})
-          } else {
+          }else if(type === 'scan'){
+            ToastLong('上传成功')
+            this.setState({...configState})
+          }else {
             await this.setBeforeRefresh();
             this.back(type);
           }

@@ -386,3 +386,17 @@ export function editProdReferPrice(data, token, callback) {
 
 
 
+
+export function queryUpcCode(code,token,callback) {
+  return dispatch => {
+    let url = `/api/query_product_by_code/${code}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp.ok,resp.desc,resp.obj);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}

@@ -584,7 +584,7 @@ class GoodsPriceDetails extends PureComponent {
                   }}
                   value={''+setReferPrice}
                   onChangeText={(text)=>{
-                    //console.log(text)
+                    console.log(text)
                     this.setState({setReferPrice:text})
                   }}
                   keyboardType={'numeric'}
