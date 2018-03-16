@@ -10,6 +10,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -17,8 +18,15 @@ import com.google.zxing.Result;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.domain.ProductTpl;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FullScannerActivity extends BaseScannerActivity implements MessageDialogFragment.MessageDialogListener,
         ZXingScannerView.ResultHandler, FormatSelectorDialogFragment.FormatSelectorDialogListener,
@@ -146,7 +154,29 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
             Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
         } catch (Exception e) {}
-        showMessageDialog("Contents = " + rawResult.getText() + ", Format = " + rawResult.getBarcodeFormat().toString());
+        String code = rawResult.getText();
+        BarcodeFormat barcodeFormat = rawResult.getBarcodeFormat();
+        Call<ResultBean<List<ProductTpl>>> rb = GlobalCtx.app().dao.searchByBarCode(code);
+        rb.enqueue(new Callback<ResultBean<List<ProductTpl>>>() {
+            @Override
+            public void onResponse(Call<ResultBean<List<ProductTpl>>> call, Response<ResultBean<List<ProductTpl>>> response) {
+                ResultBean body = response.body();
+                if (body!=null&&body.isOk()) {
+                    //查询到结果
+                    List<ProductTpl> products = (List<ProductTpl>) body.getObj();
+                    
+                } else {
+                    //没有查询到结果
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResultBean<List<ProductTpl>>> call, Throwable t) {
+                showMessageDialog("扫码失败,请重试！");
+            }
+        });
+        //showMessageDialog("Contents = " + code + ", Format = " + barcodeFormat.toString());
     }
 
     public void showMessageDialog(String message) {

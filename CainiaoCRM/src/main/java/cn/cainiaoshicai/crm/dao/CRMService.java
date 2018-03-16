@@ -1,11 +1,13 @@
 package cn.cainiaoshicai.crm.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.FileBean;
 import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
+import cn.cainiaoshicai.crm.domain.ProductTpl;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -78,6 +80,9 @@ public interface CRMService {
 
     @GET("/api/print_in_cloud/{orderId}")
     Call<ResultBean<Integer>> printInCloud(@Path("orderId") int orderId);
+
+    @GET("/api/query_product_by_code/{code}")
+    Call<ResultBean<List<ProductTpl>>> searchByBarCode(@Path("code") String code);
 
     class UploadRes {
         private FileBean file;

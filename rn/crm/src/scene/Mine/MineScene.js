@@ -916,7 +916,7 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-
+            native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity")
           }}
           activeOpacity={customerOpacity}
         >
