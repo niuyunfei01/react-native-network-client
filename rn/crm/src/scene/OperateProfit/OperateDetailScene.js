@@ -189,7 +189,7 @@ class OperateDetailScene extends PureComponent {
     return (
         <View style={content.in_box}>
           {
-            this.renderTitle('支出流水')
+            this.renderTitle('支出流水',0 ,'添加支出流水')
           }
           <CellAccess title={`用户退款金额(${outcome_normal[Cts.OPERATE_REFUND_OUT]['order_num']})单`}
                       money={outcome_normal[Cts.OPERATE_REFUND_OUT]['num']}
@@ -202,12 +202,12 @@ class OperateDetailScene extends PureComponent {
                       money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]['num']}/>
           <CellAccess title={'CRM平台服务费'} money={outcome_normal[Cts.OPERATE_OUT_BLX]['num']}/>
           <CellAccess title={'外卖平台服务费(已扣除,支出不含此项)'} money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]['num']}/>
-          {/*{*/}
-            {/*this.renderTitle('其他支出流水', Cts.OPERATE_OTHER_OUT, '添加支出项')*/}
-          {/*}*/}
-          {/*{*/}
-            {/*_this.renderOtherOut()*/}
-          {/*}*/}
+          {
+            this.renderTitle('其他支出流水', Cts.OPERATE_OTHER_OUT, '添加支出项')
+          }
+          {
+            _this.renderOtherOut()
+          }
         </View>
     )
   }
