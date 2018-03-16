@@ -18,7 +18,7 @@ public class ProductTpl {
     private String first_category_id;
     private String second_category_id;
     private String third_category_id;
-    private List<String> img;
+    private List<UploadFile> img;
 
     public int getId() {
         return id;
@@ -108,11 +108,11 @@ public class ProductTpl {
         this.third_category_id = third_category_id;
     }
 
-    public List<String> getImg() {
+    public List<UploadFile> getImg() {
         return img;
     }
 
-    public void setImg(List<String> img) {
+    public void setImg(List<UploadFile> img) {
         this.img = img;
     }
 }
