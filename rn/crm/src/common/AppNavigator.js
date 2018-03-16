@@ -283,7 +283,7 @@ class Navigator extends Component {
         [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
         [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
         [Config.ROUTE_SCAN]: {screen: ScanScene},
-        [Config.ROUTE_SCAN]: {screen: GoodsScanSearchScene},
+        [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
       },
       stackNavigatorConfigs
     );

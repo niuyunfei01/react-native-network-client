@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.common.collect.Lists;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
@@ -161,19 +162,19 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
             @Override
             public void onResponse(Call<ResultBean<List<ProductTpl>>> call, Response<ResultBean<List<ProductTpl>>> response) {
                 ResultBean body = response.body();
-                if (body!=null&&body.isOk()) {
+                List<ProductTpl> productTplList = Lists.newArrayList();
+                if (body != null && body.isOk()) {
                     //查询到结果
-                    List<ProductTpl> products = (List<ProductTpl>) body.getObj();
-                    
-                } else {
-                    //没有查询到结果
-
+                    productTplList = (List<ProductTpl>) body.getObj();
                 }
+                mScannerView.resumeCameraPreview(FullScannerActivity.this);
+                GlobalCtx.app().toGoodScanSearch(FullScannerActivity.this, productTplList);
             }
 
             @Override
             public void onFailure(Call<ResultBean<List<ProductTpl>>> call, Throwable t) {
                 showMessageDialog("扫码失败,请重试！");
+                mScannerView.resumeCameraPreview(FullScannerActivity.this);
             }
         });
         //showMessageDialog("Contents = " + code + ", Format = " + barcodeFormat.toString());
