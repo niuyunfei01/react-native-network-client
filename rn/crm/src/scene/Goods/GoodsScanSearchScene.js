@@ -137,7 +137,6 @@ class GoodsScanSearchScene extends PureComponent {
     this.setState({query: true})
     dispatch(queryUpcCode(this.state.upc, accessToken, (ok, desc, obj) => {
       this.setState({query: false})
-      console.log(obj)
       if (ok) {
         this.setState({products: obj})
       } else {
@@ -158,7 +157,6 @@ class GoodsScanSearchScene extends PureComponent {
   }
 
   renderList() {
-    console.log('>>>>>>',this.state.products);
     return this.state.products.map((item, index) => {
       return (
           <TouchableOpacity key={index}
@@ -184,7 +182,11 @@ class GoodsScanSearchScene extends PureComponent {
                     borderColor: colors.main_back,
                     borderWidth: 1
                   }}
-                  source={{uri: ' '}}
+                  source={
+                    tool.length(item.img) >0
+                        ? {uri: 'https://www.cainiaoshicai.cn'+item.img[0]['path']}
+                        : require('../../img/Order/zanwutupian_.png')
+                  }
               />
               <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
                 <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name}</Text>

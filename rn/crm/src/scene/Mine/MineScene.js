@@ -31,7 +31,7 @@ import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from 'moment';
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
-
+import { NavigationActions } from 'react-navigation'
 function mapStateToProps(state) {
   const {mine, user, global} = state;
   return {mine: mine, user: user, global: global}
@@ -741,16 +741,6 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>活动加价</Text>
         </TouchableOpacity>)}
 
-        {(is_helper || is_service_mgr) && (<TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => {
-              native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity")
-            }}
-            activeOpacity={customerOpacity}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/My/jiagejianguan_.png')}/>
-          <Text style={[block_styles.block_name]}>扫码</Text>
-        </TouchableOpacity>)}
       </View>
     )
   }
@@ -914,16 +904,6 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
           <Text style={[block_styles.block_name]}>老的提醒</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity")
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image style={[block_styles.block_img]} source={require('../../img/Mine/icon_mine_collection_2x.png')}/>
-          <Text style={[block_styles.block_name]}>扫码上货</Text>
         </TouchableOpacity>
       </View>
     )
