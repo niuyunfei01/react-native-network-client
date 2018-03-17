@@ -83,8 +83,8 @@ export function fetchProfitOutcomeOtherItem(id,token,callback) {
   }
 }
 
-export function fetchProfitOtherAdd(data, token, callback) {
-  let url = `api/profit_other_add.json?access_token=${token}`;
+export function fetchProfitOtherAdd(store_id,day,data, token, callback) {
+  let url = `api/profit_other_add/${store_id}/${day}.json?access_token=${token}`;
   return jsonWithTpl2(url, data, (json) => {
         callback(json.ok, json.reason, json.obj);
       },
