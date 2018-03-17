@@ -36,8 +36,6 @@ import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon} from "../../weui/index";
 
-import BarcodeScanner from 'react-native-barcodescanner';
-
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
