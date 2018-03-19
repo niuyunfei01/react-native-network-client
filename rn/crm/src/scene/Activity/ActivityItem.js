@@ -105,7 +105,7 @@ class ActivityItem extends PureComponent {
           return (
               <Cell key={index} customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
                 <CellHeader>
-                  <Text>{min_price / 100}元-{max_price / 100}元</Text>
+                  <Text>{ tool.toFixed(min_price)}元-{tool.toFixed(max_price)}元</Text>
                 </CellHeader>
                 <CellFooter>
                   <Text>{percent}%</Text>
@@ -138,7 +138,7 @@ class ActivityItem extends PureComponent {
                           <Cell key={index}
                                 customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
                             <CellHeader>
-                              <Text>{min_price / 100}元-{max_price / 100}元</Text>
+                              <Text>{tool.toFixed(min_price)}元-{tool.toFixed(max_price)}元</Text>
                             </CellHeader>
                             <CellFooter>
                               <Text>{percent}%</Text>
