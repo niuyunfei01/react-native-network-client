@@ -5,7 +5,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  TextInput, StyleSheet,
 } from 'react-native';
 import {NavigationItem} from '../../widget';
 import colors from "../../styles/colors";
@@ -14,14 +14,12 @@ import native from "../../common/native";
 import pxToDp from "../../util/pxToDp";
 import MyBtn from '../../common/myBtn'
 import tool from '../../common/tool'
-import {queryUpcCode} from '../../reducers/product/productActions'
-import * as globalActions from "../../reducers/global/globalActions";
+import {queryUpcCode,queryProductByKey} from '../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
 import RenderEmpty from '../OperateProfit/RenderEmpty'
-
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
@@ -30,7 +28,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      queryUpcCode
+      queryUpcCode,
+      queryProductByKey,
     }, dispatch)
   }
 }
@@ -63,7 +62,6 @@ class GoodsScanSearchScene extends PureComponent {
                   borderColor: colors.main_color,
                   textAlignVertical: 'center',
                 }}
-                keyboardType='numeric'
             />
             <TouchableOpacity onPress={() => searchUpc()}>
               <Text style={{
@@ -94,13 +92,13 @@ class GoodsScanSearchScene extends PureComponent {
     super(props);
     this.state = {
       products: [],
-      upc: '6935284466669',
+      upc: '',
       query: false
     }
   }
 
   inputText = (text) => {
-    this.setState({upc: text})
+    this.setState({upc: text});
     this.props.navigation.setParams({
       inputText: this.inputText,
       upc: text,
@@ -112,7 +110,6 @@ class GoodsScanSearchScene extends PureComponent {
     try {
       let products = JSON.parse(this.props.navigation.state.params.products);
       if (tool.length(products) > 0) {
-        try {
           this.setState({
             products: products,
             upc: products[0]['upc']
@@ -122,11 +119,13 @@ class GoodsScanSearchScene extends PureComponent {
             upc: products[0]['upc'],
             searchUpc: this.searchUpc
           })
-        } catch (e) {
-        }
       }
     } catch (e) {
-      console.log(e)
+      this.props.navigation.setParams({
+        inputText: this.inputText,
+        upc: '',
+        searchUpc: this.searchUpc
+      })
     }
 
   }
@@ -134,15 +133,30 @@ class GoodsScanSearchScene extends PureComponent {
   searchUpc = () => {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    this.setState({query: true})
-    dispatch(queryUpcCode(this.state.upc, accessToken, (ok, desc, obj) => {
-      this.setState({query: false})
-      if (ok) {
-        this.setState({products: obj})
-      } else {
-        ToastLong('没差查询结果')
-      }
-    }))
+    this.setState({query: true});
+    let {type} = this.props.navigation.state.params;
+    console.log(type)
+    if(type === 'searchAdd'){
+      dispatch(queryProductByKey(this.state.upc, accessToken, (ok, desc, obj) => {
+        this.setState({query: false});
+        if (ok) {
+          this.setState({products: obj})
+        } else {
+          ToastLong('没差查询结果')
+        }
+      }))
+    }else {
+      dispatch(queryUpcCode(this.state.upc, accessToken, (ok, desc, obj) => {
+        this.setState({query: false});
+        if (ok) {
+          this.setState({products: obj})
+        } else {
+          ToastLong('没差查询结果')
+        }
+      }))
+    }
+
+
   };
 
   handleImg(item) {
@@ -156,17 +170,45 @@ class GoodsScanSearchScene extends PureComponent {
     return item
   }
 
+  renderBtn() {
+    let {type} = this.props.navigation.state.params;
+    if (type === 'searchAdd') {
+      return null
+    } else {
+      return (
+          <View>
+            {tool.length(this.state.products)
+                ? null
+                : <MyBtn
+                    onPress={() => {
+                      this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {})
+                    }}
+                    style={[styles.btn, {backgroundColor: colors.main_color, color: colors.white}]}
+                    text={'直接上新'}/>
+            }
+            <MyBtn
+                onPress={() => {
+                  native.nativeBack();
+                }}
+                style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
+                text={'重新扫码'}/>
+          </View>
+      )
+    }
+
+  }
   renderList() {
     return this.state.products.map((item, index) => {
       return (
-          <TouchableOpacity key={index}
-                            onPress={() => {
-                              let msg = this.handleImg(tool.deepClone(item))
-                              this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                                type: 'scan',
-                                product_detail: msg
-                              })
-                            }}
+          <TouchableOpacity
+              key={index}
+              onPress={() => {
+                let msg = this.handleImg(tool.deepClone(item))
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'scan',
+                  product_detail: msg
+                })
+              }}
           >
             <View style={{
               flexDirection: 'row',
@@ -190,7 +232,9 @@ class GoodsScanSearchScene extends PureComponent {
               />
               <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
                 <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name}</Text>
-                <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>UPC:{item.upc}</Text>
+                <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>
+                  UPC:{ !!item.upc ? item.upc:"无" }
+                  </Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -201,29 +245,14 @@ class GoodsScanSearchScene extends PureComponent {
   render() {
     return (
         <View style={{flex: 1, backgroundColor: colors.main_back}}>
-          <ScrollView style={{}}>
+          <ScrollView style={{height:pxToDp(300)}}>
             {
               tool.length(this.state.products) > 0  ? this.renderList() : <RenderEmpty/>
             }
           </ScrollView>
-
           {
-            tool.length(this.state.products)
-                ? null
-                : <MyBtn
-                    onPress={() => {
-                      this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {})
-                    }}
-                    style={[styles.btn, {backgroundColor: colors.main_color, color: colors.white}]}
-                    text={'直接上新'}/>
+            this.renderBtn()
           }
-          <MyBtn
-              onPress={() => {
-                native.nativeBack();
-              }}
-              style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
-              text={'重新扫码'}/>
-
           <Toast
               icon="loading"
               show={this.state.query}
@@ -246,6 +275,46 @@ const styles = {
     borderColor: colors.main_color,
     marginHorizontal: pxToDp(30),
     borderRadius: pxToDp(45)
+  },
+  container: {
+    paddingTop: 25,
+    flex: 1,
+  },
+  autocompleteContainer: {
+    left: 0,
+    position: 'absolute',
+    right: pxToDp(30),
+    top: 0,
+    paddingLeft: pxToDp(30),
+    paddingTop: pxToDp(20),
+    zIndex: 1,
+    maxHeight: '90%',
+    borderColor: colors.main_color,
+  },
+  moneyLabel: {fontSize: pxToDp(30), fontWeight: 'bold'},
+  moneyText: {fontSize: pxToDp(40), color: colors.color999},
+  itemText: {
+    fontSize: 15,
+    margin: 2
+  },
+  infoText: {
+    textAlign: 'center'
+  },
+  titleText: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginBottom: 10,
+    marginTop: 10,
+    textAlign: 'center'
+  },
+  directorText: {
+    color: 'grey',
+    fontSize: 12,
+    marginBottom: 10,
+    textAlign: 'center'
+  },
+  openingText: {
+    textAlign: 'center'
   }
 }
 

@@ -35,7 +35,9 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon} from "../../weui/index";
-
+import MyBtn from '../../common/myBtn'
+import ModalDropdown from 'react-native-modal-dropdown';
+import top_styles from "../Remind/TopStyles";
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -112,36 +114,46 @@ class GoodsEditScene extends PureComponent {
               paddingRight: pxToDp(30)
             }
           }>
-            <TouchableOpacity
+            <MyBtn
+                text="搜索上传"
+                onPress={() => {
+                  navigation.navigate(Config.ROUTE_GOODS_SCAN_SEARCH,{type : 'searchAdd'})
+                }}
+                style={{
+                  fontSize: pxToDp(32),
+                  color: '#59b26a',
+                  marginRight: pxToDp(30)
+                }}
+            />
+            <MyBtn
+                text="扫码上传"
                 onPress={() => {
                   native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity")
                 }}
-            >
-              <Text style={{
-                fontSize: pxToDp(32),
-                color: '#59b26a',
-                marginRight:pxToDp(30)
-              }}>扫码上传</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+                style={{
+                  fontSize: pxToDp(32),
+                  color: '#59b26a',
+                  marginRight: pxToDp(30)
+                }}
+            />
+            <MyBtn
+                text='保存'
+                style={{
+                  fontSize: pxToDp(32),
+                  color: '#59b26a'
+                }}
                 onPress={() => {
                   params.upLoad();
                 }}
-            >
-              <Text style={{
-                fontSize: pxToDp(32),
-                color: '#59b26a'
-              }}>保存</Text>
-            </TouchableOpacity>
+            />
           </View>),
+
     }
-  };
+  }
 
   constructor(props) {
-
     super(props);
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
-
     this.state = {
         ...configState,
       vendor_id: currVendorId,

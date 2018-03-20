@@ -168,7 +168,7 @@ class ActivitySelectStoreScene extends PureComponent {
       } else {
         ToastLong(desc);
       }
-    }));
+    },1));
   }
 
   dataToCheck(arr) {
@@ -184,15 +184,17 @@ class ActivitySelectStoreScene extends PureComponent {
     let list = [];
     if (type) {
       arr.forEach((item) => {
-        json[item.id] = item.name
+        json[item.id] = `${item.name}(${item.price_ratio})`
       });
       return json;
     } else {
       arr.forEach((item) => {
         if (platId.indexOf(parseInt(item.platform)) >= 0) {
+          item.label = `${item.name}(${item.price_ratio})`;
           list.push(item)
         }
       });
+      console.log('list>>>',list)
       return list.sort((a, b) => {
         return a.platform - b.platform
       });

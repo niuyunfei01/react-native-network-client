@@ -36,9 +36,9 @@ export function activityRuleList(refresh) {
     activityRule:refresh,
   }
 }
-export function fetchWmStores(vendor_id,token,callback) {
+export function fetchWmStores(vendor_id,token,callback,with_price_ratio=0) {
   return dispatch => {
-    const url = `api/get_wm_stores/${vendor_id}.json?access_token=${token}`;
+    const url = `api/get_wm_stores/${vendor_id}.json?access_token=${token}&with_price_ratio=${with_price_ratio}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {

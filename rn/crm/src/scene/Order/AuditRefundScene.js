@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native'
+import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity,TextInput} from 'react-native'
 import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
@@ -12,6 +12,7 @@ import {Button, TextArea, RadioCells, ButtonArea, Toast, Label, Dialog, Cells, I
 import S from '../../stylekit'
 import MyBtn from  '../../common/myBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
+import {ToastLong} from "../../util/ToastUtils";
 
 const numeral = require('numeral');
 
@@ -38,7 +39,6 @@ class AuditRefundScene extends Component {
 
     return {
       headerTitle: '退单详情',
-      headerRight: '',
     }
   };
 
@@ -54,20 +54,34 @@ class AuditRefundScene extends Component {
       custom: '',
       chevron:false,
       tabNum:0,
-      reason:'已与用户协商一致'
+      reason:'已与用户协商一致',
+      onSubmitting:false,
+      money:''
+
     };
     this.renderReason = this.renderReason.bind(this)
   }
-
   componentWillMount() {
     let{remind,order} = this.props.navigation.state.params;
-    console.log(remind,order)
     this.setState({
       order:order,
       remind:remind,
     })
   }
 
+  tplAction(reason,agreeOrRefuse) {
+    const {remind} = (this.props.navigation.state.params || {});
+    const {dispatch, global} = this.props;
+    let {money} = this.state;
+    dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
+        money, (ok, msg, data) => {
+          if (ok) {
+            this.setState({onSubmitting: false});
+          } else {
+            this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
+          }
+        }));
+  }
 
   renderReason() {
     let {tabNum} = this.state;
@@ -77,9 +91,33 @@ class AuditRefundScene extends Component {
             <View style={{marginVertical:pxToDp(40)}}>
               <Text style={[styles.bottom_box_text,{color:colors.editStatusAdd}] } >
                 同意退款后,货款立即原路退回，无法追回</Text>
+              <TextInput
+                  maxLength={20}
+                  value={this.state.money}
+                  onChangeText={(text)=>{
+                    this.setState({money:text})
+                  }}
+                  underlineColorAndroid='transparent'
+                  placeholder='输入退款金额'
+                  placeholderTextColor = "#ccc"
+                  keyboardType='numeric'
+                  style={{
+                    borderWidth:pxToDp(1),
+                    marginTop:pxToDp(30),
+                    borderColor:'#ccc',
+                  }}
+              />
             </View>
             <MyBtn
                 text={'同意退款'}
+                onPress={()=>{
+                  let {onSubmitting} = this.state;
+                  if(onSubmitting){
+                    return false
+                  }
+                  this.setState({onSubmitting:true});
+                  this.tplAction(reasons.custom_talked_ok,true)
+                }}
                 style = {styles.handle}/>
           </View>
       )
@@ -93,7 +131,7 @@ class AuditRefundScene extends Component {
                   this.setState({reason:text})
                 }}
                 underlineColorAndroid='transparent'
-                placeholder='一定要收入理由'
+                placeholder='一定要输入理由'
                 placeholderTextColor = "#ccc"
                 style={{
                   borderWidth:pxToDp(1),
@@ -104,6 +142,15 @@ class AuditRefundScene extends Component {
             />
             <MyBtn
                 text={'已与用户沟通,拒绝退款'}
+                onPress={ async()=>{
+                  let {onSubmitting,reason} = this.state;
+                  if(onSubmitting || (tool.length(reason)<=0)){
+                    ToastLong('一定要输入理由');
+                    return false
+                  }
+                  this.setState({onSubmitting:true})
+                  this.tplAction(reason,false)
+                }}
                 style = {[styles.handle,{color:colors.white,backgroundColor:colors.editStatusAdd}]}/>
           </View>
       )
@@ -111,7 +158,16 @@ class AuditRefundScene extends Component {
 
   }
   render() {
-    let {id,dayId,store_name,platform,platform_oid,ship_worker_mobile,ship_worker_name} = this.state.order;
+    let {id,
+      dayId,
+      store_name,
+      platform,
+      platform_oid,
+      ship_worker_mobile,
+      ship_worker_name,
+      expectTime,
+      orderTime,
+    } = this.state.order;
     let {remind_id} = this.state.remind;
     remind_id = JSON.parse(remind_id)
     return (
@@ -134,8 +190,12 @@ class AuditRefundScene extends Component {
               <CellBody/>
               <CellFooter>
                 <View>
-                  <Text style={styles.text}>期望送达: 12-16 14:30</Text>
-                  <Text style={styles.text}>下单时间: 12-16 11:00</Text>
+                  <Text style={styles.text}>期望送达: {
+                    tool.orderExpectTime(expectTime)
+                  }</Text>
+                  <Text style={styles.text}>下单时间: {
+                    tool.orderExpectTime(orderTime)
+                  }</Text>
                 </View>
               </CellFooter>
             </Cell>
@@ -157,9 +217,7 @@ class AuditRefundScene extends Component {
                 </CellFooter>
               </Cell>:null
             }
-
             <Cell customStyle={styles.my_cell}>
-
             <CellHeader>
                 <Text>商品/金额明细</Text>
               </CellHeader>
@@ -178,18 +236,19 @@ class AuditRefundScene extends Component {
               </CellFooter>
             </Cell>
             {
-              this.state.chevron ? <Cell customStyle={styles.my_cell}>
-                <CellHeader>
-                  <Text style={{color:colors.fontBlack}} >用户申请部分退款</Text>
-                  <Text style={[styles.text,]} >退款金额 : ￥12.55</Text>
-                  <Text style={[styles.text,]} >退款商品 : 精选土豆500克</Text>
-                  <Text style={[styles.text,]} >退款理由 : {remind_id.reason}</Text>
-                </CellHeader>
-              </Cell> : null
+              this.state.chevron ?
+                  <Cell customStyle={[styles.my_cell]}>
+                    <CellHeader style={{marginVertical:pxToDp(15)}}>
+                      <Text style={{color: colors.fontBlack}}>用户申请退款</Text>
+                      {/*<Text style={[styles.text,]}>退款金额 : ￥12.55</Text>*/}
+                      {/*<Text style={[styles.text,]}>退款商品 : 精选土豆500克</Text>*/}
+                      <Text style={[styles.text,]}>退款理由 : {remind_id.reason}</Text>
+                    </CellHeader>
+                  </Cell> : null
             }
             <Cell customStyle={[styles.my_cell,{height:pxToDp(120)}]}>
             <CellHeader>
-                <Text><Text>23分钟36秒</Text>后自动同意退款</Text>
+                <Text><Text>长时间后</Text>后自动同意退款</Text>
               </CellHeader>
               <CellBody/>
               <CellFooter>
@@ -221,7 +280,16 @@ class AuditRefundScene extends Component {
           {
             this.renderReason()
           }
-
+          <Toast
+              onRequestClose={()=>{}}
+              show = {this.state.show}
+          />
+          <Toast
+              icon="loading"
+              show={this.state.onSubmitting}
+              onRequestClose={() => {
+              }}
+          >提交中</Toast>
         </ScrollView>
     )
   }
