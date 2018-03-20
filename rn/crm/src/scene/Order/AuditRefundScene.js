@@ -69,14 +69,18 @@ class AuditRefundScene extends Component {
     })
   }
 
-  tplAction(reason,agreeOrRefuse) {
+  tplAction(,agreeOrRefuse) {
     const {remind} = (this.props.navigation.state.params || {});
     const {dispatch, global} = this.props;
     let {money} = this.state;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
         money, (ok, msg, data) => {
           if (ok) {
+            ToastLong('发送成功,即将返回上一页');
             this.setState({onSubmitting: false});
+            setTimeout(()=>{
+              this.props.navigation.goBack()
+            },1000)
           } else {
             this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
           }
@@ -110,12 +114,13 @@ class AuditRefundScene extends Component {
             </View>
             <MyBtn
                 text={'同意退款'}
-                onPress={()=>{
-                  let {onSubmitting} = this.state;
-                  if(onSubmitting){
+                onPress={async()=>{
+                  let {onSubmitting,money} = this.state;
+                  if(onSubmitting || parseInt(money) <= 0){
+                    ToastLong('请输入退款金额');
                     return false
                   }
-                  this.setState({onSubmitting:true});
+                  await this.setState({onSubmitting:true});
                   this.tplAction(reasons.custom_talked_ok,true)
                 }}
                 style = {styles.handle}/>
@@ -148,7 +153,7 @@ class AuditRefundScene extends Component {
                     ToastLong('一定要输入理由');
                     return false
                   }
-                  this.setState({onSubmitting:true})
+                  await this.setState({onSubmitting:true,money:''})
                   this.tplAction(reason,false)
                 }}
                 style = {[styles.handle,{color:colors.white,backgroundColor:colors.editStatusAdd}]}/>
@@ -248,7 +253,7 @@ class AuditRefundScene extends Component {
             }
             <Cell customStyle={[styles.my_cell,{height:pxToDp(120)}]}>
             <CellHeader>
-                <Text><Text>长时间后</Text>后自动同意退款</Text>
+                <Text>长时间不处理,系统自动退款</Text>
               </CellHeader>
               <CellBody/>
               <CellFooter>
@@ -357,7 +362,7 @@ const styles = StyleSheet.create({
     height:pxToDp(90),
     color:colors.white,
     textAlignVertical:"center",
-    borderRadius:pxToDp(8)
+    borderRadius:pxToDp(8),
   }
 });
 
