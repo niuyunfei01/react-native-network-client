@@ -88,9 +88,8 @@ class GoodsPriceDetails extends PureComponent {
 
   async componentWillMount() {
     let {item, vendorId} = this.props.navigation.state.params;
-    console.log('vendorId>>>>',vendorId);
-    let {list_img, name, product_id, sale_store_num,} = item;
-    await this.setState({list_img, name, product_id, sale_store_num, vendorId});
+    let {list_img, name, product_id,} = item;
+    await this.setState({list_img, name, product_id, vendorId});
     this.getListStoresGoods();
   }
 
@@ -111,6 +110,7 @@ class GoodsPriceDetails extends PureComponent {
           setUpperLimit: upper_limit == 0 ? 120 : upper_limit,
           setLowerLimit: lower_limit == 0 ? 90 : lower_limit,
           setReferPrice: price == 0 ? '' : tool.toFixed(price),
+          sale_store_num:tool.length(obj.store_list)
         });
         _this.listSort();
         this.forceUpdate()
@@ -435,10 +435,19 @@ class GoodsPriceDetails extends PureComponent {
     return (
         <View style={{flex: 1}}>
           <View style={header.box}>
-            <Image
-                style={header.image}
-                source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
-            />
+            <TouchableOpacity
+                onPress = {()=>{
+                  this.props.navigation.navigate(Config.ROUTE_GOODS_DETAIL,{
+                    productId:this.state.product_id,
+                    vendorId:this.state.vendorId,
+                  })
+                }}
+            >
+              <Image
+                  style={header.image}
+                  source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
+              />
+            </TouchableOpacity>
             <View style={header.desc}>
               <Text style={header.text}>{name}</Text>
               <Text style={header.text}>#{product_id}</Text>

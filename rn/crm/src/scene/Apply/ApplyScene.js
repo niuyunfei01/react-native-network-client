@@ -1,10 +1,11 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, SearchButton, ScrollView} from 'react-native'
+import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
+import native from "../../common/native";
 
 import {
   Cell,
@@ -370,13 +371,14 @@ class ApplyScene extends PureComponent {
             <Button type="primary" onPress={()=>this.onApply()}>我要开店</Button>
           </ButtonArea>
 
-          <Flex direction="row" style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <View  style={{flex: 1, justifyContent: 'center', alignItems: 'center',flexDirection:'row'}}>
             <Text style={{fontSize: 16}}>有不明处?</Text>
-            <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
-            }}>
-              联系客服
-            </Text>
-          </Flex>
+              <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
+                native.dialNumber('18910275329');
+              }}>
+                联系客服
+              </Text>
+          </View>
           <Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {
           }}>提交中</Toast>
           <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {

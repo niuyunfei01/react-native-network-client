@@ -188,7 +188,7 @@ class GoodsScanSearchScene extends PureComponent {
             }
             <MyBtn
                 onPress={() => {
-                  native.nativeBack();
+                  native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity", false)
                 }}
                 style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
                 text={'重新扫码'}/>
