@@ -128,7 +128,7 @@ class GoodsEditScene extends PureComponent {
             <MyBtn
                 text="扫码上传"
                 onPress={() => {
-                  native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity")
+                  native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity", false)
                 }}
                 style={{
                   fontSize: pxToDp(32),

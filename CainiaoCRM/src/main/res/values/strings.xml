@@ -291,8 +291,8 @@
     <string name="custom_view_finder_sample">Custom View Finder Sample</string>
     <string name="scaling_sample">Scaling Sample</string>
     <string name="toggle_flash">闪光灯</string>
-    <string name="flash_on">开启闪光灯</string>
-    <string name="flash_off">关闭闪光灯</string>
+    <string name="flash_on">关闭闪光灯</string>
+    <string name="flash_off">开启闪光灯</string>
     <string name="auto_focus_on">自动聚焦</string>
     <string name="auto_focus_off">关闭自动聚焦</string>
     <string name="formats">格式</string>
