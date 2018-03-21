@@ -146,6 +146,8 @@ const C = {
   ROUTE_ACTIVITY_CLASSIFY:'ActivitySelectClassify',
   ROUTE_ACTIVITY_LIST:'ActivityList',
   ROUTE_JD_AUDIT_DELIVERY:'JdAuditDelivery',
+  ROUTE_SCAN:'Scan',
+  ROUTE_GOODS_SCAN_SEARCH:'GoodsScanSearch',
   serverUrl,
   apiUrl,
   staticUrl,

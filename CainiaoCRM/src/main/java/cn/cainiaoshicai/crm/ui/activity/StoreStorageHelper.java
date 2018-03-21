@@ -307,7 +307,7 @@ public class StoreStorageHelper {
                                     AlertUtil.error(activity, "价格不能为空");
                                     return;
                                 }
-                                final int newCents = (int) (100 * Double.parseDouble(priceStr));
+                                final int newCents = (int) (100 * Float.parseFloat(priceStr));
                                 if (newCents < 1) {
                                     AlertUtil.error(activity, "价格不能低于1分钱");
                                     return;

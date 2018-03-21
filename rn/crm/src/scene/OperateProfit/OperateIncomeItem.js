@@ -8,7 +8,7 @@ import {changeProfitInvalidate, fetchProfitIncomeOrderList} from '../../reducers
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {connect} from "react-redux";
-
+import tool from '../../common/tool'
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -39,23 +39,22 @@ class OperateIncomeItem extends PureComponent {
     dispatch(changeProfitInvalidate(id, accessToken, async (ok, obj, desc) => {
       if (ok) {
         this.setState({upload: false,})
-        await this.props.update();
+        await this.props.update(this.props.item.id);
       }else {
         ToastLong('操作失败');
-        this.setState({upload: false,})
+        this.setState({upload: false})
       }
     }));
   }
   render() {
-    let {label, invalid, remark, money,id} = this.props.item;
-    let {editable} = this.props.state ;
-    if (invalid) {
+    let {label, invalid, remark, money,id,editable} = this.props.item;
+    if (!parseInt(invalid)) {
       return (
           <View style={item.wrapper}>
             <View style={item.title_wrapper}>
               <Text style={item.title_text}>{label}</Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={item.title_money}>{money}</Text>
+                <Text style={item.title_money}>{tool.toFixed(money)}</Text>
                 <TouchableOpacity
                     onPress={() => {
                       if (editable) {
@@ -107,14 +106,14 @@ class OperateIncomeItem extends PureComponent {
           <View>
             <View style={item.wrapper}>
               <View style={item.title_wrapper}>
-                <Text style={[item.title_text, {color: colors.fontGray}]}>配送费收入</Text>
+                <Text style={[item.title_text, {color: colors.fontGray}]}>{label}</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={[item.title_money, {color: colors.fontGray}]}>135.66</Text>
+                  <Text style={[item.title_money, {color: colors.fontGray}]}>{tool.toFixed(money)}</Text>
                   <Text style={[item.title_btn, {backgroundColor: colors.fontGray}]}>无效</Text>
                 </View>
                 <Text style={item.line_though}/>
               </View>
-              <Text style={item.details}>备注:今年财神不送礼，发条短信传给你。健康快乐长伴你，幸福美满粘着你，还有我要告诉你，财神已经盯上你！</Text>
+              <Text style={item.details}>备注:！</Text>
             </View>
           </View>
       )

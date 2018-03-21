@@ -2,14 +2,16 @@ import React, { Component } from 'react'
 import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native'
 import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../common/CommonStyles'
-
+import Icons from 'react-native-vector-icons/FontAwesome';
 import {orderAuditRefund} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, TextArea, RadioCells, ButtonArea, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellBody, CellsTips} from "../../weui/index";
 import S from '../../stylekit'
+import MyBtn from  '../../common/myBtn'
+import CellFooter from "../../weui/Cell/CellFooter";
+import {ToastLong} from "../../util/ToastUtils";
 
 const numeral = require('numeral');
 
@@ -35,8 +37,7 @@ class AuditRefundScene extends Component {
     const {params = {}} = navigation.state;
 
     return {
-      headerTitle: '客户退款申请',
-      headerRight: '',
+      headerTitle: '退单详情',
     }
   };
 
@@ -50,207 +51,298 @@ class AuditRefundScene extends Component {
       selected_action: '',
       reason_key:'',
       custom: '',
+      chevron:true,
+      tabNum:0,
+      reason:'已与用户协商一致',
+      onSubmitting:false,
     };
-
-    this._onActionSelected = this._onActionSelected.bind(this);
-    this._onReasonSelected = this._onReasonSelected.bind(this);
-    this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
-    this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
-    this._refundYuanChanged = this._refundYuanChanged.bind(this);
-    this._doAgreeRefund = this._doAgreeRefund.bind(this);
-    this._doRefuseRefund = this._doRefuseRefund.bind(this);
+    this.renderReason = this.renderReason.bind(this)
   }
-
   componentWillMount() {
-    const {order, remind} = (this.props.navigation.state.params || {});
-    this.setState({order, remind})
-  }
-
-  _onReasonSelected(key) {
-    this.setState({reason_idx: key})
-  }
-
-  _onActionSelected(action) {
-    this.setState({selected_action: action})
-  }
-
-  _checkShowCustomTextArea() {
-    return this.state.reason_idx === 'custom';
-  }
-
-  _checkDisableSubmit() {
-    return !(this.state.reason_idx && (this.state.reason_idx !== 'custom' || this.state.custom));
-  }
-
-  _refundYuanChanged(v) {
-    this.setState({refund_yuan: v});
-  }
-
-  _doAgreeRefund() {
-    this.__tpl_action(true, () => {
-      this.setState({onSuccessAgreed: true});
+    let{remind,order} = this.props.navigation.state.params;
+    this.setState({
+      order:order,
+      remind:remind,
     })
   }
-
-  _goBack() {
-    const {navigation} = this.props;
-    navigation.goBack();
-  }
-
-  _doRefuseRefund() {
-    this.__tpl_action(false, () => {
-      this.setState({onSuccessRefused: true});
-    })
-  }
-
-  __tpl_action(agreeOrRefuse, doneCall) {
+  tplAction(reason,agreeOrRefuse) {
     const {remind} = (this.props.navigation.state.params || {});
     const {dispatch, global} = this.props;
-
-    this.setState({onSubmitting: true});
-    const reason = this.state.reason_idx === 'custom' ? this.state.custom : reasons[this.state.reason_idx];
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
-      this.state.refund_yuan, (ok, msg, data) => {
-      if (ok) {
-        this.setState({onSubmitting: false});
-        doneCall();
-      } else {
-        this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
-      }
-    }));
+        0, (ok, msg, data) => {
+          if (ok) {
+            ToastLong('发送成功,即将返回上一页');
+            this.setState({onSubmitting: false});
+            setTimeout(()=>{
+              this.props.navigation.goBack()
+            },1000)
+          } else {
+            this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
+          }
+        }));
   }
-
-  _shouldDisabledAgreeBtn() {
-    return !this.state.refund_yuan;
-  }
-
-  _shouldDisableRefuseBtn() {
-    return !this.state.reason_idx || (this.state.reason_idx === 'custom' && this.state.custom === '');
-  }
-
-  render() {
-
-    const {order} = (this.props.navigation.state.params || {});
-    const reasonOpts = tool.objectMap(reasons, (reason, key) => {
-      return {label: reason, value: key}
-    });
-
-    return <ScrollView style={[styles.container, {flex: 1}]}>
-        <Dialog onRequestClose={()=>{}}
-          visible={!!this.state.errorHints}
-          buttons={[{
-            type: 'default',
-            label: '知道了',
-            onPress: () => {this.setState({errorHints: ''})}
-          }]}
-        ><Text>{this.state.errorHints}</Text></Dialog>
-
-      <CellsTitle style={CommonStyle.cellsTitle35}>拒绝还是同意？</CellsTitle>
-      <RadioCells
-        style={{marginTop: 2}}
-        options={[{label: '同意退款', value: 'yes'}, {label: '拒绝退款', value: 'no'}]}
-        onChange={this._onActionSelected}
-        cellTextStyle={[CommonStyle.cellTextH45, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.selected_action}
-      />
-
-      {this.state.selected_action === 'no' && <View>
-        <CellsTitle style={CommonStyle.cellsTitle35}>拒绝理由</CellsTitle>
-        <RadioCells
-          style={{marginTop: 2}}
-          options={reasonOpts}
-          onChange={this._onReasonSelected}
-          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.reason_idx}
-        />
-
-        {this._checkShowCustomTextArea() && <View>
-          <CellsTitle>请填写拒绝原因</CellsTitle>
-          <Cells style={{marginTop: 2}}>
-            <Cell>
-              <CellBody>
+  renderReason() {
+    let {tabNum} = this.state;
+    if (tabNum === 1) {
+      return (
+          <View style={styles.bottom_box}>
+            <View style={{marginVertical:pxToDp(40)}}>
+              <Text style={[styles.bottom_box_text,{color:colors.editStatusAdd}] } >
+                同意退款后,货款立即原路退回，无法追回</Text>
+            </View>
+            <MyBtn
+                text={'同意退款'}
+                onPress={async()=>{
+                  let {onSubmitting} = this.state;
+                  if(onSubmitting ){
+                    return false
+                  }
+                  await this.setState({onSubmitting:true});
+                  this.tplAction(reasons.custom_talked_ok,Cts.REFUND_AUDIT_AGREE)
+                }}
+                style = {styles.handle}/>
+          </View>
+      )
+    } else if (tabNum === 2) {
+      return (
+          <View style={styles.bottom_box}>
             <TextArea
-              maxLength={20}
-              placeholder="请输入"
-              onChange={(v) => {
-                this.setState({custom: v})
-              }}
-              value={this.state.custom}
-              underlineColorAndroid={'transparent'}
+                maxLength={20}
+                value={this.state.reason}
+                onChangeText={(text)=>{
+                  this.setState({reason:text})
+                }}
+                underlineColorAndroid='transparent'
+                placeholder='一定要输入理由'
+                placeholderTextColor = "#ccc"
+                style={{
+                  borderWidth:pxToDp(1),
+                  marginTop:pxToDp(30),
+                  borderColor:'#ccc',
+
+                }}
             />
-              </CellBody>
+            <MyBtn
+                text={'已与用户沟通,拒绝退款'}
+                onPress={ async()=>{
+                  let {onSubmitting,reason} = this.state;
+                  if(onSubmitting || (tool.length(reason)<=0)){
+                    ToastLong('一定要输入理由');
+                    return false
+                  }
+                  await this.setState({onSubmitting:true})
+                  this.tplAction(reason,Cts.REFUND_AUDIT_REFUSE)
+                }}
+                style = {[styles.handle,{color:colors.white,backgroundColor:colors.editStatusAdd}]}/>
+          </View>
+      )
+    }
+
+  }
+  render() {
+    let {id,
+      dayId,
+      store_name,
+      platform,
+      platform_oid,
+      ship_worker_mobile,
+      ship_worker_name,
+      expectTime,
+      orderTime,
+    } = this.state.order;
+    let {remind_id,refund_type} = this.state.remind;
+    remind_id = JSON.parse(remind_id)
+    return (
+        <ScrollView style={{flex: 1}}>
+          <Cells style={{borderWidth: 0, marginLeft: 0,borderTopWidth:0,marginTop:pxToDp(5),borderBottomWidth:0}}>
+            <Cell customStyle={styles.my_cell}>
+              <CellHeader>
+                <Text style={styles.shop_name}>{id}#{dayId}</Text>
+              </CellHeader>
+              <CellBody/>
+              <CellFooter>
+                <Text style={styles.shop_name}>{store_name}</Text>
+              </CellFooter>
             </Cell>
-          </Cells></View>}
-        <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 15}}>
-          <Text style={{color:'#f44040'}}>拒绝前，请保证已与客户沟通过</Text>
-        </View>
-
-      </View>}
-
-      {this.state.selected_action === 'yes' && <View>
-        <CellsTitle style={CommonStyle.cellsTitle35}>请记录退款金额</CellsTitle>
-        <Cells>
-          <Cell error={true}>
-            <CellHeader><Label>记录退款金额</Label></CellHeader>
-            <CellBody>
-              <Input
-                placeholder="0.00"
-                keyboardType = 'numeric'
-                value={this.state.refund_yuan}
-                onChangeText={this._refundYuanChanged}
-                underlineColorAndroid={'transparent'}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-        <CellsTips>实际退款金额请以平台为准，此处只做记录</CellsTips>
-      </View>
-      }
-
-      <ButtonArea style={{marginTop: 35}}>
-        {this.state.selected_action === 'yes' &&
-        <Button type="primary" disabled={this._shouldDisabledAgreeBtn()} onPress={this._doAgreeRefund} style={[S.mlr15]}>同意退款</Button>}
-
-        {this.state.selected_action === 'no' &&
-        <Button type="warn" disabled={this._shouldDisableRefuseBtn()}
-                onPress={this._doRefuseRefund} style={[S.mlr15]}>拒绝退款</Button>}
-      </ButtonArea>
-
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
-      <Dialog onRequestClose={()=>{}}
-              visible={this.state.onSuccessRefused}
-              buttons={[{
-                type: 'default',
-                label: '知道了',
-                onPress: () => {this._goBack(); this.setState({onSuccessRefused: false});}
-              }]}
-      ><Text>已拒绝用户的退款申请</Text></Dialog>
-      <Dialog onRequestClose={()=>{}}
-              visible={this.state.onSuccessAgreed}
-              buttons={[{
-                type: 'default',
-                label: '知道了',
-                onPress: () => {this._goBack(); this.setState({onSuccessAgreed: false});}
-              }]}
-      ><Text>已通过用户的退款申请</Text></Dialog>
-    </ScrollView>
+            <Cell customStyle={[styles.my_cell,{height:pxToDp(120)}]}>
+              <CellHeader>
+                <Text style={styles.text}>订单号:{id}</Text>
+                <Text style={styles.text}>{tool.ship_name(platform)}#{platform_oid}</Text>
+              </CellHeader>
+              <CellBody/>
+              <CellFooter>
+                <View>
+                  <Text style={styles.text}>期望送达: {
+                    tool.orderExpectTime(expectTime)
+                  }</Text>
+                  <Text style={styles.text}>下单时间: {
+                    tool.orderExpectTime(orderTime)
+                  }</Text>
+                </View>
+              </CellFooter>
+            </Cell>
+            {
+              ship_worker_mobile ?  <Cell customStyle={[styles.my_cell]}>
+                <CellHeader style={{height:pxToDp(120),justifyContent:'center'}}>
+                  <Text style={[styles.text,{fontWeight:'600'}]}>{ship_worker_name}</Text>
+                  <Text style={styles.text}>{ship_worker_mobile}</Text>
+                </CellHeader>
+                <CellBody/>
+                <CellFooter>
+                  <MyBtn
+                      text={'呼叫'}
+                      style={styles.btn}
+                      onPress={()=>{
+                        native.dialNumber(ship_worker_mobile);
+                      }}
+                  />
+                </CellFooter>
+              </Cell>:null
+            }
+            <Cell customStyle={styles.my_cell}>
+            <CellHeader>
+                <Text>商品/金额明细</Text>
+              </CellHeader>
+              <CellBody/>
+              <CellFooter>
+                <TouchableOpacity
+                    style={{paddingLeft:pxToDp(20),paddingHorizontal:pxToDp(10)}}
+                    onPress = {()=>{
+                      this.setState((prevState) => {
+                        return {chevron: !prevState.chevron}
+                      });
+                    }}
+                >
+                  <Icons name={this.state.chevron ? 'chevron-up' : 'chevron-down'}/>
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
+            {
+              this.state.chevron ?
+                  <Cell customStyle={[styles.my_cell]}>
+                    <CellHeader style={{marginVertical:pxToDp(15)}}>
+                      <Text style={{color: colors.editStatusAdd}}>
+                        { refund_type == 0 ? '用户全额退款' : '用户部分退款' }
+                      </Text>
+                      {/*<Text style={[styles.text,]}>退款金额 : ￥12.55</Text>*/}
+                      {/*<Text style={[styles.text,]}>退款商品 : 精选土豆500克</Text>*/}
+                      <Text style={[styles.text,]}>退款理由 : {remind_id.reason}</Text>
+                    </CellHeader>
+                  </Cell> : null
+            }
+            <Cell customStyle={[styles.my_cell,{height:pxToDp(120)}]}>
+            <CellHeader>
+                <Text>长时间不处理,系统将自动退款</Text>
+              </CellHeader>
+              <CellBody/>
+              <CellFooter>
+                <MyBtn style={
+                  this.state.tabNum === 2
+                      ? [styles.btn, styles.btn_red, {
+                    backgroundColor: '#f40',
+                    color: colors.white
+                  }] : [styles.btn, styles.btn_red]
+                }
+                       text={'拒绝'}
+                       onPress={() => {
+                         this.setState({tabNum: 2});
+                       }}
+                />
+                <MyBtn
+                    style={
+                      this.state.tabNum === 1 ?
+                          [styles.btn, styles.btn_green, {marginLeft: pxToDp(20)}]
+                          : [styles.btn, {marginLeft: pxToDp(20)}]
+                    }
+                    onPress={() => {
+                      this.setState({tabNum: 1});
+                    }}
+                    text={'同意'}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
+          {
+            this.renderReason()
+          }
+          <Toast
+              onRequestClose={()=>{}}
+              show = {this.state.show}
+          />
+          <Toast
+              icon="loading"
+              show={this.state.onSubmitting}
+              onRequestClose={() => {
+              }}
+          >提交中</Toast>
+        </ScrollView>
+    )
   }
 }
 
 const styles = StyleSheet.create({
-  container: {backgroundColor: '#f2f2f2'},
-  border_top: {
-    borderTopWidth: pxToDp(1),
-    borderTopColor: colors.color999,
+  my_cell: {
+    marginLeft: pxToDp(30),
+    marginRight: pxToDp(30),
+    paddingRight: 0,
+    minHeight: pxToDp(90),
+    flexDirection:"row",
+    borderColor:colors.fontGray,
+    alignItems:"center",
   },
-  cells: {
-    marginTop: 0,
+  shop_name: {
+    fontSize: pxToDp(32),
+    color: colors.fontBlack,
   },
+  text: {
+    fontSize: pxToDp(26),
+    color: colors.fontGray,
+    height:pxToDp(50),
+    textAlignVertical:'center',
+  },
+  btn: {
+    paddingHorizontal: pxToDp(30),
+    borderWidth: 0.7,
+    borderColor: colors.main_color,
+    color:colors.main_color,
+    borderRadius:pxToDp(5),
+    paddingVertical:pxToDp(8)
+  },
+  bottom:{
+    marginBottom:pxToDp(10)
+  },
+  btn_red:{
+    color:colors.editStatusAdd,
+    borderColor:colors.editStatusAdd
+  },
+  agree:{
+    marginTop:pxToDp(30),
+    fontSize:pxToDp(30),
+    lineHeight:pxToDp(50),
+    textAlignVertical:'center'
+  },
+  bottom_box: {
+    backgroundColor: colors.white,
+    paddingHorizontal: pxToDp(30),
+    paddingBottom: pxToDp(50),
+    marginTop:pxToDp(10),
+    justifyContent:'center'
+  },
+  bottom_box_text: {
+    lineHeight: pxToDp(40)
+  },
+  btn_green:{
+    color:colors.white,
+    backgroundColor:colors.main_color
+  },
+  handle:{
+    width:'100%',
+    textAlign:'center',
+    backgroundColor:colors.main_color,
+    height:pxToDp(90),
+    color:colors.white,
+    textAlignVertical:"center",
+    borderRadius:pxToDp(8),
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuditRefundScene)

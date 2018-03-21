@@ -71,8 +71,8 @@ class GoodsMangerScene extends PureComponent {
         Cts.GOODS_MANAGE_DEFAULT_SORT,
         Cts.GOODS_MANAGE_SOLD_SORT,
       ],
-      query: true,
-      queryTags:true,
+      query: false,
+      queryTags:false,
     }
   }
 
@@ -117,7 +117,6 @@ class GoodsMangerScene extends PureComponent {
       } else {
         ToastLong(desc);
       }
-
     }));
   }
 
@@ -292,7 +291,10 @@ class GoodsMangerScene extends PureComponent {
                 min_price,
                 name,
                 product_id,
-                sale_store_num
+                sale_store_num,
+                refer_upper,
+                refer_lower,
+                refer_price,
               } = item;
               return (
                   <TouchableOpacity
@@ -301,7 +303,6 @@ class GoodsMangerScene extends PureComponent {
                       }}
                   >
                     <View style={content.goods_item} key={key}>
-
                       <View style={{paddingHorizontal: pxToDp(10)}}>
                         <Image style={content.good_img}
                                source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
@@ -311,20 +312,31 @@ class GoodsMangerScene extends PureComponent {
 
                       <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
                         <Text style={content.good_name}
-                              numberOfLines={2}
+                              numberOfLines={1}
                         >{name}</Text>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                          <View style={content.good_desc}>
-                            <Text style={content.on_sale}>在售({sale_store_num})家</Text>
+                        <View>
+                          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <View style={content.good_desc}>
+                              <Text style={content.on_sale}>在售({sale_store_num})家</Text>
+                            </View>
+                            <View style={content.good_desc}>
+                              <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
+                              <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
+                            </View>
+                            <View style={content.good_desc}>
+                              <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
+                              <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
+                            </View>
                           </View>
-                          <View style={content.good_desc}>
-                            <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
-                            <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
-                          </View>
-                          <View style={content.good_desc}>
-                            <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
-                            <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
-                          </View>
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text style={content.cankao}>参考价范围 :
+                            {
+                              refer_price ?
+                                  tool.toFixed(refer_lower) +' - '+ tool.toFixed(refer_upper)
+                                  :' 无'
+                            }
+                            </Text>
                         </View>
                       </View>
                     </View>
@@ -539,6 +551,16 @@ const content = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: pxToDp(140),
+  },
+  cankao:{
+    width: '100%',
+    height: pxToDp(50),
+    backgroundColor: '#ededed',
+    borderRadius:pxToDp(35),
+    textAlignVertical:"center",
+    paddingLeft:pxToDp(20),
+    fontSize:pxToDp(24),
+    marginTop:pxToDp(8)
   }
 
 });

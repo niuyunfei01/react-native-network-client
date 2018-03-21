@@ -46,6 +46,7 @@ dependencies {
 
     compile 'com.android.support:multidex:1.0.2'
     compile 'com.roughike:bottom-bar:2.3.1'
+    compile 'me.dm7.barcodescanner:zxing:1.9.8'
 
     compile project(':react-native-vector-icons')
     compile project(':react-native-i18n')
@@ -68,6 +69,10 @@ List<String> dirs = [
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 
     defaultConfig {
         minSdkVersion 18

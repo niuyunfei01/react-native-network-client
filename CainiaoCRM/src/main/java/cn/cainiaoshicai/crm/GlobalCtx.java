@@ -66,6 +66,8 @@ import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
+import cn.cainiaoshicai.crm.domain.Product;
+import cn.cainiaoshicai.crm.domain.ProductTpl;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -800,6 +802,17 @@ public class GlobalCtx extends Application {
         Bundle params = new Bundle();
         params.putString("initTab", "GoodsApplyRecord");
         params.putString("viewStoreId", String.valueOf(storeId));
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toGoodScanSearch(Activity ctx, List<ProductTpl> products) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsScanSearch");
+        Bundle params = new Bundle();
+        Gson gson = new Gson();
+        String productJson = gson.toJson(products);
+        params.putString("products", productJson);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }

@@ -275,5 +275,31 @@
         <item>只看总部备货</item>
         <item>只看门店备货</item>
     </string-array>
-    
+
+    <string name="scanner_activity">扫码上新</string>
+    <string name="scanner_fragment_activity">ZXing Scanner - Full Fragment Activity</string>
+    <string name="simple_scanner_activity">ZXing Scanner - Simple Activity</string>
+    <string name="custom_view_finder_scanner_activity">ZXing Scanner - Custom View Finder Activity</string>
+    <string name="scaling_scanner_activity">ZXing Scanner - Scaling Activity</string>
+    <string name="simple_scanner_fragment_activity">ZXing Scanner - Simple Fragment Activity</string>
+    <string name="full_screen_scanner_fragment_activity">ZXing Scanner - Full Screen Fragment Activity</string>
+    <string name="simple_activity_sample">Simple Activity Sample</string>
+    <string name="simple_fragment_sample">Simple Fragment Sample</string>
+    <string name="activity_sample">Full Activity Sample</string>
+    <string name="fragment_sample">Full Fragment Sample</string>
+    <string name="full_screen_sample">Full Screen Fragment Sample</string>
+    <string name="custom_view_finder_sample">Custom View Finder Sample</string>
+    <string name="scaling_sample">Scaling Sample</string>
+    <string name="toggle_flash">闪光灯</string>
+    <string name="flash_on">关闭闪光灯</string>
+    <string name="flash_off">开启闪光灯</string>
+    <string name="auto_focus_on">自动聚焦</string>
+    <string name="auto_focus_off">关闭自动聚焦</string>
+    <string name="formats">格式</string>
+    <string name="choose_formats">切换格式</string>
+    <string name="select_camera">切换相机</string>
+    <string name="ok_button">确定</string>
+    <string name="cancel_button">取消</string>
+    <bool name="cameraPreviewShouldFillView">true</bool>
+
 </resources>

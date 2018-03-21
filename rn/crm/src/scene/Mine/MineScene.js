@@ -31,7 +31,7 @@ import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from 'moment';
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
-
+import { NavigationActions } from 'react-navigation'
 function mapStateToProps(state) {
   const {mine, user, global} = state;
   return {mine: mine, user: user, global: global}
@@ -552,7 +552,6 @@ class MineScene extends PureComponent {
 
   onPress(route, params = {}) {
     let _this = this;
-
     if (route === Config.ROUTE_SETTING) {
       native.toSettings();
       return;
@@ -595,7 +594,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>业绩</Text>
         </TouchableOpacity>)}
 
-        {fnPriceControlled > 0 && is_service_mgr &&
+        {fnPriceControlled > 0 ?
         (<TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
@@ -603,7 +602,7 @@ class MineScene extends PureComponent {
         >
           <Image style={[block_styles.block_img]} source={require('../../img/My/yunyingshouyi_.png')}/>
           <Text style={[block_styles.block_name]}>运营收益</Text>
-        </TouchableOpacity>)}
+        </TouchableOpacity>):<View/>}
 
         {fnPriceControlled > 0 && is_service_mgr &&
         (<TouchableOpacity
@@ -741,11 +740,6 @@ class MineScene extends PureComponent {
           <Image style={[block_styles.block_img]} source={require('../../img/My/jiagejianguan_.png')}/>
           <Text style={[block_styles.block_name]}>活动加价</Text>
         </TouchableOpacity>)}
-
-        {/*{is_service_mgr && (fnPriceControlled > 0 && is_helper ? (<View style={[block_styles.block_box]}/>) :*/}
-            {/*(fnPriceControlled > 0 || is_helper) && (<View style={[block_styles.empty_box]}/>) )}*/}
-        {/*{fnPriceControlled > 0 && is_service_mgr && <View style={[block_styles.block_box]}/>}*/}
-        {/*{(is_helper || is_service_mgr) && <View style={[block_styles.block_box]}/>}*/}
 
       </View>
     )

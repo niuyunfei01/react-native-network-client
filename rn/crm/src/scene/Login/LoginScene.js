@@ -9,7 +9,8 @@ import {
   Image,
   ToastAndroid,
   NativeModules,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput
 } from 'react-native'
 import {FormInput} from 'react-native-elements'
 import Dimensions from 'Dimensions'
@@ -40,7 +41,6 @@ const styles = StyleSheet.create({
     width: null,
   },
   container: {
-    flexDirection: 'column',
     flex: 1,
     marginTop: 10
   },
@@ -62,7 +62,14 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: pxToDp(40),
     borderWidth: 1,
-    borderColor: '#999999'
+    borderColor: '#999999',
+    justifyContent:'center',
+    alignItems:'center',
+    marginTop:pxToDp(45),
+    height:pxToDp(90),
+    width:pxToDp(230),
+    textAlignVertical:'center',
+    textAlign:'center',
   }
 })
 
@@ -266,29 +273,62 @@ class LoginScene extends PureComponent {
   }
 
   render() {
-    return (<Image style={[styles.backgroundImage, {backgroundColor: colors.white}]}
-                   source={require('../../img/Login/login_bg.png')}>
-      <View style={styles.container}>
+    return (
+      <View style={{backgroundColor: '#e4ecf7',width:width,height:height}}>
         <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
         }}>正在登录...</Toast>
-        <ScrollView horizontal={false} width={width} height={height}>
-          <View style={{marginTop: 100}}>
+        <ScrollView  style={{zIndex:10,flex:1}}>
+          <View >
+            <View style={{alignItems:"center"}}>
+              <Image
+                  style={{
+                    height:pxToDp(134),
+                    width:pxToDp(134),
+                    borderRadius:pxToDp(20),
+                    marginVertical:pxToDp(50),
+                    marginHorizontal:'auto'
+                  }}
+                  source = {require('../../img/Login/login_logo.jpg')}/>
+            </View>
             <View>
-              <FormInput onChangeText={(mobile) => {
-                this.setState({mobile})
-              }}
-                         value={this.state.mobile}
-                         keyboardType="numeric"
-                         placeholder="请输入手机号"/>
+              <TextInput
+                  underlineColorAndroid='transparent'
+                  placeholder="请输入手机号"
+                  onChangeText={(mobile) => {
+                    this.setState({mobile})
+                  }}
+                  value={this.state.mobile}
+                  placeholderTextColor={'#cad0d9'}
+                  style={{
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.main_color,
+                    borderRadius: pxToDp(52),
+                    marginHorizontal: pxToDp(50),
+                    paddingLeft:pxToDp(45),
+                    height:pxToDp(90)
+                  }}
+              />
             </View>
             <View style={styles.inputs}>
               <View style={{flexDirection: 'row'}}>
-                <FormInput placeholder="请输入验证码"
-                           onChangeText={(verifyCode) => this.setState({verifyCode})}
-                           value={this.state.verifyCode}
-                           keyboardType="numeric"
-                           containerStyle={{width: width - 180}}
-                           placeholderColor={colors.default_container_bg}
+                <TextInput
+                    underlineColorAndroid='transparent'
+                    placeholder="请输入验证码"
+                    onChangeText={(verifyCode) => this.setState({verifyCode})}
+                    value={this.state.verifyCode}
+                    keyboardType="numeric"
+                    placeholderTextColor={'#cad0d9'}
+                    style={{
+                      borderWidth: pxToDp(1),
+                      borderColor: colors.main_color,
+                      borderRadius: pxToDp(52),
+                      marginHorizontal: pxToDp(50),
+                      paddingLeft:pxToDp(40),
+                      width:pxToDp(370),
+                      marginTop:pxToDp(45),
+                      height:pxToDp(90),
+                      marginRight:pxToDp(20),
+                    }}
                 />
                 {this.state.canAskReqSmsCode ?
                   <CountDownText
@@ -307,7 +347,17 @@ class LoginScene extends PureComponent {
                     }
                     }
                   />
-                  : <TouchableOpacity style={{alignSelf: 'center'}} onPress={this.onRequestSmsCode}>
+                  : <TouchableOpacity style={{
+                    alignSelf: 'center',
+                      height:pxToDp(90),
+                      width:pxToDp(230),
+                      borderWidth:pxToDp(1),
+                      borderRadius:pxToDp(45),
+                      justifyContent:'center',
+                      alignItems:'center',
+                      marginTop:pxToDp(40),
+                      borderColor:colors.main_color
+                    }} onPress={this.onRequestSmsCode}>
                     <Text
                       style={{fontSize: pxToDp(colors.actionSecondSize), color: colors.main_vice_color}}>获取验证码</Text>
                   </TouchableOpacity>
@@ -316,11 +366,18 @@ class LoginScene extends PureComponent {
             </View>
 
             <View style={{marginLeft: 15, marginRight: 15}}>
-              <TouchableOpacity>
-                <Text>比邻鲜使用协议</Text>
-              </TouchableOpacity>
+              {/*<>*/}
+                {/*<Text>比邻鲜使用协议</Text>*/}
+              {/*</TouchableOpacity>*/}
 
-              <Button style={[]} type={'primary'} onPress={this.onLogin}>登录</Button>
+              <Button style={{
+                height:pxToDp(90),
+                borderRadius:pxToDp(45),
+                marginTop:pxToDp(50),
+                marginHorizontal:pxToDp(20),
+              }}
+                      type={'primary'}
+                      onPress={this.onLogin}>登录</Button>
 
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
@@ -334,11 +391,27 @@ class LoginScene extends PureComponent {
                 </TouchableOpacity>
               </View>
             </View>
-
           </View>
         </ScrollView>
+        <Text style={{
+          textAlign:'center',
+          position:'absolute',
+          width:'100%',
+          bottom:pxToDp(100),
+          zIndex:100}}>登录即表示您已同意
+          <Text style={{color:colors.main_color}}>比邻鲜使用协议</Text>
+        </Text>
+        <Image style={{
+          bottom: pxToDp(40),
+          width: pxToDp(684),
+          height: pxToDp(612),
+          zIndex: 1,
+          position: 'absolute',
+          marginLeft:pxToDp(18)
+        }}
+               source={require('../../img/Login/login_bird.jpg')}/>
       </View>
-    </Image>)
+)
   }
 }
 

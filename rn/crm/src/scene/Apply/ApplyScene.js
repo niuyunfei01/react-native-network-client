@@ -159,7 +159,8 @@ class ApplyScene extends PureComponent {
     this.props.actions.customerApply(data, (success) => {
       self.doneApply();
       if (success) {
-        this.showSuccessToast(applySuccessMsg)
+        this.showSuccessToast(applySuccessMsg);
+        setTimeout(()=>this.props.navigation.goBack(),2000)
       } else {
         this.showErrorToast(applyErrorMsg)
       }
@@ -229,7 +230,7 @@ class ApplyScene extends PureComponent {
       <ScrollView style={styles.container}>
         <View style={styles.register_panel}>
           <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
-            <Cell>
+            <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/login_phone_.png')} style={{
                   width: pxToDp(33),
@@ -243,12 +244,13 @@ class ApplyScene extends PureComponent {
                        value={this.state.mobile}
                        style={styles.input}
                        keyboardType="numeric"
-                       placeholder={mobileInputPlaceHold} placeholderStyle={{color: "#999"}}
-                       underlineColorAndroid="#999"/>
+                       placeholder={mobileInputPlaceHold}
+                       placeholderTextColor={'#ccc'}
+                       underlineColorAndroid="transparent"/>
               </CellBody>
             </Cell>
 
-            <Cell>
+            <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/login_message_.png')} style={{
                   width: pxToDp(39),
@@ -259,8 +261,9 @@ class ApplyScene extends PureComponent {
                 <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
                        value={this.state.verifyCode}
                        style={styles.input}
-                       placeholder={validCodePlaceHold} placeholderStyle={{color: "#999"}}
-                       underlineColorAndroid="#999"/>
+                       placeholder={validCodePlaceHold}
+                       placeholderTextColor={'#ccc'}
+                       underlineColorAndroid="transparent"/>
               </CellBody>
               <CellFooter>
                 {this.state.canAskReqSmsCode ?
@@ -286,7 +289,7 @@ class ApplyScene extends PureComponent {
               </CellFooter>
             </Cell>
 
-            <Cell>
+            <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/login_name_.png')} style={{
                   width: pxToDp(39),
@@ -299,13 +302,13 @@ class ApplyScene extends PureComponent {
                          this.setState({name})
                        }}
                        value={this.state.name}
-                       placeholderStyle={{color: "#999"}}
+                       placeholderTextColor={'#ccc'}
                        style={styles.input}
-                       underlineColorAndroid="#999"/>
+                       underlineColorAndroid="transparent"/>
               </CellBody>
             </Cell>
 
-            <Cell>
+            <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/dianming_.png')} style={{
                   width: pxToDp(39),
@@ -318,13 +321,13 @@ class ApplyScene extends PureComponent {
                          this.setState({shopName})
                        }}
                        value={this.state.shopName}
-                       placeholderStyle={{color: "#999"}}
+                       placeholderTextColor={'#ccc'}
                        style={styles.input}
-                       underlineColorAndroid="#999"/>
+                       underlineColorAndroid="transparent"/>
               </CellBody>
             </Cell>
 
-            <Cell>
+            <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/jingying_.png')} style={{
                   width: pxToDp(39),
@@ -337,12 +340,12 @@ class ApplyScene extends PureComponent {
                          this.setState({classify})
                        }}
                        value={this.state.classify}
-                       placeholderStyle={{color: "#999"}}
+                       placeholderTextColor={'#ccc'}
                        style={styles.input}
-                       underlineColorAndroid="#999"/>
+                       underlineColorAndroid="transparent"/>
               </CellBody>
             </Cell>
-            <Cell>
+            <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/map_.png')} style={{
                   width: pxToDp(39),
@@ -354,21 +357,21 @@ class ApplyScene extends PureComponent {
                        onChangeText={(address) => {
                          this.setState({address})
                        }}
+                       placeholderTextColor={'#ccc'}
                        value={this.state.address}
-                       placeholderStyle={{color: "#999"}}
                        style={styles.input}
-                       underlineColorAndroid="#999"/>
+                       underlineColorAndroid="transparent"
+                />
               </CellBody>
             </Cell>
           </Cells>
 
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-            <Button type="primary" onPress={this.onApply}>我要开店</Button>
+            <Button type="primary" onPress={()=>this.onApply()}>我要开店</Button>
           </ButtonArea>
 
           <Flex direction="row" style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <Text style={{fontSize: 16}}>有不明处?</Text>
-            <Text> </Text>
             <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
             }}>
               联系客服
@@ -422,7 +425,9 @@ const styles = StyleSheet.create({
     paddingBottom: 6 * 0.75,
   },
   input: {
-    color: "#999"
+    color: "#999",
+    borderBottomWidth:pxToDp(1),
+    borderBottomColor:'#999'
   }
 });
 

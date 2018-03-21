@@ -9,9 +9,9 @@ class OperateHeader extends PureComponent {
     super(props);
   }
   render() {
-    let {text,money} = this.props;
+    let {text,money,customStyle} = this.props;
     return (
-          <View style={header.header}>
+          <View style={[header.header,customStyle ? customStyle : null,]}>
             <Text style={header.text}>{text}</Text>
             <Text style={header.text}>{money}</Text>
           </View>

@@ -11,7 +11,7 @@ import {changeProfitInvalidate, fetchProfitOutcomeOtherItem} from "../../reducer
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import OperateIncomeItem from './OperateIncomeItem';
-
+import tool from '../../common/tool'
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -42,14 +42,14 @@ class OperateOtherExpendDetailScene extends PureComponent {
     }
   }
 
-  getProfitOutcomeOtherItem(id) {
+  getProfitOutcomeOtherItem() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
+    let {id} = this.props.navigation.state.params;
     dispatch(fetchProfitOutcomeOtherItem(id, accessToken, async (ok, obj, desc) => {
-      this.setState({query: false,});
       if (ok) {
-        let {editable, label, money, remark,invalid} = obj.obj;
-        this.setState({editable, label, money, remark,invalid});
+        this.setState({item:obj,query: false});
+        this.props.navigation.state.params.refresh()
       } else {
         ToastLong('操作失败');
         this.setState({query: false,})
@@ -58,34 +58,35 @@ class OperateOtherExpendDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {id,} = this.props.navigation.state.params;
+    let {id} = this.props.navigation.state.params;
     this.setState({
-      id: id,
+      id: id
     });
     this.getProfitOutcomeOtherItem(id);
   }
 
   renderList() {
-    let {editable, label, money, remark,invalid,id} = this.state;
+    let {editable, label, money, remark,invalid} = this.state.item;
     return <OperateIncomeItem
-        state={this.state}
+        update = {(id)=>{this.getProfitOutcomeOtherItem(id)}}
         item={{
-          id: id,
+          id : this.state.id,
           label:label,
           money:money,
           remark:remark,
-          invalid:invalid
+          invalid:invalid,
+          editable:editable,
         }}/>
   }
 
   render() {
+    console.log(this.state)
     return (
         <View style={{flex: 1}}>
           <ScrollView style={{flex: 1}}>
             {
-              this.renderList()
+              tool.length(this.state.item) > 0 ? this.renderList():<View/>
             }
-
           </ScrollView>
           <Toast
               icon="loading"

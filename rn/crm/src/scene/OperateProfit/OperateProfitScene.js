@@ -82,8 +82,8 @@ class OperateProfitScene extends PureComponent {
   componentWillMount() {
     this.getProfitHome()
   }
-  toOperateDetail(day) {
-    this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL,{day:day})
+  toOperateDetail(day,total_balanced) {
+    this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL,{day,total_balanced})
   }
   renderList(obj) {
     if(tool.length(obj)>0){
@@ -102,14 +102,19 @@ class OperateProfitScene extends PureComponent {
                           <Cell
                                 style={content.cell}
                                 onPress={() => {
-                                  this.toOperateDetail(day)
+                                  this.toOperateDetail(day,total_balanced)
                                 }}
                                 key={key}
-                                customStyle={{paddingRight:pxToDp(12)}}
+                                customStyle={content.cust}
                           >
                             <CellHeader style={content.header}>
-                              <Text style={content.date}> {day}</Text>
-                              <Text style={content.payment}>结款 {toFixed(balance_money)}</Text>
+                             <View>
+                               <Text style={content.date}> {day}</Text>
+                               {
+                                 parseInt(balance_money) > 0 ?
+                                     <Text style={content.payment}>结款 {toFixed(balance_money)}</Text> : <View/>
+                               }
+                             </View>
                             </CellHeader>
                             <CellBody style={{marginLeft: pxToDp(10)}}>
                               {
@@ -196,10 +201,12 @@ const content = StyleSheet.create({
   cell: {
     height: pxToDp(125),
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   header: {
     minWidth: pxToDp(150),
+    height:'100%',
+    justifyContent:'center'
   },
   body: {
     width: pxToDp(175),
@@ -224,13 +231,21 @@ const content = StyleSheet.create({
     lineHeight: pxToDp(30),
     paddingHorizontal: pxToDp(10),
     paddingVertical: pxToDp(5),
-    marginTop: pxToDp(2)
+    marginTop: pxToDp(5)
   },
   expend: {
     color: '#fe0000'
   },
   take_in: {
     color: colors.main_color
+  },
+  cust: {
+    marginLeft: 0,
+    width: '100%',
+    paddingHorizontal: pxToDp(30),
+    paddingRight: pxToDp(10),
+    marginTop: pxToDp(0),
+    height: pxToDp(125)
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(OperateProfitScene)

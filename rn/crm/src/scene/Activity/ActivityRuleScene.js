@@ -2,27 +2,21 @@ import React, {PureComponent} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   TouchableOpacity,
   ScrollView,
   TextInput,
-  FlatList,
-  TouchableHighlight,
-  Alert,
 } from 'react-native';
 import {
   Cells,
   Cell,
   CellHeader,
-  CellBody,
   CellFooter,
-  Label,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchSavePriceRule} from '../../reducers/activity/activityAction';
+import {fetchSavePriceRule,activityRuleList} from '../../reducers/activity/activityAction';
 import pxToDp from "../../util/pxToDp";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -35,9 +29,7 @@ import {Toast, Icon} from "../../weui/index";
 import style from './commonStyle'
 import ImgBtn from "./imgBtn";
 import BottomBtn from './ActivityBottomBtn'
-import {setAccessToken} from "../../reducers/global/globalActions";
-import native from "../../common/native";
-
+import Percentage from './ActivityPercentage'
 function mapStateToProps(state) {
   const {mine, global, activity, product} = state;
   return {mine: mine, global: global, activity: activity, product: product}
@@ -46,7 +38,9 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      ...globalActions
+      ...globalActions,
+      fetchSavePriceRule,
+      activityRuleList,
     }, dispatch)
   }
 }
@@ -583,6 +577,7 @@ class ActivityRuleScene extends PureComponent {
         this.setState({uploading:false});
         if (ok) {
           ToastLong('提交成功');
+          dispatch(activityRuleList(true))
           setTimeout(()=>{
             _this.props.navigation.goBack();
           },1000)
@@ -736,13 +731,11 @@ class ActivityRuleScene extends PureComponent {
               }
             </Cells>
             <BottomBtn onPress={async () => {
-              let {uploading}=this.state
+              let {uploading} = this.state;
               if(uploading){
                 return false
               }
-
               await this.setState({uploading:true});
-
               this.uploadData()
             }}/>
           </ScrollView>
@@ -790,47 +783,6 @@ class ActivityRuleScene extends PureComponent {
   }
 }
 
-class Percentage extends PureComponent {
-  render() {
-    let {min_price, max_price, percent, tail, text} = this.props || {};
-    return (
-        <Cell customStyle={style.cell} first={false}>
-          {
-            text ? <CellHeader>
-              {
-                tail ? <Text style={style.cell_header_text}>{tool.toFixed(min_price, 'int')}元以上</Text>
-                    : <Text
-                        style={style.cell_header_text}>{tool.toFixed(min_price, 'int')}元--{tool.toFixed(max_price, 'int')}元</Text>
-              }
-            </CellHeader> : <CellHeader/>
-          }
-          <CellFooter>
-            <TouchableOpacity
-                onPress={() => {
-                  if (percent > 100) {
-                    this.props.onPressReduce()
-                  } else {
-                    ToastLong('加价比例不能小于100%')
-                  }
-
-                }
-                }
-            >
-              <Image style={style.operation}
-                     source={percent <= 100 ? require('../../img/Activity/jianshaohui_.png') : require('../../img/Activity/jianshao_.png')}
-              />
-            </TouchableOpacity>
-            <Text style={style.percentage_text}>{percent}%</Text>
-            <TouchableOpacity
-                onPress={() => this.props.onPressAdd()}
-            >
-              <Image style={style.operation} source={require('../../img/Activity/zengjia_.png')}/>
-            </TouchableOpacity>
-          </CellFooter>
-        </Cell>
-    )
-  }
-}
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityRuleScene)

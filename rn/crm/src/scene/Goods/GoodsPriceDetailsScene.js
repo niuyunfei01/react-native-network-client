@@ -88,7 +88,8 @@ class GoodsPriceDetails extends PureComponent {
 
   async componentWillMount() {
     let {item, vendorId} = this.props.navigation.state.params;
-    let {list_img, max_price, min_price, name, product_id, sale_store_num,} = item;
+    console.log('vendorId>>>>',vendorId);
+    let {list_img, name, product_id, sale_store_num,} = item;
     await this.setState({list_img, name, product_id, sale_store_num, vendorId});
     this.getListStoresGoods();
   }
@@ -107,9 +108,9 @@ class GoodsPriceDetails extends PureComponent {
           referPrice: price,
           upperLimit: upper_limit,
           lowerLimit: lower_limit,
-          setUpperLimit: upper_limit == 0 ? 100 : upper_limit,
-          setLowerLimit: lower_limit == 0 ? 100 : lower_limit,
-          setReferPrice: price==0?'':tool.toFixed(price),
+          setUpperLimit: upper_limit == 0 ? 120 : upper_limit,
+          setLowerLimit: lower_limit == 0 ? 90 : lower_limit,
+          setReferPrice: price == 0 ? '' : tool.toFixed(price),
         });
         _this.listSort();
         this.forceUpdate()
@@ -150,7 +151,7 @@ class GoodsPriceDetails extends PureComponent {
   }
 
   validate(data){
-    let {refer_price,product_id,lower_limit,upper_limit} =data
+    let {refer_price,product_id,lower_limit,upper_limit,vendorId} =data
     if(refer_price<=0){
       ToastLong('检查参考价不能为0');
       return false;
@@ -163,25 +164,28 @@ class GoodsPriceDetails extends PureComponent {
     }else if(upper_limit<100){
       ToastLong('上限值不能小于100');
       return false;
+    }else if(vendorId){
+      ToastLong('未选择品牌');
+      return false;
     }else {
       return true
     }
 
   }
 
+
   upEditProdReferPrice() {
-    let {product_id, uploading, setReferPrice,setLowerLimit ,setUpperLimit}= this.state;
+    let {product_id, uploading, setReferPrice,setLowerLimit ,setUpperLimit,vendorId}= this.state;
     if (uploading) {
       return false
     }
-
     let data = {
       refer_price: Math.ceil(setReferPrice * 100),
       product_id: product_id,
       lower_limit: setLowerLimit,
-      upper_limit : setUpperLimit,
+      upper_limit: setUpperLimit,
+      vendor_id: vendorId
     };
-    console.log(data);
     if(this.validate(data)){
       this.setState({uploading: true});
       const {accessToken} = this.props.global;
@@ -223,7 +227,6 @@ class GoodsPriceDetails extends PureComponent {
     let num = this.state[str];
     if (str == 'setUpperLimit') {
       num++;
-      console.log(num);
       this.setState({[str]: num})
     } else {
       if (num >= 100) {
@@ -581,7 +584,7 @@ class GoodsPriceDetails extends PureComponent {
                   }}
                   value={''+setReferPrice}
                   onChangeText={(text)=>{
-                    //console.log(text)
+                    console.log(text)
                     this.setState({setReferPrice:text})
                   }}
                   keyboardType={'numeric'}

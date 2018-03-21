@@ -39,13 +39,20 @@ class ActivityItem extends PureComponent {
       end_time: [],
       edit: false,
     }
+    this.setProps = this.setProps.bind(this)
   }
 
   componentWillMount() {
+   this.setProps(this.props)
+  }
+  componentWillReceiveProps(nextProps) {
+    this.setProps(nextProps)
+  }
+  setProps(data) {
     let _this = this;
     try {
-      let {edit} = _this.props;
-      let {price_rules, interval_rules, goods_rules} = _this.props.item;
+      let {edit} = data;
+      let {price_rules, interval_rules, goods_rules} = data.item;
       let {min_price, max_price, percent} = interval_rules[Cts.RULE_TYPE_GENERAL][Object.keys(interval_rules[Cts.RULE_TYPE_GENERAL])[0]];
       let {ext_store, vendor_id, rule_name, ext_store_id, start_time, end_time} = price_rules;
       _this.setState({
@@ -62,14 +69,9 @@ class ActivityItem extends PureComponent {
         edit: edit
       })
     } catch (e) {
-      console.log(e)
+      // console.log(e)
     }
   }
-
-  componentDidMount() {
-    console.log(this.props.item)
-  }
-
   dialogToggle(type, title) {
     this.setState({
       showDialog: true,
@@ -103,7 +105,7 @@ class ActivityItem extends PureComponent {
           return (
               <Cell key={index} customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
                 <CellHeader>
-                  <Text>{min_price / 100}元-{max_price / 100}元</Text>
+                  <Text>{ tool.toFixed(min_price)}元-{tool.toFixed(max_price)}元</Text>
                 </CellHeader>
                 <CellFooter>
                   <Text>{percent}%</Text>
@@ -113,7 +115,7 @@ class ActivityItem extends PureComponent {
         });
         break;
       case Cts.RULE_TYPE_SPECIAL:
-        if (tool.length(interval_rules[Cts.RULE_TYPE_SPECIAL])<=0) {
+        if (tool.length(interval_rules[Cts.RULE_TYPE_SPECIAL]) <= 0) {
           return <RenderEmpty/>
         } else {
           return tool.objectMap(interval_rules[Cts.RULE_TYPE_SPECIAL], (item, index) => {
@@ -136,7 +138,7 @@ class ActivityItem extends PureComponent {
                           <Cell key={index}
                                 customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
                             <CellHeader>
-                              <Text>{min_price / 100}元-{max_price / 100}元</Text>
+                              <Text>{tool.toFixed(min_price)}元-{tool.toFixed(max_price)}元</Text>
                             </CellHeader>
                             <CellFooter>
                               <Text>{percent}%</Text>
@@ -151,46 +153,49 @@ class ActivityItem extends PureComponent {
         }
         break;
       case constant.GOOD_RULE:
-        return goods_rules.map((item, index) => {
-          let {percent, prod_list} = item;
-          return (
-              <View key={index}>
-                <Cell customStyle={[style.cell, {
-                  paddingLeft: pxToDp(15),
-                  paddingRight: pxToDp(15),
-                  minHeight: pxToDp(100)
-                }]}>
-                  <CellHeader>
-                    <Text>
-                      {percent}%
-                    </Text>
-                  </CellHeader>
-                </Cell>
-                {
-                  tool.objectMap(prod_list, (ite, index) => {
-                    let {listimg, name} = ite;
-                    return (
-                        <Cell key={index}
-                              customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
-                          <CellHeader>
-                            <Image style={{height: pxToDp(90), width: pxToDp(90)}}
-                                   source={!!listimg ? {uri: listimg} : require('../../img/Order/zanwutupian_.png')}
-                            />
-                          </CellHeader>
-                          <CellBody>
-                            <View>
-                              <Text>{name}</Text>
-                              <Text>#{index}</Text>
-                            </View>
-                          </CellBody>
-                        </Cell>
-                    )
-                  })
-                }
-              </View>)
-        })
+        if (tool.length(goods_rules) <= 0) {
+          return <RenderEmpty/>
+        } else {
+          return goods_rules.map((item, index) => {
+            let {percent, prod_list} = item;
+            return (
+                <View key={index}>
+                  <Cell customStyle={[style.cell, {
+                    paddingLeft: pxToDp(15),
+                    paddingRight: pxToDp(15),
+                    minHeight: pxToDp(100)
+                  }]}>
+                    <CellHeader>
+                      <Text>
+                        {percent}%
+                      </Text>
+                    </CellHeader>
+                  </Cell>
+                  {
+                    tool.objectMap(prod_list, (ite, index) => {
+                      let {listimg, name} = ite;
+                      return (
+                          <Cell key={index}
+                                customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}>
+                            <CellHeader>
+                              <Image style={{height: pxToDp(90), width: pxToDp(90)}}
+                                     source={!!listimg ? {uri: listimg} : require('../../img/Order/zanwutupian_.png')}
+                              />
+                            </CellHeader>
+                            <CellBody>
+                              <View>
+                                <Text>{name}</Text>
+                                <Text>#{index}</Text>
+                              </View>
+                            </CellBody>
+                          </Cell>
+                      )
+                    })
+                  }
+                </View>)
+          })
+        }
     }
-
   }
 
   render() {

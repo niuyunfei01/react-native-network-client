@@ -2,20 +2,14 @@ import React, {PureComponent} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   TouchableOpacity,
   ScrollView,
   RefreshControl,
 } from 'react-native';
 import {
-  Cells,
   Cell,
   CellHeader,
-  CheckboxCells,
-  CellBody,
-  CellFooter,
-  Label,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -25,20 +19,14 @@ import colors from "../../styles/colors";
 
 import Config from "../../config";
 import tool from '../../common/tool';
-import Cts from '../../Cts';
-import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Icon, Dialog} from "../../weui/index";
+import {Toast} from "../../weui/index";
 import style from './commonStyle'
-import SelectBox from './SelectBox'
-import ImgBtn from "./imgBtn";
 import {fetchRuleList} from "../../reducers/activity/activityAction";
 import ActivityItem from './ActivityItem'
-
 function mapStateToProps(state) {
   const {mine, global, activity} = state;
   return {mine: mine, global: global, activity: activity}
 }
-
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
@@ -50,8 +38,6 @@ function mapDispatchToProps(dispatch) {
 class ActivityManageScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
-    let {backPage} = params;
     return {
       headerTitle: '活动加价管理',
       headerRight: (
@@ -109,19 +95,21 @@ class ActivityManageScene extends PureComponent {
     });
     return arr;
   }
-
   componentWillMount() {
     this.getRuleList()
   }
-
-  getRuleList() {
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.activity.activityRule){
+      this.getRuleList()
+    }
+  }
+  getRuleList = () => {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(fetchRuleList('active', accessToken, (ok, desc, obj) => {
       if (ok) {
         let operatingList = this.differentiateList(obj, true);
         let willOperatingList = this.differentiateList(obj, false);
-        console.log(obj);
         this.setState({
           query: false,
           operatingList: operatingList,
