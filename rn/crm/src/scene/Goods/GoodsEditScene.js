@@ -87,7 +87,7 @@ let configState = {
   torchMode: 'on',
   cameraType: 'back',
   scanBoolean:true,
-}
+};
 
 class GoodsEditScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
@@ -170,6 +170,7 @@ class GoodsEditScene extends PureComponent {
 
   componentWillMount() {
     let _this = this;
+    console.log('navigation>>>',this.props.navigation);
     let {params} = this.props.navigation.state;
     console.log('params>>>',params)
     let {type} = params;
@@ -216,7 +217,6 @@ class GoodsEditScene extends PureComponent {
           name: name,
         })
       }else if(type === 'scan') {
-        console.log('>>>>',this.props.navigation.state.params.product_detail)
         let {name,weight,img} = this.props.navigation.state.params.product_detail;
         let upload_files = {};
         if (tool.length(img) > 0) {
@@ -326,7 +326,16 @@ class GoodsEditScene extends PureComponent {
       }
     }));
   }
-
+resetRouter(){
+  this.setState({...configState})
+  resetAction = NavigationActions.reset({
+    index: 0,
+    actions: [
+      NavigationActions.navigate({routeName:'GoodsEdit',params:{type:"add"}})//要跳转到的页面名字
+    ]
+  });
+  this.props.navigation.dispatch(resetAction);
+}
   toModalData(obj) {
     let arr = [];
     Object.keys(obj).map((key) => {
@@ -341,6 +350,9 @@ class GoodsEditScene extends PureComponent {
   }
 
   upLoad = async () => {
+
+    this.resetRouter()
+    return false
     let {type} = this.props.navigation.state.params;
     if (!this.state.fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED})
@@ -383,7 +395,7 @@ class GoodsEditScene extends PureComponent {
             this.setState({selectToWhere: true})
           }else if(type === 'scan'){
             ToastLong('上传成功')
-            this.setState({...configState})
+            this.resetRouter()
           }else {
             await this.setBeforeRefresh();
             this.back(type);

@@ -98,8 +98,9 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {productId, backPage} = (this.props.navigation.state.params || {});
+    let {productId, backPage,vendorId} = (this.props.navigation.state.params || {});
     let {currVendorId} = tool.vendor(this.props.global);
+    currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
     /*if (product_detail[productId] === undefined) {
@@ -153,7 +154,6 @@ class GoodsDetailScene extends PureComponent {
 
   getProductDetail() {
     let product_id = this.productId;
-    console.log('product_id ---------------------> ', product_id);
     if (product_id > 0) {
       let {currVendorId} = tool.vendor(this.props.global);
       const {accessToken} = this.props.global;
@@ -163,7 +163,7 @@ class GoodsDetailScene extends PureComponent {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
           if (resp.ok) {
             let product_detail = resp.obj;
-            //console.log('product_detail -------->', product_detail);
+            console.log('product_detail -------->', product_detail);
             _this.setState({
               product_detail: product_detail,
               isRefreshing: false,
@@ -434,6 +434,38 @@ class GoodsDetailScene extends PureComponent {
           <View style={{flex: 1}}/>
           <TouchableOpacity
               style = {styles.related_edit}
+              onPress={() => {
+                let {name ,coverimg,id,vendor_id}  = this.state.product_detail;
+                let {store_product} =this.state;
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_GOODS_PRICE_DETAIL,{
+                   item:{
+                     list_img:coverimg,
+                     name:name,
+                     product_id:id,
+                     sale_store_num:tool.length(store_product)
+                   },
+                    vendorId:vendor_id
+                  });
+                });
+              }}
+          >
+            <Text style={
+              {fontSize: pxToDp(30),
+                color: '#59b26a',
+                textAlignVertical: 'center',
+                marginRight:pxToDp(30),
+                borderRightColor:colors.fontGray,
+                borderRightWidth:pxToDp(1),
+                paddingRight:pxToDp(20)
+              }
+            }>
+              比价
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+              style = {[styles.related_edit]}
               onPress={() => {
                 InteractionManager.runAfterInteractions(() => {
                   navigation.navigate(Config.ROUTE_GOODS_RELATE,{
