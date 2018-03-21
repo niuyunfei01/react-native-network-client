@@ -48,7 +48,6 @@ export default {
 
   REFUND_AUDIT_AGREE: 1, //同意退款
   REFUND_AUDIT_REFUSE: 0, //拒绝退款
-
   //审核状态
   AUDIT_STATUS_WAIT: 0,//审核中
   AUDIT_STATUS_PASSED: 1,//已完成

@@ -98,7 +98,7 @@ class AuditRefundScene extends Component {
                     return false
                   }
                   await this.setState({onSubmitting:true});
-                  this.tplAction(reasons.custom_talked_ok,true)
+                  this.tplAction(reasons.custom_talked_ok,Cts.REFUND_AUDIT_AGREE)
                 }}
                 style = {styles.handle}/>
           </View>
@@ -131,7 +131,7 @@ class AuditRefundScene extends Component {
                     return false
                   }
                   await this.setState({onSubmitting:true})
-                  this.tplAction(reason,false)
+                  this.tplAction(reason,Cts.REFUND_AUDIT_REFUSE)
                 }}
                 style = {[styles.handle,{color:colors.white,backgroundColor:colors.editStatusAdd}]}/>
           </View>
@@ -222,7 +222,7 @@ class AuditRefundScene extends Component {
                   <Cell customStyle={[styles.my_cell]}>
                     <CellHeader style={{marginVertical:pxToDp(15)}}>
                       <Text style={{color: colors.editStatusAdd}}>
-                        { refund_type ?  '用户部分退款' :'用户全额退款'  }
+                        { refund_type == 0 ? '用户全额退款' : '用户部分退款' }
                       </Text>
                       {/*<Text style={[styles.text,]}>退款金额 : ￥12.55</Text>*/}
                       {/*<Text style={[styles.text,]}>退款商品 : 精选土豆500克</Text>*/}

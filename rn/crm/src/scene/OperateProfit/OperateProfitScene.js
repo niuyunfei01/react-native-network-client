@@ -105,7 +105,7 @@ class OperateProfitScene extends PureComponent {
                                   this.toOperateDetail(day,total_balanced)
                                 }}
                                 key={key}
-                                customStyle={{marginLeft:0,width:'100%',paddingHorizontal:pxToDp(30),paddingRight:pxToDp(10),marginTop:pxToDp(0),height:pxToDp(125)}}
+                                customStyle={content.cust}
                           >
                             <CellHeader style={content.header}>
                              <View>
@@ -238,6 +238,14 @@ const content = StyleSheet.create({
   },
   take_in: {
     color: colors.main_color
+  },
+  cust: {
+    marginLeft: 0,
+    width: '100%',
+    paddingHorizontal: pxToDp(30),
+    paddingRight: pxToDp(10),
+    marginTop: pxToDp(0),
+    height: pxToDp(125)
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(OperateProfitScene)
