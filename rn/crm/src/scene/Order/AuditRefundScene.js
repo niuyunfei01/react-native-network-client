@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity,TextInput} from 'react-native'
+import { Platform, View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native'
 import { screen, system, tool, native } from '../../common'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../common/CommonStyles'
 import Icons from 'react-native-vector-icons/FontAwesome';
 import {orderAuditRefund} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
@@ -52,12 +51,10 @@ class AuditRefundScene extends Component {
       selected_action: '',
       reason_key:'',
       custom: '',
-      chevron:false,
+      chevron:true,
       tabNum:0,
       reason:'已与用户协商一致',
       onSubmitting:false,
-      money:''
-
     };
     this.renderReason = this.renderReason.bind(this)
   }
@@ -68,13 +65,11 @@ class AuditRefundScene extends Component {
       remind:remind,
     })
   }
-
-  tplAction(resron,agreeOrRefuse) {
+  tplAction(reason,agreeOrRefuse) {
     const {remind} = (this.props.navigation.state.params || {});
     const {dispatch, global} = this.props;
-    let {money} = this.state;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
-        money, (ok, msg, data) => {
+        0, (ok, msg, data) => {
           if (ok) {
             ToastLong('发送成功,即将返回上一页');
             this.setState({onSubmitting: false});
@@ -86,7 +81,6 @@ class AuditRefundScene extends Component {
           }
         }));
   }
-
   renderReason() {
     let {tabNum} = this.state;
     if (tabNum === 1) {
@@ -95,29 +89,12 @@ class AuditRefundScene extends Component {
             <View style={{marginVertical:pxToDp(40)}}>
               <Text style={[styles.bottom_box_text,{color:colors.editStatusAdd}] } >
                 同意退款后,货款立即原路退回，无法追回</Text>
-              <TextInput
-                  maxLength={20}
-                  value={this.state.money}
-                  onChangeText={(text)=>{
-                    this.setState({money:text})
-                  }}
-                  underlineColorAndroid='transparent'
-                  placeholder='输入退款金额'
-                  placeholderTextColor = "#ccc"
-                  keyboardType='numeric'
-                  style={{
-                    borderWidth:pxToDp(1),
-                    marginTop:pxToDp(30),
-                    borderColor:'#ccc',
-                  }}
-              />
             </View>
             <MyBtn
                 text={'同意退款'}
                 onPress={async()=>{
-                  let {onSubmitting,money} = this.state;
-                  if(onSubmitting || parseInt(money) <= 0){
-                    ToastLong('请输入退款金额');
+                  let {onSubmitting} = this.state;
+                  if(onSubmitting ){
                     return false
                   }
                   await this.setState({onSubmitting:true});
@@ -153,7 +130,7 @@ class AuditRefundScene extends Component {
                     ToastLong('一定要输入理由');
                     return false
                   }
-                  await this.setState({onSubmitting:true,money:''})
+                  await this.setState({onSubmitting:true})
                   this.tplAction(reason,false)
                 }}
                 style = {[styles.handle,{color:colors.white,backgroundColor:colors.editStatusAdd}]}/>
@@ -173,7 +150,7 @@ class AuditRefundScene extends Component {
       expectTime,
       orderTime,
     } = this.state.order;
-    let {remind_id} = this.state.remind;
+    let {remind_id,refund_type} = this.state.remind;
     remind_id = JSON.parse(remind_id)
     return (
         <ScrollView style={{flex: 1}}>
@@ -244,7 +221,9 @@ class AuditRefundScene extends Component {
               this.state.chevron ?
                   <Cell customStyle={[styles.my_cell]}>
                     <CellHeader style={{marginVertical:pxToDp(15)}}>
-                      <Text style={{color: colors.fontBlack}}>用户申请退款</Text>
+                      <Text style={{color: colors.editStatusAdd}}>
+                        { refund_type ?  '用户部分退款' :'用户全额退款'  }
+                      </Text>
                       {/*<Text style={[styles.text,]}>退款金额 : ￥12.55</Text>*/}
                       {/*<Text style={[styles.text,]}>退款商品 : 精选土豆500克</Text>*/}
                       <Text style={[styles.text,]}>退款理由 : {remind_id.reason}</Text>
@@ -253,7 +232,7 @@ class AuditRefundScene extends Component {
             }
             <Cell customStyle={[styles.my_cell,{height:pxToDp(120)}]}>
             <CellHeader>
-                <Text>长时间不处理,系统自动退款</Text>
+                <Text>长时间不处理,系统将自动退款</Text>
               </CellHeader>
               <CellBody/>
               <CellFooter>
