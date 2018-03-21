@@ -318,13 +318,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void navigateToNativeActivity(String activityName) {
+    void navigateToNativeActivity(String activityName, boolean putStack) {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             Class<?> cls = null;
             try {
                 cls = Class.forName(activityName);
                 Intent intent = new Intent(activity, cls);
+                if (!putStack) {
+                    intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                }
                 activity.startActivity(intent);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
