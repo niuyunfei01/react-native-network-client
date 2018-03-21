@@ -69,7 +69,7 @@ class AuditRefundScene extends Component {
     })
   }
 
-  tplAction(,agreeOrRefuse) {
+  tplAction(resron,agreeOrRefuse) {
     const {remind} = (this.props.navigation.state.params || {});
     const {dispatch, global} = this.props;
     let {money} = this.state;
