@@ -50,12 +50,12 @@ public class StorageActionDao {
         return actionWithResult(String.format("/store_chg_status/%d/%d/%d/%d", storeId, product_id, status, destStatus), null);
     }
 
-    public ResultEditReq store_edit_provide_req(int pid, int store_id, int total_req, String remark, int lastStat) throws ServiceException {
+    public ResultEditReq store_edit_provide_req(int pid, int store_id, int total_req, float total_amount, String remark, int lastStat, int unitType) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         params.put("remark", remark);
         params.put("last_stat", String.valueOf(lastStat));
         params.put("day", DateTimeUtils.shortYmd(new Date()));
-        return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d", pid, store_id, total_req), params);
+        return actionEditReq(String.format("/store_edit_provide_req/%d/%d/%d/%.2f/%d", pid, store_id, total_req, total_amount, unitType), params);
     }
 
     public ResultBean store_provide_req(Long storeId, int reqId) throws ServiceException {

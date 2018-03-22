@@ -7,8 +7,11 @@ import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -354,6 +357,12 @@ public class StoreStorageHelper {
         final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
         final EditText nowStatTxt = (EditText) npView.findViewById(R.id.now_stat);
         final EditText remark = (EditText) npView.findViewById(R.id.remark);
+        final EditText totalResp = (EditText)npView.findViewById(R.id.total_resp);
+        final Spinner selectUnitType = (Spinner)npView.findViewById(R.id.select_req_unit_type);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
+                R.array.req_select_list, android.R.layout.simple_spinner_item);
+        selectUnitType.setAdapter(adapter);
+
 
         int totalInReq = item.getTotalInReq();
         int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
@@ -372,12 +381,11 @@ public class StoreStorageHelper {
                                         ResultEditReq rb;
                                         String s = totalReqTxt.getText().toString();
                                         String nowStatStr = nowStatTxt.getText().toString();
-
+                                        String respS = totalResp.getText().toString();
                                         if (TextUtils.isEmpty(nowStatStr)) {
                                             AlertUtil.errorOnActivity(activity, "订货前请盘点当前的库存，务必保持准确！");
                                             return null;
                                         }
-
                                         if (TextUtils.isEmpty(s)) {
                                             activity.runOnUiThread(new Runnable() {
                                                 @Override
@@ -387,13 +395,14 @@ public class StoreStorageHelper {
                                             });
                                             return null;
                                         }
-
                                         final int total_req_no = Integer.parseInt(s);
                                         final int nowStat = Integer.parseInt(nowStatStr);
+                                        final float totalResp = Float.parseFloat(respS);
                                         final String remarkTxt = remark.getText().toString();
+                                        final int unitType = selectUnitType.getSelectedItemPosition();
                                         try {
                                             StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
-                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, remarkTxt, nowStat);
+                                            rb = sad.store_edit_provide_req(item.getProduct_id(), item.getStore_id(), total_req_no, totalResp, remarkTxt, nowStat, unitType);
                                         } catch (ServiceException e) {
                                             rb = new ResultEditReq(false, "访问服务器出错");
                                         }
