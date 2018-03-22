@@ -13,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
-        android:text="库存:"
+        android:text="现有库存:"
         android:textColor="@color/light_blue" />
 
 
@@ -36,7 +36,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/label_now_stat"
         android:layout_marginTop="10dp"
-        android:text="份数:"
+        android:text="订货份数:"
         android:textColor="@color/light_blue" />
 
     <EditText
@@ -51,20 +51,61 @@
         android:textColor="@color/light_blue" />
 
     <TextView
+        android:id="@+id/label_req_unit_type"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_below="@id/label_least_amount"
+        android:layout_marginTop="10dp"
+        android:text="订货单位:"
+        android:textColor="@color/light_blue" />
+
+    <Spinner
+        android:id="@+id/select_req_unit_type"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/total_req"
+        android:background="@android:drawable/btn_dropdown"
+        android:layout_toEndOf="@id/label_req_unit_type"
+        android:spinnerMode="dropdown"/>
+
+    <TextView
+        android:id="@+id/label_total_resp"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/label_req_unit_type"
+        android:layout_marginTop="10dp"
+        android:text="订货总量:"
+        android:textColor="@color/light_blue" />
+
+    <EditText
+        android:id="@+id/total_resp"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_below="@id/select_req_unit_type"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_style"
+        android:layout_toEndOf="@id/label_total_resp"
+        android:inputType="number"
+        android:textColor="@color/light_blue" />
+
+
+    <TextView
         android:id="@+id/label_kf_msg"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/label_least_amount"
+        android:layout_below="@+id/label_total_resp"
         android:layout_marginTop="10dp"
-        android:text="备注:"
+        android:text="订货备注:"
         android:textColor="@color/light_blue" />
 
     <EditText
         android:id="@+id/remark"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_below="@id/label_least_amount"
+        android:layout_below="@id/total_resp"
         android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/label_kf_msg"
         android:background="@drawable/edittext_style"

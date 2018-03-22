@@ -276,6 +276,13 @@
         <item>只看门店备货</item>
     </string-array>
 
+    <string-array name="req_select_list">
+        <item>斤</item>
+        <item>个</item>
+        <item>克</item>
+        <item>千克</item>
+    </string-array>
+
     <string name="scanner_activity">扫码上新</string>
     <string name="scanner_fragment_activity">ZXing Scanner - Full Fragment Activity</string>
     <string name="simple_scanner_activity">ZXing Scanner - Simple Activity</string>
