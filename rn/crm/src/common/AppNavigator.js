@@ -79,7 +79,7 @@ import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassif
 import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
 import InvoicingScene from "../scene/Invoicing/InvoicingScene";
-
+import InvoicingGatherDetail from "../scene/Invoicing/InvoicingGatherDetailScene"
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -250,7 +250,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
-        [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
+        [Config.ROUTE_GOODS_DETAIL]: {screen: InvoicingGatherDetail},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: { screen: VersionScene },
         [Config.ROUTE_SELECT_STORE]: { screen: SelectStoreScene },

@@ -17,7 +17,9 @@ import {
   CellFooter,
 } from "../../weui/index";
 import Styles  from './InvoicingStyles'
-class InvoicingScene extends PureComponent {
+import  font from  './fontStyles'
+
+class InvoicingShipping extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: '进销存',
   });
@@ -31,9 +33,11 @@ class InvoicingScene extends PureComponent {
           <View>
             <ScrollView>
               <Cells>
-                <Cell  access customStyle={Styles.in_cell}>
-                  <CellHeader>
-                    <Text>回龙观店</Text>
+                <Cell  access customStyle={Styles.in_h_cell}>
+                  <CellHeader style={{justifyContent:'center',height:pxToDp(180)}}>
+                    <Text style={[font.font30,font.fontBlack]} >回龙观店</Text>
+                    <Text style={[font.font24,font.fontGray,{marginTop:pxToDp(10)}]} >朱春浩 2018-03-09 19:30:31 提交</Text>
+                    <Text style={[font.font24,font.fontRed,{marginTop:pxToDp(10)}]} >备注: 10000 个袋子</Text>
                   </CellHeader>
                   <CellBody/>
                   <CellFooter>
@@ -47,4 +51,4 @@ class InvoicingScene extends PureComponent {
   }
 }
 
-export default InvoicingScene
+export default InvoicingShipping

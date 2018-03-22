@@ -8,15 +8,17 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view'
-import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-// import InvoiceGather from 'InvoicingGatherScene'
+import InvoiceGather from './InvoicingGatherScene'
+import InvoicingShipping from './InvoicingShippingScene'
+import InvoicingOrderGoods from './InvoicingOrderGoodsScene'
 class InvoicingScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
-    headerTitle: '进销存',
-    headerTitleColor: colors.fontBlue
+    headerTitle: '进销存系统',
+    headerStyle: {
+      backgroundColor: colors.fontBlue,
+    },
   });
-
   constructor(props) {
     super(props)
   }
@@ -25,11 +27,14 @@ class InvoicingScene extends PureComponent {
     return (
           <ScrollableTabView
               renderTabBar={() => <DefaultTabBar/>}>
-            <Text tabLabel='Tab1'>Tab1</Text>
-            <Text tabLabel='Tab2'>Tab2</Text>
+            <InvoiceGather tabLabel='采集中'/>
+            <InvoicingShipping tabLabel='调货单'/>
+            <InvoicingOrderGoods tabLabel='订货单'/>
+            <Text tabLabel='收货单'>Tab2</Text>
           </ScrollableTabView>
     )
   }
 }
+
 
 export default InvoicingScene
