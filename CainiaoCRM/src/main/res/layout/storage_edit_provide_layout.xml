@@ -26,6 +26,7 @@
         android:layout_toEndOf="@id/label_now_stat"
         android:background="@drawable/edittext_style"
         android:inputType="number"
+        android:textCursorDrawable="@drawable/edit_cursor_color"
         android:textColor="@color/light_blue" />
 
 
@@ -48,6 +49,7 @@
         android:layout_toEndOf="@id/label_least_amount"
         android:background="@drawable/edittext_style"
         android:inputType="number"
+        android:textCursorDrawable="@drawable/edit_cursor_color"
         android:textColor="@color/light_blue" />
 
     <TextView
@@ -88,6 +90,7 @@
         android:background="@drawable/edittext_style"
         android:layout_toEndOf="@id/label_total_resp"
         android:inputType="number"
+        android:textCursorDrawable="@drawable/edit_cursor_color"
         android:textColor="@color/light_blue" />
 
 
@@ -110,6 +113,7 @@
         android:layout_toEndOf="@+id/label_kf_msg"
         android:background="@drawable/edittext_style"
         android:inputType="textMultiLine"
+        android:textCursorDrawable="@drawable/edit_cursor_color"
         android:textColor="@color/light_blue" />
 
 </RelativeLayout>
