@@ -148,6 +148,7 @@ const C = {
   ROUTE_JD_AUDIT_DELIVERY:'JdAuditDelivery',
   ROUTE_SCAN:'Scan',
   ROUTE_GOODS_SCAN_SEARCH:'GoodsScanSearch',
+  ROUTE_INVOICING:'Invoicing',
   serverUrl,
   apiUrl,
   staticUrl,
