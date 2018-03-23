@@ -18,7 +18,7 @@ import {
 } from "../../weui/index";
 import Styles  from './InvoicingStyles'
 import  font from  './fontStyles'
-
+import Config from '../../config'
 class InvoicingShipping extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: '进销存',
@@ -33,7 +33,9 @@ class InvoicingShipping extends PureComponent {
           <View>
             <ScrollView>
               <Cells>
-                <Cell  access customStyle={Styles.in_h_cell}>
+                <Cell  access customStyle={Styles.in_h_cell} onPress={()=>{
+                  this.props.navigate(Config.ROUTE_INVOICING_SHIPPING_DETAIL)
+                }}>
                   <CellHeader style={{justifyContent:'center',height:pxToDp(180)}}>
                     <Text style={[font.font30,font.fontBlack]} >回龙观店</Text>
                     <Text style={[font.font24,font.fontGray,{marginTop:pxToDp(10)}]} >朱春浩 2018-03-09 19:30:31 提交</Text>

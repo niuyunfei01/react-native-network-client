@@ -9,6 +9,7 @@ import {
 } from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
+import Conf from '../../config'
 import {
   Cells,
   Cell,
@@ -31,7 +32,11 @@ class InvoicingScene extends PureComponent {
           <View>
             <ScrollView>
               <Cells>
-                <Cell  access customStyle={Styles.in_cell}>
+                <Cell  access customStyle={Styles.in_cell}
+                       onPress = {()=>{
+
+                         this.props.navigate(Conf.ROUTE_INVOICING_GATHER_DETAIL,{})
+                       }}>
                   <CellHeader>
                     <Text>回龙观店</Text>
                   </CellHeader>

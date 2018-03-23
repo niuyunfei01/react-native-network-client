@@ -16,7 +16,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {get_supply_items,to_settlement} from '../../reducers/settlement/settlementActions'
-import {NavigationItem} from '../../widget';
 import  tool from '../../common/tool.js'
 import {Toast,Dialog} from "../../weui/index";
 import DateTimePicker from 'react-native-modal-datetime-picker';

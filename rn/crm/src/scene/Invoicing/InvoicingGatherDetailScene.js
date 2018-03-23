@@ -20,12 +20,12 @@ import {
 import Styles from './InvoicingStyles'
 import TextArea from "../../weui/Form/TextArea";
 import MyBtn from '../../common/myBtn'
+import Config from '../../config'
 class InvoicingGatherDetail extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: (<Text style={{color: colors.white}}>回龙观店</Text>),
     headerStyle: {
       backgroundColor: colors.fontBlue,
-      color: colors.white
     },
   });
 
@@ -46,7 +46,11 @@ class InvoicingGatherDetail extends PureComponent {
             <Cell customStyle={{
               marginLeft: pxToDp(0),
               paddingHorizontal: pxToDp(30)
-            }}>
+            }}
+                  onPress = {()=>{
+                    this.props.navigate(Config.ROUTE_INVOICING_GATHER_DETAIL);
+                  }}
+            >
               <CellHeader style={{width: pxToDp(300)}}>
                 <Text>商品名</Text>
               </CellHeader>
@@ -90,10 +94,14 @@ class InvoicingGatherDetail extends PureComponent {
             </Cells>
           </ScrollView>
           <View style={{flexDirection: 'row',position:'absolute',width:'100%',bottom:0,left:0,backgroundColor:colors.white}}>
-           <View style={{width:'100%',flexDirection:'row'}}>
-             <MyBtn text = '打印'  style={{ width:'25%',justifyContent:"center"}} />
-             <MyBtn text = '订货'  style={{ width:'25%',justifyContent:"center"}} />
-             <MyBtn text = '提交'  style={{ width:'50%',justifyContent:"center"}} />
+           <View style={{flex:1,flexDirection:'row'}}>
+             <MyBtn text = '打印'  style={[{ width:pxToDp(180),color:colors.fontBlue},styles.bottom_btn,]} />
+             <MyBtn text = '订货'  style={[{ width:pxToDp(180),color:colors.fontBlue},styles.bottom_btn,]} />
+             <MyBtn text = '提交'  style={[{
+               width:pxToDp(360),
+               color:colors.white,
+               backgroundColor:colors.fontBlue,
+             },styles.bottom_btn,]} />
            </View>
           </View>
         </View>
@@ -101,4 +109,11 @@ class InvoicingGatherDetail extends PureComponent {
   }
 }
 
+const styles = {
+  bottom_btn: {
+    textAlign: 'center',
+    height:pxToDp(100),
+    textAlignVertical:'center'
+  }
+}
 export default InvoicingGatherDetail

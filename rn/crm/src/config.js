@@ -10,6 +10,8 @@ import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene"
 import ActivityManageScene from "./scene/Activity/ActivityManageScene";
 import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
 import ActivityListScene from "./scene/Activity/ActivityListScene";
+import InvoicingGatherDetail from "./scene/Invoicing/InvoicingGatherDetailScene";
+import InvoicingShippingDetail from "./scene/Invoicing/InvoicingShippingDetailScene";
 
 
 const {
@@ -149,6 +151,8 @@ const C = {
   ROUTE_SCAN:'Scan',
   ROUTE_GOODS_SCAN_SEARCH:'GoodsScanSearch',
   ROUTE_INVOICING:'Invoicing',
+  ROUTE_INVOICING_GATHER_DETAIL:'InvoicingGatherDetail',
+  ROUTE_INVOICING_SHIPPING_DETAIL:'InvoicingShippingDetail',
   serverUrl,
   apiUrl,
   staticUrl,

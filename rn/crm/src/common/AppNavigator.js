@@ -80,6 +80,7 @@ import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
 import InvoicingScene from "../scene/Invoicing/InvoicingScene";
 import InvoicingGatherDetail from "../scene/Invoicing/InvoicingGatherDetailScene"
+import InvoicingShippingDetail from "../scene/Invoicing/InvoicingShippingDetailScene"
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -250,7 +251,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
-        [Config.ROUTE_GOODS_DETAIL]: {screen: InvoicingGatherDetail},
+        [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: { screen: VersionScene },
         [Config.ROUTE_SELECT_STORE]: { screen: SelectStoreScene },
@@ -284,6 +285,8 @@ class Navigator extends Component {
         [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
         [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
         [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
+        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetail},
+        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetail},
       },
       stackNavigatorConfigs
     );

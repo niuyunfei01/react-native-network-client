@@ -351,8 +351,6 @@ resetRouter(){
 
   upLoad = async () => {
 
-    this.resetRouter()
-    return false
     let {type} = this.props.navigation.state.params;
     if (!this.state.fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED})

@@ -12,6 +12,7 @@ import colors from "../../styles/colors";
 import InvoiceGather from './InvoicingGatherScene'
 import InvoicingShipping from './InvoicingShippingScene'
 import InvoicingOrderGoods from './InvoicingOrderGoodsScene'
+import InvoicingReceipt from'./InvoicingReceiptScene'
 class InvoicingScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: '进销存系统',
@@ -22,15 +23,22 @@ class InvoicingScene extends PureComponent {
   constructor(props) {
     super(props)
   }
-
+  toDetail(router, params = {}) {
+    this.props.navigation.navigate(router, params)
+  }
   render() {
     return (
           <ScrollableTabView
               renderTabBar={() => <DefaultTabBar/>}>
-            <InvoiceGather tabLabel='采集中'/>
-            <InvoicingShipping tabLabel='调货单'/>
+            <InvoicingReceipt tabLabel='收货单'/>
+
+            <InvoiceGather tabLabel='采集中' navigate = {(router,params)=>{
+              this.toDetail(router,params)
+            }}/>
+            <InvoicingShipping tabLabel='调货单' navigate = {(router,params)=>{
+              this.toDetail(router,params)
+            }}/>
             <InvoicingOrderGoods tabLabel='订货单'/>
-            <Text tabLabel='收货单'>Tab2</Text>
           </ScrollableTabView>
     )
   }
