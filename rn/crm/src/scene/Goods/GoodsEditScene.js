@@ -351,8 +351,6 @@ resetRouter(){
 
   upLoad = async () => {
 
-    this.resetRouter()
-    return false
     let {type} = this.props.navigation.state.params;
     if (!this.state.fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED})
@@ -381,8 +379,6 @@ resetRouter(){
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
-
-    console.log('formData ==> ', formData);
     if (check_res) {
       this.setState({uploading: true});
       if (this.state.uploading) {

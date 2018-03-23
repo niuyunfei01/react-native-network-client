@@ -12,7 +12,7 @@ import S from '../../stylekit'
 import MyBtn from  '../../common/myBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
 import {ToastLong} from "../../util/ToastUtils";
-
+import Cts from '../../Cts'
 const numeral = require('numeral');
 
 const reasons = {
