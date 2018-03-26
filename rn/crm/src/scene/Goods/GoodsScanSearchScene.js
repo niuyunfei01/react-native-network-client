@@ -37,6 +37,7 @@ function mapDispatchToProps(dispatch) {
 class GoodsScanSearchScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    console.log('state.params:', params);
     let {name} = params;
     let {backPage, inputText, upc, searchUpc} = params;
     let searchVal = '';
@@ -121,27 +122,30 @@ class GoodsScanSearchScene extends PureComponent {
   }
 
   componentWillMount() {
+    let keyword = '';
+    const state = this.props.navigation.state;
     try {
-      let products = JSON.parse(this.props.navigation.state.params.products);
+      console.log('state.params:', state.params);
+      let products = JSON.parse(state.params.products);
       if (tool.length(products) > 0) {
           this.setState({
             products: products,
             upc: products[0]['upc']
           });
-          this.props.navigation.setParams({
-            inputText: this.inputText,
-            upc: products[0]['upc'],
-            searchUpc: this.searchUpc
-          })
+          keyword = products[0]['upc'];
       }
     } catch (e) {
-      this.props.navigation.setParams({
-        inputText: this.inputText,
-        upc: '',
-        searchUpc: this.searchUpc
-      })
     }
 
+    if (state.params.keyword && !keyword){
+      keyword = state.params.keyword;
+    }
+    
+    this.props.navigation.setParams({
+      inputText: this.inputText,
+      upc: keyword,
+      searchUpc: this.searchUpc
+    })
   }
 
   searchUpc = () => {

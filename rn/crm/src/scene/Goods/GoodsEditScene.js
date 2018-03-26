@@ -92,7 +92,8 @@ let configState = {
 class GoodsEditScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type, backPage} = params;
+    let {type, backPage, task_id, name} = params;
+    console.log('navigation.state.params', params);
     return {
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerLeft: (<NavigationItem
@@ -117,7 +118,9 @@ class GoodsEditScene extends PureComponent {
                 text="搜索上传"
                 onPress={() => {
                   navigation.navigate(Config.ROUTE_GOODS_SCAN_SEARCH, {
-                    type: 'searchAdd'
+                    type: 'searchAdd',
+                    task_id,
+                    keyword: name,
                   })
                 }}
                 style={{
@@ -148,7 +151,6 @@ class GoodsEditScene extends PureComponent {
                 }}
             />
           </View>),
-
     }
   }
 
@@ -166,14 +168,6 @@ class GoodsEditScene extends PureComponent {
     this.back = this.back.bind(this);
     this.toModalData = this.toModalData.bind(this);
     this.dataValidate = this.dataValidate.bind(this);
-    this.searchByKeyword = this.searchByKeyword.bind(this)
-
-  }
-
-  searchByKeyword = () => {
-    this.props.navigation.navigate(Config.ROUTE_GOODS_SCAN_SEARCH, {
-      type: 'searchAdd'
-    })
   }
 
   componentWillMount() {
@@ -261,9 +255,6 @@ class GoodsEditScene extends PureComponent {
         store_tags: store_tags,
       });
     }
-    this.props.navigation.setParams({
-      searchByKeyword: this.searchByKeyword
-    })
   }
 
   getVendorTags(_v_id) {
