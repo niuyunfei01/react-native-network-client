@@ -65,7 +65,9 @@ class GoodsScanSearchScene extends PureComponent {
               flex: 1,
               borderRadius: pxToDp(90),
               borderWidth: 0.7,
-              height: pxToDp(60),
+              height: pxToDp(80),
+              paddingLeft: pxToDp(40),
+              marginLeft: pxToDp(40),
               borderColor: colors.main_color,
               textAlignVertical: 'center',
             }}

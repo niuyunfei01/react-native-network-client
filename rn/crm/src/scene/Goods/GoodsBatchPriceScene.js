@@ -94,7 +94,8 @@ class GoodsBatchPriceScene extends PureComponent {
       productList: {},
       productListCopy: {},
       uploading: false,
-      fnProviding:fnProviding
+      batch_edit_supply: false,
+      fnProviding:fnProviding,
     };
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.renderList = this.renderList.bind(this);
@@ -104,13 +105,14 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {productId, store_product} = (this.props.navigation.state.params || {});
+    let {productId, store_product, batch_edit_supply} = (this.props.navigation.state.params || {});
     store_product = tool.deepClone(store_product);
     store_product = this.handleObj(store_product);
     let store_product_copy = tool.deepClone(store_product);
     this.productId = productId;
     this.store_product = store_product;
     this.store_product_copy = store_product_copy;
+    this.setState({batch_edit_supply});
     this.getVendorProduct()
   }
 
@@ -126,7 +128,7 @@ class GoodsBatchPriceScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
     let store_product = this.store_product;
-    let store_product_copy = this.store_product_copy
+    let store_product_copy = this.store_product_copy;
     if (product_id) {
       _this.setState({productList: store_product, productListCopy: store_product_copy});
     } else {
@@ -135,8 +137,9 @@ class GoodsBatchPriceScene extends PureComponent {
       const {dispatch} = this.props;
       dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
         _this.setState({
-          productList: tool.deepClone(resp.obj),
-          productListCopy: tool.deepClone(resp.obj)
+          productList: tool.deepClone(resp.obj.goods),
+          batch_edit_supply: resp.obj.batch_edit_supply_price,
+          productListCopy: tool.deepClone(resp.obj.goods)
         })
       }))
     }
@@ -188,7 +191,7 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   async upload(s_product) {
-    const {store_id, product_id, price, status, self_provided, left_since_last_stat} = s_product;
+    const {store_id, product_id, price, status, self_provided, supply_price, left_since_last_stat} = s_product;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -196,6 +199,7 @@ class GoodsBatchPriceScene extends PureComponent {
       store_id: store_id,
       product_id: product_id,
       price: Math.ceil(price* 100),
+      supply_price: supply_price,
       sale_status: status,
       provided: self_provided,
       stock: left_since_last_stat
@@ -237,6 +241,7 @@ class GoodsBatchPriceScene extends PureComponent {
   }
   renderList(store_product) {
     let _this = this;
+    console.log("_this.state.batch_edit_supply" + _this.state.batch_edit_supply);
     return tool.objectMap(store_product, function (s_product, store_id) {
       let productItem = _this.state.productList[store_id];
       return (
@@ -279,12 +284,17 @@ class GoodsBatchPriceScene extends PureComponent {
                     s_product.fn_price_controlled == 0 ? [styles.item_font_style, {width: '100%',textAlign: 'center'}]
                         :[styles.item_font_style, {width: '100%',textAlign: 'center',color:'#ccc'}]
                   }
-                  editable = {s_product.fn_price_controlled == 0 ? true:false}
+                  editable = {s_product.fn_price_controlled == 0 || _this.state.batch_edit_supply}
                   keyboardType='numeric'
                   value={s_product.fn_price_controlled == 0 ? ''+s_product.price:''+s_product.supply_price/100}
                   onChangeText={(text) => {
-                    console.log(text)
-                    s_product.price = text;
+
+                    if (s_product.fn_price_controlled){
+                      s_product.supply_price = Math.ceil(text * 100);
+                    } else {
+                      s_product.price = text;
+                    }
+
                     _this.forceUpdate()
                   }}/>
             </View>
