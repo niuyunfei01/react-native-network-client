@@ -37,63 +37,75 @@ function mapDispatchToProps(dispatch) {
 class GoodsScanSearchScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
+    let {name} = params;
     let {backPage, inputText, upc, searchUpc} = params;
+    let searchVal = '';
+    if (name) {
+      searchVal = name
+    }
+    if (upc) {
+      searchVal = upc
+    }
     return {
       headerTitle: (
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            width: pxToDp(600),
-            height: '100%',
-            alignItems: 'center'
-          }}>
-            <TextInput
-                underlineColorAndroid='transparent'
-                value={upc}
-                onChangeText={(text) => {
-                  inputText(text)
-                }}
-                style={{
-                  flex: 1,
-                  borderRadius: pxToDp(90),
-                  borderWidth: 0.7,
-                  height: pxToDp(60),
-                  borderColor: colors.main_color,
-                  textAlignVertical: 'center',
-                }}
-            />
-            <TouchableOpacity onPress={() => searchUpc()}>
-              <Text style={{
-                height: '100%',
-                width: pxToDp(120),
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                color: colors.main_color,
-              }}>搜索</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          width: pxToDp(600),
+          height: '100%',
+          alignItems: 'center'
+        }}>
+          <TextInput
+            underlineColorAndroid='transparent'
+            value={searchVal}
+            onChangeText={(text) => {
+              inputText(text)
+            }}
+            style={{
+              flex: 1,
+              borderRadius: pxToDp(90),
+              borderWidth: 0.7,
+              height: pxToDp(60),
+              borderColor: colors.main_color,
+              textAlignVertical: 'center',
+            }}
+          />
+          <TouchableOpacity onPress={() => searchUpc()}>
+            <Text style={{
+              height: '100%',
+              width: pxToDp(120),
+              textAlign: 'center',
+              textAlignVertical: 'center',
+              color: colors.main_color,
+            }}>搜索</Text>
+          </TouchableOpacity>
+        </View>
       ),
       headerLeft: (<NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            if (!!backPage) {
-              native.nativeBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+        onPress={() => {
+          if (!!backPage) {
+            native.nativeBack();
+          } else {
+            navigation.goBack();
+          }
+        }}
       />)
     }
   };
 
   constructor(props) {
     super(props);
+    let task_id = this.props.navigation.state.params.task_id;
+    if(!task_id){
+      task_id = 0;
+    }
     this.state = {
       products: [],
       upc: '',
-      query: false
+      query: false,
+      task_id: task_id
     }
   }
 
@@ -155,18 +167,24 @@ class GoodsScanSearchScene extends PureComponent {
         }
       }))
     }
-
-
   };
 
   handleImg(item) {
     let img = {};
-    item.img.forEach((ite) => {
-      img[ite.id] = {
-        url: 'https://www.cainiaoshicai.cn' + ite.path
-      }
-    });
-    item.img = img;
+    let prefix = 'https://www.cainiaoshicai.cn';
+    if (item.img) {
+      item.img.forEach((ite) => {
+        img[ite.id] = {
+          url: prefix + ite.path,
+          path: ite.path,
+          mid_thumb: item.mid_thumb
+        }
+      });
+      item.img = img;
+    } else if (item.img_path) {
+      item.img = {"0": {url: prefix + item.img_path, path: item.img_path, mid_thumb: item.mid_thumb}}
+    }
+    console.log("search product redirect info : ", item)
     return item
   }
 
@@ -198,7 +216,16 @@ class GoodsScanSearchScene extends PureComponent {
 
   }
   renderList() {
+    let task_id = this.state.task_id;
     return this.state.products.map((item, index) => {
+      let img = require('../../img/Order/zanwutupian_.png');
+      if(tool.length(item.img) > 0){
+        //TODO get base url from config
+        img = {uri: 'https://www.cainiaoshicai.cn'+item.img[0]['path']}
+      }
+      if(item['coverimg']){
+        img = {uri: 'https://www.cainiaoshicai.cn'+item['coverimg']}
+      }
       return (
           <TouchableOpacity
               key={index}
@@ -206,7 +233,8 @@ class GoodsScanSearchScene extends PureComponent {
                 let msg = this.handleImg(tool.deepClone(item))
                 this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'scan',
-                  product_detail: msg
+                  product_detail: msg,
+                  task_id: task_id
                 })
               }}
           >
@@ -224,11 +252,7 @@ class GoodsScanSearchScene extends PureComponent {
                     borderColor: colors.main_back,
                     borderWidth: 1
                   }}
-                  source={
-                    tool.length(item.img) >0
-                        ? {uri: 'https://www.cainiaoshicai.cn'+item.img[0]['path']}
-                        : require('../../img/Order/zanwutupian_.png')
-                  }
+                  source={img}
               />
               <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
                 <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name}</Text>
