@@ -289,7 +289,7 @@ class GoodsBatchPriceScene extends PureComponent {
                   value={s_product.fn_price_controlled == 0 ? ''+s_product.price:''+s_product.supply_price/100}
                   onChangeText={(text) => {
 
-                    if (s_product.fn_price_controlled){
+                    if (s_product.fn_price_controlled != 0){
                       s_product.supply_price = Math.ceil(text * 100);
                     } else {
                       s_product.price = text;
