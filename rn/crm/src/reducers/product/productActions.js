@@ -89,7 +89,7 @@ function receiveProductDetail(product_id, detail = {}) {
 
 export function fetchVendorProduct(_v_id, product_id, token, callback) {
   return dispatch => {
-    const url = `api/get_vendor_product/${_v_id}/${product_id}.json?access_token=${token}`;
+    const url = `api/get_vendor_product2/${_v_id}/${product_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
