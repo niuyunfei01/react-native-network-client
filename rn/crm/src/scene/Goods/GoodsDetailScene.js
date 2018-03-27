@@ -88,6 +88,7 @@ class GoodsDetailScene extends PureComponent {
       is_helper: is_helper,
       sync_goods_info: false,
       include_img: false,
+      batch_edit_supply: false,
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
@@ -189,10 +190,11 @@ class GoodsDetailScene extends PureComponent {
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async(resp) => {
           if (resp.ok) {
-            let store_product = resp.obj;
+            let store_product = resp.obj.goods;
           await _this.setState({
               store_product: store_product,
-              isLoading: false,
+            batch_edit_supply: resp.obj.batch_edit_supply_price,
+            isLoading: false,
             });
           } else {
             _this.setState({isLoading: false});
@@ -421,7 +423,7 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderALlStore = () => {
-    let {store_product ,product_detail, isLoading} = this.state;
+    let {store_product ,product_detail, isLoading, batch_edit_supply} = this.state;
     let {navigation} = this.props;
     if (isLoading) {
       return <LoadingView/>;
@@ -486,9 +488,11 @@ class GoodsDetailScene extends PureComponent {
               style = {styles.related_edit}
               onPress={() => {
                 InteractionManager.runAfterInteractions(() => {
+                  console.log('batch_edit_supply:' + batch_edit_supply);
                   navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
                     productId:this.productId,
                     store_product:store_product,
+                    batch_edit_supply: batch_edit_supply,
                     detail_key:navigation.state.key
                   });
 
@@ -530,7 +534,7 @@ class GoodsDetailScene extends PureComponent {
           <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
           <View style = {{flexDirection:'row',alignItems:'center',width:pxToDp(150)}}>
             <Text style={[styles.info_text, styles.sale_price]}>
-              ¥ {parseInt(s_product.fn_price_controlled) === 0  ?  s_product.price / 100 :s_product.supply_price / 100 }
+              ¥ {parseInt(s_product.fn_price_controlled) === 0  ?  s_product.price / 100 : s_product.supply_price / 100 }
             </Text>
             {parseInt(s_product.fn_price_controlled) === 0 ? null :
                 <Image

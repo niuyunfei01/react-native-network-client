@@ -92,8 +92,8 @@ let configState = {
 class GoodsEditScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
-    let {backPage} = params;
+    let {type, backPage, task_id, name} = params;
+    console.log('navigation.state.params', params);
     return {
       headerTitle: type === 'edit' ? '修改商品' : '新增商品',
       headerLeft: (<NavigationItem
@@ -117,7 +117,11 @@ class GoodsEditScene extends PureComponent {
             <MyBtn
                 text="搜索上传"
                 onPress={() => {
-                  navigation.navigate(Config.ROUTE_GOODS_SCAN_SEARCH,{type : 'searchAdd'})
+                  navigation.navigate(Config.ROUTE_GOODS_SCAN_SEARCH, {
+                    type: 'searchAdd',
+                    task_id,
+                    keyword: name,
+                  })
                 }}
                 style={{
                   fontSize: pxToDp(32),
@@ -147,7 +151,6 @@ class GoodsEditScene extends PureComponent {
                 }}
             />
           </View>),
-
     }
   }
 
@@ -165,7 +168,6 @@ class GoodsEditScene extends PureComponent {
     this.back = this.back.bind(this);
     this.toModalData = this.toModalData.bind(this);
     this.dataValidate = this.dataValidate.bind(this);
-
   }
 
   componentWillMount() {
@@ -217,13 +219,18 @@ class GoodsEditScene extends PureComponent {
           name: name,
         })
       }else if(type === 'scan') {
-        let {name,weight,img} = this.props.navigation.state.params.product_detail;
+        let {name, weight, img} = this.props.navigation.state.params.product_detail;
         let upload_files = {};
-        if (tool.length(img) > 0) {
+        if (img != null && tool.length(img) > 0) {
           for (let img_id in img) {
             if (img.hasOwnProperty(img_id)) {
               let img_data = img[img_id];
-              upload_files[img_id] = {id: img_id, name: img_data.name}
+              upload_files[img_id] = {
+                id: img_id,
+                name: img_data.name,
+                path: img_data.path,
+                mid_thumb: img_data.mid_thumb
+              }
             }
           }
         }
@@ -242,7 +249,6 @@ class GoodsEditScene extends PureComponent {
       this.getVendorTags(vendor_id);
     } else {
       let basic_cat_list = this.toModalData(basic_category[vendor_id]);
-      console.log('基础分类',basic_cat_list);
       this.setState({
         basic_cat_list: basic_cat_list,
         basic_categories: basic_category[vendor_id],
@@ -777,7 +783,6 @@ resetRouter(){
                 {tool.length(this.state.list_img) > 0 ?
                     tool.objectMap(this.state.list_img, (img_data, img_id) => {
                       let img_url = img_data['url'];
-                      let img_name = img_data['name'];
                       return (
                           <View key={img_id}
                                 style={{
