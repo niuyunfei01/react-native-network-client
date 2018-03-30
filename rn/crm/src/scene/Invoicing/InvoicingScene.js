@@ -1,12 +1,4 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native'
 import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view'
 import colors from "../../styles/colors";
 import InvoiceGather from './InvoicingGatherScene'
@@ -28,21 +20,19 @@ class InvoicingScene extends PureComponent {
   }
   render() {
     return (
-          <ScrollableTabView
-              renderTabBar={() => <DefaultTabBar/>}>
-            <InvoicingReceipt tabLabel='收货单'/>
-
-            <InvoiceGather tabLabel='采集中' navigate = {(router,params)=>{
-              this.toDetail(router,params)
-            }}/>
-            <InvoicingShipping tabLabel='调货单' navigate = {(router,params)=>{
-              this.toDetail(router,params)
-            }}/>
-            <InvoicingOrderGoods tabLabel='订货单'/>
-          </ScrollableTabView>
+      <ScrollableTabView
+          renderTabBar={() => <DefaultTabBar/>}>
+        <InvoiceGather tabLabel='采集中' navigate = {(router,params)=>{
+          this.toDetail(router,params)
+        }}/>
+        <InvoicingShipping tabLabel='调货单' navigate = {(router,params)=>{
+          this.toDetail(router,params)
+        }}/>
+        <InvoicingOrderGoods tabLabel='订货单'/>
+        <InvoicingReceipt tabLabel='已结算'/>
+      </ScrollableTabView>
     )
   }
 }
-
 
 export default InvoicingScene

@@ -1,55 +1,115 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native'
-import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import {RefreshControl, ScrollView, Text, View} from 'react-native'
 import Conf from '../../config'
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
-import Styles  from './InvoicingStyles'
+import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
+import {bindActionCreators} from "redux";
+import Styles from './InvoicingStyles'
+import {connect} from "react-redux";
+import * as globalActions from '../../reducers/global/globalActions';
+import {fetchUnlocked} from "../../reducers/invoicing/invoicingActions";
+
+function mapStateToProps(state) {
+  const {invoicing, global} = state;
+  return {invoicing: invoicing, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      fetchUnlocked,
+      ...globalActions
+    }, dispatch)
+  }
+}
+
+const customerOpacity = 0.6;
+
 class InvoicingScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: '进销存',
   });
 
   constructor(props) {
-    super(props)
+    super(props);
+    this.state = {
+      isRefreshing: false,
+      tapDisabled: false,
+    }
+  }
+
+  componentWillMount() {
+    this.reloadData()
+  }
+
+  componentWillReceiveProps() {
+  }
+
+  onHeaderRefresh() {
+    this.setState({isRefreshing: true});
+    this.reloadData();
+  }
+
+  reloadData(){
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let currStoreId = global['currStoreId'];
+    let _this = this;
+    dispatch(fetchUnlocked(currStoreId, token, function () {
+      _this.setState({isRefreshing: false});
+    }));
+  }
+
+  toDetailView(data){
+    let tapDisable = this.state.tapDisabled;
+    if(!tapDisable){
+      this.setState({
+        tapDisabled: true,
+      });
+      setTimeout(()=>{
+        this.setState({
+          tapDisabled: false,
+        });
+      }, 3000);
+      this.props.navigate(Conf.ROUTE_INVOICING_GATHER_DETAIL, {req: data});
+    }
   }
 
   render() {
-    return (
-          <View>
-            <ScrollView>
-              <Cells>
-                <Cell  access customStyle={Styles.in_cell}
-                       onPress = {()=>{
+    let {invoicing} = this.props;
+    let {unlockedList} = invoicing;
+    let reqList = [];
+    let _self = this;
+    if(unlockedList){
+      reqList = unlockedList.map(function (item, idx) {
+        return <Cell access customStyle={Styles.in_cell} key={idx}
+                     onPress={() => _self.toDetailView(item)}>
+          <CellHeader>
+            <Text>{item['store_name']}</Text>
+          </CellHeader>
+          <CellBody/>
+          <CellFooter>
+            {item['req_count']}种商品
+          </CellFooter>
+        </Cell>
+      });
+    }
 
-                         this.props.navigate(Conf.ROUTE_INVOICING_GATHER_DETAIL,{})
-                       }}>
-                  <CellHeader>
-                    <Text>回龙观店</Text>
-                  </CellHeader>
-                  <CellBody/>
-                  <CellFooter>
-                    26种商品
-                  </CellFooter>
-                </Cell>
-              </Cells>
-            </ScrollView>
-          </View>
+    return (
+      <View>
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }>
+          <Cells>
+            {reqList}
+          </Cells>
+        </ScrollView>
+      </View>
     )
   }
 }
 
-export default InvoicingScene
+export default connect(mapStateToProps, mapDispatchToProps)(InvoicingScene)
