@@ -15,7 +15,7 @@ import {
   Image,
 } from 'react-native'
 
-class orderComponent extends PureComponent {
+class OrderComponent extends PureComponent {
   render() {
     return (
         <View style={{backgroundColor:'#fff'}}>
@@ -114,5 +114,5 @@ const list = {
   }
 }
 
-export default orderComponent
+export default OrderComponent
 

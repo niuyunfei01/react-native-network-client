@@ -2,12 +2,21 @@ import React, {PureComponent} from 'react';
 import {ScrollView, Text, TextInput, View,} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells, Select} from "../../weui/index";
 import MyBtn from '../../common/myBtn'
 import Config from '../../config'
 import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import native from "../../common/native";
+
+const SkuUnitSelect = [
+  [{label: '斤', value: 0},
+    {label: '份', value: 1},],
+  [{label: '克', value: 2},
+    {label: '千克', value: 3},]
+];
+
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -22,9 +31,9 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class InvoicingGatherDetail extends PureComponent {
+class InvoicingGatherDetailScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
-    const {req} =  (navigation.state.params || {});
+    const {req} = (navigation.state.params || {});
     let storeName = req['store_name'];
     return {
       headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
@@ -49,7 +58,7 @@ class InvoicingGatherDetail extends PureComponent {
     };
   }
 
-  renderItems(){
+  renderItems() {
     const reqData = this.state.reqData;
     let reqItems = reqData['req_items'];
     let items = reqItems.map(function (item, idx) {
@@ -57,13 +66,21 @@ class InvoicingGatherDetail extends PureComponent {
         marginLeft: pxToDp(0),
         paddingHorizontal: pxToDp(30),
         minHeight: pxToDp(100),
-      }}>
-        <CellHeader style={{width: pxToDp(300)}}>
+      }} access={true}>
+        <CellHeader style={{width: pxToDp(250)}}>
           <Text>{item['name']}</Text>
         </CellHeader>
         <CellBody/>
         <CellFooter>
-          <Text style={{width: pxToDp(100), textAlign: 'center'}}>{item['total_req']}</Text>
+          <TextInput
+            underlineColorAndroid='transparent'
+            style={{
+              backgroundColor: colors.white,
+              height: pxToDp(70), width: pxToDp(100),
+            }}
+            placeholder='输入'
+            placeholderTextColor='#ccc'
+            value={item['total_req']}/>
           <View style={{
             width: pxToDp(200),
             flexDirection: 'row',
@@ -74,14 +91,17 @@ class InvoicingGatherDetail extends PureComponent {
               underlineColorAndroid='transparent'
               style={{
                 backgroundColor: colors.white,
-                height: pxToDp(70), width: pxToDp(110),
+                height: pxToDp(70), width: pxToDp(150),
               }}
               placeholder='输入'
               placeholderTextColor='#ccc'
               value={item['req_amount']}
             />
-            <Text>斤</Text>
           </View>
+          <Select
+            options={SkuUnitSelect}
+            value={item['unit_type']}
+            placeholder="请选择"/>
         </CellFooter>
       </Cell>
     });
@@ -97,22 +117,24 @@ class InvoicingGatherDetail extends PureComponent {
             style={{backgroundColor: colors.white, height: pxToDp(200)}}
             placeholder='输入备注信息'
             placeholderTextColor='#ccc'
+            value={this.state.reqData.remark}
           />
           <Cell customStyle={{
             marginLeft: pxToDp(0),
             paddingHorizontal: pxToDp(30)
           }}
-              onPress={() => {
-                this.props.navigate(Config.ROUTE_INVOICING_GATHER_DETAIL);
-              }}
+          onPress={() => {
+            this.props.navigate(Config.ROUTE_INVOICING_GATHER_DETAIL);
+          }}
           >
-            <CellHeader style={{width: pxToDp(300)}}>
+            <CellHeader style={{width: pxToDp(250)}}>
               <Text>商品名</Text>
             </CellHeader>
             <CellBody/>
             <CellFooter>
-              <Text style={{width: pxToDp(100), textAlign: 'center'}}>分数</Text>
-              <Text style={{width: pxToDp(200), textAlign: 'center'}}>总量</Text>
+              <Text style={{width: pxToDp(100), textAlign: 'center'}}>份数</Text>
+              <Text style={{width: pxToDp(150), textAlign: 'center'}}>总量</Text>
+              <text style={{width: pxToDp(100), textAlign: 'center'}}>单位</text>
             </CellFooter>
           </Cell>
           <Cells>
@@ -129,7 +151,7 @@ class InvoicingGatherDetail extends PureComponent {
         }}>
           <View style={{flex: 1, flexDirection: 'row'}}>
             <MyBtn text='打印' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
-            <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
+            <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]} onPress={() => native.toGoods()}/>
             <MyBtn text='提交' style={[{
               width: pxToDp(360),
               color: colors.white,
@@ -148,6 +170,6 @@ const styles = {
     height: pxToDp(100),
     textAlignVertical: 'center'
   }
-}
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(InvoicingGatherDetail)
+export default connect(mapStateToProps, mapDispatchToProps)(InvoicingGatherDetailScene)

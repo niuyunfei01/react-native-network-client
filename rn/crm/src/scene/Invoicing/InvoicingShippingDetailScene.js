@@ -23,7 +23,7 @@ import MyBtn from '../../common/myBtn'
 import tool from "../../common/tool";
 import CheckboxCells from './check_box'
 
-class InvoicingShippingDetail extends PureComponent {
+class InvoicingShippingDetailScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: ('回龙观店'),
   });
@@ -127,4 +127,4 @@ const styles = {
 };
 
 
-export default InvoicingShippingDetail
+export default InvoicingShippingDetailScene

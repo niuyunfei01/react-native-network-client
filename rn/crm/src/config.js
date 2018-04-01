@@ -1,17 +1,4 @@
 'use strict';
-import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
-import OperateProfitScene from "./scene/OperateProfit/OperateProfitScene";
-import OperateIncomeDetailScene from "./scene/OperateProfit/OperateIncomeDetailScene";
-import OperateExpendDetailScene from "./scene/OperateProfit/OperateExpendDetailScene";
-import GoodsPriceDetailsScene from "./scene/Goods/GoodsPriceDetailsScene";
-import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
-import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
-import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
-import ActivityManageScene from "./scene/Activity/ActivityManageScene";
-import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
-import ActivityListScene from "./scene/Activity/ActivityListScene";
-import InvoicingGatherDetail from "./scene/Invoicing/InvoicingGatherDetailScene";
-import InvoicingShippingDetail from "./scene/Invoicing/InvoicingShippingDetailScene";
 
 
 const {

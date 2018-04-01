@@ -78,9 +78,11 @@ import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
 import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
 import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
+
 import InvoicingScene from "../scene/Invoicing/InvoicingScene";
-import InvoicingGatherDetail from "../scene/Invoicing/InvoicingGatherDetailScene"
-import InvoicingShippingDetail from "../scene/Invoicing/InvoicingShippingDetailScene"
+import InvoicingGatherDetailScene from "../scene/Invoicing/InvoicingGatherDetailScene";
+import InvoicingShippingDetailScene from "../scene/Invoicing/InvoicingShippingDetailScene";
+
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -285,8 +287,8 @@ class Navigator extends Component {
         [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
         [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
         [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
-        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetail},
-        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetail},
+        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
+        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
       },
       stackNavigatorConfigs
     );

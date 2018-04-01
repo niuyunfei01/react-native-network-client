@@ -7,8 +7,8 @@ import {
 } from 'react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import OrderComponent from './orderComponent'
-class InvoicingReceipt extends PureComponent {
+import OrderComponent from './OrderComponent'
+class InvoicingReceiptScene extends PureComponent {
   constructor(props) {
     super(props)
   }
@@ -67,4 +67,4 @@ const styles = {
   }
 }
 
-export default InvoicingReceipt
+export default InvoicingReceiptScene
