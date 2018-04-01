@@ -1,25 +1,12 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native'
+import {ScrollView, Text, View,} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
-import Styles  from './InvoicingStyles'
-import  font from  './fontStyles'
+import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
+import Styles from './InvoicingStyles'
+import font from './fontStyles'
 import Config from '../../config'
-class InvoicingShipping extends PureComponent {
+
+class InvoicingShippingScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: '进销存',
   });
@@ -53,4 +40,4 @@ class InvoicingShipping extends PureComponent {
   }
 }
 
-export default InvoicingShipping
+export default InvoicingShippingScene

@@ -1,9 +1,5 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  ScrollView
-} from 'react-native'
+import {ScrollView, Text, View} from 'react-native'
 import font from './fontStyles'
 import styles from './InvoicingStyles'
 import pxToDp from "../../util/pxToDp";
@@ -12,10 +8,9 @@ import Cell from "../../weui/Cell/Cell";
 import CellHeader from "../../weui/Cell/CellHeader";
 import CellBody from "../../weui/Cell/CellBody";
 import MyBtn from '../../common/myBtn'
-import Cells from "../../weui/Cell/Cells";
 import CellFooter from "../../weui/Cell/CellFooter";
 
-class InvoicingOrderGoods extends PureComponent {
+class InvoicingOrderGoodsScene extends PureComponent {
   constructor(props) {
     super(props)
   }
@@ -189,4 +184,4 @@ const list = {
     color:colors.white
   }
 }
-export default InvoicingOrderGoods
+export default InvoicingOrderGoodsScene

@@ -43,7 +43,7 @@ class InvoicingGatherDetailScene extends PureComponent {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
   }
 
@@ -123,9 +123,9 @@ class InvoicingGatherDetailScene extends PureComponent {
             marginLeft: pxToDp(0),
             paddingHorizontal: pxToDp(30)
           }}
-          onPress={() => {
-            this.props.navigate(Config.ROUTE_INVOICING_GATHER_DETAIL);
-          }}
+                onPress={() => {
+                  this.props.navigate(Config.ROUTE_INVOICING);
+                }}
           >
             <CellHeader style={{width: pxToDp(250)}}>
               <Text>商品名</Text>
@@ -151,7 +151,8 @@ class InvoicingGatherDetailScene extends PureComponent {
         }}>
           <View style={{flex: 1, flexDirection: 'row'}}>
             <MyBtn text='打印' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
-            <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]} onPress={() => native.toGoods()}/>
+            <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}
+                   onPress={() => native.toGoods()}/>
             <MyBtn text='提交' style={[{
               width: pxToDp(360),
               color: colors.white,

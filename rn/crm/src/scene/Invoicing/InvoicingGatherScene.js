@@ -22,9 +22,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const customerOpacity = 0.6;
-
-class InvoicingScene extends PureComponent {
+class InvoicingGatherScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     headerTitle: '进销存',
   });
@@ -112,4 +110,4 @@ class InvoicingScene extends PureComponent {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(InvoicingScene)
+export default connect(mapStateToProps, mapDispatchToProps)(InvoicingGatherScene)
