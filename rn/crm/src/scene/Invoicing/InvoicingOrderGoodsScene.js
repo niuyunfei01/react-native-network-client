@@ -7,7 +7,7 @@ import colors from "../../styles/colors";
 import Cell from "../../weui/Cell/Cell";
 import CellHeader from "../../weui/Cell/CellHeader";
 import CellBody from "../../weui/Cell/CellBody";
-import MyBtn from '../../common/myBtn'
+import MyBtn from '../../common/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
 
 class InvoicingOrderGoodsScene extends PureComponent {

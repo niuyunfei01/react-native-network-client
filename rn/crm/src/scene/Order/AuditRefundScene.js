@@ -9,7 +9,7 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, TextArea, RadioCells, ButtonArea, Toast, Label, Dialog, Cells, Input, CellsTitle, Cell, CellHeader, CellBody, CellsTips} from "../../weui/index";
 import S from '../../stylekit'
-import MyBtn from  '../../common/myBtn'
+import MyBtn from '../../common/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
 import {ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'

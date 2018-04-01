@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import pxToDp from "../../util/pxToDp";
 import font from "./fontStyles";
 import colors from "../../styles/colors";
-import MyBtn from '../../common/myBtn'
+import MyBtn from '../../common/MyBtn'
 import {
   Cell,
   CellHeader,

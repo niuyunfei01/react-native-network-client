@@ -19,7 +19,7 @@ import {
 } from "../../weui/index";
 import Styles from './InvoicingStyles'
 import font from './fontStyles'
-import MyBtn from '../../common/myBtn'
+import MyBtn from '../../common/MyBtn'
 import tool from "../../common/tool";
 import CheckboxCells from './check_box'
 

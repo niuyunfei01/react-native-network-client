@@ -100,4 +100,6 @@ export default keyMirror({
   ACTIVITY_MANAGER_REFRESH:null,
 
   FETCH_UNLOCKED_REQ:null,
+  EDIT_UNLOCKED_REQ_ITEMS:null,
+  EDIT_UNLOCKED_REQ:null
 })
