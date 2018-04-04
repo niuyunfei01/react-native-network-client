@@ -78,9 +78,9 @@ export function loadAllSuppliers(token) {
       .then(resp => {
         let {ok, reason, obj} = resp;
         if (ok) {
-          receiveSuppliers(obj)
+          dispatch(receiveSuppliers(obj))
         } else {
-          receiveSuppliers([])
+          dispatch(receiveSuppliers([]))
         }
       })
   }
@@ -129,7 +129,7 @@ function receiveLockedReq(data) {
 function receiveSuppliers(suppliers) {
   return {
     type: LIST_ALL_SUPPLIERS,
-    suppliers: suppilers
+    suppliers: suppliers
   }
 }
 

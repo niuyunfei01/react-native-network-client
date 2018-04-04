@@ -39,7 +39,7 @@ export default function invoicing(state = initialState, action) {
     case LIST_ALL_SUPPLIERS:
       return {
         ...state, suppliers: extractSuppliers(state, action)
-      }
+      };
     default:
       return state
   }
@@ -47,7 +47,7 @@ export default function invoicing(state = initialState, action) {
 
 function extractSuppliers(state, action) {
   state.suppliers = action.suppliers;
-  return state.suppilers;
+  return state.suppliers;
 }
 
 function extractUnlockedList(state, action) {

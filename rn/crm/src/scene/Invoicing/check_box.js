@@ -19,7 +19,7 @@ import pxToDp from "../../util/pxToDp";
 
 const styles = StyleSheet.create({
   checkbox: {
-    fontSize: 23,
+    fontSize: 18,
     marginRight: $V.baseFontSize * 0.35,
   }
 })
@@ -41,7 +41,7 @@ const CheckboxCells = (props) => {
         {options.map((option, idx) =>
             <Cell customStyle={{marginLeft:0,paddingLeft:pxToDp(30)}} key={idx} onPress={() => onChange(xor(value, [option.value]))}>
               <CellHeader>
-                <CellText>{option.label || option.value}</CellText>
+                <CellText style={{fontSize:13}}>{option.label || option.value}</CellText>
               </CellHeader>
               <CellBody/>
               <CellFooter>

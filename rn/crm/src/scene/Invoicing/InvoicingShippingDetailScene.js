@@ -1,90 +1,111 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-} from 'react-native'
+import {ScrollView, Switch, Text, View,} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
-import Styles from './InvoicingStyles'
 import font from './fontStyles'
 import MyBtn from '../../common/MyBtn'
-import tool from "../../common/tool";
 import CheckboxCells from './check_box'
 
+import * as globalActions from '../../reducers/global/globalActions';
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+
+function mapStateToProps(state) {
+  const {global} = state;
+  return {global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      ...globalActions
+    }, dispatch)
+  }
+}
+
 class InvoicingShippingDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => ({
-    headerTitle: ('回龙观店'),
-  });
+  static navigationOptions = ({navigation}) => {
+    const {req} = (navigation.state.params || {});
+    let storeName = req['store_name'];
+    return {
+      headerTitle: storeName,
+
+    }
+  };
 
   constructor(props) {
     super(props)
+    this.state = {
+      req: {},
+      suppliers: []
+    }
+  }
+
+  componentWillMount(){
+    const {req, suppliers} = (this.props.navigation.state.params || {});
+    this.setState({req: req, suppliers:suppliers});
+    let reqItems = req['req_items'];
+    let checkItems = reqItems.map(function (item, idx) {
+      return {label: item['name'], id: item['id']}
+    });
+    this.setState({checkItems: checkItems})
+  }
+
+  renderSuppliers(){
+    let suppliers = this.state.suppliers;
+    let s = suppliers.map(function (item, idx) {
+      return <Text style={[styles.item_left, font.fontBlue]} key={idx}>{item['name']}(1)</Text>;
+    });
+    return s;
   }
 
   render() {
+    let req = this.state.req;
+    let checkItems = this.state.checkItems;
     return (
-        <View style={{flex: 1}}>
-          <Text style={styles.header_text}>砂糖橘给我好的,你个坑比</Text>
-          <View style={{flexDirection: 'row'}}>
-            <ScrollView style={styles.left_list}>
-              <Text style={styles.item_left}>总部(6)</Text>
-              <Text style={[styles.item_left, font.fontBlue]}>总部(6)</Text>
-            </ScrollView>
-            <ScrollView style={styles.left_right}>
-              <CheckboxCells
-                  options={[
-                    {label: 1, id: 1},
-                    {label: 2, id: 2},
-                    {label: 3, id: 3},
-                    {label: 4, id: 4},
-                    {label: 5, id: 5},
-                    {label: 6, id: 6},
-                  ]}
-                  value={[{label: 2, id: 2}]}
-                  onChange={(checked) => {
-                  }}
-                  style={{
-                    marginLeft: 0,
-                    paddingLeft: 0,
-                    backgroundColor: "#fff",
-                    marginTop: 0
-                  }}
-              />
-            </ScrollView>
-          </View>
-          <View style={{
-            flexDirection: 'row',
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            height: pxToDp(100),
-            backgroundColor:'#fff'
-          }}>
-            <View style={styles.switch}>
-              <Text>跟单备注</Text>
-              <Switch/>
-            </View>
-            <MyBtn text='下单' style={{
-              height:pxToDp(100),
-              textAlignVertical:'center',
-              textAlign:'center',
-              width:pxToDp(360),
-              backgroundColor:colors.fontBlue,
-              color:colors.white
-            }}/>
-          </View>
+      <View style={{flex: 1}}>
+        <Text style={styles.header_text}>{req['remark']}</Text>
+        <View style={{flexDirection: 'row'}}>
+          <ScrollView style={styles.left_list}>
+            {this.renderSuppliers()}
+          </ScrollView>
+          <ScrollView style={styles.left_right}>
+            <CheckboxCells
+              options={checkItems}
+              value={[{label: 2, id: 2}]}
+              onChange={(checked) => {
+              }}
+              style={{
+                marginLeft: 0,
+                paddingLeft: 0,
+                backgroundColor: "#fff",
+                marginTop: 0
+              }}
+            />
+          </ScrollView>
         </View>
+        <View style={{
+          flexDirection: 'row',
+          position: 'absolute',
+          left: 0,
+          bottom: 0,
+          height: pxToDp(100),
+          backgroundColor: '#fff'
+        }}>
+          <View style={styles.switch}>
+            <Text>跟单备注</Text>
+            <Switch/>
+          </View>
+          <MyBtn text='下单' style={{
+            height: pxToDp(100),
+            textAlignVertical: 'center',
+            textAlign: 'center',
+            width: pxToDp(360),
+            backgroundColor: colors.fontBlue,
+            color: colors.white
+          }}/>
+        </View>
+      </View>
     )
   }
 }
@@ -112,6 +133,7 @@ const styles = {
     marginRight: pxToDp(10),
     height: pxToDp(100),
     marginBottom: pxToDp(4),
+    fontSize: 12,
     textAlignVertical: 'center',
     color: colors.fontGray,
   },
@@ -127,4 +149,4 @@ const styles = {
 };
 
 
-export default InvoicingShippingDetailScene
+export default connect(mapStateToProps, mapDispatchToProps)(InvoicingShippingDetailScene)

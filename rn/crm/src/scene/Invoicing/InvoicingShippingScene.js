@@ -25,9 +25,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingScene extends PureComponent {
-  static navigationOptions = ({navigation}) => ({
-    headerTitle: '进销存',
-  });
+  static navigationOptions = ({navigation}) => {
+    return {
+      headerTitle: '调货单',
+    }
+  };
 
   constructor(props) {
     super(props);
@@ -38,13 +40,13 @@ class InvoicingShippingScene extends PureComponent {
   }
 
   componentWillMount() {
-    this.reloadData()
+    this.reloadData();
+    this.loadAllSuppliers();
   }
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.reloadData();
-    this.loadAllSuppliers();
   }
 
   loadAllSuppliers() {
@@ -74,7 +76,9 @@ class InvoicingShippingScene extends PureComponent {
           tapDisabled: false,
         });
       }, 3000);
-      this.props.navigate(Conf.ROUTE_INVOICING_SHIPPING_DETAIL, {req: data});
+      let {invoicing} = this.props;
+      let {suppliers} = invoicing;
+      this.props.navigate(Conf.ROUTE_INVOICING_SHIPPING_DETAIL, {req: data, suppliers: suppliers});
     }
   }
 
