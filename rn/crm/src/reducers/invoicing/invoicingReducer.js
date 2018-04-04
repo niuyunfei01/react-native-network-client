@@ -3,11 +3,14 @@
 const {
   FETCH_UNLOCKED_REQ,
   EDIT_UNLOCKED_REQ_ITEMS,
-  EDIT_UNLOCKED_REQ
+  EDIT_UNLOCKED_REQ,
+  LOCK_PROVIDE_REQ,
+  FETCH_LOCKED_REQ
 } = require('../../common/constants').default;
 
 const initialState = {
   unlockedList: [],
+  lockedList: []
 };
 
 
@@ -25,6 +28,12 @@ export default function invoicing(state = initialState, action) {
       return {
         ...state, unlockedList: editUnlockedReq(state, action)
       };
+    case LOCK_PROVIDE_REQ:
+      return {...state, unlockedList: lockProvideReq(state, action)};
+    case FETCH_LOCKED_REQ:
+      return {
+        ...state, lockedList: extractLockedList(state, action)
+      };
     default:
       return state
   }
@@ -33,6 +42,11 @@ export default function invoicing(state = initialState, action) {
 function extractUnlockedList(state, action) {
   state.unlockedList = action.unlockedList;
   return state.unlockedList;
+}
+
+function extractLockedList(state, action) {
+  state.lockedList = action.lockedList;
+  return state.lockedList;
 }
 
 function editUnlockedReq(state, action) {
@@ -70,6 +84,22 @@ function editUnlockedItem(state, action) {
     }
     copy.push(req);
   });
+  state.unlockedList = copy;
+  return state.unlockedList;
+}
+
+function lockProvideReq(state, action) {
+  let unlockedList = state.unlockedList;
+  let reqId = action.reqId;
+  let success = action.success;
+  let copy = [];
+  if (success) {
+    unlockedList.forEach(function (req) {
+      if (req['id'] != reqId) {
+        copy.push(req);
+      }
+    });
+  }
   state.unlockedList = copy;
   return state.unlockedList;
 }

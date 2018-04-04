@@ -10,7 +10,9 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import native from "../../common/native";
 import SelectDialog from "../../common/SelectDialog"
-import {editUnlockedItems, editUnlockedReq} from "../../reducers/invoicing/invoicingActions";
+import {ToastLong} from '../../util/ToastUtils';
+import Conf from '../../config'
+import {editUnlockedItems, editUnlockedReq, lockProvideReq} from "../../reducers/invoicing/invoicingActions";
 
 const SkuUnitSelect = [
   {txt: '斤', id: '0'},
@@ -51,6 +53,7 @@ class InvoicingGatherDetailScene extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   componentDidMount() {
@@ -86,6 +89,20 @@ class InvoicingGatherDetailScene extends PureComponent {
 
   handleChangeItemReqAmount(val, id) {
     this.doUpdateItems('req_amount', val, id);
+  }
+
+  handleSubmit() {
+    const {dispatch, global, navigation} = this.props;
+    let reqData = this.state.reqData;
+    let token = global['accessToken'];
+    dispatch(lockProvideReq(reqData, token, function (ok, desc) {
+      if (ok) {
+        //redirect to ship order
+        navigation.navigate(Conf.ROUTE_INVOICING, {refresh: true, initPage: 1});
+      } else {
+        ToastLong(desc);
+      }
+    }))
   }
 
   showSelectUnitType(item) {
@@ -188,7 +205,7 @@ class InvoicingGatherDetailScene extends PureComponent {
               width: pxToDp(360),
               color: colors.white,
               backgroundColor: colors.fontBlue,
-            }, styles.bottom_btn,]}/>
+            }, styles.bottom_btn,]} onPress={this.handleSubmit}/>
           </View>
         </View>
         <SelectDialog

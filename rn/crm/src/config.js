@@ -140,6 +140,7 @@ const C = {
   ROUTE_INVOICING:'Invoicing',
   ROUTE_INVOICING_GATHER_DETAIL:'InvoicingGatherDetail',
   ROUTE_INVOICING_SHIPPING_DETAIL:'InvoicingShippingDetail',
+  ROUTE_INVOICING_SHIPPING_LIST: 'InvoicingShippingList',
   serverUrl,
   apiUrl,
   staticUrl,

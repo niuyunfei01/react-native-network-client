@@ -8,6 +8,7 @@ import {
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import OrderComponent from './OrderComponent'
+
 class InvoicingReceiptScene extends PureComponent {
   constructor(props) {
     super(props)

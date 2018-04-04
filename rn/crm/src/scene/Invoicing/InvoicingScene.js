@@ -5,6 +5,22 @@ import InvoicingGatherScene from './InvoicingGatherScene'
 import InvoicingShippingScene from './InvoicingShippingScene'
 import InvoicingOrderGoodsScene from './InvoicingOrderGoodsScene'
 import InvoicingReceiptScene from './InvoicingReceiptScene'
+import * as globalActions from '../../reducers/global/globalActions';
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+
+function mapStateToProps(state) {
+  const {global} = state;
+  return {global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      ...globalActions
+    }, dispatch)
+  }
+}
 
 class InvoicingScene extends PureComponent {
   static navigationOptions = ({navigation}) => ({
@@ -16,6 +32,17 @@ class InvoicingScene extends PureComponent {
 
   constructor(props) {
     super(props)
+    this.state = {
+      initPage: 0
+    }
+  }
+
+  componentWillMount() {
+    const {navigation} = this.props;
+    const {initPage} = (navigation.state.params || {});
+    if(initPage){
+      this.setState({initPage: initPage})
+    }
   }
 
   toDetail(router, params = {}) {
@@ -25,7 +52,7 @@ class InvoicingScene extends PureComponent {
   render() {
     return (
       <ScrollableTabView
-        renderTabBar={() => <DefaultTabBar/>}>
+        renderTabBar={() => <DefaultTabBar/>} initialPage={this.state.initPage} page={this.state.initPage}>
         <InvoicingGatherScene tabLabel='采集中' navigate={(router, params) => {
           this.toDetail(router, params)
         }}/>
@@ -39,4 +66,4 @@ class InvoicingScene extends PureComponent {
   }
 }
 
-export default InvoicingScene
+export default connect(mapStateToProps, mapDispatchToProps)(InvoicingScene)

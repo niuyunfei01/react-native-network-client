@@ -82,6 +82,7 @@ import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
 import InvoicingScene from "../scene/Invoicing/InvoicingScene";
 import InvoicingGatherDetailScene from "../scene/Invoicing/InvoicingGatherDetailScene";
 import InvoicingShippingDetailScene from "../scene/Invoicing/InvoicingShippingDetailScene";
+import InvoicingShippingScene from "../scene/Invoicing/InvoicingShippingScene"
 
 const tabDef = {
   Remind: {
@@ -289,6 +290,7 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
+        [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene}
       },
       stackNavigatorConfigs
     );
