@@ -7,7 +7,7 @@ import font from './fontStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchLocked} from "../../reducers/invoicing/invoicingActions";
+import {fetchLocked, loadAllSuppliers} from "../../reducers/invoicing/invoicingActions";
 import Conf from '../../config';
 
 function mapStateToProps(state) {
@@ -44,6 +44,13 @@ class InvoicingShippingScene extends PureComponent {
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.reloadData();
+    this.loadAllSuppliers();
+  }
+
+  loadAllSuppliers() {
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    dispatch(loadAllSuppliers(token));
   }
 
   reloadData() {
@@ -86,12 +93,13 @@ class InvoicingShippingScene extends PureComponent {
             <Text
               style={[font.font24, font.fontGray, {marginTop: pxToDp(10)}]}>{item['uid_confirm_name']} {item['time_confirm']}
               提交</Text>
-            {item['remark'] ?
-              <Text style={[font.font24, font.fontRed, {marginTop: pxToDp(10)}]}>备注: {item['remark']}</Text> : null}
+            {!!item['remark'] ? <Text style={[font.font24, font.fontRed, {marginTop: pxToDp(10)}]} numberOfLines={1}
+                                      ellipsizeMode={'tail'}>备注: {item['remark']}</Text> :
+              <Text style={[font.font24, {marginTop: pxToDp(10)}]}>无备注</Text>}
           </CellHeader>
           <CellBody/>
           <CellFooter>
-            {item['req_count']}种商品
+            {item['req_count']} 种商品
           </CellFooter>
         </Cell>
       });

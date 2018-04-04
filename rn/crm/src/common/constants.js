@@ -103,5 +103,6 @@ export default keyMirror({
   FETCH_LOCKED_REQ: null,
   EDIT_UNLOCKED_REQ_ITEMS:null,
   EDIT_UNLOCKED_REQ:null,
-  LOCK_PROVIDE_REQ:null
+  LOCK_PROVIDE_REQ:null,
+  LIST_ALL_SUPPLIERS: null
 })

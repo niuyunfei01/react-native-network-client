@@ -9,7 +9,8 @@ const {
   EDIT_UNLOCKED_REQ_ITEMS,
   EDIT_UNLOCKED_REQ,
   LOCK_PROVIDE_REQ,
-  FETCH_LOCKED_REQ
+  FETCH_LOCKED_REQ,
+  LIST_ALL_SUPPLIERS
 } = require('../../common/constants').default;
 
 export function fetchUnlocked(store_id, token, callback) {
@@ -69,6 +70,22 @@ export function lockProvideReq(req, token, callBack) {
   }
 }
 
+export function loadAllSuppliers(token) {
+  return dispatch => {
+    const url = `InventoryApi/list_supplier?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        if (ok) {
+          receiveSuppliers(obj)
+        } else {
+          receiveSuppliers([])
+        }
+      })
+  }
+}
+
 function fireLockProvideReq(reqId, success) {
   return {
     type: LOCK_PROVIDE_REQ,
@@ -106,6 +123,13 @@ function receiveLockedReq(data) {
   return {
     type: FETCH_LOCKED_REQ,
     lockedList: data
+  }
+}
+
+function receiveSuppliers(suppliers) {
+  return {
+    type: LIST_ALL_SUPPLIERS,
+    suppliers: suppilers
   }
 }
 

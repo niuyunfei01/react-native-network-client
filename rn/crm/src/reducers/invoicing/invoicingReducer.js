@@ -5,12 +5,14 @@ const {
   EDIT_UNLOCKED_REQ_ITEMS,
   EDIT_UNLOCKED_REQ,
   LOCK_PROVIDE_REQ,
-  FETCH_LOCKED_REQ
+  FETCH_LOCKED_REQ,
+  LIST_ALL_SUPPLIERS
 } = require('../../common/constants').default;
 
 const initialState = {
   unlockedList: [],
-  lockedList: []
+  lockedList: [],
+  suppliers:[]
 };
 
 
@@ -34,9 +36,18 @@ export default function invoicing(state = initialState, action) {
       return {
         ...state, lockedList: extractLockedList(state, action)
       };
+    case LIST_ALL_SUPPLIERS:
+      return {
+        ...state, suppliers: extractSuppliers(state, action)
+      }
     default:
       return state
   }
+}
+
+function extractSuppliers(state, action) {
+  state.suppliers = action.suppliers;
+  return state.suppilers;
 }
 
 function extractUnlockedList(state, action) {
