@@ -11,6 +11,7 @@ import {
   InteractionManager,
   RefreshControl,
   Alert,
+  Clipboard,
   ToastAndroid,
 } from 'react-native'
 import InputNumber from 'rc-input-number';
@@ -829,7 +830,7 @@ class OrderScene extends Component {
                 <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35), marginLeft: pxToDp(24) }}>{item.modified}</Text>
               </View>
               <View style={{ marginTop: pxToDp(20),width:'100%' ,height:'auto',marginBottom:pxToDp(20)}}>
-                <Text style={{ fontSize: pxToDp(24),height:'auto',lineHeight:pxToDp(28)}}>{item.what}</Text>
+                <Text selectable={true} style={{ fontSize: pxToDp(24),height:'auto',lineHeight:pxToDp(28)}}>{item.what}</Text>
               </View>
             </View>
           </View>
@@ -1449,7 +1450,7 @@ class OrderScene extends Component {
             color: colors.color666,
             marginTop: pxToDp(20),
             marginRight: pxToDp(114 + 20)
-          }]}>
+          }]} selectable={true}>
             {order.address}
           </Text>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
@@ -1882,7 +1883,7 @@ class Remark extends PureComponent {
     const {label, remark} = this.props;
     return (<View style={{flexDirection: 'row'}}>
       <Text style={styles.remarkText}>{label}:</Text>
-      <Text style={[styles.remarkText, styles.remarkTextBody]}>{remark}</Text>
+      <Text selectable={true} style={[styles.remarkText, styles.remarkTextBody]}>{remark}</Text>
     </View>)
   }
 }

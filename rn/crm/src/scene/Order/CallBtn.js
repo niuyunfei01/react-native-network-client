@@ -28,7 +28,7 @@ class CallBtn extends PureComponent {
 
     return <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}
                              onPress={onPress ? onPress : this._doDial}>
-      <Text style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label}</Text>
+      <Text selectable={true} style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label}</Text>
       <CallImg/>
     </TouchableOpacity>;
   }
