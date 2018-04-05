@@ -12,7 +12,7 @@ import colors from "../../styles/colors";
 import Config from '../../config'
 import native from "../../common/native";
 import pxToDp from "../../util/pxToDp";
-import MyBtn from '../../common/myBtn'
+import MyBtn from '../../common/MyBtn'
 import tool from '../../common/tool'
 import {queryUpcCode,queryProductByKey} from '../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
