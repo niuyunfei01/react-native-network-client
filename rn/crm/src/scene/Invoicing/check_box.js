@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: $V.baseFontSize * 0.35,
   }
-})
+});
 
 const CheckboxCells = (props) => {
   const {
@@ -33,23 +33,21 @@ const CheckboxCells = (props) => {
     ...others
   } = props
 
-  const inArray = (v) =>
-      value.filter((a) => a === v).length
-
   return (
-      <Cells style={style} {...others} >
-        {options.map((option, idx) =>
-            <Cell customStyle={{marginLeft:0,paddingLeft:pxToDp(30)}} key={idx} onPress={() => onChange(xor(value, [option.value]))}>
-              <CellHeader>
-                <CellText style={{fontSize:13}}>{option.label || option.value}</CellText>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <Icon name={inArray(option.value) ? 'success' : 'circle'} style={styles.checkbox}/>
-              </CellFooter>
-            </Cell>
-        )}
-      </Cells>
+    <Cells style={style} {...others} >
+      {options.map((option, idx) =>
+        <Cell customStyle={{marginLeft: 0, paddingLeft: pxToDp(30)}} key={idx}
+              onPress={() => onChange(option.sId != value, option.id)}>
+          <CellHeader>
+            <CellText style={{fontSize: 13}}>{option.label || option.value}</CellText>
+          </CellHeader>
+          <CellBody/>
+          <CellFooter>
+            <Icon name={option.sId == value ? 'success' : 'circle'} style={styles.checkbox}/>
+          </CellFooter>
+        </Cell>
+      )}
+    </Cells>
   )
 };
 

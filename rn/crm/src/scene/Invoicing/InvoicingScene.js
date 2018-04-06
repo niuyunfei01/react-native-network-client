@@ -8,6 +8,9 @@ import InvoicingReceiptScene from './InvoicingReceiptScene'
 import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import {NavigationItem} from '../../widget'
+import {View,} from 'react-native'
+import pxToDp from "../../util/pxToDp";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -28,6 +31,14 @@ class InvoicingScene extends PureComponent {
     headerStyle: {
       backgroundColor: colors.fontBlue,
     },
+    headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <NavigationItem
+        iconStyle={{width: pxToDp(60), height: pxToDp(50)}}
+        icon={require('../../img/Invoicing/kucun.png')}
+        onPress={() => {
+        }}
+      />
+    </View>),
   });
 
   constructor(props) {

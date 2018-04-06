@@ -3,17 +3,8 @@ import pxToDp from "../../util/pxToDp";
 import font from "./fontStyles";
 import colors from "../../styles/colors";
 import MyBtn from '../../common/MyBtn'
-import {
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
-import {
-  Text,
-  View,
-  Image,
-} from 'react-native'
+import {Cell, CellBody, CellFooter, CellHeader,} from "../../weui/index";
+import {Text, View,} from 'react-native'
 
 class OrderComponent extends PureComponent {
   render() {

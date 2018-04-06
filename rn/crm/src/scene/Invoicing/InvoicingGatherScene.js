@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {RefreshControl, ScrollView, Text, View} from 'react-native'
 import Conf from '../../config'
-import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText} from "../../weui/index";
 import {bindActionCreators} from "redux";
 import Styles from './InvoicingStyles'
 import {connect} from "react-redux";
@@ -47,7 +47,7 @@ class InvoicingGatherScene extends PureComponent {
     this.reloadData();
   }
 
-  reloadData(){
+  reloadData() {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
     let currStoreId = global['currStoreId'];
@@ -57,13 +57,13 @@ class InvoicingGatherScene extends PureComponent {
     }));
   }
 
-  toDetailView(data){
+  toDetailView(data) {
     let tapDisable = this.state.tapDisabled;
-    if(!tapDisable){
+    if (!tapDisable) {
       this.setState({
         tapDisabled: true,
       });
-      setTimeout(()=>{
+      setTimeout(() => {
         this.setState({
           tapDisabled: false,
         });
@@ -77,7 +77,7 @@ class InvoicingGatherScene extends PureComponent {
     let {unlockedList} = invoicing;
     let reqList = [];
     let _self = this;
-    if(unlockedList){
+    if (unlockedList) {
       reqList = unlockedList.map(function (item, idx) {
         return <Cell access customStyle={Styles.in_cell} key={idx}
                      onPress={() => _self.toDetailView(item)}>
@@ -102,7 +102,10 @@ class InvoicingGatherScene extends PureComponent {
           />
         }>
           <Cells>
-            {reqList}
+            {reqList.length > 0 ? reqList : <Cell>
+              <CellBody><CellText>暂无数据</CellText></CellBody>
+              <CellFooter>刷新试试</CellFooter>
+            </Cell>}
           </Cells>
         </ScrollView>
       </View>

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {ScrollView, Text, View, RefreshControl} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText} from "../../weui/index";
 import Styles from './InvoicingStyles'
 import font from './fontStyles'
 import {bindActionCreators} from "redux";
@@ -119,7 +119,10 @@ class InvoicingShippingScene extends PureComponent {
           />
         }>
           <Cells>
-            {reqList}
+            {reqList.length > 0 ? reqList : <Cell>
+              <CellBody><CellText>暂无数据</CellText></CellBody>
+              <CellFooter>刷新试试</CellFooter>
+            </Cell>}
           </Cells>
         </ScrollView>
       </View>

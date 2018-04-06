@@ -10,7 +10,9 @@ const {
   EDIT_UNLOCKED_REQ,
   LOCK_PROVIDE_REQ,
   FETCH_LOCKED_REQ,
-  LIST_ALL_SUPPLIERS
+  LIST_ALL_SUPPLIERS,
+  AFTER_SET_REQ_SUPPLIER,
+  AFTER_CREATE_SUPPLY_ORDER
 } = require('../../common/constants').default;
 
 export function fetchUnlocked(store_id, token, callback) {
@@ -83,6 +85,52 @@ export function loadAllSuppliers(token) {
           dispatch(receiveSuppliers([]))
         }
       })
+  }
+}
+
+export function setReqItemSupplier(items, reqId, token, callback) {
+  return dispatch => {
+    const url = `InventoryApi/set_item_supplier/${reqId}?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, items))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        if (ok) {
+          dispatch(afterSetItemSupplier(obj))
+          callback(ok, reason)
+        } else {
+          ToastLong('设置供应商失败!');
+        }
+      })
+  }
+}
+
+export function createSupplyOrder(reqId, token, callback) {
+  return dispatch => {
+    const url = `InventoryApi/create_supply_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {'req_id': reqId}))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch(afterCreateSupplyOrder(ok, reqId))
+        callback(ok, reason)
+      })
+  }
+}
+
+
+function afterCreateSupplyOrder(ok, reqId) {
+  return {
+    type: AFTER_CREATE_SUPPLY_ORDER,
+    reqId: reqId,
+    success: ok
+  }
+}
+
+function afterSetItemSupplier(data) {
+  return {
+    type: AFTER_SET_REQ_SUPPLIER,
+    reqId: data['req_id']
   }
 }
 
