@@ -105,9 +105,13 @@ class ActivityListScene extends PureComponent {
       if (ok) {
         await this.setState({
           ruleList: obj,
-          query: false,
         });
+      }else{
+        ToastLong("请求出错!")
       }
+      await this.setState({
+        query: false
+      });
     }))
   }
   initDate(date) {
