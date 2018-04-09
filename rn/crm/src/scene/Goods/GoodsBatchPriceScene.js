@@ -91,6 +91,7 @@ class GoodsBatchPriceScene extends PureComponent {
       ],
       head_supply: -1,
       flag: 0,
+      price_edits: {},
       productList: {},
       productListCopy: {},
       uploading: false,
@@ -123,6 +124,15 @@ class GoodsBatchPriceScene extends PureComponent {
     });
     return store_product
   }
+
+  _getEditInputInit(store_product) {
+    let priceVal = {};
+    tool.objectMap(store_product, function (s_product, store_id){
+      priceVal[store_id] = s_product.fn_price_controlled == 0 ? '' + s_product.price : '' + s_product.supply_price/100;
+    });
+    return priceVal;
+  }
+
   getVendorProduct() {
     let _this = this;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -130,16 +140,21 @@ class GoodsBatchPriceScene extends PureComponent {
     let store_product = this.store_product;
     let store_product_copy = this.store_product_copy;
     if (product_id) {
-      _this.setState({productList: store_product, productListCopy: store_product_copy});
+      _this.setState({
+        productList: store_product,
+        productListCopy: store_product_copy,
+        price_edits: _this._getEditInputInit(store_product)
+      });
     } else {
       const {accessToken} = this.props.global;
       let _this = this;
       const {dispatch} = this.props;
       dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
         _this.setState({
-          productList: tool.deepClone(resp.obj.goods),
           batch_edit_supply: resp.obj.batch_edit_supply_price,
-          productListCopy: tool.deepClone(resp.obj.goods)
+          productList: tool.deepClone(resp.obj.goods),
+          productListCopy: tool.deepClone(resp.obj.goods),
+          price_edits: _this._getEditInputInit(store_product)
         })
       }))
     }
@@ -240,10 +255,12 @@ class GoodsBatchPriceScene extends PureComponent {
     return true
   }
   renderList(store_product) {
-    let _this = this;
+    const _this = this;
     console.log("_this.state.batch_edit_supply" + _this.state.batch_edit_supply);
     return tool.objectMap(store_product, function (s_product, store_id) {
       let productItem = _this.state.productList[store_id];
+      const val = _this.state.price_edits[store_id] || '';
+      const fn_pc = s_product.fn_price_controlled != 0;
       return (
           <View style={styles.item} key={store_id}>
             <View style={[styles.store_name]}>
@@ -281,20 +298,23 @@ class GoodsBatchPriceScene extends PureComponent {
               <TextInput
                   underlineColorAndroid='transparent'
                   style={
-                    s_product.fn_price_controlled == 0 ? [styles.item_font_style, {width: '100%',textAlign: 'center'}]
+                    !fn_pc ? [styles.item_font_style, {width: '100%',textAlign: 'center'}]
                         :[styles.item_font_style, {width: '100%',textAlign: 'center',color:'#ccc'}]
                   }
-                  editable = {s_product.fn_price_controlled == 0 || _this.state.batch_edit_supply}
+                  editable = {fn_pc || _this.state.batch_edit_supply}
                   keyboardType='numeric'
-                  value={s_product.fn_price_controlled == 0 ? ''+s_product.price:''+s_product.supply_price/100}
+                  value={val}
                   onChangeText={(text) => {
 
-                    if (s_product.fn_price_controlled != 0){
-                      s_product.supply_price = Math.ceil(text * 100);
+                    if (fn_pc) {
+                        s_product.supply_price = Math.ceil(text * 100)
                     } else {
-                      s_product.price = text;
+                        s_product.price = text;
                     }
 
+                    console.log(_this.state);
+                    _this.state.price_edits[store_id] = text;
+                    _this.setState({price_edits: _this.state.price_edits});
                     _this.forceUpdate()
                   }}/>
             </View>

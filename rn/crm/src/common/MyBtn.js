@@ -3,7 +3,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-class myBtn extends PureComponent {
+class MyBtn extends PureComponent {
   render() {
     let {
       text,
@@ -19,4 +19,4 @@ class myBtn extends PureComponent {
    )
   }
 }
-export default myBtn
+export default MyBtn

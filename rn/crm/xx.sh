@@ -1,0 +1,10 @@
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1403';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1404';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1409';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1410';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1411';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1412';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1415';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1416';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1421';
+curl 'http://l.cainiaoshicai.cn/operation/ajax_store_data/1422';

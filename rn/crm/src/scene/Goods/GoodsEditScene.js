@@ -35,7 +35,7 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon} from "../../weui/index";
-import MyBtn from '../../common/myBtn'
+import MyBtn from '../../common/MyBtn'
 import ModalDropdown from 'react-native-modal-dropdown';
 import top_styles from "../Remind/TopStyles";
 function mapStateToProps(state) {
