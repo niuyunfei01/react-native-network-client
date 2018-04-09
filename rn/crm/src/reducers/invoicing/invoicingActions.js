@@ -12,7 +12,8 @@ const {
   FETCH_LOCKED_REQ,
   LIST_ALL_SUPPLIERS,
   AFTER_SET_REQ_SUPPLIER,
-  AFTER_CREATE_SUPPLY_ORDER
+  AFTER_CREATE_SUPPLY_ORDER,
+  RECEIVE_WAIT_SUPPLY_ORDER
 } = require('../../common/constants').default;
 
 export function fetchUnlocked(store_id, token, callback) {
@@ -88,6 +89,22 @@ export function loadAllSuppliers(token) {
   }
 }
 
+export function fetchSupplyWaitOrder(storeId, token) {
+  return dispatch => {
+    const url = `InventoryApi/list_wait_received_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {storeId: storeId}))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        if (ok) {
+          dispatch(receiveWaitSupplyOrder(obj))
+        } else {
+          dispatch(receiveWaitSupplyOrder([]))
+        }
+      })
+  }
+}
+
 export function setReqItemSupplier(items, reqId, token, callback) {
   return dispatch => {
     const url = `InventoryApi/set_item_supplier/${reqId}?access_token=${token}`;
@@ -158,6 +175,21 @@ function fireEditUnlockedItem(reqId, itemId, itemKey, itemVal) {
     itemKey: itemKey,
     itemVal: itemVal
   }
+}
+
+function receiveWaitSupplyOrder(data) {
+  return {
+    type: RECEIVE_WAIT_SUPPLY_ORDER,
+    waitReceiveSupplyOrder: data
+  }
+}
+
+function receiveWaitConfirmOrder() {
+
+}
+
+function receiveWaitBalanceOrder() {
+
 }
 
 function receiveUnlockedReq(data) {

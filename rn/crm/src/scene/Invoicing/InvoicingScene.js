@@ -33,7 +33,7 @@ class InvoicingScene extends PureComponent {
     },
     headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
       <NavigationItem
-        iconStyle={{width: pxToDp(60), height: pxToDp(50)}}
+        iconStyle={{width: pxToDp(45), height: pxToDp(45)}}
         icon={require('../../img/Invoicing/kucun.png')}
         onPress={() => {
         }}
@@ -62,7 +62,7 @@ class InvoicingScene extends PureComponent {
 
   render() {
     return (
-      <ScrollableTabView
+      <ScrollableTabView locked={true}
         renderTabBar={() => <DefaultTabBar/>} initialPage={this.state.initPage} page={this.state.initPage}>
         <InvoicingGatherScene tabLabel='采集中' navigate={(router, params) => {
           this.toDetail(router, params)

@@ -10,9 +10,36 @@ import CellBody from "../../weui/Cell/CellBody";
 import MyBtn from '../../common/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
 
+
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+import * as globalActions from '../../reducers/global/globalActions';
+import {fetchSupplyWaitOrder} from "../../reducers/invoicing/invoicingActions";
+
+import _ from 'lodash'
+
+function mapStateToProps(state) {
+  const {invoicing, global} = state;
+  return {invoicing: invoicing, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      fetchSupplyWaitOrder,
+      ...globalActions
+    })
+  }
+}
+
 class InvoicingOrderGoodsScene extends PureComponent {
   constructor(props) {
-    super(props)
+    super(props);
+    this.state = {
+      isRefreshing: false,
+      listData: []
+    };
+    this.reloadData = this.reloadData.bind(this)
   }
 
   tab() {
@@ -30,100 +57,135 @@ class InvoicingOrderGoodsScene extends PureComponent {
     )
   }
 
+  componentWillMount() {
+    this.reloadData();
+  }
+
+  componentDidMount() {
+  }
+
+  reloadData() {
+    this.setState({isRefreshing: true});
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let currStoreId = global['currStoreId'];
+    let _this = this;
+    dispatch(fetchSupplyWaitOrder(currStoreId, token, function () {
+      _this.setState({isRefreshing: false});
+    }));
+  }
+
+  renderItems() {
+    let {invoicing} = this.props;
+    let {waitReceiveSupplyOrder} = invoicing;
+    if (waitReceiveSupplyOrder.length==0) {
+      return <View style={{display:'flex', justifyContent: 'center'}}><Text>暂无数据</Text></View>
+    }
+    let self = this;
+    let itemsView = [];
+    _.forEach(waitReceiveSupplyOrder, function (val, idx) {
+      itemsView.push(self.renderItem(val, idx));
+    });
+    return itemsView;
+  }
+
+  renderItem(data, key) {
+    return <View style={list.cell} key={key}>
+      <View style={[styles.in_cell, list.item_header]}>
+        <View>
+          <Text style={[font.font30, font.fontBlack]}>
+            回龙观店
+            <Text style={[font.font24, font.fontGray]}>2个订单</Text>
+          </Text>
+          <Text style={[font.font24, font.fontRed]}>待结算金额: $95.75</Text>
+        </View>
+        <View style={{flexDirection: 'row', width: pxToDp(220), alignItems: 'center'}}>
+          <View style={{
+            borderWidth: 1,
+            borderColor: colors.fontBlue,
+            width: pxToDp(160),
+            borderRadius: pxToDp(5),
+          }}>
+            <Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>计算本店</Text>
+            <Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>所有订单</Text>
+          </View>
+          <View style={{marginLeft: 20, width: pxToDp(100),}}>
+            <Image source={require('../../img/Public/xiangxialv_.png')}
+                   style={{width: pxToDp(28), height: pxToDp(18)}}/>
+          </View>
+        </View>
+      </View>
+      {/*
+            展开详情
+            */}
+      <View>
+        <Cell customStyle={list.init_cell} first>
+          <CellHeader style={list.flex}>
+            <Text style={[font.font38, font.fontRed, font.fontWeight]}>#01</Text>
+            <Text style={[font.font30]}>刘建通 (11111111111)</Text>
+          </CellHeader>
+          <CellBody/>
+          <CellFooter>
+            <Image source={require('../../img/Invoicing/dianhua.png')}
+                   style={{width: pxToDp(38), height: pxToDp(38), marginRight: pxToDp(10)}}/>
+            <Text style={[font.fontBlue]}>呼叫</Text>
+          </CellFooter>
+        </Cell>
+        <Cell customStyle={list.init_cell} access>
+          <CellHeader>
+            <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
+          </CellHeader>
+          <CellBody/>
+          <CellFooter>
+            <Text style={[font.font28, font.fontBlack]}>2018-03-09 09:30</Text>
+          </CellFooter>
+        </Cell>
+        <Cell customStyle={list.init_cell} access>
+          <CellHeader style={list.flex}>
+            <Text style={[font.font30, font.fontBlack]}>商品</Text>
+            <Text style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>$32.5</Text>
+          </CellHeader>
+          <CellBody/>
+          <CellFooter>
+            <Text style={[font.font30, font.fontBlack]}>3</Text>
+          </CellFooter>
+        </Cell>
+        {/*商品*/}
+        <View>
+          <Cell customStyle={list.init_cell}>
+            <CellHeader style={list.flex}>
+              <Text style={[font.font26, font.fontGray, {width: pxToDp(200)}]}>商品名</Text>
+            </CellHeader>
+            <CellFooter>
+              <Text style={[font.font26, font.fontGray, list.goods_title]}>分数</Text>
+              <Text style={[font.font26, font.fontGray, list.goods_title]}>总量</Text>
+              <Text style={[font.font26, font.fontGray, list.goods_title]}>单价</Text>
+              <Text style={[font.font26, font.fontGray, list.goods_title]}>总价</Text>
+            </CellFooter>
+          </Cell>
+        </View>
+
+        <Cell customStyle={list.init_cell}>
+          <CellHeader>
+            <Text style={[font.font26, font.fontOrange]}>朱春浩 确认收货</Text>
+            <Text style={[font.font26, font.fontOrange]}>2018-03-09 09:30</Text>
+          </CellHeader>
+          <CellBody/>
+          <CellFooter>
+            <MyBtn text='置为无效' style={list.danger_btn}/>
+            <MyBtn text='修改' style={list.info_btn}/>
+            <MyBtn text='确认收货' style={list.blue_btn}/>
+          </CellFooter>
+        </Cell>
+      </View>
+    </View>
+  }
+
   render() {
     return (
       <ScrollView>
-        {
-          this.tab()
-        }
-        <View style={list.cell}>
-          <View style={[styles.in_cell, list.item_header]}>
-            <View>
-              <Text style={[font.font30, font.fontBlack]}>
-                回龙观店
-                <Text style={[font.font24, font.fontGray]}>2个订单</Text>
-              </Text>
-              <Text style={[font.font24, font.fontRed]}>待结算金额: $95.75</Text>
-            </View>
-            <View style={{flexDirection: 'row', width: pxToDp(220), alignItems: 'center'}}>
-              <View style={{
-                borderWidth: 1,
-                borderColor: colors.fontBlue,
-                width: pxToDp(160),
-                borderRadius: pxToDp(5),
-              }}>
-                <Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>计算本店</Text>
-                <Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>所有订单</Text>
-              </View>
-              <View style={{marginLeft: 20, width: pxToDp(100),}}>
-                <Image source={require('../../img/Public/xiangxialv_.png')} style={{width: pxToDp(28), height: pxToDp(18)}}/>
-              </View>
-            </View>
-          </View>
-          {/*
-            展开详情
-            */}
-          <View>
-            <Cell customStyle={list.init_cell} first>
-              <CellHeader style={list.flex}>
-                <Text style={[font.font38, font.fontRed, font.fontWeight]}>#01</Text>
-                <Text style={[font.font30]}>刘建通 (11111111111)</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <Image source={require('../../img/Invoicing/dianhua.png')}
-                       style={{width: pxToDp(35), height: pxToDp(35), marginRight: pxToDp(10)}}/>
-                <Text>呼叫</Text>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={list.init_cell} access>
-              <CellHeader>
-                <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <Text style={[font.font28, font.fontBlack]}>2018-03-09 09:30</Text>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={list.init_cell} access>
-              <CellHeader style={list.flex}>
-                <Text style={[font.font30, font.fontBlack]}>商品</Text>
-                <Text style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>$32.5</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <Text style={[font.font30, font.fontBlack]}>3</Text>
-              </CellFooter>
-            </Cell>
-            {/*商品*/}
-            <View>
-              <Cell customStyle={list.init_cell}>
-                <CellHeader style={list.flex}>
-                  <Text style={[font.font26, font.fontGray, {width: pxToDp(200)}]}>商品名</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text style={[font.font26, font.fontGray, list.goods_title]}>分数</Text>
-                  <Text style={[font.font26, font.fontGray, list.goods_title]}>总量</Text>
-                  <Text style={[font.font26, font.fontGray, list.goods_title]}>单价</Text>
-                  <Text style={[font.font26, font.fontGray, list.goods_title]}>总价</Text>
-                </CellFooter>
-              </Cell>
-            </View>
-
-            <Cell customStyle={list.init_cell}>
-              <CellHeader>
-                <Text style={[font.font26, font.fontOrange]}>朱春浩 确认收货</Text>
-                <Text style={[font.font26, font.fontOrange]}>2018-03-09 09:30</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <MyBtn text='置为无效' style={list.danger_btn}/>
-                <MyBtn text='修改' style={list.info_btn}/>
-                <MyBtn text='确认收货' style={list.blue_btn}/>
-              </CellFooter>
-            </Cell>
-          </View>
-        </View>
+        {this.tab()}
+        {this.renderItems()}
       </ScrollView>
     )
   }
@@ -220,4 +282,5 @@ const list = {
     fontSize: 13,
   },
 }
-export default InvoicingOrderGoodsScene
+
+export default connect(mapStateToProps, mapDispatchToProps)(InvoicingOrderGoodsScene)

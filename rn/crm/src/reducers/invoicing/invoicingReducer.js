@@ -8,13 +8,15 @@ const {
   FETCH_LOCKED_REQ,
   LIST_ALL_SUPPLIERS,
   AFTER_SET_REQ_SUPPLIER,
-  AFTER_CREATE_SUPPLY_ORDER
+  AFTER_CREATE_SUPPLY_ORDER,
+  RECEIVE_WAIT_SUPPLY_ORDER
 } = require('../../common/constants').default;
 
 const initialState = {
   unlockedList: [],
   lockedList: [],
-  suppliers: []
+  suppliers: [],
+  waitReceiveSupplyOrder: [],
 };
 
 export default function invoicing(state = initialState, action) {
@@ -43,9 +45,18 @@ export default function invoicing(state = initialState, action) {
       };
     case AFTER_SET_REQ_SUPPLIER:
       return state;
+    case RECEIVE_WAIT_SUPPLY_ORDER:
+      return {
+        ...state, waitReceiveSupplyOrder: extractWaitReceiveOrder(state, action)
+      }
     default:
       return state
   }
+}
+
+function extractWaitReceiveOrder(state, action) {
+  state.waitReceiveSupplyOrder = action.waitReceiveSupplyOrder;
+  return state.waitReceiveSupplyOrder;
 }
 
 function extractSuppliers(state, action) {

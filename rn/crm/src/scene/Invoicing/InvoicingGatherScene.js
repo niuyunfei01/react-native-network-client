@@ -2,8 +2,8 @@ import React, {PureComponent} from 'react';
 import {RefreshControl, ScrollView, Text, View} from 'react-native'
 import Conf from '../../config'
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText} from "../../weui/index";
-import {bindActionCreators} from "redux";
 import Styles from './InvoicingStyles'
+import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUnlocked} from "../../reducers/invoicing/invoicingActions";
