@@ -5,7 +5,7 @@ import colors from "../../styles/colors";
 import font from './fontStyles'
 import MyBtn from '../../common/MyBtn'
 import Loader from '../../common/Loader'
-import CheckboxCells from './check_box'
+import CheckboxCells from './CheckBoxCells'
 
 import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
