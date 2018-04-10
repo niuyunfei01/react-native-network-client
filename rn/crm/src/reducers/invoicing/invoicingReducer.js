@@ -9,7 +9,10 @@ const {
   LIST_ALL_SUPPLIERS,
   AFTER_SET_REQ_SUPPLIER,
   AFTER_CREATE_SUPPLY_ORDER,
-  RECEIVE_WAIT_SUPPLY_ORDER
+  RECEIVE_WAIT_SUPPLY_ORDER,
+  RECEIVE_RECEIVED_SUPPLY_ORDER,
+  RECEIVE_WAIT_BALANCE_SUPPLY_ORDER,
+  RECEIVE_BALANCED_SUPPLY_ORDER
 } = require('../../common/constants').default;
 
 const initialState = {
@@ -17,6 +20,9 @@ const initialState = {
   lockedList: [],
   suppliers: [],
   waitReceiveSupplyOrder: [],
+  receivedSupplyOrder: [],
+  confirmedSupplyOrder: [],
+  balancedSupplyOrder: []
 };
 
 export default function invoicing(state = initialState, action) {
@@ -43,12 +49,18 @@ export default function invoicing(state = initialState, action) {
       return {
         ...state, suppliers: extractSuppliers(state, action)
       };
+    case AFTER_CREATE_SUPPLY_ORDER:
+      return state;
     case AFTER_SET_REQ_SUPPLIER:
       return state;
     case RECEIVE_WAIT_SUPPLY_ORDER:
-      return {
-        ...state, waitReceiveSupplyOrder: extractWaitReceiveOrder(state, action)
-      }
+      return {...state, waitReceiveSupplyOrder: extractWaitReceiveOrder(state, action)};
+    case RECEIVE_RECEIVED_SUPPLY_ORDER:
+      return {...state, receivedSupplyOrder: extractReceivedOrder(state, action)};
+    case RECEIVE_WAIT_BALANCE_SUPPLY_ORDER:
+      return {...state, confirmedSupplyOrder: extractConfirmOrder(state, action)};
+    case RECEIVE_BALANCED_SUPPLY_ORDER:
+      return {...state, balancedSupplyOrder: extractBalancedOrder(state, action)};
     default:
       return state
   }
@@ -57,6 +69,21 @@ export default function invoicing(state = initialState, action) {
 function extractWaitReceiveOrder(state, action) {
   state.waitReceiveSupplyOrder = action.waitReceiveSupplyOrder;
   return state.waitReceiveSupplyOrder;
+}
+
+function extractReceivedOrder(state, action) {
+  state.receivedSupplyOrder = action.receivedSupplyOrder;
+  return state.receivedSupplyOrder;
+}
+
+function extractConfirmOrder(state, action) {
+  state.confirmedSupplyOrder = action.waitBalanceSupplyOrder;
+  return state.confirmedSupplyOrder;
+}
+
+function extractBalancedOrder(state, action) {
+  state.balancedSupplyOrder = action.balancedOrder;
+  return state.balancedSupplyOrder;
 }
 
 function extractSuppliers(state, action) {

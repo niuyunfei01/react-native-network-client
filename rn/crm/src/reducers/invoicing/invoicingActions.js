@@ -13,7 +13,10 @@ const {
   LIST_ALL_SUPPLIERS,
   AFTER_SET_REQ_SUPPLIER,
   AFTER_CREATE_SUPPLY_ORDER,
-  RECEIVE_WAIT_SUPPLY_ORDER
+  RECEIVE_WAIT_SUPPLY_ORDER,
+  RECEIVE_RECEIVED_SUPPLY_ORDER,
+  RECEIVE_WAIT_BALANCE_SUPPLY_ORDER,
+  RECEIVE_BALANCED_SUPPLY_ORDER
 } = require('../../common/constants').default;
 
 export function fetchUnlocked(store_id, token, callback) {
@@ -89,18 +92,38 @@ export function loadAllSuppliers(token) {
   }
 }
 
-export function fetchSupplyWaitOrder(storeId, token) {
+export function fetchSupplyWaitOrder(storeId, token, callback) {
+  const url = `InventoryApi/list_wait_received_order?access_token=${token}`;
+  return doFetchSupplyOrder(url, storeId, receiveWaitSupplyOrder, callback)
+}
+
+export function fetchSupplyArrivedOrder(storeId, token, callback) {
+  const url = `InventoryApi/list_received_order?access_token=${token}`;
+  return doFetchSupplyOrder(url, storeId, receiveWaitConfirmOrder, callback)
+}
+
+export function fetchSupplyWaitBalanceOrder(storeId, token, callback) {
+  const url = `InventoryApi/list_wait_balance_order?access_token=${token}`;
+  return doFetchSupplyOrder(url, storeId, receiveWaitBalanceOrder, callback)
+}
+
+export function fetchSupplyBalancedOrder(storeId, token, callback) {
+  const url = `InventoryApi/list_balance_order?access_token=${token}`;
+  return doFetchSupplyOrder(url, storeId, receiveBalancedOrder, callback)
+}
+
+function doFetchSupplyOrder(url, storeId, respHandle, callback) {
   return dispatch => {
-    const url = `InventoryApi/list_wait_received_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {storeId: storeId}))
       .then(resp => resp.json())
       .then(resp => {
         let {ok, reason, obj} = resp;
         if (ok) {
-          dispatch(receiveWaitSupplyOrder(obj))
+          dispatch(respHandle(obj))
         } else {
-          dispatch(receiveWaitSupplyOrder([]))
+          dispatch(respHandle([]))
         }
+        callback()
       })
   }
 }
@@ -184,12 +207,25 @@ function receiveWaitSupplyOrder(data) {
   }
 }
 
-function receiveWaitConfirmOrder() {
-
+function receiveWaitConfirmOrder(data) {
+  return {
+    type: RECEIVE_RECEIVED_SUPPLY_ORDER,
+    receivedSupplyOrder: data
+  }
 }
 
-function receiveWaitBalanceOrder() {
+function receiveWaitBalanceOrder(data) {
+  return {
+    type: RECEIVE_WAIT_BALANCE_SUPPLY_ORDER,
+    waitBalanceSupplyOrder: data
+  }
+}
 
+function receiveBalancedOrder(data) {
+  return {
+    type: RECEIVE_BALANCED_SUPPLY_ORDER,
+    balancedOrder: data
+  }
 }
 
 function receiveUnlockedReq(data) {
