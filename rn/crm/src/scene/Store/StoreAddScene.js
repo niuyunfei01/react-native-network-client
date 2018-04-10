@@ -158,7 +158,7 @@ class StoreAddScene extends PureComponent {
       alias: alias,//别名
       name: name,//店名
       district: district,//所属区域
-      owner_name: owner_name,//店长姓名
+      owner_name: owner_name,//店主收款人姓名
       owner_nation_id: owner_nation_id,//身份证号
       location_long: location_long,
       location_lat: location_lat,
@@ -200,7 +200,6 @@ class StoreAddScene extends PureComponent {
     if (user_type === 'owner') {
       this.setState({
         owner_id: user_id,
-        owner_name: user_id > 0 ? user_list[user_id]['nickname'] : '',
         mobile: user_id > 0 ? user_list[user_id]['mobilephone'] : '',
       });
     } else {
@@ -244,9 +243,11 @@ class StoreAddScene extends PureComponent {
   };
 
   render() {
-    let {store_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips, user_list} = this.state;
+    let {store_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile, dada_address,
+      owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips, user_list} = this.state;
     //let vice_mgr_name = !!vice_mgr ? user_list[vice_mgr]['nickname'] : undefined;
 
+    let store_mgr_name = (user_list[owner_id] || {nickname: '-'})['nickname'];
     let vice_mgr_name = '';
     if(!!vice_mgr && vice_mgr !== '0'){
       for (let vice_mgr_id of vice_mgr.split(',')){
@@ -395,7 +396,7 @@ class StoreAddScene extends PureComponent {
                 skin='customer'
                 defaultKey={owner_id}
               >
-                <Text style={styles.body_text}>{owner_id > 0 ? owner_name : '点击选择店长'}</Text>
+                <Text style={styles.body_text}>{owner_id > 0 ? store_mgr_name : '点击选择店长'}</Text>
               </ModalSelector>
             </CellBody>
           </Cell>
@@ -542,6 +543,23 @@ class StoreAddScene extends PureComponent {
           </Cell>
         </Cells>
 
+        <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>店长实名</Label>
+            </CellHeader>
+            <CellBody>
+              <Input
+                onChangeText={(v) => {this.setState({owner_name: v})}}
+                value={this.state.owner_name}
+                style={[styles.cell_input,]}
+                underlineColorAndroid='transparent' //取消安卓下划线
+              />
+            </CellBody>
+          </Cell>
+        </Cells>
+
         <Button
           onPress={() => {
             this.onStoreAdd();
@@ -605,7 +623,8 @@ class StoreAddScene extends PureComponent {
     const {accessToken} = this.props.global;
     let _this = this;
     if (this.onCheckData()) {
-      let {currVendorId, btn_type, store_id, type, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips} = this.state;
+      let {currVendorId, btn_type, store_id, type, alias, name, district, owner_name, owner_nation_id, location_long, location_lat,
+        deleted, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips} = this.state;
 
       let send_data = {
         type: type,//品牌id
@@ -653,7 +672,8 @@ class StoreAddScene extends PureComponent {
   }
 
   onCheckData() {
-    let {store_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile, dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips} = this.state;
+    let {store_id, alias, name, district, owner_name, owner_nation_id, location_long, location_lat, deleted, tel, mobile,
+      dada_address, owner_id, open_end, open_start, vice_mgr, call_not_print, ship_way, printer_cfg, auto_add_tips} = this.state;
     let error_msg = '';
     if (name.length < 1 || name.length > 8) {
       error_msg = '店名应在1-8个字符内';
