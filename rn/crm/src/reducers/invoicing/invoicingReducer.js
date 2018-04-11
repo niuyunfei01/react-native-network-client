@@ -1,5 +1,7 @@
 'use strict';
 
+import Constant from "../../Constat"
+
 const {
   FETCH_UNLOCKED_REQ,
   EDIT_UNLOCKED_REQ_ITEMS,
@@ -12,8 +14,14 @@ const {
   RECEIVE_WAIT_SUPPLY_ORDER,
   RECEIVE_RECEIVED_SUPPLY_ORDER,
   RECEIVE_WAIT_BALANCE_SUPPLY_ORDER,
-  RECEIVE_BALANCED_SUPPLY_ORDER
-} = require('../../common/constants').default;
+  RECEIVE_BALANCED_SUPPLY_ORDER,
+  AFTER_UPDATE_SUPPLY_ORDER,
+  AFTER_UPDATE_SUPPLY_ORDER_ITEM,
+  AFTER_DELETE_SUPPLY_ORDER_ITEM,
+  AFTER_TRANSFER_ORDER_ITEM,
+  AFTER_APPEND_SUPPLY_ORDER,
+  REMOVE_SUPPLY_ORDER
+} = require('./ActionTypes.js').default;
 
 const initialState = {
   unlockedList: [],
@@ -61,9 +69,153 @@ export default function invoicing(state = initialState, action) {
       return {...state, confirmedSupplyOrder: extractConfirmOrder(state, action)};
     case RECEIVE_BALANCED_SUPPLY_ORDER:
       return {...state, balancedSupplyOrder: extractBalancedOrder(state, action)};
+    case AFTER_UPDATE_SUPPLY_ORDER:
+      return {...state, ...afterUpdateSupplyOrder(state, action)};
+    case AFTER_UPDATE_SUPPLY_ORDER_ITEM:
+      return {...state, ...afterUpdateOrderItem(state, action)};
+    case AFTER_DELETE_SUPPLY_ORDER_ITEM:
+      return {...state, ...afterDeleteOrderItem(state, action)};
+    case AFTER_APPEND_SUPPLY_ORDER:
+      return state;
+    case AFTER_TRANSFER_ORDER_ITEM:
+      return state;
+    case REMOVE_SUPPLY_ORDER:
+      return {...state, ...removeSupplyOrder(state, action)};
     default:
       return state
   }
+}
+
+function afterUpdateSupplyOrder(state, action) {
+  return updateListData(state, action, doMergeSupplyOrderList);
+}
+
+
+function afterUpdateOrderItem(state, action) {
+  return updateListData(state, action, doMergeSupplyOrderItem);
+}
+
+function afterDeleteOrderItem(state, action) {
+  return updateListData(state, action, doDeleteSupplyOrderItem);
+}
+
+function removeSupplyOrder(state, action) {
+  console.log(action);
+  return updateListData(state, action, doRemoveSupplyOrder);
+}
+
+function updateListData(state, action, handler) {
+  let {data, ok, status, storeId} = action;
+  if (!ok) {
+    return {};
+  }
+  switch (status) {
+    case Constant.INVOICING.STATUS_CREATED:
+      return {waitReceiveSupplyOrder: handler(state.waitReceiveSupplyOrder, data, storeId)};
+      break;
+    case Constant.INVOICING.STATUS_CONFIRMED:
+      return {receivedSupplyOrder: handler(state.receivedSupplyOrder, data, storeId)};
+      return state;
+      break;
+    case Constant.INVOICING.STATUS_ARRIVED:
+      return {confirmedSupplyOrder: handler(state.confirmedSupplyOrder, data, storeId)};
+      return state;
+      break;
+  }
+  return {};
+}
+
+function doRemoveSupplyOrder(list, data, storeId) {
+  let copy = [];
+  list.forEach(function (item) {
+    if (item['store_id'] == storeId) {
+      let dataList = item['data'];
+      let dataListCopy = [];
+      dataList.forEach(function (orderItem) {
+        if (orderItem['id'] != data['id']) {
+          dataListCopy.push(orderItem);
+        }
+      });
+      item['data'] = dataListCopy;
+    }
+    if (item['data'].length > 0) {
+      copy.push(item);
+    }
+  });
+  return copy;
+}
+
+function doMergeSupplyOrderList(list, data, storeId) {
+  let copy = [];
+  list.forEach(function (item) {
+    if (item['store_id'] == storeId) {
+      let dataList = item['data'];
+      let dataListCopy = [];
+      dataList.forEach(function (orderItem) {
+        if (orderItem['id'] == data['id']) {
+          orderItem = Object.assign({}, orderItem, data);
+        }
+        dataListCopy.push(orderItem);
+      });
+      item['data'] = dataListCopy;
+    }
+    copy.push(item);
+  });
+  return copy;
+}
+
+function doDeleteSupplyOrderItem(list, data, storeId) {
+  let copy = [];
+  console.log(list, data, storeId)
+  list.forEach(function (item) {
+    if (item['store_id'] == storeId) {
+      let dataList = item['data'];
+      let dataListCopy = [];
+      dataList.forEach(function (orderItem) {
+        if (orderItem['id'] == data['supply_order_id']) {
+          let copyItems = [];
+          let itemsData = orderItem['req_items'];
+          itemsData.forEach(function (d) {
+            if (d['id'] != data['id']) {
+              copyItems.push(d);
+            }
+          });
+          orderItem['req_items'] = copyItems;
+        }
+        dataListCopy.push(orderItem);
+      });
+      item['data'] = dataListCopy;
+    }
+    copy.push(item);
+  });
+  return copy;
+}
+
+function doMergeSupplyOrderItem(list, data, storeId) {
+  let copy = [];
+  list.forEach(function (item) {
+    if (item['store_id'] == storeId) {
+      let dataList = item['data'];
+      let dataListCopy = [];
+      dataList.forEach(function (orderItem) {
+        if (orderItem['id'] == data['supply_order_id']) {
+          let copyItems = [];
+          let itemsData = orderItem['req_items'];
+          itemsData.forEach(function (d) {
+            if (d['id'] == data['id']) {
+              d = Object.assign({}, d, data);
+            }
+            copyItems.push(d);
+          });
+          orderItem['req_items'] = copyItems;
+        }
+        dataListCopy.push(orderItem);
+      });
+      item['data'] = dataListCopy;
+    }
+    copy.push(item);
+  });
+  return copy;
 }
 
 function extractWaitReceiveOrder(state, action) {

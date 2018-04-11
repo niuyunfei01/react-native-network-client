@@ -9,6 +9,7 @@ import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchLocked, loadAllSuppliers} from "../../reducers/invoicing/invoicingActions";
 import Conf from '../../config';
+import EmptyListView from "./EmptyListView";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -119,10 +120,7 @@ class InvoicingShippingScene extends PureComponent {
           />
         }>
           <Cells>
-            {reqList.length > 0 ? reqList : <Cell>
-              <CellBody><CellText>暂无数据</CellText></CellBody>
-              <CellFooter>刷新试试</CellFooter>
-            </Cell>}
+            {reqList.length > 0 ? reqList : <EmptyListView/>}
           </Cells>
         </ScrollView>
       </View>

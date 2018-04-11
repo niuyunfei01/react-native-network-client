@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, Text, View, Image, TextInput, Alert, TouchableOpacity} from 'react-native'
+import {Alert, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import font from './fontStyles'
 import styles from './InvoicingStyles'
 import pxToDp from "../../util/pxToDp";
@@ -22,14 +22,27 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {
+  deleteSupplyOrderItem,
+  fetchSupplyArrivedOrder,
+  fetchSupplyWaitBalanceOrder,
   fetchSupplyWaitOrder,
   loadAllSuppliers,
-  fetchSupplyArrivedOrder,
-  fetchSupplyWaitBalanceOrder
+  updateSupplyOrder,
+  updateSupplyOrderItem,
+  transferSupplier,
+  appendSupplyOrder,
+  trashSupplyOrder,
+  receivedSupplyOrder,
 } from "../../reducers/invoicing/invoicingActions";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
+
 import _ from 'lodash'
+import EmptyListView from "./EmptyListView";
+
+import Constant from "../../Constat"
+import moment from "moment"
+import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -41,14 +54,23 @@ function mapDispatchToProps(dispatch) {
     dispatch, ...bindActionCreators({
       fetchSupplyWaitOrder,
       loadAllSuppliers,
+      fetchSupplyArrivedOrder,
+      fetchSupplyWaitBalanceOrder,
+      updateSupplyOrder,
+      updateSupplyOrderItem,
+      deleteSupplyOrderItem,
+      appendSupplyOrder,
+      transferSupplier,
+      trashSupplyOrder,
+      receivedSupplyOrder,
       ...globalActions
     })
   }
 }
 
 const SkuUnitSelect = [
-  {txt: '斤', id: '0'},
-  {txt: '份', id: '1'},
+  {label: '斤', value: '0'},
+  {label: '份', value: '1'},
 ];
 
 const SkuUnitMap = {
@@ -77,14 +99,6 @@ function getGoodItemTextStyle(highlight = false) {
   return [font.font26, font.fontGray, list.goods_title];
 }
 
-const STATUS_TRASHED = -1;
-const STATUS_CREATED = 0;
-const STATUS_LOCKED = 1;
-const STATUS_SHIPPED = 2;
-const STATUS_ARRIVED = 3;
-const STATUS_CONFIRMED = 4;
-const STATUS_COMPLETE = 5;
-
 class InvoicingOrderGoodsScene extends Component {
   constructor(props) {
     super(props);
@@ -97,7 +111,12 @@ class InvoicingOrderGoodsScene extends Component {
       editDialogVisible: false,
       moveSupplierDialogVisible: false,
       orderCtrlStatus: {},
-      storeCtrlStatus: {}
+      storeCtrlStatus: {},
+      currentEditItem: {},
+      currentEditOrderId: 0,
+      currentEditStoreId: 0,
+      currentCheckedSupplier: 0,
+      currentMovedSupplierOptions: []
     };
     this.reloadData = this.reloadData.bind(this)
     this.renderItem = this.renderItem.bind(this)
@@ -117,6 +136,13 @@ class InvoicingOrderGoodsScene extends Component {
     this.renderDateTimePicker = this.renderDateTimePicker.bind(this)
     this.renderMoveSupplierDialog = this.renderMoveSupplierDialog.bind(this)
     this.renderEditDialog = this.renderEditDialog.bind(this)
+    this.setMoveSuppliersOption = this.setMoveSuppliersOption.bind(this)
+    this.updateOrderGoodItem = this.updateOrderGoodItem.bind(this)
+    this.deleteOrderGoodItem = this.deleteOrderGoodItem.bind(this)
+    this.setMoveCurrentCheckedVal = this.setMoveCurrentCheckedVal.bind(this)
+    this.updateOrderGoodItemSupplier = this.updateOrderGoodItemSupplier.bind(this)
+    this.trashSupplyOrder = this.trashSupplyOrder.bind(this)
+    this.confirmReceivedOrder = this.confirmReceivedOrder.bind(this)
   }
 
   tab() {
@@ -124,13 +150,13 @@ class InvoicingOrderGoodsScene extends Component {
     let leftStyle = [tabs.tabs_item, tabs.tabs_item_left_radius,];
     let middleStyle = [tabs.tabs_item,];
     let rightStyle = [tabs.tabs_item, tabs.tabs_item_right_radius];
-    if (filterStatus == STATUS_CREATED) {
+    if (filterStatus == Constant.INVOICING.STATUS_CREATED) {
       leftStyle.push(tabs.tabs_item_active);
     }
-    if (filterStatus == STATUS_ARRIVED) {
+    if (filterStatus == Constant.INVOICING.STATUS_ARRIVED) {
       middleStyle.push(tabs.tabs_item_active);
     }
-    if (filterStatus == STATUS_CONFIRMED) {
+    if (filterStatus == Constant.INVOICING.STATUS_CONFIRMED) {
       rightStyle.push(tabs.tabs_item_active);
     }
     return (
@@ -140,9 +166,9 @@ class InvoicingOrderGoodsScene extends Component {
       }]}>
         <View style={tabs.tabs}>
           <Text style={leftStyle}
-                onPress={() => this.changeTab(0)}>待收货</Text>
-          <Text style={middleStyle} onPress={() => this.changeTab(3)}>待审核</Text>
-          <Text style={rightStyle} onPress={() => this.changeTab(4)}>待结算</Text>
+                onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货</Text>
+          <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核</Text>
+          <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算</Text>
         </View>
       </View>
     )
@@ -179,10 +205,13 @@ class InvoicingOrderGoodsScene extends Component {
   }
 
   changeTab(val) {
-    this.setState({
-      filterStatus: val
-    });
-    this.reloadData()
+    let currentStatus = this.state.filterStatus;
+    if (currentStatus !== val) {
+      this.setState({
+        filterStatus: val
+      });
+      this.reloadData()
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -198,10 +227,12 @@ class InvoicingOrderGoodsScene extends Component {
     this.reloadData();
   }
 
-  chooseConsigneeDateTime(old) {
+  chooseConsigneeDateTime(old, orderId, storeId) {
     this.setState({
       consigneeDate: old,
-      showDatePicker: true
+      showDatePicker: true,
+      currentEditOrderId: orderId,
+      currentEditStoreId: storeId
     });
   }
 
@@ -225,29 +256,224 @@ class InvoicingOrderGoodsScene extends Component {
     }
 
     switch (filterStatus) {
-      case STATUS_CREATED:
+      case Constant.INVOICING.STATUS_CREATED:
         dispatch(fetchSupplyWaitOrder(currStoreId, token, callBack));
         break;
-      case STATUS_ARRIVED:
+      case Constant.INVOICING.STATUS_ARRIVED:
         dispatch(fetchSupplyArrivedOrder(currStoreId, token, callBack));
         break;
-      case STATUS_CONFIRMED:
+      case Constant.INVOICING.STATUS_CONFIRMED:
         dispatch(fetchSupplyWaitBalanceOrder(currStoreId, token, callBack));
         break;
     }
-
   }
 
-  /**
-   * 确认操作
-   */
+  updateOrderConsigneeDatetime(datetime) {
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let status = this.state.filterStatus;
+    let id = this.state.currentEditOrderId;
+    let storeId = this.state.currentEditStoreId;
+    let dateTime = moment(datetime).format("YYYY-MM-DD HH:mm:ss");
+    dispatch(updateSupplyOrder(token, status, storeId, {
+      id: id,
+      consignee_date: dateTime
+    }, function (ok, reason) {
+      if (ok) {
+        ToastLong("更新成功!")
+      } else {
+        ToastLong("更新失败!")
+      }
+    }, function () {
+    }));
+    this.setState({showDatePicker: false, consigneeDate: null, currentEditOrderId: 0});
+  }
+
+  updateOrderGoodItem() {
+    let postData = this.state.currentEditItem;
+    let status = this.state.filterStatus;
+    let storeId = this.state.currentEditStoreId;
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let self = this;
+    dispatch(updateSupplyOrderItem(token, status, storeId, postData, function (ok, reason) {
+      if (ok) {
+        ToastLong("保存成功")
+      } else {
+        ToastLong("保存失败，请重试！")
+      }
+      self.setState({
+        editDialogVisible: false,
+        currentEditStoreId: 0,
+        currentEditItem: {}
+      });
+    }));
+  }
+
+  deleteOrderGoodItem() {
+    let currentEditItem = this.state.currentEditItem;
+    let status = this.state.filterStatus;
+    let storeId = this.state.currentEditStoreId;
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let title = currentEditItem['name'];
+    let self = this;
+
+    function cleanCtx() {
+      self.setState({
+        opVisible: false,
+        currentEditStoreId: 0,
+        currentEditItem: {}
+      });
+    }
+
+    let postData = {id: currentEditItem['id'], deleted: 1, 'supply_order_id': currentEditItem['supply_order_id']};
+
+    function okFunc() {
+      dispatch(deleteSupplyOrderItem(token, status, storeId, postData, function (ok, reason) {
+        cleanCtx();
+      }))
+    }
+
+    this.confirmOp(title, "确认要删除？", cleanCtx, okFunc)
+  }
+
+  updateOrderGoodItemSupplier() {
+    let currentEditItem = this.state.currentEditItem;
+    let status = this.state.filterStatus;
+    let storeId = this.state.currentEditStoreId;
+    const {dispatch, global} = this.props;
+    let checkSupplierId = this.state.currentCheckedSupplier;
+    let currentStoreOptions = this.state.currentMovedSupplierOptions;
+
+    let token = global['accessToken'];
+
+    let append = false;
+    let supplyOrderId = 0;
+
+    let self = this;
+
+    _.forEach(currentStoreOptions, function (value) {
+      let sId = value['sId'];
+      if (sId == checkSupplierId) {
+        if (value['isNew']) {
+          append = true;
+        } else {
+          supplyOrderId = value['orderId'];
+          append = false;
+        }
+        return false;
+      }
+    });
+
+    if (append) {
+      let postData = {itemId: currentEditItem['id'], supplierId: checkSupplierId, storeId: storeId};
+      console.log(postData)
+      dispatch(appendSupplyOrder(token, status, storeId, postData, function (ok, reason) {
+        if (ok) {
+          self.reloadData();
+        } else {
+          ToastLong("保存失败")
+        }
+        self.setState({
+          moveSupplierDialogVisible: false,
+          currentEditStoreId: 0,
+          currentEditItem: {}
+        });
+      }));
+    } else {
+      let postData = {itemId: currentEditItem['id'], orderId: supplyOrderId};
+      dispatch(transferSupplier(token, status, storeId, postData, function (ok, reason) {
+        if (ok) {
+          self.reloadData();
+        } else {
+          ToastLong("保存失败")
+        }
+        self.setState({
+          moveSupplierDialogVisible: false,
+          currentEditStoreId: 0,
+          currentEditItem: {}
+        });
+      }));
+    }
+  }
+
+  trashSupplyOrder(id, storeId) {
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let status = this.state.filterStatus;
+    dispatch(trashSupplyOrder(token, status, storeId, {id: id}, function (ok, reason) {
+      if (ok) {
+        ToastLong("操作成功")
+      }
+    }))
+  }
+
+  confirmReceivedOrder(id, storeId) {
+    const {dispatch, global} = this.props;
+    let token = global['accessToken'];
+    let status = this.state.filterStatus;
+    dispatch(receivedSupplyOrder(token, status, storeId, {id: id}, function (ok, reason) {
+      if (ok) {
+        ToastLong("操作成功")
+      }
+    }))
+  }
+
+  setMoveSuppliersOption() {
+    const {invoicing} = this.props;
+    let {waitReceiveSupplyOrder, suppliers} = invoicing;
+    let storeId = this.state.currentEditStoreId;
+    let storeData = {};
+    _.forEach(waitReceiveSupplyOrder, function (val, id) {
+      if (val['store_id'] == storeId) {
+        storeData = val;
+        return false;
+      }
+    });
+    let tmp = {};
+    _.forEach(suppliers, function (val, idx) {
+      tmp[val['id']] = {id: val['id'], label: val['name'], count: 0, isNew: true}
+    });
+    let storeOrderData = storeData['data'];
+    _.forEach(storeOrderData, function (item, val) {
+      let supplierId = item['supplier_id'];
+      tmp[supplierId]['isNew'] = false;
+      tmp[supplierId]['count'] = item['req_items'].length;
+      tmp[supplierId]['orderId'] = item['id'];
+    });
+    let r = [];
+    _.mapValues(tmp, function (o) {
+      let label = o['label'] + '(' + (o['isNew'] ? '新建' : o['count']) + ')';
+      r.push({
+        sId: o['id'],
+        label: label,
+        id: o['id'],
+        isNew: o['isNew'],
+        orderId: o['orderId']
+      });
+    });
+    this.setState({currentMovedSupplierOptions: r})
+  }
+
+  setMoveCurrentCheckedVal(val) {
+    if (!val) {
+      let currentEditItem = this.state.currentEditItem;
+      val = currentEditItem['supplier_id'];
+    }
+    this.setState({
+      currentCheckedSupplier: val
+    });
+  }
+
+
   confirmOp(title, msg, cancelFunc, okFunc) {
     Alert.alert(
       title,
       msg,
       [
-        {text: '取消', onPress: cancelFunc, style: 'cancel'},
-        {text: '确认', okFunc},
+        {text: '取消', onPress: () => cancelFunc(), style: 'cancel'},
+        {text: '确认', onPress: () => okFunc()},
       ]
     );
   }
@@ -280,11 +506,11 @@ class InvoicingOrderGoodsScene extends Component {
     let {invoicing} = this.props;
     let {waitReceiveSupplyOrder, receivedSupplyOrder, confirmedSupplyOrder} = invoicing;
     switch (status) {
-      case STATUS_CREATED:
+      case Constant.INVOICING.STATUS_CREATED:
         return waitReceiveSupplyOrder;
-      case STATUS_ARRIVED:
+      case Constant.INVOICING.STATUS_ARRIVED:
         return receivedSupplyOrder;
-      case STATUS_CONFIRMED:
+      case Constant.INVOICING.STATUS_CONFIRMED:
         return confirmedSupplyOrder;
     }
   }
@@ -301,7 +527,7 @@ class InvoicingOrderGoodsScene extends Component {
       suppliersMap[id] = val;
     });
     if (listData.length == 0) {
-      return <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}><Text style={{flex: 1}}>暂无数据</Text></View>
+      return <EmptyListView/>
     }
     let self = this;
     let itemsView = [];
@@ -312,20 +538,22 @@ class InvoicingOrderGoodsScene extends Component {
     return itemsView;
   }
 
-  handleEditOrderItem(text) {
+  handleEditOrderItem(itemData, storeId) {
     this.setState({
-      opVisible: true
+      opVisible: true,
+      currentEditItem: _.clone(itemData),
+      currentEditStoreId: storeId
     });
   }
 
-  renderGoodList(goodList, editAble) {
+  renderGoodList(goodList, editAble, storeId) {
     let goodsView = [];
     let self = this;
     _.forEach(goodList, function (item, idx) {
-      goodsView.push(<Cell key={idx} customStyle={list.good_cell} access={false}>
+      goodsView.push(<Cell key={idx} customStyle={list.good_cell} access={false}
+                           onPress={() => editAble ? self.handleEditOrderItem(item, storeId) : false}>
         <CellHeader style={list.flex}>
-          <Text style={editAble ? {width: pxToDp(150), ...font.fontBlue} : {width: pxToDp(150)}}
-                onPress={() => editAble ? self.handleEditOrderItem(item['name']) : false}>{item['name']}</Text>
+          <Text style={editAble ? {width: pxToDp(150), ...font.fontBlue} : {width: pxToDp(150)}}>{item['name']}</Text>
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           <Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>
@@ -343,11 +571,23 @@ class InvoicingOrderGoodsScene extends Component {
     let ordersView = [];
     let self = this;
     _.forEach(listData, function (val, idx) {
+      let opBtns = [];
+      if (status == Constant.INVOICING.STATUS_CREATED) {
+        opBtns = [<MyBtn key={1} text='置为无效' style={list.danger_btn} onPress={() => self.trashSupplyOrder(val['id'], val['consignee_store_id'])}/>,
+          <MyBtn key={2} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn} onPress={() => self.toggleGoodEditStatus(val['id'])}/>,
+          <MyBtn key={3} text='确认收货' style={list.blue_btn} onPress={() => self.confirmReceivedOrder(val['id'], val['consignee_store_id'])}/>]
+      }
+      if (status == Constant.INVOICING.STATUS_ARRIVED) {
+        opBtns = [<MyBtn key={1} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn} onPress={() => self.toggleGoodEditStatus(val['id'])}/>, <MyBtn key={2} text='确认审核' style={list.blue_btn} onPress={() => {}}/>];
+      }
+      if (status == Constant.INVOICING.STATUS_CONFIRMED) {
+        opBtns = [<MyBtn key={3} text='确认结算' style={list.blue_btn} onPress={() => {}}/>];
+      }
       ordersView.push(
         <View key={val['id']}>
           <Cell customStyle={list.init_cell} first>
             <CellHeader style={list.flex}>
-              <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx, 2)}</Text>
+              <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)}</Text>
               <Text style={[font.font30]}>{suppliers[val['supplier_id']]['name']}
                 ({suppliers[val['supplier_id']]['mobile']})</Text>
             </CellHeader>
@@ -359,7 +599,7 @@ class InvoicingOrderGoodsScene extends Component {
             </CellFooter>
           </Cell>
           <Cell customStyle={list.init_cell} access={true}
-                onPress={() => self.chooseConsigneeDateTime(val['consignee_date'])}>
+                onPress={() => self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])}>
             <CellHeader>
               <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
             </CellHeader>
@@ -395,20 +635,19 @@ class InvoicingOrderGoodsScene extends Component {
             </Cell>
 
             <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
-              {self.renderGoodList(val['req_items'], orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['editAble'])}
+              {self.renderGoodList(val['req_items'], orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['editAble'], val['consignee_store_id'])}
             </Cells>
+
           </View>}
           <Cell customStyle={list.init_cell}>
             <CellHeader>
-              {status > 0 ? <View><Text style={[font.font26, font.fontOrange]}>朱春浩 确认收货</Text>
-                <Text style={[font.font26, font.fontOrange]}>2018-03-09 09:30</Text></View> : null}
+              {status > Constant.INVOICING.STATUS_CREATED ?
+                <View><Text style={[font.font26, font.fontOrange]}>朱春浩 确认收货</Text>
+                  <Text style={[font.font26, font.fontOrange]}>2018-03-09 09:30</Text></View> : null}
             </CellHeader>
             <CellBody/>
             <CellFooter>
-              <MyBtn text='置为无效' style={list.danger_btn}/>
-              <MyBtn text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn}
-                     onPress={() => self.toggleGoodEditStatus(val['id'])}/>
-              <MyBtn text='确认收货' style={list.blue_btn}/>
+              {opBtns}
             </CellFooter>
           </Cell>
         </View>
@@ -425,10 +664,11 @@ class InvoicingOrderGoodsScene extends Component {
             {data['store_name']}
             <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单</Text>
           </Text>
-          {status == 3 ? <Text style={[font.font24, font.fontRed]}>待结算金额: ￥95.75</Text> : null}
+          {status == Constant.INVOICING.STATUS_CONFIRMED ?
+            <Text style={[font.font24, font.fontRed]}>待结算金额: ￥95.75</Text> : null}
         </View>
         <View style={{flexDirection: 'row', width: pxToDp(220), alignItems: 'center'}}>
-          {status == 3 ? <View style={{
+          {status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{
             borderWidth: 1,
             borderColor: colors.fontBlue,
             width: pxToDp(160),
@@ -457,7 +697,13 @@ class InvoicingOrderGoodsScene extends Component {
   render() {
     return (
       <View>
-        <ScrollView>
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.reloadData()}
+            tintColor='gray'
+          />
+        }>
           {this.tab()}
           {this.renderItems()}
         </ScrollView>
@@ -470,6 +716,7 @@ class InvoicingOrderGoodsScene extends Component {
   }
 
   renderActionSheet() {
+    let currentEditItem = this.state.currentEditItem;
     return <ActionSheet
       visible={this.state.opVisible}
       onRequestClose={() => {
@@ -477,14 +724,14 @@ class InvoicingOrderGoodsScene extends Component {
       menus={[
         {
           type: 'default',
-          label: '操作一',
+          label: currentEditItem['name'],
           onPress: () => {
+            return false;
           },
         }, {
           type: 'warn',
           label: '删除',
-          onPress: () => {
-          },
+          onPress: () => this.deleteOrderGoodItem(),
         }, {
           type: 'primary',
           label: '编辑',
@@ -497,6 +744,8 @@ class InvoicingOrderGoodsScene extends Component {
           label: '移入其他供应商',
           onPress: () => {
             this.setState({opVisible: false, moveSupplierDialogVisible: true});
+            this.setMoveCurrentCheckedVal(false);
+            this.setMoveSuppliersOption();
           },
         }
       ]}
@@ -515,22 +764,24 @@ class InvoicingOrderGoodsScene extends Component {
   renderDateTimePicker() {
     return <DateTimePicker
       date={initDate(this.state.consigneeDate)}
-      mode='date'
+      mode='datetime'
       isVisible={this.state.showDatePicker}
-      onConfirm={async (date) => {
-        this.setState({showDatePicker: false});
+      onConfirm={async (datetime) => {
+        this.updateOrderConsigneeDatetime(datetime);
       }}
       onCancel={() => {
-        this.setState({showDatePicker: false});
+        this.setState({showDatePicker: false, consigneeDate: null, currentEditOrderId: 0});
       }}
     />;
   }
 
   renderMoveSupplierDialog() {
     let self = this;
+    let currentEditItem = this.state.currentEditItem;
+    const title = currentEditItem['name']
     return <Dialog
       visible={this.state.moveSupplierDialogVisible}
-      title="转移供应商"
+      title={title}
       onRequestClose={() => {
       }}
       buttons={[
@@ -546,24 +797,16 @@ class InvoicingOrderGoodsScene extends Component {
           type: 'primary',
           label: '确定',
           onPress: () => {
-            self.setState({
-              moveSupplierDialogVisible: false
-            });
+            self.updateOrderGoodItemSupplier();
           },
         },
       ]}>
-      <CellsTitle>表单</CellsTitle>
+      <CellsTitle>转移供应商</CellsTitle>
       <CheckboxCells
-        options={[
-          {label: 1, id: 1},
-          {label: 2, id: 2},
-          {label: 3, id: 3},
-          {label: 4, id: 4},
-          {label: 5, id: 5},
-          {label: 6, id: 6},
-        ]}
-        value={[{label: 2, id: 2}]}
-        onChange={(checked) => {
+        options={self.state.currentMovedSupplierOptions}
+        value={self.state.currentCheckedSupplier}
+        onChange={(checked, val) => {
+          self.setMoveCurrentCheckedVal(val)
         }}
         style={{
           marginLeft: 0,
@@ -577,11 +820,12 @@ class InvoicingOrderGoodsScene extends Component {
 
   renderEditDialog() {
     let self = this;
+    let currentEditItem = this.state.currentEditItem;
     return <Dialog
       visible={self.state.editDialogVisible}
       onRequestClose={() => {
       }}
-      title="编辑"
+      title={currentEditItem['name']}
       buttons={[
         {
           type: 'default',
@@ -594,20 +838,21 @@ class InvoicingOrderGoodsScene extends Component {
         }, {
           type: 'primary',
           label: '确定',
-          onPress: () => {
-            self.setState({
-              editDialogVisible: false
-            });
-          },
+          onPress: () => self.updateOrderGoodItem(),
         },
       ]}>
       <Cell style={customStyles.formCellStyle}>
         <CellHeader><Label style={font.font24}>份数</Label></CellHeader>
         <CellBody>
           <Input
-            placeholder=""
-            value={'100'}
-            onChangeText={() => {
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="采购份数"
+            value={currentEditItem['total_req']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['total_req'] = val;
+              this.setState({currentEditItem: currentEditItem});
             }}
           />
         </CellBody>
@@ -616,9 +861,14 @@ class InvoicingOrderGoodsScene extends Component {
         <CellHeader><Label style={font.font24}>总量</Label></CellHeader>
         <CellBody>
           <Input
-            placeholder=""
-            value={'100'}
-            onChangeText={() => {
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="订货总量"
+            value={currentEditItem['req_amount']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['req_amount'] = val;
+              this.setState({currentEditItem: currentEditItem});
             }}
           />
         </CellBody>
@@ -627,18 +877,13 @@ class InvoicingOrderGoodsScene extends Component {
       <RadioCells
         cellStyle={customStyles.radioCellsStyle}
         cellTextStyle={font.font24}
-        options={[
-          {
-            label: '选项一',
-            value: 1
-          }, {
-            label: '选项二',
-            value: 2
-          }
-        ]}
-        onChange={() => {
+        options={SkuUnitSelect}
+        onChange={(val) => {
+          let currentEditItem = self.state.currentEditItem;
+          currentEditItem['unit_type'] = val;
+          this.setState({currentEditItem: currentEditItem});
         }}
-        value={1}
+        value={currentEditItem['unit_type']}
       />
     </Dialog>;
   }
@@ -661,11 +906,10 @@ const customStyles = {
     marginLeft: pxToDp(30),
     maxHeight: pxToDp(80)
   },
-  radioCellsTextStyle: {
-
-  },
-  formCellsStyle: {
-
+  radioCellsTextStyle: {},
+  formCellsStyle: {},
+  hideStyle: {
+    height: 0
   }
 };
 

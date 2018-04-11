@@ -1,19 +1,6 @@
 import React, {PropTypes} from 'react'
-import {
-  StyleSheet,
-} from 'react-native'
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  CellText,
-  Icon,
-} from "../../weui/index";
-
-
-import xor from 'lodash/xor'
+import {StyleSheet,} from 'react-native'
+import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText, Icon,} from "../../weui/index";
 import $V from '../../weui/variable'
 import pxToDp from "../../util/pxToDp";
 

@@ -16,8 +16,14 @@ const {
   RECEIVE_WAIT_SUPPLY_ORDER,
   RECEIVE_RECEIVED_SUPPLY_ORDER,
   RECEIVE_WAIT_BALANCE_SUPPLY_ORDER,
-  RECEIVE_BALANCED_SUPPLY_ORDER
-} = require('../../common/constants').default;
+  RECEIVE_BALANCED_SUPPLY_ORDER,
+  AFTER_UPDATE_SUPPLY_ORDER,
+  AFTER_UPDATE_SUPPLY_ORDER_ITEM,
+  AFTER_DELETE_SUPPLY_ORDER_ITEM,
+  AFTER_TRANSFER_ORDER_ITEM,
+  AFTER_APPEND_SUPPLY_ORDER,
+  REMOVE_SUPPLY_ORDER
+} = require('./ActionTypes.js').default;
 
 export function fetchUnlocked(store_id, token, callback) {
   return dispatch => {
@@ -148,16 +154,169 @@ export function setReqItemSupplier(items, reqId, token, callback) {
 export function createSupplyOrder(reqId, token, callback) {
   return dispatch => {
     const url = `InventoryApi/create_supply_order?access_token=${token}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {'req_id': reqId}))
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
         let {ok, reason, obj} = resp;
-        dispatch(afterCreateSupplyOrder(ok, reqId))
+        dispatch(afterUpdateSupplyOrder(ok, reqId))
+        callback(ok, reason)
+      }).catch(e => {
+    }).finally(() => {
+
+    });
+  }
+}
+
+export function updateSupplyOrder(token, status, storeId, data, callback, errHandle) {
+  return dispatch => {
+    const url = `InventoryApi/update_supply_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch(afterUpdateSupplyOrder(ok, obj, status, storeId))
+        callback(ok, reason)
+      })
+      .catch(e => {
+        errHandle()
+      })
+      .finally(() => {
+      })
+
+  }
+}
+
+export function updateSupplyOrderItem(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/update_req_item?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch(afterUpdateSupplyOrderItem(ok, obj, status, storeId))
+        callback(ok, reason)
+      });
+  }
+}
+
+export function deleteSupplyOrderItem(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/update_req_item?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        if (ok) {
+          dispatch(afterDeleteSupplyOrderItem(ok, obj, status, storeId))
+        }
+        callback(ok, reason)
+      });
+  }
+}
+
+export function transferSupplier(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/transfer_supply_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch(afterTransferSupplier(ok, obj, status, storeId))
         callback(ok, reason)
       })
   }
 }
 
+export function appendSupplyOrder(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/append_supply_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch(afterAppendSupplyOrder(ok, obj, status, storeId))
+        callback(ok, reason)
+      })
+  }
+}
+
+export function trashSupplyOrder(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/trash_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch({type: REMOVE_SUPPLY_ORDER, data: obj, ok: ok, status: status, storeId: storeId});
+        callback(ok, reason);
+      })
+  }
+}
+
+
+export function receivedSupplyOrder(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/confirm_receive_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})
+        callback(ok, reason);
+      })
+  }
+}
+
+
+function afterTransferSupplier(ok, obj, status, storeId) {
+  return {
+    type: AFTER_TRANSFER_ORDER_ITEM,
+    data: obj,
+    ok: ok,
+    status: status,
+    storeId: storeId
+  }
+}
+
+function afterAppendSupplyOrder(ok, obj, status, storeId) {
+  return {
+    type: AFTER_APPEND_SUPPLY_ORDER,
+    data: obj,
+    ok: ok,
+    status: status,
+    storeId: storeId
+  }
+}
+
+function afterDeleteSupplyOrderItem(ok, obj, status, storeId) {
+  return {
+    type: AFTER_DELETE_SUPPLY_ORDER_ITEM,
+    data: obj,
+    ok: ok,
+    status: status,
+    storeId: storeId
+  }
+}
+
+function afterUpdateSupplyOrder(ok, obj, status, storeId) {
+  return {
+    type: AFTER_UPDATE_SUPPLY_ORDER,
+    data: obj,
+    ok: ok,
+    status: status,
+    storeId: storeId
+  }
+}
+
+function afterUpdateSupplyOrderItem(ok, obj, status, storeId) {
+  return {
+    type: AFTER_UPDATE_SUPPLY_ORDER_ITEM,
+    data: obj,
+    ok: ok,
+    status: status,
+    storeId: storeId
+  }
+}
 
 function afterCreateSupplyOrder(ok, reqId) {
   return {
