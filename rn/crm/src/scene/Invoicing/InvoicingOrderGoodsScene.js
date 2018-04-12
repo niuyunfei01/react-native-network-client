@@ -17,7 +17,7 @@ import CheckboxCells from "./CheckBoxCells"
 import RadioCells from "../../weui/Form/RadioCells"
 import Label from "../../weui/Form/Label"
 import Input from "../../weui/Form/Input"
-
+import CallBtn from "./CallBtn"
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -33,6 +33,8 @@ import {
   appendSupplyOrder,
   trashSupplyOrder,
   receivedSupplyOrder,
+  reviewSupplyOrder,
+  balanceSupplyOrder,
 } from "../../reducers/invoicing/invoicingActions";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
@@ -43,6 +45,8 @@ import EmptyListView from "./EmptyListView";
 import Constant from "../../Constat"
 import moment from "moment"
 import {ToastLong} from "../../util/ToastUtils";
+
+import numeral from "numeral";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -63,6 +67,8 @@ function mapDispatchToProps(dispatch) {
       transferSupplier,
       trashSupplyOrder,
       receivedSupplyOrder,
+      reviewSupplyOrder,
+      balanceSupplyOrder,
       ...globalActions
     })
   }
@@ -143,6 +149,10 @@ class InvoicingOrderGoodsScene extends Component {
     this.updateOrderGoodItemSupplier = this.updateOrderGoodItemSupplier.bind(this)
     this.trashSupplyOrder = this.trashSupplyOrder.bind(this)
     this.confirmReceivedOrder = this.confirmReceivedOrder.bind(this)
+    this.getGoodsTotalFee = this.getGoodsTotalFee.bind(this)
+    this.reviewOrder = this.reviewOrder.bind(this)
+    this.balanceOrder = this.balanceOrder.bind(this)
+    this.commonHandleProxy = this.commonHandleProxy.bind(this)
   }
 
   tab() {
@@ -399,21 +409,26 @@ class InvoicingOrderGoodsScene extends Component {
   }
 
   trashSupplyOrder(id, storeId) {
-    const {dispatch, global} = this.props;
-    let token = global['accessToken'];
-    let status = this.state.filterStatus;
-    dispatch(trashSupplyOrder(token, status, storeId, {id: id}, function (ok, reason) {
-      if (ok) {
-        ToastLong("操作成功")
-      }
-    }))
+    this.commonHandleProxy(id, storeId, trashSupplyOrder)
   }
 
   confirmReceivedOrder(id, storeId) {
+    this.commonHandleProxy(id, storeId, receivedSupplyOrder)
+  }
+
+  reviewOrder(id, storeId) {
+    this.commonHandleProxy(id, storeId, reviewSupplyOrder)
+  }
+
+  balanceOrder(id, storeId) {
+    this.commonHandleProxy(id, storeId, balanceSupplyOrder)
+  }
+
+  commonHandleProxy(id, storeId, handle) {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
     let status = this.state.filterStatus;
-    dispatch(receivedSupplyOrder(token, status, storeId, {id: id}, function (ok, reason) {
+    dispatch(handle(token, status, storeId, {id: id}, function (ok, reason) {
       if (ok) {
         ToastLong("操作成功")
       }
@@ -481,6 +496,14 @@ class InvoicingOrderGoodsScene extends Component {
   orderEditAble(orderId) {
     let orderCtrlStatus = this.state.orderCtrlStatus;
     return orderCtrlStatus[orderId] && orderCtrlStatus[orderId]['editAble'];
+  }
+
+  getGoodsTotalFee(items) {
+    let totalFee = 0;
+    _.forEach(items, function (item) {
+      totalFee += item['req_amount'] * item['unit_price']
+    });
+    return numeral(totalFee).format('0.00')
   }
 
   /**
@@ -573,15 +596,24 @@ class InvoicingOrderGoodsScene extends Component {
     _.forEach(listData, function (val, idx) {
       let opBtns = [];
       if (status == Constant.INVOICING.STATUS_CREATED) {
-        opBtns = [<MyBtn key={1} text='置为无效' style={list.danger_btn} onPress={() => self.trashSupplyOrder(val['id'], val['consignee_store_id'])}/>,
-          <MyBtn key={2} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn} onPress={() => self.toggleGoodEditStatus(val['id'])}/>,
-          <MyBtn key={3} text='确认收货' style={list.blue_btn} onPress={() => self.confirmReceivedOrder(val['id'], val['consignee_store_id'])}/>]
+        opBtns = [<MyBtn key={1} text='置为无效' style={list.danger_btn}
+                         onPress={() => self.trashSupplyOrder(val['id'], val['consignee_store_id'])}/>,
+          <MyBtn key={2} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn}
+                 onPress={() => self.toggleGoodEditStatus(val['id'])}/>,
+          <MyBtn key={3} text='确认收货' style={list.blue_btn}
+                 onPress={() => self.confirmReceivedOrder(val['id'], val['consignee_store_id'])}/>]
       }
       if (status == Constant.INVOICING.STATUS_ARRIVED) {
-        opBtns = [<MyBtn key={1} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn} onPress={() => self.toggleGoodEditStatus(val['id'])}/>, <MyBtn key={2} text='确认审核' style={list.blue_btn} onPress={() => {}}/>];
+        opBtns = [<MyBtn key={1} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn}
+                         onPress={() => self.toggleGoodEditStatus(val['id'])}/>,
+          <MyBtn key={2} text='确认审核' style={list.blue_btn}
+                 onPress={() => self.reviewOrder(val['id'], val['consignee_store_id'])}/>];
       }
       if (status == Constant.INVOICING.STATUS_CONFIRMED) {
-        opBtns = [<MyBtn key={3} text='确认结算' style={list.blue_btn} onPress={() => {}}/>];
+        opBtns = [<MyBtn key={1} text={self.orderEditAble(val['id']) ? '保存' : '修改'} style={list.info_btn}
+                         onPress={() => self.toggleGoodEditStatus(val['id'])}/>,
+          <MyBtn key={3} text='确认结算' style={list.blue_btn}
+                 onPress={() => self.balanceOrder(val['id'], val['consignee_store_id'])}/>];
       }
       ordersView.push(
         <View key={val['id']}>
@@ -593,13 +625,16 @@ class InvoicingOrderGoodsScene extends Component {
             </CellHeader>
             <CellBody/>
             <CellFooter>
-              <Image source={require('../../img/Invoicing/dianhua.png')}
-                     style={{width: pxToDp(38), height: pxToDp(38), marginRight: pxToDp(10)}}/>
-              <Text style={[font.fontBlue]}>呼叫</Text>
+              <CallBtn label={'呼叫'} mobile={suppliers[val['supplier_id']]['mobile']}/>
             </CellFooter>
           </Cell>
-          <Cell customStyle={list.init_cell} access={true}
-                onPress={() => self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])}>
+          <Cell customStyle={list.init_cell} access={true} onPress={() => {
+            if (status = Constant.INVOICING.STATUS_CREATED) {
+              self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])
+            }else{
+              return false;
+            }
+          }}>
             <CellHeader>
               <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
             </CellHeader>
@@ -611,7 +646,8 @@ class InvoicingOrderGoodsScene extends Component {
           <Cell customStyle={list.init_cell} onPress={() => self.toggleGoods(val['id'])}>
             <CellHeader style={list.flex}>
               <Text style={[font.font30, font.fontBlack]}>商品</Text>
-              <Text style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥32.5</Text>
+              <Text
+                style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{self.getGoodsTotalFee(val['req_items'])}</Text>
             </CellHeader>
             <CellBody/>
             <CellFooter access={true}>
@@ -642,8 +678,8 @@ class InvoicingOrderGoodsScene extends Component {
           <Cell customStyle={list.init_cell}>
             <CellHeader>
               {status > Constant.INVOICING.STATUS_CREATED ?
-                <View><Text style={[font.font26, font.fontOrange]}>朱春浩 确认收货</Text>
-                  <Text style={[font.font26, font.fontOrange]}>2018-03-09 09:30</Text></View> : null}
+                <View><Text style={[font.font26, font.fontOrange]}>{val['consignee_name']} 确认收货</Text>
+                  <Text style={[font.font26, font.fontOrange]}>{val['consignee_date']}</Text></View> : null}
             </CellHeader>
             <CellBody/>
             <CellFooter>

@@ -246,9 +246,7 @@ export function trashSupplyOrder(token, status, storeId, data, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch({type: REMOVE_SUPPLY_ORDER, data: obj, ok: ok, status: status, storeId: storeId});
-        callback(ok, reason);
+        commonRespHandle(dispatch, resp, storeId, status, callback)
       })
   }
 }
@@ -260,13 +258,38 @@ export function receivedSupplyOrder(token, status, storeId, data, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})
-        callback(ok, reason);
+        commonRespHandle(dispatch, resp, storeId, status, callback)
       })
   }
 }
 
+export function reviewSupplyOrder(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/auditing_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        commonRespHandle(dispatch, resp, storeId, status, callback)
+      })
+  }
+}
+
+export function balanceSupplyOrder(token, status, storeId, data, callback) {
+  return dispatch => {
+    const url = `InventoryApi/confirm_balance_order?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
+      .then(resp => resp.json())
+      .then(resp => {
+        commonRespHandle(dispatch, resp, storeId, status, callback)
+      })
+  }
+}
+
+function commonRespHandle(dispatch, resp, storeId, status, callback) {
+  let {ok, reason, obj} = resp;
+  dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})
+  callback(ok, reason)
+}
 
 function afterTransferSupplier(ok, obj, status, storeId) {
   return {
