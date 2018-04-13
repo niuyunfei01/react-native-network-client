@@ -586,7 +586,8 @@ class InvoicingOrderGoodsScene extends Component {
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           <Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>
-          <Text style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
+          <Text
+            style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
           <Text style={getGoodItemTextStyle()}>{item['unit_price']}</Text>
           <Text style={getGoodItemTextStyle()}>{item['total_cost']}</Text>
         </CellBody>
@@ -662,7 +663,7 @@ class InvoicingOrderGoodsScene extends Component {
           </Cell>
           {/*商品*/}
           {orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['expandGoods'] && <View>
-            <Cell customStyle={{...list.init_cell, borderBottomWidth: 0.8}}>
+            <Cell customStyle={{...list.init_cell, borderBottomWidth: 0.5, minHeight: pxToDp(80)}}>
               <CellHeader style={list.flex}>
                 <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名</Text>
               </CellHeader>
@@ -676,7 +677,7 @@ class InvoicingOrderGoodsScene extends Component {
               </CellFooter>
             </Cell>
 
-            <Cells style={{borderTopWidth: 0.5, borderBottomWidth: 0}}>
+            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
               {self.renderGoodList(val['req_items'], orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['editAble'], val['consignee_store_id'])}
             </Cells>
 
@@ -706,6 +707,11 @@ class InvoicingOrderGoodsScene extends Component {
             {data['store_name']}
             <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单</Text>
           </Text>
+          {status == Constant.INVOICING.STATUS_CREATED && !!data['remark'] ?
+            <View style={{flexDirection: 'row', flexWrap: 'nowrap'}}><Text
+              style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text><Text
+              style={[font.font24, font.fontRed, {marginTop: pxToDp(11)}]} numberOfLines={1}
+              ellipsizeMode={'tail'}> {data['remark']}</Text></View> : null}
           {status == Constant.INVOICING.STATUS_CONFIRMED ?
             <Text style={[font.font24, font.fontRed]}>待结算金额: ￥{this.getStoreTotalFee(data['store_id'])}</Text> : null}
         </View>

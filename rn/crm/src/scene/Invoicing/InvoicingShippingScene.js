@@ -98,8 +98,10 @@ class InvoicingShippingScene extends PureComponent {
             <Text
               style={[font.font24, font.fontGray, {marginTop: pxToDp(10)}]}>{item['uid_confirm_name']} {item['time_confirm']}
               提交</Text>
-            {!!item['remark'] ? <Text style={[font.font24, font.fontRed, {marginTop: pxToDp(10)}]} numberOfLines={1}
-                                      ellipsizeMode={'tail'}>备注: {item['remark']}</Text> :
+            {!!item['remark'] ? <View style={{flexDirection: 'row', flexWrap:'nowrap'}}><Text
+                style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text><Text
+                style={[font.font24, font.fontRed, {marginTop: pxToDp(11)}]} numberOfLines={1}
+                ellipsizeMode={'tail'}> {item['remark']}</Text></View> :
               <Text style={[font.font24, {marginTop: pxToDp(10)}]}>无备注</Text>}
           </CellHeader>
           <CellBody/>
@@ -119,8 +121,7 @@ class InvoicingShippingScene extends PureComponent {
             tintColor='gray'
           />
         }>
-          {reqList.length > 0 ? <Cells>
-            reqList</Cells> : <EmptyListView/>}
+          {reqList.length > 0 ? <Cells>{reqList}</Cells> : <EmptyListView/>}
         </ScrollView>
       </View>
     )

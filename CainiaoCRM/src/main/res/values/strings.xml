@@ -278,7 +278,7 @@
 
     <string-array name="req_select_list">
         <item>斤</item>
-        <item>个</item>
+        <item>份</item>
         <item>克</item>
         <item>千克</item>
     </string-array>

@@ -1,5 +1,5 @@
-import React, {PureComponent} from 'react';
-import {ScrollView, Switch, Text, View, TouchableOpacity} from 'react-native'
+import React, {Component} from 'react';
+import {ScrollView, Switch, Text, View, TouchableOpacity, TextInput} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import font from './fontStyles'
@@ -32,7 +32,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class InvoicingShippingDetailScene extends PureComponent {
+class InvoicingShippingDetailScene extends Component {
   static navigationOptions = ({navigation}) => {
     const {req} = (navigation.state.params || {});
     let storeName = req['store_name'];
@@ -47,14 +47,16 @@ class InvoicingShippingDetailScene extends PureComponent {
       req: {},
       suppliers: [],
       checkedSupplierId: 1,
-      trackRemark: false,
-      loading: false
+      trackRemark: true,
+      loading: false,
+      remark: {}
     }
     this.handleCheckSupplier = this.handleCheckSupplier.bind(this);
     this.handleCheckItem = this.handleCheckItem.bind(this);
     this.toggleTrackRemark = this.toggleTrackRemark.bind(this);
     this.saveSupplier = this.saveSupplier.bind(this);
     this.submitOrder = this.submitOrder.bind(this);
+    this.setSupplierRemark = this.setSupplierRemark.bind(this);
   }
 
   componentWillMount() {
@@ -62,9 +64,11 @@ class InvoicingShippingDetailScene extends PureComponent {
     this.setState({req: req, suppliers: suppliers});
     let reqItems = req['req_items'];
     let checkCount = {};
+    let orderRemark = {};
     _.forEach(suppliers, function (item) {
       let supplyId = item['id'];
       checkCount[supplyId] = 0;
+      orderRemark[supplyId] = '';
     });
     let checkItems = reqItems.map(function (item, idx) {
       if (item['supplier_id'] > 0) {
@@ -78,8 +82,8 @@ class InvoicingShippingDetailScene extends PureComponent {
       return {id: item['id'], name: item['name']}
     });
     this.setState({checkSuppliers: checkSuppliers});
-    console.log(checkCount);
     this.setState({checkCount: checkCount})
+    this.setState({remark: orderRemark})
   }
 
   saveSupplier(callback) {
@@ -91,7 +95,6 @@ class InvoicingShippingDetailScene extends PureComponent {
     _.forEach(checkItems, function (item) {
       postData.push({id: item['id'], supplier_id: item['sId']});
     });
-    console.log("save supplier data ", postData);
     dispatch(setReqItemSupplier(postData, reqId, token, callback))
   }
 
@@ -154,6 +157,16 @@ class InvoicingShippingDetailScene extends PureComponent {
     this.setState({trackRemark: !track});
   }
 
+  setSupplierRemark(text, supplierId) {
+    let checkSupplierId = this.state.checkedSupplierId;
+    if (supplierId != checkSupplierId) {
+      return false;
+    }
+    let remark = this.state.remark;
+    remark[checkSupplierId] = text;
+    this.setState({remark: remark});
+  }
+
   submitOrder() {
     let items = this.state.checkItems;
     let unSetSuppiler = _.find(items, function (item) {
@@ -170,7 +183,7 @@ class InvoicingShippingDetailScene extends PureComponent {
     let token = global['accessToken'];
     this.saveSupplier(function (ok, reason) {
       if (ok) {
-        dispatch(createSupplyOrder(reqId, token, function (ok, reason) {
+        dispatch(createSupplyOrder(reqId, remark, token, function (ok, reason) {
           self.setState({loading: false});
           if (ok) {
             navigation.navigate(Conf.ROUTE_INVOICING, {refresh: true, initPage: 2});
@@ -192,9 +205,16 @@ class InvoicingShippingDetailScene extends PureComponent {
     let checkItems = _.filter(this.state.checkItems, function (o) {
       return o['sId'] == 0 || o['sId'] == checkSupplierId;
     });
+    let cRemark = this.state.remark[checkSupplierId];
     return (
       <View style={{flex: 1}}>
-        <Text style={styles.header_text}>{req['remark']}</Text>
+        <TextInput
+          style={styles.header_text}
+          onChangeText={(text) => this.setSupplierRemark(text, checkSupplierId)}
+          value={cRemark}
+          placeholderTextColor={colors.fontGray}
+          placeholder={'请输入对应供应商订货单备注'}
+        />
         <View style={{flexDirection: 'row'}}>
           <ScrollView style={styles.left_list}>
             {this.renderSuppliers()}
@@ -210,7 +230,8 @@ class InvoicingShippingDetailScene extends PureComponent {
                 marginLeft: 0,
                 paddingLeft: 0,
                 backgroundColor: "#fff",
-                marginTop: 0
+                marginTop: 0,
+                borderTopWidth: 0.5
               }}
             />
           </ScrollView>
@@ -249,7 +270,7 @@ const styles = {
     textAlignVertical: 'center',
     paddingHorizontal: pxToDp(30),
     borderBottomColor: colors.fontBlack,
-    borderBottomWidth: pxToDp(1),
+    borderBottomWidth: 0,
   },
   left_list: {
     width: '30%',

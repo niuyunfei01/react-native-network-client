@@ -80,8 +80,9 @@ class InvoicingGatherDetailScene extends PureComponent {
     dispatch(editUnlockedReq(reqData['id'], text));
   }
 
-  handleChangeUnitType(value, selectedItem, id) {
-    this.doUpdateItems('unit_type', selectedItem['id'], id);
+  handleChangeUnitType(value, id) {
+    this.doUpdateItems('unit_type', value['id'], id);
+    this.refs.skuUnitType.hide()
   }
 
   handleChangeItemReqCount(val, id) {
@@ -96,6 +97,11 @@ class InvoicingGatherDetailScene extends PureComponent {
     const {dispatch, global, navigation} = this.props;
     let reqData = this.state.reqData;
     let token = global['accessToken'];
+    let remark = reqData['remark'];
+    if (!remark) {
+      ToastLong("请输入备注信息!");
+      return false;
+    }
     dispatch(lockProvideReq(reqData, token, function (ok, desc) {
       if (ok) {
         //redirect to ship order
@@ -214,7 +220,7 @@ class InvoicingGatherDetailScene extends PureComponent {
           innersHeight={160}
           ref="skuUnitType"
           titles={'请选择单位'}
-          valueChange={(item, index, dialogKey) => this.handleChangeUnitType.bind(this)}
+          valueChange={(item, index, dialogKey) => this.handleChangeUnitType(item, dialogKey)}
           datas={SkuUnitSelect}
           animateType={'fade'}
         />

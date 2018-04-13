@@ -166,14 +166,15 @@ export function setReqItemSupplier(items, reqId, token, callback) {
   }
 }
 
-export function createSupplyOrder(reqId, token, callback) {
+export function createSupplyOrder(reqId, remark, token, callback) {
   return dispatch => {
     const url = `InventoryApi/create_supply_order?access_token=${token}`;
+    let data = {req_id: reqId, remark: remark};
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
         let {ok, reason, obj} = resp;
-        dispatch(afterUpdateSupplyOrder(ok, reqId))
+        dispatch(afterCreateSupplyOrder(ok, reqId))
         callback(ok, reason)
       }).catch(e => {
     }).finally(() => {
