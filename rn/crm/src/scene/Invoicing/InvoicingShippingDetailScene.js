@@ -181,6 +181,7 @@ class InvoicingShippingDetailScene extends Component {
     const {dispatch, global, navigation} = this.props;
     let reqId = this.state.req.id;
     let token = global['accessToken'];
+    let remark = this.state.remark;
     this.saveSupplier(function (ok, reason) {
       if (ok) {
         dispatch(createSupplyOrder(reqId, remark, token, function (ok, reason) {
