@@ -20,13 +20,15 @@ const {
   AFTER_DELETE_SUPPLY_ORDER_ITEM,
   AFTER_TRANSFER_ORDER_ITEM,
   AFTER_APPEND_SUPPLY_ORDER,
-  REMOVE_SUPPLY_ORDER
+  REMOVE_SUPPLY_ORDER,
+  LIST_ALL_STORES
 } = require('./ActionTypes.js').default;
 
 const initialState = {
   unlockedList: [],
   lockedList: [],
   suppliers: [],
+  stores: [],
   waitReceiveSupplyOrder: [],
   receivedSupplyOrder: [],
   confirmedSupplyOrder: [],
@@ -57,6 +59,10 @@ export default function invoicing(state = initialState, action) {
       return {
         ...state, suppliers: extractSuppliers(state, action)
       };
+    case LIST_ALL_STORES:
+      return {
+        ...state, stores: extractStores(state, action)
+      }
     case AFTER_CREATE_SUPPLY_ORDER:
       return state;
     case AFTER_SET_REQ_SUPPLIER:
@@ -100,7 +106,6 @@ function afterDeleteOrderItem(state, action) {
 }
 
 function removeSupplyOrder(state, action) {
-  console.log(action);
   return updateListData(state, action, doRemoveSupplyOrder);
 }
 
@@ -114,11 +119,11 @@ function updateListData(state, action, handler) {
       return {waitReceiveSupplyOrder: handler(state.waitReceiveSupplyOrder, data, storeId)};
       break;
     case Constant.INVOICING.STATUS_CONFIRMED:
-      return {receivedSupplyOrder: handler(state.receivedSupplyOrder, data, storeId)};
+      return {receivedSupplyOrder: handler(state.confirmedSupplyOrder, data, storeId)};
       return state;
       break;
     case Constant.INVOICING.STATUS_ARRIVED:
-      return {confirmedSupplyOrder: handler(state.confirmedSupplyOrder, data, storeId)};
+      return {confirmedSupplyOrder: handler(state.receivedSupplyOrder, data, storeId)};
       return state;
       break;
   }
@@ -166,7 +171,6 @@ function doMergeSupplyOrderList(list, data, storeId) {
 
 function doDeleteSupplyOrderItem(list, data, storeId) {
   let copy = [];
-  console.log(list, data, storeId)
   list.forEach(function (item) {
     if (item['store_id'] == storeId) {
       let dataList = item['data'];
@@ -241,6 +245,11 @@ function extractBalancedOrder(state, action) {
 function extractSuppliers(state, action) {
   state.suppliers = action.suppliers;
   return state.suppliers;
+}
+
+function extractStores(state, action) {
+  state.stores = action.stores;
+  return state.stores;
 }
 
 function extractUnlockedList(state, action) {

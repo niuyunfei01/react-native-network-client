@@ -119,9 +119,8 @@ class InvoicingShippingScene extends PureComponent {
             tintColor='gray'
           />
         }>
-          <Cells>
-            {reqList.length > 0 ? reqList : <EmptyListView/>}
-          </Cells>
+          {reqList.length > 0 ? <Cells>
+            reqList</Cells> : <EmptyListView/>}
         </ScrollView>
       </View>
     )

@@ -22,7 +22,8 @@ const {
   AFTER_DELETE_SUPPLY_ORDER_ITEM,
   AFTER_TRANSFER_ORDER_ITEM,
   AFTER_APPEND_SUPPLY_ORDER,
-  REMOVE_SUPPLY_ORDER
+  REMOVE_SUPPLY_ORDER,
+  LIST_ALL_STORES
 } = require('./ActionTypes.js').default;
 
 export function fetchUnlocked(store_id, token, callback) {
@@ -35,7 +36,6 @@ export function fetchUnlocked(store_id, token, callback) {
         if (ok) {
           dispatch(receiveUnlockedReq(obj))
         } else {
-          ToastLong(reason);
           dispatch(receiveUnlockedReq([]))
         }
         callback();
@@ -53,7 +53,6 @@ export function fetchLocked(store_id, token, callback) {
         if (ok) {
           dispatch(receiveLockedReq(obj))
         } else {
-          ToastLong(reason);
           dispatch(receiveLockedReq([]))
         }
         callback(ok, reason)
@@ -93,6 +92,22 @@ export function loadAllSuppliers(token) {
           dispatch(receiveSuppliers(obj))
         } else {
           dispatch(receiveSuppliers([]))
+        }
+      })
+  }
+}
+
+export function loadAllStores(token) {
+  return dispatch => {
+    const url = `InventoryApi/list_stores?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj} = resp;
+        if (ok) {
+          dispatch(receiveStores(obj))
+        } else {
+          dispatch(receiveStores([]))
         }
       })
   }
@@ -182,7 +197,6 @@ export function updateSupplyOrder(token, status, storeId, data, callback, errHan
       })
       .finally(() => {
       })
-
   }
 }
 
@@ -428,6 +442,13 @@ function receiveSuppliers(suppliers) {
   return {
     type: LIST_ALL_SUPPLIERS,
     suppliers: suppliers
+  }
+}
+
+function receiveStores(stores) {
+  return {
+    type: LIST_ALL_STORES,
+    stores: stores
   }
 }
 

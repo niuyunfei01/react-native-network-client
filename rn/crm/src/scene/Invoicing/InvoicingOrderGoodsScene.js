@@ -20,6 +20,7 @@ import Input from "../../weui/Form/Input"
 import CallBtn from "./CallBtn"
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import {padNum} from "../../util/common"
 import * as globalActions from '../../reducers/global/globalActions';
 import {
   deleteSupplyOrderItem,
@@ -74,22 +75,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const SkuUnitSelect = [
-  {label: '斤', value: '0'},
-  {label: '份', value: '1'},
-];
-
-const SkuUnitMap = {
-  '0': '斤',
-  '1': '份'
-};
-
-function padNum(num, size) {
-  var s = num + "";
-  while (s.length < size) s = "0" + s;
-  return s;
-}
-
 function initDate(date) {
   if (date) {
     return new Date(date.replace(/-/g, "/"))
@@ -110,7 +95,7 @@ class InvoicingOrderGoodsScene extends Component {
     super(props);
     this.state = {
       isRefreshing: false,
-      filterStatus: 0,
+      filterStatus: Constant.INVOICING.STATUS_CREATED,
       showDatePicker: false,
       consigneeDate: null,
       opVisible: false,
@@ -150,6 +135,7 @@ class InvoicingOrderGoodsScene extends Component {
     this.trashSupplyOrder = this.trashSupplyOrder.bind(this)
     this.confirmReceivedOrder = this.confirmReceivedOrder.bind(this)
     this.getGoodsTotalFee = this.getGoodsTotalFee.bind(this)
+    this.getStoreTotalFee = this.getStoreTotalFee.bind(this)
     this.reviewOrder = this.reviewOrder.bind(this)
     this.balanceOrder = this.balanceOrder.bind(this)
     this.commonHandleProxy = this.commonHandleProxy.bind(this)
@@ -506,6 +492,26 @@ class InvoicingOrderGoodsScene extends Component {
     return numeral(totalFee).format('0.00')
   }
 
+  getStoreTotalFee(storeId) {
+    let totalFee = 0;
+    const {invoicing} = this.props;
+    let {confirmedSupplyOrder} = invoicing;
+    _.forEach(confirmedSupplyOrder, function (item) {
+      let sId = item['store_id'];
+      if (sId == storeId) {
+        let orders = item['data'];
+        _.forEach(orders, function (item) {
+          let reqItems = item['req_items'];
+          _.forEach(reqItems, function (reqItem) {
+            totalFee += reqItem['req_amount'] * reqItem['unit_price'];
+          })
+        });
+        return false;
+      }
+    });
+    return numeral(totalFee).format('0.00');
+  }
+
   /**
    * 控制状态的显示与否
    **/
@@ -580,7 +586,7 @@ class InvoicingOrderGoodsScene extends Component {
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           <Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>
-          <Text style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{SkuUnitMap[item['unit_type']]}</Text>
+          <Text style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
           <Text style={getGoodItemTextStyle()}>{item['unit_price']}</Text>
           <Text style={getGoodItemTextStyle()}>{item['total_cost']}</Text>
         </CellBody>
@@ -631,7 +637,7 @@ class InvoicingOrderGoodsScene extends Component {
           <Cell customStyle={list.init_cell} access={true} onPress={() => {
             if (status = Constant.INVOICING.STATUS_CREATED) {
               self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])
-            }else{
+            } else {
               return false;
             }
           }}>
@@ -670,7 +676,7 @@ class InvoicingOrderGoodsScene extends Component {
               </CellFooter>
             </Cell>
 
-            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
+            <Cells style={{borderTopWidth: 0.5, borderBottomWidth: 0}}>
               {self.renderGoodList(val['req_items'], orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['editAble'], val['consignee_store_id'])}
             </Cells>
 
@@ -701,7 +707,7 @@ class InvoicingOrderGoodsScene extends Component {
             <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单</Text>
           </Text>
           {status == Constant.INVOICING.STATUS_CONFIRMED ?
-            <Text style={[font.font24, font.fontRed]}>待结算金额: ￥95.75</Text> : null}
+            <Text style={[font.font24, font.fontRed]}>待结算金额: ￥{this.getStoreTotalFee(data['store_id'])}</Text> : null}
         </View>
         <View style={{flexDirection: 'row', width: pxToDp(220), alignItems: 'center'}}>
           {status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{
@@ -909,11 +915,27 @@ class InvoicingOrderGoodsScene extends Component {
           />
         </CellBody>
       </Cell>
+      <Cell style={customStyles.formCellStyle}>
+        <CellHeader><Label style={font.font24}>单价</Label></CellHeader>
+        <CellBody>
+          <Input
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="订货单价"
+            value={currentEditItem['unit_price']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['unit_price'] = val;
+              this.setState({currentEditItem: currentEditItem});
+            }}
+          />
+        </CellBody>
+      </Cell>
       <CellsTitle>订货单位</CellsTitle>
       <RadioCells
         cellStyle={customStyles.radioCellsStyle}
         cellTextStyle={font.font24}
-        options={SkuUnitSelect}
+        options={Constant.INVOICING.SkuUnitSelect}
         onChange={(val) => {
           let currentEditItem = self.state.currentEditItem;
           currentEditItem['unit_type'] = val;

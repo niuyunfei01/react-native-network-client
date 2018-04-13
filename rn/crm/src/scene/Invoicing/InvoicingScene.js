@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import {NavigationItem} from '../../widget'
 import {View,} from 'react-native'
 import pxToDp from "../../util/pxToDp";
+import native from "../../common/native"
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -35,8 +36,7 @@ class InvoicingScene extends PureComponent {
       <NavigationItem
         iconStyle={{width: pxToDp(45), height: pxToDp(45)}}
         icon={require('../../img/Invoicing/kucun.png')}
-        onPress={() => {
-        }}
+        onPress={() => {native.toGoods()}}
       />
     </View>),
   });
