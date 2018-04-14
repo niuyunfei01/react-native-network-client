@@ -37,6 +37,9 @@ import { ToastLong } from "../../util/ToastUtils";
 import { NavigationActions } from "react-navigation";
 import { Toast, Dialog, Icon, Button } from "../../weui/index";
 
+//组件
+import { Left, Adv } from "../component/All";
+
 function mapStateToProps(state) {
   const { mine, product, global } = state;
   return { mine: mine, product: product, global: global };
@@ -56,13 +59,13 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-class GoodsWorkNewProductScene extends PureComponent {
+class NewProduct extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     let { type, backPage } = params;
 
     return {
-      headerTitle: "我要上新",
+      headerTitle: "新增商品",
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
@@ -188,7 +191,7 @@ class GoodsWorkNewProductScene extends PureComponent {
       return false;
     }
   }
-
+  //打开相册的图片并上传呀
   pickSingleImg() {
     ImagePicker.openPicker({
       width: 500,
@@ -202,13 +205,14 @@ class GoodsWorkNewProductScene extends PureComponent {
       includeExif: true
     })
       .then(image => {
-        let image_path = image.path;
+        let image_path = image.path; //理解为图片的路径
         let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
+        let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
         let image_info = {
           uri: image_path,
           name: image_name
         };
+        console.log("上传图片:%o,上传的图片信息:%o", image, image_info);
         this.uploadImg(image_info);
       })
       .catch(e => {
@@ -219,9 +223,8 @@ class GoodsWorkNewProductScene extends PureComponent {
   uploadImg(image_info) {
     const { dispatch } = this.props;
     let { isUploadImg, list_img, upload_files } = this.state;
-    if (isUploadImg) {
-      return false;
-    }
+    //判断为正在上传
+    if (isUploadImg) return false;
     this.setState({ isUploadImg: true });
     dispatch(
       uploadImg(
@@ -231,7 +234,7 @@ class GoodsWorkNewProductScene extends PureComponent {
             let { name, uri } = image_info;
             let { file_id, fspath } = resp.obj;
             list_img[file_id] = {
-              url: Config.staticUrl(fspath),
+              url: Config.staticUrl(fspath), //配置一下url
               name: name
             };
             upload_files.push({ id: file_id, name: name });
@@ -266,100 +269,156 @@ class GoodsWorkNewProductScene extends PureComponent {
         >
           <Text style={{ color: colors.white }}>保存</Text>
         </Button>
-        <Button
-          style={[
-            styles.save_btn,
-            {
-              backgroundColor: colors.back_color,
-              borderColor: colors.main_color
-            }
-          ]}
-          onPress={() => {
-            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-              type: "add"
-            });
-          }}
-        >
-          <Text style={{ color: colors.main_color }}>直接上新</Text>
-        </Button>
+        {
+          //    <Button
+          //    style={[
+          //      styles.save_btn,
+          //      {
+          //        backgroundColor: colors.back_color,
+          //        borderColor: colors.main_color
+          //      }
+          //    ]}
+          //    onPress={() => {
+          //      this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+          //        type: "add"
+          //      });
+          //    }}
+          //  >
+          //    <Text style={{ color: colors.main_color }}>直接上新</Text>
+          //  </Button>
+        }
       </View>
     );
   }
 
   render() {
+    console.log("图片列表呀:%o", this.state.list_img);
     return (
-      <ScrollView
-        style={{
-          flex: 1,
-          paddingVertical: 36,
-          paddingHorizontal: 18
-        }}
-      >
-        {/*创建和搜索*/}
-        <Search
-          bgc="#559ae7"
-          title="扫码创建"
-          image={require(`../../img/new/scan.png`)}
-          onPress={() => {
-            native.gotoNativeActivity(
-              "cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity",
-              false
+      <ScrollView>
+        <Left
+          title="商品名称"
+          placeholder="输入商品名(不超过20个字)"
+          maxLength={20}
+          value={this.state.goods_name}
+          onChangeText={text => this.setState({ goods_name: text })}
+        />
+        <Left
+          title="价格描述"
+          placeholder="如1.25元每斤或每瓶3元"
+          value={`${this.state.price_desc}`}
+          onChangeText={text => this.setState({ price_desc: text })}
+        />
+        <Adv
+          title={"商品介绍"}
+          right={`${this.state.slogan.length} / 50`}
+          onChangeText={text => this.setState({ slogan: text })}
+          placeholder={"请输入商品介绍"}
+          value={this.state.slogan}
+          maxLength={50}
+        />
+        {/*上传图片*/}
+        <View style={[styles.area_cell, styles.add_img_wrapper]}>
+          {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            let img_url = img_data["url"];
+            let img_name = img_data["name"];
+            console.log("img_data:%o,img_id:%o", img_data, img_id);
+            return (
+              <View
+                key={img_id}
+                style={{
+                  height: pxToDp(170),
+                  width: pxToDp(170),
+                  flexDirection: "row",
+                  alignItems: "flex-end"
+                }}
+              >
+                <Image style={styles.img_add} source={{ uri: img_url }} />
+                <TouchableOpacity
+                  style={{
+                    position: "absolute",
+                    right: pxToDp(4),
+                    top: pxToDp(4)
+                  }}
+                  onPress={() => {
+                    delete this.state.list_img[img_id];
+                    delete this.state.upload_files[img_id];
+                    this.forceUpdate();
+                  }}
+                >
+                  <Icon
+                    name={"clear"}
+                    size={pxToDp(40)}
+                    style={{ backgroundColor: "#fff" }}
+                    color={"#d81e06"}
+                    msg={false}
+                  />
+                </TouchableOpacity>
+              </View>
             );
-          }}
-        />
-        <Search
-          bgc="#ff648d"
-          mgt={27}
-          title="搜索上传"
-          image={require(`../../img/new/search.png`)}
-          onPress={() => {
-            this.props.navigation.navigate("SearchGoods");
-          }}
-        />
-      </ScrollView>
-    );
-  }
-}
-
-class Search extends PureComponent {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    const { bgc, title, mgt, image, onPress } = this.props;
-    return (
-      <TouchableOpacity onPress={onPress}>
-        <View
-          style={{
-            paddingVertical: 25,
-            width: "100%",
-            justifyContent: "center",
-            backgroundColor: "white",
-            alignItems: "center",
-            borderRadius: 10,
-            marginTop: mgt
-          }}
-        >
+          })}
           <View
             style={{
-              width: 80,
-              height: 80,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 40,
-              backgroundColor: bgc
+              height: pxToDp(170),
+              width: pxToDp(170),
+              flexDirection: "row",
+              alignItems: "flex-end"
             }}
           >
-            <Image source={image} style={{ width: 40, height: 40 }} />
-          </View>
-
-          <View>
-            <Text style={{ color: "#3e3e3e", fontSize: 17, marginTop: 10 }}>
-              {title}
-            </Text>
+            <TouchableOpacity
+              style={[styles.img_add, styles.img_add_box, { flexWrap: "wrap" }]}
+              onPress={() => this.pickSingleImg()}
+            >
+              <Text style={{ fontSize: pxToDp(36), color: "#bfbfbf" }}>+</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </TouchableOpacity>
+        {this.renderBtn()}
+
+        <Toast icon="loading" show={this.state.isUploadImg}>
+          图片上传中...
+        </Toast>
+        <Toast
+          icon="loading"
+          show={this.state.uploading}
+          onRequestClose={() => {}}
+        >
+          提交中
+        </Toast>
+        <Dialog
+          onRequestClose={() => {}}
+          visible={this.state.dialogStatus}
+          buttons={[
+            {
+              type: "default",
+              label: "知道了",
+              onPress: () => {
+                this.setState({
+                  goods_name: "",
+                  price_desc: "",
+                  slogan: "",
+                  list_img: {},
+                  upload_files: {},
+                  dialogStatus: false
+                });
+              }
+            }
+          ]}
+        >
+          <Text
+            style={{
+              width: "100%",
+              textAlign: "center",
+              fontSize: pxToDp(30),
+              color: colors.color333
+            }}
+          >
+            提交成功
+          </Text>
+          <Text style={{ width: "100%", textAlign: "center" }}>
+            门店经理会在三个小时内完成上新操作请耐心等候
+          </Text>
+        </Dialog>
+      </ScrollView>
     );
   }
 }
@@ -438,149 +497,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  GoodsWorkNewProductScene
-);
-
-{
-  /* <ScrollView>
-<View>
-  <Cells style={styles.my_cells}>
-    <Cell customStyle={[styles.my_cell]}>
-      <CellHeader style={styles.attr_name}>
-        <Label style={[styles.cell_label]}>商品名称</Label>
-      </CellHeader>
-      <CellBody>
-        <TextInput
-            placeholder='输入商品名(不超过20个字)'
-            underlineColorAndroid='transparent'
-            maxLength={20}
-            style={[styles.input_text]}
-            value={this.state.goods_name}
-            onChangeText={(text) => {
-              this.setState({goods_name: text})
-            }}
-        />
-      </CellBody>
-    </Cell>
-
-    <Cell customStyle={[styles.my_cell]}>
-      <CellHeader style={styles.attr_name}>
-        <Label style={[styles.cell_label]}>价格描述</Label>
-      </CellHeader>
-      <CellBody>
-        <TextInput
-            placeholder='如1.25元每斤或每瓶3元'
-            underlineColorAndroid='transparent'
-            style={[styles.input_text]}
-            value={`${this.state.price_desc}`}
-            onChangeText={(text) => {
-              this.setState({price_desc: text})
-            }}
-        />
-      </CellBody>
-      <CellFooter/>
-    </Cell>
-
-    <View style={[styles.area_cell, {height: pxToDp(250)}]}>
-      <View>
-        <Text style={[styles.area_input_title]}>商品介绍</Text>
-      </View>
-      <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
-        <TextInput
-            multiline={true}
-            underlineColorAndroid='transparent'
-            placeholder='请输入商品介绍'
-            style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
-            value={this.state.slogan}
-            onChangeText={(text) => {
-              this.setState({slogan: text})
-            }}
-        />
-        <Text style={{alignSelf: 'flex-end'}}>{this.state.slogan.length}/50</Text>
-      </View>
-    </View>
-  </Cells>
-</View>
-<View style={[styles.area_cell, styles.add_img_wrapper]}>
-  {tool.objectMap(this.state.list_img, (img_data, img_id) => {
-    let img_url = img_data['url'];
-    let img_name = img_data['name'];
-    return (
-        <View key={img_id}
-              style={{height: pxToDp(170), width: pxToDp(170), flexDirection: 'row', alignItems: 'flex-end'}}>
-          <Image
-              style={styles.img_add}
-              source={{uri: img_url}}
-          />
-          <TouchableOpacity
-              style={{position: 'absolute', right: pxToDp(4), top: pxToDp(4)}}
-              onPress={() => {
-                delete  this.state.list_img[img_id]
-                delete  this.state.upload_files[img_id]
-                this.forceUpdate()
-              }}
-          >
-            <Icon
-                name={'clear'}
-                size={pxToDp(40)}
-                style={{backgroundColor: '#fff'}}
-                color={'#d81e06'}
-                msg={false}
-            />
-          </TouchableOpacity>
-        </View>
-    );
-  })}
-  <View style={{
-    height: pxToDp(170),
-    width: pxToDp(170),
-    flexDirection: 'row',
-    alignItems: 'flex-end'
-  }}>
-    <TouchableOpacity
-        style={[styles.img_add, styles.img_add_box, {flexWrap: 'wrap'}]}
-        onPress={() => this.pickSingleImg()}
-    >
-      <Text style={{fontSize: pxToDp(36), color: '#bfbfbf'}}>+</Text>
-    </TouchableOpacity>
-  </View>
-</View>
-{
-  this.renderBtn()
-}
-
-<Toast
-    icon="loading"
-    show={this.state.isUploadImg}
->图片上传中...</Toast>
-<Toast
-    icon="loading"
-    show={this.state.uploading}
-    onRequestClose={() => {
-    }}
->提交中</Toast>
-<Dialog onRequestClose={() => {
-}}
-        visible={this.state.dialogStatus}
-        buttons={[{
-          type: 'default',
-          label: '知道了',
-          onPress: () => {
-            this.setState({
-              goods_name: '',
-              price_desc: '',
-              slogan: '',
-              list_img: {},
-              upload_files: {},
-              dialogStatus: false
-            })
-
-          }
-        }]}
->
-  <Text style={{width: '100%', textAlign: 'center', fontSize: pxToDp(30), color: colors.color333}}>提交成功</Text>
-  <Text style={{width: '100%', textAlign: 'center'}}>门店经理会在三个小时内完成上新操作请耐心等候</Text>
-</Dialog>
-</ScrollView> */
-}
+export default connect(mapStateToProps, mapDispatchToProps)(NewProduct);

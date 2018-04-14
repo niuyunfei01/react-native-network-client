@@ -1,51 +1,54 @@
-'use strict';
-import AppConfig from '../config.js'
+"use strict";
+import AppConfig from "../config.js";
 
 export default {
   timeout(ms, promise) {
-    return new Promise(function (resolve, reject) {
-      const timer = setTimeout(function () {
-        reject(new Error('请求超时，请重新尝试'))
+    return new Promise(function(resolve, reject) {
+      const timer = setTimeout(function() {
+        reject(new Error("请求超时，请重新尝试"));
       }, ms);
       promise.then(
-        (res) => {
+        res => {
           clearTimeout(timer);
           resolve(res);
         },
-        (err) => {
+        err => {
           clearTimeout(timer);
           reject(err);
         }
       );
-    })
+    });
   },
-
+  //post数据
   post(action, formData) {
+    //action为url
     const url = AppConfig.apiUrl(action);
-    console.log('post: ' + url);
+    console.log("post: " + url);
     return fetch(url, {
-      credential: 'include',//带上cookie发送请求请求
-      method: 'POST',
+      credential: "include", //带上cookie发送请求请求
+      method: "POST",
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data"
       },
       body: formData
     });
   },
-  
+
   postForm(action, object) {
     const url = AppConfig.apiUrl(action);
 
     let parameters = Object.keys(object) // expand the elements from the .entries() iterator into an actual array
-      .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(object[key]))
-      .join('&');// transform the elements into encoded key-value-pairs
+      .map(
+        key => encodeURIComponent(key) + "=" + encodeURIComponent(object[key])
+      )
+      .join("&"); // transform the elements into encoded key-value-pairs
 
-    console.log('postForm: ' + url, parameters);
+    console.log("postForm: " + url, parameters);
     return fetch(url, {
-      credential: 'include',//带上cookie发送请求请求
-      method: 'POST',
+      credential: "include", //带上cookie发送请求请求
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded"
       },
       body: parameters
     });
@@ -54,25 +57,25 @@ export default {
   postJSON(action, data) {
     const url = AppConfig.apiUrl(action);
 
-    console.log('postJSON: ' + url);
+    console.log("postJSON: " + url);
     return fetch(url, {
-      credential: 'include',
-      method: 'POST',
+      credential: "include",
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(data)
-    })
+    });
   },
 
-  get(action, paras = '') {
-    let url = AppConfig.apiUrl(action + (paras === '' ? '' : '?' + paras));
+  get(action, paras = "") {
+    let url = AppConfig.apiUrl(action + (paras === "" ? "" : "?" + paras));
 
-    console.log('get: ', url);
+    console.log("get: ", url);
     return fetch(url, {
-      credential: 'include',//带上cookie发送请求请求
-      method: 'GET'
+      credential: "include", //带上cookie发送请求请求
+      method: "GET"
     });
   }
 };

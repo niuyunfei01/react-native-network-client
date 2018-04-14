@@ -133,6 +133,9 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sound')
+    compile project(':react-native-ble-manager')
+    compile project(':react-native-barcodescanner')
     compile project(':react-native-image-crop-picker')
     compile project(':react-native-vector-icons')
     compile project(':react-native-i18n')

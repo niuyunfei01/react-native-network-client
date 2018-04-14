@@ -8,23 +8,32 @@
 
 //import liraries
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Image,Dimensions} from 'react-native'
 
+var {height,width}=Dimensions.get('window')
 // create a component
 class NavigationItem extends PureComponent {
   render() {
 
-    const {icon, iconStyle, title, titleStyle, containerStyle, onPress, ...others} = this.props;
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others,} = this.props;
     let _icon = this.props.icon &&
       <Image style={[styles.icon, iconStyle]} source={icon}/>
 
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
-      <TouchableOpacity style={[styles.container, containerStyle]} onPress={onPress} {...others}>
+     <View style={{flexDirection:'row',width:width,alignItems:'center'}}>
+        <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
         {_icon}
         {_title}
       </TouchableOpacity>
+      {
+        children?
+        <View style={{flex:1,marginLeft:20,}}>{children}</View>
+        :
+        null
+      }
+     </View>
     );
   }
 }

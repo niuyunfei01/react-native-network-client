@@ -805,10 +805,10 @@ public class GlobalCtx extends Application {
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
-
+    //扫描二维码之后跳转到指定界面
     public void toGoodScanSearch(Activity ctx, List<ProductTpl> products) {
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "GoodsScanSearch");
+        i.putExtra("_action", "SearchGoods");
         Bundle params = new Bundle();
         Gson gson = new Gson();
         String productJson = gson.toJson(products);
