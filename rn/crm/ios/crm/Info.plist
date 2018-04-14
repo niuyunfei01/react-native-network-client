@@ -38,8 +38,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>需要相册</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>需要蓝牙</string>
+	<key>NSCameraUsageDescription</key>
+	<string>需要相机</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>

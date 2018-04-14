@@ -84,10 +84,14 @@ import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
 import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
 import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
+import NewProduct from "../scene/Goods/NewProduct";
 
 //扫码创新
 import CreateScan from "../scene/Goods/CreateScan";
 import SearchGoods from "../scene/Goods/SearchGoods";
+
+//新产品详情
+import NewProductDetail from "../scene/Goods/NewProductDetail";
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -309,7 +313,9 @@ class Navigator extends Component {
         [Config.ROUTE_JD_AUDIT_DELIVERY]: { screen: JdAuditDeliveryScene },
         [Config.ROUTE_GOODS_SCAN_SEARCH]: { screen: GoodsScanSearchScene },
         CreateScan: { screen: CreateScan },
-        SearchGoods: { screen: SearchGoods }
+        SearchGoods: { screen: SearchGoods },
+        NewProduct: { screen: NewProduct },
+        NewProductDetail: { screen: NewProductDetail }
       },
       stackNavigatorConfigs
     );

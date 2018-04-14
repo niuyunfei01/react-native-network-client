@@ -3,6 +3,9 @@ package com.crm;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.zmxv.RNSound.RNSoundPackage;
+import it.innove.BleManagerPackage;
+import com.eguma.barcodescanner.BarcodeScannerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.i18n.reactnativei18n.ReactNativeI18n;
@@ -28,6 +31,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSoundPackage(),
+            new BleManagerPackage(),
+            new BarcodeScannerPackage(),
             new PickerPackage(),
             new VectorIconsPackage(),
             new ReactNativeI18n(),
