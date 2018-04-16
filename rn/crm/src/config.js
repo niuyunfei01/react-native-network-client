@@ -1,9 +1,17 @@
 'use strict';
+import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
+import OperateProfitScene from "./scene/OperateProfit/OperateProfitScene";
+import OperateIncomeDetailScene from "./scene/OperateProfit/OperateIncomeDetailScene";
+import OperateExpendDetailScene from "./scene/OperateProfit/OperateExpendDetailScene";
+import GoodsPriceDetailsScene from "./scene/Goods/GoodsPriceDetailsScene";
+import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
+import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
+import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
+import ActivityManageScene from "./scene/Activity/ActivityManageScene";
+import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
+import ActivityListScene from "./scene/Activity/ActivityListScene";
 
-
-const {
-  HOST_UPDATED,
-} = require('./common/constants').default
+const { HOST_UPDATED } = require("./common/constants").default;
 
 /**
  * if none in global, return the default host and try to update from settings into global
@@ -17,9 +25,9 @@ export function host(globalRed, dispatch, native) {
   if (globalRed.host) {
     return globalRed.host;
   } else {
-    native.host((host) => {
+    native.host(host => {
       if (host) {
-        dispatch({type: HOST_UPDATED, host: host});
+        dispatch({ type: HOST_UPDATED, host: host });
       }
     });
 
@@ -28,14 +36,15 @@ export function host(globalRed, dispatch, native) {
 }
 
 export function apiUrl(path) {
-  const hp = (global.hostPort ? global.hostPort : C.defaultHost);
+  const hp = global.hostPort ? global.hostPort : C.defaultHost;
   return `https://${hp}/${path}`;
 }
 
 export function staticUrl(path) {
-  const hp = (global.hostPort ? global.hostPort : C.defaultHost);
-  path = path[0] === '/' ? path.substr(1) : path;
-  return `https://${hp}/${path}`;
+  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  let isHttps = path.indexOf("http");
+  let newPath = path[0] === "/" ? path.substr(1) : path;
+  return isHttps === -1 ? `https://${hp}/${newPath}` : path;
 }
 
 /**
@@ -45,9 +54,9 @@ export function staticUrl(path) {
  * @returns {string}
  */
 export function serverUrl(path, useHttps = true) {
-  const proto = useHttps ? 'https' : 'http';
-  const hp = (global.hostPort ? global.hostPort : C.defaultHost);
-  path = path[0] === '/' ? path.substr(1) : path;
+  const proto = useHttps ? "https" : "http";
+  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  path = path[0] === "/" ? path.substr(1) : path;
   return `${proto}://${hp}/${path}`;
 }
 
@@ -57,11 +66,11 @@ export function serverUrl(path, useHttps = true) {
 const C = {
   https: true,
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
-  defaultHost: 'www.cainiaoshicai.cn',
-  'AppName': 'Crm',
+  defaultHost: "www.cainiaoshicai.cn",
+  AppName: "Crm",
 
-  'DownloadUrl': `https://www.cainiaoshicai.cn/util/crm_dl`,
-  MAP_WAY_URL: 'util/amap_way',
+  DownloadUrl: `https://www.cainiaoshicai.cn/util/crm_dl`,
+  MAP_WAY_URL: "util/amap_way",
   FetchTimeout: 30000,
 
   GRANT_TYP_PASSWORD: "password",
@@ -69,7 +78,7 @@ const C = {
 
   ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
 
-  LOC_PICKER: 'loc_picker',
+  LOC_PICKER: "loc_picker",
 
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
@@ -141,14 +150,13 @@ const C = {
   ROUTE_INVOICING_GATHER_DETAIL:'InvoicingGatherDetail',
   ROUTE_INVOICING_SHIPPING_DETAIL:'InvoicingShippingDetail',
   ROUTE_INVOICING_SHIPPING_LIST: 'InvoicingShippingList',
-
   serverUrl,
   apiUrl,
   staticUrl,
   /**
    * @see host
    */
-  host,
+  host
 };
 
 export default C;
