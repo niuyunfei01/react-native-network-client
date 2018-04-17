@@ -804,9 +804,9 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let path = `/stores/provide_req_all.html${token}`;
-            let url = Config.serverUrl(path, Config.https);
-            this.onPress(Config.ROUTE_WEB, {url: url});
+            // let path = `/stores/provide_req_all.html${token}`;
+            // let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_INVOICING,{});
           }}
           activeOpacity={customerOpacity}
         >
