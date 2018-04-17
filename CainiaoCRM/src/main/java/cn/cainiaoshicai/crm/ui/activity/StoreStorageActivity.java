@@ -414,13 +414,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     private void setHeadToolBar() {
         boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
-        boolean isProfitControlled = currStore != null && currStore.getFn_profit_controlled() == PROFIT_CONTROLLER_YES;
         if (isPriceControlled) {
             this.btnReqList.setVisibility(View.INVISIBLE);
             this.btnEmptyList.setVisibility(View.INVISIBLE);
-            if(isProfitControlled){
-                this.btnApplyPriceList.setVisibility(View.VISIBLE);
-            }
+            this.btnApplyPriceList.setVisibility(View.VISIBLE);
             if (statusAdapter != null) {
                 statusAdapter.clear();
                 statusAdapter.addAll(StatusItem.STATUS_PRICE_CONTROLLED);
