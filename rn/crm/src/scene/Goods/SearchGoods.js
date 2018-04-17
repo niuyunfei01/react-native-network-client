@@ -96,7 +96,7 @@ class SearchGoods extends Component {
       isLoading: false,
       value: undefined
     };
-    this.text = undefined;
+    this.text = '';
     this.cooperation = true;
   }
 
@@ -126,6 +126,7 @@ class SearchGoods extends Component {
       );
     }
     this.fetchResources(storeId);
+    this.state = {storeId: storeId};
   }
 
   inputText = text => {
@@ -168,24 +169,19 @@ class SearchGoods extends Component {
     this.setState({
       isLoading: true
     });
-    console.log("url:%o", url);
     let url = "";
     if (!this.text) {
-      console.log("扫码进入", this.state.value);
       url = `api/query_product_by_upc.json?access_token=${
         this.props.global.accessToken
         }&upc=${this.state.value}`;
     } else {
-      console.log("搜索");
       url = `api/query_product_by_keyword.json?access_token=${
         this.props.global.accessToken
         }&keyword=${this.text}`;
     }
-
     http: getWithTpl(
       url,
       json => {
-        console.log("jsonixudfg:%o", json.obj);
         if (json.ok) {
           let path = Config.staticUrl(json.obj[0].coverimg);
           this.setState({
@@ -207,7 +203,6 @@ class SearchGoods extends Component {
   };
   //样式
   renderRow = ({item, index}) => {
-    console.log("item:%o", item);
     return (
       <TouchableOpacity
         key={item.id}
@@ -262,20 +257,19 @@ class SearchGoods extends Component {
 
   render() {
     console.disableYellowBox = true;
+    let storeId = this.state.store_id;
     return this.state.isLoading ? (
       <LoadingView/>
     ) : (
       <View style={{flex: 1}}>
         <View style={{flex: 1}}>
           {/*搜索商品列表*/}
-          {this.state.goods.length ? (
-            <View
-              style={{
-                paddingHorizontal: 18,
-                paddingVertical: 20,
-                backgroundColor: "#fff"
-              }}
-            >
+          {this.state.goods && this.state.goods.length ? (
+            <View style={{
+              paddingHorizontal: 18,
+              paddingVertical: 20,
+              backgroundColor: "#fff"
+            }}>
               <FlatList
                 showsVerticalScrollIndicator={false}
                 data={this.state.goods}
@@ -283,45 +277,32 @@ class SearchGoods extends Component {
                   this.ListView = list;
                 }}
                 initialNumToRender={this.state.goods.length}
-                renderItem={this.renderRow}
-              />
+                renderItem={this.renderRow}/>
             </View>
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Text style={[{}, Styles.tb]}>暂无数据</Text>
-            </View>
-          )}
+          ) : (<View style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}>
+            <Text style={[{}, Styles.tb]}>暂无数据</Text>
+          </View>)}
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            if (this.cooperation) {
-              this.props.navigation.navigate(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, {
-                type: "add"
-              });
-            }else{
-              this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                type: "add"
-              });
-            }
-          }}
-        >
+        <TouchableOpacity onPress={() => {
+          if (this.cooperation) {
+            this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId});
+          } else {
+            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: "add"});
+          }
+        }}>
           <View style={{paddingHorizontal: pxToDp(31), marginTop: 10}}>
-            <View
-              style={{
-                width: "100%",
-                height: 45,
-                backgroundColor: "#59b26a",
-                borderRadius: 7,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
+            <View style={{
+              width: "100%",
+              height: 45,
+              backgroundColor: "#59b26a",
+              borderRadius: 7,
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
               <Text style={{color: "#fff", fontSize: 20, textAlign: "center"}}>
                 手动添加
               </Text>

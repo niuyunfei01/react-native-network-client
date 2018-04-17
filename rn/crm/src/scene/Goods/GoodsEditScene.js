@@ -176,8 +176,6 @@ class GoodsEditScene extends PureComponent {
           }
         }
       }
-      console.log("mid_list_img>>>>", mid_list_img);
-      console.log("upload_files>>>>", upload_files);
       this.setState({
         name: name,
         sku_having_unit: sku_having_unit,

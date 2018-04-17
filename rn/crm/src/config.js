@@ -145,6 +145,7 @@ const C = {
   ROUTE_ACTIVITY_LIST:'ActivityList',
   ROUTE_JD_AUDIT_DELIVERY:'JdAuditDelivery',
   ROUTE_SCAN:'Scan',
+  ROUTE_CREATE_NEW_GOOD_REMIND: 'CreateApplyNewProductRemind',
   ROUTE_GOODS_SCAN_SEARCH:'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
