@@ -567,7 +567,7 @@ class MineScene extends PureComponent {
 
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
-    let {currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled} = this.state;
+    let {currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled, fnProfitControlled} = this.state;
     return (
       <View style={[block_styles.container]}>
         {fnPriceControlled > 0 ? <TouchableOpacity
