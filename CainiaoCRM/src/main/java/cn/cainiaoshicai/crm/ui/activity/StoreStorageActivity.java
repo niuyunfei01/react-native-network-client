@@ -323,7 +323,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         currStatusSpinner = titleBar.findViewById(R.id.spinner_curr_status);
         statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
         boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
-        boolean isProfitControlled = currStore !=null && currStore.getFn_profit_controlled() == PROFIT_CONTROLLER_YES;
 
         statusAdapter.addAll(isPriceControlled ? StatusItem.STATUS_PRICE_CONTROLLED : StatusItem.STATUS);
 
