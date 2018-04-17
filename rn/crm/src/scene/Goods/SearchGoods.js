@@ -11,7 +11,8 @@ import {Styles} from "../../themes";
 import {getWithTpl} from "../../util/common";
 //配置图片的路由
 import Config from "../../config";
-let data = [{ id: 1 }, { id: 2 }, { id: 2 }, { id: 2 }, { id: 2 }];
+
+let data = [{id: 1}, {id: 2}, {id: 2}, {id: 2}, {id: 2}];
 
 const mapStateToProps = state => {
   return {
@@ -21,13 +22,13 @@ const mapStateToProps = state => {
 
 const resetAction = NavigationActions.reset({
   index: 0,
-  actions: [NavigationActions.navigate({ routeName: "AllSearch" })]
+  actions: [NavigationActions.navigate({routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT})]
 });
 
 class SearchGoods extends Component {
   //导航
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
       headerLeft: (
         <NavigationItem
@@ -39,13 +40,7 @@ class SearchGoods extends Component {
             // marginTop: pxToDp(20)
           }}
           onPress={() => {
-            if (params && params.products) {
-              console.log("navition", navigation);
-              // return navigation.goBack("SearchGoods");
-              // navigation.dispatch(backAction);
-              return navigation.dispatch(resetAction);
-            }
-            navigation.goBack();
+            navigation.dispatch(resetAction)
           }}
           children={
             <View
@@ -56,9 +51,6 @@ class SearchGoods extends Component {
                 borderColor: "#59b26a",
                 borderWidth: 1,
                 flexDirection: "row",
-                // paddingHorizontal: 5,
-                // paddingVertical: 10,
-
                 alignItems: "center"
               }}
             >
@@ -75,13 +67,12 @@ class SearchGoods extends Component {
                 placeholder={"请输入搜索内容"}
                 underlineColorAndroid="transparent"
                 placeholderTextColor={"#bfbfbf"}
-                //onChangeText={text => (this.text = text)}
                 onChangeText={text => params.inputText(text)}
               />
               <TouchableOpacity onPress={() => params.search()}>
                 <Image
                   source={require("../../img/new/searchG.png")}
-                  style={{ width: 20, height: 20, marginRight: 5 }}
+                  style={{width: 20, height: 20, marginRight: 5}}
                 />
               </TouchableOpacity>
             </View>
@@ -90,6 +81,7 @@ class SearchGoods extends Component {
       )
     };
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -116,6 +108,7 @@ class SearchGoods extends Component {
     }
     this.fetchResources();
   }
+
   inputText = text => {
     console.log("text", text);
     this.text = text;
@@ -124,7 +117,7 @@ class SearchGoods extends Component {
   fetchResources = () => {
     let url = `api/get_store_type/${
       this.props.global.currStoreId
-    }?access_token=${this.props.global.accessToken}`;
+      }?access_token=${this.props.global.accessToken}`;
     http: getWithTpl(
       url,
       json => {
@@ -154,7 +147,7 @@ class SearchGoods extends Component {
     console.log("执行搜索");
     const url = `api/query_product_by_keyword.json?access_token=${
       this.props.global.accessToken
-    }&keyword=${this.text}`;
+      }&keyword=${this.text}`;
     console.log("url:%o", url);
     http: getWithTpl(
       url,
@@ -180,7 +173,7 @@ class SearchGoods extends Component {
     );
   };
   //样式
-  renderRow = ({ item, index }) => {
+  renderRow = ({item, index}) => {
     console.log("item:%o", item);
     return (
       <TouchableOpacity
@@ -192,7 +185,7 @@ class SearchGoods extends Component {
             price: item.price
           })
         }
-        style={{ marginTop: index === 0 ? 0 : 30, flexDirection: "row" }}
+        style={{marginTop: index === 0 ? 0 : 30, flexDirection: "row"}}
       >
         <View
           style={{
@@ -203,8 +196,8 @@ class SearchGoods extends Component {
           }}
         >
           <Image
-            source={{ uri: Config.staticUrl(item.coverimg) }}
-            style={{ width: 98, height: 98 }}
+            source={{uri: Config.staticUrl(item.coverimg)}}
+            style={{width: 98, height: 98}}
           />
         </View>
         <View
@@ -216,30 +209,31 @@ class SearchGoods extends Component {
         >
           <Text
             numberOfLines={1}
-            style={{ fontSize: 16, color: "#3e3e3e", fontWeight: "bold" }}
+            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
           >
             {item.name}
           </Text>
           <Text
             numberOfLines={3}
-            style={{ flex: 1, color: "#bfbfbf", fontSize: 12, lineHeight: 14 }}
+            style={{flex: 1, color: "#bfbfbf", fontSize: 12, lineHeight: 14}}
           >
             {item.description || "该产品暂无描述"}
           </Text>
-          <Text numberOfLines={1} style={{ color: "#bfbfbf", fontSize: 12 }}>
+          <Text numberOfLines={1} style={{color: "#bfbfbf", fontSize: 12}}>
             UPC:{item.upc || "无"}
           </Text>
         </View>
       </TouchableOpacity>
     );
   };
+
   render() {
     console.disableYellowBox = true;
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
           {/*搜索商品列表*/}
           {this.state.goods.length ? (
             <View
@@ -275,8 +269,8 @@ class SearchGoods extends Component {
           onPress={() => {
             console.log("是不是联营:%o", this.cooperation);
             this.props.navigation.navigate("GoodsEdit", {
-                  type: "add"
-                });
+              type: "add"
+            });
             // if(this.cooperation){
             //   this.props.navigation.navigate("NewProduct", {
             //     type: "lianying"
@@ -287,11 +281,11 @@ class SearchGoods extends Component {
             //     type: "add"
             //   });
             // }
-           
-           
+
+
           }}
         >
-          <View style={{ paddingHorizontal: pxToDp(31), marginTop: 10 }}>
+          <View style={{paddingHorizontal: pxToDp(31), marginTop: 10}}>
             <View
               style={{
                 width: "100%",
@@ -303,7 +297,7 @@ class SearchGoods extends Component {
               }}
             >
               <Text
-                style={{ color: "#fff", fontSize: 20, textAlign: "center" }}
+                style={{color: "#fff", fontSize: 20, textAlign: "center"}}
               >
                 手动添加
               </Text>
@@ -325,4 +319,5 @@ class SearchGoods extends Component {
     );
   }
 }
+
 export default connect(mapStateToProps)(SearchGoods);
