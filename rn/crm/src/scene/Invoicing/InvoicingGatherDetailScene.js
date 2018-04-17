@@ -163,6 +163,10 @@ class InvoicingGatherDetailScene extends PureComponent {
   }
 
   render() {
+    let remark = this.state.reqData.remark;
+    if(!remark){
+      remark = "无备注";
+    }
     return (
       <View style={{flex: 1}}>
         <ScrollView>
@@ -171,7 +175,7 @@ class InvoicingGatherDetailScene extends PureComponent {
             style={{backgroundColor: colors.white, height: pxToDp(200)}}
             placeholder='输入备注信息'
             placeholderTextColor='#ccc'
-            value={this.state.reqData.remark}
+            value={remark}
             onChangeText={(text) => this.handleChangeReqRemark(text)}
           />
           <Cell customStyle={{

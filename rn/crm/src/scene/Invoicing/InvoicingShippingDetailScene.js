@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, Switch, Text, View, TouchableOpacity, TextInput} from 'react-native'
+import {ScrollView, Switch, Text, View, TouchableOpacity, TextInput, Dimensions} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import font from './fontStyles'
@@ -279,7 +279,7 @@ const styles = {
   },
   left_right: {
     width: '70%',
-    height: '100%',
+    height: (Dimensions.get("window").height) * 0.67,
   },
   item_left: {
     textAlign: 'center',
