@@ -53,11 +53,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     public void setStore(Store store) {
         this.store = store;
     }
-
-    private boolean showExtraInfo(){
-        return store.getFn_price_controlled() == PRICE_CONTROLLER_NO || (store.getFn_price_controlled() == PRICE_CONTROLLER_YES && store.getFn_profit_controlled() == PROFIT_CONTROLLER_YES);
-    }
-
+    
     public View getView(int pos, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
@@ -209,12 +205,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 allInvisible = false;
             }
         }
-
-        if (this.showExtraInfo()) {
-            holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
-        } else {
-            holder.wmInfoBar.setVisibility(View.GONE);
-        }
+        holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
 
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day() / 5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend() / 2.0));
