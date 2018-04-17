@@ -1,48 +1,26 @@
-import React, { PureComponent } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput
-} from "react-native";
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label
-} from "../../weui/index";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {PureComponent} from "react";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Button, Dialog, Icon, Toast} from "../../weui/index";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import { getVendorStores } from "../../reducers/mine/mineActions";
+import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
 
-import {
-  uploadImg,
-  newProductSave
-} from "../../reducers/product/productActions";
+import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
-import Cts from "../../Cts";
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import native from "../../common/native";
-import { ToastLong } from "../../util/ToastUtils";
-import { NavigationActions } from "react-navigation";
-import { Toast, Dialog, Icon, Button } from "../../weui/index";
-
+import {ToastLong} from "../../util/ToastUtils";
 //组件
-import { Left, Adv } from "../component/All";
+import {Adv, Left} from "../component/All";
 
 function mapStateToProps(state) {
-  const { mine, product, global } = state;
-  return { mine: mine, product: product, global: global };
+  const {mine, product, global} = state;
+  return {mine: mine, product: product, global: global};
 }
 
 function mapDispatchToProps(dispatch) {
@@ -60,9 +38,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class NewProduct extends PureComponent {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
-    let { type, backPage } = params;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    let {type, backPage} = params;
 
     return {
       headerTitle: "新增商品",
@@ -89,7 +67,7 @@ class NewProduct extends PureComponent {
 
   constructor(props) {
     super(props);
-    let { currVendorId } = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
     let currStoreId = this.props.navigation.state.params.store_id;
     if (!currStoreId) {
       currStoreId = this.props.global.currStoreId;
@@ -120,9 +98,9 @@ class NewProduct extends PureComponent {
   }
 
   getVendorStore() {
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
-    let { currVendorId } = tool.vendor(this.props.global);
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
       getVendorStores(currVendorId, accessToken, resp => {
@@ -159,15 +137,15 @@ class NewProduct extends PureComponent {
       upload_files
     };
     let check_res = this.dataValidate(formData);
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
     if (check_res) {
-      this.setState({ uploading: true });
+      this.setState({uploading: true});
       dispatch(
         newProductSave(formData, accessToken, async (ok, reason, obj) => {
-          this.setState({ uploading: false });
+          this.setState({uploading: false});
           if (ok) {
-            this.setState({ dialogStatus: true });
+            this.setState({dialogStatus: true});
           } else {
             ToastLong(reason);
           }
@@ -177,7 +155,7 @@ class NewProduct extends PureComponent {
   };
 
   dataValidate(formData) {
-    let { goods_name, price_desc } = formData;
+    let {goods_name, price_desc} = formData;
     let err_msg = "";
     if (goods_name.length <= 0) {
       err_msg = "请输入商品名";
@@ -191,6 +169,7 @@ class NewProduct extends PureComponent {
       return false;
     }
   }
+
   //打开相册的图片并上传呀
   pickSingleImg() {
     ImagePicker.openPicker({
@@ -221,23 +200,23 @@ class NewProduct extends PureComponent {
   }
 
   uploadImg(image_info) {
-    const { dispatch } = this.props;
-    let { isUploadImg, list_img, upload_files } = this.state;
+    const {dispatch} = this.props;
+    let {isUploadImg, list_img, upload_files} = this.state;
     //判断为正在上传
     if (isUploadImg) return false;
-    this.setState({ isUploadImg: true });
+    this.setState({isUploadImg: true});
     dispatch(
       uploadImg(
         image_info,
         resp => {
           if (resp.ok) {
-            let { name, uri } = image_info;
-            let { file_id, fspath } = resp.obj;
+            let {name, uri} = image_info;
+            let {file_id, fspath} = resp.obj;
             list_img[file_id] = {
               url: Config.staticUrl(fspath), //配置一下url
               name: name
             };
-            upload_files.push({ id: file_id, name: name });
+            upload_files.push({id: file_id, name: name});
             this.setState({
               list_img: list_img,
               upload_files: upload_files,
@@ -267,26 +246,8 @@ class NewProduct extends PureComponent {
             this.upLoad();
           }}
         >
-          <Text style={{ color: colors.white }}>保存</Text>
+          <Text style={{color: colors.white}}>保存</Text>
         </Button>
-        {
-          //    <Button
-          //    style={[
-          //      styles.save_btn,
-          //      {
-          //        backgroundColor: colors.back_color,
-          //        borderColor: colors.main_color
-          //      }
-          //    ]}
-          //    onPress={() => {
-          //      this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-          //        type: "add"
-          //      });
-          //    }}
-          //  >
-          //    <Text style={{ color: colors.main_color }}>直接上新</Text>
-          //  </Button>
-        }
       </View>
     );
   }
@@ -300,18 +261,18 @@ class NewProduct extends PureComponent {
           placeholder="输入商品名(不超过20个字)"
           maxLength={20}
           value={this.state.goods_name}
-          onChangeText={text => this.setState({ goods_name: text })}
+          onChangeText={text => this.setState({goods_name: text})}
         />
         <Left
           title="价格描述"
           placeholder="如1.25元每斤或每瓶3元"
           value={`${this.state.price_desc}`}
-          onChangeText={text => this.setState({ price_desc: text })}
+          onChangeText={text => this.setState({price_desc: text})}
         />
         <Adv
           title={"商品介绍"}
           right={`${this.state.slogan.length} / 50`}
-          onChangeText={text => this.setState({ slogan: text })}
+          onChangeText={text => this.setState({slogan: text})}
           placeholder={"请输入商品介绍"}
           value={this.state.slogan}
           maxLength={50}
@@ -332,7 +293,7 @@ class NewProduct extends PureComponent {
                   alignItems: "flex-end"
                 }}
               >
-                <Image style={styles.img_add} source={{ uri: img_url }} />
+                <Image style={styles.img_add} source={{uri: img_url}}/>
                 <TouchableOpacity
                   style={{
                     position: "absolute",
@@ -348,7 +309,7 @@ class NewProduct extends PureComponent {
                   <Icon
                     name={"clear"}
                     size={pxToDp(40)}
-                    style={{ backgroundColor: "#fff" }}
+                    style={{backgroundColor: "#fff"}}
                     color={"#d81e06"}
                     msg={false}
                   />
@@ -365,10 +326,10 @@ class NewProduct extends PureComponent {
             }}
           >
             <TouchableOpacity
-              style={[styles.img_add, styles.img_add_box, { flexWrap: "wrap" }]}
+              style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
               onPress={() => this.pickSingleImg()}
             >
-              <Text style={{ fontSize: pxToDp(36), color: "#bfbfbf" }}>+</Text>
+              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -380,12 +341,14 @@ class NewProduct extends PureComponent {
         <Toast
           icon="loading"
           show={this.state.uploading}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           提交中
         </Toast>
         <Dialog
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
           visible={this.state.dialogStatus}
           buttons={[
             {
@@ -414,7 +377,7 @@ class NewProduct extends PureComponent {
           >
             提交成功
           </Text>
-          <Text style={{ width: "100%", textAlign: "center" }}>
+          <Text style={{width: "100%", textAlign: "center"}}>
             门店经理会在三个小时内完成上新操作请耐心等候
           </Text>
         </Dialog>

@@ -1,28 +1,26 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {Component} from "react";
+import {connect} from "react-redux";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
+  PixelRatio,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  ScrollView,
-  TextInput,
-  FlatList,
-  PixelRatio
+  View
 } from "react-native";
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
-import { Metrics, Colors, Styles } from "../../themes";
+import {Colors, Metrics, Styles} from "../../themes";
 import LoadingView from "../../widget/LoadingView";
 
-import { Left } from "../component/All";
-import { getWithTpl, jsonWithTpl } from "../../util/common";
+import {Left} from "../component/All";
+import {getWithTpl, jsonWithTpl} from "../../util/common";
 import tool from "../../common/tool";
-import { ToastLong } from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
+import {Toast} from "../../weui/index";
 
 const mapStateToProps = state => {
   return {
@@ -30,6 +28,7 @@ const mapStateToProps = state => {
     mine: state.mine
   };
 };
+
 class NewProductDetail extends Component {
   constructor(props) {
     super(props);
@@ -42,8 +41,9 @@ class NewProductDetail extends Component {
       isSave: false
     };
   }
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
       headerTitle: "新增商品",
       headerLeft: (
@@ -60,18 +60,19 @@ class NewProductDetail extends Component {
       ),
       headerRight: (
         <TouchableOpacity onPress={() => params.save()}>
-          <View style={{ marginRight: 18 }}>
-            <Text style={{ color: "#59b26a" }}>保存</Text>
+          <View style={{marginRight: 18}}>
+            <Text style={{color: "#59b26a"}}>保存</Text>
           </View>
         </TouchableOpacity>
       )
     };
   };
+
   componentWillMount() {
     this.props.navigation.setParams({
       save: this.save
     });
-    let { currVendorId } = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
     let storeList = this.toStores(this.props.mine.vendor_stores[currVendorId]);
     this.setState({
       storeTag: storeList
@@ -79,9 +80,8 @@ class NewProductDetail extends Component {
     console.log("storeList:%o", storeList);
     this.fetchResources(currVendorId || 0);
   }
-  //保存函数
+
   save = () => {
-    console.log("保存");
     if (!this.state.price) return ToastLong("请输入商品价格");
     if (!this.getCategory()) return ToastLong("请选择门店分类");
     if (this.state.isSave) return;
@@ -97,7 +97,6 @@ class NewProductDetail extends Component {
       product_id: this.props.navigation.state.params.productId,
       price: this.state.price
     };
-    console.log("json", JSON.stringify(payload));
     jsonWithTpl(
       `api/direct_product_save?access_token=${this.props.global.accessToken}`,
       payload,
@@ -109,24 +108,23 @@ class NewProductDetail extends Component {
           ToastLong(ok.reason);
           this.props.navigation.goBack();
         }
-        console.log("结果是什么:%o", ok);
       },
       error => {
         ToastLong("网络错误");
         this.props.navigation.goBack();
       },
-      action => {}
+      action => {
+      }
     );
   };
   //获取数据
   fetchResources = currVendorId => {
     let url = `api/list_vendor_tags/${currVendorId}?access_token=${
       this.props.global.accessToken
-    }`;
+      }`;
     http: getWithTpl(
       url,
       json => {
-        console.log("判断是否联营:%o", json.obj);
         if (json.ok) {
           for (let i of json.obj) {
             i.active = false;
@@ -135,7 +133,6 @@ class NewProductDetail extends Component {
             storeList: json.obj,
             isLoading: false
           });
-          // this.cooperation = json.obj;
         } else {
           this.setState({
             isLoading: false
@@ -149,6 +146,7 @@ class NewProductDetail extends Component {
       }
     );
   };
+
   //发布一下门店函数
   toStores(obj) {
     let arr = [];
@@ -159,6 +157,7 @@ class NewProductDetail extends Component {
       return arr.join(" , ");
     }
   }
+
   title = text => {
     return (
       <View
@@ -169,14 +168,14 @@ class NewProductDetail extends Component {
           backgroundColor: "#f2f2f2"
         }}
       >
-        <Text style={{ fontSize: 16, color: "#ccc" }}>{text}</Text>
+        <Text style={{fontSize: 16, color: "#ccc"}}>{text}</Text>
       </View>
     );
   };
   info = (title, info, right, id) => {
     return (
       <TouchableOpacity
-        onPress={() => (id === 3 ? this.setState({ visual: true }) : null)}
+        onPress={() => (id === 3 ? this.setState({visual: true}) : null)}
       >
         <View
           style={{
@@ -187,15 +186,15 @@ class NewProductDetail extends Component {
             paddingHorizontal: 18
           }}
         >
-          <Text style={{ fontSize: 18, color: "#333" }}>{title}</Text>
+          <Text style={{fontSize: 18, color: "#333"}}>{title}</Text>
           <Text
-            style={{ fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1 }}
+            style={{fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1}}
           >
             {info}
           </Text>
           {right}
         </View>
-        <View style={{ height: 1, backgroundColor: "#f2f2f2" }} />
+        <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
       </TouchableOpacity>
     );
   };
@@ -210,7 +209,7 @@ class NewProductDetail extends Component {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          this.setState({ visual: false });
+          this.setState({visual: false});
         }}
       >
         <View
@@ -238,7 +237,7 @@ class NewProductDetail extends Component {
             >
               <Text style={Styles.n1grey6}>门店分类（多选）</Text>
             </View>
-            <ScrollView style={{ flex: 1, paddingHorizontal: 18 }}>
+            <ScrollView style={{flex: 1, paddingHorizontal: 18}}>
               {this.state.storeList.map(element => {
                 return (
                   <TouchableOpacity
@@ -246,79 +245,53 @@ class NewProductDetail extends Component {
                       this.select(element);
                     }}
                   >
-                    <View
-                      style={[
-                        {
-                          flexDirection: "row",
-                          // justifyContent: "center",
-                          alignItems: "center",
-                          padding: 12
-                        }
-                      ]}
+                    <View style={[{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      padding: 12
+                    }]}
                     >
-                      <Yuan
-                        icon={"md-checkmark"}
-                        size={15}
-                        ic={Colors.white}
-                        w={22}
-                        onPress={() => {
-                          this.select(element);
-                        }}
-                        bw={Metrics.one}
-                        bgc={element.active ? Colors.grey9 : Colors.white}
-                        bc={element.active ? Colors.white : Colors.greyc}
+                      <Yuan icon={"md-checkmark"}
+                            size={15}
+                            ic={Colors.white}
+                            w={22}
+                            onPress={() => {
+                              this.select(element);
+                            }}
+                            bw={Metrics.one}
+                            bgc={element.active ? Colors.grey9 : Colors.white}
+                            bc={element.active ? Colors.white : Colors.greyc}
                       />
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: "#9d9d9d",
-                          marginLeft: 20
-                        }}
-                      >
+                      <Text style={{
+                        fontSize: 14,
+                        color: "#9d9d9d",
+                        marginLeft: 20
+                      }}>
                         {element.name}
                       </Text>
                     </View>
-                    <Line h={1.3} />
+                    <Line h={1.3}/>
                   </TouchableOpacity>
                 );
               })}
             </ScrollView>
-            <View
-              style={[
-                { flexDirection: "row", alignItems: "center" },
+            <View style={[
+                {flexDirection: "row", alignItems: "center"},
                 Styles.t1theme
               ]}
             >
-              <View
-                style={{
+              <View style={{
                   flex: 1,
                   borderRightColor: Colors.line,
                   borderRightWidth: 1.5
-                }}
-              >
-                <Text
-                  style={[{ textAlign: "center" }, Styles.t1grey6]}
-                  allowFontScaling={false}
-                >
+                }}>
+                <Text style={[{textAlign: "center"}, Styles.t1grey6]} allowFontScaling={false}>
                   取消
                 </Text>
               </View>
-              <View style={{ flex: 1, paddingVertical: 16 }}>
-                <TouchableWithoutFeedback
-                  onPress={() => this.setState({ visual: false })}
-                  // 	unbindWechat(this.state.data[0].id).then(resp => {
-                  // 		toastOnShow('解绑成功')
-                  // 		this.setState({
-                  // 			isBind: false
-                  // 		})
-                  // 		this.props.callback1()
-                  // 	})
-                  // }}
-                >
-                  <Text
-                    style={[{ textAlign: "center" }, Styles.t1grey6]}
-                    allowFontScaling={false}
-                  >
+              <View style={{flex: 1, paddingVertical: 16}}>
+                <TouchableWithoutFeedback onPress={() => this.setState({visual: false})}>
+                  <Text style={[{textAlign: "center"}, Styles.t1grey6]} allowFontScaling={false}>
                     确定
                   </Text>
                 </TouchableWithoutFeedback>
@@ -343,14 +316,20 @@ class NewProductDetail extends Component {
       return undefined;
     }
   };
+
   render() {
     let active = this.state.storeList.filter(element => {
       return element.active === true;
     });
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
+        <Toast
+          icon="loading"
+          show={this.state.isSave}
+        >正在保存，请稍后!
+        </Toast>
         {this.state.visual ? this.modal() : null}
         {this.title("基本信息")}
         <Left
@@ -361,29 +340,29 @@ class NewProductDetail extends Component {
           title="商品价格"
           // placeholder={}
           value={this.state.price}
-          onChangeText={text => this.setState({ price: text })}
+          onChangeText={text => this.setState({price: text})}
           right={
-            <Text style={{ fontSize: 14, color: "#ccc", fontWeight: "bold" }}>
+            <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
               元
             </Text>
           }
         />
         <Left
           title="门店分类"
-          onPress={() => this.setState({ visual: true })}
+          onPress={() => this.setState({visual: true})}
           info={this.getCategory() || "选择门店分类"}
           right={
-            <Text style={{ fontSize: 14, color: "#ccc", fontWeight: "bold" }}>
+            <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
               >
             </Text>
           }
         />
         {/*现实选择门店分类信息*/}
-        <View style={{ padding: 18 }}>
-          <Text style={{ fontSize: 14, color: "#9d9d9d" }}>
+        <View style={{padding: 18}}>
+          <Text style={{fontSize: 14, color: "#9d9d9d"}}>
             发布到以下门店：
           </Text>
-          <Text style={{ fontSize: 14, color: "#9d9d9d", marginTop: 5 }}>
+          <Text style={{fontSize: 14, color: "#9d9d9d", marginTop: 5}}>
             {this.state.storeTag}
           </Text>
         </View>
@@ -398,6 +377,7 @@ class Yuan extends Component {
     bgc: Colors.white,
     size: 20
   };
+
   render() {
     let {
       w,
@@ -436,7 +416,7 @@ class Yuan extends Component {
             Styles.center
           ]}
         >
-          {icon ? <Icon name={icon} color={ic} size={size} /> : null}
+          {icon ? <Icon name={icon} color={ic} size={size}/> : null}
 
           {t ? (
             <Text style={fontStyle} allowFontScaling={false}>
@@ -445,7 +425,7 @@ class Yuan extends Component {
           ) : null}
           {image || images ? (
             <Image
-              source={image ? image : { uri: images }}
+              source={image ? image : {uri: images}}
               style={{
                 width: w,
                 height: w,
@@ -460,6 +440,7 @@ class Yuan extends Component {
     );
   }
 }
+
 class Line extends Component {
   static defaultProps = {
     h: 1 / PixelRatio.get(),
@@ -467,7 +448,7 @@ class Line extends Component {
   };
 
   render() {
-    const { w, h, mgt, mgb, c, fontStyle, t } = this.props;
+    const {w, h, mgt, mgb, c, fontStyle, t} = this.props;
     return (
       <View
         style={{

@@ -31,6 +31,10 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
+import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_NO;
+import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
+import static cn.cainiaoshicai.crm.Cts.PROFIT_CONTROLLER_YES;
+
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
     private Activity context;
@@ -81,6 +85,9 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.wmMeituan = row.findViewById(R.id.wm_mt);
             holder.wmInfoBar = row.findViewById(R.id.wm_info_bar);
 
+            holder.sold_5day_fen = row.findViewById(R.id.sold_5day_fen);
+            holder.sold_weekend_fen = row.findViewById(R.id.sold_weekend_fen);
+
             convertView = row;
             convertView.setTag(holder);
         }
@@ -98,7 +105,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.prodStatus.setBackground(null);
         }
 
-        if (store != null && store.getFn_price_controlled() == 1) {
+        if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
             holder.leftNumber.setVisibility(View.INVISIBLE);
             holder.salePrice.setVisibility(View.INVISIBLE);
@@ -155,7 +162,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         if(item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT){
             holder.reOnSale.setVisibility(View.VISIBLE);
-
             int bg;
             if (item.getWhen_sale_again() > 0) {
                 bg = R.drawable.list_text_border_green_mini;
@@ -199,11 +205,17 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 allInvisible = false;
             }
         }
-
         holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
 
-        holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day()/5.0));
-        holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend()/2.0));
+        holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day() / 5.0));
+        holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend() / 2.0));
+        if (store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
+            holder.sold_5day.setVisibility(View.GONE);
+            holder.sold_weekend.setVisibility(View.GONE);
+            holder.sold_weekend_fen.setVisibility(View.GONE);
+            holder.sold_5day_fen.setVisibility(View.GONE);
+        }
+
         holder.goodIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,7 +298,9 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView label;
         TextView leftNumber;
         TextView sold_5day;
+        TextView sold_5day_fen;
         TextView sold_weekend;
+        TextView sold_weekend_fen;
 
         TextView prodStatus;
         TextView req_total;

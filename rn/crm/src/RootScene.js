@@ -130,7 +130,6 @@ class RootScene extends PureComponent {
       //hiding after state recovered
       SplashScreen.hide();
       if (!this.store.getState().global.accessToken) {
-        alert("没有token");
         ToastAndroid.showWithGravity(
           "请您先登录",
           ToastAndroid.SHORT,

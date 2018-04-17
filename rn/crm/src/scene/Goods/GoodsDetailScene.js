@@ -1,13 +1,28 @@
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity, TouchableHighlight, ScrollView, RefreshControl, InteractionManager} from 'react-native';
-import {Button, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter, Input, Label, Icon, Toast,} from "../../weui/index";
+import {
+  Image,
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Icon, Label, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
-import {fetchProductDetail, fetchVendorProduct, fetchVendorTags, UpdateWMGoods} from "../../reducers/product/productActions";
+import {
+  fetchProductDetail,
+  fetchVendorProduct,
+  fetchVendorTags,
+  UpdateWMGoods
+} from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
@@ -15,7 +30,7 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -104,13 +119,6 @@ class GoodsDetailScene extends PureComponent {
     currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
-    /*if (product_detail[productId] === undefined) {
-      this.getProductDetail();
-    } else {
-      this.setState({
-        product_detail: product_detail[productId],
-      });
-    }*/
     this.getProductDetail();
     this.getVendorProduct();
 
@@ -140,7 +148,6 @@ class GoodsDetailScene extends PureComponent {
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
             console.log('fetchVendorTags -> ', resp.ok);
-            // console.log(resp.ok, resp.obj.basic_category, resp.ok.store_tags);
         }));
       });
     }
@@ -164,7 +171,6 @@ class GoodsDetailScene extends PureComponent {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
           if (resp.ok) {
             let product_detail = resp.obj;
-            console.log('product_detail -------->', product_detail);
             _this.setState({
               product_detail: product_detail,
               isRefreshing: false,

@@ -14,12 +14,13 @@ import native from "../../common/native";
 import pxToDp from "../../util/pxToDp";
 import MyBtn from '../../common/MyBtn'
 import tool from '../../common/tool'
-import {queryUpcCode,queryProductByKey} from '../../reducers/product/productActions'
+import {queryUpcCode, queryProductByKey} from '../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
 import RenderEmpty from '../OperateProfit/RenderEmpty'
+
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
@@ -37,7 +38,6 @@ function mapDispatchToProps(dispatch) {
 class GoodsScanSearchScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    console.log('state.params:', params);
     let {name} = params;
     let {backPage, inputText, upc, searchUpc} = params;
     let searchVal = '';
@@ -101,7 +101,7 @@ class GoodsScanSearchScene extends PureComponent {
   constructor(props) {
     super(props);
     let task_id = this.props.navigation.state.params.task_id;
-    if(!task_id){
+    if (!task_id) {
       task_id = 0;
     }
     this.state = {
@@ -125,22 +125,21 @@ class GoodsScanSearchScene extends PureComponent {
     let keyword = '';
     const state = this.props.navigation.state;
     try {
-      console.log('state.params:', state.params);
       let products = JSON.parse(state.params.products);
       if (tool.length(products) > 0) {
-          this.setState({
-            products: products,
-            upc: products[0]['upc']
-          });
-          keyword = products[0]['upc'];
+        this.setState({
+          products: products,
+          upc: products[0]['upc']
+        });
+        keyword = products[0]['upc'];
       }
     } catch (e) {
     }
 
-    if (state.params.keyword && !keyword){
+    if (state.params.keyword && !keyword) {
       keyword = state.params.keyword;
     }
-    
+
     this.props.navigation.setParams({
       inputText: this.inputText,
       upc: keyword,
@@ -154,7 +153,7 @@ class GoodsScanSearchScene extends PureComponent {
     this.setState({query: true});
     let {type} = this.props.navigation.state.params;
     console.log(type)
-    if(type === 'searchAdd'){
+    if (type === 'searchAdd') {
       dispatch(queryProductByKey(this.state.upc, accessToken, (ok, desc, obj) => {
         this.setState({query: false});
         if (ok) {
@@ -163,7 +162,7 @@ class GoodsScanSearchScene extends PureComponent {
           ToastLong('没差查询结果')
         }
       }))
-    }else {
+    } else {
       dispatch(queryUpcCode(this.state.upc, accessToken, (ok, desc, obj) => {
         this.setState({query: false});
         if (ok) {
@@ -190,7 +189,6 @@ class GoodsScanSearchScene extends PureComponent {
     } else if (item.img_path) {
       item.img = {"0": {url: prefix + item.img_path, path: item.img_path, mid_thumb: item.mid_thumb}}
     }
-    console.log("search product redirect info : ", item)
     return item
   }
 
@@ -200,96 +198,96 @@ class GoodsScanSearchScene extends PureComponent {
       return null
     } else {
       return (
-          <View>
-            {tool.length(this.state.products)
-                ? null
-                : <MyBtn
-                    onPress={() => {
-                      this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {})
-                    }}
-                    style={[styles.btn, {backgroundColor: colors.main_color, color: colors.white}]}
-                    text={'直接上新'}/>
-            }
-            <MyBtn
-                onPress={() => {
-                  native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity", false)
-                }}
-                style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
-                text={'重新扫码'}/>
-          </View>
+        <View>
+          {tool.length(this.state.products)
+            ? null
+            : <MyBtn
+              onPress={() => {
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {})
+              }}
+              style={[styles.btn, {backgroundColor: colors.main_color, color: colors.white}]}
+              text={'直接上新'}/>
+          }
+          <MyBtn
+            onPress={() => {
+              native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity", false)
+            }}
+            style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
+            text={'重新扫码'}/>
+        </View>
       )
     }
 
   }
+
   renderList() {
     let task_id = this.state.task_id;
     return this.state.products.map((item, index) => {
       let img = require('../../img/Order/zanwutupian_.png');
-      if(tool.length(item.img) > 0){
-        //TODO get base url from config
-        img = {uri: 'https://www.cainiaoshicai.cn'+item.img[0]['path']}
+      if (tool.length(item.img) > 0) {
+        img = {uri: 'https://www.cainiaoshicai.cn' + item.img[0]['path']}
       }
-      if(item['coverimg']){
-        img = {uri: 'https://www.cainiaoshicai.cn'+item['coverimg']}
+      if (item['coverimg']) {
+        img = {uri: 'https://www.cainiaoshicai.cn' + item['coverimg']}
       }
       return (
-          <TouchableOpacity
-              key={index}
-              onPress={() => {
-                let msg = this.handleImg(tool.deepClone(item))
-                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'scan',
-                  product_detail: msg,
-                  task_id: task_id
-                })
+        <TouchableOpacity
+          key={index}
+          onPress={() => {
+            let msg = this.handleImg(tool.deepClone(item))
+            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+              type: 'scan',
+              product_detail: msg,
+              task_id: task_id
+            })
+          }}
+        >
+          <View style={{
+            flexDirection: 'row',
+            paddingVertical: pxToDp(30),
+            paddingHorizontal: pxToDp(30),
+            backgroundColor: colors.white
+          }}>
+            <Image
+              style={{
+                height: pxToDp(120),
+                backgroundColor: '#ccc',
+                width: pxToDp(120),
+                borderColor: colors.main_back,
+                borderWidth: 1
               }}
-          >
-            <View style={{
-              flexDirection: 'row',
-              paddingVertical: pxToDp(30),
-              paddingHorizontal: pxToDp(30),
-              backgroundColor: colors.white
-            }}>
-              <Image
-                  style={{
-                    height: pxToDp(120),
-                    backgroundColor: '#ccc',
-                    width: pxToDp(120),
-                    borderColor: colors.main_back,
-                    borderWidth: 1
-                  }}
-                  source={img}
-              />
-              <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
-                <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name}</Text>
-                <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>
-                  UPC:{ !!item.upc ? item.upc:"无" }
-                  </Text>
-              </View>
+              source={img}
+            />
+            <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
+              <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name}</Text>
+              <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>
+                UPC:{!!item.upc ? item.upc : "无"}
+              </Text>
             </View>
-          </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       )
     })
   }
 
   render() {
     return (
-        <View style={{flex: 1, backgroundColor: colors.main_back}}>
-          <ScrollView style={{height:pxToDp(300)}}>
-            {
-              tool.length(this.state.products) > 0  ? this.renderList() : <RenderEmpty/>
-            }
-          </ScrollView>
+      <View style={{flex: 1, backgroundColor: colors.main_back}}>
+        <ScrollView style={{height: pxToDp(300)}}>
           {
-            this.renderBtn()
+            tool.length(this.state.products) > 0 ? this.renderList() : <RenderEmpty/>
           }
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >查询中</Toast>
-        </View>
+        </ScrollView>
+        {
+          this.renderBtn()
+        }
+        <Toast
+          icon="loading"
+          show={this.state.query}
+          onRequestClose={() => {
+          }}
+        >查询中</Toast>
+      </View>
     )
   }
 }

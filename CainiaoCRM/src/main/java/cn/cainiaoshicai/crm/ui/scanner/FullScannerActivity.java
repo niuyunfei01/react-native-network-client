@@ -13,11 +13,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -41,11 +44,13 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
     private boolean mAutoFocus;
     private ArrayList<Integer> mSelectedIndices;
     private int mCameraId = -1;
+    private String storeId;
+    private String vendorId;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        if(state != null) {
+        if (state != null) {
             mFlash = state.getBoolean(FLASH_STATE, false);
             mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
             mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
@@ -59,11 +64,16 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
 
         setContentView(R.layout.activity_simple_scanner);
         setupToolbar();
-
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         mScannerView = new ZXingScannerView(this);
         setupFormats();
         contentFrame.addView(mScannerView);
+        Bundle bundle = getIntent().getExtras();
+        String jsonData = bundle.getString("jsonData");
+        Gson gson = new Gson();
+        Map<String, String> json = gson.fromJson(jsonData, Map.class);
+        storeId = json.get("store_id");
+        vendorId = json.get("vendor_id");
     }
 
     @Override
@@ -88,7 +98,7 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem menuItem;
 
-        if(mFlash) {
+        if (mFlash) {
             menuItem = menu.add(Menu.NONE, R.id.menu_flash, 0, R.string.flash_on);
         } else {
             menuItem = menu.add(Menu.NONE, R.id.menu_flash, 0, R.string.flash_off);
@@ -96,7 +106,7 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
         MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_NEVER);
 
 
-        if(mAutoFocus) {
+        if (mAutoFocus) {
             menuItem = menu.add(Menu.NONE, R.id.menu_auto_focus, 0, R.string.auto_focus_on);
         } else {
             menuItem = menu.add(Menu.NONE, R.id.menu_auto_focus, 0, R.string.auto_focus_off);
@@ -118,7 +128,7 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
         switch (item.getItemId()) {
             case R.id.menu_flash:
                 mFlash = !mFlash;
-                if(mFlash) {
+                if (mFlash) {
                     item.setTitle(R.string.flash_on);
                 } else {
                     item.setTitle(R.string.flash_off);
@@ -127,7 +137,7 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
                 return true;
             case R.id.menu_auto_focus:
                 mAutoFocus = !mAutoFocus;
-                if(mAutoFocus) {
+                if (mAutoFocus) {
                     item.setTitle(R.string.auto_focus_on);
                 } else {
                     item.setTitle(R.string.auto_focus_off);
@@ -154,29 +164,12 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         String code = rawResult.getText();
-        BarcodeFormat barcodeFormat = rawResult.getBarcodeFormat();
-        Call<ResultBean<List<ProductTpl>>> rb = GlobalCtx.app().dao.searchByBarCode(code);
-        rb.enqueue(new Callback<ResultBean<List<ProductTpl>>>() {
-            @Override
-            public void onResponse(Call<ResultBean<List<ProductTpl>>> call, Response<ResultBean<List<ProductTpl>>> response) {
-                ResultBean body = response.body();
-                List<ProductTpl> productTplList = Lists.newArrayList();
-                if (body != null && body.isOk()) {
-                    //查询到结果
-                    productTplList = (List<ProductTpl>) body.getObj();
-                }
-                mScannerView.resumeCameraPreview(FullScannerActivity.this);
-                GlobalCtx.app().toGoodScanSearch(FullScannerActivity.this, productTplList);
-            }
-
-            @Override
-            public void onFailure(Call<ResultBean<List<ProductTpl>>> call, Throwable t) {
-                showMessageDialog("扫码失败,请重试！");
-                mScannerView.resumeCameraPreview(FullScannerActivity.this);
-            }
-        });
+        Map<String, String> result = Maps.newHashMap();
+        result.put("code", code);
+        GlobalCtx.app().toGoodScanSearch(FullScannerActivity.this, result, storeId);
         //showMessageDialog("Contents = " + code + ", Format = " + barcodeFormat.toString());
     }
 
@@ -196,7 +189,7 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
     public void closeDialog(String dialogName) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         DialogFragment fragment = (DialogFragment) fragmentManager.findFragmentByTag(dialogName);
-        if(fragment != null) {
+        if (fragment != null) {
             fragment.dismiss();
         }
     }
@@ -223,17 +216,17 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
 
     public void setupFormats() {
         List<BarcodeFormat> formats = new ArrayList<BarcodeFormat>();
-        if(mSelectedIndices == null || mSelectedIndices.isEmpty()) {
+        if (mSelectedIndices == null || mSelectedIndices.isEmpty()) {
             mSelectedIndices = new ArrayList<Integer>();
-            for(int i = 0; i < ZXingScannerView.ALL_FORMATS.size(); i++) {
+            for (int i = 0; i < ZXingScannerView.ALL_FORMATS.size(); i++) {
                 mSelectedIndices.add(i);
             }
         }
 
-        for(int index : mSelectedIndices) {
+        for (int index : mSelectedIndices) {
             formats.add(ZXingScannerView.ALL_FORMATS.get(index));
         }
-        if(mScannerView != null) {
+        if (mScannerView != null) {
             mScannerView.setFormats(formats);
         }
     }

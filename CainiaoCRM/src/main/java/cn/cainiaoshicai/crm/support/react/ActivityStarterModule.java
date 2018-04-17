@@ -318,7 +318,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void navigateToNativeActivity(String activityName, boolean putStack) {
+    void navigateToNativeActivity(String activityName, boolean putStack, String jsonData) {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             Class<?> cls = null;
@@ -328,6 +328,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 if (!putStack) {
                     intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 }
+                Bundle bundle=new Bundle();
+                bundle.putString("jsonData", jsonData);
+                intent.putExtras(bundle);
                 activity.startActivity(intent);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();

@@ -27,6 +27,7 @@ public class Store {
     private int call_not_print;
     private int ship_way;
     private int fn_price_controlled;
+    private int fn_profit_controlled;
 
     public Store() {
     }
@@ -147,6 +148,14 @@ public class Store {
 
     public int getFn_price_controlled() {
         return fn_price_controlled;
+    }
+
+    public int getFn_profit_controlled() {
+        return fn_profit_controlled;
+    }
+
+    public void setFn_profit_controlled(int fn_profit_controlled) {
+        this.fn_profit_controlled = fn_profit_controlled;
     }
 
     public void setFn_price_controlled(int fn_price_controlled) {

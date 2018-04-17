@@ -110,6 +110,7 @@ export function vendor(global) {
   let currVendorName = currStore['vendor'];
   let currStoreName = currStore['name'];
   let fnPriceControlled = parseInt(currStore['fn_price_controlled']);
+  let fnProfitControlled = parseInt(currStore['fn_profit_controlled']);
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
@@ -164,6 +165,7 @@ export function vendor(global) {
     fnProviding: fnProviding,
     fnProvidingOnway: fnProvidingOnway,
     fnPriceControlled: fnPriceControlled,
+    fnProfitControlled: fnProfitControlled
   };
 }
 
@@ -343,6 +345,9 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
         if(a === b){
           return typeof minor === 'function' ? minor(o,p):0;
         }
+        if (typeof a === typeof b && typeof a === 'string') {
+          return a.localeCompare(b);
+        }
         if(typeof a === typeof b){
           return a < b ? -1:1;
         }
@@ -354,12 +359,7 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
   };
 
   let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
-  /*let sortStores = Object.values(canReadStores).sort(function (a, b) {
-    let res = (parseInt(a.vendor_id) - parseInt(b.vendor_id));
-    console.log('res ------------------> ', parseInt(a.vendor_id), parseInt(b.vendor_id), res);
-    return res;
-  });*/
-  let sortStores = Object.values(canReadStores).sort(by('vendor_id',by('id')));
+  let sortStores = Object.values(canReadStores).sort(by(('city'), by('vendor_id', by('id'))));
   for (let store of sortStores) {
     if (store.id > 0) {
       let item = {
