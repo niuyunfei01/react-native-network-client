@@ -1,26 +1,14 @@
-import React, { Component } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  FlatList
-} from "react-native";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { NavigationActions } from "react-navigation";
+import React, {Component} from "react";
+import {FlatList, Image, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {connect} from "react-redux";
+import {NavigationActions} from "react-navigation";
 
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
-import NewProduct from "./NewProduct";
 import LoadingView from "../../widget/LoadingView";
-import { Styles } from "../../themes";
+import {Styles} from "../../themes";
 //请求
-import { getWithTpl } from "../../util/common";
-
+import {getWithTpl} from "../../util/common";
 //配置图片的路由
 import Config from "../../config";
 let data = [{ id: 1 }, { id: 2 }, { id: 2 }, { id: 2 }, { id: 2 }];

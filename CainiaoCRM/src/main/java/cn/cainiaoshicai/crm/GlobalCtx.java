@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -806,13 +807,13 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
     //扫描二维码之后跳转到指定界面
-    public void toGoodScanSearch(Activity ctx, List<ProductTpl> products) {
+    public void toGoodScanSearch(Activity ctx, Map<String, String> data) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "SearchGoods");
         Bundle params = new Bundle();
         Gson gson = new Gson();
-        String productJson = gson.toJson(products);
-        params.putString("products", productJson);
+        String dataJson = gson.toJson(data);
+        params.putString("result", dataJson);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }

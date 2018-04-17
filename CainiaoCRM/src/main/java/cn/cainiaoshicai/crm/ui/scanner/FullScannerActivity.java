@@ -13,11 +13,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -156,27 +158,9 @@ public class FullScannerActivity extends BaseScannerActivity implements MessageD
             r.play();
         } catch (Exception e) {}
         String code = rawResult.getText();
-        BarcodeFormat barcodeFormat = rawResult.getBarcodeFormat();
-        Call<ResultBean<List<ProductTpl>>> rb = GlobalCtx.app().dao.searchByBarCode(code);
-        rb.enqueue(new Callback<ResultBean<List<ProductTpl>>>() {
-            @Override
-            public void onResponse(Call<ResultBean<List<ProductTpl>>> call, Response<ResultBean<List<ProductTpl>>> response) {
-                ResultBean body = response.body();
-                List<ProductTpl> productTplList = Lists.newArrayList();
-                if (body != null && body.isOk()) {
-                    //查询到结果
-                    productTplList = (List<ProductTpl>) body.getObj();
-                }
-                mScannerView.resumeCameraPreview(FullScannerActivity.this);
-                GlobalCtx.app().toGoodScanSearch(FullScannerActivity.this, productTplList);
-            }
-
-            @Override
-            public void onFailure(Call<ResultBean<List<ProductTpl>>> call, Throwable t) {
-                showMessageDialog("扫码失败,请重试！");
-                mScannerView.resumeCameraPreview(FullScannerActivity.this);
-            }
-        });
+        Map<String, String> result = Maps.newHashMap();
+        result.put("code", code);
+        GlobalCtx.app().toGoodScanSearch(FullScannerActivity.this, result);
         //showMessageDialog("Contents = " + code + ", Format = " + barcodeFormat.toString());
     }
 
