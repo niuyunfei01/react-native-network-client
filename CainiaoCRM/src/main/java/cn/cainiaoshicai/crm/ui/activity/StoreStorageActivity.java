@@ -50,6 +50,7 @@ import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
+import static cn.cainiaoshicai.crm.Cts.PROFIT_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
@@ -322,6 +323,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         currStatusSpinner = titleBar.findViewById(R.id.spinner_curr_status);
         statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
         boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
+        boolean isProfitControlled = currStore !=null && currStore.getFn_profit_controlled() == PROFIT_CONTROLLER_YES;
+
         statusAdapter.addAll(isPriceControlled ? StatusItem.STATUS_PRICE_CONTROLLED : StatusItem.STATUS);
 
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
@@ -415,7 +418,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             this.btnReqList.setVisibility(View.INVISIBLE);
             this.btnEmptyList.setVisibility(View.INVISIBLE);
             this.btnApplyPriceList.setVisibility(View.VISIBLE);
-
             if (statusAdapter != null) {
                 statusAdapter.clear();
                 statusAdapter.addAll(StatusItem.STATUS_PRICE_CONTROLLED);

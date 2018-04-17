@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 import FetchEx from "./fetchEx";
 import Config from "../config";
 
@@ -36,7 +36,6 @@ export function jsonWithTpl2(url, data, okFn, failFn) {
  * @param failFn
  * @param dispatch
  */
-//get请求
 export function getWithTpl(url, okFn, failFn, dispatch) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
     .then(res => res.json())
@@ -75,7 +74,6 @@ export function jsonWithTpl(url, data, okFn, failFn, dispatch) {
  * @param okFn function with one param: json
  * @param failFn function with error msg
  */
-//post请求
 export function postWithTpl(url, data, okFn, failFn) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.postForm(url, data))
     .then(res => res.json())
@@ -134,3 +132,9 @@ export default {
   getWithTpl,
   postWithTpl
 };
+
+export function padNum(num, size) {
+  var s = num + "";
+  while (s.length < size) s = "0" + s;
+  return s;
+}

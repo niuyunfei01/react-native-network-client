@@ -79,7 +79,7 @@ class MineScene extends PureComponent {
     }
 
     let {currStoreName, currVendorName, currVendorId, currVersion, currManager,
-      is_mgr, is_helper, service_uid, is_service_mgr, fnPriceControlled} = tool.vendor(this.props.global);
+      is_mgr, is_helper, service_uid, is_service_mgr, fnPriceControlled, fnProfitControlled} = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
 
     let storeActionSheet = tool.storeActionSheet(canReadStores, (is_helper || is_service_mgr));
@@ -114,6 +114,7 @@ class MineScene extends PureComponent {
       is_helper: is_helper,
       is_service_mgr: is_service_mgr,
       fnPriceControlled: fnPriceControlled,
+      fnProfitControlled: fnProfitControlled,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? cover_image : '',
     };
@@ -143,7 +144,6 @@ class MineScene extends PureComponent {
   componentWillMount() {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
-      console.log('currStoreId =======>', currStoreId);
       let first_store_id = tool.first_store_id(canReadStores);
       if (first_store_id > 0) {
         this._doChangeStore(first_store_id, false);
@@ -398,7 +398,7 @@ class MineScene extends PureComponent {
   }
 
   renderManager() {
-    let {order_num, turnover, fnPriceControlled} = this.state;
+    let {order_num, turnover, fnPriceControlled, fnProfitControlled} = this.state;
 
     return (
       <TouchableOpacity
@@ -424,7 +424,7 @@ class MineScene extends PureComponent {
           </View>
           <View style={[worker_styles.sales_box]}>
             <Text style={[worker_styles.sale_text]}>{fnPriceControlled > 0 ? '今日已完成' : '今日订单'}: {order_num}</Text>
-            {fnPriceControlled > 0 ?
+            {(fnPriceControlled > 0 && fnProfitControlled > 0)?
               (<TouchableOpacity
                 activeOpacity={1}
                 onPress={() => {this.setState({FnPriceMsg: true})}}
@@ -567,7 +567,7 @@ class MineScene extends PureComponent {
 
   renderStoreBlock() {
     let token = `?access_token=${this.props.global.accessToken}`;
-    let {currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled} = this.state;
+    let {currVendorId, currVersion, is_mgr, is_helper, is_service_mgr, fnPriceControlled, fnProfitControlled} = this.state;
     return (
       <View style={[block_styles.container]}>
         {fnPriceControlled > 0 ? <TouchableOpacity
@@ -594,7 +594,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>业绩</Text>
         </TouchableOpacity>)}
 
-        {fnPriceControlled > 0 ?
+        {(fnPriceControlled > 0 && fnProfitControlled > 0)?
         (<TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
@@ -804,9 +804,9 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            let path = `/stores/provide_req_all.html${token}`;
-            let url = Config.serverUrl(path, Config.https);
-            this.onPress(Config.ROUTE_WEB, {url: url});
+            // let path = `/stores/provide_req_all.html${token}`;
+            // let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_INVOICING,{});
           }}
           activeOpacity={customerOpacity}
         >

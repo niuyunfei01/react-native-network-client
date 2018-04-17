@@ -62,6 +62,9 @@ public class Cts {
     public static final int PRICE_CONTROLLER_NO = 0;
     public static final int PRICE_CONTROLLER_YES = 1;
 
+    public static final int PROFIT_CONTROLLER_NO = 0;
+    public static final int PROFIT_CONTROLLER_YES = 1;
+
     public static final Provide PROVIDE_SLEF = new Provide(1, "自采");
     public static final Provide PROVIDE_COMMON = new Provide(0, "直供");
 

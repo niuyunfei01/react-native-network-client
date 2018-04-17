@@ -224,4 +224,3 @@ export function customerApply(applyData, callback) {
       })
   }
 }
-

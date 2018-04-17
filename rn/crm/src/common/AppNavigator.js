@@ -86,6 +86,11 @@ import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
 import NewProduct from "../scene/Goods/NewProduct";
 
+import InvoicingScene from "../scene/Invoicing/InvoicingScene";
+import InvoicingGatherDetailScene from "../scene/Invoicing/InvoicingGatherDetailScene";
+import InvoicingShippingDetailScene from "../scene/Invoicing/InvoicingShippingDetailScene";
+import InvoicingShippingScene from "../scene/Invoicing/InvoicingShippingScene"
+
 //扫码创新
 import CreateScan from "../scene/Goods/CreateScan";
 import SearchGoods from "../scene/Goods/SearchGoods";
@@ -317,7 +322,11 @@ class Navigator extends Component {
         SearchGoods: { screen: SearchGoods },
         NewProduct: { screen: NewProduct },
         NewProductDetail: { screen: NewProductDetail },
-        Refund: { screen: Refund }
+        Refund: { screen: Refund },
+        [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
+        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
+        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
+        [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene}
       },
       stackNavigatorConfigs
     );

@@ -110,6 +110,7 @@ export function vendor(global) {
   let currVendorName = currStore['vendor'];
   let currStoreName = currStore['name'];
   let fnPriceControlled = parseInt(currStore['fn_price_controlled']);
+  let fnProfitControlled = parseInt(currStore['fn_profit_controlled']);
 
   let currVendor = canReadVendors[currVendorId] === undefined ? {} : canReadVendors[currVendorId];
   let currVersion = currVendor['version'];
@@ -164,6 +165,7 @@ export function vendor(global) {
     fnProviding: fnProviding,
     fnProvidingOnway: fnProvidingOnway,
     fnPriceControlled: fnPriceControlled,
+    fnProfitControlled: fnProfitControlled
   };
 }
 
