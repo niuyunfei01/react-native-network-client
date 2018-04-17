@@ -23,7 +23,7 @@ import { Left } from "../component/All";
 import { getWithTpl, jsonWithTpl } from "../../util/common";
 import tool from "../../common/tool";
 import { ToastLong } from "../../util/ToastUtils";
-
+import {Toast} from "../../weui/index";
 const mapStateToProps = state => {
   return {
     global: state.global, //全局token
@@ -81,7 +81,6 @@ class NewProductDetail extends Component {
   }
   //保存函数
   save = () => {
-    console.log("保存");
     if (!this.state.price) return ToastLong("请输入商品价格");
     if (!this.getCategory()) return ToastLong("请选择门店分类");
     if (this.state.isSave) return;
@@ -351,6 +350,11 @@ class NewProductDetail extends Component {
       <LoadingView />
     ) : (
       <View style={{ flex: 1 }}>
+         <Toast
+              icon="loading"
+              show={this.state.isSave}
+          >正在保存，请稍后!
+        </Toast>
         {this.state.visual ? this.modal() : null}
         {this.title("基本信息")}
         <Left
