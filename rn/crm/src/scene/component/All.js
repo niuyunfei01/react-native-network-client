@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, Component } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,17 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput
+  TextInput,
+  PixelRatio,
+  TouchableWithoutFeedback
 } from "react-native";
 
 import pxToDp from "../../util/pxToDp";
+import { Colors, Styles, Metrics } from "../../themes";
+import Icon from "react-native-vector-icons/Ionicons";
+
+const one = 1 / PixelRatio.get();
+
 class Left extends PureComponent {
   static defaultProps = {
     isOne: true
@@ -113,5 +120,216 @@ class Adv extends PureComponent {
     );
   }
 }
+class Yuan extends Component {
+  static defaultProps = {
+    w: Metrics.CW / 10,
+    bgc: Colors.white,
+    size: 20
+  };
+  render() {
+    let {
+      w,
+      bgc,
+      ic,
+      size,
+      bc,
+      bw,
+      t,
+      fontStyle,
+      icon,
+      image,
+      images,
+      mgt,
+      mgb,
+      mgl,
+      mgr,
+      onPress
+    } = this.props;
+    return (
+      <TouchableWithoutFeedback onPress={onPress}>
+        <View
+          style={[
+            {
+              width: w,
+              height: w,
+              borderRadius: w / 2,
+              borderColor: bc,
+              borderWidth: bw,
+              backgroundColor: bgc,
+              marginTop: mgt,
+              marginBottom: mgb,
+              marginLeft: mgl,
+              marginRight: mgr
+            },
+            Styles.center
+          ]}
+        >
+          {icon ? <Icon name={icon} color={ic} size={size} /> : null}
 
-export { Left, Adv };
+          {t ? (
+            <Text style={fontStyle} allowFontScaling={false}>
+              {t}
+            </Text>
+          ) : null}
+          {image || images ? (
+            <Image
+              source={image ? image : { uri: images }}
+              style={{
+                width: w,
+                height: w,
+                borderRadius: w / 2,
+                borderColor: bc,
+                borderWidth: bw
+              }}
+            />
+          ) : null}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
+class Button extends Component {
+  static defaultProps = {
+    w: 70,
+    h: 30,
+    r: 15,
+    bw: one,
+    bc: Colors.theme,
+    t: "已完成",
+    fontStyle: Styles.n2
+  };
+  render() {
+    const {
+      w,
+      h,
+      bw,
+      bc,
+      r,
+      bgc,
+      fontStyle,
+      t,
+      onPress,
+      mgt,
+      mgb,
+      mgl,
+      mgr,
+      content
+    } = this.props;
+    return (
+      <TouchableOpacity
+        style={[
+          {
+            height: h,
+            width: w,
+            borderRadius: r,
+            borderWidth: bw,
+            borderColor: bc,
+            backgroundColor: bgc,
+            marginTop: mgt,
+            marginBottom: mgb,
+            marginLeft: mgl,
+            marginRight: mgr
+          },
+          Styles.center
+        ]}
+        onPress={onPress}
+      >
+        {t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : (
+          <View>{content}</View>
+        )}
+      </TouchableOpacity>
+    );
+  }
+}
+class Line extends Component {
+  static defaultProps = {
+    h: 1 / PixelRatio.get() * 2,
+    c: Colors.line
+  };
+
+  render() {
+    const { w, h, mgt, mgb, c, fontStyle, t } = this.props;
+    return (
+      <View
+        style={{
+          width: w,
+          height: h,
+          marginTop: mgt,
+          marginBottom: mgb,
+          backgroundColor: c
+        }}
+      >
+        {this.props.t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : null}
+      </View>
+    );
+  }
+}
+class Button1 extends Component {
+  static defaultProps = {
+    w: Metrics.CW * 0.7,
+    h: 40,
+    r: 20,
+    bw: one,
+    bc: Colors.theme,
+    bgc: Colors.theme,
+    mgt: 15,
+    t: "Button",
+    fontStyle: Styles.t1white
+  };
+  render() {
+    const {
+      w,
+      h,
+      bw,
+      bc,
+      r,
+      bgc,
+      fontStyle,
+      t,
+      onPress,
+      mgt,
+      mgb,
+      mgl,
+      mgr,
+      content
+    } = this.props;
+    return (
+      <TouchableOpacity
+        style={[
+          {
+            height: h,
+            width: w,
+            borderRadius: r,
+            borderWidth: bw,
+            borderColor: bc,
+            backgroundColor: bgc,
+            marginTop: mgt,
+            marginBottom: mgb,
+            marginLeft: mgl,
+            marginRight: mgr
+          },
+          Styles.center
+        ]}
+        onPress={onPress}
+      >
+        {t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : (
+          <View>{content}</View>
+        )}
+      </TouchableOpacity>
+    );
+  }
+}
+
+export { Left, Adv, Button, Line, Yuan, Button1 };

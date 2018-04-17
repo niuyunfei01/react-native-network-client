@@ -89,9 +89,10 @@ import NewProduct from "../scene/Goods/NewProduct";
 //扫码创新
 import CreateScan from "../scene/Goods/CreateScan";
 import SearchGoods from "../scene/Goods/SearchGoods";
-
 //新产品详情
 import NewProductDetail from "../scene/Goods/NewProductDetail";
+//退款详情
+import Refund from "../scene/Order/Refund";
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -315,7 +316,8 @@ class Navigator extends Component {
         CreateScan: { screen: CreateScan },
         SearchGoods: { screen: SearchGoods },
         NewProduct: { screen: NewProduct },
-        NewProductDetail: { screen: NewProductDetail }
+        NewProductDetail: { screen: NewProductDetail },
+        Refund: { screen: Refund }
       },
       stackNavigatorConfigs
     );
