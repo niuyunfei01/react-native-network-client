@@ -97,11 +97,6 @@ class InvoicingGatherDetailScene extends PureComponent {
     const {dispatch, global, navigation} = this.props;
     let reqData = this.state.reqData;
     let token = global['accessToken'];
-    let remark = reqData['remark'];
-    if (!remark) {
-      ToastLong("请输入备注信息!");
-      return false;
-    }
     dispatch(lockProvideReq(reqData, token, function (ok, desc) {
       if (ok) {
         //redirect to ship order
@@ -164,9 +159,6 @@ class InvoicingGatherDetailScene extends PureComponent {
 
   render() {
     let remark = this.state.reqData.remark;
-    if(!remark){
-      remark = "无备注";
-    }
     return (
       <View style={{flex: 1}}>
         <ScrollView>
