@@ -356,11 +356,6 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
   };
 
   let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
-  /*let sortStores = Object.values(canReadStores).sort(function (a, b) {
-    let res = (parseInt(a.vendor_id) - parseInt(b.vendor_id));
-    console.log('res ------------------> ', parseInt(a.vendor_id), parseInt(b.vendor_id), res);
-    return res;
-  });*/
   let sortStores = Object.values(canReadStores).sort(by('vendor_id',by('id')));
   for (let store of sortStores) {
     if (store.id > 0) {

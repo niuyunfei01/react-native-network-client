@@ -53,7 +53,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     public void setStore(Store store) {
         this.store = store;
     }
-    
+
     public View getView(int pos, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
