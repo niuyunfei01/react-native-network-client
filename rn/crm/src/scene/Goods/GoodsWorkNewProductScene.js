@@ -55,21 +55,20 @@ class GoodsWorkNewProductScene extends PureComponent {
     return {
       headerTitle: '申请工单上新',
       headerLeft: (<NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            if (type == 'add') {
-              native.gotoPage(type);
-            } else {
-              navigation.goBack();
-            }
-          }}
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+        onPress={() => {
+          if (type == 'add') {
+            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
+          } else {
+            navigation.goBack();
+          }
+        }}
       />)
     };
   };
 
   constructor(props) {
-
     super(props);
     this.state = {
       isUploadImg: false,
@@ -91,7 +90,7 @@ class GoodsWorkNewProductScene extends PureComponent {
 
   componentWillMount() {
     this.getRemark();
-    this.setState({task_id:this.props.navigation.state.params.task_id});
+    this.setState({task_id: this.props.navigation.state.params.task_id});
   }
 
 
@@ -99,7 +98,6 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {key, params} = this.props.navigation.state;
     let {store_categories, tag_list} = (params || {});
     if (store_categories && tag_list) {
-      console.log('tag_list -> ', tag_list);
       this.setState({store_categories: store_categories, tag_list: tag_list});
     }
   }
@@ -116,21 +114,24 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {task_id} = this.props.navigation.state.params;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    this.setState({uploading: true});
-    dispatch(getGoodsProduct(task_id, accessToken, (resp) => {
-      this.setState({uploading: false});
-      if (resp.ok) {
-        let {remark, price_desc, slogan, images} = resp.obj;
-        this.setState({
-          name: remark,
-          price_desc: price_desc,
-          slogan: slogan,
-          images: images,
-        })
-      } else {
-        ToastLong(resp.desc + '请返回重试')
-      }
-    }));
+    this.state = {'task_id': task_id};
+    if (task_id) {
+      this.setState({uploading: true});
+      dispatch(getGoodsProduct(task_id, accessToken, (resp) => {
+        this.setState({uploading: false});
+        if (resp.ok) {
+          let {remark, price_desc, slogan, images} = resp.obj;
+          this.setState({
+            name: remark,
+            price_desc: price_desc,
+            slogan: slogan,
+            images: images,
+          })
+        } else {
+          ToastLong(resp.desc + '请返回重试')
+        }
+      }));
+    }
   }
 
   setBeforeRefresh() {
@@ -145,7 +146,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     dispatch(markTaskDone(accessToken, task_id, status, async (ok, reason) => {
       this.setState({upReason: false});
       if (ok) {
-        await this.setState({reason:''})
+        await this.setState({reason: ''})
         this.setBeforeRefresh();
         this.props.navigation.goBack();
       }
@@ -153,177 +154,176 @@ class GoodsWorkNewProductScene extends PureComponent {
   }
 
   renderBtn() {
+    let taskId = this.state.task_id;
     return (
-        <View style={{paddingVertical: pxToDp(20)}}>
-          <Button
-              style={[styles.save_btn]}
-              onPress={() => {
-                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'add',
-                  task_id: this.props.navigation.state.params.task_id,
-                  name: this.state.name,
-                })
-              }}
+      <View style={{paddingVertical: pxToDp(20)}}>
+        <Button
+          style={[styles.save_btn]}
+          onPress={() => {
+            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+              type: 'add',
+              task_id: this.props.navigation.state.params.task_id,
+              name: this.state.name,
+            })
+          }}
+        >
+          <Text style={{color: colors.white}}>立即上新</Text>
+        </Button>
+        <Button
+          style={[styles.save_btn, styles.save_btn_no]}
+          onPress={() => {
+            this.setState({showDialog: true})
+          }}
+        >
+          <Text style={{color: colors.main_color}}>暂不上新</Text>
+        </Button>
+        {!!taskId && <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={async () => {
+              if (this.state.upReason) {
+                return false
+              }
+              await this.setState({upReason: true});
+              this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
+            }}
           >
-            <Text style={{color: colors.white}}>立即上新</Text>
-          </Button>
-          <Button
-              style={[styles.save_btn, styles.save_btn_no]}
-              onPress={() => {
-                this.setState({showDialog: true})
-              }}
-          >
-            <Text style={{color: colors.main_color}}>暂不上新</Text>
-          </Button>
-
-          <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
-            <TouchableOpacity
-                onPress={async () => {
-                  if(this.state.upReason){
-                    return false
-                  }
-                  await this.setState({upReason: true});
-                  this.changeTaskStatus(Cts.TASK_STATUS_DONE,'')
-                }}
-            >
-              <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新</Text>
+          </TouchableOpacity>
+        </View>}
+      </View>
     )
   }
-  renderImg(images = []) {
 
+  renderImg(images = []) {
     if (images.length > 0) {
       return (
-          <View style={[styles.area_cell, styles.add_img_wrapper]}>
-            {
-              images.map((item, index) => {
-                return (
-                    <View key={index}
-                          style={{
-                            height: pxToDp(170),
-                            width: pxToDp(170),
-                            flexDirection: 'row',
-                            alignItems: 'flex-end'
-                          }}>
-                      <Image
-                          style={styles.img_add}
-                          source={{uri: item}}
-                      />
-                    </View>
-                )
-              })
-            }
-          </View>
+        <View style={[styles.area_cell, styles.add_img_wrapper]}>
+          {
+            images.map((item, index) => {
+              return (
+                <View key={index}
+                      style={{
+                        height: pxToDp(170),
+                        width: pxToDp(170),
+                        flexDirection: 'row',
+                        alignItems: 'flex-end'
+                      }}>
+                  <Image
+                    style={styles.img_add}
+                    source={{uri: item}}
+                  />
+                </View>
+              )
+            })
+          }
+        </View>
       )
     } else {
       return null;
     }
-
   }
 
   render() {
     let {name, price_desc, slogan, images} = this.state;
     return (
-        <ScrollView style={{flex: 1}}>
-          <View>
-            <Cells style={styles.my_cells}>
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>商品名称</Label>
-                </CellHeader>
-                <CellBody>
-                  <Text style={[styles.input_text]}>
-                    {name}
-                  </Text>
-                </CellBody>
-              </Cell>
+      <ScrollView style={{flex: 1}}>
+        <View>
+          <Cells style={styles.my_cells}>
+            <Cell customStyle={[styles.my_cell]}>
+              <CellHeader style={styles.attr_name}>
+                <Label style={[styles.cell_label]}>商品名称</Label>
+              </CellHeader>
+              <CellBody>
+                <Text style={[styles.input_text]}>
+                  {name}
+                </Text>
+              </CellBody>
+            </Cell>
 
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={styles.attr_name}>
-                  <Label style={[styles.cell_label]}>价格描述</Label>
-                </CellHeader>
-                <CellBody>
-                  <Text style={[styles.input_text]}>
-                    {price_desc}
-                  </Text>
-                </CellBody>
-                <CellFooter/>
-              </Cell>
-              <View style={[styles.area_cell, {height: pxToDp(250)}]}>
-                <View>
-                  <Text style={[styles.area_input_title]}>商品介绍</Text>
-                </View>
-                <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
-                  <TextInput
-                      multiline={true}
-                      underlineColorAndroid='transparent'
-                      editable={false}
-                      placeholderTextColor={"#7A7A7A"}
-                      style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
-                      value={slogan}
-                      onChangeText={(text) => {
-                        this.setState({content: text})
-                      }}
-                  />
-
-                </View>
+            <Cell customStyle={[styles.my_cell]}>
+              <CellHeader style={styles.attr_name}>
+                <Label style={[styles.cell_label]}>价格描述</Label>
+              </CellHeader>
+              <CellBody>
+                <Text style={[styles.input_text]}>
+                  {price_desc}
+                </Text>
+              </CellBody>
+              <CellFooter/>
+            </Cell>
+            <View style={[styles.area_cell, {height: pxToDp(250)}]}>
+              <View>
+                <Text style={[styles.area_input_title]}>商品介绍</Text>
               </View>
-            </Cells>
-          </View>
+              <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
+                <TextInput
+                  multiline={true}
+                  underlineColorAndroid='transparent'
+                  editable={false}
+                  placeholderTextColor={"#7A7A7A"}
+                  style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
+                  value={slogan}
+                  onChangeText={(text) => {
+                    this.setState({content: text})
+                  }}
+                />
 
-          {
-            this.renderImg(images)
-          }
+              </View>
+            </View>
+          </Cells>
+        </View>
 
-          {
-            this.renderBtn('NewProduct')
-          }
-          <Toast
-              icon="loading"
-              show={this.state.uploading}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
-          <Toast
-              icon="loading"
-              show={this.state.upReason}
-              onRequestClose={() => {
-              }}
-          >提交中..</Toast>
-          <Dialog onRequestClose={() => {
+        {
+          this.renderImg(images)
+        }
+
+        {
+          this.renderBtn('NewProduct')
+        }
+        <Toast
+          icon="loading"
+          show={this.state.uploading}
+          onRequestClose={() => {
           }}
-                  visible={this.state.showDialog}
-                  title={'备注(理由)'}
-                  buttons={[{
-                    type: 'default',
-                    label: '取消',
-                    onPress: () => {
-                      this.setState({showDialog: false})
+        >加载中</Toast>
+        <Toast
+          icon="loading"
+          show={this.state.upReason}
+          onRequestClose={() => {
+          }}
+        >提交中..</Toast>
+        <Dialog onRequestClose={() => {
+        }}
+                visible={this.state.showDialog}
+                title={'备注(理由)'}
+                buttons={[{
+                  type: 'default',
+                  label: '取消',
+                  onPress: () => {
+                    this.setState({showDialog: false})
+                  }
+                }, {
+                  type: 'primary',
+                  label: '确定',
+                  onPress: async () => {
+                    if (this.state.upReason) {
+                      return false
                     }
-                  }, {
-                    type: 'primary',
-                    label: '确定',
-                    onPress: async() => {
-                      if(this.state.upReason){
-                        return false
-                      }
-                      await this.setState({showDialog: false, upReason: true});
-                      this.changeTaskStatus(Cts.TASK_STATUS_CONFIRMED, this.state.reason)
-                    }
-                  }]}
-          >
-            <Input
-                multiline={true}
-                style={{height: pxToDp(90)}}
-                value={this.state.reason}
-                onChangeText={(text) => {
-                  this.setState({reason: text})
-                }}
-            />
-          </Dialog>
-        </ScrollView>
+                    await this.setState({showDialog: false, upReason: true});
+                    this.changeTaskStatus(Cts.TASK_STATUS_CONFIRMED, this.state.reason)
+                  }
+                }]}
+        >
+          <Input
+            multiline={true}
+            style={{height: pxToDp(90)}}
+            value={this.state.reason}
+            onChangeText={(text) => {
+              this.setState({reason: text})
+            }}
+          />
+        </Dialog>
+      </ScrollView>
     )
   }
 }

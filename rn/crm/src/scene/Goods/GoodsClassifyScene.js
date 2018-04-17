@@ -49,21 +49,20 @@ class GoodsClassifyScene extends PureComponent {
 
   async setGoodsCats(checked) {
     let {state, dispatch} = this.props.navigation;
-    let tag_list =  this.GetCheckName(checked)
-    console.log(tag_list)
+    let tag_list = this.GetCheckName(checked)
     const setParamsAction = NavigationActions.setParams({
-      params: {store_categories: checked,tag_list:tag_list},
+      params: {store_categories: checked, tag_list: tag_list},
       key: state.params.nav_key
     });
     dispatch(setParamsAction);
   }
 
   toCheckBoxData(arr) {
-    arr.forEach((item,index) => {
+    arr.forEach((item, index) => {
       item.label = item.name
       item.value = item.id
-      if(item.id == Cts.TAG_HIDE ){
-        arr.splice(index,1)
+      if (item.id == Cts.TAG_HIDE) {
+        arr.splice(index, 1)
       }
 
     });
@@ -90,20 +89,20 @@ class GoodsClassifyScene extends PureComponent {
           <CheckboxCells
             options={this.state.arrData}
             onChange={(checked) => {
-             this.setState({checked:checked})
+              this.setState({checked: checked})
             }}
             style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
             value={this.state.checked}
           />
         </ScrollView>
         <TouchableOpacity
-          onPress={ async () =>{
+          onPress={async () => {
             await   this.setGoodsCats(this.state.checked);
             this.props.navigation.dispatch(NavigationActions.back())
           }}
         >
           <View style={styles.save_btn_box}>
-           <Text style = { styles.save_btn }>保存</Text>
+            <Text style={styles.save_btn}>保存</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -114,21 +113,21 @@ class GoodsClassifyScene extends PureComponent {
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsClassifyScene)
 
 const styles = StyleSheet.create({
-  save_btn_box:{
-    height:pxToDp(100),
-    width:'100%',
-    flexDirection:'row',
-    justifyContent:'center',
-    alignItems:'center',
+  save_btn_box: {
+    height: pxToDp(100),
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
 
   },
-  save_btn:{
-    fontSize:pxToDp(30),
-    color:'#fff',
-    backgroundColor:"#59b26a",
-    textAlign:'center',
-    width:'90%',
-    paddingVertical:pxToDp(15),
-    borderRadius:pxToDp(5)
+  save_btn: {
+    fontSize: pxToDp(30),
+    color: '#fff',
+    backgroundColor: "#59b26a",
+    textAlign: 'center',
+    width: '90%',
+    paddingVertical: pxToDp(15),
+    borderRadius: pxToDp(5)
   }
 })

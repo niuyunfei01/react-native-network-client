@@ -79,9 +79,19 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
 
   constructor(props) {
     super(props);
+    let {currVendorId} = tool.vendor(this.props.global);
+    let currStoreId = this.props.navigation.state.params.store_id;
+    if (!currStoreId) {
+      currStoreId = this.props.global.currStoreId;
+    }
+    this.state = {
+      vendor_id: currVendorId,
+      store_id: currStoreId,
+    };
   }
 
   render() {
+    let jsonData = JSON.stringify(this.state);
     return (
       <ScrollView
         style={{
@@ -98,7 +108,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
           onPress={() => {
             native.gotoNativeActivity(
               "cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity",
-              false
+              false, jsonData
             );
           }}
         />

@@ -1,25 +1,16 @@
-import React, { Component } from "react";
-import {
-  FlatList,
-  Image,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
-import { connect } from "react-redux";
-import { NavigationActions } from "react-navigation";
+import React, {Component} from "react";
+import {FlatList, Image, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {connect} from "react-redux";
+import {NavigationActions} from "react-navigation";
 
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import LoadingView from "../../widget/LoadingView";
-import { Styles } from "../../themes";
+import {Styles} from "../../themes";
 //请求
-import { getWithTpl } from "../../util/common";
+import {getWithTpl} from "../../util/common";
 //配置图片的路由
 import Config from "../../config";
-
-let data = [{ id: 1 }, { id: 2 }, { id: 2 }, { id: 2 }, { id: 2 }];
 
 const mapStateToProps = state => {
   return {
@@ -27,22 +18,17 @@ const mapStateToProps = state => {
   };
 };
 
-const resetAction = NavigationActions.reset({
-  index: 0,
-  actions: [
-    NavigationActions.navigate({
-      routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT
-    })
-  ]
-});
-
 class SearchGoods extends Component {
   //导航
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     let value = ""; //关键字
     if (params.value) {
       value = params.value;
+    }
+    let storeId = '';
+    if (params.store_id) {
+      storeId = params.store_id;
     }
     return {
       headerLeft: (
@@ -52,10 +38,17 @@ class SearchGoods extends Component {
             width: pxToDp(48),
             height: pxToDp(48),
             marginLeft: pxToDp(31)
-            // marginTop: pxToDp(20)
           }}
           onPress={() => {
-            navigation.dispatch(resetAction);
+            navigation.dispatch(NavigationActions.reset({
+              index: 0,
+              actions: [
+                NavigationActions.navigate({
+                  routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT,
+                  params: {store_id: storeId}
+                })
+              ]
+            }));
           }}
           children={
             <View
@@ -70,14 +63,12 @@ class SearchGoods extends Component {
               }}
             >
               <TextInput
-                style={[
-                  {
-                    fontSize: 14,
-                    flex: 1,
-                    paddingVertical: 5,
-                    paddingLeft: 5
-                  }
-                ]}
+                style={[{
+                  fontSize: 14,
+                  flex: 1,
+                  paddingVertical: 5,
+                  paddingLeft: 5
+                }]}
                 value={value}
                 maxLength={20}
                 placeholder={"请输入搜索内容"}
@@ -88,7 +79,7 @@ class SearchGoods extends Component {
               <TouchableOpacity onPress={() => params.search()}>
                 <Image
                   source={require("../../img/new/searchG.png")}
-                  style={{ width: 20, height: 20, marginRight: 5 }}
+                  style={{width: 20, height: 20, marginRight: 5}}
                 />
               </TouchableOpacity>
             </View>
@@ -116,6 +107,10 @@ class SearchGoods extends Component {
       search: this.search
     });
     const state = this.props.navigation.state;
+    let storeId = this.props.global.currStoreId;
+    if (state.params && state.params.store_id) {
+      storeId = state.params.store_id;
+    }
     if (state.params && state.params.result) {
       let code = JSON.parse(state.params.result);
       console.log("code:%o", code);
@@ -126,13 +121,11 @@ class SearchGoods extends Component {
           value: code.code //upc
         },
         () => {
-          this.fetchResources();
           this.search();
         }
       );
-    } else {
-      this.fetchResources();
     }
+    this.fetchResources(storeId);
   }
 
   inputText = text => {
@@ -148,10 +141,8 @@ class SearchGoods extends Component {
     });
   };
   //获取数据判断是否联营
-  fetchResources = () => {
-    let url = `api/get_store_type/${
-      this.props.global.currStoreId
-    }?access_token=${this.props.global.accessToken}`;
+  fetchResources = (storeId) => {
+    let url = `api/get_store_type/${storeId}?access_token=${this.props.global.accessToken}`;
     http: getWithTpl(
       url,
       json => {
@@ -183,12 +174,12 @@ class SearchGoods extends Component {
       console.log("扫码进入", this.state.value);
       url = `api/query_product_by_upc.json?access_token=${
         this.props.global.accessToken
-      }&upc=${this.state.value}`;
+        }&upc=${this.state.value}`;
     } else {
       console.log("搜索");
       url = `api/query_product_by_keyword.json?access_token=${
         this.props.global.accessToken
-      }&keyword=${this.text}`;
+        }&keyword=${this.text}`;
     }
 
     http: getWithTpl(
@@ -215,7 +206,7 @@ class SearchGoods extends Component {
     );
   };
   //样式
-  renderRow = ({ item, index }) => {
+  renderRow = ({item, index}) => {
     console.log("item:%o", item);
     return (
       <TouchableOpacity
@@ -227,7 +218,7 @@ class SearchGoods extends Component {
             price: item.price
           })
         }
-        style={{ marginTop: index === 0 ? 0 : 30, flexDirection: "row" }}
+        style={{marginTop: index === 0 ? 0 : 30, flexDirection: "row"}}
       >
         <View
           style={{
@@ -238,8 +229,8 @@ class SearchGoods extends Component {
           }}
         >
           <Image
-            source={{ uri: Config.staticUrl(item.coverimg) }}
-            style={{ width: 98, height: 98 }}
+            source={{uri: Config.staticUrl(item.coverimg)}}
+            style={{width: 98, height: 98}}
           />
         </View>
         <View
@@ -251,17 +242,17 @@ class SearchGoods extends Component {
         >
           <Text
             numberOfLines={1}
-            style={{ fontSize: 16, color: "#3e3e3e", fontWeight: "bold" }}
+            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
           >
             {item.name}
           </Text>
           <Text
             numberOfLines={3}
-            style={{ flex: 1, color: "#bfbfbf", fontSize: 12, lineHeight: 14 }}
+            style={{flex: 1, color: "#bfbfbf", fontSize: 12, lineHeight: 14}}
           >
             {item.description || "该产品暂无描述"}
           </Text>
-          <Text numberOfLines={1} style={{ color: "#bfbfbf", fontSize: 12 }}>
+          <Text numberOfLines={1} style={{color: "#bfbfbf", fontSize: 12}}>
             UPC:{item.upc || "无"}
           </Text>
         </View>
@@ -272,10 +263,10 @@ class SearchGoods extends Component {
   render() {
     console.disableYellowBox = true;
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
           {/*搜索商品列表*/}
           {this.state.goods.length ? (
             <View
@@ -309,23 +300,18 @@ class SearchGoods extends Component {
         </View>
         <TouchableOpacity
           onPress={() => {
-            console.log("是不是联营:%o", this.cooperation);
-            this.props.navigation.navigate("GoodsEdit", {
-              type: "add"
-            });
-            // if(this.cooperation){
-            //   this.props.navigation.navigate("NewProduct", {
-            //     type: "lianying"
-            //   })
-            // } else{
-            //   console.log('不是联营')
-            //   this.props.navigation.navigate("GoodsEdit", {
-            //     type: "add"
-            //   });
-            // }
+            if (this.cooperation) {
+              this.props.navigation.navigate(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, {
+                type: "add"
+              });
+            }else{
+              this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: "add"
+              });
+            }
           }}
         >
-          <View style={{ paddingHorizontal: pxToDp(31), marginTop: 10 }}>
+          <View style={{paddingHorizontal: pxToDp(31), marginTop: 10}}>
             <View
               style={{
                 width: "100%",
@@ -336,9 +322,7 @@ class SearchGoods extends Component {
                 justifyContent: "center"
               }}
             >
-              <Text
-                style={{ color: "#fff", fontSize: 20, textAlign: "center" }}
-              >
+              <Text style={{color: "#fff", fontSize: 20, textAlign: "center"}}>
                 手动添加
               </Text>
             </View>

@@ -59,9 +59,9 @@ export default {
     }
   },
 
-  gotoNativeActivity: async function (activityName, putStack) {
+  gotoNativeActivity: async function (activityName, putStack, json = '{}') {
     if (NativeModules.ActivityStarter && activityName) {
-      await NativeModules.ActivityStarter.navigateToNativeActivity(activityName, putStack);
+      await NativeModules.ActivityStarter.navigateToNativeActivity(activityName, putStack, json);
     }
   },
 
