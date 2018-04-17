@@ -118,13 +118,18 @@ class SearchGoods extends Component {
     const state = this.props.navigation.state;
     if (state.params && state.params.result) {
       let code = JSON.parse(state.params.result);
-      this.props.navigation.setParams({
-        inputText: this.inputText,
-        search: this.search,
-        value: code.code //upc
-      });
-      this.fetchResources();
-      this.search();
+      console.log("code:%o", code);
+      this.props.navigation.setParams(
+        {
+          inputText: this.inputText,
+          search: this.search,
+          value: code.code //upc
+        },
+        () => {
+          this.fetchResources();
+          this.search();
+        }
+      );
     } else {
       this.fetchResources();
     }
@@ -175,8 +180,8 @@ class SearchGoods extends Component {
     console.log("url:%o", url);
     let url = "";
     if (!this.text) {
-      console.log("扫码进入");
-      url = `api/query_product_by_keyword.json?access_token=${
+      console.log("扫码进入", this.state.value);
+      url = `api/query_product_by_upc.json?access_token=${
         this.props.global.accessToken
       }&upc=${this.state.value}`;
     } else {
