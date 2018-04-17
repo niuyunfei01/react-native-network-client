@@ -30,8 +30,10 @@ const mapStateToProps = state => {
     global: state.global //全局token,
   };
 };
-const backAction = NavigationActions.back({
-  key: "GoodsWorkNewProduct"
+
+const resetAction = NavigationActions.reset({
+  index: 0,
+  actions: [NavigationActions.navigate({ routeName: "AllSearch" })]
 });
 
 class SearchGoods extends Component {
@@ -52,7 +54,8 @@ class SearchGoods extends Component {
             if (params && params.products) {
               console.log("navition", navigation);
               // return navigation.goBack("SearchGoods");
-              navigation.dispatch(backAction);
+              // navigation.dispatch(backAction);
+              return navigation.dispatch(resetAction);
             }
             navigation.goBack();
           }}
@@ -142,7 +145,7 @@ class SearchGoods extends Component {
           this.setState({
             isLoading: false
           });
-          this.cooperation = json.obj;
+          this.cooperation = json.obj.cooperation;
         } else {
           this.setState({
             isLoading: false
@@ -282,13 +285,22 @@ class SearchGoods extends Component {
         </View>
         <TouchableOpacity
           onPress={() => {
-            !this.cooperation
-              ? this.props.navigation.navigate("NewProduct", {
-                  type: "feilianying"
-                })
-              : this.props.navigation.navigate("GoodsEdit", {
+            console.log("是不是联营:%o", this.cooperation);
+            this.props.navigation.navigate("GoodsEdit", {
                   type: "add"
                 });
+            // if(this.cooperation){
+            //   this.props.navigation.navigate("NewProduct", {
+            //     type: "lianying"
+            //   })
+            // } else{
+            //   console.log('不是联营')
+            //   this.props.navigation.navigate("GoodsEdit", {
+            //     type: "add"
+            //   });
+            // }
+           
+           
           }}
         >
           <View style={{ paddingHorizontal: pxToDp(31), marginTop: 10 }}>
