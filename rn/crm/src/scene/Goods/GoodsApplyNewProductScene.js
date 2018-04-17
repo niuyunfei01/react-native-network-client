@@ -70,7 +70,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            navigation.goBack();
+            native.toGoods();
           }}
         />
       )
