@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="230"
+    android:versionCode="300"
     android:versionName="2.3.7-8">
 
     <permission
