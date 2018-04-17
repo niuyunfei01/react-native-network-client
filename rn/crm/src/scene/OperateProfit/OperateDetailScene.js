@@ -85,10 +85,7 @@ class OperateDetailScene extends PureComponent {
       sum: 0,
       editable: false,
       check_detail: false,
-      income: {
-        [Cts.OPERATE_ORDER_IN]: { num: 0 },
-        [Cts.OPERATE_OTHER_IN]: { num: 0 }
-      },
+      income:null,
       outcome_normal: {
         [Cts.OPERATE_REFUND_OUT]: { num: 0, order_num: 0 },
         [Cts.OPERATE_DISTRIBUTION_TIPS]: { num: 0, order_num: 0 },
@@ -117,10 +114,6 @@ class OperateDetailScene extends PureComponent {
     }
   }
   componentWillMount() {
-    console.log(
-      "total_balanced",
-      this.props.navigation.state.params.total_balanced
-    );
     this.setState({
       total_balanced: this.props.navigation.state.params.total_balanced
     });
@@ -188,10 +181,10 @@ class OperateDetailScene extends PureComponent {
             income,
             outcome_normal,
             outcome_other,
-            type: 0
+            type: 0,
+            isLoading: false
           });
         }
-        this.setState({ isLoading: false });
       })
     );
   }
@@ -308,7 +301,7 @@ class OperateDetailScene extends PureComponent {
       name,
       total_balanced
     } = this.state;
-    console.log("订单收入:%o", income, income[Cts.OPERATE_ORDER_IN].num);
+    console.log("订单收入:%o", income,);
     return this.state.isLoading ? (
       <LoadingView />
     ) : (
