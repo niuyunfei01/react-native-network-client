@@ -24,6 +24,40 @@ const fontSizeScaler =
 const w = Metrics.CW;
 
 const Styles = {
+  h32bf: {
+    color: Colors.greybf,
+    fontSize: Fonts.size.h32,
+    fontWeight: "bold"
+  },
+  h22theme: {
+    color: Colors.theme,
+    fontSize: Fonts.size.h22
+  },
+  h303e: {
+    color: Colors.e3,
+    fontSize: Fonts.size.h30,
+    fontWeight: "bold"
+  },
+  h203e: {
+    color: Colors.e3,
+    fontSize: Fonts.size.h20
+  },
+  h18theme: {
+    color: Colors.theme,
+    fontSize: Fonts.size.h18
+  },
+  h22a2: {
+    color: Colors.a2,
+    fontSize: Fonts.size.h22
+  },
+  h223e: {
+    color: Colors.e3,
+    fontSize: Fonts.size.h22
+  },
+  h16c4: {
+    color: Colors.c4,
+    fontSize: Fonts.size.h16
+  },
   // 对齐样式
   center: {
     justifyContent: "center",

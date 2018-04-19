@@ -88,6 +88,8 @@ import SearchGoods from "../scene/Goods/SearchGoods";
 import NewProductDetail from "../scene/Goods/NewProductDetail";
 import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProductRemindScene"
 
+//退款详情
+import Refund from "../scene/Order/Refund";
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -313,6 +315,7 @@ class Navigator extends Component {
         [Config.ROUTE_NEW_PRODUCT]: {screen: NewProduct},
         [Config.ROUTE_NEW_PRODUCT_DETAIL]: {screen: NewProductDetail},
         [Config.ROUTE_CREATE_NEW_GOOD_REMIND]: {screen: CreateApplyNewProductRemindScene},
+        Refund: { screen: Refund },
         [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},

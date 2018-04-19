@@ -1513,8 +1513,19 @@ class OrderScene extends Component {
               }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
-
+            {
+              order.orderStatus=='4'?
+              null
+              :
+              <TouchableOpacity
+              onPress={()=>this.props.navigation.navigate('Refund',{orderDetail:order})}
+            >
+                <Text>申请退款</Text>
+            </TouchableOpacity>
+            }
+         
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
+            
               <ImageBtn
                 source={require('../../img/Order/good/queren_.png')}
                 imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
