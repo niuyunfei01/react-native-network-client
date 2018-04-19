@@ -306,7 +306,8 @@ class OperateDetailScene extends PureComponent {
       money,
       type,
       name,
-      total_balanced
+      total_balanced,
+      balance_money
     } = this.state;
     console.log("订单收入:%o", income);
     console.disableYellowBox = true;
@@ -315,11 +316,10 @@ class OperateDetailScene extends PureComponent {
     ) : (
       <View style={{ flex: 1 }}>
         <Header text={"今日运营收益"} money={toFixed(sum)} />
-        <Header text={"运营收益结转"} money={"1.95"} />
+        {balance_money>0&&<Header text={"运营收益结转"} money={toFixed(balance_money)} />}
         <Header
           text={"待结算运营收益总额"}
           money={toFixed(total_balanced)}
-          // customStyle={{ height: pxToDp(60), alignItems: "flex-start" }}
         />
         <ScrollView style={{ paddingBottom: pxToDp(50) }}>
           <View style={content.in_box}>
