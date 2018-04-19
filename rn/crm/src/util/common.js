@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 import FetchEx from "./fetchEx";
 import Config from "../config";
 
@@ -63,7 +63,8 @@ export function jsonWithTpl(url, data, okFn, failFn, dispatch) {
       okFn(json, dispatch);
     })
     .catch(error => {
-      failFn(error, dispatch);
+      // console.log("err", error);
+      dispatch ? failFn(error, dispatch) : failFn(error);
     });
 }
 
