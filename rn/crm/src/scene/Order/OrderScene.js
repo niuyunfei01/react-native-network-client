@@ -1569,10 +1569,8 @@ class OrderScene extends Component {
                 http: getWithTpl(
                   url,
                   json => {
-                    console.log('json:%o',json)
                     if (json.ok) {
-                      console.log('json',json)
-                      this.props.navigation.navigate('Refund',{orderDetail:order})
+                      this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL,{orderDetail:order})
                     } else {
                       this.setState({
                         visible:true,
