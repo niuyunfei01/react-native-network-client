@@ -19,13 +19,24 @@ import {
 import { NavigationItem } from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import { Styles, Metrics, Colors } from "../../themes";
-
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 //组件
 import { Button, Line, Yuan, Button1 } from "../component/All";
-import index from "../../stylekit";
+import LoadingView from "../../widget/LoadingView";
+//请求
+import { getWithTpl, jsonWithTpl } from "../../util/common";
+import { tool } from "../../common";
+import { ToastLong } from "../../util/ToastUtils";
+
 const one = 1 / PixelRatio.get(); //屏幕密度
-console.log("one:%o", one);
-export default class Refund extends Component {
+
+const mapStateToProps = state => {
+  return {
+    global: state.global //全局token,
+  };
+};
+class Refund extends Component {
   //导航
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
@@ -51,33 +62,54 @@ export default class Refund extends Component {
     super(props);
     this.state = {
       orderDetail: this.props.navigation.state.params.orderDetail,
-      refundReason: [
-        { id: 1, text: "商家订单太多，怕您等的太久" },
-        { id: 2, text: "没有货了" },
-        { id: 3, text: "跟客户协商要求换货" },
-        { id: 4, text: "其他原因" }
-      ],
+      refundReason: [],
       active: false,
       index: 0,
-      goodsList: JSON.parse(
-        this.props.navigation.state.params.orderDetail.goods_json
-      )
+      goodsList: this.props.navigation.state.params.orderDetail.items,
+      isLoading: true
     };
-    this.goodsList = JSON.parse(
-      this.props.navigation.state.params.orderDetail.goods_json
-    );
+    this.refundReason = null;
   }
   componentWillMount() {
-    let data = this.state.goodsList;
-    data.map(element => {
-      let active = false;
-      element.gNum = 0;
-      element.active = active;
-    });
-    this.setState({
-      goodsList: data
-    });
+    console.log(
+      "this.props.navigation.state.params.orderDetail:%o",
+      this.props.navigation.state.params.orderDetail
+    );
+    this.fetchResources();
   }
+  fetchResources = () => {
+    let url = `/api/refund_reason?access_token=${
+      this.props.global.accessToken
+    }`;
+    http: getWithTpl(
+      url,
+      json => {
+        if (json.ok) {
+          console.log("退款原因:%o", json.obj);
+          let data = this.state.goodsList;
+          data.map(element => {
+            let active = false;
+            element.num = 0;
+            element.active = active;
+          });
+          this.setState({
+            goodsList: data,
+            isLoading: false,
+            refundReason: json.obj.concat(["其他原因"])
+          });
+        } else {
+          this.setState({
+            isLoading: false
+          });
+        }
+      },
+      error => {
+        this.setState({
+          isLoading: false
+        });
+      }
+    );
+  };
   title = text => {
     return (
       <View
@@ -92,12 +124,9 @@ export default class Refund extends Component {
       </View>
     );
   };
-  select = element => {
-    // let reson = this.state.refundReason;
-    // element.active = !element.active;
+  select = (element, index) => {
     this.setState({
-      active: element.id === this.state.index ? false : true,
-      index: element.id
+      index: index
     });
   };
   selectRefund = element => {
@@ -112,20 +141,55 @@ export default class Refund extends Component {
     let num = 0;
     this.state.goodsList.map(element => {
       if (element.active) {
-        num = num + element.gNum;
+        num = num + element.num;
       }
     });
     return num;
   };
-  render() {
-    console.log("this.props:%o", this.props.navigation);
-    console.log(
-      "商品列表:%o:不应该变化的数组",
-      this.state.goodsList,
-      this.goodsList
+  //退款
+  refund = () => {
+    if (
+      this.state.index === this.state.refundReason.length - 1 &&
+      !this.refundReason
+    )
+      return ToastLong("请输入退款原因！");
+    if (this.getNum() === 0) return ToastLong("请选择退款商品！");
+    this.refundgoodsList = [];
+    this.state.goodsList.map(element => {
+      if (element.active && element.num !== 0) {
+        this.refundgoodsList.push({ id: element.id, count: element.num });
+      }
+    });
+    let payload = {
+      order_id: this.state.orderDetail.id,
+      items: this.refundgoodsList,
+      reason: this.refundReason || this.state.refundReason[this.state.index]
+    };
+    console.log("payload:%o", JSON.stringify(payload));
+    jsonWithTpl(
+      `api/manual_refund?access_token=${this.props.global.accessToken}`,
+      payload,
+      ok => {
+        if (ok.ok) {
+          ToastLong("退款成功！");
+          this.props.navigation.goBack();
+        } else {
+          ToastLong(ok.reason);
+          // this.props.navigation.goBack();
+        }
+      },
+      error => {
+        console.log("error:%o", error);
+        ToastLong("网络错误");
+      },
+      action => {}
     );
+  };
+  render() {
     console.disableYellowBox = true;
-    return (
+    return this.state.isLoading ? (
+      <LoadingView />
+    ) : (
       <View
         style={{
           paddingVertical: 9,
@@ -136,8 +200,24 @@ export default class Refund extends Component {
         <ScrollView>
           <View style={{ paddingHorizontal: pxToDp(31) }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={Styles.h32bf}>0000</Text>
-              <Button fontStyle={Styles.h22theme} mgl={30 * one} />
+              <Text style={Styles.h32bf}>
+                {tool.shortOrderDay(this.state.orderDetail.orderTime)}#{
+                  this.state.orderDetail.dayId
+                }
+              </Text>
+              <Button
+                fontStyle={Styles.h22theme}
+                mgl={30 * one}
+                t={
+                  this.state.orderDetail.orderStatus == 1
+                    ? "已收单"
+                    : this.state.orderDetail.orderStatus == 2
+                      ? "已分拣"
+                      : this.state.orderDetail.orderStatus == 3
+                        ? "已出发"
+                        : "已送达"
+                }
+              />
             </View>
             <Line mgt={15} />
             {/*订单号*/}
@@ -148,9 +228,13 @@ export default class Refund extends Component {
                 marginTop: 15
               }}
             >
-              <Text style={Styles.h22a2}>订单号：589634</Text>
               <Text style={Styles.h22a2}>
-                期望送达：{this.state.orderDetail.expectTimeStr}
+                订单号：{this.state.orderDetail.id}
+              </Text>
+              <Text style={Styles.h22a2}>
+                期望送达：{tool.orderExpectTime(
+                  this.state.orderDetail.expectTime
+                )}
               </Text>
             </View>
             <View
@@ -161,10 +245,13 @@ export default class Refund extends Component {
               }}
             >
               <Text style={Styles.h22a2}>
-                {this.state.orderDetail.pl_name}：589634
+                <Text>{this.state.orderDetail.pl_name}：</Text>
+                {this.state.orderDetail.platform_oid}
               </Text>
               <Text style={Styles.h22a2}>
-                下单时间：{this.state.orderDetail.orderTime}
+                下单时间：{tool.orderOrderTimeShort(
+                  this.state.orderDetail.orderTime
+                )}
               </Text>
             </View>
             {/*下单提示*/}
@@ -176,6 +263,7 @@ export default class Refund extends Component {
           {/*商品明细列表*/}
           <View style={{ paddingHorizontal: pxToDp(31) }}>
             {this.state.goodsList.map((element, index) => {
+              console.log("element", element);
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -221,7 +309,12 @@ export default class Refund extends Component {
                           marginRight: 20,
                           borderColor: "#ccc"
                         }}
-                      />
+                      >
+                        <Image
+                          source={{ uri: element.product_img }}
+                          style={{ width: 40, height: 40 }}
+                        />
+                      </View>
                       <View
                         style={{
                           height: 42,
@@ -242,10 +335,10 @@ export default class Refund extends Component {
                             {element.gPrice}
                           </Text>
                           <Text style={[Styles.h16c4, { flex: 1 }]}>
-                            总价 {element.gPrice * this.goodsList[index].gNum}
+                            总价 {element.price * element.origin_num}
                           </Text>
                           <Text style={[Styles.h16c4, { flex: 1 }]}>
-                            *{this.goodsList[index].gNum}
+                            *{element.origin_num}
                           </Text>
                         </View>
                       </View>
@@ -256,43 +349,36 @@ export default class Refund extends Component {
                       <Yuan
                         icon={"md-remove"}
                         size={10}
-                        ic={element.gNum <= 0 ? Colors.greyc : Colors.grey3}
+                        ic={element.num <= 0 ? Colors.greyc : Colors.grey3}
                         w={18}
                         bw={Metrics.one}
                         mgr={5}
                         bgc={Colors.white}
                         bc={Colors.greyc}
                         onPress={() => {
-                          if (element.gNum <= 0) return;
+                          if (element.num <= 0) return;
 
-                          element.gNum = element.gNum - 1;
+                          element.num = element.num - 1;
                           element.active = true;
                           let data = this.state.goodsList;
-                          console.log("element:%o", element.gNum);
                           this.setState({
                             goodsList: data
                           });
                         }}
                       />
-                      <Text>{element.gNum}</Text>
+                      <Text>{element.num}</Text>
                       <Yuan
                         icon={"md-add"}
                         size={10}
                         ic={
-                          element.gNum >= this.goodsList[index].gNum
+                          element.num >= element.origin_num
                             ? Colors.greyc
                             : Colors.grey3
                         }
                         w={18}
                         onPress={() => {
-                          console.log(
-                            "元吃的:%o,现在的:%o",
-                            this.goodsList[index].gNum,
-                            element.gNum
-                          );
-                          if (element.gNum >= this.goodsList[index].gNum)
-                            return;
-                          element.gNum = element.gNum + 1;
+                          if (element.num >= element.origin_num) return;
+                          element.num = element.num + 1;
                           element.active = true;
                           let data = this.state.goodsList;
                           this.setState({
@@ -333,11 +419,11 @@ export default class Refund extends Component {
             </View>
           </View>
           {this.title("退款理由")}
-          {this.state.refundReason.map(element => {
+          {this.state.refundReason.map((element, index) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  this.select(element);
+                  this.select(element, index);
                 }}
               >
                 <View
@@ -358,22 +444,18 @@ export default class Refund extends Component {
                     ic={Colors.white}
                     w={22}
                     onPress={() => {
-                      this.select(element);
+                      this.select(element, index);
                     }}
                     bw={Metrics.one}
                     bgc={
-                      this.state.index === element.id && this.state.active
-                        ? Colors.theme
-                        : Colors.white
+                      this.state.index === index ? Colors.theme : Colors.white
                     }
                     bc={
-                      this.state.index === element.id && this.state.active
-                        ? Colors.theme
-                        : Colors.greyc
+                      this.state.index === index ? Colors.theme : Colors.greyc
                     }
                   />
                   <Text style={[Styles.h203e, { marginLeft: 20 }]}>
-                    {element.text}
+                    {element}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -399,19 +481,19 @@ export default class Refund extends Component {
               underlineColorAndroid="transparent"
               placeholderTextColor={Colors.grey9}
               multiline={true}
-              // onChangeText={(text) => {
-              // 	this.setState({
-              // 		introduceValue: text
-              // 	})
-              // }}
+              onChangeText={text => {
+                this.refundReason = text;
+              }}
             />
           </View>
         </ScrollView>
         {/*退款按钮*/}
         <View style={{ paddingHorizontal: pxToDp(31) }}>
-          <Button1 t="确认退款" w="100%" />
+          <Button1 t="确认退款" w="100%" onPress={() => this.refund()} />
         </View>
       </View>
     );
   }
 }
+
+export default connect(mapStateToProps)(Refund);
