@@ -85,7 +85,7 @@ class OperateDetailScene extends PureComponent {
       sum: 0,
       editable: false,
       check_detail: false,
-      income:null,
+      income: null,
       outcome_normal: {
         [Cts.OPERATE_REFUND_OUT]: { num: 0, order_num: 0 },
         [Cts.OPERATE_DISTRIBUTION_TIPS]: { num: 0, order_num: 0 },
@@ -289,7 +289,14 @@ class OperateDetailScene extends PureComponent {
       </View>
     );
   }
-
+  transform = obj => {
+    let arr = [];
+    for (let item in obj) {
+      arr.push(obj[item]);
+    }
+    console.log("arr:%o", arr);
+    return arr;
+  };
   render() {
     let {
       sum,
@@ -301,7 +308,8 @@ class OperateDetailScene extends PureComponent {
       name,
       total_balanced
     } = this.state;
-    console.log("订单收入:%o", income,);
+    console.log("订单收入:%o", income);
+    console.disableYellowBox = true;
     return this.state.isLoading ? (
       <LoadingView />
     ) : (
@@ -318,7 +326,7 @@ class OperateDetailScene extends PureComponent {
             {this.renderTitle("收入流水", Cts.OPERATE_OTHER_IN, "添加收入项")}
             <CellAccess
               title={"订单收入"}
-              money={income[Cts.OPERATE_ORDER_IN].num}
+              money={this.transform(income)[Cts.OPERATE_ORDER_IN].num}
               toOperateDetail={() =>
                 this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
                   type: Cts.OPERATE_ORDER_IN,
@@ -329,7 +337,11 @@ class OperateDetailScene extends PureComponent {
             />
             <CellAccess
               title={"其他收入"}
-              money={income[Cts.OPERATE_OTHER_IN].num}
+              money={
+                this.transform(income)[Cts.OPERATE_OTHER_IN]
+                  ? this.transform(income)[Cts.OPERATE_OTHER_IN].num
+                  : 0
+              }
               toOperateDetail={() =>
                 this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
                   type: Cts.OPERATE_OTHER_IN
