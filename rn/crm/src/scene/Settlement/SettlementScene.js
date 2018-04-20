@@ -343,17 +343,10 @@ class SettlementScene extends PureComponent {
               <Text style={styles.to_month}>本月销量汇总</Text>
             </TouchableOpacity>
           </View>
-          <Cells style={{ margin: 0, borderBottomColor: "#fff" }}>
+          <View>
             {tool.objectMap(item, (ite, key) => {
               return (
-                <Cell
-                  key={key}
-                  customStyle={{
-                    marginLeft: 0,
-                    paddingHorizontal: pxToDp(30),
-                    borderColor: "#EEEEEE",
-                    paddingRight: pxToDp(12)
-                  }}
+                <TouchableOpacity
                   onPress={() => {
                     this.toggleCheck(
                       ite.key,
@@ -363,33 +356,68 @@ class SettlementScene extends PureComponent {
                     );
                   }}
                 >
-                  <CellHeader
+                  <View
                     style={{
-                      minWidth: pxToDp(180),
                       flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: pxToDp(30),
+                      borderBottomColor: "#EEEEEE",
+                      borderBottomWidth: 1,
+                      justifyContent: "space-between",
                       height: pxToDp(100),
-                      alignItems: "center"
+                      backgroundColor: "#fff"
                     }}
                   >
-                    <Text style={{ height: "auto" }}> {ite.bill_date}</Text>
-                  </CellHeader>
-                  <CellBody style={{ marginLeft: pxToDp(10) }}>
+                    <Text style={{ height: "auto", marginRight: pxToDp(10) }}>
+                      {" "}
+                      {ite.bill_date}
+                    </Text>
                     {this.renderStatus(ite.status)}
-                  </CellBody>
-                  <CellFooter style={{ color: colors.fontGray }}>
-                    {tool.toFixed(ite.bill_price)}元
-                    <Image
+                    <View style={{ marginLeft: pxToDp(10) }}>
+                      <Text
+                        style={{
+                          color: colors.fontGray,
+                          fontSize: 16,
+                          textAlign: "center"
+                        }}
+                      >
+                        500
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          color: "red",
+                          textAlign: "center"
+                        }}
+                      >
+                        说明
+                      </Text>
+                    </View>
+
+                    <View
                       style={{
+                        flexDirection: "row",
                         alignItems: "center",
-                        transform: [{ scale: 0.6 }, { rotate: "-90deg" }]
+                        justifyContent: "flex-end",
+                        width: 100
                       }}
-                      source={require("../../img/Public/xiangxia_.png")}
-                    />
-                  </CellFooter>
-                </Cell>
+                    >
+                      <Text style={{ color: colors.fontGray, fontSize: 16 }}>
+                        {tool.toFixed(ite.bill_price)}元
+                      </Text>
+                      <Image
+                        style={{
+                          alignItems: "center",
+                          transform: [{ scale: 0.6 }, { rotate: "-90deg" }]
+                        }}
+                        source={require("../../img/Public/xiangxia_.png")}
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
               );
             })}
-          </Cells>
+          </View>
         </View>
       );
     });

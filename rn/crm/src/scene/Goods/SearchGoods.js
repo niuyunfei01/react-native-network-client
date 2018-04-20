@@ -193,7 +193,7 @@ class SearchGoods extends Component {
   };
   //样式
   renderRow = ({ item, index }) => {
-    console.log("item:%o", item);
+    console.log("item:%o", Config.staticUrl(item.coverimg));
     return (
       <TouchableOpacity
         key={item.id}
@@ -287,8 +287,8 @@ class SearchGoods extends Component {
           onPress={() => {
             console.log("是不是联营:%o", this.cooperation);
             this.props.navigation.navigate("GoodsEdit", {
-                  type: "add"
-                });
+              type: "add"
+            });
             // if(this.cooperation){
             //   this.props.navigation.navigate("NewProduct", {
             //     type: "lianying"
@@ -299,8 +299,6 @@ class SearchGoods extends Component {
             //     type: "add"
             //   });
             // }
-           
-           
           }}
         >
           <View style={{ paddingHorizontal: pxToDp(31), marginTop: 10 }}>

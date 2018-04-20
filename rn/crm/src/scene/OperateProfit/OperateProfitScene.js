@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from "react";
 import {
   View,
   Text,
@@ -6,50 +6,58 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
-} from 'react-native';
+  TextInput
+} from "react-native";
 import {
   Cells,
   Cell,
   CellHeader,
   CellBody,
-  CellFooter,
+  CellFooter
 } from "../../weui/index";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from '../../reducers/global/globalActions';
-import {fetchProfitHome} from "../../reducers/operateProfit/operateProfitActions";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as globalActions from "../../reducers/global/globalActions";
+import { fetchProfitHome } from "../../reducers/operateProfit/operateProfitActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {uploadImg, newProductSave, fetchApplyRocordList} from "../../reducers/product/productActions";
-import tool from '../../common/tool';
-import {toFixed} from "../../common/tool";
-import Cts from '../../Cts';
-import {NavigationItem} from '../../widget';
-import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
-import  RenderEmpty from './RenderEmpty'
+import {
+  uploadImg,
+  newProductSave,
+  fetchApplyRocordList
+} from "../../reducers/product/productActions";
+import tool from "../../common/tool";
+import { toFixed } from "../../common/tool";
+import Cts from "../../Cts";
+import { NavigationItem } from "../../widget";
+import { ToastLong } from "../../util/ToastUtils";
+import { NavigationActions } from "react-navigation";
+import { Toast, Dialog, Icon, Button } from "../../weui/index";
+import RenderEmpty from "./RenderEmpty";
 
 function mapStateToProps(state) {
-  const {mine, product, global} = state;
-  return {mine: mine, product: product, global: global}
+  const { mine, product, global } = state;
+  return { mine: mine, product: product, global: global };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch, ...bindActionCreators({
-      fetchProfitHome,
-      ...globalActions
-    }, dispatch)
-  }
+    dispatch,
+    ...bindActionCreators(
+      {
+        fetchProfitHome,
+        ...globalActions
+      },
+      dispatch
+    )
+  };
 }
 
 class OperateProfitScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
+  static navigationOptions = ({ navigation }) => {
     return {
-      headerTitle: '运营收益',
+      headerTitle: "运营收益"
     };
   };
 
@@ -61,110 +69,158 @@ class OperateProfitScene extends PureComponent {
       unbalanced: 0
     };
 
-    this.getProfitHome = this.getProfitHome.bind(this)
+    this.getProfitHome = this.getProfitHome.bind(this);
   }
   getProfitHome() {
-    const {dispatch} = this.props;
-    let {currStoreId,accessToken} = this.props.global;
-    dispatch(fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
-      console.log('obj',obj)
-      if (ok) {
-        this.setState({
-          unbalanced: obj.unbalanced,
-          items: obj.items
-        })
-      }else {
-
-      }
-      this.setState({query: false,})
-    }));
+    const { dispatch } = this.props;
+    let { currStoreId, accessToken } = this.props.global;
+    dispatch(
+      fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
+        console.log("obj", obj);
+        if (ok) {
+          this.setState({
+            unbalanced: obj.unbalanced,
+            items: obj.items
+          });
+        } else {
+        }
+        this.setState({ query: false });
+      })
+    );
   }
   componentWillMount() {
-    this.getProfitHome()
+    this.getProfitHome();
   }
-  toOperateDetail(day,total_balanced) {
-    this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL,{day,total_balanced})
+  toOperateDetail(day, total_balanced) {
+    this.props.navigation.navigate(Config.ROUTE_OPERATE_DETAIL, {
+      day,
+      total_balanced
+    });
   }
   renderList(obj) {
-    if(tool.length(obj)>0){
+    if (tool.length(obj) > 0) {
       return tool.objectMap(obj, (item, index) => {
         return (
-            <View key={index}>
-              <View style={content.item_header}>
-                <Text style={{color: '#b2b2b2'}}>{index}</Text>
-              </View>
-              <View>
-                <Cells style={{marginTop: 0}}>
-                  {
-                    item.map((ite, key) => {
-                      let {day, balance_money, sum_today, total_balanced} = ite;
-                      return (
-                          <Cell
-                                style={content.cell}
-                                onPress={() => {
-                                  this.toOperateDetail(day,total_balanced)
-                                }}
-                                key={key}
-                                customStyle={content.cust}
-                          >
-                            <CellHeader style={content.header}>
-                             <View>
-                               <Text style={content.date}> {day}</Text>
-                               {
-                                 parseInt(balance_money) > 0 ?
-                                     <Text style={content.payment}>结款 {toFixed(balance_money)}</Text> : <View/>
-                               }
-                             </View>
-                            </CellHeader>
-                            <CellBody style={{marginLeft: pxToDp(10)}}>
-                              {
-                                sum_today > 0 ?
-                                    <Text style={[content.text_right, content.take_in]}>+{toFixed(sum_today)}</Text>
-                                    : <Text style={[content.text_right, content.take_in,{color:'#fe0000'}]}>-{toFixed(sum_today)}</Text>
-                              }
-                            </CellBody>
-                            <CellFooter style={[content.text_right, content.foot, content.date]}>
-                              {toFixed(total_balanced)}
-                              <Image
-                                  style={{transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                                  source={require('../../img/Public/xiangxia_.png')}
-                              />
-                            </CellFooter>
-                          </Cell>
-                      )
-                    })
-                  }
-                </Cells>
-              </View>
+          <View key={index}>
+            <View style={content.item_header}>
+              <Text style={{ color: "#b2b2b2" }}>{index}</Text>
             </View>
-        )
-      })
-    }else {
-      return <RenderEmpty />
-    }
+            <View>
+              <Cells
+                style={{
+                  marginTop: 0
+                }}
+              >
+                {item.map((ite, key) => {
+                  let { day, balance_money, sum_today, total_balanced } = ite;
+                  return (
+                    <Cell
+                      style={content.cell}
+                      onPress={() => {
+                        this.toOperateDetail(day, total_balanced);
+                      }}
+                      key={key}
+                      customStyle={content.cust}
+                    >
+                      <CellHeader style={content.header}>
+                        <View>
+                          <Text style={content.date}> {day}</Text>
+                          {parseInt(balance_money) > 0 ? (
+                            <Text style={content.payment}>
+                              结款 {toFixed(balance_money)}
+                            </Text>
+                          ) : (
+                            <View />
+                          )}
+                        </View>
+                      </CellHeader>
 
+                      <CellBody
+                        style={{
+                          marginLeft: pxToDp(10),
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between"
+                        }}
+                      >
+                        <View
+                          style={{
+                            marginLeft: pxToDp(10),
+                            marginRight: pxToDp(10),
+                            flexDirection: "row",
+                            alignItems: "center"
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: colors.fontGray,
+                              fontSize: 16,
+                              textAlign: "center"
+                            }}
+                          >
+                            500(<Text
+                              style={{
+                                fontSize: 10,
+                                color: "red",
+                                textAlign: "center"
+                              }}
+                            >
+                              说明
+                            </Text>)
+                          </Text>
+                        </View>
+                        {sum_today > 0 ? (
+                          <Text style={[content.text_right, content.take_in]}>
+                            +{toFixed(sum_today)}
+                          </Text>
+                        ) : (
+                          <Text
+                            style={[
+                              content.text_right,
+                              content.take_in,
+                              { color: "#fe0000" }
+                            ]}
+                          >
+                            {toFixed(sum_today)}
+                          </Text>
+                        )}
+                      </CellBody>
+                      <CellFooter
+                        style={[content.text_right, content.foot, content.date]}
+                      >
+                        {toFixed(total_balanced)}
+                        <Image
+                          style={{
+                            transform: [{ scale: 0.6 }, { rotate: "-90deg" }]
+                          }}
+                          source={require("../../img/Public/xiangxia_.png")}
+                        />
+                      </CellFooter>
+                    </Cell>
+                  );
+                })}
+              </Cells>
+            </View>
+          </View>
+        );
+      });
+    } else {
+      return <RenderEmpty />;
+    }
   }
   render() {
     return (
-        <View style={{flex: 1}}>
-          <View style={header.wrapper}>
-            <Text style={header.profit}>{toFixed(this.state.unbalanced)}</Text>
-            <Text style={header.desc}>待结算运营收益额</Text>
-          </View>
-          <ScrollView>
-            {
-              this.renderList(this.state.items)
-            }
-
-          </ScrollView>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
+      <View style={{ flex: 1 }}>
+        <View style={header.wrapper}>
+          <Text style={header.profit}>{toFixed(this.state.unbalanced)}</Text>
+          <Text style={header.desc}>待结算运营收益额</Text>
         </View>
-    )
+        <ScrollView>{this.renderList(this.state.items)}</ScrollView>
+        <Toast icon="loading" show={this.state.query} onRequestClose={() => {}}>
+          加载中
+        </Toast>
+      </View>
+    );
   }
 }
 
@@ -172,14 +228,14 @@ const header = StyleSheet.create({
   wrapper: {
     backgroundColor: colors.white,
     height: pxToDp(290),
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderBottomWidth: pxToDp(1),
     borderColor: colors.fontGray
   },
   profit: {
     fontSize: pxToDp(72),
-    color: colors.main_color,
+    color: colors.main_color
   },
   desc: {
     fontSize: pxToDp(24),
@@ -189,8 +245,8 @@ const header = StyleSheet.create({
 });
 const content = StyleSheet.create({
   item_header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     height: pxToDp(60),
     paddingHorizontal: pxToDp(30)
   },
@@ -200,20 +256,23 @@ const content = StyleSheet.create({
   },
   cell: {
     height: pxToDp(125),
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row"
   },
   header: {
     minWidth: pxToDp(150),
-    height:'100%',
-    justifyContent:'center'
+    height: "100%",
+    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center"
   },
   body: {
     width: pxToDp(175),
-    alignItems: 'flex-end',
+    alignItems: "flex-end"
   },
   text_right: {
-    textAlign: 'right'
+    textAlign: "right"
   },
   foot: {
     width: pxToDp(150)
@@ -224,28 +283,28 @@ const content = StyleSheet.create({
   payment: {
     borderWidth: pxToDp(1),
     borderRadius: pxToDp(30),
-    borderColor: '#fe0000',
-    color: '#fe0000',
+    borderColor: "#fe0000",
+    color: "#fe0000",
     fontSize: pxToDp(24),
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: pxToDp(30),
     paddingHorizontal: pxToDp(10),
     paddingVertical: pxToDp(5),
     marginTop: pxToDp(5)
   },
   expend: {
-    color: '#fe0000'
+    color: "#fe0000"
   },
   take_in: {
     color: colors.main_color
   },
   cust: {
     marginLeft: 0,
-    width: '100%',
+    width: "100%",
     paddingHorizontal: pxToDp(30),
     paddingRight: pxToDp(10),
     marginTop: pxToDp(0),
     height: pxToDp(125)
   }
 });
-export default connect(mapStateToProps, mapDispatchToProps)(OperateProfitScene)
+export default connect(mapStateToProps, mapDispatchToProps)(OperateProfitScene);
