@@ -41,11 +41,10 @@ export function apiUrl(path) {
 }
 
 export function staticUrl(path) {
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
-  let isHttps = path.indexOf("http");
-  let newPath = path[0] === "/" ? path.substr(1) : path;
-  return isHttps === -1 ? `https://${hp}/${newPath}` : path;
+  let isFullUrl = path.indexOf("http");
+  return isFullUrl === -1 ? serverUrl(path, true) : path;
 }
+
 
 /**
  * get server url

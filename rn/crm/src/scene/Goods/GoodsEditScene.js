@@ -616,7 +616,6 @@ class GoodsEditScene extends PureComponent {
     this.setState({isUploadImg: true});
     dispatch(
       uploadImg(image_info, resp => {
-        console.log("image_resp ===> ", resp);
         if (resp.ok) {
           let {name, uri} = image_info;
           let {file_id, fspath} = resp.obj;

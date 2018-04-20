@@ -118,7 +118,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
           title="搜索上传"
           image={require(`../../img/new/search.png`)}
           onPress={() => {
-            this.props.navigation.navigate("SearchGoods");
+            this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS);
           }}
         />
       </ScrollView>
