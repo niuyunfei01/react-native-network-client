@@ -1,41 +1,14 @@
 import React, {PureComponent} from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput
-} from "react-native";
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label
-} from "../../weui/index";
+import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as globalActions from "../../reducers/global/globalActions";
-import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
 import Config from "../../config";
-
-import {
-  uploadImg,
-  newProductSave
-} from "../../reducers/product/productActions";
-import ImagePicker from "react-native-image-crop-picker";
+import {setCreateProductStoreId} from '../../reducers/global/globalActions'
+import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import tool from "../../common/tool";
-import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -45,11 +18,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
-    ...bindActionCreators(
-      {
+    ...bindActionCreators({
         uploadImg,
         newProductSave,
-        ...globalActions
+        setCreateProductStoreId
       },
       dispatch
     )
@@ -80,14 +52,25 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
-    let currStoreId = this.props.navigation.state.params.store_id;
+    let {currNewProductStoreId} = this.props.global;
+    let navParams = this.props.navigation.state.params;
+    let currStoreId = 0;
+    if (navParams) {
+      currStoreId = this.props.navigation.state.params.store_id;
+    }
     if (!currStoreId) {
-      currStoreId = this.props.global.currStoreId;
+      if (!currNewProductStoreId) {
+        currStoreId = this.props.global.currStoreId;
+      } else {
+        currStoreId = currNewProductStoreId;
+      }
     }
     this.state = {
       vendor_id: currVendorId,
       store_id: currStoreId,
     };
+    const {dispatch} = this.props;
+    dispatch(setCreateProductStoreId(currStoreId))
   }
 
   render() {

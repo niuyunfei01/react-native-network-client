@@ -26,10 +26,6 @@ class SearchGoods extends Component {
     if (params.value) {
       value = params.value;
     }
-    let storeId = '';
-    if (params.store_id) {
-      storeId = params.store_id;
-    }
     return {
       headerLeft: (
         <NavigationItem
@@ -44,8 +40,7 @@ class SearchGoods extends Component {
               index: 0,
               actions: [
                 NavigationActions.navigate({
-                  routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT,
-                  params: {store_id: storeId}
+                  routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT
                 })
               ]
             }));
@@ -79,7 +74,7 @@ class SearchGoods extends Component {
               <TouchableOpacity onPress={() => params.search()}>
                 <Image
                   source={require("../../img/new/searchG.png")}
-                  style={{width: 20, height: 20, marginRight: 5}}
+                  style={{width: 20, height: 20, marginRight: 5, padding:5}}
                 />
               </TouchableOpacity>
             </View>
@@ -200,7 +195,6 @@ class SearchGoods extends Component {
   };
   //样式
   renderRow = ({item, index}) => {
-    console.log(Config.staticUrl(item.coverimg))
     return (
       <TouchableOpacity
         key={item.id}

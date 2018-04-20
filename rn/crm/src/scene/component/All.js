@@ -1,4 +1,4 @@
-import React, { PureComponent, Component } from "react";
+import React, {PureComponent, Component} from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import pxToDp from "../../util/pxToDp";
-import { Colors, Styles, Metrics } from "../../themes";
+import {Colors, Styles, Metrics} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const one = 1 / PixelRatio.get();
@@ -21,6 +21,7 @@ class Left extends PureComponent {
   static defaultProps = {
     isOne: true
   };
+
   render() {
     const {
       title,
@@ -46,22 +47,22 @@ class Left extends PureComponent {
             paddingHorizontal: pxToDp(31)
           }}
         >
-          <Text style={{ fontSize: 16, color: "#333", width: 85 }}>
+          <Text style={{fontSize: 16, color: "#333", width: 85}}>
             {title}
           </Text>
           {info ? (
             <Text
               numberOfLines={1}
-              style={{ fontSize: 14, color: "#7A7A7A", flex: 1 }}
+              style={{fontSize: 14, color: "#7A7A7A", flex: 1}}
             >
               {info}
             </Text>
           ) : (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <TextInput
                 placeholder={placeholder}
                 underlineColorAndroid="transparent"
-                style={{ padding: 0, fontSize: 14 }}
+                style={{padding: 0, fontSize: 14}}
                 maxLength={maxLength}
                 placeholderTextColor={"#7A7A7A"}
                 keyboardType={type}
@@ -73,7 +74,7 @@ class Left extends PureComponent {
 
           {right}
         </View>
-        <View style={{ height: 1, backgroundColor: "#f2f2f2" }} />
+        <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
       </TouchableOpacity>
     );
   }
@@ -98,34 +99,35 @@ class Adv extends PureComponent {
             paddingHorizontal: pxToDp(31)
           }}
         >
-          <Text style={{ fontSize: 16, color: "#333", width: 85 }}>
+          <Text style={{fontSize: 16, color: "#333", width: 85}}>
             {title}
           </Text>
           <TextInput
             placeholder={placeholder}
             underlineColorAndroid="transparent"
-            style={{ padding: 0, fontSize: 14 }}
             maxLength={maxLength}
-            style={{ marginTop: 6, marginBottom: 3 }}
+            style={{marginTop: 6, marginBottom: 3, padding: 0, fontSize: 14}}
             placeholderTextColor={"#7A7A7A"}
             value={value}
             onChangeText={onChangeText}
           />
-          <Text style={{ fontSize: 14, color: "#ccc", textAlign: "right" }}>
+          <Text style={{fontSize: 14, color: "#ccc", textAlign: "right"}}>
             {right}
           </Text>
         </View>
-        <View style={{ height: 1, backgroundColor: "#f2f2f2" }} />
+        <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
       </TouchableOpacity>
     );
   }
 }
+
 class Yuan extends Component {
   static defaultProps = {
     w: Metrics.CW / 10,
     bgc: Colors.white,
     size: 20
   };
+
   render() {
     let {
       w,
@@ -164,7 +166,7 @@ class Yuan extends Component {
             Styles.center
           ]}
         >
-          {icon ? <Icon name={icon} color={ic} size={size} /> : null}
+          {icon ? <Icon name={icon} color={ic} size={size}/> : null}
 
           {t ? (
             <Text style={fontStyle} allowFontScaling={false}>
@@ -173,7 +175,7 @@ class Yuan extends Component {
           ) : null}
           {image || images ? (
             <Image
-              source={image ? image : { uri: images }}
+              source={image ? image : {uri: images}}
               style={{
                 width: w,
                 height: w,
@@ -188,6 +190,7 @@ class Yuan extends Component {
     );
   }
 }
+
 class Button extends Component {
   static defaultProps = {
     w: 70,
@@ -198,6 +201,7 @@ class Button extends Component {
     t: "已完成",
     fontStyle: Styles.n2
   };
+
   render() {
     const {
       w,
@@ -245,6 +249,7 @@ class Button extends Component {
     );
   }
 }
+
 class Line extends Component {
   static defaultProps = {
     h: 1 / PixelRatio.get() * 2,
@@ -252,7 +257,7 @@ class Line extends Component {
   };
 
   render() {
-    const { w, h, mgt, mgb, c, fontStyle, t } = this.props;
+    const {w, h, mgt, mgb, c, fontStyle, t} = this.props;
     return (
       <View
         style={{
@@ -272,6 +277,7 @@ class Line extends Component {
     );
   }
 }
+
 class Button1 extends Component {
   static defaultProps = {
     w: Metrics.CW * 0.7,
@@ -284,6 +290,7 @@ class Button1 extends Component {
     t: "Button",
     fontStyle: Styles.t1white
   };
+
   render() {
     const {
       w,
@@ -332,4 +339,4 @@ class Button1 extends Component {
   }
 }
 
-export { Left, Adv, Button, Line, Yuan, Button1 };
+export {Left, Adv, Button, Line, Yuan, Button1};
