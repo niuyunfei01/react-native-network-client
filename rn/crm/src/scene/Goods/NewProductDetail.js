@@ -53,7 +53,6 @@ class NewProductDetail extends Component {
             width: pxToDp(48),
             height: pxToDp(48),
             marginLeft: 18
-            // marginTop: pxToDp(20)
           }}
           onPress={() => navigation.goBack()}
         />
@@ -77,7 +76,6 @@ class NewProductDetail extends Component {
     this.setState({
       storeTag: storeList
     });
-    console.log("storeList:%o", storeList);
     this.fetchResources(currVendorId || 0);
   }
 
@@ -338,7 +336,6 @@ class NewProductDetail extends Component {
         />
         <Left
           title="商品价格"
-          // placeholder={}
           value={this.state.price}
           onChangeText={text => this.setState({price: text})}
           right={

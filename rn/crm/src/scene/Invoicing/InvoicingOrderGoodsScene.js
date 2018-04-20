@@ -96,7 +96,7 @@ class InvoicingOrderGoodsScene extends Component {
     this.state = {
       isRefreshing: false,
       filterStatus: Constant.INVOICING.STATUS_CREATED,
-      showDatePicker: false,
+      showDatePicker: true,
       consigneeDate: null,
       opVisible: false,
       editDialogVisible: false,
@@ -161,8 +161,7 @@ class InvoicingOrderGoodsScene extends Component {
         marginBottom: pxToDp(10),
       }]}>
         <View style={tabs.tabs}>
-          <Text style={leftStyle}
-                onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货</Text>
+          <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货</Text>
           <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核</Text>
           <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算</Text>
         </View>
@@ -364,7 +363,6 @@ class InvoicingOrderGoodsScene extends Component {
 
     if (append) {
       let postData = {itemId: currentEditItem['id'], supplierId: checkSupplierId, storeId: storeId};
-      console.log(postData)
       dispatch(appendSupplyOrder(token, status, storeId, postData, function (ok, reason) {
         if (ok) {
           self.reloadData();
@@ -636,7 +634,7 @@ class InvoicingOrderGoodsScene extends Component {
             </CellFooter>
           </Cell>
           <Cell customStyle={list.init_cell} access={true} onPress={() => {
-            if (status = Constant.INVOICING.STATUS_CREATED) {
+            if (status == Constant.INVOICING.STATUS_CREATED) {
               self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])
             } else {
               return false;
@@ -646,7 +644,7 @@ class InvoicingOrderGoodsScene extends Component {
               <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
             </CellHeader>
             <CellBody/>
-            <CellFooter>
+            <CellFooter access={true}>
               <Text style={[font.font28, font.fontBlack]}>{val['consignee_date']}</Text>
             </CellFooter>
           </Cell>
@@ -810,15 +808,16 @@ class InvoicingOrderGoodsScene extends Component {
   }
 
   renderDateTimePicker() {
+    let self = this;
     return <DateTimePicker
-      date={initDate(this.state.consigneeDate)}
+      date={initDate(self.state.consigneeDate)}
       mode='datetime'
-      isVisible={this.state.showDatePicker}
+      isVisible={self.state.showDatePicker}
       onConfirm={async (datetime) => {
-        this.updateOrderConsigneeDatetime(datetime);
+        self.updateOrderConsigneeDatetime(datetime);
       }}
       onCancel={() => {
-        this.setState({showDatePicker: false, consigneeDate: null, currentEditOrderId: 0});
+        self.setState({showDatePicker: false, consigneeDate: null, currentEditOrderId: 0});
       }}
     />;
   }
