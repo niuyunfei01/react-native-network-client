@@ -227,6 +227,8 @@ class OrderScene extends Component {
     this._onToProvide = this._onToProvide.bind(this);
     this._callShip = this._callShip.bind(this);
     this.cancelZsDelivery = this.cancelZsDelivery.bind(this);
+
+    this._doRefund = this._doRefund.bind(this);
   }
 
   componentDidMount() {
@@ -595,6 +597,31 @@ class OrderScene extends Component {
 
     console.log('accept a item:', item, 'to new', newNum);
     this._recordEdition({...item, num: newNum});
+  }
+
+  _doRefund(){
+    const {order} = this.props.order;
+    let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
+      this.props.global.accessToken
+      }`
+    http: getWithTpl(
+      url,
+      json => {
+        if (json.ok) {
+          this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL,{orderDetail:order})
+        } else {
+          this.setState({
+            visible:true,
+            phone:json.obj&&json.obj.phone?json.obj.phone:this.props.order.order.mobile,
+            person:json.obj&&json.obj.phone?'联系服务经理':'联系客户',
+            reason:json.reason
+          })
+        }
+      },
+      error => {
+        ToastLong('获取数据失败')
+      }
+    );
   }
 
   _recordEdition(item) {
@@ -1558,38 +1585,7 @@ class OrderScene extends Component {
               }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
-           
-              <TouchableOpacity
-              onPress={()=>{
-                console.log('order:%o',order)
-                let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
-                  this.props.global.accessToken
-                }`
-                console.log('url:%o',url)
-                http: getWithTpl(
-                  url,
-                  json => {
-                    if (json.ok) {
-                      this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL,{orderDetail:order})
-                    } else {
-                      this.setState({
-                        visible:true,
-                        phone:json.obj&&json.obj.phone?json.obj.phone:this.props.order.order.mobile,
-                        person:json.obj&&json.obj.phone?'联系服务经理':'联系客户',
-                        reason:json.reason
-                      })
-                    }
-                  },
-                  error => {
-                    ToastLong('获取数据失败')
-                  }
-                );
-              }
-            }
-            >
-                <Text>申请退款</Text>
-            </TouchableOpacity>
-            
+            <ImageBtn source={require('../../img/Order/refund.png')} imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doRefund}/>
          
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
             
