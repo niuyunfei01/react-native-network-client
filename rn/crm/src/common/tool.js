@@ -493,6 +493,7 @@ function getVendorName(vendorId){
   map[Cts.STORE_TYPE_AFFILIATE]='菜鸟';
   map[Cts.STORE_TYPE_GZW]='鲜果集';
   map[Cts.STORE_TYPE_BLX]='比邻鲜';
+  map[Cts.STORE_TYPE_HLCS] = '华联超市';
   map[0]='全部';
   return map[vendorId];
 }
