@@ -368,7 +368,7 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
       let city = store.city ? store.city : '';
       let item = {
         key: store.id,
-        label: is_service_mgr && !!store.vendor ? (city + ' ' + store.vendor + ':' + store.name) : store.name,
+        label: is_service_mgr && !!store.vendor ? ( store.vendor + city + ':' + store.name) : store.name,
       };
       storeActionSheet.push(item);
     }
