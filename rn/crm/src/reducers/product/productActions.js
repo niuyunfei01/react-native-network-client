@@ -233,14 +233,13 @@ export function uploadImg(image_info, callback, file_model_name = "Product") {
   formData.append("return_type", "json"); //返回值类型
   formData.append("data_id", 0); //给个dataid吧
   formData.append("photo", photo);
-  console.log("formData -> ", formData);
-
   const url = `uploadfiles/upload`; //上传图片的服务器地址
-
+  console.log("上传的形式:%o", formData);
   return dispatch => {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())
       .then(resp => {
+        console.log("貌似没进入");
         let ok = false;
         let desc = "";
         console.log("uploadImg resp --->", resp);

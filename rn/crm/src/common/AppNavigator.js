@@ -89,7 +89,7 @@ import NewProduct from "../scene/Goods/NewProduct";
 import InvoicingScene from "../scene/Invoicing/InvoicingScene";
 import InvoicingGatherDetailScene from "../scene/Invoicing/InvoicingGatherDetailScene";
 import InvoicingShippingDetailScene from "../scene/Invoicing/InvoicingShippingDetailScene";
-import InvoicingShippingScene from "../scene/Invoicing/InvoicingShippingScene"
+import InvoicingShippingScene from "../scene/Invoicing/InvoicingShippingScene";
 
 //扫码创新
 import CreateScan from "../scene/Goods/CreateScan";
@@ -98,6 +98,9 @@ import SearchGoods from "../scene/Goods/SearchGoods";
 import NewProductDetail from "../scene/Goods/NewProductDetail";
 //退款详情
 import Refund from "../scene/Order/Refund";
+import SelectCity from "../scene/Store/SelectCity";
+import Qualification from "../scene/Store/Qualification";
+
 const tabDef = {
   Remind: {
     screen: RemindScene,
@@ -323,10 +326,18 @@ class Navigator extends Component {
         NewProduct: { screen: NewProduct },
         NewProductDetail: { screen: NewProductDetail },
         Refund: { screen: Refund },
-        [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
-        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
-        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
-        [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene}
+        [Config.ROUTE_INVOICING]: { screen: InvoicingScene },
+        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {
+          screen: InvoicingGatherDetailScene
+        },
+        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {
+          screen: InvoicingShippingDetailScene
+        },
+        [Config.ROUTE_INVOICING_SHIPPING_LIST]: {
+          screen: InvoicingShippingScene
+        },
+        [Config.ROUTE_SELECTCITY_LIST]: { screen: SelectCity },
+        [Config.ROUTE_SELECTCITY_Qualification]: { screen: Qualification }
       },
       stackNavigatorConfigs
     );
