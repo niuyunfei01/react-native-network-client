@@ -26,10 +26,6 @@ class SearchGoods extends Component {
     if (params.value) {
       value = params.value;
     }
-    let storeId = '';
-    if (params.store_id) {
-      storeId = params.store_id;
-    }
     return {
       headerLeft: (
         <NavigationItem
@@ -44,8 +40,7 @@ class SearchGoods extends Component {
               index: 0,
               actions: [
                 NavigationActions.navigate({
-                  routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT,
-                  params: {store_id: storeId}
+                  routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT
                 })
               ]
             }));
@@ -79,7 +74,7 @@ class SearchGoods extends Component {
               <TouchableOpacity onPress={() => params.search()}>
                 <Image
                   source={require("../../img/new/searchG.png")}
-                  style={{width: 20, height: 20, marginRight: 5}}
+                  style={{width: 20, height: 20, marginRight: 5, padding:5}}
                 />
               </TouchableOpacity>
             </View>
@@ -130,7 +125,6 @@ class SearchGoods extends Component {
   }
 
   inputText = text => {
-    console.log("text", text);
     this.text = text;
     this.setState({
       value: text
@@ -183,7 +177,6 @@ class SearchGoods extends Component {
       url,
       json => {
         if (json.ok) {
-          let path = Config.staticUrl(json.obj[0].coverimg);
           this.setState({
             goods: json.obj,
             isLoading: false
@@ -193,8 +186,7 @@ class SearchGoods extends Component {
             isLoading: false
           });
         }
-      },
-      error => {
+      }, error => {
         this.setState({
           isLoading: false
         });
@@ -207,22 +199,19 @@ class SearchGoods extends Component {
       <TouchableOpacity
         key={item.id}
         onPress={() =>
-          this.props.navigation.navigate("NewProductDetail", {
+          this.props.navigation.navigate(Config.ROUTE_NEW_PRODUCT_DETAIL, {
             productId: item.id,
             title: item.name,
             price: item.price
           })
-        }
-        style={{marginTop: index === 0 ? 0 : 30, flexDirection: "row"}}
-      >
+        } style={{marginTop: index === 0 ? 0 : 30, flexDirection: "row"}}>
         <View
           style={{
             width: 100,
             height: 100,
             borderWidth: 1,
             borderColor: "#ccc"
-          }}
-        >
+          }}>
           <Image
             source={{uri: Config.staticUrl(item.coverimg)}}
             style={{width: 98, height: 98}}

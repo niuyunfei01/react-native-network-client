@@ -14,6 +14,7 @@ export default keyMirror({
   UPDATE_CFG: null,
   UPDATE_CFG_ITEM: null,
   HOST_UPDATED: null,
+  UPDATE_EDIT_PRODUCT_STORE_ID: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,

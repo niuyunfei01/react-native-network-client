@@ -15,7 +15,7 @@ import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import LoadingView from "../../widget/LoadingView";
-
+import {getVendorStores} from "../../reducers/mine/mineActions";
 import {Left} from "../component/All";
 import {getWithTpl, jsonWithTpl} from "../../util/common";
 import tool from "../../common/tool";
@@ -30,16 +30,26 @@ const mapStateToProps = state => {
 };
 
 class NewProductDetail extends Component {
+
   constructor(props) {
     super(props);
+    let {currVendorId} = tool.vendor(this.props.global);
+    let {currNewProductStoreId} = this.props.global;
+    let pid = this.props.navigation.state.params.productId;
     this.state = {
       visual: false,
       price: this.props.navigation.state.params.price,
-      storeList: [],
-      isLoading: true,
-      storeTag: "",
-      isSave: false
+      checkList: [],
+      tagList: [],
+      isLoading: false,
+      isSave: false,
+      vendorId: currVendorId,
+      currNewProductStoreId: currNewProductStoreId,
+      pid: pid,
+      vendor_stores: ''
     };
+    this.fetchTags(currVendorId || 0, pid);
+    this.getVendorStore();
   }
 
   static navigationOptions = ({navigation}) => {
@@ -53,7 +63,6 @@ class NewProductDetail extends Component {
             width: pxToDp(48),
             height: pxToDp(48),
             marginLeft: 18
-            // marginTop: pxToDp(20)
           }}
           onPress={() => navigation.goBack()}
         />
@@ -72,13 +81,6 @@ class NewProductDetail extends Component {
     this.props.navigation.setParams({
       save: this.save
     });
-    let {currVendorId} = tool.vendor(this.props.global);
-    let storeList = this.toStores(this.props.mine.vendor_stores[currVendorId]);
-    this.setState({
-      storeTag: storeList
-    });
-    console.log("storeList:%o", storeList);
-    this.fetchResources(currVendorId || 0);
   }
 
   save = () => {
@@ -88,17 +90,18 @@ class NewProductDetail extends Component {
     this.setState({
       isSave: true
     });
-    let category = this.state.storeList.filter(element => {
+    let category = this.state.tagList.filter(element => {
       return element.active === true;
     });
+    let {currVendorId, currNewProductStoreId} = this.state;
     let payload = {
-      vendor_id: tool.vendor(this.props.global).currVendorId,
+      vendor_id: currVendorId,
+      store_id: currNewProductStoreId,
       categories: category,
       product_id: this.props.navigation.state.params.productId,
       price: this.state.price
     };
-    jsonWithTpl(
-      `api/direct_product_save?access_token=${this.props.global.accessToken}`,
+    jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
       payload,
       ok => {
         if (ok.ok) {
@@ -117,11 +120,46 @@ class NewProductDetail extends Component {
       }
     );
   };
+
+  fetchCheckedTags = (vendorId, pid) => {
+    let url = `api/list_vendor_checked_tags/${pid}/${vendorId}?access_token=${this.props.global.accessToken}`
+    http: getWithTpl(
+      url,
+      json => {
+        if (json.ok) {
+          let self = this;
+          let checkList = json.obj;
+          if (checkList.length > 0) {
+            checkList.forEach(function (tagId) {
+              self.checkTag(tagId)
+            })
+          }
+          this.setState({
+            checkList: checkList,
+          });
+        }
+      },
+      error => {
+      }
+    );
+  };
+
+  checkTag = tagId => {
+    let tagList = this.state.tagList;
+    let tagCopy = tagList.map(function (item) {
+      if (item.id == tagId) {
+        item.active = !item.active;
+      }
+      return item;
+    })
+    this.setState({
+      tagList: tagCopy
+    });
+  }
+
   //获取数据
-  fetchResources = currVendorId => {
-    let url = `api/list_vendor_tags/${currVendorId}?access_token=${
-      this.props.global.accessToken
-      }`;
+  fetchTags = (currVendorId, pid) => {
+    let url = `api/list_vendor_tags/${currVendorId}?access_token=${this.props.global.accessToken}`;
     http: getWithTpl(
       url,
       json => {
@@ -130,9 +168,10 @@ class NewProductDetail extends Component {
             i.active = false;
           }
           this.setState({
-            storeList: json.obj,
+            tagList: json.obj,
             isLoading: false
           });
+          this.fetchCheckedTags(currVendorId, pid);
         } else {
           this.setState({
             isLoading: false
@@ -147,36 +186,42 @@ class NewProductDetail extends Component {
     );
   };
 
-  //发布一下门店函数
-  toStores(obj) {
-    let arr = [];
-    if (obj) {
-      tool.objectMap(obj, (item, id) => {
-        arr.push(item.name);
-      });
-      return arr.join(" , ");
-    }
+  getVendorStore() {
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
+    let _this = this;
+    dispatch(
+      getVendorStores(currVendorId, accessToken, resp => {
+        if (resp.ok) {
+          let curr_stores = resp.obj;
+          let curr_stores_arr = [];
+          Object.values(curr_stores).forEach((item, id) => {
+            curr_stores_arr.push(item.name);
+          });
+          _this.setState({
+            vendor_stores: curr_stores_arr.join(" , ")
+          });
+        }
+      })
+    );
   }
 
   title = text => {
     return (
-      <View
-        style={{
-          height: 45,
-          justifyContent: "center",
-          paddingHorizontal: 18,
-          backgroundColor: "#f2f2f2"
-        }}
-      >
+      <View style={{
+        height: 45,
+        justifyContent: "center",
+        paddingHorizontal: 18,
+        backgroundColor: "#f2f2f2"
+      }}>
         <Text style={{fontSize: 16, color: "#ccc"}}>{text}</Text>
       </View>
     );
   };
   info = (title, info, right, id) => {
     return (
-      <TouchableOpacity
-        onPress={() => (id === 3 ? this.setState({visual: true}) : null)}
-      >
+      <TouchableOpacity onPress={() => (id === 3 ? this.setState({visual: true}) : null)}>
         <View
           style={{
             height: 45,
@@ -184,12 +229,9 @@ class NewProductDetail extends Component {
             alignItems: "center",
             backgroundColor: "#fff",
             paddingHorizontal: 18
-          }}
-        >
+          }}>
           <Text style={{fontSize: 18, color: "#333"}}>{title}</Text>
-          <Text
-            style={{fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1}}
-          >
+          <Text style={{fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1}}>
             {info}
           </Text>
           {right}
@@ -199,31 +241,24 @@ class NewProductDetail extends Component {
     );
   };
   select = element => {
-    let storeList = this.state.storeList;
-    element.active = !element.active;
-    this.setState({
-      storeList: storeList
-    });
+    this.checkTag(element.id)
   };
   modal = () => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
           this.setState({visual: false});
-        }}
-      >
-        <View
-          style={[
-            {
-              position: "absolute",
-              width: "100%",
-              height: Metrics.CH - 60,
-              backgroundColor: "rgba(0,0,0,0.7)",
-              zIndex: 200
-            },
-            Styles.center
-          ]}
-        >
+        }}>
+        <View style={[
+          {
+            position: "absolute",
+            width: "100%",
+            height: Metrics.CH - 60,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            zIndex: 200
+          },
+          Styles.center
+        ]}>
           <View style={styles.content}>
             <View
               style={{
@@ -233,58 +268,49 @@ class NewProductDetail extends Component {
                 justifyContent: "center",
                 borderTopLeftRadius: 8,
                 borderTopRightRadius: 8
-              }}
-            >
+              }}>
               <Text style={Styles.n1grey6}>门店分类（多选）</Text>
             </View>
             <ScrollView style={{flex: 1, paddingHorizontal: 18}}>
-              {this.state.storeList.map(element => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.select(element);
-                    }}
-                  >
-                    <View style={[{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 12
-                    }]}
-                    >
-                      <Yuan icon={"md-checkmark"}
-                            size={15}
-                            ic={Colors.white}
-                            w={22}
-                            onPress={() => {
-                              this.select(element);
-                            }}
-                            bw={Metrics.one}
-                            bgc={element.active ? Colors.grey9 : Colors.white}
-                            bc={element.active ? Colors.white : Colors.greyc}
-                      />
-                      <Text style={{
-                        fontSize: 14,
-                        color: "#9d9d9d",
-                        marginLeft: 20
-                      }}>
-                        {element.name}
-                      </Text>
-                    </View>
-                    <Line h={1.3}/>
-                  </TouchableOpacity>
-                );
+              {this.state.tagList.map(element => {
+                return (<TouchableOpacity key={element.id}
+                                          onPress={() => {
+                                            this.select(element);
+                                          }}>
+                  <View style={[{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    padding: 12
+                  }]}>
+                    <Yuan icon={"md-checkmark"}
+                          size={15}
+                          ic={Colors.white}
+                          w={22}
+                          onPress={() => {
+                            this.select(element);
+                          }}
+                          bw={Metrics.one}
+                          bgc={element.active ? Colors.grey9 : Colors.white}
+                          bc={element.active ? Colors.white : Colors.greyc}
+                    />
+                    <Text style={{
+                      fontSize: 14,
+                      color: "#9d9d9d",
+                      marginLeft: 20
+                    }}>
+                      {element.name}
+                    </Text>
+                  </View>
+                  <Line h={1.3}/>
+                </TouchableOpacity>);
               })}
             </ScrollView>
-            <View style={[
-                {flexDirection: "row", alignItems: "center"},
-                Styles.t1theme
-              ]}
-            >
+            <View style={[{flexDirection: "row", alignItems: "center"}, Styles.t1theme]}>
               <View style={{
-                  flex: 1,
-                  borderRightColor: Colors.line,
-                  borderRightWidth: 1.5
-                }}>
+                flex: 1,
+                borderRightColor: Colors.line,
+                borderRightWidth: 1.5
+              }}>
                 <Text style={[{textAlign: "center"}, Styles.t1grey6]} allowFontScaling={false}>
                   取消
                 </Text>
@@ -303,7 +329,7 @@ class NewProductDetail extends Component {
     );
   };
   getCategory = () => {
-    let data = this.state.storeList.filter(element => {
+    let data = this.state.tagList.filter(element => {
       return element.active === true;
     });
     if (data && data.length) {
@@ -318,9 +344,6 @@ class NewProductDetail extends Component {
   };
 
   render() {
-    let active = this.state.storeList.filter(element => {
-      return element.active === true;
-    });
     return this.state.isLoading ? (
       <LoadingView/>
     ) : (
@@ -338,7 +361,6 @@ class NewProductDetail extends Component {
         />
         <Left
           title="商品价格"
-          // placeholder={}
           value={this.state.price}
           onChangeText={text => this.setState({price: text})}
           right={
@@ -355,15 +377,14 @@ class NewProductDetail extends Component {
             <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
               >
             </Text>
-          }
-        />
+          }/>
         {/*现实选择门店分类信息*/}
         <View style={{padding: 18}}>
           <Text style={{fontSize: 14, color: "#9d9d9d"}}>
             发布到以下门店：
           </Text>
           <Text style={{fontSize: 14, color: "#9d9d9d", marginTop: 5}}>
-            {this.state.storeTag}
+            {this.state.vendor_stores}
           </Text>
         </View>
       </View>

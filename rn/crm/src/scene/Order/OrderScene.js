@@ -13,6 +13,9 @@ import {
   Alert,
   Clipboard,
   ToastAndroid,
+  Modal,
+  TouchableWithoutFeedback,
+  Linking
 } from 'react-native'
 import InputNumber from 'rc-input-number';
 import {color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView} from '../../widget'
@@ -26,7 +29,7 @@ import CallBtn from './CallBtn'
 import OrderBottom from './OrderBottom'
 import CommonStyle from '../../common/CommonStyles'
 import LoadingView from "../../widget/LoadingView";
-
+import {Button1} from '../component/All'
 import {
   getOrder,
   printInCloud,
@@ -62,7 +65,8 @@ import { Array } from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import coalesceNonElementChildren from "../../widget/coalesceNonElementChildren";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
-
+import { getWithTpl, jsonWithTpl } from "../../util/common";
+import { Metrics, Colors, Styles } from "../../themes";
 const numeral = require('numeral');
 
 function mapStateToProps(state) {
@@ -153,7 +157,7 @@ class OrderScene extends Component {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -193,7 +197,11 @@ class OrderScene extends Component {
       store_contacts: [],
       addTipDialog:false,
       addTipMoney:false,
-      addMoneyNum:''
+      addMoneyNum:'',
+      visible:false,
+      reason:'饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
+      phone:undefined,
+      person:'联系客户'
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -219,6 +227,8 @@ class OrderScene extends Component {
     this._onToProvide = this._onToProvide.bind(this);
     this._callShip = this._callShip.bind(this);
     this.cancelZsDelivery = this.cancelZsDelivery.bind(this);
+
+    this._doRefund = this._doRefund.bind(this);
   }
 
   componentDidMount() {
@@ -589,6 +599,31 @@ class OrderScene extends Component {
     this._recordEdition({...item, num: newNum});
   }
 
+  _doRefund(){
+    const {order} = this.props.order;
+    let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
+      this.props.global.accessToken
+      }`
+    http: getWithTpl(
+      url,
+      json => {
+        if (json.ok) {
+          this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL,{orderDetail:order})
+        } else {
+          this.setState({
+            visible:true,
+            phone:json.obj&&json.obj.phone?json.obj.phone:this.props.order.order.mobile,
+            person:json.obj&&json.obj.phone?'联系服务经理':'联系客户',
+            reason:json.reason
+          })
+        }
+      },
+      error => {
+        ToastLong('获取数据失败')
+      }
+    );
+  }
+
   _recordEdition(item) {
     if (item.id) {
       this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
@@ -870,6 +905,39 @@ class OrderScene extends Component {
     })
     return num
   }
+  //modal弹出框
+  modal = ()=>{
+    return(
+      <TouchableWithoutFeedback
+      onPress={() => {
+        this.setState({ visible: false });
+      }}
+    >
+      <View
+        style={[
+          {
+            position: "absolute",
+            width: "100%",
+            height: Metrics.CH - 60,
+            backgroundColor: "rgba(0,0,0,0.1)",
+            zIndex: 200
+          },
+          Styles.center
+        ]}
+      >
+        <View style={{ 
+          width: Metrics.CW * 0.85,
+          paddingVertical:36,
+          paddingHorizontal:18,
+          backgroundColor: Colors.white,
+          borderRadius: 8}}>
+          <Text style={{fontSize:14,color:'#333',fontWeight:'bold',textAlign:'center',lineHeight:20}}>{this.state.reason}</Text>
+          <Button1 t={this.state.person} w="100%" r={5} mgt={10} onPress={()=>Linking.openURL(`tel:${this.state.phone}`)}/>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
+    )
+  }
   render() {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
@@ -898,6 +966,10 @@ class OrderScene extends Component {
       </ScrollView>
       : (
         <View style={[styles.container, {flex: 1}]}>
+          {
+            this.state.visible?
+            this.modal():null
+          }
           {this.state.showOptionMenu &&
           <TouchableOpacity style={[top_styles.icon_dropDown]}>
           </TouchableOpacity>}
@@ -1513,8 +1585,10 @@ class OrderScene extends Component {
               }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
-
+            <ImageBtn source={require('../../img/Order/refund.png')} imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doRefund}/>
+         
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
+            
               <ImageBtn
                 source={require('../../img/Order/good/queren_.png')}
                 imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>

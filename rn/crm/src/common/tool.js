@@ -342,6 +342,9 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
       if(o && p && typeof o === 'object' && typeof p ==='object'){
         a = o[name];
         b = p[name];
+        if (a === null || b === null) {
+          return a === null ? -1 : 1;
+        }
         if(a === b){
           return typeof minor === 'function' ? minor(o,p):0;
         }
@@ -359,7 +362,7 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
   };
 
   let storeActionSheet = [{key: -999, section: true, label: '选择门店'}];
-  let sortStores = Object.values(canReadStores).sort(by(('city'), by('vendor_id', by('id'))));
+  let sortStores = Object.values(canReadStores).sort(by('vendor_id', by('city', by('id'))));
   for (let store of sortStores) {
     if (store.id > 0) {
       let item = {

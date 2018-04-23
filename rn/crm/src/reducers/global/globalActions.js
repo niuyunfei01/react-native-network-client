@@ -28,7 +28,8 @@ const {
   SET_CURR_STORE,
   SET_CURR_PROFILE,
   UPDATE_CFG,
-  UPDATE_CFG_ITEM
+  UPDATE_CFG_ITEM,
+  UPDATE_EDIT_PRODUCT_STORE_ID
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -73,6 +74,15 @@ export function logout() {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout();
+  }
+}
+
+export function setCreateProductStoreId(storeId) {
+  return dispatch => {
+    dispatch({
+      type: UPDATE_EDIT_PRODUCT_STORE_ID,
+      storeId: storeId
+    })
   }
 }
 
@@ -122,7 +132,7 @@ export function getCommonConfig(token, storeId, callback) {
 export function trans_data_to_java(obj) {
   let {can_read_vendors} = obj;
   let vendor_list = {};
-  for (let vendor of can_read_vendors){
+  for (let vendor of can_read_vendors) {
     let vendor_id = vendor['id'];
     vendor_list[vendor_id] = vendor;
   }
@@ -132,7 +142,7 @@ export function trans_data_to_java(obj) {
     let vendor_id = stores['type'];
     stores['vendor_id'] = vendor_id;
     let vendor_info = vendor_list[vendor_id];
-    if(vendor_info !== undefined){
+    if (vendor_info !== undefined) {
       stores['vendor'] = vendor_info['brand_name'];
     }
     return stores;
@@ -202,12 +212,12 @@ export function requestSmsCode(mobile, type, callback) {
   return dispatch => {
     const url = `check/blx_app_message_code.json?device_uuid=${getDeviceUUID()}&mobile=${mobile}&type=${type}`;
     return getWithTpl(url, (json => {
-        console.log("requestSmsCode res", json);
-        callback(json.success, json.reason)
-      }), (error) => {
-        console.log('request error', error);
-        callback(false, '网络错误，请检查您的网络连接')
-      });
+      console.log("requestSmsCode res", json);
+      callback(json.success, json.reason)
+    }), (error) => {
+      console.log('request error', error);
+      callback(false, '网络错误，请检查您的网络连接')
+    });
   }
 }
 
