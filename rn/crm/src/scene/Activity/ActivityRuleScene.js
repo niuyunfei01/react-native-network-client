@@ -169,35 +169,37 @@ class ActivityRuleScene extends PureComponent {
 
   componentWillMount() {
     try {
-      let {rules, type} = this.props.navigation.state.params;
-      let {price_rules, interval_rules, goods_rules} = rules;
-      let {vendor_id, rule_name, ext_store_id, start_time, end_time, store_id, id} = price_rules;
-      let commonRule = Object.values(interval_rules[Cts.RULE_TYPE_GENERAL]).sort(function (a, b) {
-        return a.min_price - b.min_price
-      });
-      let specialRuleList = interval_rules[Cts.RULE_TYPE_SPECIAL] || [];
-      let arr = [];
-      let goods_data = [];
-      specialRuleList.map((item) => {
-        arr.push(Object.values(item.rules))
-      });
-      goods_rules.forEach((item) => {
-        let {product_id, percent} = item;
-        goods_data.push({product_id, percent})
-      });
-      this.setState({
-        ext_store_id: ext_store_id,
-        vendorId: vendor_id,
-        rule_name: rule_name,
-        startTime: start_time,
-        endTime: end_time,
-        commonRule: commonRule,
-        specialRuleList: arr,
-        store_id: store_id,
-        goods_data: goods_data,
-        id: id,
-        type: type,
-      })
+      if (this.props.navigation.state.params) {
+        let {rules, type} = this.props.navigation.state.params;
+        let {price_rules, interval_rules, goods_rules} = rules;
+        let {vendor_id, rule_name, ext_store_id, start_time, end_time, store_id, id} = price_rules;
+        let commonRule = Object.values(interval_rules[Cts.RULE_TYPE_GENERAL]).sort(function (a, b) {
+          return a.min_price - b.min_price
+        });
+        let specialRuleList = interval_rules[Cts.RULE_TYPE_SPECIAL] || [];
+        let arr = [];
+        let goods_data = [];
+        specialRuleList.map((item) => {
+          arr.push(Object.values(item.rules))
+        });
+        goods_rules.forEach((item) => {
+          let {product_id, percent} = item;
+          goods_data.push({product_id, percent})
+        });
+        this.setState({
+          ext_store_id: ext_store_id,
+          vendorId: vendor_id,
+          rule_name: rule_name,
+          startTime: start_time,
+          endTime: end_time,
+          commonRule: commonRule,
+          specialRuleList: arr,
+          store_id: store_id,
+          goods_data: goods_data,
+          id: id,
+          type: type,
+        })
+      }
     } catch (e) {
       console.log(e)
     }
@@ -580,6 +582,7 @@ class ActivityRuleScene extends PureComponent {
       dispatch(fetchSavePriceRule(all, accessToken, (ok, reason, obj) => {
         this.setState({uploading:false});
         if (ok) {
+          console.log('save rule result', ok, reason, obj)
           ToastLong('提交成功');
           dispatch(activityRuleList(true))
           setTimeout(()=>{
