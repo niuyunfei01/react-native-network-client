@@ -365,9 +365,10 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
   let sortStores = Object.values(canReadStores).sort(by('vendor_id', by('city', by('id'))));
   for (let store of sortStores) {
     if (store.id > 0) {
+      let city = store.city ? store.city : '';
       let item = {
         key: store.id,
-        label: is_service_mgr && !!store.vendor ? (store.vendor + ':' + store.name) : store.name,
+        label: is_service_mgr && !!store.vendor ? ( store.vendor + city + ':' + store.name) : store.name,
       };
       storeActionSheet.push(item);
     }
