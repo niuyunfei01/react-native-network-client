@@ -183,10 +183,8 @@ class StoreAddScene extends PureComponent {
     let storeImageUrl = undefined;
     let bossImageUrl = undefined;
     let imageList = [];
-    let fileId = [];
     if (files && files.length) {
       files.map(element => {
-        fileId.push({ modeclass: element.modeclass, id: element.id }); //要上传的ID
         if (element.modelclass === "StoreImage") {
           storeImageUrl = Config.staticUrl(element.thumb);
         } else if (element.modelclass === "StoreBoss") {
@@ -252,8 +250,7 @@ class StoreAddScene extends PureComponent {
       storeImageUrl: storeImageUrl, //门店照片
       storeImageInfo: undefined,
       bossImageUrl: bossImageUrl,
-      bossImageInfo: undefined,
-      fileId: fileId
+      bossImageInfo: undefined
     };
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
@@ -521,12 +518,8 @@ class StoreAddScene extends PureComponent {
                             bossImageInfo: qualification.bossImageInfo
                           },
                           () => {
-                            // this.fileId = [];
-                            // console.log(
-                            //   "this.state.boss:%o",
-                            //   this.state.bossImageInfo
-                            // );
-
+                            this.fileId = [];
+                            //上传图片操作
                             this.upload(this.state.bossImageInfo, "StoreBoss");
                             this.upload(
                               this.state.storeImageInfo,
@@ -637,6 +630,25 @@ class StoreAddScene extends PureComponent {
                 keyboardType="numeric" //默认弹出的键盘
                 underlineColorAndroid="transparent" //取消安卓下划线
               />
+            </CellBody>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>选择模板店</Label>
+            </CellHeader>
+            <CellBody>
+              <ModalSelector
+                onChange={option => {
+                  this.onCheckUser("owner", option.key);
+                }}
+                data={this.state.userActionSheet}
+                skin="customer"
+                defaultKey={owner_id}
+              >
+                <Text style={styles.body_text}>
+                  {owner_id > 0 ? store_mgr_name : "点击选择店长"}
+                </Text>
+              </ModalSelector>
             </CellBody>
           </Cell>
         </Cells>
@@ -916,23 +928,13 @@ class StoreAddScene extends PureComponent {
     );
   }
   upload = (imageInfo, name) => {
-    this.setState({
-      isUploadingImage: true
-    });
     uploadImg(
       imageInfo,
       resp => {
         if (resp.ok) {
-          this.uploadCount++;
           this.fileId.push(resp.obj.file_id);
-          this.setState({
-            isUploadingImage: false
-          });
         } else {
           ToastLong(resp.desc);
-          this.setState({
-            isUploadingImage: false
-          });
         }
       },
       name
@@ -942,9 +944,9 @@ class StoreAddScene extends PureComponent {
     if (this.state.onSubmitting) {
       return false;
     }
-    if (this.state.isUploadingImage) {
-      return ToastLong("正在上传图片请稍后进行操作！");
-    }
+    // if (this.state.isUploadingImage) {
+    //   return ToastLong("正在上传图片请稍后进行操作！");
+    // }
     //发送的数据
 
     const { dispatch } = this.props;
@@ -977,6 +979,7 @@ class StoreAddScene extends PureComponent {
         auto_add_tips,
         isTrusteeship
       } = this.state;
+
       let data = this.fileId
         .map((element, index) => {
           return element;
