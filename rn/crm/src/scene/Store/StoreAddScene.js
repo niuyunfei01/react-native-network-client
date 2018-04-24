@@ -134,9 +134,7 @@ class StoreAddScene extends PureComponent {
     super(props);
 
     let { currVendorId, currVendorName } = tool.vendor(this.props.global);
-    // console.log('currVendorId -> ', currVendorId);
     const { btn_type, store_info } = this.props.navigation.state.params || {};
-    console.log("门店信息:%o", store_info);
     let {
       id = 0, //store_id
       shop_no,
@@ -310,10 +308,8 @@ class StoreAddScene extends PureComponent {
           isLoading: false,
           isBd: response.obj.is_bd
         });
-        console.log("是否是bd:%o", response);
       }
     });
-
     const { store_info } = this.props.navigation.state.params || {};
     let url = `api/get_tpl_stores?access_token=${
       this.props.global.accessToken
@@ -360,8 +356,6 @@ class StoreAddScene extends PureComponent {
           for (let i in response.obj) {
             arr.push(response.obj[i]); //属性
           }
-
-          console.log("arr:%o", arr);
           let selectTemp = [];
           let data = _.toPairs(response.obj);
           selectTemp.push({ key: -999, section: true, label: "选择bd" });
@@ -380,7 +374,6 @@ class StoreAddScene extends PureComponent {
             };
             selectTemp.push(value);
           }
-          console.log("bd列表:%o", selectTemp);
           this.setState({
             bdList: selectTemp
           });
@@ -450,39 +443,36 @@ class StoreAddScene extends PureComponent {
       isUploadingImage: true
     });
     let barrier = simpleBarrier();
-    this.setState(
-      {
+    let self = this;
+    this.upload(qualification.bossImageInfo, "StoreBoss", barrier);
+    this.upload(qualification.storeImageInfo, "StoreImage", barrier);
+    qualification.imageList.map(element => {
+      this.upload(element.imageInfo, "StoreImageList", barrier);
+    });
+    let doneUpload = () => {
+      let rmIds = qualification.rmIds;
+      let existImgIds = self.state.existImgIds;
+      let ids = _.difference(existImgIds, rmIds); //去掉rmids中的和existimgids中重复的去掉 返回去重后的existImgIds
+      let fileIds = self.fileId;
+      fileIds = fileIds.concat(ids);
+      console.log('image file ids ', ids, fileIds, rmIds, existImgIds);
+      self.fileId = fileIds;
+      self.setState({
+        isUploadingImage: false,
+        fileId: fileIds,
         qualification: qualification,
         imageList: qualification.imageList, // array
         storeImageUrl: qualification.storeImageUrl,
         storeImageInfo: qualification.storeImageInfo,
         bossImageUrl: qualification.bossImageUrl,
         bossImageInfo: qualification.bossImageInfo
-      },
-      () => {
-        let callBack = function() {
-          barrier.waitOn();
-        };
-        console.log("callback", callBack, callBack());
-        let self = this;
-        this.upload(this.state.bossImageInfo, "StoreBoss", callBack);
-        this.upload(this.state.storeImageInfo, "StoreImage", callBack);
-        this.state.qualification.imageList.map(element => {
-          this.upload(element.imageInfo, "StoreImageList", callBack);
-        });
-        barrier.endWith(function() {
-          let rmIds = qualification.rmIds;
-          let existImgIds = self.state.existImgIds;
-          let ids = _.difference(rmIds, existImgIds); //去掉rmids中的和existimgids中重复的去掉 返回去重后的existImgIds
-          let fileIds = self.state.fileId;
-          // fileIds = _.union(fileIds, ids);
-          fileIds = [...new Set(fileIds.concat(ids))];
-          self.setState({
-            fileId: fileIds
-          });
-        });
-      }
-    );
+      });
+    };
+    if (barrier.getRequiredCallbacks() > 0) {
+      barrier.endWith(doneUpload);
+    } else {
+      doneUpload();
+    }
   };
 
   render() {
@@ -1105,20 +1095,22 @@ class StoreAddScene extends PureComponent {
     );
   }
 
-  upload = (imageInfo, name, callback) => {
-    console.log("函数:%p,回调:%o", imageInfo, callback);
-    uploadImg(
-      imageInfo,
-      resp => {
-        if (resp.ok) {
-          this.fileId.push(resp.obj.file_id);
-        } else {
-          ToastLong(resp.desc);
-        }
-        callback();
-      },
-      name
-    );
+  upload = (imageInfo, name, barrier) => {
+    let handleResp = (resp) => {
+      if (resp.ok) {
+        this.fileId.push(resp.obj.file_id);
+      } else {
+        ToastLong(resp.desc);
+      }
+      return resp;
+    };
+    if (imageInfo) {
+      uploadImg(
+        imageInfo,
+        barrier.waitOn(handleResp),
+        name
+      );
+    }
   };
   onStoreAdd() {
     if (this.state.onSubmitting) {
@@ -1159,36 +1151,16 @@ class StoreAddScene extends PureComponent {
         auto_add_tips,
         isTrusteeship
       } = this.state;
-      console.log(
-        "附件数组图片都是啥:%o,原始:%o,之后:%o",
-        this.state.existImgIds,
-        this.fileId,
-        this.state.fileId
-      );
 
-      let data = this.state.fileId
-        .map((element, index) => {
-          return element;
-        })
-        .join(",");
-      console.log("str", data);
       let send_data = {
         type: type, //品牌id
         name: name,
-        tpl_store: !this.state.isBd ? "unset" : this.state.templateInfo.key,
-        service_bd: !this.state.isBd ? "unset" : this.state.bdInfo.key,
         city: this.state.selectCity.name,
-        attachment: !this.state.isBd ? "unset" : data,
         owner_name: owner_name,
         owner_nation_id: owner_nation_id,
         owner_id: owner_id,
         mobile: mobile,
         tel: tel,
-        fn_price_controlled: !this.state.isBd
-          ? "unset"
-          : this.state.isTrusteeship
-            ? 0
-            : 1,
         dada_address: dada_address,
         location_long: location_long,
         location_lat: location_lat,
@@ -1199,7 +1171,13 @@ class StoreAddScene extends PureComponent {
         ship_way: ship_way,
         vice_mgr: vice_mgr
       };
-      console.log("send:%o", send_data);
+      if (this.state.isBd) {
+        let data = this.state.fileId.join(",");
+        send_data['tpl_store'] = this.state.templateInfo.key;
+        send_data['service_bd'] = this.state.bdInfo.key;
+        send_data['attachment'] = data;
+        send_data['fn_price_controlled'] = this.state.isTrusteeship ? 0 : 1;
+      }
       if (store_id > 0) {
         send_data.id = store_id;
       }

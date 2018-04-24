@@ -192,7 +192,6 @@ class Qualification extends Component {
   //选择相册相机后的函数
   picker = () => {
     ImagePicker[this.state.camera](this.config).then(image => {
-      console.log("image:%o", image);
       let imagePath = image.path;
       let image_arr = imagePath.split("/");
       let image_name = image_arr[image_arr.length - 1];
@@ -205,6 +204,7 @@ class Qualification extends Component {
   };
 
   pushRemoveIds = img => {
+    console.log('rm img', img);
     if (img && img.id) {
       let rmIds = this.state.removeIds;
       rmIds.push(img.id);
