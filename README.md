@@ -57,6 +57,8 @@ React Native Debug
 ---------------
 
 REACT_DEBUGGER="open -g 'rndebugger://set-debugger-loc?port=8081' ||" npm start
+
+
 adb reverse tcp:8081 tcp:8081
 
 Support
