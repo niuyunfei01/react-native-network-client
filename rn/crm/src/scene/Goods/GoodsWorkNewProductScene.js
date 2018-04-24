@@ -1,22 +1,6 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  InteractionManager
-} from 'react-native';
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label,
-} from "../../weui/index";
+import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Input, Label, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -24,12 +8,9 @@ import {getGoodsProduct} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import {markTaskDone} from '../../reducers/remind/remindActions'
 import colors from "../../styles/colors";
-import tool from '../../common/tool';
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
-import {Toast, Dialog, Icon, Button, Input} from "../../weui/index";
 import Cts from '../../Cts'
 import Config from "../../config";
 
@@ -211,6 +192,7 @@ class GoodsWorkNewProductScene extends PureComponent {
                   <Image
                     style={styles.img_add}
                     source={{uri: item}}
+                    resizeMode="contain"
                   />
                 </View>
               )
