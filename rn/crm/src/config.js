@@ -155,6 +155,8 @@ const C = {
   ROUTE_INVOICING_SHIPPING_DETAIL:'InvoicingShippingDetail',
   ROUTE_INVOICING_SHIPPING_LIST: 'InvoicingShippingList',
   ROUTE_REFUND_DETAIL: 'RefundDetail',
+  ROUTE_SELECTCITY_LIST: "SelectCity",
+  ROUTE_SELECTCITY_Qualification: "Qualification",
   serverUrl,
   apiUrl,
   staticUrl,

@@ -442,16 +442,56 @@ export function sellingStatus(sell_status) {
     return '选择门店状态'
   }
 }
+
 export function headerSupply(mode) {
-let map = {};
-map[Cts.STORE_SELF_PROVIDED] ='门店自采';
-map[Cts.STORE_COMMON_PROVIDED] ='总部供货';
-if (map[mode]){
-  return map[mode]
-}else {
-  return '选择供货方式'
+  let map = {};
+  map[Cts.STORE_SELF_PROVIDED] = '门店自采';
+  map[Cts.STORE_COMMON_PROVIDED] = '总部供货';
+  if (map[mode]) {
+    return map[mode]
+  } else {
+    return '选择供货方式'
+  }
 }
+
+export function simpleBarrier() {
+  let requiredCallbacks = 0,
+    doneCallbacks = 0,
+    startTime = Date.now(),
+    results = [];
+
+  function defaultCallback(err, data) {
+    return data;
+  }
+
+  let instance = {
+    waitOn: function (callback) {
+      let callbackIndex = requiredCallbacks;
+      callback = callback || defaultCallback;
+      requiredCallbacks++;
+      return function () {
+        let result = callback.apply(this, arguments);
+        results[callbackIndex] = result;
+        doneCallbacks++;
+        if (requiredCallbacks === doneCallbacks) {
+          instance.duration = Date.now() - startTime;
+          instance.endWithCallback(results);
+        }
+      }
+    },
+    endWith: function (fn) {
+      instance.endWithCallback = fn;
+    },
+    getRequiredCallbacks: function () {
+      return requiredCallbacks;
+    },
+    getDoneCallbacks: function () {
+      return doneCallbacks;
+    }
+  };
+  return instance;
 }
+
 function getOperateDetailsType(type) {
   let map ={};
   map[Cts.OPERATE_DISTRIBUTION_TIPS] ='加小费详情';
@@ -565,4 +605,5 @@ export default {
   platformsLogo,
   goodSoldStatusImg,
   getTimeStamp,
+  simpleBarrier
 }

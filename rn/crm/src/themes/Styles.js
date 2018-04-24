@@ -432,7 +432,7 @@ const Styles = {
     fontWeight: "bold"
   },
   /*引导页标题 */
-  guideDesc: {
+  eDesc: {
     color: Colors.black41,
     fontSize: dpi.font(Fonts.size.normal1)
   },

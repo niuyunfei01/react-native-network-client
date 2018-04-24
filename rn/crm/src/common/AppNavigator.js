@@ -90,6 +90,8 @@ import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProdu
 
 //退款详情
 import Refund from "../scene/Order/Refund";
+import SelectCity from "../scene/Store/SelectCity";
+import Qualification from "../scene/Store/Qualification";
 
 const tabDef = {
   Remind: {
@@ -321,6 +323,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
+        [Config.ROUTE_SELECTCITY_LIST]: { screen: SelectCity },
+        [Config.ROUTE_SELECTCITY_Qualification]: { screen: Qualification }
       },
       stackNavigatorConfigs
     );
