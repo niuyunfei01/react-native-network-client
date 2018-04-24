@@ -52,6 +52,12 @@ yarn config set disturl https://npm.taobao.org/dist --global```
   ```
   npm install react-community/react-navigation#fe4b1e2
   ```
+  
+React Native Debug
+---------------
+
+REACT_DEBUGGER="open -g 'rndebugger://set-debugger-loc?port=8081' ||" npm start
+adb reverse tcp:8081 tcp:8081
 
 Support
 -------
