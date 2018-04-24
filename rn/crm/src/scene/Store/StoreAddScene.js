@@ -341,7 +341,7 @@ class StoreAddScene extends PureComponent {
         let self = this;
         this.upload(this.state.bossImageInfo, "StoreBoss", callBack());
         this.upload(this.state.storeImageInfo, "StoreImage", callBack());
-        this.state.qualification.info.imageList.map(
+        this.state.qualification.imageList.map(
           element => {
             this.upload(element.imageInfo, "StoreImageList", callBack());
           }
