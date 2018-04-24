@@ -64,7 +64,7 @@ class StoreScene extends PureComponent {
     };
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     let { currVendorId, currVendorName } = tool.vendor(this.props.global);

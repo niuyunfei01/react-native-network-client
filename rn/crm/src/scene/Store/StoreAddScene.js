@@ -1,9 +1,17 @@
 //import liraries
-import React, {PureComponent} from "react";
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
+import React, { PureComponent } from "react";
+import {
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity
+} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {simpleBarrier} from "../../common/tool"
+import { simpleBarrier } from "../../common/tool";
+import { guid } from "../../util/common";
+
 import {
   Button,
   Cell,
@@ -17,25 +25,31 @@ import {
   Label,
   Toast
 } from "../../weui/index";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import { ToastLong, ToastShort } from "../../util/ToastUtils";
 import Config from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Cts from "../../Cts";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
+import {
+  copyStoreGoods,
+  saveOfflineStore
+} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
 //组件
-import {Yuan} from "../component/All";
-import {Colors, Metrics} from "../../themes";
-import {uploadImg} from "../../reducers/product/productActions";
+import { Yuan } from "../component/All";
+import { Colors, Metrics } from "../../themes";
+import { uploadImg } from "../../reducers/product/productActions";
+import LoadingView from "../../widget/LoadingView";
 
-import _ from "lodash"
+import _ from "lodash";
+//请求
+import { getWithTpl } from "../../util/common";
 
 function mapStateToProps(state) {
   const { mine, global } = state;
@@ -124,6 +138,7 @@ class StoreAddScene extends PureComponent {
     let {
       id = 0, //store_id
       shop_no,
+      tpl_store,
       area_id,
       alias = "",
       name = "",
@@ -152,7 +167,8 @@ class StoreAddScene extends PureComponent {
       city = undefined,
       city_code = undefined,
       fn_price_controlled = 0
-    } = store_info || {};
+    } =
+      store_info || {};
 
     const { mine } = this.props;
     let user_list = mine.user_list[currVendorId];
@@ -172,25 +188,33 @@ class StoreAddScene extends PureComponent {
     let storeImageUrl = undefined;
     let bossImageUrl = undefined;
     let imageList = [];
-<<<<<<< HEAD
-=======
     let existImgIds = [];
     let fileId = [];
->>>>>>> 09dbc6b4797b92cc9e425357d1fe53893b7ae8ef
     if (files && files.length) {
+      let index = 0;
       //初始化已有图片
       files.map(element => {
-<<<<<<< HEAD
-=======
         existImgIds.push(element.id);
->>>>>>> 09dbc6b4797b92cc9e425357d1fe53893b7ae8ef
+
         if (element.modelclass === "StoreImage") {
-          storeImageUrl = {url: Config.staticUrl(element.thumb), id: element.id};
+          storeImageUrl = {
+            url: Config.staticUrl(element.thumb),
+            id: element.id
+          };
         } else if (element.modelclass === "StoreBoss") {
-          bossImageUrl = {url: Config.staticUrl(element.thumb), id: element.id};
+          bossImageUrl = {
+            url: Config.staticUrl(element.thumb),
+            id: element.id
+          };
         } else {
+          //判断为列表
+          // (imageList[index].imageUrl = {
+          //   url: Config.staticUrl(element.thumb),
+          //   id: element.id
+          // }),
+          //   index++;
           imageList.push({
-            imageUrl: {url: Config.staticUrl(element.thumb), id: element.id},
+            imageUrl: { url: Config.staticUrl(element.thumb), id: element.id },
             imageInfo: undefined
           });
         }
@@ -216,7 +240,7 @@ class StoreAddScene extends PureComponent {
         name: files && files.length ? "资质已上传" : "点击上传资质",
         info: undefined
       }, //上传资质
-
+      isBd: false, //是否是bd
       store_id: id > 0 ? id : 0,
       type: type, //currVendorId
       alias: alias, //别名
@@ -249,13 +273,14 @@ class StoreAddScene extends PureComponent {
       storeImageUrl: storeImageUrl, //门店照片
       storeImageInfo: undefined,
       bossImageUrl: bossImageUrl,
-<<<<<<< HEAD
-      bossImageInfo: undefined
-=======
       bossImageInfo: undefined,
       fileId: fileId,
-      existImgIds: existImgIds
->>>>>>> 09dbc6b4797b92cc9e425357d1fe53893b7ae8ef
+      existImgIds: existImgIds,
+      templateList: [], //模板列表
+      templateInfo: { key: undefined, label: undefined },
+      bdList: [],
+      bdInfo: { key: undefined, label: undefined },
+      isLoading: true
     };
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
@@ -274,6 +299,93 @@ class StoreAddScene extends PureComponent {
         this.setState({ goToReset: true });
       }
     });
+  }
+  componentWillMount() {
+    let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
+    getWithTpl(isBdUrl, response => {
+      if (response.ok) {
+        this.setState({
+          isLoading: false,
+          isBd: response.obj.is_bd
+        });
+        console.log("是否是bd:%o", response);
+      }
+    });
+
+    const { store_info } = this.props.navigation.state.params || {};
+    let url = `api/get_tpl_stores?access_token=${
+      this.props.global.accessToken
+    }`;
+    let bdUrl = `api/get_bds?access_token=${this.props.global.accessToken}`;
+    getWithTpl(
+      url,
+      response => {
+        if (response.ok) {
+          let arr = [];
+          for (let i in response.obj) {
+            arr.push(response.obj[i]); //属性
+          }
+          let selectTemp = [];
+          selectTemp.push({ key: -999, section: true, label: "选择模板店" });
+          for (let item of arr) {
+            if (item.id === store_info.tpl_store) {
+              this.setState({
+                templateInfo: {
+                  key: item.id,
+                  label: item.name
+                }
+              });
+            }
+            let value = {
+              key: item.id,
+              label: item.name
+            };
+            selectTemp.push(value);
+          }
+
+          this.setState({
+            templateList: selectTemp
+          });
+        }
+      },
+      error => {}
+    );
+    getWithTpl(
+      bdUrl,
+      response => {
+        if (response.ok) {
+          let arr = [];
+          for (let i in response.obj) {
+            arr.push(response.obj[i]); //属性
+          }
+
+          console.log("arr:%o", arr);
+          let selectTemp = [];
+          let data = _.toPairs(response.obj);
+          selectTemp.push({ key: -999, section: true, label: "选择bd" });
+          for (let item of data) {
+            if (item[0] === store_info.service_bd) {
+              this.setState({
+                bdInfo: {
+                  key: item[0],
+                  label: item[1]
+                }
+              });
+            }
+            let value = {
+              key: item[0],
+              label: item[1]
+            };
+            selectTemp.push(value);
+          }
+          console.log("bd列表:%o", selectTemp);
+          this.setState({
+            bdList: selectTemp
+          });
+        }
+      },
+      error => {}
+    );
   }
 
   onPress(route, params = {}) {
@@ -331,12 +443,13 @@ class StoreAddScene extends PureComponent {
     this._hideDateTimePicker();
   };
 
-  doUploadImg = (qualification) => {
+  doUploadImg = qualification => {
     this.setState({
       isUploadingImage: true
     });
     let barrier = simpleBarrier();
-    this.setState({
+    this.setState(
+      {
         qualification: qualification,
         imageList: qualification.imageList, // array
         storeImageUrl: qualification.storeImageUrl,
@@ -345,21 +458,20 @@ class StoreAddScene extends PureComponent {
         bossImageInfo: qualification.bossImageInfo
       },
       () => {
-        let callBack = function () {
+        let callBack = function() {
           barrier.waitOn();
         };
+        console.log("callback", callBack, callBack());
         let self = this;
-        this.upload(this.state.bossImageInfo, "StoreBoss", callBack());
-        this.upload(this.state.storeImageInfo, "StoreImage", callBack());
-        this.state.qualification.imageList.map(
-          element => {
-            this.upload(element.imageInfo, "StoreImageList", callBack());
-          }
-        );
-        barrier.endWith(function () {
+        this.upload(this.state.bossImageInfo, "StoreBoss", callBack);
+        this.upload(this.state.storeImageInfo, "StoreImage", callBack);
+        this.state.qualification.imageList.map(element => {
+          this.upload(element.imageInfo, "StoreImageList", callBack);
+        });
+        barrier.endWith(function() {
           let rmIds = qualification.rmIds;
           let existImgIds = self.state.existImgIds;
-          let ids = _.difference(rmIds, existImgIds);
+          let ids = _.difference(rmIds, existImgIds); //去掉rmids中的和existimgids中重复的去掉 返回去重后的existImgIds
           let fileIds = self.state.fileId;
           fileIds = _.union(fileIds, ids);
           self.setState({
@@ -368,7 +480,7 @@ class StoreAddScene extends PureComponent {
         });
       }
     );
-  }
+  };
 
   render() {
     let {
@@ -394,8 +506,6 @@ class StoreAddScene extends PureComponent {
       auto_add_tips,
       user_list
     } = this.state;
-    //let vice_mgr_name = !!vice_mgr ? user_list[vice_mgr]['nickname'] : undefined;
-
     let store_mgr_name = (user_list[owner_id] || { nickname: "-" })["nickname"];
     let vice_mgr_name = "";
     if (!!vice_mgr && vice_mgr !== "0") {
@@ -415,7 +525,9 @@ class StoreAddScene extends PureComponent {
     }
     let _this = this;
 
-    return (
+    return this.state.isLoading ? (
+      <LoadingView />
+    ) : (
       <ScrollView style={{ backgroundColor: colors.main_back }}>
         <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
         <Cells style={[styles.cell_box]}>
@@ -536,132 +648,109 @@ class StoreAddScene extends PureComponent {
               </TouchableOpacity>
             </CellBody>
           </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>商家资质</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate(
-                    Config.ROUTE_SELECTCITY_Qualification,
-                    {
-                      imageList: this.state.imageList,
-                      storeImageUrl: this.state.storeImageUrl,
-                      storeImageInfo: this.state.storeImageInfo,
-                      bossImageUrl: this.state.bossImageUrl,
-                      bossImageInfo: this.state.bossImageInfo,
-                      callback: qualification => {
-<<<<<<< HEAD
-                        this.setState(
-                          {
-                            qualification: qualification,
-                            imageList: qualification.imageList,
-                            storeImageUrl: qualification.storeImageUrl,
-                            storeImageInfo: qualification.storeImageInfo,
-                            bossImageUrl: qualification.bossImageUrl,
-                            bossImageInfo: qualification.bossImageInfo
-                          },
-                          () => {
-                            this.fileId = [];
-                            //上传图片操作
-                            this.upload(this.state.bossImageInfo, "StoreBoss");
-                            this.upload(
-                              this.state.storeImageInfo,
-                              "StoreImage"
-                            );
-                            this.state.qualification.info.imageList.map(
-                              element => {
-                                this.upload(
-                                  element.imageInfo,
-                                  "StoreImageList"
-                                );
-                              }
-                            );
-                          }
-                        );
-=======
-                        this.doUploadImg(qualification)
->>>>>>> 09dbc6b4797b92cc9e425357d1fe53893b7ae8ef
-                      }
-                    }
-                  )
-                }
-              >
-                <Text style={styles.body_text}>
-                  {this.state.qualification.name}
-                </Text>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>门店类型</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
+          {/*商家资质不是bd不显示*/
+          this.state.isBd ? (
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>商家资质</Label>
+              </CellHeader>
+              <CellBody>
                 <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginRight: 20
-                  }}
                   onPress={() =>
-                    this.setState({
-                      isTrusteeship: true
-                    })
+                    this.props.navigation.navigate(
+                      Config.ROUTE_SELECTCITY_Qualification,
+                      {
+                        imageList: this.state.imageList,
+                        storeImageUrl: this.state.storeImageUrl,
+                        storeImageInfo: this.state.storeImageInfo,
+                        bossImageUrl: this.state.bossImageUrl,
+                        bossImageInfo: this.state.bossImageInfo,
+                        callback: qualification => {
+                          this.doUploadImg(qualification);
+                        }
+                      }
+                    )
                   }
                 >
-                  <Yuan
-                    icon={"md-checkmark"}
-                    size={10}
-                    ic={Colors.white}
-                    w={18}
-                    bw={Metrics.one}
-                    bgc={this.state.isTrusteeship ? Colors.grey3 : Colors.white}
-                    bc={Colors.grey3}
-                    mgr={5}
-                    onPress={() => {
-                      this.setState({
-                        isTrusteeship: true
-                      });
-                      // this.selectRefund(element);
-                    }}
-                  />
-                  <Text style={styles.body_text}>托管店</Text>
+                  <Text style={styles.body_text}>
+                    {this.state.qualification.name}
+                  </Text>
                 </TouchableOpacity>
+              </CellBody>
+            </Cell>
+          ) : null}
+          {this.state.isBd ? (
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>门店类型</Label>
+              </CellHeader>
+              <CellBody>
                 <TouchableOpacity
                   style={{ flexDirection: "row", alignItems: "center" }}
-                  onPress={() =>
-                    this.setState({
-                      isTrusteeship: false
-                    })
-                  }
                 >
-                  <Yuan
-                    icon={"md-checkmark"}
-                    size={10}
-                    ic={Colors.white}
-                    w={18}
-                    mgr={5}
-                    bw={Metrics.one}
-                    bgc={
-                      !this.state.isTrusteeship ? Colors.grey3 : Colors.white
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginRight: 20
+                    }}
+                    onPress={() =>
+                      this.setState({
+                        isTrusteeship: true
+                      })
                     }
-                    bc={Colors.grey3}
-                    onPress={() => {
+                  >
+                    <Yuan
+                      icon={"md-checkmark"}
+                      size={10}
+                      ic={Colors.white}
+                      w={18}
+                      bw={Metrics.one}
+                      bgc={
+                        this.state.isTrusteeship ? Colors.grey3 : Colors.white
+                      }
+                      bc={Colors.grey3}
+                      mgr={5}
+                      onPress={() => {
+                        this.setState({
+                          isTrusteeship: true
+                        });
+                        // this.selectRefund(element);
+                      }}
+                    />
+                    <Text style={styles.body_text}>托管店</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                    onPress={() =>
                       this.setState({
                         isTrusteeship: false
-                      });
-                    }}
-                  />
-                  <Text style={styles.body_text}>联营店</Text>
+                      })
+                    }
+                  >
+                    <Yuan
+                      icon={"md-checkmark"}
+                      size={10}
+                      ic={Colors.white}
+                      w={18}
+                      mgr={5}
+                      bw={Metrics.one}
+                      bgc={
+                        !this.state.isTrusteeship ? Colors.grey3 : Colors.white
+                      }
+                      bc={Colors.grey3}
+                      onPress={() => {
+                        this.setState({
+                          isTrusteeship: false
+                        });
+                      }}
+                    />
+                    <Text style={styles.body_text}>联营店</Text>
+                  </TouchableOpacity>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
+              </CellBody>
+            </Cell>
+          ) : null}
           <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
               <Label style={[styles.cell_label]}>身份证号</Label>
@@ -680,25 +769,62 @@ class StoreAddScene extends PureComponent {
               />
             </CellBody>
           </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>选择模板店</Label>
-            </CellHeader>
-            <CellBody>
-              <ModalSelector
-                onChange={option => {
-                  this.onCheckUser("owner", option.key);
-                }}
-                data={this.state.userActionSheet}
-                skin="customer"
-                defaultKey={owner_id}
-              >
-                <Text style={styles.body_text}>
-                  {owner_id > 0 ? store_mgr_name : "点击选择店长"}
-                </Text>
-              </ModalSelector>
-            </CellBody>
-          </Cell>
+          {this.state.isBd ? (
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>选择模板店</Label>
+              </CellHeader>
+              <CellBody>
+                <ModalSelector
+                  onChange={option => {
+                    console.log("option:%o", option);
+                    this.setState({
+                      templateInfo: {
+                        key: option.key,
+                        label: option.label
+                      }
+                    });
+                    // this.onCheckUser("owner", option.key);
+                  }}
+                  data={this.state.templateList}
+                  skin="customer"
+                  defaultKey={-999}
+                >
+                  <Text style={styles.body_text}>
+                    {this.state.templateInfo.label || "点击选择模板店"}
+                  </Text>
+                </ModalSelector>
+              </CellBody>
+            </Cell>
+          ) : null}
+          {this.state.isBd ? (
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>选择bd</Label>
+              </CellHeader>
+              <CellBody>
+                <ModalSelector
+                  onChange={option => {
+                    console.log("option:%o", option);
+                    this.setState({
+                      bdInfo: {
+                        key: option.key,
+                        label: option.label
+                      }
+                    });
+                    // this.onCheckUser("owner", option.key);
+                  }}
+                  data={this.state.bdList}
+                  skin="customer"
+                  defaultKey={-999}
+                >
+                  <Text style={styles.body_text}>
+                    {this.state.bdInfo.label || "点击选择bd"}
+                  </Text>
+                </ModalSelector>
+              </CellBody>
+            </Cell>
+          ) : null}
         </Cells>
 
         <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
@@ -975,22 +1101,18 @@ class StoreAddScene extends PureComponent {
       </ScrollView>
     );
   }
-<<<<<<< HEAD
-  upload = (imageInfo, name) => {
+
+  upload = (imageInfo, name, callback) => {
+    console.log("函数:%p,回调:%o", imageInfo, callback);
     uploadImg(
       imageInfo,
       resp => {
-=======
-
-  upload = (imageInfo, name, callback) => {
-    uploadImg(imageInfo, resp => {
->>>>>>> 09dbc6b4797b92cc9e425357d1fe53893b7ae8ef
         if (resp.ok) {
           this.fileId.push(resp.obj.file_id);
         } else {
           ToastLong(resp.desc);
         }
-        callback()
+        callback();
       },
       name
     );
@@ -1045,14 +1167,20 @@ class StoreAddScene extends PureComponent {
         type: type, //品牌id
         name: name,
         //alias: name,
+        tpl_store: !this.state.isBd ? "unset" : this.state.templateInfo.key,
+        service_bd: !this.state.isBd ? "unset" : this.state.bdInfo.key,
         city: this.state.selectCity.name,
-        attachment: data,
+        attachment: !this.state.isBd ? "unset" : data,
         owner_name: owner_name,
         owner_nation_id: owner_nation_id,
         owner_id: owner_id,
         mobile: mobile,
         tel: tel,
-        fn_price_controlled: this.state.isTrusteeship ? 0 : 1,
+        fn_price_controlled: !this.state.isBd
+          ? "unset"
+          : this.state.isTrusteeship
+            ? 0
+            : 1,
         dada_address: dada_address,
         location_long: location_long,
         location_lat: location_lat,
@@ -1127,13 +1255,18 @@ class StoreAddScene extends PureComponent {
     } else if (!this.state.selectCity.cityId) {
       error_msg = "请选择门店所在城市";
     } else if (
-      !this.state.bossImageUrl ||
-      !this.state.storeImageUrl ||
-      !this.state.imageList.length
+      this.state.isBd &&
+      (!this.state.bossImageUrl ||
+        !this.state.storeImageUrl ||
+        !this.state.imageList.length)
     ) {
       error_msg = "请上传资质";
     } else if (owner_nation_id.length !== 18 && owner_nation_id.length !== 11) {
       error_msg = "身份证格式有误";
+    } else if (this.state.isBd && !this.state.templateInfo.key) {
+      error_msg = "请选择模板店";
+    } else if (this.state.isBd && !this.state.bdInfo.key) {
+      error_msg = "请选择bd";
     } else if (!(owner_id > 0)) {
       error_msg = "请选择门店店长";
     } else if (mobile.length !== 11) {
