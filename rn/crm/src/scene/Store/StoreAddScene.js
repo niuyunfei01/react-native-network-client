@@ -455,7 +455,6 @@ class StoreAddScene extends PureComponent {
       let ids = _.difference(existImgIds, rmIds); //去掉rmids中的和existimgids中重复的去掉 返回去重后的existImgIds
       let fileIds = self.fileId;
       fileIds = fileIds.concat(ids);
-      console.log('image file ids ', ids, fileIds, rmIds, existImgIds);
       self.fileId = fileIds;
       self.setState({
         isUploadingImage: false,
@@ -468,6 +467,7 @@ class StoreAddScene extends PureComponent {
         bossImageInfo: qualification.bossImageInfo
       });
     };
+    //存在图片上传
     if (barrier.getRequiredCallbacks() > 0) {
       barrier.endWith(doneUpload);
     } else {
