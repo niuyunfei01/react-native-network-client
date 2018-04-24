@@ -1,52 +1,41 @@
 //import liraries
-import React, { PureComponent } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from "react-native";
+import React, {PureComponent} from "react";
+import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
+import {simpleBarrier} from "../../common/tool"
 import {
-  Cells,
-  CellsTitle,
+  Button,
   Cell,
-  CellHeader,
   CellBody,
   CellFooter,
-  Button,
-  ButtonArea,
+  CellHeader,
+  Cells,
+  CellsTitle,
+  Icon,
   Input,
   Label,
-  Icon,
   Toast
 } from "../../weui/index";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import { ToastLong, ToastShort } from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Cts from "../../Cts";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import {
-  saveOfflineStore,
-  copyStoreGoods
-} from "../../reducers/mine/mineActions";
+import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
-
 //组件
-import { Line, Yuan, Button1 } from "../component/All";
-import { Styles, Metrics, Colors } from "../../themes";
-import { uploadImg } from "../../reducers/product/productActions";
+import {Yuan} from "../component/All";
+import {Colors, Metrics} from "../../themes";
+import {uploadImg} from "../../reducers/product/productActions";
+
+import _ from "lodash"
 
 function mapStateToProps(state) {
   const { mine, global } = state;
@@ -163,8 +152,7 @@ class StoreAddScene extends PureComponent {
       city = undefined,
       city_code = undefined,
       fn_price_controlled = 0
-    } =
-      store_info || {};
+    } = store_info || {};
 
     const { mine } = this.props;
     let user_list = mine.user_list[currVendorId];
@@ -179,21 +167,24 @@ class StoreAddScene extends PureComponent {
       };
       userActionSheet.push(item);
     }
+
     //门店照片的地址呀
     let storeImageUrl = undefined;
     let bossImageUrl = undefined;
     let imageList = [];
+    let existImgIds = [];
     let fileId = [];
     if (files && files.length) {
+      //初始化已有图片
       files.map(element => {
-        fileId.push({ modeclass: element.modeclass, id: element.id }); //要上传的ID
+        existImgIds.push(element.id);
         if (element.modelclass === "StoreImage") {
-          storeImageUrl = Config.staticUrl(element.thumb);
+          storeImageUrl = {url: Config.staticUrl(element.thumb), id: element.id};
         } else if (element.modelclass === "StoreBoss") {
-          bossImageUrl = Config.staticUrl(element.thumb);
+          bossImageUrl = {url: Config.staticUrl(element.thumb), id: element.id};
         } else {
           imageList.push({
-            imageUrl: Config.staticUrl(element.thumb),
+            imageUrl: {url: Config.staticUrl(element.thumb), id: element.id},
             imageInfo: undefined
           });
         }
@@ -253,7 +244,8 @@ class StoreAddScene extends PureComponent {
       storeImageInfo: undefined,
       bossImageUrl: bossImageUrl,
       bossImageInfo: undefined,
-      fileId: fileId
+      fileId: fileId,
+      existImgIds: existImgIds
     };
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
@@ -328,6 +320,45 @@ class StoreAddScene extends PureComponent {
 
     this._hideDateTimePicker();
   };
+
+  doUploadImg = (qualification) => {
+    this.setState({
+      isUploadingImage: true
+    });
+    let barrier = simpleBarrier();
+    this.setState({
+        qualification: qualification,
+        imageList: qualification.imageList, // array
+        storeImageUrl: qualification.storeImageUrl,
+        storeImageInfo: qualification.storeImageInfo,
+        bossImageUrl: qualification.bossImageUrl,
+        bossImageInfo: qualification.bossImageInfo
+      },
+      () => {
+        let callBack = function () {
+          barrier.waitOn();
+        };
+        let self = this;
+        this.upload(this.state.bossImageInfo, "StoreBoss", callBack());
+        this.upload(this.state.storeImageInfo, "StoreImage", callBack());
+        this.state.qualification.info.imageList.map(
+          element => {
+            this.upload(element.imageInfo, "StoreImageList", callBack());
+          }
+        );
+        barrier.endWith(function () {
+          let rmIds = qualification.rmIds;
+          let existImgIds = self.state.existImgIds;
+          let ids = _.difference(rmIds, existImgIds);
+          let fileIds = self.state.fileId;
+          fileIds = _.union(fileIds, ids);
+          self.setState({
+            fileId: fileIds
+          });
+        });
+      }
+    );
+  }
 
   render() {
     let {
@@ -511,37 +542,7 @@ class StoreAddScene extends PureComponent {
                       bossImageUrl: this.state.bossImageUrl,
                       bossImageInfo: this.state.bossImageInfo,
                       callback: qualification => {
-                        this.setState(
-                          {
-                            qualification: qualification,
-                            imageList: qualification.imageList,
-                            storeImageUrl: qualification.storeImageUrl,
-                            storeImageInfo: qualification.storeImageInfo,
-                            bossImageUrl: qualification.bossImageUrl,
-                            bossImageInfo: qualification.bossImageInfo
-                          },
-                          () => {
-                            // this.fileId = [];
-                            // console.log(
-                            //   "this.state.boss:%o",
-                            //   this.state.bossImageInfo
-                            // );
-
-                            this.upload(this.state.bossImageInfo, "StoreBoss");
-                            this.upload(
-                              this.state.storeImageInfo,
-                              "StoreImage"
-                            );
-                            this.state.qualification.info.imageList.map(
-                              element => {
-                                this.upload(
-                                  element.imageInfo,
-                                  "StoreImageList"
-                                );
-                              }
-                            );
-                          }
-                        );
+                        this.doUploadImg(qualification)
                       }
                     }
                   )
@@ -915,25 +916,15 @@ class StoreAddScene extends PureComponent {
       </ScrollView>
     );
   }
-  upload = (imageInfo, name) => {
-    this.setState({
-      isUploadingImage: true
-    });
-    uploadImg(
-      imageInfo,
-      resp => {
+
+  upload = (imageInfo, name, callback) => {
+    uploadImg(imageInfo, resp => {
         if (resp.ok) {
-          this.uploadCount++;
           this.fileId.push(resp.obj.file_id);
-          this.setState({
-            isUploadingImage: false
-          });
         } else {
           ToastLong(resp.desc);
-          this.setState({
-            isUploadingImage: false
-          });
         }
+        callback()
       },
       name
     );
