@@ -62,15 +62,11 @@ class Qualification extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      imageList: [
-        { id: 1, imageUrl: undefined, imageInfo: undefined },
-        { id: 2, imageUrl: undefined, imageInfo: undefined },
-        { id: 3, imageUrl: undefined, imageInfo: undefined }
-      ],
-      storeImageUrl: undefined,
-      storeImageInfo: undefined,
-      bossImageUrl: undefined,
-      bossImageInfo: undefined,
+      imageList: this.props.navigation.state.params.imageList,
+      storeImageUrl: this.props.navigation.state.params.storeImageUrl,
+      storeImageInfo: this.props.navigation.state.params.storeImageInfo,
+      bossImageUrl: this.props.navigation.state.params.bossImageUrl,
+      bossImageInfo: this.props.navigation.state.params.bossImageInfo,
       camera: "openPicker",
       opVisible: false
     };
@@ -295,6 +291,11 @@ class Qualification extends Component {
               if (!list.length) return ToastLong("请至少上传一张店铺实景");
               this.props.navigation.state.params.callback({
                 name: "资质已上传",
+                imageList: this.state.imageList,
+                storeImageUrl: this.state.storeImageUrl,
+                storeImageInfo: this.state.storeImageInfo,
+                bossImageUrl: this.state.bossImageUrl,
+                bossImageInfo: this.state.bossImageInfo,
                 info: {
                   imageList: list,
                   storeImageInfo: this.state.storeImageInfo,

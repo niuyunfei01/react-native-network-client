@@ -220,51 +220,53 @@ function receiveVendorTags(_v_id, vendor_tags = {}) {
 //理解为封装上传图片的函数
 export function uploadImg(image_info, callback, file_model_name = "Product") {
   let formData = new FormData();
-  let { uri, name } = image_info;
-  let photo = {
-    uri: uri,
-    type: "application/octet-stream",
-    name: name
-  };
+  if (image_info && image_info.uri) {
+    let { uri, name } = image_info;
+    let photo = {
+      uri: uri,
+      type: "application/octet-stream",
+      name: name
+    };
 
-  formData.append("file_post_name", "photo"); //上传类型
-  formData.append("file_model_name", file_model_name); //理解为模块的名字
-  formData.append("no_db", 0); //这个不懂啥意思
-  formData.append("return_type", "json"); //返回值类型
-  formData.append("data_id", 0); //给个dataid吧
-  formData.append("photo", photo);
-  const url = `uploadfiles/upload`; //上传图片的服务器地址
-  console.log("上传的形式:%o", formData);
-  return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
-    .then(resp => resp.json())
-    .then(resp => {
-      console.log("貌似没进入");
-      let ok = false;
-      let desc = "";
-      console.log("uploadImg resp --->", resp);
-      let {status, fspath, file_id, message} = resp;
-      if (parseInt(status) === 1) {
-        ok = true;
-        desc = "图片上传成功";
-      } else {
-        desc = message;
-      }
-      callback({
-        ok,
-        desc,
-        obj: {
-          file_id,
-          fspath
+    formData.append("file_post_name", "photo"); //上传类型
+    formData.append("file_model_name", file_model_name); //理解为模块的名字
+    formData.append("no_db", 0); //这个不懂啥意思
+    formData.append("return_type", "json"); //返回值类型
+    formData.append("data_id", 0); //给个dataid吧
+    formData.append("photo", photo);
+    const url = `uploadfiles/upload`; //上传图片的服务器地址
+    console.log("上传的形式:%o", formData);
+    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
+      .then(resp => resp.json())
+      .then(resp => {
+        console.log("貌似没进入");
+        let ok = false;
+        let desc = "";
+        console.log("uploadImg resp --->", resp);
+        let { status, fspath, file_id, message } = resp;
+        if (parseInt(status) === 1) {
+          ok = true;
+          desc = "图片上传成功";
+        } else {
+          desc = message;
         }
+        callback({
+          ok,
+          desc,
+          obj: {
+            file_id,
+            fspath
+          }
+        });
+      })
+      .catch(error => {
+        console.log("error -> ", error);
+        callback({
+          ok: false,
+          desc: "图片上传失败"
+        });
       });
-    })
-    .catch(error => {
-      console.log("error -> ", error);
-      callback({
-        ok: false,
-        desc: "图片上传失败"
-      });
-    });
+  }
 }
 export function getGoodsProduct(task_id, token, callback) {
   let url = `api/get_up_goods_task/${task_id}.json?access_token=${token}`;

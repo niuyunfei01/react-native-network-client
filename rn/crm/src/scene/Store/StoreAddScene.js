@@ -125,13 +125,13 @@ class StoreAddScene extends PureComponent {
     });
   }
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     let { currVendorId, currVendorName } = tool.vendor(this.props.global);
     // console.log('currVendorId -> ', currVendorId);
     const { btn_type, store_info } = this.props.navigation.state.params || {};
-
+    console.log("门店信息:%o", store_info);
     let {
       id = 0, //store_id
       shop_no,
@@ -140,7 +140,7 @@ class StoreAddScene extends PureComponent {
       name = "",
       type = currVendorId,
       district = "",
-      owner_name = "",
+      owner_name = undefined,
       owner_nation_id = "",
       location_long = "",
       location_lat = "",
@@ -149,6 +149,7 @@ class StoreAddScene extends PureComponent {
       child_area_id,
       tel = "",
       mobile = "",
+      files = [],
       dada_address = "",
       owner_id = "",
       open_end = "19:00:00",
@@ -158,7 +159,10 @@ class StoreAddScene extends PureComponent {
       ship_way = Cts.SHIP_AUTO,
       printer_cfg,
       auto_add_tips,
-      bd_shop_id
+      bd_shop_id,
+      city = undefined,
+      city_code = undefined,
+      fn_price_controlled = 0
     } =
       store_info || {};
 
@@ -175,6 +179,26 @@ class StoreAddScene extends PureComponent {
       };
       userActionSheet.push(item);
     }
+    //门店照片的地址呀
+    let storeImageUrl = undefined;
+    let bossImageUrl = undefined;
+    let imageList = [];
+    let fileId = [];
+    if (files && files.length) {
+      files.map(element => {
+        fileId.push({ modeclass: element.modeclass, id: element.id }); //要上传的ID
+        if (element.modelclass === "StoreImage") {
+          storeImageUrl = Config.staticUrl(element.thumb);
+        } else if (element.modelclass === "StoreBoss") {
+          bossImageUrl = Config.staticUrl(element.thumb);
+        } else {
+          imageList.push({
+            imageUrl: Config.staticUrl(element.thumb),
+            imageInfo: undefined
+          });
+        }
+      });
+    }
 
     this.state = {
       isRefreshing: false,
@@ -188,11 +212,11 @@ class StoreAddScene extends PureComponent {
       isStartVisible: false,
       isEndVisible: false,
       selectCity: {
-        cityId: undefined,
-        name: "点击选择城市"
+        cityId: city ? city_code : undefined,
+        name: city ? city : "点击选择城市"
       },
       qualification: {
-        name: "点击上传资质",
+        name: files && files.length ? "资质已上传" : "点击上传资质",
         info: undefined
       }, //上传资质
 
@@ -215,13 +239,28 @@ class StoreAddScene extends PureComponent {
       vice_mgr: vice_mgr, //店副ID
       call_not_print: call_not_print, //未打印通知
       ship_way: ship_way, //配送方式
-      isTrusteeship: true //是否是托管
+      isTrusteeship: fn_price_controlled == 0 ? true : false, //是否是托管
+      isUploadingImage: false,
+      imageList:
+        files && files.length
+          ? imageList
+          : [
+              { id: 1, imageUrl: undefined, imageInfo: undefined },
+              { id: 2, imageUrl: undefined, imageInfo: undefined },
+              { id: 3, imageUrl: undefined, imageInfo: undefined }
+            ],
+      storeImageUrl: storeImageUrl, //门店照片
+      storeImageInfo: undefined,
+      bossImageUrl: bossImageUrl,
+      bossImageInfo: undefined,
+      fileId: fileId
     };
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
     this.onStoreAdd = this.onStoreAdd.bind(this);
     this.onCheckData = this.onCheckData.bind(this);
     this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
+    this.fileId = [];
   }
 
   componentDidMount() {
@@ -466,10 +505,43 @@ class StoreAddScene extends PureComponent {
                   this.props.navigation.navigate(
                     Config.ROUTE_SELECTCITY_Qualification,
                     {
+                      imageList: this.state.imageList,
+                      storeImageUrl: this.state.storeImageUrl,
+                      storeImageInfo: this.state.storeImageInfo,
+                      bossImageUrl: this.state.bossImageUrl,
+                      bossImageInfo: this.state.bossImageInfo,
                       callback: qualification => {
-                        this.setState({
-                          qualification: qualification
-                        });
+                        this.setState(
+                          {
+                            qualification: qualification,
+                            imageList: qualification.imageList,
+                            storeImageUrl: qualification.storeImageUrl,
+                            storeImageInfo: qualification.storeImageInfo,
+                            bossImageUrl: qualification.bossImageUrl,
+                            bossImageInfo: qualification.bossImageInfo
+                          },
+                          () => {
+                            // this.fileId = [];
+                            // console.log(
+                            //   "this.state.boss:%o",
+                            //   this.state.bossImageInfo
+                            // );
+
+                            this.upload(this.state.bossImageInfo, "StoreBoss");
+                            this.upload(
+                              this.state.storeImageInfo,
+                              "StoreImage"
+                            );
+                            this.state.qualification.info.imageList.map(
+                              element => {
+                                this.upload(
+                                  element.imageInfo,
+                                  "StoreImageList"
+                                );
+                              }
+                            );
+                          }
+                        );
                       }
                     }
                   )
@@ -843,105 +915,121 @@ class StoreAddScene extends PureComponent {
       </ScrollView>
     );
   }
-
+  upload = (imageInfo, name) => {
+    this.setState({
+      isUploadingImage: true
+    });
+    uploadImg(
+      imageInfo,
+      resp => {
+        if (resp.ok) {
+          this.uploadCount++;
+          this.fileId.push(resp.obj.file_id);
+          this.setState({
+            isUploadingImage: false
+          });
+        } else {
+          ToastLong(resp.desc);
+          this.setState({
+            isUploadingImage: false
+          });
+        }
+      },
+      name
+    );
+  };
   onStoreAdd() {
     if (this.state.onSubmitting) {
       return false;
     }
+    if (this.state.isUploadingImage) {
+      return ToastLong("正在上传图片请稍后进行操作！");
+    }
+    //发送的数据
+
     const { dispatch } = this.props;
     const { accessToken } = this.props.global;
     let _this = this;
-    console.log("this.state:%o", this.state.qualification.info.storeImageInfo);
-    uploadImg(
-      this.state.qualification.info.storeImageInfo,
-      resp => {
-        console.log(
-          "image_resp ===>:%o",
-          resp,
-          this.state.qualification.info.storeImageInfo
+    if (this.onCheckData()) {
+      let {
+        currVendorId,
+        btn_type,
+        store_id,
+        type,
+        alias,
+        name,
+        district,
+        owner_name,
+        owner_nation_id,
+        location_long,
+        location_lat,
+        deleted,
+        tel,
+        mobile,
+        dada_address,
+        owner_id,
+        open_end,
+        open_start,
+        vice_mgr,
+        call_not_print,
+        ship_way,
+        printer_cfg,
+        auto_add_tips,
+        isTrusteeship
+      } = this.state;
+      let data = this.fileId
+        .map((element, index) => {
+          return element;
+        })
+        .join(",");
+      console.log("str", data);
+      let send_data = {
+        type: type, //品牌id
+        name: name,
+        //alias: name,
+        city: this.state.selectCity.name,
+        attachment: data,
+        owner_name: owner_name,
+        owner_nation_id: owner_nation_id,
+        owner_id: owner_id,
+        mobile: mobile,
+        tel: tel,
+        fn_price_controlled: this.state.isTrusteeship ? 0 : 1,
+        dada_address: dada_address,
+        location_long: location_long,
+        location_lat: location_lat,
+        open_start: open_start,
+        open_end: open_end,
+        district: district,
+        call_not_print: call_not_print,
+        ship_way: ship_way,
+        vice_mgr: vice_mgr
+      };
+      console.log("send:%o", send_data);
+      if (store_id > 0) {
+        send_data.id = store_id;
+      }
+      _this.setState({ onSubmitting: true });
+      InteractionManager.runAfterInteractions(() => {
+        dispatch(
+          saveOfflineStore(send_data, accessToken, resp => {
+            console.log("save_resp -> ", resp);
+            _this.setState({ onSubmitting: false });
+            if (resp.ok) {
+              let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
+              ToastShort(msg);
+
+              const { goBack, state } = _this.props.navigation;
+              const params = state.params;
+              if (params.actionBeforeBack) {
+                params.actionBeforeBack({ shouldRefresh: true });
+              }
+              goBack();
+            }
+          })
         );
-        if (resp.ok) {
-          ToastLong("上传图片成功!");
-        } else {
-          ToastLong(resp.desc);
-          this.setState({
-            onSubmitting: false
-          });
-        }
-      },
-      "Store"
-    );
-    // if (this.onCheckData()) {
-    //   let {
-    //     currVendorId,
-    //     btn_type,
-    //     store_id,
-    //     type,
-    //     alias,
-    //     name,
-    //     district,
-    //     owner_name,
-    //     owner_nation_id,
-    //     location_long,
-    //     location_lat,
-    //     deleted,
-    //     tel,
-    //     mobile,
-    //     dada_address,
-    //     owner_id,
-    //     open_end,
-    //     open_start,
-    //     vice_mgr,
-    //     call_not_print,
-    //     ship_way,
-    //     printer_cfg,
-    //     auto_add_tips
-    //   } = this.state;
-
-    //   let send_data = {
-    //     type: type, //品牌id
-    //     name: name,
-    //     //alias: name,
-    //     owner_name: owner_name,
-    //     owner_nation_id: owner_nation_id,
-    //     owner_id: owner_id,
-    //     mobile: mobile,
-    //     tel: tel,
-    //     dada_address: dada_address,
-    //     location_long: location_long,
-    //     location_lat: location_lat,
-    //     open_start: open_start,
-    //     open_end: open_end,
-    //     district: district,
-    //     call_not_print: call_not_print,
-    //     ship_way: ship_way,
-    //     vice_mgr: vice_mgr
-    //   };
-    //   if (store_id > 0) {
-    //     send_data.id = store_id;
-    //   }
-    //   _this.setState({ onSubmitting: true });
-
-    // InteractionManager.runAfterInteractions(() => {
-    //   dispatch(
-    //     saveOfflineStore(send_data, accessToken, resp => {
-    //       console.log("save_resp -> ", resp);
-    //       _this.setState({ onSubmitting: false });
-    //       if (resp.ok) {
-    //         let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
-    //         ToastShort(msg);
-
-    //         const { goBack, state } = _this.props.navigation;
-    //         const params = state.params;
-    //         if (params.actionBeforeBack) {
-    //           params.actionBeforeBack({ shouldRefresh: true });
-    //         }
-    //         goBack();
-    //       }
-    //     })
-    //   );
-    // });
-    //}
+      });
+    }
   }
 
   onCheckData() {
@@ -978,7 +1066,13 @@ class StoreAddScene extends PureComponent {
       error_msg = "请输入门店所在区域";
     } else if (location_long === "" || location_lat === "") {
       error_msg = "请选择门店定位信息";
-    } else if (!this.state.qualification.info) {
+    } else if (!this.state.selectCity.cityId) {
+      error_msg = "请选择门店所在城市";
+    } else if (
+      !this.state.bossImageUrl ||
+      !this.state.storeImageUrl ||
+      !this.state.imageList.length
+    ) {
       error_msg = "请上传资质";
     } else if (owner_nation_id.length !== 18 && owner_nation_id.length !== 11) {
       error_msg = "身份证格式有误";
@@ -986,6 +1080,8 @@ class StoreAddScene extends PureComponent {
       error_msg = "请选择门店店长";
     } else if (mobile.length !== 11) {
       error_msg = "店长手机号格式有误";
+    } else if (!owner_name) {
+      error_msg = "请输入店长实名";
     }
     if (error_msg === "") {
       this.setState({ onSubmitting: true });
