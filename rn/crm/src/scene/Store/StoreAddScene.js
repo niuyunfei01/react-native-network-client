@@ -10,7 +10,6 @@ import {
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import { simpleBarrier } from "../../common/tool";
-import { guid } from "../../util/common";
 
 import {
   Button,
@@ -1156,8 +1155,8 @@ class StoreAddScene extends PureComponent {
         auto_add_tips,
         isTrusteeship
       } = this.state;
-
-      let data = this.fileId
+      console.log("附件数组图片都是啥:%o", this.state.existImgIds);
+      let data = this.state.existImgIds
         .map((element, index) => {
           return element;
         })
