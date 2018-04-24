@@ -239,7 +239,6 @@ export function uploadImg(image_info, callback, file_model_name = "Product") {
     return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())
       .then(resp => {
-        console.log("貌似没进入");
         let ok = false;
         let desc = "";
         console.log("uploadImg resp --->", resp);

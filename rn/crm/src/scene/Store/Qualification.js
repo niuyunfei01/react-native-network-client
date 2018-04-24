@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import {
   ScrollView,
   RefreshControl,
@@ -9,33 +9,33 @@ import {
   TextInput,
   Image
 } from "react-native";
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
-import { Styles, Metrics, Colors } from "../../themes";
+import {Styles, Metrics, Colors} from "../../themes";
 
 import Icon from "react-native-vector-icons/Ionicons";
 import _ from "lodash";
 import ImagePicker from "react-native-image-crop-picker";
 
-import { Button, Button1 } from "../component/All";
-import { cityList } from "../data";
-import { Line } from "../component/All";
-import { NavigationItem } from "../../widget";
+import {Button, Button1} from "../component/All";
+import {cityList} from "../data";
+import {Line} from "../component/All";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
-import { ToastLong } from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 function mapStateToProps(state) {
-  const { mine, global } = state;
-  return { mine: mine, global: global };
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 class Qualification extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
       headerTitle: "提交资质",
       headerLeft: (
@@ -53,12 +53,13 @@ class Qualification extends Component {
         />
       ),
       headerRight: (
-        <View style={{ marginRight: pxToDp(31) }}>
+        <View style={{marginRight: pxToDp(31)}}>
           <Text>联系客服</Text>
         </View>
       )
     };
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -68,7 +69,8 @@ class Qualification extends Component {
       bossImageUrl: this.props.navigation.state.params.bossImageUrl,
       bossImageInfo: this.props.navigation.state.params.bossImageInfo,
       camera: "openPicker",
-      opVisible: false
+      opVisible: false,
+      removeIds: [],//删除了图片
     };
     this.config = {
       width: 500,
@@ -83,6 +85,7 @@ class Qualification extends Component {
       includeBase64: true
     };
   }
+
   title = (title, desc) => {
     return (
       <View
@@ -125,13 +128,14 @@ class Qualification extends Component {
     return (
       <ActionSheet
         visible={this.state.opVisible}
-        onRequestClose={() => {}}
+        onRequestClose={() => {
+        }}
         menus={[
           {
             type: "primary",
             label: "照相机",
             onPress: () => {
-              this.setState({ opVisible: false, camera: "openCamera" }, () => {
+              this.setState({opVisible: false, camera: "openCamera"}, () => {
                 this.picker();
               });
             }
@@ -157,7 +161,7 @@ class Qualification extends Component {
             type: "default",
             label: "取消",
             onPress: () => {
-              this.setState({ opVisible: false });
+              this.setState({opVisible: false});
             }
           }
         ]}
@@ -178,6 +182,17 @@ class Qualification extends Component {
       this.callback(image, image_info);
     });
   };
+
+  pushRemoveIds = (img) => {
+    if (img && img.id) {
+      let rmIds = this.state.removeIds;
+      rmIds.push(img.id);
+      this.setState({
+        removeIds: rmIds
+      });
+    }
+  }
+
   render() {
     let list = [];
     this.state.imageList.map(element => {
@@ -186,14 +201,16 @@ class Qualification extends Component {
       }
     });
     return (
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
-        <ScrollView style={{ flex: 1 }}>
+      <View style={{flex: 1, backgroundColor: "#fff"}}>
+        <ScrollView style={{flex: 1}}>
           {this.title("营业执照", "请上传门店执照或身份证")}
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <View style={{justifyContent: "center", alignItems: "center"}}>
             <Upload
               desc="上传文字清晰照片"
-              imageUrl={this.state.storeImageUrl}
+              imageUrl={this.state.storeImageUrl && this.state.storeImageUrl.url}
               deleteImage={() => {
+                let img = this.state.storeImageUrl;
+                this.pushRemoveIds(img);
                 this.state.storeImageUrl = undefined;
                 this.forceUpdate();
               }}
@@ -201,10 +218,9 @@ class Qualification extends Component {
               height={(Metrics.CW - 80) * 0.54}
               onPress={() =>
                 this.pickSingleImg((image, imageInfo) => {
-                  let storeImageUrl = this.state.storeImageUrl;
-                  storeImageUrl = `data:${image.mime};base64, ${image.data}`;
+                  let storeImageUrl = `data:${image.mime};base64, ${image.data}`;
                   this.setState({
-                    storeImageUrl: storeImageUrl,
+                    storeImageUrl: {url: storeImageUrl},
                     storeImageInfo: imageInfo
                   });
                 })
@@ -223,8 +239,10 @@ class Qualification extends Component {
               return (
                 <Upload
                   desc="上传门头照片"
-                  imageUrl={element.imageUrl}
+                  imageUrl={element.imageUrl && element.imageUrl.url}
                   deleteImage={() => {
+                    let img = this.state.imageList[index].imageUrl;
+                    this.pushRemoveIds(img);
                     this.state.imageList[index].imageUrl = undefined;
                     this.forceUpdate();
                   }}
@@ -232,43 +250,28 @@ class Qualification extends Component {
                     this.pickSingleImg((image, imageInfo) => {
                       let imageList = this.state.imageList;
                       imageList[index].imageInfo = imageInfo;
-                      imageList[index].imageUrl = `data:${image.mime};base64, ${
-                        image.data
-                      }`;
-                      this.setState({
-                        imageList: imageList
-                      });
+                      imageList[index].imageUrl = {url: `data:${image.mime};base64, ${image.data}`};
+                      this.setState({imageList: imageList});
                     });
                   }}
-                  //   onPress={() =>
-                  //     // this.pickSingleImg((image, imageInfo) => {
-                  //     //   let imageList = this.state.imageList;
-                  //     //   imageList[index].imageInfo = imageInfo;
-                  //     //   imageList[index].imageUrl = `data:${image.mime};base64, ${
-                  //     //     image.data
-                  //     //   }`;
-                  //     //   this.setState({
-                  //     //     imageList: imageList
-                  //     //   });
-                  //     // })
-                  //   }
                 />
               );
             })}
           </View>
           {this.title("老板形象", "请上传老板照片")}
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <View style={{justifyContent: "center", alignItems: "center"}}>
             <Upload
               desc="上传老板照片"
-              imageUrl={this.state.bossImageUrl}
+              imageUrl={this.state.bossImageUrl && this.state.bossImageUrl.url}
               deleteImage={() => {
+                let img = this.state.bossImageUrl;
+                this.pushRemoveIds(img);
                 this.state.bossImageUrl = undefined;
                 this.forceUpdate();
               }}
               onPress={() =>
                 this.pickSingleImg((image, imageInfo) => {
-                  let bossImageUrl = this.state.bossImageUrl;
-                  bossImageUrl = `data:${image.mime};base64, ${image.data}`;
+                  let bossImageUrl = {url: `data:${image.mime};base64, ${image.data}`};
                   this.setState({
                     bossImageUrl: bossImageUrl,
                     bossImageInfo: imageInfo
@@ -279,7 +282,7 @@ class Qualification extends Component {
           </View>
         </ScrollView>
         {this.renderActionSheet()}
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <View style={{justifyContent: "center", alignItems: "center"}}>
           <Button1
             t="提交"
             w={(Metrics.CW - pxToDp(31) * 2 - 20) / 3}
@@ -296,11 +299,7 @@ class Qualification extends Component {
                 storeImageInfo: this.state.storeImageInfo,
                 bossImageUrl: this.state.bossImageUrl,
                 bossImageInfo: this.state.bossImageInfo,
-                info: {
-                  imageList: list,
-                  storeImageInfo: this.state.storeImageInfo,
-                  bossImageInfo: this.state.bossImageInfo
-                }
+                rmIds: this.state.removeIds
               });
               this.props.navigation.goBack();
             }}
@@ -310,12 +309,13 @@ class Qualification extends Component {
     );
   }
 }
+
 class Upload extends Component {
   render() {
-    const { desc, onPress, width, height, imageUrl, deleteImage } = this.props;
+    const {desc, onPress, width, height, imageUrl, deleteImage} = this.props;
     return imageUrl ? (
       <Image
-        source={{ uri: imageUrl }}
+        source={{uri: imageUrl}}
         style={{
           width: width ? width : (Metrics.CW - pxToDp(31) * 2 - 20) / 3,
           height: height
@@ -332,7 +332,7 @@ class Upload extends Component {
           }}
           onPress={deleteImage}
         >
-          <Icon name={"md-close-circle"} size={pxToDp(40)} />
+          <Icon name={"md-close-circle"} size={pxToDp(40)}/>
         </TouchableOpacity>
       </Image>
     ) : (
@@ -349,7 +349,7 @@ class Upload extends Component {
         }}
       >
         <View>
-          <Text style={{ textAlign: "center", color: Colors.theme }}>
+          <Text style={{textAlign: "center", color: Colors.theme}}>
             +添加
           </Text>
           <Text
