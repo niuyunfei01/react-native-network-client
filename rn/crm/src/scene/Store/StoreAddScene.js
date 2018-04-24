@@ -43,7 +43,10 @@ import ModalSelector from "../../widget/ModalSelector/index";
 //组件
 import { Yuan } from "../component/All";
 import { Colors, Metrics } from "../../themes";
-import { uploadImg } from "../../reducers/product/productActions";
+import {
+  uploadImg,
+  newProductSave
+} from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
 
 import _ from "lodash";
@@ -1155,8 +1158,14 @@ class StoreAddScene extends PureComponent {
         auto_add_tips,
         isTrusteeship
       } = this.state;
-      console.log("附件数组图片都是啥:%o", this.state.existImgIds);
-      let data = this.state.existImgIds
+      console.log(
+        "附件数组图片都是啥:%o,原始:%o,之后:%o",
+        this.state.existImgIds,
+        this.fileId,
+        this.state.fileId
+      );
+      let allField = [...new Set(this.state.existImgIds.concat(this.fileId))];
+      let data = allField
         .map((element, index) => {
           return element;
         })
@@ -1165,7 +1174,6 @@ class StoreAddScene extends PureComponent {
       let send_data = {
         type: type, //品牌id
         name: name,
-        //alias: name,
         tpl_store: !this.state.isBd ? "unset" : this.state.templateInfo.key,
         service_bd: !this.state.isBd ? "unset" : this.state.bdInfo.key,
         city: this.state.selectCity.name,
