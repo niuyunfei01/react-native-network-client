@@ -475,7 +475,8 @@ class StoreAddScene extends PureComponent {
           let existImgIds = self.state.existImgIds;
           let ids = _.difference(rmIds, existImgIds); //去掉rmids中的和existimgids中重复的去掉 返回去重后的existImgIds
           let fileIds = self.state.fileId;
-          fileIds = _.union(fileIds, ids);
+          // fileIds = _.union(fileIds, ids);
+          fileIds = [...new Set(fileIds.concat(ids))];
           self.setState({
             fileId: fileIds
           });
@@ -1164,8 +1165,8 @@ class StoreAddScene extends PureComponent {
         this.fileId,
         this.state.fileId
       );
-      let allField = [...new Set(this.state.existImgIds.concat(this.fileId))];
-      let data = allField
+
+      let data = this.state.fileId
         .map((element, index) => {
           return element;
         })
