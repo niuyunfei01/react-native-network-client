@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,  TouchableWithoutFeedback} from 'react-native';
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Input, Label, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -13,6 +13,8 @@ import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 import Config from "../../config";
+import Swiper from "react-native-swiper";
+import { Metrics, Styles, Colors } from "../../themes";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -64,6 +66,7 @@ class GoodsWorkNewProductScene extends PureComponent {
       slogan: '',
       images: [],
       reason: '',
+      visual: false //大图
     };
     this.renderBtn = this.renderBtn.bind(this);
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this);
@@ -182,19 +185,26 @@ class GoodsWorkNewProductScene extends PureComponent {
           {
             images.map((item, index) => {
               return (
-                <View key={index}
-                      style={{
-                        height: pxToDp(170),
-                        width: pxToDp(170),
-                        flexDirection: 'row',
-                        alignItems: 'flex-end'
-                      }}>
-                  <Image
-                    style={styles.img_add}
-                    source={{uri: item}}
-                    resizeMode="contain"
-                  />
-                </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.index = index;
+                    this.setState({
+                      visual: true
+                    });
+                  }}
+                >
+                  <View
+                    key={index}
+                    style={{
+                      height: pxToDp(170),
+                      width: pxToDp(170),
+                      flexDirection: "row",
+                      alignItems: "flex-end"
+                    }}
+                  >
+                    <Image style={styles.img_add} source={{ uri: item }} />
+                  </View>
+                </TouchableOpacity>
               )
             })
           }
@@ -205,10 +215,75 @@ class GoodsWorkNewProductScene extends PureComponent {
     }
   }
 
+  modal = () => {
+    // let index = this.state.images.findIndex(i => i.timestamp === this.timestamp)
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          this.setState({ visual: false });
+        }}
+      >
+        <View
+          style={[
+            Styles.center,
+            {
+              position: "absolute",
+              top: 0,
+              width: Metrics.CW,
+              height: Metrics.CH - 50,
+              zIndex: 99999,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: Colors.opacity3
+            }
+          ]}
+        >
+          <View
+            style={{
+              height: Metrics.CW,
+              width: Metrics.CW
+            }}
+          >
+            <Swiper
+              showsButtons={false}
+              autoplay={false}
+              showsPagination={true}
+              activeDotColor={Colors.theme}
+              dotColor={Colors.white}
+              index={this.index}
+              loop={false}
+            >
+              {this.state.images.map(item => {
+                return (
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      this.setState({
+                        visual: false
+                      });
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: Metrics.CW,
+                        height: Metrics.CW
+                      }}
+                      source={{ uri: item }}
+                    />
+                  </TouchableWithoutFeedback>
+                );
+              })}
+            </Swiper>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   render() {
     let {name, price_desc, slogan, images} = this.state;
     return (
       <ScrollView style={{flex: 1}}>
+        {this.state.visual ? this.modal() : null}
         <View>
           <Cells style={styles.my_cells}>
             <Cell customStyle={[styles.my_cell]}>
