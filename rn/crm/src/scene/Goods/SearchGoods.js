@@ -179,14 +179,12 @@ class SearchGoods extends Component {
       isLoading: true
     });
     let url = "";
+    let accessToken = this.props.global.accessToken;
+    let vendorId = this.props.global.currVendorId;
     if (!this.text) {
-      url = `api/query_product_by_upc.json?access_token=${
-        this.props.global.accessToken
-      }&upc=${this.state.value}`;
+      url = `api/query_product_by_upc.json?access_token=${accessToken}&vendor_id=${vendorId}&upc=${this.state.value}`;
     } else {
-      url = `api/query_product_by_keyword.json?access_token=${
-        this.props.global.accessToken
-      }&keyword=${this.text}`;
+      url = `api/query_product_by_keyword.json?access_token=${accessToken}&vendor_id=${vendorId}&keyword=${this.text}`;
     }
     http: getWithTpl(
       url,
