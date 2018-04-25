@@ -315,7 +315,6 @@ class StoreAddScene extends Component {
       isBdUrl,
       response => {
         if (response.ok) {
-          console.log("是否是bd:%o", response.obj.is_bd);
           this.setState({
             isLoading: false,
             isBd: response.obj.is_bd
@@ -339,7 +338,6 @@ class StoreAddScene extends Component {
           let selectTemp = [];
           selectTemp.push({ key: -999, section: true, label: "选择模板店" });
           for (let item of arr) {
-            console.log("store:%o", store_info);
             if (
               store_info &&
               store_info.tpl_store &&
@@ -364,7 +362,9 @@ class StoreAddScene extends Component {
           });
         }
       },
-      error => {}
+      error => {
+        console.log("error:%o", error);
+      }
     );
     //获取bd列表
     getWithTpl(
@@ -404,7 +404,9 @@ class StoreAddScene extends Component {
           });
         }
       },
-      error => {}
+      error => {
+        console.log("error:%o", error);
+      }
     );
   }
 
@@ -542,11 +544,6 @@ class StoreAddScene extends Component {
       }
     }
     let _this = this;
-    console.log(
-      "this.state.isbd:%o",
-      this.state.isGetbdList,
-      this.state.isLoadingStoreList
-    );
     return this.state.isLoading ? (
       <LoadingView />
     ) : (
@@ -1160,11 +1157,6 @@ class StoreAddScene extends Component {
     if (this.state.onSubmitting) {
       return false;
     }
-    // if (this.state.isUploadingImage) {
-    //   return ToastLong("正在上传图片请稍后进行操作！");
-    // }
-    //发送的数据
-
     const { dispatch } = this.props;
     const { accessToken } = this.props.global;
     let _this = this;
