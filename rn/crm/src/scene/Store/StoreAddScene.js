@@ -738,7 +738,6 @@ class StoreAddScene extends Component {
                           this.setState({
                             isTrusteeship: true
                           });
-                          // this.selectRefund(element);
                         }}
                       />
                       <Text style={styles.body_text}>托管店</Text>
@@ -1212,7 +1211,7 @@ class StoreAddScene extends Component {
         send_data["tpl_store"] = this.state.templateInfo.key;
         send_data["service_bd"] = this.state.bdInfo.key;
         send_data["attachment"] = data;
-        send_data["fn_price_controlled"] = this.state.isTrusteeship ? 0 : 1;
+        send_data["fn_price_controlled"] = this.state.isTrusteeship ? 1 : 0;
       }
       if (store_id > 0) {
         send_data.id = store_id;
