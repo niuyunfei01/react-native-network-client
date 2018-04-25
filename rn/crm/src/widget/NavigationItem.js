@@ -22,21 +22,19 @@ class NavigationItem extends PureComponent {
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
-     <View style={{flexDirection:'row',width:width,alignItems:'center'}}>
+     <View>
         <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
         {_icon}
         {_title}
       </TouchableOpacity>
-      {
-        children?
-        <View style={{flex:1,marginLeft:20,}}>{children}</View>
-        :
-        null
-      }
      </View>
     );
   }
 }
+
+
+
+
 
 // define your styles
 const styles = StyleSheet.create({
