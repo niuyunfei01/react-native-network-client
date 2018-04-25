@@ -121,23 +121,25 @@ class SelectCity extends Component {
             />
           </View>
         </View>
-        <View
-          style={[
-            { height: 50, marginLeft: 18, marginRight: 18 },
-            Styles.between
-          ]}
-        >
-          <View style={Styles.startcenter}>
-            <Icon name={"ios-pin-outline"} size={17} color={Colors.theme} />
-            <Text style={Styles.n1grey9} allowFontScaling={false}>
-              {" "}
-              当前定位城市
-            </Text>
-          </View>
-          <Text style={Styles.n1b} allowFontScaling={false}>
-            {"未获取到城市"}
-          </Text>
-        </View>
+        {
+          //   <View
+          //   style={[
+          //     { height: 50, marginLeft: 18, marginRight: 18 },
+          //     Styles.between
+          //   ]}
+          // >
+          //   <View style={Styles.startcenter}>
+          //     <Icon name={"ios-pin-outline"} size={17} color={Colors.theme} />
+          //     <Text style={Styles.n1grey9} allowFontScaling={false}>
+          //       {" "}
+          //       当前定位城市
+          //     </Text>
+          //   </View>
+          //   <Text style={Styles.n1b} allowFontScaling={false}>
+          //     {"未获取到城市"}
+          //   </Text>
+          // </View>
+        }
         <ScrollView
           style={{ flex: 1 }}
           ref={scrollView => {

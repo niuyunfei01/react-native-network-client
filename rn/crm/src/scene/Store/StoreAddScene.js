@@ -1,11 +1,12 @@
 //import liraries
-import React, { PureComponent } from "react";
+import React, { PureComponent, Component } from "react";
 import {
   InteractionManager,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -73,7 +74,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 // create a component
-class StoreAddScene extends PureComponent {
+class StoreAddScene extends Component {
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
 
@@ -280,7 +281,9 @@ class StoreAddScene extends PureComponent {
       templateInfo: { key: undefined, label: undefined },
       bdList: [],
       bdInfo: { key: undefined, label: undefined },
-      isLoading: true
+      isLoading: true,
+      isGetbdList: true,
+      isLoadingStoreList: true
     };
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
@@ -301,20 +304,30 @@ class StoreAddScene extends PureComponent {
     });
   }
   componentWillMount() {
-    let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
-    getWithTpl(isBdUrl, response => {
-      if (response.ok) {
-        this.setState({
-          isLoading: false,
-          isBd: response.obj.is_bd
-        });
-      }
-    });
     const { store_info } = this.props.navigation.state.params || {};
+    console.log("门店信息:%o", store_info);
+    let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
     let url = `api/get_tpl_stores?access_token=${
       this.props.global.accessToken
     }`;
     let bdUrl = `api/get_bds?access_token=${this.props.global.accessToken}`;
+    getWithTpl(
+      isBdUrl,
+      response => {
+        if (response.ok) {
+          console.log("是否是bd:%o", response.obj.is_bd);
+          this.setState({
+            isLoading: false,
+            isBd: response.obj.is_bd
+          });
+        }
+      },
+      error => {
+        console.log("error:%o", error);
+      }
+    );
+
+    //获取模板店列表
     getWithTpl(
       url,
       response => {
@@ -326,7 +339,12 @@ class StoreAddScene extends PureComponent {
           let selectTemp = [];
           selectTemp.push({ key: -999, section: true, label: "选择模板店" });
           for (let item of arr) {
-            if (item.id === store_info.tpl_store) {
+            console.log("store:%o", store_info);
+            if (
+              store_info &&
+              store_info.tpl_store &&
+              item.id === store_info.tpl_store
+            ) {
               this.setState({
                 templateInfo: {
                   key: item.id,
@@ -340,14 +358,15 @@ class StoreAddScene extends PureComponent {
             };
             selectTemp.push(value);
           }
-
           this.setState({
-            templateList: selectTemp
+            templateList: selectTemp,
+            isLoadingStoreList: false
           });
         }
       },
       error => {}
     );
+    //获取bd列表
     getWithTpl(
       bdUrl,
       response => {
@@ -356,11 +375,16 @@ class StoreAddScene extends PureComponent {
           for (let i in response.obj) {
             arr.push(response.obj[i]); //属性
           }
+
           let selectTemp = [];
           let data = _.toPairs(response.obj);
           selectTemp.push({ key: -999, section: true, label: "选择bd" });
           for (let item of data) {
-            if (item[0] === store_info.service_bd) {
+            if (
+              store_info &&
+              store_info.service_bd &&
+              item[0] === store_info.service_bd
+            ) {
               this.setState({
                 bdInfo: {
                   key: item[0],
@@ -375,7 +399,8 @@ class StoreAddScene extends PureComponent {
             selectTemp.push(value);
           }
           this.setState({
-            bdList: selectTemp
+            bdList: selectTemp,
+            isGetbdList: false
           });
         }
       },
@@ -517,352 +542,374 @@ class StoreAddScene extends PureComponent {
       }
     }
     let _this = this;
-
+    console.log(
+      "this.state.isbd:%o",
+      this.state.isGetbdList,
+      this.state.isLoadingStoreList
+    );
     return this.state.isLoading ? (
       <LoadingView />
     ) : (
-      <ScrollView style={{ backgroundColor: colors.main_back }}>
-        <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>店铺名称</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={name => this.setState({ name })}
-                value={name}
-                style={[styles.cell_input]}
-                placeholder="8个字符以内"
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>门店电话</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={tel => this.setState({ tel })}
-                value={tel}
-                style={[styles.cell_input]}
-                placeholder="请输入店铺电话"
-                maxLength={18} // 可输入的最大长度
-                keyboardType="numeric" //默认弹出的键盘
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>门店地址</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={dada_address => this.setState({ dada_address })}
-                value={dada_address}
-                style={[styles.cell_input]}
-                placeholder="请输入门店地址"
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>所属城市</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate(Config.ROUTE_SELECTCITY_LIST, {
-                    callback: selectCity => {
-                      this.setState({
-                        selectCity: selectCity
-                      });
-                    }
-                  })
-                }
-              >
-                <Text style={styles.body_text}>
-                  {this.state.selectCity.name}
-                </Text>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>所属区域</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={district => this.setState({ district })}
-                value={district}
-                style={[styles.cell_input]}
-                placeholder="例: 昌平区"
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>定位信息</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity
-                style={{ flexDirection: "row", marginTop: pxToDp(6) }}
-                onPress={() => {
-                  let center = "";
-                  if (location_long && location_lat) {
-                    center = `${location_long},${location_lat}`;
-                  }
-                  const params = {
-                    action: Config.LOC_PICKER,
-                    center: center,
-                    actionBeforeBack: resp => {
-                      let { name, location, address } = resp;
-                      console.log("location -> ", resp);
-                      let locate = location.split(",");
-                      this.setState({
-                        location_long: locate[0],
-                        location_lat: locate[1]
-                      });
-                    }
-                  };
-                  this.onPress(Config.ROUTE_WEB, params);
-                }}
-              >
-                <MIcon name="map-marker-outline" style={styles.map_icon} />
-                <Text style={[styles.body_text]}>
-                  {location_long !== "" && location_lat !== ""
-                    ? location_long + "," + location_lat
-                    : "点击选择地址"}
-                </Text>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
-          {/*商家资质不是bd不显示*/
-          this.state.isBd ? (
+      <View style={{ flex: 1 }}>
+        <ScrollView style={{ backgroundColor: colors.main_back }}>
+          <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
+          <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
-                <Label style={[styles.cell_label]}>商家资质</Label>
+                <Label style={[styles.cell_label]}>店铺名称</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={name => this.setState({ name })}
+                  value={name}
+                  style={[styles.cell_input]}
+                  placeholder="8个字符以内"
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>门店电话</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={tel => this.setState({ tel })}
+                  value={tel}
+                  style={[styles.cell_input]}
+                  placeholder="请输入店铺电话"
+                  maxLength={18} // 可输入的最大长度
+                  keyboardType="numeric" //默认弹出的键盘
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>门店地址</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={dada_address => this.setState({ dada_address })}
+                  value={dada_address}
+                  style={[styles.cell_input]}
+                  placeholder="请输入门店地址"
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>所属城市</Label>
               </CellHeader>
               <CellBody>
                 <TouchableOpacity
                   onPress={() =>
                     this.props.navigation.navigate(
-                      Config.ROUTE_SELECTCITY_Qualification,
+                      Config.ROUTE_SELECTCITY_LIST,
                       {
-                        imageList: this.state.imageList,
-                        storeImageUrl: this.state.storeImageUrl,
-                        storeImageInfo: this.state.storeImageInfo,
-                        bossImageUrl: this.state.bossImageUrl,
-                        bossImageInfo: this.state.bossImageInfo,
-                        callback: qualification => {
-                          this.doUploadImg(qualification);
+                        callback: selectCity => {
+                          this.setState({
+                            selectCity: selectCity
+                          });
                         }
                       }
                     )
                   }
                 >
                   <Text style={styles.body_text}>
-                    {this.state.qualification.name}
+                    {this.state.selectCity.name}
                   </Text>
                 </TouchableOpacity>
               </CellBody>
             </Cell>
-          ) : null}
-          {this.state.isBd ? (
             <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
-                <Label style={[styles.cell_label]}>门店类型</Label>
+                <Label style={[styles.cell_label]}>所属区域</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={district => this.setState({ district })}
+                  value={district}
+                  style={[styles.cell_input]}
+                  placeholder="例: 昌平区"
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>定位信息</Label>
               </CellHeader>
               <CellBody>
                 <TouchableOpacity
-                  style={{ flexDirection: "row", alignItems: "center" }}
+                  style={{ flexDirection: "row", marginTop: pxToDp(6) }}
+                  onPress={() => {
+                    let center = "";
+                    if (location_long && location_lat) {
+                      center = `${location_long},${location_lat}`;
+                    }
+                    const params = {
+                      action: Config.LOC_PICKER,
+                      center: center,
+                      actionBeforeBack: resp => {
+                        let { name, location, address } = resp;
+                        console.log("location -> ", resp);
+                        let locate = location.split(",");
+                        this.setState({
+                          location_long: locate[0],
+                          location_lat: locate[1]
+                        });
+                      }
+                    };
+                    this.onPress(Config.ROUTE_WEB, params);
+                  }}
                 >
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginRight: 20
-                    }}
-                    onPress={() =>
-                      this.setState({
-                        isTrusteeship: true
-                      })
-                    }
-                  >
-                    <Yuan
-                      icon={"md-checkmark"}
-                      size={10}
-                      ic={Colors.white}
-                      w={18}
-                      bw={Metrics.one}
-                      bgc={
-                        this.state.isTrusteeship ? Colors.grey3 : Colors.white
-                      }
-                      bc={Colors.grey3}
-                      mgr={5}
-                      onPress={() => {
-                        this.setState({
-                          isTrusteeship: true
-                        });
-                        // this.selectRefund(element);
-                      }}
-                    />
-                    <Text style={styles.body_text}>托管店</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{ flexDirection: "row", alignItems: "center" }}
-                    onPress={() =>
-                      this.setState({
-                        isTrusteeship: false
-                      })
-                    }
-                  >
-                    <Yuan
-                      icon={"md-checkmark"}
-                      size={10}
-                      ic={Colors.white}
-                      w={18}
-                      mgr={5}
-                      bw={Metrics.one}
-                      bgc={
-                        !this.state.isTrusteeship ? Colors.grey3 : Colors.white
-                      }
-                      bc={Colors.grey3}
-                      onPress={() => {
-                        this.setState({
-                          isTrusteeship: false
-                        });
-                      }}
-                    />
-                    <Text style={styles.body_text}>联营店</Text>
-                  </TouchableOpacity>
+                  <MIcon name="map-marker-outline" style={styles.map_icon} />
+                  <Text style={[styles.body_text]}>
+                    {location_long !== "" && location_lat !== ""
+                      ? location_long + "," + location_lat
+                      : "点击选择地址"}
+                  </Text>
                 </TouchableOpacity>
               </CellBody>
             </Cell>
-          ) : null}
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>身份证号</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={owner_nation_id =>
-                  this.setState({ owner_nation_id })
-                }
-                value={owner_nation_id}
-                maxLength={18} // 可输入的最大长度
-                style={[styles.cell_input]}
-                placeholder="请输入本人身份证号"
-                keyboardType="numeric" //默认弹出的键盘
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          {this.state.isBd ? (
+            {/*商家资质不是bd不显示*/
+            this.state.isBd ? (
+              <Cell customStyle={[styles.cell_row]}>
+                <CellHeader>
+                  <Label style={[styles.cell_label]}>商家资质</Label>
+                </CellHeader>
+                <CellBody>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.props.navigation.navigate(
+                        Config.ROUTE_SELECTCITY_Qualification,
+                        {
+                          imageList: this.state.imageList,
+                          storeImageUrl: this.state.storeImageUrl,
+                          storeImageInfo: this.state.storeImageInfo,
+                          bossImageUrl: this.state.bossImageUrl,
+                          bossImageInfo: this.state.bossImageInfo,
+                          callback: qualification => {
+                            this.doUploadImg(qualification);
+                          }
+                        }
+                      )
+                    }
+                  >
+                    <Text style={styles.body_text}>
+                      {this.state.qualification.name}
+                    </Text>
+                  </TouchableOpacity>
+                </CellBody>
+              </Cell>
+            ) : null}
+            {this.state.isBd ? (
+              <Cell customStyle={[styles.cell_row]}>
+                <CellHeader>
+                  <Label style={[styles.cell_label]}>门店类型</Label>
+                </CellHeader>
+                <CellBody>
+                  <TouchableOpacity
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginRight: 20
+                      }}
+                      onPress={() =>
+                        this.setState({
+                          isTrusteeship: true
+                        })
+                      }
+                    >
+                      <Yuan
+                        icon={"md-checkmark"}
+                        size={10}
+                        ic={Colors.white}
+                        w={18}
+                        bw={Metrics.one}
+                        bgc={
+                          this.state.isTrusteeship ? Colors.grey3 : Colors.white
+                        }
+                        bc={Colors.grey3}
+                        mgr={5}
+                        onPress={() => {
+                          this.setState({
+                            isTrusteeship: true
+                          });
+                          // this.selectRefund(element);
+                        }}
+                      />
+                      <Text style={styles.body_text}>托管店</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                      onPress={() =>
+                        this.setState({
+                          isTrusteeship: false
+                        })
+                      }
+                    >
+                      <Yuan
+                        icon={"md-checkmark"}
+                        size={10}
+                        ic={Colors.white}
+                        w={18}
+                        mgr={5}
+                        bw={Metrics.one}
+                        bgc={
+                          !this.state.isTrusteeship
+                            ? Colors.grey3
+                            : Colors.white
+                        }
+                        bc={Colors.grey3}
+                        onPress={() => {
+                          this.setState({
+                            isTrusteeship: false
+                          });
+                        }}
+                      />
+                      <Text style={styles.body_text}>联营店</Text>
+                    </TouchableOpacity>
+                  </TouchableOpacity>
+                </CellBody>
+              </Cell>
+            ) : null}
             <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
-                <Label style={[styles.cell_label]}>选择模板店</Label>
+                <Label style={[styles.cell_label]}>身份证号</Label>
               </CellHeader>
               <CellBody>
-                <ModalSelector
-                  onChange={option => {
-                    console.log("option:%o", option);
-                    this.setState({
-                      templateInfo: {
-                        key: option.key,
-                        label: option.label
-                      }
-                    });
-                    // this.onCheckUser("owner", option.key);
-                  }}
-                  data={this.state.templateList}
-                  skin="customer"
-                  defaultKey={-999}
-                >
-                  <Text style={styles.body_text}>
-                    {this.state.templateInfo.label || "点击选择模板店"}
-                  </Text>
-                </ModalSelector>
+                <Input
+                  onChangeText={owner_nation_id =>
+                    this.setState({ owner_nation_id })
+                  }
+                  value={owner_nation_id}
+                  maxLength={18} // 可输入的最大长度
+                  style={[styles.cell_input]}
+                  placeholder="请输入本人身份证号"
+                  keyboardType="numeric" //默认弹出的键盘
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
               </CellBody>
             </Cell>
-          ) : null}
-          {this.state.isBd ? (
-            <Cell customStyle={[styles.cell_row]}>
-              <CellHeader>
-                <Label style={[styles.cell_label]}>选择bd</Label>
-              </CellHeader>
-              <CellBody>
-                <ModalSelector
-                  onChange={option => {
-                    console.log("option:%o", option);
-                    this.setState({
-                      bdInfo: {
-                        key: option.key,
-                        label: option.label
-                      }
-                    });
-                    // this.onCheckUser("owner", option.key);
-                  }}
-                  data={this.state.bdList}
-                  skin="customer"
-                  defaultKey={-999}
-                >
-                  <Text style={styles.body_text}>
-                    {this.state.bdInfo.label || "点击选择bd"}
-                  </Text>
-                </ModalSelector>
-              </CellBody>
-            </Cell>
-          ) : null}
-        </Cells>
+            {this.state.isBd ? (
+              <Cell customStyle={[styles.cell_row]}>
+                <CellHeader>
+                  <Label style={[styles.cell_label]}>选择模板店</Label>
+                </CellHeader>
+                <CellBody>
+                  {this.state.isLoadingStoreList ? (
+                    <Text style={styles.body_text}>
+                      正在获取模板店列表,请稍候！
+                    </Text>
+                  ) : (
+                    <ModalSelector
+                      onChange={option => {
+                        console.log("option:%o", option);
+                        this.setState({
+                          templateInfo: {
+                            key: option.key,
+                            label: option.label
+                          }
+                        });
+                        // this.onCheckUser("owner", option.key);
+                      }}
+                      data={this.state.templateList}
+                      skin="customer"
+                      defaultKey={-999}
+                    >
+                      <Text style={styles.body_text}>
+                        {this.state.templateInfo.label || "点击选择模板店"}
+                      </Text>
+                    </ModalSelector>
+                  )}
+                </CellBody>
+              </Cell>
+            ) : null}
+            {this.state.isBd ? (
+              <Cell customStyle={[styles.cell_row]}>
+                <CellHeader>
+                  <Label style={[styles.cell_label]}>选择bd</Label>
+                </CellHeader>
+                <CellBody>
+                  {this.state.isGetbdList ? (
+                    <Text style={styles.body_text}>
+                      正在获取bd列表,请稍候！
+                    </Text>
+                  ) : (
+                    <ModalSelector
+                      onChange={option => {
+                        console.log("option:%o", option);
+                        this.setState({
+                          bdInfo: {
+                            key: option.key,
+                            label: option.label
+                          }
+                        });
+                        // this.onCheckUser("owner", option.key);
+                      }}
+                      data={this.state.bdList}
+                      skin="customer"
+                      defaultKey={-999}
+                    >
+                      <Text style={styles.body_text}>
+                        {this.state.bdInfo.label || "点击选择bd"}
+                      </Text>
+                    </ModalSelector>
+                  )}
+                </CellBody>
+              </Cell>
+            ) : null}
+          </Cells>
 
-        <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>店长</Label>
-            </CellHeader>
-            <CellBody>
-              <ModalSelector
-                onChange={option => {
-                  this.onCheckUser("owner", option.key);
-                }}
-                data={this.state.userActionSheet}
-                skin="customer"
-                defaultKey={owner_id}
-              >
-                <Text style={styles.body_text}>
-                  {owner_id > 0 ? store_mgr_name : "点击选择店长"}
-                </Text>
-              </ModalSelector>
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>店长手机号</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={mobile => this.setState({ mobile })}
-                value={mobile}
-                maxLength={11} // 可输入的最大长度
-                style={[styles.cell_input]}
-                placeholder="店长手机号"
-                keyboardType="numeric" //默认弹出的键盘
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>店助</Label>
-            </CellHeader>
-            <CellBody>
-              {/*<ModalSelector
+          <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>店长</Label>
+              </CellHeader>
+              <CellBody>
+                <ModalSelector
+                  onChange={option => {
+                    this.onCheckUser("owner", option.key);
+                  }}
+                  data={this.state.userActionSheet}
+                  skin="customer"
+                  defaultKey={owner_id}
+                >
+                  <Text style={styles.body_text}>
+                    {owner_id > 0 ? store_mgr_name : "点击选择店长"}
+                  </Text>
+                </ModalSelector>
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>店长手机号</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={mobile => this.setState({ mobile })}
+                  value={mobile}
+                  maxLength={11} // 可输入的最大长度
+                  style={[styles.cell_input]}
+                  placeholder="店长手机号"
+                  keyboardType="numeric" //默认弹出的键盘
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>店助</Label>
+              </CellHeader>
+              <CellBody>
+                {/*<ModalSelector
                 onChange={(option) => {
                   this.onCheckUser('vice_mgr', option.key)
                 }}
@@ -872,162 +919,217 @@ class StoreAddScene extends PureComponent {
               >
                 <Text style={styles.body_text}>{vice_mgr > 0 ? vice_mgr_name : '点击选择店助'}</Text>
               </ModalSelector>*/}
-              <TouchableOpacity
-                onPress={() => {
-                  let checked = !!vice_mgr ? vice_mgr.split(",") : [];
-                  let params = {
-                    checked: checked,
-                    actionBeforeBack: resp => {
-                      console.log(
-                        "actionBeforeBack resp => ",
-                        resp.checked_users
-                      );
-                      let vice_mgr = resp.checked_users.join(",");
-                      _this.setState({ vice_mgr });
-                    }
-                  };
-                  this.props.navigation.navigate(
-                    Config.ROUTE_SELECT_WORKER,
-                    params
-                  );
-                }}
-              >
-                <Text style={styles.body_text}>
-                  {!!vice_mgr && vice_mgr !== "0"
-                    ? vice_mgr_name
-                    : "点击选择店助"}
-                </Text>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
-        </Cells>
+                <TouchableOpacity
+                  onPress={() => {
+                    let checked = !!vice_mgr ? vice_mgr.split(",") : [];
+                    let params = {
+                      checked: checked,
+                      actionBeforeBack: resp => {
+                        console.log(
+                          "actionBeforeBack resp => ",
+                          resp.checked_users
+                        );
+                        let vice_mgr = resp.checked_users.join(",");
+                        _this.setState({ vice_mgr });
+                      }
+                    };
+                    this.props.navigation.navigate(
+                      Config.ROUTE_SELECT_WORKER,
+                      params
+                    );
+                  }}
+                >
+                  <Text style={styles.body_text}>
+                    {!!vice_mgr && vice_mgr !== "0"
+                      ? vice_mgr_name
+                      : "点击选择店助"}
+                  </Text>
+                </TouchableOpacity>
+              </CellBody>
+            </Cell>
+          </Cells>
 
-        <CellsTitle style={styles.cell_title}>营业时间</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>开始营业</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ isStartVisible: true });
-                }}
-              >
-                <Text style={styles.body_text}>{open_start}</Text>
-              </TouchableOpacity>
-              <DateTimePicker
-                date={new Date(`2000/01/01 ${open_start}`)}
-                mode="time"
-                isVisible={this.state.isStartVisible}
-                onConfirm={date => {
-                  this._handleDatePicked(date, "start");
-                }}
-                onCancel={this._hideDateTimePicker}
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>结束营业</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ isEndVisible: true });
-                }}
-              >
-                <Text style={styles.body_text}>{open_end}</Text>
-              </TouchableOpacity>
-              <DateTimePicker
-                date={new Date(`2000/01/01 ${open_end}`)}
-                mode="time"
-                isVisible={this.state.isEndVisible}
-                onConfirm={date => {
-                  this._handleDatePicked(date, "end");
-                }}
-                onCancel={this._hideDateTimePicker}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
+          <CellsTitle style={styles.cell_title}>营业时间</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>开始营业</Label>
+              </CellHeader>
+              <CellBody>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({ isStartVisible: true });
+                  }}
+                >
+                  <Text style={styles.body_text}>{open_start}</Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  date={new Date(`2000/01/01 ${open_start}`)}
+                  mode="time"
+                  isVisible={this.state.isStartVisible}
+                  onConfirm={date => {
+                    this._handleDatePicked(date, "start");
+                  }}
+                  onCancel={this._hideDateTimePicker}
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>结束营业</Label>
+              </CellHeader>
+              <CellBody>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({ isEndVisible: true });
+                  }}
+                >
+                  <Text style={styles.body_text}>{open_end}</Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  date={new Date(`2000/01/01 ${open_end}`)}
+                  mode="time"
+                  isVisible={this.state.isEndVisible}
+                  onConfirm={date => {
+                    this._handleDatePicked(date, "end");
+                  }}
+                  onCancel={this._hideDateTimePicker}
+                />
+              </CellBody>
+            </Cell>
+          </Cells>
 
-        <CellsTitle style={styles.cell_title}>
-          电话催单间隔(0为不催单)
-        </CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>首次催单间隔</Label>
-            </CellHeader>
-            <CellBody style={{ flexDirection: "row", alignItems: "center" }}>
-              <Input
-                onChangeText={call_not_print =>
-                  this.setState({ call_not_print })
+          <CellsTitle style={styles.cell_title}>
+            电话催单间隔(0为不催单)
+          </CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>首次催单间隔</Label>
+              </CellHeader>
+              <CellBody style={{ flexDirection: "row", alignItems: "center" }}>
+                <Input
+                  onChangeText={call_not_print =>
+                    this.setState({ call_not_print })
+                  }
+                  value={call_not_print}
+                  style={[styles.cell_input, { width: pxToDp(65) }]}
+                  keyboardType="numeric" //默认弹出的键盘
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+                <Text style={[styles.body_text]}>分钟</Text>
+              </CellBody>
+            </Cell>
+          </Cells>
+
+          <CellsTitle style={styles.cell_title}>排单方式</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell
+              onPress={() => {
+                this.setState({ ship_way: Cts.SHIP_AUTO });
+              }}
+              customStyle={[styles.cell_row]}
+            >
+              <CellBody>
+                <Text style={styles.cell_label}>不排单</Text>
+              </CellBody>
+              <CellFooter>
+                {Cts.SHIP_AUTO === parseInt(ship_way) ? (
+                  <Icon name="success_no_circle" style={{ fontSize: 16 }} />
+                ) : null}
+              </CellFooter>
+            </Cell>
+            <Cell
+              onPress={() => {
+                this.setState({ ship_way: Cts.SHIP_AUTO_FN_DD });
+              }}
+              customStyle={[styles.cell_row]}
+            >
+              <CellBody>
+                <Text style={styles.cell_label}>自动发单</Text>
+              </CellBody>
+              <CellFooter>
+                {Cts.SHIP_AUTO_FN_DD === parseInt(ship_way) ? (
+                  <Icon name="success_no_circle" style={{ fontSize: 16 }} />
+                ) : null}
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+          <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>店长实名</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={v => {
+                    this.setState({ owner_name: v });
+                  }}
+                  value={this.state.owner_name}
+                  style={[styles.cell_input]}
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+          </Cells>
+
+          <Toast
+            icon="loading"
+            show={this.state.onSubmitting}
+            onRequestClose={() => {}}
+          >
+            提交中
+          </Toast>
+
+          <Dialog
+            onRequestClose={() => {}}
+            visible={this.state.goToReset}
+            buttons={[
+              {
+                type: "warn",
+                label: "确认",
+                onPress: () => {
+                  this.onStoreCopyGoods(true);
                 }
-                value={call_not_print}
-                style={[styles.cell_input, { width: pxToDp(65) }]}
-                keyboardType="numeric" //默认弹出的键盘
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-              <Text style={[styles.body_text]}>分钟</Text>
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={styles.cell_title}>排单方式</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell
-            onPress={() => {
-              this.setState({ ship_way: Cts.SHIP_AUTO });
-            }}
-            customStyle={[styles.cell_row]}
+              },
+              {
+                type: "default",
+                label: "取消",
+                onPress: () => {
+                  this.setState({ goToReset: false });
+                }
+              }
+            ]}
           >
-            <CellBody>
-              <Text style={styles.cell_label}>不排单</Text>
-            </CellBody>
-            <CellFooter>
-              {Cts.SHIP_AUTO === parseInt(ship_way) ? (
-                <Icon name="success_no_circle" style={{ fontSize: 16 }} />
-              ) : null}
-            </CellFooter>
-          </Cell>
-          <Cell
-            onPress={() => {
-              this.setState({ ship_way: Cts.SHIP_AUTO_FN_DD });
-            }}
-            customStyle={[styles.cell_row]}
+            <Text>
+              您选择了重置门店的所有商品、销售状态和价格，一旦修改，商户之前的工作全部归零，不可撤销！
+            </Text>
+          </Dialog>
+          <Dialog
+            onRequestClose={() => {}}
+            visible={this.state.goToCopy}
+            buttons={[
+              {
+                type: "warn",
+                label: "确认",
+                onPress: () => {
+                  this.onStoreCopyGoods(false);
+                }
+              },
+              {
+                type: "default",
+                label: "取消",
+                onPress: () => {
+                  this.setState({ goToCopy: false });
+                }
+              }
+            ]}
           >
-            <CellBody>
-              <Text style={styles.cell_label}>自动发单</Text>
-            </CellBody>
-            <CellFooter>
-              {Cts.SHIP_AUTO_FN_DD === parseInt(ship_way) ? (
-                <Icon name="success_no_circle" style={{ fontSize: 16 }} />
-              ) : null}
-            </CellFooter>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>店长实名</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={v => {
-                  this.setState({ owner_name: v });
-                }}
-                value={this.state.owner_name}
-                style={[styles.cell_input]}
-                underlineColorAndroid="transparent" //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-
+            <Text>模板店里商品太多，不要轻易复制！</Text>
+          </Dialog>
+        </ScrollView>
         <Button
           onPress={() => {
             this.onStoreAdd();
@@ -1037,66 +1139,12 @@ class StoreAddScene extends PureComponent {
         >
           {this.state.btn_type === "edit" ? "确认修改" : "创建门店"}
         </Button>
-        <Toast
-          icon="loading"
-          show={this.state.onSubmitting}
-          onRequestClose={() => {}}
-        >
-          提交中
-        </Toast>
-
-        <Dialog
-          onRequestClose={() => {}}
-          visible={this.state.goToReset}
-          buttons={[
-            {
-              type: "warn",
-              label: "确认",
-              onPress: () => {
-                this.onStoreCopyGoods(true);
-              }
-            },
-            {
-              type: "default",
-              label: "取消",
-              onPress: () => {
-                this.setState({ goToReset: false });
-              }
-            }
-          ]}
-        >
-          <Text>
-            您选择了重置门店的所有商品、销售状态和价格，一旦修改，商户之前的工作全部归零，不可撤销！
-          </Text>
-        </Dialog>
-        <Dialog
-          onRequestClose={() => {}}
-          visible={this.state.goToCopy}
-          buttons={[
-            {
-              type: "warn",
-              label: "确认",
-              onPress: () => {
-                this.onStoreCopyGoods(false);
-              }
-            },
-            {
-              type: "default",
-              label: "取消",
-              onPress: () => {
-                this.setState({ goToCopy: false });
-              }
-            }
-          ]}
-        >
-          <Text>模板店里商品太多，不要轻易复制！</Text>
-        </Dialog>
-      </ScrollView>
+      </View>
     );
   }
 
   upload = (imageInfo, name, barrier) => {
-    let handleResp = (resp) => {
+    let handleResp = resp => {
       if (resp.ok) {
         this.fileId.push(resp.obj.file_id);
       } else {
@@ -1105,11 +1153,7 @@ class StoreAddScene extends PureComponent {
       return resp;
     };
     if (imageInfo) {
-      uploadImg(
-        imageInfo,
-        barrier.waitOn(handleResp),
-        name
-      );
+      uploadImg(imageInfo, barrier.waitOn(handleResp), name);
     }
   };
   onStoreAdd() {
@@ -1173,10 +1217,10 @@ class StoreAddScene extends PureComponent {
       };
       if (this.state.isBd) {
         let data = this.state.fileId.join(",");
-        send_data['tpl_store'] = this.state.templateInfo.key;
-        send_data['service_bd'] = this.state.bdInfo.key;
-        send_data['attachment'] = data;
-        send_data['fn_price_controlled'] = this.state.isTrusteeship ? 0 : 1;
+        send_data["tpl_store"] = this.state.templateInfo.key;
+        send_data["service_bd"] = this.state.bdInfo.key;
+        send_data["attachment"] = data;
+        send_data["fn_price_controlled"] = this.state.isTrusteeship ? 0 : 1;
       }
       if (store_id > 0) {
         send_data.id = store_id;
