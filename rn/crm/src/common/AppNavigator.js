@@ -323,8 +323,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
-        [Config.ROUTE_SELECTCITY_LIST]: { screen: SelectCity },
-        [Config.ROUTE_SELECTCITY_Qualification]: { screen: Qualification }
+        [Config.ROUTE_SELECT_CITY_LIST]: { screen: SelectCity },
+        [Config.ROUTE_SELECT_QUALIFICATION]: { screen: Qualification }
       },
       stackNavigatorConfigs
     );

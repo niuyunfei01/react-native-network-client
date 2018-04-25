@@ -603,7 +603,7 @@ class StoreAddScene extends Component {
                 <TouchableOpacity
                   onPress={() =>
                     this.props.navigation.navigate(
-                      Config.ROUTE_SELECTCITY_LIST,
+                      Config.ROUTE_SELECT_CITY_LIST,
                       {
                         callback: selectCity => {
                           this.setState({
@@ -681,7 +681,7 @@ class StoreAddScene extends Component {
                   <TouchableOpacity
                     onPress={() =>
                       this.props.navigation.navigate(
-                        Config.ROUTE_SELECTCITY_Qualification,
+                        Config.ROUTE_SELECT_QUALIFICATION,
                         {
                           imageList: this.state.imageList,
                           storeImageUrl: this.state.storeImageUrl,
