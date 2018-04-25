@@ -256,7 +256,7 @@ class Refund extends Component {
             </View>
             {/*下单提示*/}
             <Text style={[Styles.h18theme, { marginVertical: 15 }]}>
-              提示：提单已完成并且已过完成当天，将从结算记录中扣除相应费用
+              提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
             </Text>
           </View>
           {this.title("商品明细")}
