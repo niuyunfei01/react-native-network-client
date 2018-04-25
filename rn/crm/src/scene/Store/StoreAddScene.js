@@ -1,5 +1,5 @@
 //import liraries
-import React, { PureComponent, Component } from "react";
+import React, {PureComponent, Component} from "react";
 import {
   InteractionManager,
   ScrollView,
@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import { simpleBarrier } from "../../common/tool";
+import {simpleBarrier} from "../../common/tool";
 
 import {
   Button,
@@ -25,10 +25,10 @@ import {
   Label,
   Toast
 } from "../../weui/index";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import { ToastLong, ToastShort } from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -42,8 +42,8 @@ import * as tool from "../../common/tool";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
 //组件
-import { Yuan } from "../component/All";
-import { Colors, Metrics } from "../../themes";
+import {Yuan} from "../component/All";
+import {Colors, Metrics} from "../../themes";
 import {
   uploadImg,
   newProductSave
@@ -52,11 +52,11 @@ import LoadingView from "../../widget/LoadingView";
 
 import _ from "lodash";
 //请求
-import { getWithTpl } from "../../util/common";
+import {getWithTpl} from "../../util/common";
 
 function mapStateToProps(state) {
-  const { mine, global } = state;
-  return { mine: mine, global: global };
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 function mapDispatchToProps(dispatch) {
@@ -75,14 +75,14 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class StoreAddScene extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
 
     let title = params.btn_type === "add" ? "新增门店" : "门店信息/修改";
     let ActionSheet = [
-      { key: -999, section: true, label: "操作" },
-      { key: 1, label: "初始化商品" }, //force -> true
-      { key: 2, label: "复制商品" } //force -> false
+      {key: -999, section: true, label: "操作"},
+      {key: 1, label: "初始化商品"}, //force -> true
+      {key: 2, label: "复制商品"} //force -> false
     ];
 
     return {
@@ -100,16 +100,16 @@ class StoreAddScene extends Component {
             data={ActionSheet}
             skin="customer"
           >
-            <Entypo name="dots-three-horizontal" style={styles.btn_select} />
+            <Entypo name="dots-three-horizontal" style={styles.btn_select}/>
           </ModalSelector>
         )
     };
   };
 
   onStoreCopyGoods(force) {
-    const { accessToken } = this.props.global;
-    const { dispatch } = this.props;
-    let { store_id } = this.state;
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {store_id} = this.state;
     if (!(store_id > 0)) {
       ToastLong("错误的门店信息");
       return false;
@@ -134,8 +134,8 @@ class StoreAddScene extends Component {
   constructor(props) {
     super(props);
 
-    let { currVendorId, currVendorName } = tool.vendor(this.props.global);
-    const { btn_type, store_info } = this.props.navigation.state.params || {};
+    let {currVendorId, currVendorName} = tool.vendor(this.props.global);
+    const {btn_type, store_info} = this.props.navigation.state.params || {};
     let {
       id = 0, //store_id
       shop_no,
@@ -169,14 +169,14 @@ class StoreAddScene extends Component {
       city_code = undefined,
       fn_price_controlled = 0
     } =
-      store_info || {};
+    store_info || {};
 
-    const { mine } = this.props;
+    const {mine} = this.props;
     let user_list = mine.user_list[currVendorId];
 
     let userActionSheet = [];
-    userActionSheet.push({ key: -999, section: true, label: "职位任命" });
-    userActionSheet.push({ key: 0, label: "不任命任何人" });
+    userActionSheet.push({key: -999, section: true, label: "职位任命"});
+    userActionSheet.push({key: 0, label: "不任命任何人"});
     for (let user_info of mine.normal[currVendorId]) {
       let item = {
         key: user_info.id,
@@ -215,7 +215,7 @@ class StoreAddScene extends Component {
           // }),
           //   index++;
           imageList.push({
-            imageUrl: { url: Config.staticUrl(element.thumb), id: element.id },
+            imageUrl: {url: Config.staticUrl(element.thumb), id: element.id},
             imageInfo: undefined
           });
         }
@@ -261,16 +261,16 @@ class StoreAddScene extends Component {
       vice_mgr: vice_mgr, //店副ID
       call_not_print: call_not_print, //未打印通知
       ship_way: ship_way, //配送方式
-      isTrusteeship: fn_price_controlled == 0 ? true : false, //是否是托管
+      isTrusteeship: fn_price_controlled == 1 ? true : false, //是否是托管
       isUploadingImage: false,
       imageList:
         files && files.length
           ? imageList
           : [
-              { id: 1, imageUrl: undefined, imageInfo: undefined },
-              { id: 2, imageUrl: undefined, imageInfo: undefined },
-              { id: 3, imageUrl: undefined, imageInfo: undefined }
-            ],
+            {id: 1, imageUrl: undefined, imageInfo: undefined},
+            {id: 2, imageUrl: undefined, imageInfo: undefined},
+            {id: 3, imageUrl: undefined, imageInfo: undefined}
+          ],
       storeImageUrl: storeImageUrl, //门店照片
       storeImageInfo: undefined,
       bossImageUrl: bossImageUrl,
@@ -278,9 +278,9 @@ class StoreAddScene extends Component {
       fileId: fileId,
       existImgIds: existImgIds,
       templateList: [], //模板列表
-      templateInfo: { key: undefined, label: undefined },
+      templateInfo: {key: undefined, label: undefined},
       bdList: [],
-      bdInfo: { key: undefined, label: undefined },
+      bdInfo: {key: undefined, label: undefined},
       isLoading: true,
       isGetbdList: true,
       isLoadingStoreList: true
@@ -296,20 +296,21 @@ class StoreAddScene extends Component {
   componentDidMount() {
     this.props.navigation.setParams({
       goToCopy: () => {
-        this.setState({ goToCopy: true });
+        this.setState({goToCopy: true});
       },
       goToReset: () => {
-        this.setState({ goToReset: true });
+        this.setState({goToReset: true});
       }
     });
   }
+
   componentWillMount() {
-    const { store_info } = this.props.navigation.state.params || {};
+    const {store_info} = this.props.navigation.state.params || {};
     console.log("门店信息:%o", store_info);
     let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
     let url = `api/get_tpl_stores?access_token=${
       this.props.global.accessToken
-    }`;
+      }`;
     let bdUrl = `api/get_bds?access_token=${this.props.global.accessToken}`;
     getWithTpl(
       isBdUrl,
@@ -336,7 +337,7 @@ class StoreAddScene extends Component {
             arr.push(response.obj[i]); //属性
           }
           let selectTemp = [];
-          selectTemp.push({ key: -999, section: true, label: "选择模板店" });
+          selectTemp.push({key: -999, section: true, label: "选择模板店"});
           for (let item of arr) {
             if (
               store_info &&
@@ -378,7 +379,7 @@ class StoreAddScene extends Component {
 
           let selectTemp = [];
           let data = _.toPairs(response.obj);
-          selectTemp.push({ key: -999, section: true, label: "选择bd" });
+          selectTemp.push({key: -999, section: true, label: "选择bd"});
           for (let item of data) {
             if (
               store_info &&
@@ -418,7 +419,7 @@ class StoreAddScene extends Component {
   }
 
   onCheckUser(user_type, user_id) {
-    let { user_list } = this.state;
+    let {user_list} = this.state;
     if (user_type === "owner") {
       this.setState({
         owner_id: user_id,
@@ -451,14 +452,14 @@ class StoreAddScene extends Component {
       if (Hours > end_hour) {
         ToastLong("开始营业时间不能大于结束营业时间");
       } else {
-        this.setState({ open_start: confirm_time });
+        this.setState({open_start: confirm_time});
       }
     } else {
       let start_hour = this.state.open_start.split(":")[0];
       if (start_hour > Hours) {
         ToastLong("结束营业时间不能小于开始营业时间");
       } else {
-        this.setState({ open_end: confirm_time });
+        this.setState({open_end: confirm_time});
       }
     }
 
@@ -526,7 +527,7 @@ class StoreAddScene extends Component {
       auto_add_tips,
       user_list
     } = this.state;
-    let store_mgr_name = (user_list[owner_id] || { nickname: "-" })["nickname"];
+    let store_mgr_name = (user_list[owner_id] || {nickname: "-"})["nickname"];
     let vice_mgr_name = "";
     if (!!vice_mgr && vice_mgr !== "0") {
       for (let vice_mgr_id of vice_mgr.split(",")) {
@@ -545,10 +546,10 @@ class StoreAddScene extends Component {
     }
     let _this = this;
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
-      <View style={{ flex: 1 }}>
-        <ScrollView style={{ backgroundColor: colors.main_back }}>
+      <View style={{flex: 1}}>
+        <ScrollView style={{backgroundColor: colors.main_back}}>
           <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
@@ -557,7 +558,7 @@ class StoreAddScene extends Component {
               </CellHeader>
               <CellBody>
                 <Input
-                  onChangeText={name => this.setState({ name })}
+                  onChangeText={name => this.setState({name})}
                   value={name}
                   style={[styles.cell_input]}
                   placeholder="8个字符以内"
@@ -571,7 +572,7 @@ class StoreAddScene extends Component {
               </CellHeader>
               <CellBody>
                 <Input
-                  onChangeText={tel => this.setState({ tel })}
+                  onChangeText={tel => this.setState({tel})}
                   value={tel}
                   style={[styles.cell_input]}
                   placeholder="请输入店铺电话"
@@ -587,7 +588,7 @@ class StoreAddScene extends Component {
               </CellHeader>
               <CellBody>
                 <Input
-                  onChangeText={dada_address => this.setState({ dada_address })}
+                  onChangeText={dada_address => this.setState({dada_address})}
                   value={dada_address}
                   style={[styles.cell_input]}
                   placeholder="请输入门店地址"
@@ -626,7 +627,7 @@ class StoreAddScene extends Component {
               </CellHeader>
               <CellBody>
                 <Input
-                  onChangeText={district => this.setState({ district })}
+                  onChangeText={district => this.setState({district})}
                   value={district}
                   style={[styles.cell_input]}
                   placeholder="例: 昌平区"
@@ -640,7 +641,7 @@ class StoreAddScene extends Component {
               </CellHeader>
               <CellBody>
                 <TouchableOpacity
-                  style={{ flexDirection: "row", marginTop: pxToDp(6) }}
+                  style={{flexDirection: "row", marginTop: pxToDp(6)}}
                   onPress={() => {
                     let center = "";
                     if (location_long && location_lat) {
@@ -650,7 +651,7 @@ class StoreAddScene extends Component {
                       action: Config.LOC_PICKER,
                       center: center,
                       actionBeforeBack: resp => {
-                        let { name, location, address } = resp;
+                        let {name, location, address} = resp;
                         console.log("location -> ", resp);
                         let locate = location.split(",");
                         this.setState({
@@ -662,7 +663,7 @@ class StoreAddScene extends Component {
                     this.onPress(Config.ROUTE_WEB, params);
                   }}
                 >
-                  <MIcon name="map-marker-outline" style={styles.map_icon} />
+                  <MIcon name="map-marker-outline" style={styles.map_icon}/>
                   <Text style={[styles.body_text]}>
                     {location_long !== "" && location_lat !== ""
                       ? location_long + "," + location_lat
@@ -672,36 +673,36 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
             {/*商家资质不是bd不显示*/
-            this.state.isBd ? (
-              <Cell customStyle={[styles.cell_row]}>
-                <CellHeader>
-                  <Label style={[styles.cell_label]}>商家资质</Label>
-                </CellHeader>
-                <CellBody>
-                  <TouchableOpacity
-                    onPress={() =>
-                      this.props.navigation.navigate(
-                        Config.ROUTE_SELECT_QUALIFICATION,
-                        {
-                          imageList: this.state.imageList,
-                          storeImageUrl: this.state.storeImageUrl,
-                          storeImageInfo: this.state.storeImageInfo,
-                          bossImageUrl: this.state.bossImageUrl,
-                          bossImageInfo: this.state.bossImageInfo,
-                          callback: qualification => {
-                            this.doUploadImg(qualification);
+              this.state.isBd ? (
+                <Cell customStyle={[styles.cell_row]}>
+                  <CellHeader>
+                    <Label style={[styles.cell_label]}>商家资质</Label>
+                  </CellHeader>
+                  <CellBody>
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.props.navigation.navigate(
+                          Config.ROUTE_SELECT_QUALIFICATION,
+                          {
+                            imageList: this.state.imageList,
+                            storeImageUrl: this.state.storeImageUrl,
+                            storeImageInfo: this.state.storeImageInfo,
+                            bossImageUrl: this.state.bossImageUrl,
+                            bossImageInfo: this.state.bossImageInfo,
+                            callback: qualification => {
+                              this.doUploadImg(qualification);
+                            }
                           }
-                        }
-                      )
-                    }
-                  >
-                    <Text style={styles.body_text}>
-                      {this.state.qualification.name}
-                    </Text>
-                  </TouchableOpacity>
-                </CellBody>
-              </Cell>
-            ) : null}
+                        )
+                      }
+                    >
+                      <Text style={styles.body_text}>
+                        {this.state.qualification.name}
+                      </Text>
+                    </TouchableOpacity>
+                  </CellBody>
+                </Cell>
+              ) : null}
             {this.state.isBd ? (
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
@@ -709,7 +710,7 @@ class StoreAddScene extends Component {
                 </CellHeader>
                 <CellBody>
                   <TouchableOpacity
-                    style={{ flexDirection: "row", alignItems: "center" }}
+                    style={{flexDirection: "row", alignItems: "center"}}
                   >
                     <TouchableOpacity
                       style={{
@@ -729,9 +730,7 @@ class StoreAddScene extends Component {
                         ic={Colors.white}
                         w={18}
                         bw={Metrics.one}
-                        bgc={
-                          this.state.isTrusteeship ? Colors.grey3 : Colors.white
-                        }
+                        bgc={this.state.isTrusteeship ? Colors.grey3 : Colors.white}
                         bc={Colors.grey3}
                         mgr={5}
                         onPress={() => {
@@ -743,7 +742,7 @@ class StoreAddScene extends Component {
                       <Text style={styles.body_text}>托管店</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                      style={{flexDirection: "row", alignItems: "center"}}
                       onPress={() =>
                         this.setState({
                           isTrusteeship: false
@@ -757,11 +756,7 @@ class StoreAddScene extends Component {
                         w={18}
                         mgr={5}
                         bw={Metrics.one}
-                        bgc={
-                          !this.state.isTrusteeship
-                            ? Colors.grey3
-                            : Colors.white
-                        }
+                        bgc={!this.state.isTrusteeship ? Colors.grey3 : Colors.white}
                         bc={Colors.grey3}
                         onPress={() => {
                           this.setState({
@@ -782,7 +777,7 @@ class StoreAddScene extends Component {
               <CellBody>
                 <Input
                   onChangeText={owner_nation_id =>
-                    this.setState({ owner_nation_id })
+                    this.setState({owner_nation_id})
                   }
                   value={owner_nation_id}
                   maxLength={18} // 可输入的最大长度
@@ -890,7 +885,7 @@ class StoreAddScene extends Component {
               </CellHeader>
               <CellBody>
                 <Input
-                  onChangeText={mobile => this.setState({ mobile })}
+                  onChangeText={mobile => this.setState({mobile})}
                   value={mobile}
                   maxLength={11} // 可输入的最大长度
                   style={[styles.cell_input]}
@@ -926,7 +921,7 @@ class StoreAddScene extends Component {
                           resp.checked_users
                         );
                         let vice_mgr = resp.checked_users.join(",");
-                        _this.setState({ vice_mgr });
+                        _this.setState({vice_mgr});
                       }
                     };
                     this.props.navigation.navigate(
@@ -954,7 +949,7 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({ isStartVisible: true });
+                    this.setState({isStartVisible: true});
                   }}
                 >
                   <Text style={styles.body_text}>{open_start}</Text>
@@ -977,7 +972,7 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({ isEndVisible: true });
+                    this.setState({isEndVisible: true});
                   }}
                 >
                   <Text style={styles.body_text}>{open_end}</Text>
@@ -1003,13 +998,13 @@ class StoreAddScene extends Component {
               <CellHeader>
                 <Label style={[styles.cell_label]}>首次催单间隔</Label>
               </CellHeader>
-              <CellBody style={{ flexDirection: "row", alignItems: "center" }}>
+              <CellBody style={{flexDirection: "row", alignItems: "center"}}>
                 <Input
                   onChangeText={call_not_print =>
-                    this.setState({ call_not_print })
+                    this.setState({call_not_print})
                   }
                   value={call_not_print}
-                  style={[styles.cell_input, { width: pxToDp(65) }]}
+                  style={[styles.cell_input, {width: pxToDp(65)}]}
                   keyboardType="numeric" //默认弹出的键盘
                   underlineColorAndroid="transparent" //取消安卓下划线
                 />
@@ -1022,7 +1017,7 @@ class StoreAddScene extends Component {
           <Cells style={[styles.cell_box]}>
             <Cell
               onPress={() => {
-                this.setState({ ship_way: Cts.SHIP_AUTO });
+                this.setState({ship_way: Cts.SHIP_AUTO});
               }}
               customStyle={[styles.cell_row]}
             >
@@ -1031,13 +1026,13 @@ class StoreAddScene extends Component {
               </CellBody>
               <CellFooter>
                 {Cts.SHIP_AUTO === parseInt(ship_way) ? (
-                  <Icon name="success_no_circle" style={{ fontSize: 16 }} />
+                  <Icon name="success_no_circle" style={{fontSize: 16}}/>
                 ) : null}
               </CellFooter>
             </Cell>
             <Cell
               onPress={() => {
-                this.setState({ ship_way: Cts.SHIP_AUTO_FN_DD });
+                this.setState({ship_way: Cts.SHIP_AUTO_FN_DD});
               }}
               customStyle={[styles.cell_row]}
             >
@@ -1046,7 +1041,7 @@ class StoreAddScene extends Component {
               </CellBody>
               <CellFooter>
                 {Cts.SHIP_AUTO_FN_DD === parseInt(ship_way) ? (
-                  <Icon name="success_no_circle" style={{ fontSize: 16 }} />
+                  <Icon name="success_no_circle" style={{fontSize: 16}}/>
                 ) : null}
               </CellFooter>
             </Cell>
@@ -1061,7 +1056,7 @@ class StoreAddScene extends Component {
               <CellBody>
                 <Input
                   onChangeText={v => {
-                    this.setState({ owner_name: v });
+                    this.setState({owner_name: v});
                   }}
                   value={this.state.owner_name}
                   style={[styles.cell_input]}
@@ -1074,13 +1069,15 @@ class StoreAddScene extends Component {
           <Toast
             icon="loading"
             show={this.state.onSubmitting}
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
           >
             提交中
           </Toast>
 
           <Dialog
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
             visible={this.state.goToReset}
             buttons={[
               {
@@ -1094,7 +1091,7 @@ class StoreAddScene extends Component {
                 type: "default",
                 label: "取消",
                 onPress: () => {
-                  this.setState({ goToReset: false });
+                  this.setState({goToReset: false});
                 }
               }
             ]}
@@ -1104,7 +1101,8 @@ class StoreAddScene extends Component {
             </Text>
           </Dialog>
           <Dialog
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
             visible={this.state.goToCopy}
             buttons={[
               {
@@ -1118,7 +1116,7 @@ class StoreAddScene extends Component {
                 type: "default",
                 label: "取消",
                 onPress: () => {
-                  this.setState({ goToCopy: false });
+                  this.setState({goToCopy: false});
                 }
               }
             ]}
@@ -1152,12 +1150,13 @@ class StoreAddScene extends Component {
       uploadImg(imageInfo, barrier.waitOn(handleResp), name);
     }
   };
+
   onStoreAdd() {
     if (this.state.onSubmitting) {
       return false;
     }
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
     let _this = this;
     if (this.onCheckData()) {
       let {
@@ -1216,20 +1215,20 @@ class StoreAddScene extends Component {
       if (store_id > 0) {
         send_data.id = store_id;
       }
-      _this.setState({ onSubmitting: true });
+      _this.setState({onSubmitting: true});
       InteractionManager.runAfterInteractions(() => {
         dispatch(
           saveOfflineStore(send_data, accessToken, resp => {
             console.log("save_resp -> ", resp);
-            _this.setState({ onSubmitting: false });
+            _this.setState({onSubmitting: false});
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
 
-              const { goBack, state } = _this.props.navigation;
+              const {goBack, state} = _this.props.navigation;
               const params = state.params;
               if (params.actionBeforeBack) {
-                params.actionBeforeBack({ shouldRefresh: true });
+                params.actionBeforeBack({shouldRefresh: true});
               }
               goBack();
             }
@@ -1296,7 +1295,7 @@ class StoreAddScene extends Component {
       error_msg = "请输入店长实名";
     }
     if (error_msg === "") {
-      this.setState({ onSubmitting: true });
+      this.setState({onSubmitting: true});
       return true;
     } else {
       ToastLong(error_msg);
