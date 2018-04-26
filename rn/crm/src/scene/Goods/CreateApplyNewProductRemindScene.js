@@ -39,6 +39,9 @@ import native from "../../common/native";
 import { ToastLong } from "../../util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
+//请求
+import { getWithTpl, jsonWithTpl } from "../../util/common";
+
 function mapStateToProps(state) {
   const { mine, product, global } = state;
   return { mine: mine, product: product, global: global };
@@ -102,7 +105,8 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       upload_files: [],
       goBackValue: false,
       camera: "openPicker",
-      opVisible: false
+      opVisible: false,
+      isShow: false
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -137,7 +141,32 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       })
     );
   }
-
+  componentWillMount() {
+    let { currVendorId } = tool.vendor(this.props.global);
+    let url = `api/is_service_mgr/${currVendorId}?access_token=${
+      this.props.global.accessToken
+    }`;
+    http: getWithTpl(
+      url,
+      json => {
+        if (json.ok) {
+          console.log("是否有权限:%o", json.obj);
+          this.setState({
+            isShow: json.obj.is_mgr
+          });
+        } else {
+          this.setState({
+            isShow: false
+          });
+        }
+      },
+      error => {
+        this.setState({
+          isShow: false
+        });
+      }
+    );
+  }
   upLoad = async () => {
     let {
       vendor_id,
@@ -313,10 +342,24 @@ class CreateApplyNewProductRemindScene extends PureComponent {
         >
           <Text style={{ color: colors.white }}>保存</Text>
         </Button>
-        {/*<Button style={[styles.save_btn, {backgroundColor: colors.back_color, borderColor: colors.main_color}]}*/}
-        {/*onPress={() => {*/}
-        {/*this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add',})*/}
-        {/*}}><Text style={{color: colors.main_color}}>直接上新</Text></Button>*/}
+        {this.state.isShow ? (
+          <Button
+            style={[
+              styles.save_btn,
+              {
+                backgroundColor: colors.back_color,
+                borderColor: colors.main_color
+              }
+            ]}
+            onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: "add"
+              });
+            }}
+          >
+            <Text style={{ color: colors.main_color }}>直接上新</Text>
+          </Button>
+        ) : null}
       </View>
     );
   }

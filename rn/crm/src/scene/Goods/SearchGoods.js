@@ -304,6 +304,10 @@ class SearchGoods extends Component {
         </View>
         <TouchableOpacity
           onPress={() => {
+            // this.props.navigation.navigate(
+            //   Config.ROUTE_CREATE_NEW_GOOD_REMIND,
+            //   { storeId: storeId }
+            // );
             if (this.cooperation) {
               this.props.navigation.navigate(
                 Config.ROUTE_CREATE_NEW_GOOD_REMIND,

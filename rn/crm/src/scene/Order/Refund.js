@@ -335,7 +335,8 @@ class Refund extends Component {
                             {element.gPrice}
                           </Text>
                           <Text style={[Styles.h16c4, { flex: 1 }]}>
-                            总价 {element.price * element.origin_num}
+                            总价{" "}
+                            {(element.price * element.origin_num).toFixed(2)}
                           </Text>
                           <Text style={[Styles.h16c4, { flex: 1 }]}>
                             *{element.origin_num}
