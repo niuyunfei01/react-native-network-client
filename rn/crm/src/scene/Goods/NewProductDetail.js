@@ -34,7 +34,7 @@ class NewProductDetail extends Component {
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
-    let {currNewProductStoreId} = this.props.global;
+    let {currStoreId} = this.props.global;
     let pid = this.props.navigation.state.params.productId;
     this.state = {
       visual: false,
@@ -44,7 +44,7 @@ class NewProductDetail extends Component {
       isLoading: false,
       isSave: false,
       vendorId: currVendorId,
-      currNewProductStoreId: currNewProductStoreId,
+      currNewProductStoreId: currStoreId,
       pid: pid,
       vendor_stores: ''
     };
@@ -93,14 +93,15 @@ class NewProductDetail extends Component {
     let category = this.state.tagList.filter(element => {
       return element.active === true;
     });
-    let {currVendorId, currNewProductStoreId} = this.state;
+    let {vendorId, currNewProductStoreId} = this.state;
     let payload = {
-      vendor_id: currVendorId,
+      vendor_id: vendorId,
       store_id: currNewProductStoreId,
       categories: category,
       product_id: this.props.navigation.state.params.productId,
       price: this.state.price
     };
+    console.log("direct save product data ", payload);
     jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
       payload,
       ok => {
@@ -109,12 +110,16 @@ class NewProductDetail extends Component {
           this.props.navigation.goBack();
         } else {
           ToastLong(ok.reason);
-          this.props.navigation.goBack();
         }
+        this.setState({
+          isSave: false
+        });
       },
       error => {
         ToastLong("网络错误");
-        this.props.navigation.goBack();
+        this.setState({
+          isSave: false
+        });
       },
       action => {
       }
