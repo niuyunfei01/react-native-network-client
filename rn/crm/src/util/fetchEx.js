@@ -13,7 +13,6 @@ export default {
           resolve(res);
         },
         err => {
-          alert("cuwuuwduhfu");
           clearTimeout(timer);
           reject(err);
         }
