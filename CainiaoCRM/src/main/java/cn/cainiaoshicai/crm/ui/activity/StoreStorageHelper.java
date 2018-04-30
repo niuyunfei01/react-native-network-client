@@ -395,9 +395,23 @@ public class StoreStorageHelper {
                                             });
                                             return null;
                                         }
+                                        if(TextUtils.isEmpty(respS)){
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AlertUtil.error(activity, "订货总量不能为空");
+                                                }
+                                            });
+                                            return null;
+                                        }
                                         final int total_req_no = Integer.parseInt(s);
                                         final int nowStat = Integer.parseInt(nowStatStr);
-                                        final float totalResp = Float.parseFloat(respS);
+                                        float totalResp = 0;
+                                        try {
+                                            totalResp = Float.parseFloat(respS);
+                                        } catch (Exception e) {
+                                            totalResp = 0;
+                                        }
                                         final String remarkTxt = remark.getText().toString();
                                         final int unitType = selectUnitType.getSelectedItemPosition();
                                         try {

@@ -82,7 +82,7 @@ class Qualification extends Component {
           ? this.props.navigation.state.params.imageList.concat(
               data.slice(
                 0,
-                this.props.navigation.state.params.imageList.length + 1
+                3 - this.props.navigation.state.params.imageList.length
               )
             )
           : this.props.navigation.state.params.imageList,
@@ -204,7 +204,7 @@ class Qualification extends Component {
   };
 
   pushRemoveIds = img => {
-    console.log('rm img', img);
+    console.log("rm img", img);
     if (img && img.id) {
       let rmIds = this.state.removeIds;
       rmIds.push(img.id);

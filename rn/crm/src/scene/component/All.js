@@ -8,7 +8,8 @@ import {
   ScrollView,
   TextInput,
   PixelRatio,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Dimensions
 } from "react-native";
 
 import pxToDp from "../../util/pxToDp";
@@ -16,7 +17,7 @@ import {Colors, Styles, Metrics} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const one = 1 / PixelRatio.get();
-
+const  {height,width}=Dimensions.get('window')
 class Left extends PureComponent {
   static defaultProps = {
     isOne: true
@@ -339,4 +340,49 @@ class Button1 extends Component {
   }
 }
 
-export {Left, Adv, Button, Line, Yuan, Button1};
+class NavigationItem1 extends PureComponent {
+  render() {
+
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others,} = this.props;
+    let _icon = this.props.icon &&
+      <Image style={[styles.icon, iconStyle]} source={icon}/>
+
+    let _title = this.props.title &&
+      <Text style={[styles.title, titleStyle]}>{title}</Text>
+    return (
+     <View style={{flexDirection:'row',width:width,alignItems:'center'}}>
+        <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
+        {_icon}
+        {_title}
+      </TouchableOpacity>
+      {
+        children?
+        <View style={{flex:1,marginLeft:20,}}>{children}</View>
+        :
+        null
+      }
+     </View>
+    );
+  }
+}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  icon: {
+    width: 27,
+    height: 27,
+    margin: 8,
+  },
+  title: {
+    fontSize: 15,
+    color: '#333333',
+    margin: 8,
+  }
+});
+
+
+export {Left, Adv, Button, Line, Yuan, Button1,NavigationItem1 };

@@ -82,11 +82,9 @@ class OrderCallShip extends Component {
       this.setState({onSubmitting: false});
       if (ok) {
         this.setState({doneSubmitting: true});
-        setTimeout(() => {
-          this.setState({doneSubmitting: false});
-          navigation.goBack();
-        }, 2000);
+        navigation.goBack();
       } else {
+        this.setState({doneSubmitting: false});
         this.setState({errorHints: msg});
       }
     }))

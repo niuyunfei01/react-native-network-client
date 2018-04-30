@@ -332,6 +332,7 @@ export function disWay() {
   map[Cts.SHIP_AUTO_NEW_DADA] = '新达达';
   map[Cts.SHIP_AUTO_BD] = '百度';
   map[Cts.SHIP_AUTO_SX] = '闪送';
+  map[Cts.SHIP_AUTO_MT] = '美团跑腿';
   return map
 }
 

@@ -43,7 +43,7 @@ export function getWithTpl(url, okFn, failFn, dispatch) {
       okFn(json, dispatch);
     })
     .catch(error => {
-      failFn(error, dispatch);
+      failFn && failFn(error, dispatch);
     });
 }
 
