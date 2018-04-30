@@ -749,7 +749,7 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         )}
 
-        {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
+        {fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr)? (
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
