@@ -410,7 +410,6 @@ public class StoreStorageHelper {
                                         try {
                                             totalResp = Float.parseFloat(respS);
                                         } catch (Exception e) {
-                                            totalResp = 0;
                                         }
                                         final String remarkTxt = remark.getText().toString();
                                         final int unitType = selectUnitType.getSelectedItemPosition();

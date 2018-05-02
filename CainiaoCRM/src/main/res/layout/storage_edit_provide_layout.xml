@@ -89,7 +89,7 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/edittext_style"
         android:layout_toEndOf="@id/label_total_resp"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:textCursorDrawable="@drawable/edit_cursor_color"
         android:textColor="@color/light_blue" />
 
