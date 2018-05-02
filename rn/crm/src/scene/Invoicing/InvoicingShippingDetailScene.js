@@ -12,7 +12,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import _ from "lodash"
 
-import {lockProvideReq, setReqItemSupplier, createSupplyOrder, getSupplierProductMap} from "../../reducers/invoicing/invoicingActions";
+import {lockProvideReq, setReqItemSupplier, createSupplyOrder, getSupplierProductMap, deleteCheckHistory, createCheckHistory} from "../../reducers/invoicing/invoicingActions";
 import {ToastLong} from "../../util/ToastUtils";
 import Conf from '../../config'
 
@@ -98,20 +98,23 @@ class InvoicingShippingDetailScene extends Component {
       if (item['supplier_id'] > 0) {
         supplierId = item['supplier_id'];
         checkCount[supplierId] = checkCount[supplierId] + 1;
+      } else {
+        if (lastChecked[pid]) {
+          supplierId = lastChecked[pid];
+          checkCount[supplierId] = checkCount[supplierId] + 1;
+        }
       }
-      if (lastChecked[pid]) {
-        supplierId = lastChecked[pid];
-        checkCount[supplierId] = checkCount[supplierId] + 1;
-      }
-      return {label: item['name'], id: item['id'], sId: supplierId}
+      return {label: item['name'], id: item['id'], sId: supplierId, pid: pid}
     });
-    this.setState({checkItems: checkItems});
     let checkSuppliers = suppliers.map(function (item, idx) {
       return {id: item['id'], name: item['name']}
     });
-    this.setState({checkSuppliers: checkSuppliers});
-    this.setState({checkCount: checkCount});
-    this.setState({remark: orderRemark});
+    this.setState({
+      checkItems: checkItems,
+      checkSuppliers: checkSuppliers,
+      checkCount: checkCount,
+      remark: orderRemark
+    });
   }
 
   saveSupplier(callback) {
@@ -152,15 +155,27 @@ class InvoicingShippingDetailScene extends Component {
     let checkedSupplierId = this.state.checkedSupplierId;
     let copy = [];
     let self = this;
+    let pid = 0;
     _.forEach(checkItems, function (value) {
       let vId = value['id'];
       if (itemId == vId) {
         value['sId'] = checked ? checkedSupplierId : 0;
         self.setCheckCount(checkedSupplierId, checked);
+        pid = value['pid'];
       }
       copy.push(value);
     });
     this.setState({checkItems: copy});
+
+    const {global} = this.props;
+    let token = global['accessToken'];
+    let {req} = this.state;
+    let storeId = req['store_id'];
+    if (checked) {
+      createCheckHistory(token, pid, checkedSupplierId, storeId);
+    } else {
+      deleteCheckHistory(token, pid, checkedSupplierId, storeId);
+    }
   }
 
   renderSuppliers() {
