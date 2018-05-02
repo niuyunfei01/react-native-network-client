@@ -20,7 +20,6 @@ export function urlByAppendingParams(url: string, params: Object) {
 
 export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
-  console.log("faduhdf:%o", keys);
   if (typeof keys === "undefined" || keys.length === 0) {
     return [];
   }
