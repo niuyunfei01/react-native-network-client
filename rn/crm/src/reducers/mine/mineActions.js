@@ -287,7 +287,6 @@ export function setWmStoreStatus(
   openTime,
   callback
 ) {
-  console.log("下哈哈哈哈次开业时间:%o", openTime);
   return dispatch => {
     const url = `api/set_wm_store_status/${vendor_id}/${platform}/${wid}/${status}.json?access_token=${token}&openTime=${openTime}`;
     console.log("url", url);

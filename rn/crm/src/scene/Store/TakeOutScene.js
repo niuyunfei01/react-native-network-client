@@ -1,44 +1,26 @@
 //import liraries
-import React, { PureComponent, Component } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from "react-native";
+import React, {Component} from "react";
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 import DateTimePicker from "react-native-modal-datetime-picker";
 
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Switch
-} from "../../weui/index";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {
-  fetchWmStore,
-  setWmStoreStatus
-} from "../../reducers/mine/mineActions";
+import {fetchWmStore, setWmStoreStatus} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
-import { ToastLong, ToastShort } from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
 import CallBtn from "../Order/CallBtn";
 
+import Moment from "moment/moment";
+
 function mapStateToProps(state) {
-  const { mine, user, global } = state;
-  return { mine: mine, user: user, global: global };
+  const {mine, user, global} = state;
+  return {mine: mine, user: user, global: global};
 }
 
 function mapDispatchToProps(dispatch) {
@@ -54,12 +36,12 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
-let myDate = new Date(); //获取系统当前时间
-let nextDate = new Date(myDate.getTime() + 24 * 60 * 60 * 1000); //后一天
-console.log("下一天:%o", nextDate);
+
+let myDate = new Date();
+
 class TakeOutScene extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     let set_val = !params.isOperating;
 
     return {
@@ -92,12 +74,11 @@ class TakeOutScene extends Component {
     super(props);
 
     // let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-    let { currStoreId } = this.props.global;
-    const { wm_list } = this.props.mine;
+    let {currStoreId} = this.props.global;
+    const {wm_list} = this.props.mine;
     let curr_wm_list = wm_list[currStoreId];
 
     let server_info = tool.server_info(this.props);
-    console.log("server:%o", curr_wm_list);
     this.state = {
       isSearching: false,
       isRefreshing: false,
@@ -114,8 +95,8 @@ class TakeOutScene extends Component {
   }
 
   componentWillMount() {
-    let { currStoreId } = this.props.global;
-    const { wm_list } = this.props.mine;
+    let {currStoreId} = this.props.global;
+    const {wm_list} = this.props.mine;
     let curr_wm_list = wm_list[currStoreId];
     if (curr_wm_list === undefined) {
       this.getWmStores();
@@ -123,7 +104,7 @@ class TakeOutScene extends Component {
   }
 
   componentDidMount() {
-    let { is_service_mgr, is_helper } = tool.vendor(this.props.global);
+    let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
 
     this.props.navigation.setParams({
       is_service_mgr: is_service_mgr,
@@ -143,28 +124,26 @@ class TakeOutScene extends Component {
     if (this.state.isSearching) {
       return;
     }
-    this.setState({ isSearching: true });
-    const { dispatch } = this.props;
-    const { currStoreId, accessToken } = this.props.global;
+    this.setState({isSearching: true});
+    const {dispatch} = this.props;
+    const {currStoreId, accessToken} = this.props.global;
     let _this = this;
     let cache = 0; //不使用缓存
     dispatch(
       fetchWmStore(currStoreId, cache, accessToken, resp => {
-        console.log("store resp -> ", resp);
         if (resp.ok) {
           let wm_list = resp.obj;
           _this.setState({
             wm_list: wm_list
           });
         }
-        _this.setState({ isRefreshing: false, isSearching: false });
+        _this.setState({isRefreshing: false, isSearching: false});
       })
     );
   };
 
   setWmStoreStatus = (platform, wid, status) => {
-    console.log("data -> ", platform, wid, status);
-    let { isToggleSubmitting } = this.state;
+    let {isToggleSubmitting} = this.state;
     if (isToggleSubmitting) {
       ToastShort("正在提交中...");
       return false;
@@ -174,9 +153,6 @@ class TakeOutScene extends Component {
       set_status = "open";
       this.submit(platform, set_status, wid);
     } else if (status === false) {
-      console.log("我要关闭门店");
-      set_status = "close";
-      //设置营业时间
       this.setState({
         isDateTimePickerVisible: true
       });
@@ -185,13 +161,11 @@ class TakeOutScene extends Component {
       return false;
     }
   };
-  submit = (platform, set_status, wid, time) => {
-    this.setState({ isToggleSubmitting: true });
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
-    let { currVendorId } = tool.vendor(this.props.global);
-    console.log("params -> ", currVendorId, platform, wid, set_status);
-
+  submit = (platform, set_status, wid, openTime) => {
+    this.setState({isToggleSubmitting: true});
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
       setWmStoreStatus(
@@ -200,20 +174,19 @@ class TakeOutScene extends Component {
         wid,
         set_status,
         accessToken,
-        time ? time : 0,
+        openTime ? openTime : 0,
         resp => {
-          console.log("set_status resp -> ", resp);
           if (resp.ok) {
             ToastLong(resp.desc);
             _this.getWmStores();
           }
-          _this.setState({ isToggleSubmitting: false });
+          _this.setState({isToggleSubmitting: false});
         }
       )
     );
   };
   onHeaderRefresh = () => {
-    this.setState({ isRefreshing: true });
+    this.setState({isRefreshing: true});
     this.getWmStores();
   };
 
@@ -231,7 +204,6 @@ class TakeOutScene extends Component {
     }
 
     return tool.objectMap(wm_list, (store, platform) => {
-      console.log("对象的store:%o", store);
       return (
         <View key={platform}>
           <CellsTitle style={[styles.cell_title]}>
@@ -244,14 +216,8 @@ class TakeOutScene extends Component {
   };
 
   renderStore = store_list => {
-    let { isOperating, time } = this.state;
+    let {isOperating, time} = this.state;
     return tool.objectMap(store_list, (store, store_id) => {
-      console.log(
-        "营业时间:%o,营业状态:%o,是否可以操作:%o",
-        store.next_open_time,
-        store.wm_status,
-        isOperating
-      );
       return (
         <Cells style={[styles.cells]} key={store_id}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
@@ -264,7 +230,6 @@ class TakeOutScene extends Component {
                   style={styles.switch_right}
                   value={store.wm_status === "正在营业" ? true : false}
                   onValueChange={val => {
-                    //开门开门
                     this.platform = store.platform;
                     this.wid = store.wid;
                     this.store = store;
@@ -280,7 +245,7 @@ class TakeOutScene extends Component {
                     this.store = store;
                     this.store_id = store_id;
 
-                    this.setState({ isDateTimePickerVisible: true });
+                    this.setState({isDateTimePickerVisible: true});
                   }}
                 >
                   <Text style={[styles.working_text, styles.is_working_on]}>
@@ -299,27 +264,25 @@ class TakeOutScene extends Component {
     });
   };
 
-  hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+  hideDateTimePicker = () => this.setState({isDateTimePickerVisible: false});
 
   handleDatePicked = date => {
     let timestamp = Date.parse(new Date());
     let choosetimestamp = Date.parse(date);
     if (choosetimestamp < timestamp) {
       ToastLong("选择的营业时间不能小于当前时间！");
-
       this.setState({
         isOperating: false,
         isDateTimePickerVisible: false
       });
       return;
     }
-    let time = date.toLocaleString().replace(/:\d{1,2}$/, " ");
-
+    console.log(date)
+    let time = Moment(date).format('YYYY-MM-DD HH:mm:ss');
+    console.log(time)
     let data = this.state.wm_list;
     data[this.platform][this.store_id].next_open_time = time;
-
-    this.setState(
-      {
+    this.setState({
         wm_list: data,
         isOperating: false,
         isDateTimePickerVisible: false
@@ -328,16 +291,10 @@ class TakeOutScene extends Component {
         this.submit(this.platform, "close", this.wid, time);
       }
     );
-    // ;
   };
-  showDateTimePicker = () =>
-    this.setState({ isDateTimePickerVisible: true }, () =>
-      console.log("怎么不渲染", this.state.isDateTimePickerVisible)
-    );
 
   render() {
-    let { isDateTimePickerVisible } = this.state;
-    console.log("是否重新渲染", isDateTimePickerVisible);
+    let {isDateTimePickerVisible} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -347,14 +304,15 @@ class TakeOutScene extends Component {
             tintColor="gray"
           />
         }
-        style={{ backgroundColor: colors.main_back }}
+        style={{backgroundColor: colors.main_back}}
       >
         {this.renderPlat(this.state.wm_list)}
 
         <Toast
           icon="loading"
           show={this.state.isToggleSubmitting}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           提交中
         </Toast>
@@ -362,7 +320,8 @@ class TakeOutScene extends Component {
         <Toast
           icon="loading"
           show={this.state.isSearching}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           查询中外卖店铺中...
         </Toast>
@@ -372,7 +331,6 @@ class TakeOutScene extends Component {
           onCancel={this.hideDateTimePicker}
           mode="datetime"
           minimumDate={myDate}
-          maximumDate={nextDate}
         />
         <View style={styles.service}>
           <CallBtn
