@@ -1,5 +1,5 @@
 //import liraries
-import React, {PureComponent} from 'react'
+import React, { PureComponent, Component } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,10 @@ import {
   ScrollView,
   RefreshControl,
   InteractionManager
-} from 'react-native';
+} from "react-native";
+
+import DateTimePicker from "react-native-modal-datetime-picker";
+
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {
@@ -19,93 +22,100 @@ import {
   CellHeader,
   CellBody,
   CellFooter,
-  Switch,
+  Switch
 } from "../../weui/index";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from '../../reducers/global/globalActions';
-import {fetchWmStore, setWmStoreStatus} from "../../reducers/mine/mineActions";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as globalActions from "../../reducers/global/globalActions";
+import {
+  fetchWmStore,
+  setWmStoreStatus
+} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import { ToastLong, ToastShort } from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
 import CallBtn from "../Order/CallBtn";
 
 function mapStateToProps(state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const { mine, user, global } = state;
+  return { mine: mine, user: user, global: global };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch, ...bindActionCreators({
-      fetchWmStore,
-      setWmStoreStatus,
-      ...globalActions
-    }, dispatch)
-  }
+    dispatch,
+    ...bindActionCreators(
+      {
+        fetchWmStore,
+        setWmStoreStatus,
+        ...globalActions
+      },
+      dispatch
+    )
+  };
 }
-
-class TakeOutScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+let myDate = new Date(); //获取系统当前时间
+let nextDate = new Date(myDate.getTime() + 24 * 60 * 60 * 1000); //后一天
+console.log("下一天:%o", nextDate);
+class TakeOutScene extends Component {
+  static navigationOptions = ({ navigation }) => {
+    const { params = {} } = navigation.state;
     let set_val = !params.isOperating;
 
     return {
-      headerTitle: '外卖平台列表',
+      headerTitle: "外卖平台列表",
       headerRight: (
         <TouchableOpacity
-          style={[
-            params.isOperating ?
-              styles.cancel_btn :
-              styles.right_btn,
-          ]}
+          style={[params.isOperating ? styles.cancel_btn : styles.right_btn]}
           onPress={() => {
-            if(params.is_service_mgr || params.is_helper){
+            if (params.is_service_mgr || params.is_helper) {
               params.setOperating(set_val);
               navigation.setParams({
-                isOperating: set_val,
+                isOperating: set_val
               });
             } else {
-              ToastLong('如需操作请联系服务经理');
+              ToastLong("如需操作请联系服务经理");
             }
           }}
         >
-          {params.isOperating ?
-            <Text style={styles.cancel_text}>取消</Text> :
-            <Text style={styles.right_text}>营业/置休</Text>}
+          {params.isOperating ? (
+            <Text style={styles.cancel_text}>取消</Text>
+          ) : (
+            <Text style={styles.right_text}>营业/置休</Text>
+          )}
         </TouchableOpacity>
-      ),
-    }
+      )
+    };
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     // let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-    let {currStoreId} = this.props.global;
-    const {wm_list} = this.props.mine;
+    let { currStoreId } = this.props.global;
+    const { wm_list } = this.props.mine;
     let curr_wm_list = wm_list[currStoreId];
 
     let server_info = tool.server_info(this.props);
-
+    console.log("server:%o", curr_wm_list);
     this.state = {
       isSearching: false,
       isRefreshing: false,
       isOperating: false,
       isToggleSubmitting: false,
+      time: undefined,
+      isDateTimePickerVisible: false, //时间弹出框
       wm_list: curr_wm_list === undefined ? {} : curr_wm_list,
-      server_mobile: server_info.mobilephone,
+      server_mobile: server_info.mobilephone
     };
-    this.setOperating = this.setOperating.bind(this);
-    this.getWmStores = this.getWmStores.bind(this);
-    this.setWmStoreStatus = this.setWmStoreStatus.bind(this);
-
-
+    // this.setOperating = this.setOperating.bind(this);
+    // this.getWmStores = this.getWmStores.bind(this);
+    // this.setWmStoreStatus = this.setWmStoreStatus.bind(this);
   }
 
   componentWillMount() {
-    let {currStoreId} = this.props.global;
-    const {wm_list} = this.props.mine;
+    let { currStoreId } = this.props.global;
+    const { wm_list } = this.props.mine;
     let curr_wm_list = wm_list[currStoreId];
     if (curr_wm_list === undefined) {
       this.getWmStores();
@@ -113,107 +123,135 @@ class TakeOutScene extends PureComponent {
   }
 
   componentDidMount() {
-    let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
+    let { is_service_mgr, is_helper } = tool.vendor(this.props.global);
 
     this.props.navigation.setParams({
       is_service_mgr: is_service_mgr,
       is_helper: is_helper,
       isOperating: this.state.isOperating,
-      setOperating: (isOperating) => this.setOperating(isOperating),
+      setOperating: isOperating => this.setOperating(isOperating)
     });
   }
 
-  setOperating(isOperating) {
+  setOperating = isOperating => {
     this.setState({
-      isOperating: isOperating,
+      isOperating: isOperating
     });
-  }
+  };
 
-  getWmStores() {
+  getWmStores = () => {
     if (this.state.isSearching) {
       return;
     }
-    this.setState({isSearching: true});
-    const {dispatch} = this.props;
-    const {currStoreId, accessToken} = this.props.global;
+    this.setState({ isSearching: true });
+    const { dispatch } = this.props;
+    const { currStoreId, accessToken } = this.props.global;
     let _this = this;
-    let cache = 0;//不使用缓存
-    dispatch(fetchWmStore(currStoreId, cache, accessToken, (resp) => {
-      console.log('store resp -> ', resp);
-      if (resp.ok) {
-        let wm_list = resp.obj;
-        _this.setState({
-          wm_list: wm_list,
-        });
-      }
-      _this.setState({isRefreshing: false, isSearching: false});
-    }));
-  }
+    let cache = 0; //不使用缓存
+    dispatch(
+      fetchWmStore(currStoreId, cache, accessToken, resp => {
+        console.log("store resp -> ", resp);
+        if (resp.ok) {
+          let wm_list = resp.obj;
+          _this.setState({
+            wm_list: wm_list
+          });
+        }
+        _this.setState({ isRefreshing: false, isSearching: false });
+      })
+    );
+  };
 
-  setWmStoreStatus(platform, wid, status) {
-    console.log('data -> ', platform, wid, status);
-    let {isToggleSubmitting} = this.state;
+  setWmStoreStatus = (platform, wid, status) => {
+    console.log("data -> ", platform, wid, status);
+    let { isToggleSubmitting } = this.state;
     if (isToggleSubmitting) {
-      ToastShort('正在提交中...');
+      ToastShort("正在提交中...");
       return false;
     }
-    let set_status = '';
+    let set_status = "";
     if (status === true) {
-      set_status = 'open';
+      set_status = "open";
+      this.submit(platform, set_status, wid);
     } else if (status === false) {
-      set_status = 'close';
+      console.log("我要关闭门店");
+      set_status = "close";
+      //设置营业时间
+      this.setState({
+        isDateTimePickerVisible: true
+      });
     } else {
-      ToastLong('错误的门店状态');
+      ToastLong("错误的门店状态");
       return false;
     }
-
-    this.setState({isToggleSubmitting: true});
-    const {dispatch} = this.props;
-    const {accessToken} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global);
-    console.log('params -> ', currVendorId, platform, wid, set_status);
+  };
+  submit = (platform, set_status, wid, time) => {
+    this.setState({ isToggleSubmitting: true });
+    const { dispatch } = this.props;
+    const { accessToken } = this.props.global;
+    let { currVendorId } = tool.vendor(this.props.global);
+    console.log("params -> ", currVendorId, platform, wid, set_status);
 
     let _this = this;
-    dispatch(setWmStoreStatus(currVendorId, platform, wid, set_status, accessToken, (resp) => {
-      console.log('set_status resp -> ', resp);
-      if (resp.ok) {
-        ToastLong(resp.desc);
-        _this.getWmStores();
-      }
-      _this.setState({isToggleSubmitting: false});
-    }));
-  }
-
-  onHeaderRefresh() {
-    this.setState({isRefreshing: true});
+    dispatch(
+      setWmStoreStatus(
+        currVendorId,
+        platform,
+        wid,
+        set_status,
+        accessToken,
+        time ? time : 0,
+        resp => {
+          console.log("set_status resp -> ", resp);
+          if (resp.ok) {
+            ToastLong(resp.desc);
+            _this.getWmStores();
+          }
+          _this.setState({ isToggleSubmitting: false });
+        }
+      )
+    );
+  };
+  onHeaderRefresh = () => {
+    this.setState({ isRefreshing: true });
     this.getWmStores();
-  }
+  };
 
-  renderPlat(wm_list) {
-    let _this = this;
+  renderPlat = wm_list => {
     if (tool.length(wm_list) === 0) {
       return (
         <View style={styles.service}>
-          <Text style={styles.service_text}>{this.state.isSearching ? '查询中外卖店铺中...' : '暂无已关联的外卖平台'}</Text>
+          <Text style={styles.service_text}>
+            {this.state.isSearching
+              ? "查询中外卖店铺中..."
+              : "暂无已关联的外卖平台"}
+          </Text>
         </View>
       );
     }
 
-    return tool.objectMap(wm_list, function (store, platform) {
+    return tool.objectMap(wm_list, (store, platform) => {
+      console.log("对象的store:%o", store);
       return (
         <View key={platform}>
-          <CellsTitle style={[styles.cell_title]}>外卖平台: {tool.get_platform_name(platform)}</CellsTitle>
-          {_this.renderStore(store)}
+          <CellsTitle style={[styles.cell_title]}>
+            外卖平台: {tool.get_platform_name(platform)}
+          </CellsTitle>
+          {this.renderStore(store)}
         </View>
       );
     });
-  }
+  };
 
-  renderStore(store_list) {
-    let {isOperating} = this.state;
-    let _this = this;
-
-    return tool.objectMap(store_list, function (store, store_id) {
+  renderStore = store_list => {
+    let { isOperating, time } = this.state;
+    return tool.objectMap(store_list, (store, store_id) => {
+      console.log(
+        "营业时间:%o,营业状态:%o,是否可以操作:%o",
+        store.next_open_time,
+        store.wm_status,
+        isOperating
+      );
       return (
         <Cells style={[styles.cells]} key={store_id}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
@@ -221,55 +259,131 @@ class TakeOutScene extends PureComponent {
               <Text style={[styles.wm_store_name]}>{store.name}</Text>
             </CellBody>
             <CellFooter>
-              {isOperating ? <Switch
+              {isOperating ? (
+                <Switch
                   style={styles.switch_right}
-                  value={store.wm_status === '正在营业' ? true : false}
-                  onValueChange={(val) => {
-                    _this.setWmStoreStatus(store.platform, store.wid, val);
-                  }}/> :
-                <Text style={[styles.working_text, styles.is_working_on]}>{store.wm_status}</Text>}
+                  value={store.wm_status === "正在营业" ? true : false}
+                  onValueChange={val => {
+                    //开门开门
+                    this.platform = store.platform;
+                    this.wid = store.wid;
+                    this.store = store;
+                    this.store_id = store_id;
+                    this.setWmStoreStatus(store.platform, store.wid, val);
+                  }}
+                />
+              ) : store.wm_status === "休息中" ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    this.platform = store.platform;
+                    this.wid = store.wid;
+                    this.store = store;
+                    this.store_id = store_id;
+
+                    this.setState({ isDateTimePickerVisible: true });
+                  }}
+                >
+                  <Text style={[styles.working_text, styles.is_working_on]}>
+                    {store.next_open_time || store.wm_status}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={[styles.working_text, styles.is_working_on]}>
+                  {store.wm_status}
+                </Text>
+              )}
             </CellFooter>
           </Cell>
         </Cells>
       );
     });
-  }
+  };
+
+  hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+
+  handleDatePicked = date => {
+    let timestamp = Date.parse(new Date());
+    let choosetimestamp = Date.parse(date);
+    if (choosetimestamp < timestamp) {
+      ToastLong("选择的营业时间不能小于当前时间！");
+
+      this.setState({
+        isOperating: false,
+        isDateTimePickerVisible: false
+      });
+      return;
+    }
+    let time = date.toLocaleString().replace(/:\d{1,2}$/, " ");
+
+    let data = this.state.wm_list;
+    data[this.platform][this.store_id].next_open_time = time;
+
+    this.setState(
+      {
+        wm_list: data,
+        isOperating: false,
+        isDateTimePickerVisible: false
+      },
+      () => {
+        this.submit(this.platform, "close", this.wid, time);
+      }
+    );
+    // ;
+  };
+  showDateTimePicker = () =>
+    this.setState({ isDateTimePickerVisible: true }, () =>
+      console.log("怎么不渲染", this.state.isDateTimePickerVisible)
+    );
 
   render() {
+    let { isDateTimePickerVisible } = this.state;
+    console.log("是否重新渲染", isDateTimePickerVisible);
     return (
       <ScrollView
         refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
+            tintColor="gray"
           />
         }
-        style={{backgroundColor: colors.main_back}}
+        style={{ backgroundColor: colors.main_back }}
       >
         {this.renderPlat(this.state.wm_list)}
 
         <Toast
           icon="loading"
           show={this.state.isToggleSubmitting}
-          onRequestClose={() => {
-          }}
-        >提交中</Toast>
+          onRequestClose={() => {}}
+        >
+          提交中
+        </Toast>
 
         <Toast
           icon="loading"
           show={this.state.isSearching}
-          onRequestClose={() => {
-          }}
-        >查询中外卖店铺中...</Toast>
-
+          onRequestClose={() => {}}
+        >
+          查询中外卖店铺中...
+        </Toast>
+        <DateTimePicker
+          isVisible={isDateTimePickerVisible}
+          onConfirm={this.handleDatePicked}
+          onCancel={this.hideDateTimePicker}
+          mode="datetime"
+          minimumDate={myDate}
+          maximumDate={nextDate}
+        />
         <View style={styles.service}>
-          <CallBtn style={styles.service_text} label='如需新增外卖店铺, 请联系服务经理' mobile={this.state.server_mobile}/>
+          <CallBtn
+            style={styles.service_text}
+            label="如需新增外卖店铺, 请联系服务经理"
+            mobile={this.state.server_mobile}
+          />
         </View>
       </ScrollView>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -277,7 +391,7 @@ const styles = StyleSheet.create({
     marginTop: pxToDp(30),
     marginBottom: pxToDp(10),
     fontSize: pxToDp(26),
-    color: colors.color999,
+    color: colors.color999
   },
   cells: {
     marginBottom: pxToDp(10),
@@ -285,74 +399,73 @@ const styles = StyleSheet.create({
     paddingLeft: pxToDp(30),
     borderTopWidth: pxToDp(1),
     borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999,
+    borderColor: colors.color999
   },
   cell_height: {
-    height: pxToDp(70),
+    height: pxToDp(70)
   },
   cell_content: {
-    justifyContent: 'center',
+    justifyContent: "center",
     marginLeft: 0,
-    paddingRight: 0,
+    paddingRight: 0
   },
   wm_store_name: {
     fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color666,
+    fontWeight: "bold",
+    color: colors.color666
   },
   working_text: {
     fontSize: pxToDp(30),
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.color999,
-    marginRight: pxToDp(30),
+    marginRight: pxToDp(30)
   },
   is_working_on: {
-    color: colors.main_color,
+    color: colors.main_color
   },
   service: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: pxToDp(40),
-    justifyContent: 'center',
+    justifyContent: "center"
   },
   service_text: {
     fontSize: pxToDp(26),
-    color: colors.main_color,
+    color: colors.main_color
   },
   switch_right: {
-    marginRight: pxToDp(20),
+    marginRight: pxToDp(20)
   },
   right_btn: {
     width: pxToDp(120),
     height: pxToDp(52),
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 3,
     marginRight: pxToDp(30),
-    backgroundColor: colors.main_color,
+    backgroundColor: colors.main_color
   },
   right_text: {
-    textAlign: 'center',
-    textAlignVertical: 'center',
+    textAlign: "center",
+    textAlignVertical: "center",
     fontSize: pxToDp(24),
-    color: colors.white,
+    color: colors.white
   },
   cancel_btn: {
     width: pxToDp(120),
     height: pxToDp(52),
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 3,
     marginRight: pxToDp(30),
-    backgroundColor: colors.color999,
+    backgroundColor: colors.color999
   },
   cancel_text: {
-    textAlign: 'center',
-    textAlignVertical: 'center',
+    textAlign: "center",
+    textAlignVertical: "center",
     fontSize: pxToDp(24),
-    fontWeight: 'bold',
-    color: colors.white,
-  },
+    fontWeight: "bold",
+    color: colors.white
+  }
 });
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(TakeOutScene)
+export default connect(mapStateToProps, mapDispatchToProps)(TakeOutScene);
