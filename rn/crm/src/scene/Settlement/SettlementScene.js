@@ -432,7 +432,7 @@ class SettlementScene extends PureComponent {
                         textAlign: "center"
                       }}
                     >
-                      {ite.refund_fee}
+                      {tool.toFixed(ite.refund_fee)}元
                     </Text>
                     {this.renderProfit(ite)}
                     <View
