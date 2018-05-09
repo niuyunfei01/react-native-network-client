@@ -335,9 +335,7 @@ class SearchGoods extends Component {
                 justifyContent: "center"
               }}
             >
-              <Text
-                style={{color: "#fff", fontSize: 20, textAlign: "center"}}
-              >
+              <Text style={{color: "#fff", fontSize: 20, textAlign: "center"}}>
                 手动添加
               </Text>
             </View>
