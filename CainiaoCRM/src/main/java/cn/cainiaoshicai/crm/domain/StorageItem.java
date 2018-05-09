@@ -46,6 +46,9 @@ public class StorageItem {
     private String thumbPicUrl;
     private HashMap<Integer, StorageStatusResults.WMPrice> wm = new HashMap<>();
 
+    private String skuUnit;
+    private int weight;
+
     public int getProduct_id() {
         return product_id;
     }
@@ -302,5 +305,21 @@ public class StorageItem {
 
     public void setWm(HashMap<Integer, StorageStatusResults.WMPrice> wm) {
         this.wm = wm;
+    }
+
+    public String getSkuUnit() {
+        return skuUnit;
+    }
+
+    public void setSkuUnit(String skuUnit) {
+        this.skuUnit = skuUnit;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -354,14 +356,54 @@ public class StoreStorageHelper {
     static AlertDialog createEditProvideDlg(final StoreStorageActivity activity, final StorageItem item) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
-        final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
-        final EditText nowStatTxt = (EditText) npView.findViewById(R.id.now_stat);
-        final EditText remark = (EditText) npView.findViewById(R.id.remark);
-        final EditText totalResp = (EditText)npView.findViewById(R.id.total_resp);
-        final Spinner selectUnitType = (Spinner)npView.findViewById(R.id.select_req_unit_type);
+        final EditText totalReqTxt = npView.findViewById(R.id.total_req);
+        final EditText nowStatTxt = npView.findViewById(R.id.now_stat);
+        final EditText remark = npView.findViewById(R.id.remark);
+        final EditText totalResp = npView.findViewById(R.id.total_resp);
+        final Spinner selectUnitType = npView.findViewById(R.id.select_req_unit_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
                 R.array.req_select_list, android.R.layout.simple_spinner_item);
         selectUnitType.setAdapter(adapter);
+
+        int defaultSelect = 0;
+        if(!"斤".equals(item.getSkuUnit())){
+            defaultSelect = 1;
+        }
+        selectUnitType.setSelection(defaultSelect);
+        totalReqTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    String val = s.toString();
+                    int reqNum = 0;
+                    try {
+                        reqNum = Integer.parseInt(val);
+                    } catch (Exception e) {
+                    }
+                    double totalRespVal = 0;
+                    int weight = item.getWeight();
+                    if (selectUnitType.getSelectedItemPosition() == 1) {
+                        //按件
+                        totalRespVal = reqNum;
+                    } else if (selectUnitType.getSelectedItemPosition() == 0) {
+                        totalRespVal = reqNum * weight / (double)500;
+                    } else if (selectUnitType.getSelectedItemPosition() == 2) {
+                        totalRespVal = reqNum * weight;
+                    } else if (selectUnitType.getSelectedItemPosition() == 3) {
+                        totalRespVal = reqNum * weight / (double)1000;
+                    }
+                    totalResp.setText(totalRespVal + "");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
 
         int totalInReq = item.getTotalInReq();
@@ -410,7 +452,6 @@ public class StoreStorageHelper {
                                         try {
                                             totalResp = Float.parseFloat(respS);
                                         } catch (Exception e) {
-                                            totalResp = 0;
                                         }
                                         final String remarkTxt = remark.getText().toString();
                                         final int unitType = selectUnitType.getSelectedItemPosition();

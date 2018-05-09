@@ -300,6 +300,34 @@ export function balanceSupplyOrder(token, status, storeId, data, callback) {
   }
 }
 
+export function getSupplierProductMap(token, storeId, callback, errHandle) {
+  const url = `InventoryApi/list_check_history/${storeId}?access_token=${token}`;
+  FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+    .then(resp => resp.json())
+    .then(resp => {
+      callback(resp);
+    })
+    .catch(e => {
+      errHandle()
+    })
+}
+
+export function deleteCheckHistory(token, productId, supplierId, storeId) {
+  const url = `InventoryApi/delete_check_history/${storeId}/${productId}/${supplierId}?access_token=${token}`;
+  FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url))
+    .then(resp => resp.json())
+    .then(resp => {
+    });
+}
+
+export function createCheckHistory(token, productId, supplierId, storeId) {
+  const url = `InventoryApi/save_check_history/${storeId}/${productId}/${supplierId}?access_token=${token}`;
+  FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url))
+    .then(resp => resp.json())
+    .then(resp => {
+    });
+}
+
 function commonRespHandle(dispatch, resp, storeId, status, callback) {
   let {ok, reason, obj} = resp;
   dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})

@@ -50,7 +50,6 @@ import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
-import static cn.cainiaoshicai.crm.Cts.PROFIT_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;

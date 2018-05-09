@@ -377,6 +377,7 @@ class NewProductDetail extends Component {
         <Left
           title="门店分类"
           onPress={() => this.setState({visual: true})}
+          editable={false}
           info={this.getCategory() || "选择门店分类"}
           right={
             <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>

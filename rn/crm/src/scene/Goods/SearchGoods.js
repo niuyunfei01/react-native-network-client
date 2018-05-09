@@ -20,6 +20,7 @@ import { getWithTpl } from "../../util/common";
 //配置图片的路由
 import Config from "../../config";
 import { NavigationItem1 } from "../component/All";
+import tool from "../../common/tool";
 
 const mapStateToProps = state => {
   return {
@@ -180,11 +181,16 @@ class SearchGoods extends Component {
     });
     let url = "";
     let accessToken = this.props.global.accessToken;
-    let vendorId = this.props.global.currVendorId;
+    let { currVendorId } = tool.vendor(this.props.global);
+    console.log("没有定义的id:%o", currVendorId);
     if (!this.text) {
-      url = `api/query_product_by_upc.json?access_token=${accessToken}&vendor_id=${vendorId}&upc=${this.state.value}`;
+      url = `api/query_product_by_upc.json?access_token=${accessToken}&vendor_id=${currVendorId}&upc=${
+        this.state.value
+      }`;
     } else {
-      url = `api/query_product_by_keyword.json?access_token=${accessToken}&vendor_id=${vendorId}&keyword=${this.text}`;
+      url = `api/query_product_by_keyword.json?access_token=${accessToken}&vendor_id=${currVendorId}&keyword=${
+        this.text
+      }`;
     }
     http: getWithTpl(
       url,
@@ -302,10 +308,6 @@ class SearchGoods extends Component {
         </View>
         <TouchableOpacity
           onPress={() => {
-            // this.props.navigation.navigate(
-            //   Config.ROUTE_CREATE_NEW_GOOD_REMIND,
-            //   { storeId: storeId }
-            // );
             if (this.cooperation) {
               this.props.navigation.navigate(
                 Config.ROUTE_CREATE_NEW_GOOD_REMIND,

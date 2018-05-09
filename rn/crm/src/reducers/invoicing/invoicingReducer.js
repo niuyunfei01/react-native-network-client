@@ -32,7 +32,7 @@ const initialState = {
   waitReceiveSupplyOrder: [],
   receivedSupplyOrder: [],
   confirmedSupplyOrder: [],
-  balancedSupplyOrder: []
+  balancedSupplyOrder: [],
 };
 
 export default function invoicing(state = initialState, action) {

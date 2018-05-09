@@ -1,42 +1,31 @@
 //import liraries
-import React, { PureComponent } from "react";
+import React, {PureComponent} from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
   InteractionManager,
-  TextInput
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  ActionSheet
-} from "../../weui/index";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {ActionSheet, Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/index";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import { fetchWorkers, getVendorStores } from "../../reducers/mine/mineActions";
-import { ToastShort } from "../../util/ToastUtils";
+import {fetchWorkers, getVendorStores} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Button from "react-native-vector-icons/Entypo";
 import * as tool from "../../common/tool";
 import LoadingView from "../../widget/LoadingView";
-import CallBtn from "../Order/CallBtn";
 import native from "../../common/native";
 
 function mapStateToProps(state) {
-  const { mine, global } = state;
-  return { mine: mine, global: global };
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 function mapDispatchToProps(dispatch) {
@@ -55,8 +44,8 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class StoreScene extends PureComponent {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
 
     return {
       headerTitle: "店铺管理",
@@ -67,9 +56,9 @@ class StoreScene extends PureComponent {
   constructor(props) {
     super(props);
 
-    let { currVendorId, currVendorName } = tool.vendor(this.props.global);
+    let {currVendorId, currVendorName} = tool.vendor(this.props.global);
 
-    const { vendor_stores, user_list } = this.props.mine;
+    const {vendor_stores, user_list} = this.props.mine;
     let curr_stores = tool.curr_vendor(vendor_stores, currVendorId);
     let curr_user_list = tool.curr_vendor(user_list, currVendorId);
 
@@ -90,7 +79,7 @@ class StoreScene extends PureComponent {
   }
 
   componentDidMount() {
-    let { curr_stores, curr_user_list } = this.state;
+    let {curr_stores, curr_user_list} = this.state;
     /*if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
       this.getVendorStore();
       this.onSearchWorkers();
@@ -102,45 +91,44 @@ class StoreScene extends PureComponent {
   }
 
   getVendorStore() {
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
-    let { currVendorId } = tool.vendor(this.props.global);
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
       getVendorStores(currVendorId, accessToken, resp => {
-        console.log("store resp -> ", resp.ok, resp.desc);
         if (resp.ok) {
           let curr_stores = resp.obj;
           _this.setState({
             curr_stores: Object.values(curr_stores)
           });
         }
-        _this.setState({ isRefreshing: false });
+        _this.setState({isRefreshing: false});
       })
     );
   }
 
   onSearchWorkers() {
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
-    let { currVendorId } = tool.vendor(this.props.global);
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
       fetchWorkers(currVendorId, accessToken, resp => {
         console.log("user resp -> ", resp.ok, resp.desc);
         if (resp.ok) {
-          let { user_list } = resp.obj;
+          let {user_list} = resp.obj;
           _this.setState({
             curr_user_list: user_list
           });
         }
-        _this.setState({ isRefreshing: false });
+        _this.setState({isRefreshing: false});
       })
     );
   }
 
   onHeaderRefresh() {
-    this.setState({ isRefreshing: true });
+    this.setState({isRefreshing: true});
     this.getVendorStore();
     this.onSearchWorkers();
   }
@@ -153,20 +141,20 @@ class StoreScene extends PureComponent {
   }
 
   renderStores() {
-    let { curr_stores, curr_user_list, currVendorId } = this.state;
+    let {curr_stores, curr_user_list, currVendorId} = this.state;
     if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
-      return <LoadingView />;
+      return <LoadingView/>;
     }
 
     let _this = this;
-    return curr_stores.map(function(store, idx) {
-      let { nickname } = curr_user_list[store.owner_id] || {};
+    return curr_stores.map(function (store, idx) {
+      let {nickname} = curr_user_list[store.owner_id] || {};
       // let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
       // let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
 
       let storeTel = [
-        { tel: store.tel, desc: "门店" },
-        { tel: store.mobile, desc: nickname }
+        {tel: store.tel, desc: "门店"},
+        {tel: store.mobile, desc: nickname}
       ];
       let vice_mgr_name = "";
       if (!!store.vice_mgr && store.vice_mgr !== "0") {
@@ -179,7 +167,7 @@ class StoreScene extends PureComponent {
               if (vice_mgr_name !== "") {
                 vice_mgr_name += ",";
               }
-              storeTel.push({ tel: mgr_tel, desc: mgr_name });
+              storeTel.push({tel: mgr_tel, desc: mgr_name});
               vice_mgr_name += mgr_name;
             }
           }
@@ -193,8 +181,8 @@ class StoreScene extends PureComponent {
               <Text style={[styles.store_name]}>{store.name}</Text>
               <Text style={[styles.open_time]}>
                 {tool.storeTime(`2000-01-01 ${store.open_start}`)}-{tool.storeTime(
-                  `2000-01-01 ${store.open_end}`
-                )}
+                `2000-01-01 ${store.open_end}`
+              )}
               </Text>
             </CellBody>
             <CellFooter>
@@ -216,7 +204,7 @@ class StoreScene extends PureComponent {
                 style={styles.cell_right}
               >
                 <Text style={styles.edit_text}>详情/修改</Text>
-                <Button name="chevron-thin-right" style={styles.right_btn} />
+                <Button name="chevron-thin-right" style={styles.right_btn}/>
               </TouchableOpacity>
             </CellFooter>
           </Cell>
@@ -274,7 +262,7 @@ class StoreScene extends PureComponent {
 
   render() {
     let _this = this;
-    let { currVendorName } = this.state;
+    let {currVendorName} = this.state;
     return (
       <ScrollView
         refreshControl={
@@ -284,7 +272,7 @@ class StoreScene extends PureComponent {
             tintColor="gray"
           />
         }
-        style={{ backgroundColor: colors.main_back }}
+        style={{backgroundColor: colors.main_back}}
       >
         <CellsTitle style={[styles.cell_title]}>新增门店</CellsTitle>
         <Cells style={[styles.cells]}>
@@ -327,7 +315,7 @@ class StoreScene extends PureComponent {
                 <Text style={[styles.add_store]}>新增门店</Text>
               </TouchableOpacity>
             </CellBody>
-            <CellFooter />
+            <CellFooter/>
           </Cell>
         </Cells>
 
@@ -347,7 +335,7 @@ class StoreScene extends PureComponent {
               type: "default",
               label: "取消",
               onPress: () => {
-                this.setState({ showCallStore: false });
+                this.setState({showCallStore: false});
               }
             }
           ]}

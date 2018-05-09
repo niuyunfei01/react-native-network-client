@@ -104,7 +104,6 @@ class NewProduct extends PureComponent {
     let _this = this;
     dispatch(
       getVendorStores(currVendorId, accessToken, resp => {
-        console.log("store resp -> ", resp.ok, resp.desc);
         if (resp.ok) {
           let curr_stores = resp.obj;
           let curr_stores_arr = [];

@@ -17,6 +17,8 @@ public class Product {
     private int published;
     private String promote_name;
     private String tag_code;
+    private String sku_unit;
+    private int weight;
 
     public int getId() {
         return id;
@@ -104,6 +106,22 @@ public class Product {
 
     public void setTag_code(String tag_code) {
         this.tag_code = tag_code;
+    }
+
+    public String getSku_unit() {
+        return sku_unit;
+    }
+
+    public void setSku_unit(String sku_unit) {
+        this.sku_unit = sku_unit;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 
     //
