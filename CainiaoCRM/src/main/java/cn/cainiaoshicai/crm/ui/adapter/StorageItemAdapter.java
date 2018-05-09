@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.StorageStatusResults;
@@ -98,11 +99,15 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.label.setText(item.nameAndPidStr());
         }
 
-        holder.prodStatus.setText(item.getStatusText());
-        if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
-            holder.prodStatus.setBackground(ContextCompat.getDrawable(this.context, R.drawable.list_text_border_red_mini));
+        if (GlobalCtx.app().fnEnabledReqProvide()) {
+            holder.prodStatus.setText(item.getStatusText());
+            if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
+                holder.prodStatus.setBackground(ContextCompat.getDrawable(this.context, R.drawable.list_text_border_red_mini));
+            } else {
+                holder.prodStatus.setBackground(null);
+            }
         } else {
-            holder.prodStatus.setBackground(null);
+            holder.prodStatus.setVisibility(View.GONE);
         }
 
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {

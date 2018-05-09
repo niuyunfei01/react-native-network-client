@@ -27,6 +27,7 @@ public class Config {
     private Vendor[] can_read_vendors;
     private HashMap<String, String> v_b;
     private List<Integer> help_uid = new ArrayList<Integer>();
+    private boolean enabled_good_mgr = false;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
@@ -128,6 +129,14 @@ public class Config {
 
     public void setHelp_uid(List<Integer> help_uid) {
         this.help_uid = help_uid;
+    }
+
+    public boolean isEnabled_good_mgr() {
+        return enabled_good_mgr;
+    }
+
+    public void setEnabled_good_mgr(boolean enabled_good_mgr) {
+        this.enabled_good_mgr = enabled_good_mgr;
     }
 
     private class TaskType {

@@ -307,6 +307,7 @@ class OrderScene extends Component {
 
   _navSetParams = () => {
     let {backPage} = (this.props.navigation.state.params || {});
+    const {enabled_special_menu = false} = this.props.global.config;
 
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -314,9 +315,12 @@ class OrderScene extends Component {
       {key: MENU_EDIT_STORE, label: '修改门店'},
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_SET_INVALID, label: '置为无效'},
-      {key: MENU_ADD_TODO, label: '稍后处理'},
-      {key: MENU_OLD_VERSION, label: '老版订单页'},
     ];
+
+    if (enabled_special_menu) {
+      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
+      as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
+    }
 
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_PROVIDING, label: '门店备货'});
