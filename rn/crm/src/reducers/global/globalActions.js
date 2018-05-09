@@ -10,7 +10,7 @@
 import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
-import {getWithTpl, postWithTpl} from '../../util/common'
+import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
 
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
@@ -233,4 +233,15 @@ export function customerApply(applyData, callback) {
         callback(false, '网络错误，请检查您的网络连接')
       })
   }
+}
+
+export function checkIsKf(token, callback) {
+  const url = `api/is_kf?access_token=${token}`;
+  getWithTpl(url, (json) => {
+      callback(json.ok, json.reason, json.obj)
+    }, (error) => {
+      console.log('error:', error);
+      callback(false, "网络错误, 请稍后重试")
+    }
+  )
 }
