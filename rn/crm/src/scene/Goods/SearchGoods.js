@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import {
   FlatList,
   Image,
@@ -8,30 +8,37 @@ import {
   View,
   Dimensions
 } from "react-native";
-import { connect } from "react-redux";
-import { NavigationActions } from "react-navigation";
+import {connect} from "react-redux";
+import {NavigationActions} from "react-navigation";
 
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import LoadingView from "../../widget/LoadingView";
-import { Styles } from "../../themes";
+import {Styles} from "../../themes";
 //请求
-import { getWithTpl } from "../../util/common";
+import {getWithTpl} from "../../util/common";
 //配置图片的路由
 import Config from "../../config";
-import { NavigationItem1 } from "../component/All";
+import {NavigationItem1} from "../component/All";
 import tool from "../../common/tool";
+import {ToastLong} from "../../util/ToastUtils";
 
-const mapStateToProps = state => {
+
+function mapStateToProps(state) {
+  const {global} = state;
+  return {global: global};
+}
+
+function mapDispatchToProps(dispatch) {
   return {
-    global: state.global //全局token,
+    dispatch
   };
-};
+}
 
 class SearchGoods extends Component {
   //导航
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     let value = ""; //关键字
     if (params.value) {
       value = params.value;
@@ -88,7 +95,7 @@ class SearchGoods extends Component {
               <TouchableOpacity onPress={() => params.search()}>
                 <Image
                   source={require("../../img/new/searchG.png")}
-                  style={{ width: 20, height: 20, marginRight: 5, padding: 5 }}
+                  style={{width: 20, height: 20, marginRight: 5, padding: 5}}
                 />
               </TouchableOpacity>
             </View>
@@ -122,7 +129,6 @@ class SearchGoods extends Component {
     }
     if (state.params && state.params.result) {
       let code = JSON.parse(state.params.result);
-      console.log("code:%o", code);
       this.props.navigation.setParams(
         {
           inputText: this.inputText,
@@ -135,7 +141,7 @@ class SearchGoods extends Component {
       );
     }
     this.fetchResources(storeId);
-    this.state = { storeId: storeId };
+    this.state = {storeId: storeId};
   }
 
   inputText = text => {
@@ -153,7 +159,7 @@ class SearchGoods extends Component {
   fetchResources = storeId => {
     let url = `api/get_store_type/${storeId}?access_token=${
       this.props.global.accessToken
-    }`;
+      }`;
     http: getWithTpl(
       url,
       json => {
@@ -176,21 +182,21 @@ class SearchGoods extends Component {
     );
   };
   search = () => {
+    let loading = this.state.isLoading;
+    if (loading) {
+      ToastLong("正在查询");
+      return;
+    }
     this.setState({
       isLoading: true
     });
     let url = "";
     let accessToken = this.props.global.accessToken;
-    let { currVendorId } = tool.vendor(this.props.global);
-    console.log("没有定义的id:%o", currVendorId);
+    let {currVendorId} = tool.vendor(this.props.global);
     if (!this.text) {
-      url = `api/query_product_by_upc.json?access_token=${accessToken}&vendor_id=${currVendorId}&upc=${
-        this.state.value
-      }`;
+      url = `api/query_product_by_upc.json?access_token=${accessToken}&vendor_id=${currVendorId}&upc=${this.state.value}`;
     } else {
-      url = `api/query_product_by_keyword.json?access_token=${accessToken}&vendor_id=${currVendorId}&keyword=${
-        this.text
-      }`;
+      url = `api/query_product_by_keyword.json?access_token=${accessToken}&vendor_id=${currVendorId}&keyword=${this.text}`;
     }
     http: getWithTpl(
       url,
@@ -214,19 +220,16 @@ class SearchGoods extends Component {
     );
   };
   //样式
-  renderRow = ({ item, index }) => {
+  renderRow = ({item, index}) => {
     return (
       <TouchableOpacity
-        key={item.id}
         onPress={() =>
           this.props.navigation.navigate(Config.ROUTE_NEW_PRODUCT_DETAIL, {
             productId: item.id,
             title: item.name,
             price: item.price
           })
-        }
-        style={{ marginTop: index === 0 ? 0 : 30, flexDirection: "row" }}
-      >
+        } style={{marginTop: index === 0 ? 0 : 30, flexDirection: "row"}}>
         <View
           style={{
             width: 100,
@@ -236,8 +239,8 @@ class SearchGoods extends Component {
           }}
         >
           <Image
-            source={{ uri: Config.staticUrl(item.coverimg) }}
-            style={{ width: 98, height: 98 }}
+            source={{uri: Config.staticUrl(item.coverimg)}}
+            style={{width: 98, height: 98}}
           />
         </View>
         <View
@@ -249,17 +252,17 @@ class SearchGoods extends Component {
         >
           <Text
             numberOfLines={1}
-            style={{ fontSize: 16, color: "#3e3e3e", fontWeight: "bold" }}
+            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
           >
             {item.name}
           </Text>
           <Text
             numberOfLines={3}
-            style={{ flex: 1, color: "#bfbfbf", fontSize: 12, lineHeight: 14 }}
+            style={{flex: 1, color: "#bfbfbf", fontSize: 12, lineHeight: 14}}
           >
             {item.description || "该产品暂无描述"}
           </Text>
-          <Text numberOfLines={1} style={{ color: "#bfbfbf", fontSize: 12 }}>
+          <Text numberOfLines={1} style={{color: "#bfbfbf", fontSize: 12}}>
             UPC:{item.upc || "无"}
           </Text>
         </View>
@@ -271,10 +274,10 @@ class SearchGoods extends Component {
     console.disableYellowBox = true;
     let storeId = this.state.store_id;
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
           {/*搜索商品列表*/}
           {this.state.goods && this.state.goods.length ? (
             <View
@@ -290,6 +293,7 @@ class SearchGoods extends Component {
                 ref={list => {
                   this.ListView = list;
                 }}
+                keyExtractor = {(item, idx) => item.id}
                 initialNumToRender={this.state.goods.length}
                 renderItem={this.renderRow}
               />
@@ -311,7 +315,7 @@ class SearchGoods extends Component {
             if (this.cooperation) {
               this.props.navigation.navigate(
                 Config.ROUTE_CREATE_NEW_GOOD_REMIND,
-                { storeId: storeId }
+                {storeId: storeId}
               );
             } else {
               this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
@@ -320,7 +324,7 @@ class SearchGoods extends Component {
             }
           }}
         >
-          <View style={{ paddingHorizontal: pxToDp(31), marginTop: 10 }}>
+          <View style={{paddingHorizontal: pxToDp(31), marginTop: 10}}>
             <View
               style={{
                 width: "100%",
@@ -332,7 +336,7 @@ class SearchGoods extends Component {
               }}
             >
               <Text
-                style={{ color: "#fff", fontSize: 20, textAlign: "center" }}
+                style={{color: "#fff", fontSize: 20, textAlign: "center"}}
               >
                 手动添加
               </Text>
@@ -355,4 +359,4 @@ class SearchGoods extends Component {
   }
 }
 
-export default connect(mapStateToProps)(SearchGoods);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchGoods);
