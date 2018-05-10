@@ -703,6 +703,10 @@ class MineScene extends PureComponent {
   }
 
   renderStoreBlock() {
+    const {
+      show_activity_mgr = false,
+      show_goods_monitor = false,
+    } = this.props.global.config;
     let token = `?access_token=${this.props.global.accessToken}`;
     let {
       currVendorId,
@@ -912,7 +916,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        {(is_helper || is_service_mgr) && (
+        {(show_goods_monitor && (is_helper || is_service_mgr)) && (
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_GOODS_MANAGE)}
@@ -926,7 +930,7 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         )}
 
-        {(is_helper || is_service_mgr) && (
+        {(show_activity_mgr && (is_helper || is_service_mgr)) && (
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_ACTIVITY_MANAGE)}
@@ -945,19 +949,22 @@ class MineScene extends PureComponent {
 
   renderVersionBlock() {
     let server_info = tool.server_info(this.props);
-
+    const {
+      show_expense_center = false,
+    } = this.props.global.config;
     return (
       <View style={[block_styles.container]}>
-        <TouchableOpacity
+
+        { show_expense_center &&( <TouchableOpacity
           style={[block_styles.block_box]}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
             source={require("../../img/My/huiyuan_.png")}
           />
-          <Text style={[block_styles.block_name]}>会员信息</Text>
+          <Text style={[block_styles.block_name]}>我的钱包</Text>
         </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={[block_styles.block_box]}

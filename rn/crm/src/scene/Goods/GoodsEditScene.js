@@ -721,6 +721,7 @@ class GoodsEditScene extends PureComponent {
         <Left
           title="门店分类"
           info={this.state.tag_list}
+          editable={false}
           onPress={() => {
             let {state, navigate} = this.props.navigation;
             navigate(Config.ROUTE_GOODS_CLASSIFY, {

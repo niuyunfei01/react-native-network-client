@@ -35,8 +35,13 @@ class Left extends PureComponent {
       value,
       type,
       isOne,
-      maxLength
+      maxLength,
+      editable,
     } = this.props;
+    let editFlag = editable;
+    if(editFlag!==false){
+      editFlag = true;
+    }
     return (
       <TouchableOpacity onPress={onPress}>
         <View
@@ -68,6 +73,7 @@ class Left extends PureComponent {
                 placeholderTextColor={"#7A7A7A"}
                 keyboardType={type}
                 value={value}
+                editable = {editFlag}
                 onChangeText={onChangeText}
               />
             </View>

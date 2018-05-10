@@ -33,6 +33,10 @@ export default {
   TASK_TYPE_ORDER_CHANGE: 7, //订单修改
   TASK_TYPE_UPLOAD_GOODS_FAILED: 8, //外卖上传商品失败
   TASK_TYPE_UPLOAD_NEW_GOODS: 9, //商家申请上新任务
+  TASK_TYPE_UP_SUPPLY_PRICE: 10, //向上调价
+  TASK_TYPE_DOWN_SUPPLY_PRICE: 11,//向下调价
+
+  TASK_TYPE_CHG_SUPPLY_PRICE: 200,
 
   //任务紧急程度
   TASK_QUICK_NO: 0,

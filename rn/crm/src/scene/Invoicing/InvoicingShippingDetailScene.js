@@ -12,7 +12,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import _ from "lodash"
 
-import {lockProvideReq, setReqItemSupplier, createSupplyOrder} from "../../reducers/invoicing/invoicingActions";
+import {lockProvideReq, setReqItemSupplier, createSupplyOrder, getSupplierProductMap, deleteCheckHistory, createCheckHistory} from "../../reducers/invoicing/invoicingActions";
 import {ToastLong} from "../../util/ToastUtils";
 import Conf from '../../config'
 
@@ -36,6 +36,7 @@ class InvoicingShippingDetailScene extends Component {
   static navigationOptions = ({navigation}) => {
     const {req} = (navigation.state.params || {});
     let storeName = req['store_name'];
+
     return {
       headerTitle: storeName,
     }
@@ -49,7 +50,10 @@ class InvoicingShippingDetailScene extends Component {
       checkedSupplierId: 1,
       trackRemark: true,
       loading: false,
-      remark: {}
+      remark: {},
+      productSupplierMap : {},
+      checkSuppliers: {},
+      checkCount: {}
     }
     this.handleCheckSupplier = this.handleCheckSupplier.bind(this);
     this.handleCheckItem = this.handleCheckItem.bind(this);
@@ -60,6 +64,24 @@ class InvoicingShippingDetailScene extends Component {
   }
 
   componentWillMount() {
+    const {global} = this.props;
+    const {req} = (this.props.navigation.state.params || {});
+    let storeId = req['store_id'];
+    let token = global['accessToken'];
+    let self = this;
+    self.initViewData();
+    getSupplierProductMap(token, storeId, function (resp) {
+      if (resp.ok) {
+        self.setState({
+          productSupplierMap: resp['obj']
+        });
+        self.initViewData(resp['obj']);
+      }
+    }, function () {
+    });
+  }
+
+  initViewData(lastChecked = {}) {
     const {req, suppliers} = (this.props.navigation.state.params || {});
     this.setState({req: req, suppliers: suppliers});
     let reqItems = req['req_items'];
@@ -71,19 +93,28 @@ class InvoicingShippingDetailScene extends Component {
       orderRemark[supplyId] = '';
     });
     let checkItems = reqItems.map(function (item, idx) {
+      let pid = item['pid'];
+      let supplierId = 0;
       if (item['supplier_id'] > 0) {
-        let supplierId = item['supplier_id'];
+        supplierId = item['supplier_id'];
         checkCount[supplierId] = checkCount[supplierId] + 1;
+      } else {
+        if (lastChecked[pid]) {
+          supplierId = lastChecked[pid];
+          checkCount[supplierId] = checkCount[supplierId] + 1;
+        }
       }
-      return {label: item['name'], id: item['id'], sId: item['supplier_id']}
+      return {label: item['name'], id: item['id'], sId: supplierId, pid: pid}
     });
-    this.setState({checkItems: checkItems});
     let checkSuppliers = suppliers.map(function (item, idx) {
       return {id: item['id'], name: item['name']}
     });
-    this.setState({checkSuppliers: checkSuppliers});
-    this.setState({checkCount: checkCount})
-    this.setState({remark: orderRemark})
+    this.setState({
+      checkItems: checkItems,
+      checkSuppliers: checkSuppliers,
+      checkCount: checkCount,
+      remark: orderRemark
+    });
   }
 
   saveSupplier(callback) {
@@ -124,15 +155,27 @@ class InvoicingShippingDetailScene extends Component {
     let checkedSupplierId = this.state.checkedSupplierId;
     let copy = [];
     let self = this;
+    let pid = 0;
     _.forEach(checkItems, function (value) {
       let vId = value['id'];
       if (itemId == vId) {
         value['sId'] = checked ? checkedSupplierId : 0;
         self.setCheckCount(checkedSupplierId, checked);
+        pid = value['pid'];
       }
       copy.push(value);
     });
     this.setState({checkItems: copy});
+
+    const {global} = this.props;
+    let token = global['accessToken'];
+    let {req} = this.state;
+    let storeId = req['store_id'];
+    if (checked) {
+      createCheckHistory(token, pid, checkedSupplierId, storeId);
+    } else {
+      deleteCheckHistory(token, pid, checkedSupplierId, storeId);
+    }
   }
 
   renderSuppliers() {

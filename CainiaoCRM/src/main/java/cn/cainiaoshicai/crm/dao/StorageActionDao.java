@@ -199,6 +199,8 @@ public class StorageActionDao {
                         si.setName(pd.getName());
                         si.setTag_code(pd.getTag_code());
                         si.setThumbPicUrl(to_full_path(pd.getCoverimg()));
+                        si.setSkuUnit(pd.getSku_unit());
+                        si.setWeight(pd.getWeight());
                     }
 
                     if (mapOfPids != null && plOfExt != null) {

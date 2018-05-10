@@ -69,8 +69,8 @@ function mapDispatchToProps(dispatch) {
 let canLoadMore;
 let loadMoreTime = 0;
 const _typeIds = [100, 101, 102, 103];
-const _fetchDataTypeIds = [100, 101, 102, Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_NEW_GOODS];//其他分类下的子分类定义
-const _otherSubTypeIds = [Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_NEW_GOODS];//其他分类下的子分类定义
+const _fetchDataTypeIds = [100, 101, 102, Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_NEW_GOODS, Cts.TASK_TYPE_CHG_SUPPLY_PRICE];//其他分类下的子分类定义
+const _otherSubTypeIds = [Cts.TASK_TYPE_OTHER_IMP, Cts.TASK_TYPE_UN_CLASSIFY, Cts.TASK_TYPE_UPLOAD_NEW_GOODS, Cts.TASK_TYPE_CHG_SUPPLY_PRICE];//其他分类下的子分类定义
 const _typeAlias = ['refund_type', 'remind_type', 'complain_type', 'other_type'];
 const _otherTypeTag = 103;
 
@@ -102,7 +102,7 @@ class RemindScene extends PureComponent {
     dispatch(fetchRemindCount(vendor_id, store_id, token));
 
     let {is_helper, is_service_mgr} = tool.vendor(this.props.global);
-    if((is_helper || is_service_mgr) && _fetchDataTypeIds.indexOf(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED) === -1){//上传商品失败分类只展示给服务人员和后台人员
+    if ((is_helper || is_service_mgr) && _fetchDataTypeIds.indexOf(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED) === -1) {//上传商品失败分类只展示给服务人员和后台人员
       _fetchDataTypeIds.push(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED);
     }
     _fetchDataTypeIds.forEach((typeId) => {
@@ -268,8 +268,8 @@ class RemindScene extends PureComponent {
         </RNButton>
       }
       BadgeElement={
-        <Text style={{color: '#FFFFFF',fontSize:pxToDp(18)}}>{quick >99 ? '99+':quick}</Text>
-        }
+        <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
+      }
       MainViewStyle={{marginHorizontal: pxToDp(10)}}
       Hidden={quick == 0}
       IconBadgeStyle={styles.iconBadgeStyle}
@@ -287,7 +287,7 @@ class RemindScene extends PureComponent {
     let quickNum = remind.quickNum;
 
     let {is_helper, is_service_mgr} = tool.vendor(this.props.global);
-    if((is_helper || is_service_mgr) && _otherSubTypeIds.indexOf(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED) === -1){//上传商品失败分类只展示给服务人员和后台人员
+    if ((is_helper || is_service_mgr) && _otherSubTypeIds.indexOf(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED) === -1) {//上传商品失败分类只展示给服务人员和后台人员
       _otherSubTypeIds.push(Cts.TASK_TYPE_UPLOAD_GOODS_FAILED);
     }
     _otherSubTypeIds.forEach((typeId) => {
@@ -323,20 +323,21 @@ class RemindScene extends PureComponent {
       </RNButton>
     </View>;
     else
-    return (
-      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
-        <Text style={{textAlign: 'center', fontSize: 16}}>
-          加载中…
-        </Text>
-      </View>
-    );
+      return (
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
+          <Text style={{textAlign: 'center', fontSize: 16}}>
+            加载中…
+          </Text>
+        </View>
+      );
   }
 
   renderItem(remind) {
     let {item, index} = remind;
     return (
-      <RemindItem item={item} index={index} key={index} onRefresh={() => this.onRefresh(item.type)} onPressDropdown={this.onPressDropdown.bind(this)}
+      <RemindItem item={item} index={index} key={index} onRefresh={() => this.onRefresh(item.type)}
+                  onPressDropdown={this.onPressDropdown.bind(this)}
                   onPress={this.onPress.bind(this)}/>
     );
   }
@@ -391,7 +392,7 @@ class RemindScene extends PureComponent {
           this.pageY = e.nativeEvent.pageY;
         }}
         onTouchMove={(e) => {
-          if(Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)){
+          if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
             this.setState({scrollLocking: true});
           } else {
             this.setState({scrollLocking: false});
@@ -548,9 +549,9 @@ class RemindItem extends React.PureComponent {
     let {item, onPressDropdown, onPress} = this.props;
     let task_type = parseInt(item.type);
     let task_info = item.remark;
-    if(task_type === Cts.TASK_TYPE_UPLOAD_NEW_GOODS && item.remind_id){
+    if (task_type === Cts.TASK_TYPE_UPLOAD_NEW_GOODS && item.remind_id) {
       let new_goods_info = JSON.parse(item.remind_id);
-      task_info = '申请上架: '+ item.remark + ';  价格: ' + new_goods_info.price_desc;
+      task_info = '申请上架: ' + item.remark + ';  价格: ' + new_goods_info.price_desc;
     }
 
     return (
@@ -566,10 +567,12 @@ class RemindItem extends React.PureComponent {
               }
             };
             onPress(Config.ROUTE_GOODS_WORK_NEW_PRODUCT, params);
+          } else if (parseInt(item.type) === Cts.TASK_TYPE_CHG_SUPPLY_PRICE) {
+            let params = {viewStoreId: item.store};
+            onPress(Config.ROUTE_GOODS_APPLY_RECORD, params);
           }
         }}
-        activeOpacity={0.6}
-      >
+        activeOpacity={0.6}>
         <View style={top_styles.container}>
           <View style={[top_styles.order_box]}>
             <View style={top_styles.box_top}>
@@ -621,7 +624,7 @@ class RemindItem extends React.PureComponent {
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
               {!!item.expect_end_time &&
-                <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
+              <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
               </View>

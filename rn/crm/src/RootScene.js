@@ -176,6 +176,7 @@ class RootScene extends PureComponent {
           </View>
           <AppNavigator
             uriPrefix={prefix}
+            store_ = {this.store}
             ref={nav => {
               this.navigator = nav;
             }}

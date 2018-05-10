@@ -21,6 +21,7 @@ import {getWithTpl, jsonWithTpl} from "../../util/common";
 import tool from "../../common/tool";
 import {ToastLong} from "../../util/ToastUtils";
 import {Toast} from "../../weui/index";
+import native from "../../common/native";
 
 const mapStateToProps = state => {
   return {
@@ -101,13 +102,12 @@ class NewProductDetail extends Component {
       product_id: this.props.navigation.state.params.productId,
       price: this.state.price
     };
-    console.log("direct save product data ", payload);
     jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
       payload,
       ok => {
         if (ok.ok) {
           ToastLong(ok.desc);
-          this.props.navigation.goBack();
+          native.toGoods();
         } else {
           ToastLong(ok.reason);
         }
@@ -116,7 +116,7 @@ class NewProductDetail extends Component {
         });
       },
       error => {
-        ToastLong("网络错误");
+        ToastLong("保存失败");
         this.setState({
           isSave: false
         });
@@ -377,6 +377,7 @@ class NewProductDetail extends Component {
         <Left
           title="门店分类"
           onPress={() => this.setState({visual: true})}
+          editable={false}
           info={this.getCategory() || "选择门店分类"}
           right={
             <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>

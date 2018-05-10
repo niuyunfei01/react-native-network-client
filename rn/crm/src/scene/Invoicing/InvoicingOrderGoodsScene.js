@@ -519,10 +519,10 @@ class InvoicingOrderGoodsScene extends Component {
     let storeCtrlStatus = {};
     _.forEach(listData, function (val) {
       let storeId = val['store_id'];
-      storeCtrlStatus[storeId] = {expandSupplier: true};
+      storeCtrlStatus[storeId] = {expandSupplier: false};
       _.forEach(val['data'], function (o) {
         let oId = o['id'];
-        orderCtrlStatus[oId] = {editAble: false, expandGoods: true}
+        orderCtrlStatus[oId] = {editAble: false, expandGoods: false}
       })
     });
     this.setState({orderCtrlStatus: orderCtrlStatus, storeCtrlStatus: storeCtrlStatus})

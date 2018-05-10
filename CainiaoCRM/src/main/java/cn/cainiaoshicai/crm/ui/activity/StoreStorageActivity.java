@@ -50,7 +50,6 @@ import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
-import static cn.cainiaoshicai.crm.Cts.PROFIT_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
@@ -166,8 +165,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        final GlobalCtx app = GlobalCtx.app();
+        if (!app.appEnabledGoodMgr()) {
+            app.toGoodsMgrRN(StoreStorageActivity.this);
+            return;
+        }
 
+        super.onCreate(savedInstanceState);
         inflater = (LayoutInflater)
                 getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -183,8 +187,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             AlertUtil.error(this, "系统错误: no title bar!");
             return;
         }
-
-        final GlobalCtx app = GlobalCtx.app();
 
         bar.setCustomView(R.layout.store_list_in_title);
         View titleBar = bar.getCustomView();
@@ -429,8 +431,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 this.addNewBtn.setLayoutParams(params);
             }
         } else {
-            this.btnReqList.setVisibility(View.VISIBLE);
-            this.btnEmptyList.setVisibility(View.VISIBLE);
+            boolean fnEnabledReqProvide = GlobalCtx.app().fnEnabledReqProvide();
+            this.btnReqList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
+            this.btnEmptyList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
+
             this.btnApplyPriceList.setVisibility(View.INVISIBLE);
 
             if (statusAdapter != null) {

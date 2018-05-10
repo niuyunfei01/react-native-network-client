@@ -787,6 +787,15 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toGoodsMgrRN(Activity ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Tab");
+        Bundle params = new Bundle();
+        params.putString("initTab", "Goods");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", /*isPriceControlled ?*/ "GoodsApplyNewProduct" /*: "GoodsEdit"*/);
@@ -972,6 +981,11 @@ public class GlobalCtx extends Application {
 
     public Activity pageToActivity(String page) {
         return new MainActivity();
+    }
+
+    public boolean appEnabledGoodMgr() {
+        Config cfg = this.serverCfg.get(SettingUtility.getListenerStore());
+        return cfg != null && cfg.isEnabled_good_mgr();
     }
 
     public interface TaskCountUpdated {
