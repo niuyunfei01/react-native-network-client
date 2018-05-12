@@ -689,6 +689,7 @@ class OrderScene extends Component {
       this.setState({
         gotoEditPoi: true
       });
+      this.goToSetMap();
     }
   }
 
