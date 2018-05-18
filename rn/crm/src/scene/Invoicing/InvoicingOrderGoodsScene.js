@@ -708,8 +708,8 @@ class InvoicingOrderGoodsScene extends Component {
           {status == Constant.INVOICING.STATUS_CREATED && !!data['remark'] ?
             <View style={{flexDirection: 'row', flexWrap: 'nowrap'}}><Text
               style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text><Text
-              style={[font.font24, font.fontRed, {marginTop: pxToDp(11)}]} numberOfLines={1}
-              ellipsizeMode={'tail'}> {data['remark']}</Text></View> : null}
+              style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap', width: pxToDp(450)}]}
+              ellipsizeMode={'tail'}> {data['remark'].replace(/\s/g, ",")}</Text></View> : null}
           {status == Constant.INVOICING.STATUS_CONFIRMED ?
             <Text style={[font.font24, font.fontRed]}>待结算金额: ￥{this.getStoreTotalFee(data['store_id'])}</Text> : null}
         </View>
