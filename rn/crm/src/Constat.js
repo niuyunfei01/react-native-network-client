@@ -15,5 +15,10 @@ export default {
       {label: '斤', value: '0'},
       {label: '份', value: '1'},
     ]
+  },
+  ERROR_CODE: {
+    INVALID_TOKEN: '21327',
+    EXPIRE_TOKEN: '21332',
+    ACCESS_DENIED: '10001'
   }
 };
