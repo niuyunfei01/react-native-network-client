@@ -695,7 +695,7 @@ class MineScene extends PureComponent {
 					}}
 					onPickerDone={(value) => {
 						console.log(`on picker done `, value)
-						this.onCanChangeStore(value[2])
+						this.onCanChangeStore(value[1])
 					}}
 					onValueChange={(value) => {
 						console.log(`on value change `, value)
