@@ -164,9 +164,9 @@ public class StorageItem {
         this.risk_min_stat = risk_min_stat;
     }
 
-    public  String getStatusText() {
+    public  String getStatusText(boolean enableReq) {
         if (this.status == STORE_PROD_ON_SALE) {
-            return (this.getLeft_since_last_stat() >= this.risk_min_stat)? "正常" : "告急";
+            return (this.getLeft_since_last_stat() >= this.risk_min_stat || !enableReq)? "正常" : "告急";
         }
         return this.status == STORE_PROD_OFF_SALE? "下架" : (this.status == STORE_PROD_SOLD_OUT? "缺货" : "不明");
     }
