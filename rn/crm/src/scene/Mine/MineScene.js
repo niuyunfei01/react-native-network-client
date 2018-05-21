@@ -150,7 +150,7 @@ class MineScene extends PureComponent {
       currVendorName: currVendorName,
 			cover_image: !!cover_image ? cover_image : "",
 
-			storeList: [],
+			storeList: tool.storeListOfPicker(canReadStores),
 			storeListPickerVisible: false
     };
 
@@ -474,7 +474,7 @@ class MineScene extends PureComponent {
 
 					<TouchableOpacity
 						onPress={() => {
-							this.showStoreListPicker()
+							this.setState({'storeListPickerVisible': true})
 						}}
 					>
 						<View style={{flexDirection: "row"}}>
@@ -706,6 +706,13 @@ class MineScene extends PureComponent {
 					onRequestClose={() => {
 						console.log(`store_list_picker => closed`)
 						this.setState({storeListPickerVisible: false})
+					}}
+					onPickerDone={(value) => {
+						console.log(`on picker done `, value)
+						this.onCanChangeStore(value[2])
+					}}
+					onValueChange={(value) => {
+						console.log(`on value change `, value)
 					}}
 					style={{height: 150}}
 				/>
@@ -1178,18 +1185,6 @@ class MineScene extends PureComponent {
       </View>
     );
   }
-
-	showStoreListPicker() {
-		const {canReadStores} = this.props.global;
-		const storeList = tool.storeListOfPicker(canReadStores)
-		console.log(storeList)
-		this.setState({
-			'storeListPickerVisible': true,
-			'storeList': storeList
-		})
-		this.forceUpdate()
-		console.log(this.state)
-	}
 }
 
 const styles = StyleSheet.create({
