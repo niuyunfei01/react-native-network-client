@@ -502,7 +502,7 @@ export function storeListOfPicker(canReadStores) {
 			let storeDistrictValue = storeDistrict.children
 
 			for (store of storeDistrictValue) {
-				store.label = store.name
+				store.label = store.vendor + '-' + store.name
 				store.value = store.id
 			}
 		}

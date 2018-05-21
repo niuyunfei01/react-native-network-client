@@ -458,20 +458,6 @@ class MineScene extends PureComponent {
           <Text style={header_styles.shop_name}>
             {this.state.currStoreName}
           </Text>
-					{/*<ModalSelector*/}
-					{/*onChange={option => {*/}
-					{/*this.onCanChangeStore(option.key);*/}
-					{/*}}*/}
-					{/*skin="customer"*/}
-					{/*defaultKey={currStoreId}*/}
-					{/*data={this.state.storeActionSheet}*/}
-					{/*>*/}
-					{/*<View style={{flexDirection: "row"}}>*/}
-					{/*<Icon name="exchange" style={header_styles.change_shop}/>*/}
-					{/*<Text style={header_styles.change_shop}> 切换门店</Text>*/}
-					{/*</View>*/}
-					{/*</ModalSelector>*/}
-
 					<TouchableOpacity
 						onPress={() => {
 							this.setState({'storeListPickerVisible': true})
