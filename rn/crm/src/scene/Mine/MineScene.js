@@ -1,14 +1,14 @@
 //import liraries
 import React, { PureComponent } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
+	View,
+	Text,
+	StyleSheet,
+	Image,
+	TouchableOpacity,
+	ScrollView,
+	RefreshControl,
+	InteractionManager
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -29,14 +29,13 @@ import {
 } from "../../reducers/mine/mineActions";
 import { setCurrentStore } from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
-import ModalSelector from "../../widget/ModalSelector/index";
 import { fetchUserInfo } from "../../reducers/user/userActions";
 import { upCurrentProfile } from "../../reducers/global/globalActions";
 import { getCommonConfig } from "../../reducers/global/globalActions";
 import Moment from "moment";
 import { get_supply_orders } from "../../reducers/settlement/settlementActions";
-import { Dialog, Toast } from "../../weui/index";
-import { NavigationActions } from "react-navigation";
+import {Dialog, Toast, Picker} from "../../weui/index";
+
 function mapStateToProps(state) {
   const { mine, user, global } = state;
   return { mine: mine, user: user, global: global };
@@ -149,7 +148,10 @@ class MineScene extends PureComponent {
       fnPriceControlled: fnPriceControlled,
       fnProfitControlled: fnProfitControlled,
       currVendorName: currVendorName,
-      cover_image: !!cover_image ? cover_image : ""
+			cover_image: !!cover_image ? cover_image : "",
+
+			storeList: [],
+			storeListPickerVisible: false
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -193,7 +195,7 @@ class MineScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       dispatch(
         fetchUserInfo(uid, accessToken, resp => {
-          console.log("server_info => ", resp);
+					// console.log("server_info => ", resp);
         })
       );
     });
@@ -206,7 +208,6 @@ class MineScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       dispatch(
         fetchUserCount(currentUser, accessToken, resp => {
-          // console.log(resp);
           if (resp.ok) {
             let { sign_count, bad_cases_of } = resp.obj;
             _this.setState({
@@ -368,7 +369,7 @@ class MineScene extends PureComponent {
     const { canReadStores } = this.props.global;
     let _this = this;
     native.setCurrStoreId(store_id, function(ok, msg) {
-      console.log("setCurrStoreId => ", store_id, ok, msg);
+			// console.log("setCurrStoreId => ", store_id, ok, msg);
       if (ok) {
         _this.getTimeoutCommonConfig(store_id, true, (ok, msg, obj) => {
           if (ok) {
@@ -415,18 +416,18 @@ class MineScene extends PureComponent {
     const { accessToken, last_get_cfg_ts } = this.props.global;
     let current_time = Moment(new Date()).unix();
     let diff_time = current_time - last_get_cfg_ts;
-    console.log(
-      "last_get_cfg_ts -> ",
-      last_get_cfg_ts,
-      " | current_time ->",
-      current_time
-    );
-    console.log("get config diff_time -> ", diff_time);
+		// console.log(
+		//   "last_get_cfg_ts -> ",
+		//   last_get_cfg_ts,
+		//   " | current_time ->",
+		//   current_time
+		// );
+		// console.log("get config diff_time -> ", diff_time);
     if (should_refresh || diff_time > 300) {
       const { dispatch } = this.props;
       dispatch(
         getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
-          console.log("getCommonConfig -> ", ok, msg);
+					// console.log("getCommonConfig -> ", ok, msg);
           callback(ok, msg, obj);
         })
       );
@@ -457,19 +458,30 @@ class MineScene extends PureComponent {
           <Text style={header_styles.shop_name}>
             {this.state.currStoreName}
           </Text>
-          <ModalSelector
-            onChange={option => {
-              this.onCanChangeStore(option.key);
-            }}
-            skin="customer"
-            defaultKey={currStoreId}
-            data={this.state.storeActionSheet}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <Icon name="exchange" style={header_styles.change_shop} />
-              <Text style={header_styles.change_shop}> 切换门店</Text>
-            </View>
-          </ModalSelector>
+					{/*<ModalSelector*/}
+					{/*onChange={option => {*/}
+					{/*this.onCanChangeStore(option.key);*/}
+					{/*}}*/}
+					{/*skin="customer"*/}
+					{/*defaultKey={currStoreId}*/}
+					{/*data={this.state.storeActionSheet}*/}
+					{/*>*/}
+					{/*<View style={{flexDirection: "row"}}>*/}
+					{/*<Icon name="exchange" style={header_styles.change_shop}/>*/}
+					{/*<Text style={header_styles.change_shop}> 切换门店</Text>*/}
+					{/*</View>*/}
+					{/*</ModalSelector>*/}
+
+					<TouchableOpacity
+						onPress={() => {
+							this.showStoreListPicker()
+						}}
+					>
+						<View style={{flexDirection: "row"}}>
+							<Icon name="exchange" style={header_styles.change_shop}/>
+							<Text style={header_styles.change_shop}> 切换门店</Text>
+						</View>
+					</TouchableOpacity>
         </View>
         <TouchableOpacity
           style={[header_styles.icon_box]}
@@ -628,63 +640,77 @@ class MineScene extends PureComponent {
   render() {
     let { currVersion, is_mgr, is_helper } = this.state;
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor="gray"
-          />
-        }
-        style={{ backgroundColor: colors.main_back }}
-      >
-        {this.renderHeader()}
-        {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
-        {this.renderStoreBlock()}
-        {this.renderVersionBlock()}
-        {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
+			<View>
+				<ScrollView
+					refreshControl={
+						<RefreshControl
+							refreshing={this.state.isRefreshing}
+							onRefresh={() => this.onHeaderRefresh()}
+							tintColor="gray"
+						/>
+					}
+					style={{backgroundColor: colors.main_back}}
+				>
+					{this.renderHeader()}
+					{is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
+					{this.renderStoreBlock()}
+					{this.renderVersionBlock()}
+					{currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
 
-        <Dialog
-          onRequestClose={() => {}}
-          visible={this.state.FnPriceMsg}
-          buttons={[
-            {
-              type: "primary",
-              label: "知道了",
-              onPress: () => {
-                this.setState({ FnPriceMsg: false });
-              }
-            }
-          ]}
-        >
-          <Text style={styles.fn_price_msg}>
-            最低收益为 已完成订单 的 所有商品 的 保底价 总和
-          </Text>
-          <Text />
-          <View style={{ flexDirection: "row" }}>
-            <Text style={styles.fn_price_msg}>有关保底价的相关问题可查看 </Text>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({ FnPriceMsg: false });
-                let path = `/help/answer?type_id=5`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, { url: url });
-              }}
-            >
-              <Text style={styles.help_msg}>帮助信息</Text>
-            </TouchableOpacity>
-          </View>
-        </Dialog>
+					<Dialog
+						onRequestClose={() => {
+						}}
+						visible={this.state.FnPriceMsg}
+						buttons={[
+							{
+								type: "primary",
+								label: "知道了",
+								onPress: () => {
+									this.setState({FnPriceMsg: false});
+								}
+							}
+						]}
+					>
+						<Text style={styles.fn_price_msg}>
+							最低收益为 已完成订单 的 所有商品 的 保底价 总和
+						</Text>
+						<Text/>
+						<View style={{flexDirection: "row"}}>
+							<Text style={styles.fn_price_msg}>有关保底价的相关问题可查看 </Text>
+							<TouchableOpacity
+								onPress={() => {
+									this.setState({FnPriceMsg: false});
+									let path = `/help/answer?type_id=5`;
+									let url = Config.serverUrl(path, Config.https);
+									this.onPress(Config.ROUTE_WEB, {url: url});
+								}}
+							>
+								<Text style={styles.help_msg}>帮助信息</Text>
+							</TouchableOpacity>
+						</View>
+					</Dialog>
 
-        <Toast
-          icon="loading"
-          show={this.state.onStoreChanging}
-          onRequestClose={() => {}}
-        >
-          切换门店中...
-        </Toast>
-      </ScrollView>
-    );
+					<Toast
+						icon="loading"
+						show={this.state.onStoreChanging}
+						onRequestClose={() => {
+						}}
+					>
+						切换门店中...
+					</Toast>
+				</ScrollView>
+
+				<Picker
+					pickerData={this.state.storeList}
+					visible={this.state.storeListPickerVisible}
+					onRequestClose={() => {
+						console.log(`store_list_picker => closed`)
+						this.setState({storeListPickerVisible: false})
+					}}
+					style={{height: 150}}
+				/>
+			</View>
+		);
   }
 
   onPress(route, params = {}) {
@@ -1152,6 +1178,18 @@ class MineScene extends PureComponent {
       </View>
     );
   }
+
+	showStoreListPicker() {
+		const {canReadStores} = this.props.global;
+		const storeList = tool.storeListOfPicker(canReadStores)
+		console.log(storeList)
+		this.setState({
+			'storeListPickerVisible': true,
+			'storeList': storeList
+		})
+		this.forceUpdate()
+		console.log(this.state)
+	}
 }
 
 const styles = StyleSheet.create({

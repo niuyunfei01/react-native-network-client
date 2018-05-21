@@ -396,6 +396,120 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
   return storeActionSheet;
 }
 
+function sortStores(canReadStores) {
+	let by = function (name, minor) {
+		return function (o, p) {
+			let a, b;
+			if (o && p && typeof o === "object" && typeof p === "object") {
+				a = o[name];
+				b = p[name];
+				if (a === null || b === null) {
+					return a === null ? -1 : 1;
+				}
+				if (a === b) {
+					return typeof minor === "function" ? minor(o, p) : 0;
+				}
+				if (typeof a === typeof b && typeof a === "string") {
+					return a.localeCompare(b);
+				}
+				if (typeof a === typeof b) {
+					return a < b ? -1 : 1;
+				}
+				return typeof a < typeof b ? -1 : 1;
+			} else {
+				throw "error";
+			}
+		};
+	};
+
+	return Object.values(canReadStores).sort(
+		by("vendor_id", by("city", by("id")))
+	);
+}
+
+/**
+ * 数组按指定字段排序
+ * @param itemlist
+ * @param gby
+ * @returns {Array}
+ * @constructor
+ */
+function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
+	var setGroupObj = function (noteObj, rule, gby, gIndex, maxIndex) {
+		var gname = rule[gby[gIndex]];
+		if (gIndex == maxIndex) {
+			if (noteObj[gname] == undefined)
+				noteObj[gname] = [];
+			if (noteObj[gname].indexOf(rule) < 0) {
+				noteObj[gname].push(rule);
+			}
+		}
+		else {
+			if (noteObj[gname] == undefined) {
+				noteObj[gname] = {};
+			}
+			setGroupObj(noteObj[gname], rule, gby, gIndex + 1, maxIndex);
+		}
+	}
+
+	var noteObj = {};
+	for (var i = 0; i < itemlist.length; i++) {
+		setGroupObj(noteObj, itemlist[i], gby, 0, gby.length - 1);
+	}
+
+	var getSubInfo = function (note, p, gIndex, maxIndex) {
+		var newobj = {}
+		newobj[keyName] = p;
+		newobj[valueName] = [];
+		if (gIndex == maxIndex) {
+			for (var k in note) {
+				newobj[valueName].push(note[k]);
+			}
+		}
+		else {
+			for (var k in note[p]) {
+				newobj[valueName].push(getSubInfo(note[p][k], k, gIndex + 1, maxIndex));
+			}
+		}
+		return newobj;
+	}
+	var myobj = [];
+	for (var p in noteObj) {
+		myobj.push(getSubInfo(noteObj, p, 0, gby.length - 1));
+	}
+	return myobj;
+}
+
+/**
+ * 门店数据 格式化 -> WeUI Picker
+ * @param canReadStores
+ */
+export function storeListOfPicker(canReadStores) {
+	const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city', 'district'], 'label', 'children')
+	for (let i in storeListGroup) {
+		let storeListGroupByCity = storeListGroup[i]
+
+		if (storeListGroupByCity.label == 'undefined') {
+			storeListGroup.splice(i, 1)
+		}
+
+		storeListGroupByCity.value = i
+		let storeDistrictCityValue = storeListGroupByCity.children
+
+		for (let j in storeDistrictCityValue) {
+			let storeDistrict = storeDistrictCityValue[j]
+			storeDistrict.value = j
+			let storeDistrictValue = storeDistrict.children
+
+			for (store of storeDistrictValue) {
+				store.label = store.name
+				store.value = store.id
+			}
+		}
+	}
+	return storeListGroup
+}
+
 export function first_store_id(canReadStores) {
   let first_store_id = 0;
   for (let store of Object.values(canReadStores)) {
@@ -607,6 +721,7 @@ export default {
   user_info,
   first_store_id,
   storeActionSheet,
+	storeListOfPicker,
   fullDay,
   toFixed,
   billStatus,
