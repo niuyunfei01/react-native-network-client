@@ -135,6 +135,10 @@ class ActivityRuleScene extends PureComponent {
         {
           key: Cts.STORE_TYPE_HLCS,
           label: '华联'
+        },
+        {
+          key: Cts.STORE_TYPE_JNGY,
+          label: '嘉农果园'
         }
       ],
       price_rules: {},
