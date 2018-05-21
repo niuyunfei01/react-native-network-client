@@ -462,8 +462,8 @@ function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
 		newobj[keyName] = p;
 		newobj[valueName] = [];
 		if (gIndex == maxIndex) {
-			for (var k in note) {
-				newobj[valueName].push(note[k]);
+			for (var k in note[p]) {
+				newobj[valueName].push(note[p][k]);
 			}
 		}
 		else {
@@ -485,26 +485,22 @@ function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
  * @param canReadStores
  */
 export function storeListOfPicker(canReadStores) {
-	const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city', 'district'], 'label', 'children')
+	const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
+
 	for (let i in storeListGroup) {
 		let storeListGroupByCity = storeListGroup[i]
 
 		if (storeListGroupByCity.label == 'undefined') {
 			storeListGroup.splice(i, 1)
+			continue
 		}
 
 		storeListGroupByCity.value = i
 		let storeDistrictCityValue = storeListGroupByCity.children
 
-		for (let j in storeDistrictCityValue) {
-			let storeDistrict = storeDistrictCityValue[j]
-			storeDistrict.value = j
-			let storeDistrictValue = storeDistrict.children
-
-			for (store of storeDistrictValue) {
-				store.label = store.vendor + '-' + store.name
-				store.value = store.id
-			}
+		for (store of storeDistrictCityValue) {
+			store.label = store.vendor + '-' + store.district + '-' + store.name
+			store.value = store.id
 		}
 	}
 	return storeListGroup
