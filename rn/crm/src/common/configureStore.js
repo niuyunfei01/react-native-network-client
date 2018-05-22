@@ -32,38 +32,36 @@ import reducer from '../reducers'
  * device, global, auth, profile
  */
 export default function configureStore(persistDoneCall) {
-  const store = createStore(
-    reducer,
-    undefined,
-    compose(
-      applyMiddleware(
-        thunk,
-        // logger
-      ),
-      autoRehydrate()
-    )
-  );
+	const store = createStore(
+		reducer,
+		undefined,
+		compose(
+			applyMiddleware(
+				thunk,
+				// logger
+			),
+			autoRehydrate()
+		)
+	);
 
-  const expireTransform = createExpirationTransform({
-    expireKey: 'persistExpiresAt',
-    defaultState: {
-      custom: {}
-    }
-  });
+	const expireTransform = createExpirationTransform({
+		expireKey: 'persistExpiresAt',
+		defaultState: {
+			custom: {}
+		}
+	});
 
-  const cfg = {
-    keyPrefix: 'cn.blx.crm.',
-    storage: AsyncStorage,
-    transforms: [expireTransform]
-  };
+	const cfg = {
+		keyPrefix: 'cn.blx.crm.',
+		storage: AsyncStorage,
+		transforms: [expireTransform]
+	};
 
-  persistStore(store, cfg, () => {
-    console.log(new Date(), 'rehydration complete');
-    if (persistDoneCall) {
-      persistDoneCall(store)
-    }
-    console.log(new Date(), 'rehydration done call complete')
-  });
+	persistStore(store, cfg, () => {
+		if (persistDoneCall) {
+			persistDoneCall(store)
+		}
+	});
 
-  return store
+	return store
 }
