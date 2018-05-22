@@ -422,9 +422,9 @@ function sortStores(canReadStores) {
 		};
 	};
 
-	return Object.values(canReadStores).sort(
-		by("vendor_id", by("city", by("id")))
-	);
+  return Object.values(canReadStores).sort(
+    by("vendor_id", by("city", by("district", by("id"))))
+  );
 }
 
 /**
