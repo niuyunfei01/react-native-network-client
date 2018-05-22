@@ -139,6 +139,7 @@ export default {
   STORE_TYPE_BLX: 5,//比邻鲜
   STORE_TYPE_XGJ: 6,//鲜果集
   STORE_TYPE_HLCS: 7,//华联超市
+  STORE_TYPE_JNGY: 9, //嘉农果园
   // 商品管理的排序值
   GOODS_MANAGE_DEFAULT_SORT: '',
   GOODS_MANAGE_SOLD_SORT: 'sold',
