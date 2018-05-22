@@ -3,6 +3,8 @@
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../util/ToastUtils';
+import Constat from '../../Constat'
+import native from "../../common/native";
 
 const {
   FETCH_UNLOCKED_REQ,
@@ -26,17 +28,30 @@ const {
   LIST_ALL_STORES
 } = require('./ActionTypes.js').default;
 
+function checkErrorCode(error_code) {
+  if (error_code == Constat.ERROR_CODE.INVALID_TOKEN || error_code == Constat.ERROR_CODE.EXPIRE_TOKEN) {
+    native.logout();
+    return false;
+  }
+  if (error_code == Constat.ERROR_CODE.ACCESS_DENIED) {
+    ToastLong("没有权限访问数据!");
+  }
+  return true;
+}
+
 export function fetchUnlocked(store_id, token, callback) {
   return dispatch => {
     const url = `InventoryApi/list_unlocked/${store_id}?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
+        let {ok, reason, obj, error_code} = resp;
         if (ok) {
           dispatch(receiveUnlockedReq(obj))
         } else {
-          dispatch(receiveUnlockedReq([]))
+          if (checkErrorCode(error_code)) {
+            dispatch(receiveUnlockedReq([]))
+          }
         }
         callback();
       });
@@ -49,11 +64,13 @@ export function fetchLocked(store_id, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
+        let {ok, reason, obj, error_code} = resp;
         if (ok) {
           dispatch(receiveLockedReq(obj))
         } else {
-          dispatch(receiveLockedReq([]))
+          if (checkErrorCode(error_code)) {
+            dispatch(receiveLockedReq([]))
+          }
         }
         callback(ok, reason)
       })
@@ -74,9 +91,11 @@ export function lockProvideReq(req, token, callBack) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, req))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
-        callBack(ok, reason);
-        dispatch(fireLockProvideReq(req['id']), ok);
+        let {ok, reason, obj, error_code} = resp;
+        if (checkErrorCode(error_code)) {
+          callBack(ok, reason);
+          dispatch(fireLockProvideReq(req['id']), ok);
+        }
       });
   }
 }
@@ -87,11 +106,13 @@ export function loadAllSuppliers(token) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
+        let {ok, reason, obj, error_code} = resp;
         if (ok) {
           dispatch(receiveSuppliers(obj))
         } else {
-          dispatch(receiveSuppliers([]))
+          if (checkErrorCode(error_code)) {
+            dispatch(receiveSuppliers([]))
+          }
         }
       })
   }
@@ -103,11 +124,13 @@ export function loadAllStores(token) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
+        let {ok, reason, obj, error_code} = resp;
         if (ok) {
           dispatch(receiveStores(obj))
         } else {
-          dispatch(receiveStores([]))
+          if (checkErrorCode(error_code)) {
+            dispatch(receiveStores([]))
+          }
         }
       })
   }
@@ -138,11 +161,13 @@ function doFetchSupplyOrder(url, storeId, respHandle, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {storeId: storeId}))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
+        let {ok, reason, obj, error_code} = resp;
         if (ok) {
           dispatch(respHandle(obj))
         } else {
-          dispatch(respHandle([]))
+          if (checkErrorCode(error_code)) {
+            dispatch(respHandle([]))
+          }
         }
         callback()
       })
@@ -155,11 +180,12 @@ export function setReqItemSupplier(items, reqId, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, items))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
+        let {ok, reason, obj, error_code} = resp;
         if (ok) {
           dispatch(afterSetItemSupplier(obj))
           callback(ok, reason)
         } else {
+          checkErrorCode(error_code);
           ToastLong('设置供应商失败!');
         }
       })
@@ -173,9 +199,11 @@ export function createSupplyOrder(reqId, remark, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
       .then(resp => resp.json())
       .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch(afterCreateSupplyOrder(ok, reqId))
-        callback(ok, reason)
+        let {ok, reason, obj, error_code} = resp;
+        if (checkErrorCode(error_code)) {
+          dispatch(afterCreateSupplyOrder(ok, reqId))
+          callback(ok, reason)
+        }
       }).catch(e => {
     }).finally(() => {
 
@@ -329,7 +357,7 @@ export function createCheckHistory(token, productId, supplierId, storeId) {
 }
 
 function commonRespHandle(dispatch, resp, storeId, status, callback) {
-  let {ok, reason, obj} = resp;
+  let {ok, reason, obj, error_code} = resp;
   dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})
   callback(ok, reason)
 }

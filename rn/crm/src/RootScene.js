@@ -109,7 +109,6 @@ class RootScene extends PureComponent {
         }
 
         _g.setHostPortNoDef(store.getState().global, native, () => {
-          console.log("setHostPortNoDef done ");
           this.setState({ rehydrated: true });
         });
       }.bind(this)
@@ -148,13 +147,7 @@ class RootScene extends PureComponent {
       const { last_get_cfg_ts } = this.store.getState().global;
       let current_time = Moment(new Date()).unix();
       let diff_time = current_time - last_get_cfg_ts;
-      console.log(
-        "last_get_cfg_ts -> ",
-        last_get_cfg_ts,
-        " | current_time ->",
-        current_time
-      );
-      console.log("get config diff_time -> ", diff_time);
+
       if (diff_time > 300) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {

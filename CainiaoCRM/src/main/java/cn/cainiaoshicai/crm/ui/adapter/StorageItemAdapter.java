@@ -99,15 +99,11 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.label.setText(item.nameAndPidStr());
         }
 
-        if (GlobalCtx.app().fnEnabledReqProvide()) {
-            holder.prodStatus.setText(item.getStatusText());
-            if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
-                holder.prodStatus.setBackground(ContextCompat.getDrawable(this.context, R.drawable.list_text_border_red_mini));
-            } else {
-                holder.prodStatus.setBackground(null);
-            }
+        holder.prodStatus.setText(item.getStatusText(GlobalCtx.app().fnEnabledReqProvide()));
+        if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
+            holder.prodStatus.setBackground(ContextCompat.getDrawable(this.context, R.drawable.list_text_border_red_mini));
         } else {
-            holder.prodStatus.setVisibility(View.GONE);
+            holder.prodStatus.setBackground(null);
         }
 
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {

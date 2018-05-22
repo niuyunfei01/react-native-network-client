@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Alert, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View, Dimensions} from 'react-native'
 import font from './fontStyles'
 import styles from './InvoicingStyles'
 import pxToDp from "../../util/pxToDp";
@@ -700,7 +700,7 @@ class InvoicingOrderGoodsScene extends Component {
   renderItem(data, key, suppliers, status, orderCtrlStatus, storeCtrlStatus) {
     return <View style={list.cell} key={key}>
       <View style={[styles.in_cell, list.item_header]}>
-        <View>
+        <View style={{width: Dimensions.get("window").width - 90}}>
           <Text style={[font.font30, font.fontBlack]}>
             {data['store_name']}
             <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单</Text>
@@ -708,21 +708,21 @@ class InvoicingOrderGoodsScene extends Component {
           {status == Constant.INVOICING.STATUS_CREATED && !!data['remark'] ?
             <View style={{flexDirection: 'row', flexWrap: 'nowrap'}}><Text
               style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text><Text
-              style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap', width: pxToDp(450)}]}
+              style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap'}]}
               ellipsizeMode={'tail'}> {data['remark'].replace(/\s/g, ",")}</Text></View> : null}
           {status == Constant.INVOICING.STATUS_CONFIRMED ?
             <Text style={[font.font24, font.fontRed]}>待结算金额: ￥{this.getStoreTotalFee(data['store_id'])}</Text> : null}
         </View>
-        <View style={{flexDirection: 'row', width: pxToDp(220), alignItems: 'center'}}>
-          {status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{
-            borderWidth: 1,
-            borderColor: colors.fontBlue,
-            width: pxToDp(160),
-            borderRadius: pxToDp(5),
-          }}>
-            <Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>计算本店</Text>
-            <Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>所有订单</Text>
-          </View> : <View style={{width: pxToDp(160),}}/>}
+        <View style={{flexDirection: 'row', width: pxToDp(90), alignItems: 'center'}}>
+          {/*{status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{*/}
+            {/*borderWidth: 1,*/}
+            {/*borderColor: colors.fontBlue,*/}
+            {/*width: pxToDp(160),*/}
+            {/*borderRadius: pxToDp(5),*/}
+          {/*}}>*/}
+            {/*<Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>计算本店</Text>*/}
+            {/*<Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>所有订单</Text>*/}
+          {/*</View> : <View style={{width: pxToDp(160),}}/>}*/}
           <View style={{width: pxToDp(90),}}>
             <TouchableOpacity onPress={() => this.toggleStore(data['store_id'])}>
               <Image
