@@ -423,7 +423,7 @@ function sortStores(canReadStores) {
 	};
 
 	return Object.values(canReadStores).sort(
-		by("vendor_id", by("city", by("id")))
+    by("vendor_id", by("city", by("district", by("id"))))
 	);
 }
 
