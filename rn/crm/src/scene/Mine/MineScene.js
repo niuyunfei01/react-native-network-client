@@ -691,19 +691,19 @@ class MineScene extends PureComponent {
 					>
 						切换门店中...
 					</Toast>
+					<ModalSelector
+						initValue={""}
+						onChange={(option) => {
+              this.onCanChangeStore(option.id);
+            }}
+						onModalClose={() => {
+              this.setState({storeListSecondModalVisible: false})
+            }}
+						cancelText={'取消'}
+						visible={this.state.storeListSecondModalVisible}
+						data={this.state.storeListSecondModalData}
+					/>
 				</ScrollView>
-
-				<ModalSelector
-					onChange={(option) => {
-						this.onCanChangeStore(option.id);
-					}}
-					onModalClose={() => {
-						this.setState({storeListSecondModalVisible: false})
-					}}
-					cancelText={'取消'}
-					visible={this.state.storeListSecondModalVisible}
-					data={this.state.storeListSecondModalData}
-				/>
 			</View>
 		);
 	}
