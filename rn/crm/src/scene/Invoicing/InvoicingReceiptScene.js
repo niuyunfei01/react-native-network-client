@@ -1,22 +1,20 @@
 import React, {PureComponent} from 'react';
-import {
-	View,
-	Text,
-	ScrollView,
-	Image,
-	RefreshControl
-} from 'react-native'
+import {View, Text, Image} from 'react-native'
 import colors from "../../styles/colors";
-import pxToDp from "../../util/pxToDp";
 import OrderComponent from './OrderComponent'
-
-import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchSupplyBalancedOrder, loadAllSuppliers, loadAllStores} from "../../reducers/invoicing/invoicingActions";
 import ModalSelector from 'react-native-modal-selector'
+import Loadmore from 'react-native-loadmore'
+import FetchEx from "../../util/fetchEx";
+import AppConfig from "../../config";
+
+import pxToDp from "../../util/pxToDp";
+import {bindActionCreators} from "redux";
+import {fetchSupplyBalancedOrder, loadAllSuppliers, loadAllStores} from "../../reducers/invoicing/invoicingActions";
 import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
+
 
 function mapStateToProps(state) {
 	const {invoicing, global} = state;
@@ -37,25 +35,24 @@ class InvoicingReceiptScene extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.renderItems = this.renderItems.bind(this);
-		this.reloadData = this.reloadData.bind(this);
 		this.chooseStore = this.chooseStore.bind(this);
 		this.chooseSupplier = this.chooseSupplier.bind(this);
 		this.state = {
-			isRefreshing: false,
 			checkedStoreId: 0,
 			checkedStoreName: '全部门店',
 			checkedSupplierId: 0,
-			checkedSupplierName: '全部供货商'
+			checkedSupplierName: '全部供货商',
+			dataSource: [],
+			pageNum: 1,
+			pageSize: 5,
+			isLastPage: false
 		};
 	}
 
-	componentWillMount() {
-	}
-
 	componentDidMount() {
-		this.reloadData();
 		this.loadAllSuppliers();
 		this.loadAllStores();
+		this.fetchData()
 	}
 
 	loadAllSuppliers() {
@@ -70,38 +67,55 @@ class InvoicingReceiptScene extends PureComponent {
 		dispatch(loadAllStores(token));
 	}
 
-	reloadData() {
-		this.setState({isRefreshing: true});
-		const {dispatch, global} = this.props;
-		let token = global['accessToken'];
-		let currStoreId = global['currStoreId'];
-		let self = this;
-		dispatch(fetchSupplyBalancedOrder(currStoreId, token, function () {
-			self.setState({isRefreshing: false})
-		}))
+	fetchData(options = {}) {
+		let self = this
+		const {global} = this.props
+		const {pageNum, pageSize, dataSource, checkedStoreId, checkedSupplierId} = this.state
+		let token = global['accessToken']
+		let store_id = checkedStoreId ? checkedStoreId : global['currStoreId']
+		const url = `InventoryApi/list_balance_order?access_token=${token}`;
+		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {
+			store_id: store_id,
+			supplier_ids: checkedSupplierId,
+			page: options.pageNum ? options.pageNum : pageNum,
+			page_size: pageSize
+		})).then(resp => resp.json()).then(resp => {
+			let {ok, reason, obj, error_code} = resp;
+			if (ok) {
+				let next_page = 0
+				let isLastPage = false
+				const data_list = obj.data
+				let data = obj.currPage == 1 ? [] : dataSource
+				if (obj.currPage !== obj.totalPage) {
+					next_page = obj.currPage + 1;
+				} else {
+					isLastPage = true
+				}
+				if (data_list.length > 0) {
+					data_list.forEach(item => {
+						if (item.data.length > 0) {
+							data = data.concat(item.data)
+						}
+					})
+				}
+				self.setState({pageNum: next_page, dataSource: data, isLastPage})
+			}
+		})
 	}
 
 	renderItems(suppliersMap) {
-		let {invoicing} = this.props;
-		let {balancedSupplyOrder} = invoicing;
+		let {dataSource} = this.state;
 		let views = [];
 		let counter = 0;
-		let checkedSupplierId = this.state.checkedSupplierId;
-		let checkedStoreId = this.state.checkedStoreId;
-		balancedSupplyOrder.forEach(function (item) {
-			let storeId = item['store_id'];
-			if (checkedStoreId == 0 || checkedStoreId == storeId) {
-				let orders = item['data'];
-				orders.forEach(function (order) {
-					let supplierId = order['supplier_id'];
-					if (checkedSupplierId == 0 || supplierId == checkedSupplierId) {
-						let supplier = suppliersMap[supplierId];
-						views.push(<OrderComponent key={counter} data={order} idx={counter} supplier={supplier}/>);
-						counter += 1;
-					}
-				})
+		let checkedSupplierId = this.state.checkedSupplierId
+		dataSource.forEach(order => {
+			let supplierId = order['supplier_id'];
+			if (checkedSupplierId == 0 || supplierId == checkedSupplierId) {
+				let supplier = suppliersMap[supplierId];
+				views.push(<OrderComponent key={counter} data={order} idx={counter} supplier={supplier}/>);
+				counter += 1;
 			}
-		});
+		})
 		return views.length > 0 ? views : <EmptyListView/>;
 	}
 
@@ -134,13 +148,7 @@ class InvoicingReceiptScene extends PureComponent {
 		storeLabels.unshift({key: 0, label: '全部门店'});
 		supplierLabels.unshift({key: 0, label: '全部供货商'});
 		return (
-			<ScrollView refreshControl={
-				<RefreshControl
-					refreshing={this.state.isRefreshing}
-					onRefresh={() => this.reloadData()}
-					tintColor='gray'
-				/>
-			}>
+			<View>
 				<View style={styles.select_box}>
 					<ModalSelector
 						cancelText={'取消'}
@@ -171,10 +179,20 @@ class InvoicingReceiptScene extends PureComponent {
 						</View>
 					</ModalSelector>
 				</View>
-				<View style={{marginTop: pxToDp(10)}}>
-					{this.renderItems(suppliersMap)}
+
+				<View style={{paddingBottom: 120}}>
+					<Loadmore
+						renderList={this.renderItems(suppliersMap)}
+						onClickLoadMore={() => {
+							this.fetchData()
+						}}
+						onRefresh={() => {
+							this.fetchData({pageNum: 1})
+						}}
+						isLastPage={false}
+					/>
 				</View>
-			</ScrollView>
+			</View>
 		)
 	}
 }
