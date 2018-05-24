@@ -112,7 +112,11 @@ class InvoicingReceiptScene extends PureComponent {
 			let supplierId = order['supplier_id'];
 			if (checkedSupplierId == 0 || supplierId == checkedSupplierId) {
 				let supplier = suppliersMap[supplierId];
-				views.push(<OrderComponent key={counter} data={order} idx={counter} supplier={supplier}/>);
+				views.push(
+					<View style={{marginVertical: 5}} key={counter}>
+						<OrderComponent data={order} idx={counter} supplier={supplier}/>
+					</View>
+				);
 				counter += 1;
 			}
 		})
@@ -180,10 +184,11 @@ class InvoicingReceiptScene extends PureComponent {
 					</ModalSelector>
 				</View>
 
-				<View style={{paddingBottom: 120}}>
+				<View style={{paddingBottom: 100}}>
 					<Loadmore
+						loadMoreType={'scroll'}
 						renderList={this.renderItems(suppliersMap)}
-						onClickLoadMore={() => {
+						onLoadMore={() => {
 							this.fetchData()
 						}}
 						onRefresh={() => {
