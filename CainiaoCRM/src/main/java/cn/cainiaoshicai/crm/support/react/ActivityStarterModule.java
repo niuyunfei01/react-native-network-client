@@ -88,7 +88,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
-        GlobalCtx.app().getStoresRef().set(null);
     }
 
     @ReactMethod
