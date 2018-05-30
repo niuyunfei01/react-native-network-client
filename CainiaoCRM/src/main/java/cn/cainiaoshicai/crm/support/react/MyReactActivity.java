@@ -92,6 +92,9 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         }
 
         Collection<Store> stores = GlobalCtx.app().listStores();
+        if (stores == null) {
+            stores = GlobalCtx.app().listStores(true);
+        }
 
         Bundle storesB = new Bundle();
 

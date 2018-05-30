@@ -101,12 +101,14 @@ class RootScene extends PureComponent {
         let config = configStr ? JSON.parse(configStr) : {};
 
         if (access_token) {
-          store.dispatch(setAccessToken({ access_token }));
+          store.dispatch(setAccessToken({access_token}));
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
-          //store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
+          store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+          }));
         }
+
 
         _g.setHostPortNoDef(store.getState().global, native, () => {
           this.setState({ rehydrated: true });
