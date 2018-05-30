@@ -664,18 +664,21 @@ public class GlobalCtx extends Application {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
-                    CommonConfigDao cfgDao = new CommonConfigDao(app().token());
-                    try {
-                        LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
-                        if (s != null) {
-                            storesRef.set(s);
-                        }
-                    } catch (ServiceException e) {
-                        AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
-                        Activity runningActivity = app().getCurrentRunningActivity();
+                    String token = app().token();
+                    if (null != token && token.length() > 0) {
+                        CommonConfigDao cfgDao = new CommonConfigDao(app().token());
+                        try {
+                            LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
+                            if (s != null) {
+                                storesRef.set(s);
+                            }
+                        } catch (ServiceException e) {
+                            AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
+                            Activity runningActivity = app().getCurrentRunningActivity();
 //                        if (runningActivity != null) {
                             //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
 //                        }
+                        }
                     }
                     return null;
                 }
