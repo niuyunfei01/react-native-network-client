@@ -5,7 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.common.collect.Maps;
+
+import java.util.Map;
+
 import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 
 public class AlarmBroadcastReceiver extends BroadcastReceiver {
 	private static final String LOG_TAG = AlarmBroadcastReceiver.class.getSimpleName();
@@ -19,7 +25,11 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
 			if (previousAction == null || previousAction.length() == 0) {
 				previousAction = intent.getAction();
 			}
-			Bootstrap.startAlwaysOnService(context, previousAction);
+			long store_id = SettingUtility.getListenerStore();
+			Map<String, String> serviceExtras = Maps.newHashMap();
+			serviceExtras.put("accessToken", GlobalCtx.app().getAccountBean().getAccess_token());
+			serviceExtras.put("storeId", store_id + "");
+			Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
 		}
 	}
 }

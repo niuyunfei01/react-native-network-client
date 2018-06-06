@@ -70,7 +70,6 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
-import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -287,8 +286,6 @@ public class GlobalCtx extends Application {
         AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
-
-        Bootstrap.startAlwaysOnService(this, "Crm");
     }
 
     public void updateAfterGap(final int fiveMin) {

@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import com.iflytek.cloud.thirdparty.S;
+
 import java.util.Calendar;
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.Constants;
 
@@ -17,12 +20,17 @@ public class Bootstrap {
     private static String TAG = Bootstrap.class.getSimpleName();
 
     public static synchronized void startAlwaysOnService(Context context,
-                                                         String loadedFrom) {
+                                                         String loadedFrom, Map<String, String> extras) {
 
         if (AlwaysOnService.isRunning == false) {
             // start service
             Intent pIntent = new Intent(context, AlwaysOnService.class);
             pIntent.putExtra(Constants.STARTUP_ACTION_NAME, loadedFrom);
+            if (extras != null) {
+                for (Map.Entry<String, String> entry : extras.entrySet()) {
+                    pIntent.putExtra(entry.getKey(), entry.getValue());
+                }
+            }
             context.startService(pIntent);
 
             // enable 10 secs restart
