@@ -48,7 +48,8 @@ function mapDispatchToProps(dispatch) {
 class GoodsApplyRecordScene extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: "申请记录",
+      headerTitle: "" +
+      "申请记录",
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}

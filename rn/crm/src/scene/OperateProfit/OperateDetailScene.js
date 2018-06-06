@@ -273,7 +273,7 @@ class OperateDetailScene extends PureComponent {
         <CellAccess
           title={`呼叫配送费(${
             outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]["order_num"]
-          }单)`}
+          })单`}
           money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]["num"]}
         />
         <CellAccess
