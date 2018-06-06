@@ -14,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import cn.cainiaoshicai.crm.Constants;
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StoreDao;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -23,27 +24,16 @@ public class AlwaysOnService extends BaseService {
     private static String LOG_TAG = AlwaysOnService.class.getSimpleName();
     public static boolean isRunning = false;
     private ScheduledExecutorService backgroundService;
-    private MediaPlayer mediaPlayer;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (isRunning == false) {
             // run something
             backgroundService = Executors.newSingleThreadScheduledExecutor();
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setVolume(100, 100);
-            Uri setDataSourceUri = Uri.parse("android.resource://com.android.sim/" + R.raw.bell_new_order);
-            boolean mediaInitFlag = true;
-            try {
-                mediaPlayer.setDataSource(this, setDataSourceUri);
-                mediaInitFlag = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             String accessToken = intent.getStringExtra("accessToken");
             String storeId = intent.getStringExtra("storeId");
             backgroundService.scheduleAtFixedRate(new TimerIncreasedRunnable(this), 0, 1000, TimeUnit.MILLISECONDS);
-            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(mediaPlayer, mediaInitFlag, accessToken, storeId), 0, 3, TimeUnit.MINUTES);
+            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 3, TimeUnit.MINUTES);
             isRunning = true;
         }
         // the following will return START_STICKY
@@ -60,14 +50,10 @@ public class AlwaysOnService extends BaseService {
 
     public class NotifyNewOrderRunnable implements Runnable {
 
-        private MediaPlayer mediaPlayer;
-        private boolean mediaInitFlag;
         private String accessToken;
         private String storeId;
 
-        public NotifyNewOrderRunnable(MediaPlayer mediaPlayer, boolean mediaInitFlag, String accessToken, String storeId) {
-            this.mediaPlayer = mediaPlayer;
-            this.mediaInitFlag = mediaInitFlag;
+        public NotifyNewOrderRunnable(String accessToken, String storeId) {
             this.accessToken = accessToken;
             this.storeId = storeId;
         }
@@ -88,26 +74,9 @@ public class AlwaysOnService extends BaseService {
         }
 
         private void play() {
-            if (!mediaInitFlag) {
-                return;
-            }
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.reset();
-            }
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                int maxCount = 3;
-                int count = 0;
-
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    if (count < maxCount) {
-                        count++;
-                        mediaPlayer.seekTo(0);
-                        mediaPlayer.start();
-                    }
-                }
-            });
-            mediaPlayer.start();
+            //todo 播放语音信箱
+            GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+            soundManager.play_new_simple_order_sound(Integer.parseInt(storeId));
         }
     }
 

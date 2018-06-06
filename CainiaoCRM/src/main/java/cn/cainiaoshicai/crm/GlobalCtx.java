@@ -1032,6 +1032,7 @@ public class GlobalCtx extends Application {
         private SoundPool soundPool;
         private int newOrderSound;
         private int readyDelayWarnSound;
+        private int simpleNewOrderSound;
         private int storeSoundUnknown;
         private int storeSoundhlg;
         private int storeSoundYyc;
@@ -1053,6 +1054,7 @@ public class GlobalCtx extends Application {
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
             newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
+            simpleNewOrderSound = soundPool.load(ctx, R.raw.bell_new_order, 1);
 
             //readyDelayWarnSound = soundPool.load(GlobalCtx.app().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
             readyDelayWarnSound = soundPool.load(ctx, R.raw.should_be_ready, 1);
@@ -1072,6 +1074,7 @@ public class GlobalCtx extends Application {
             customerAskCancelSound = soundPool.load(ctx, R.raw.user_ask_cancel, 1);
             dadaManualTimeoutSound = soundPool.load(ctx, R.raw.manual_dada_timeout, 1);
             todo_complain_sound = soundPool.load(ctx, R.raw.todo_complain, 1);
+
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1098,9 +1101,9 @@ public class GlobalCtx extends Application {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        soundPool.play(firstSound, 1.0f, 1.0f, 1, 0, 1.0f);
                         pause(STORE_SOUND_LEN);
-                        soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        soundPool.play(suffixSound, 1.0f, 1.0f, 1, 0, 1.0f);
                         return null;
                     }
                 }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
@@ -1168,6 +1171,10 @@ public class GlobalCtx extends Application {
             } else {
                 return storeSoundUnknown;
             }
+        }
+
+        public boolean play_new_simple_order_sound(int storeId){
+            return this.play_double_sound(getStoreSound(storeId), simpleNewOrderSound);
         }
 
         public boolean play_new_order_sound(int store_id) {
