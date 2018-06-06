@@ -76,7 +76,7 @@ public class AudioUtils {
                         //设置音调
                         mySynthesizer.setParameter(SpeechConstant.PITCH, "50");
                         //设置音量
-                        mySynthesizer.setParameter(SpeechConstant.VOLUME, "80");
+                        mySynthesizer.setParameter(SpeechConstant.VOLUME, "120");
                     } else {
                         mySynthesizer.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
                         // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
