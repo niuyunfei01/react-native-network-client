@@ -76,16 +76,7 @@ export default function globalReducer (state = initialState, action) {
       };
 
     case LOGOUT_SUCCESS:
-      return {
-        ...state,
-        currentUser: '',
-        currStoreId: 0,
-        currentUserProfile: {},
-        accessToken: '',
-        refreshToken: '',
-        canReadStores: {},
-        canReadVendors: {},
-      };
+      return initialState;
       
     case UPDATE_CFG:
       return action.payload ? {
