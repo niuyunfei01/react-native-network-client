@@ -3,11 +3,9 @@ package cn.cainiaoshicai.crm.notify.service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.util.Log;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.StoreDao;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -33,7 +30,7 @@ public class AlwaysOnService extends BaseService {
             String accessToken = intent.getStringExtra("accessToken");
             String storeId = intent.getStringExtra("storeId");
             backgroundService.scheduleAtFixedRate(new TimerIncreasedRunnable(this), 0, 1000, TimeUnit.MILLISECONDS);
-            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 3, TimeUnit.MINUTES);
+            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 5, TimeUnit.MINUTES);
             isRunning = true;
         }
         // the following will return START_STICKY
@@ -52,7 +49,7 @@ public class AlwaysOnService extends BaseService {
 
         private String accessToken;
         private String storeId;
-
+        GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
         public NotifyNewOrderRunnable(String accessToken, String storeId) {
             this.accessToken = accessToken;
             this.storeId = storeId;
@@ -62,21 +59,25 @@ public class AlwaysOnService extends BaseService {
         public void run() {
             StoreDao dao = new StoreDao();
             try {
-                ResultBean<Map<String, String>> r = dao.getNewOrderCnt(accessToken, storeId);
-                Map<String, String> result = r.getObj();
-                int count = Integer.parseInt(result.get("cnt"));
-                if (count > 0) {
-                    play();
+                ResultBean<List<Map<String, String>>> r = dao.getNewOrderCnt(accessToken, storeId);
+                List<Map<String, String>> result = r.getObj();
+                if (result != null && result.size() > 0) {
+                    for (Map<String, String> item : result) {
+                        String alert = item.get("alert");
+                        if (null != alert && !"".equals(alert)) {
+                            play(alert);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 AppLogger.e(e.getMessage(), e);
             }
         }
 
-        private void play() {
-            //todo 播放语音信箱
-            GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-            soundManager.play_new_simple_order_sound(Integer.parseInt(storeId));
+        private void play(String text) {
+            for (int i = 0; i < 3; i++) {
+                soundManager.play_by_xunfei(text);
+            }
         }
     }
 
