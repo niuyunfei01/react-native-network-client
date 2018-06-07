@@ -148,6 +148,7 @@ class GoodsWorkNewProductScene extends PureComponent {
               type: 'add',
               task_id: this.props.navigation.state.params.task_id,
               name: this.state.name,
+              images: this.state.images,
             })
           }}
         >
@@ -186,6 +187,7 @@ class GoodsWorkNewProductScene extends PureComponent {
             images.map((item, index) => {
               return (
                 <TouchableOpacity
+                  key = {index}
                   onPress={() => {
                     this.index = index;
                     this.setState({

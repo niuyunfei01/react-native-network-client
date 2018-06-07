@@ -23,7 +23,11 @@ public class RebootBroadcastReceiver extends BroadcastReceiver {
 				|| (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED))) {
 			long store_id = SettingUtility.getListenerStore();
 			Map<String, String> serviceExtras = Maps.newHashMap();
-			serviceExtras.put("accessToken", GlobalCtx.app().getAccountBean().getAccess_token());
+			String accessToken = "";
+			if (GlobalCtx.app().getAccountBean() != null) {
+				accessToken = GlobalCtx.app().getAccountBean().getAccess_token();
+			}
+			serviceExtras.put("accessToken", accessToken);
 			serviceExtras.put("storeId", store_id + "");
 			Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
 		}
