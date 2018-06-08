@@ -30,7 +30,7 @@ public class AlwaysOnService extends BaseService {
             String accessToken = intent.getStringExtra("accessToken");
             String storeId = intent.getStringExtra("storeId");
             backgroundService.scheduleAtFixedRate(new TimerIncreasedRunnable(this), 0, 1000, TimeUnit.MILLISECONDS);
-            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 5, TimeUnit.MINUTES);
+            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 3, TimeUnit.MINUTES);
             isRunning = true;
         }
         // the following will return START_STICKY
@@ -50,6 +50,7 @@ public class AlwaysOnService extends BaseService {
         private String accessToken;
         private String storeId;
         GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+
         public NotifyNewOrderRunnable(String accessToken, String storeId) {
             this.accessToken = accessToken;
             this.storeId = storeId;
@@ -77,6 +78,11 @@ public class AlwaysOnService extends BaseService {
         private void play(String text) {
             for (int i = 0; i < 3; i++) {
                 soundManager.play_by_xunfei(text);
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
