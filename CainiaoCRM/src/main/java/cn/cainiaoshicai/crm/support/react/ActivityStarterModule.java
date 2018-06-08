@@ -33,6 +33,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.Log;
@@ -88,6 +89,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
+        Bootstrap.stopAlwaysOnService(GlobalCtx.app());
     }
 
     @ReactMethod
