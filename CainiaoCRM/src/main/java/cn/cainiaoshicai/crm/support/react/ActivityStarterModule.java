@@ -20,12 +20,14 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -114,7 +116,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback){
+    void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback) {
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             AccountBean ab = GlobalCtx.app().getAccountBean();
@@ -126,6 +128,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             } else {
                 callback.invoke(false, "Account is null", null);
             }
+            Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+            long store_id = SettingUtility.getListenerStore();
+            Map<String, String> serviceExtras = Maps.newHashMap();
+            String accessToken = "";
+            if (GlobalCtx.app().getAccountBean() != null) {
+                accessToken = GlobalCtx.app().getAccountBean().getAccess_token();
+            }
+            serviceExtras.put("accessToken", accessToken);
+            serviceExtras.put("storeId", store_id + "");
+            Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
             String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
