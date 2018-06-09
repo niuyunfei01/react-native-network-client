@@ -65,8 +65,9 @@ public class AlwaysOnService extends BaseService {
                 if (result != null && result.size() > 0) {
                     for (Map<String, String> item : result) {
                         String alert = item.get("alert");
+                        String plat = item.get("plat");
                         if (null != alert && !"".equals(alert)) {
-                            play(alert);
+                            play(alert, plat);
                         }
                     }
                 }
@@ -75,11 +76,17 @@ public class AlwaysOnService extends BaseService {
             }
         }
 
-        private void play(String text) {
+        private void play(String text, String plat) {
             for (int i = 0; i < 3; i++) {
-                soundManager.play_by_xunfei(text);
+                if (plat.equals("6")) {
+                    GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
+                } else if (plat.equals("4")) {
+                    GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
+                } else {
+                    GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
+                }
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(8000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

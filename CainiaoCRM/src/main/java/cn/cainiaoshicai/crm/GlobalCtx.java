@@ -1049,6 +1049,9 @@ public class GlobalCtx extends Application {
         private int customerRemindDeliverSound;
         private int customerAskCancelSound;
         private int dadaManualTimeoutSound;
+        private int new_mt_order_sound;
+        private int new_jd_order_sound;
+        private int new_ele_order_sound;
         private int todo_complain_sound;
 
         public void load(GlobalCtx ctx) {
@@ -1075,6 +1078,9 @@ public class GlobalCtx extends Application {
             dadaManualTimeoutSound = soundPool.load(ctx, R.raw.manual_dada_timeout, 1);
             todo_complain_sound = soundPool.load(ctx, R.raw.todo_complain, 1);
 
+            new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound1, 1);
+            new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
+            new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1173,8 +1179,20 @@ public class GlobalCtx extends Application {
             }
         }
 
-        public boolean play_new_simple_order_sound(int storeId){
+        public boolean play_new_simple_order_sound(int storeId) {
             return this.play_double_sound(getStoreSound(storeId), simpleNewOrderSound);
+        }
+
+        public boolean play_new_ele_order_sound() {
+            return this.play_single_sound(new_ele_order_sound);
+        }
+
+        public boolean play_new_mt_order_sound() {
+            return this.play_single_sound(new_mt_order_sound);
+        }
+
+        public boolean play_new_jd_order_sound() {
+            return this.play_single_sound(new_jd_order_sound);
         }
 
         public boolean play_new_order_sound(int store_id) {
