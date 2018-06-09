@@ -244,7 +244,7 @@ public class OrderPrinter {
                 String name = item.getProduct_name();
                 String tagCode = item.getTag_code();
                 if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
-                    name = name + " (编码:" + tagCode + ")";
+                    name = name + "#" + tagCode;
                 }
                 if (item.getPrice() >= 0) {
                     for (int idx = 0; idx < name.length(); ) {
