@@ -245,6 +245,13 @@ class AuditRefundScene extends Component {
             </CellHeader>
             <CellBody/>
             <CellFooter>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
               <MyBtn style={
                 this.state.tabNum === 2
                   ? [styles.btn, styles.btn_red, {
