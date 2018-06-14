@@ -83,6 +83,14 @@ class AuditRefundScene extends Component {
       }));
   }
 
+  renderPartRefundGood(goodList) {
+    let items = [];
+    goodList.forEach(function (item) {
+      items.push(<Text style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price}</Text>);
+    });
+    return items;
+  }
+
   renderReason() {
     let {tabNum} = this.state;
     if (tabNum === 1) {
@@ -232,10 +240,10 @@ class AuditRefundScene extends Component {
                   <Text style={{color: colors.editStatusAdd}}>
                     {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
                   </Text>
-                  {/*<Text style={[styles.text,]}>退款金额 : ￥12.55</Text>*/}
-                  {/*<Text style={[styles.text,]}>退款商品 : 精选土豆500克</Text>*/}
-                  <Text style={[styles.text,]}>退款理由
-                    : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>
+                  {remind_id.hasOwnProperty("total_refund_price") &&
+                  <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']}</Text>}
+                  {remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
+                  <Text style={[styles.text,]}>退款理由 : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>
                 </CellHeader>
               </Cell> : null
           }
