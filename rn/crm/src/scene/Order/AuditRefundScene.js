@@ -198,7 +198,7 @@ class AuditRefundScene extends Component {
             </CellFooter>
           </Cell>
           {
-            ship_worker_mobile ? <Cell customStyle={[styles.my_cell]}>
+            ship_worker_mobile && <Cell customStyle={[styles.my_cell]}>
               <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
                 <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name}</Text>
                 <Text style={styles.text}>{ship_worker_mobile}</Text>
@@ -213,7 +213,7 @@ class AuditRefundScene extends Component {
                   }}
                 />
               </CellFooter>
-            </Cell> : null
+            </Cell>
           }
           <Cell customStyle={styles.my_cell}>
             <CellHeader>
@@ -234,7 +234,7 @@ class AuditRefundScene extends Component {
             </CellFooter>
           </Cell>
           {
-            this.state.chevron ?
+            this.state.chevron &&
               <Cell customStyle={[styles.my_cell]}>
                 <CellHeader style={{marginVertical: pxToDp(15)}}>
                   <Text style={{color: colors.editStatusAdd}}>
@@ -245,7 +245,7 @@ class AuditRefundScene extends Component {
                   {remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
                   <Text style={[styles.text,]}>退款理由 : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>
                 </CellHeader>
-              </Cell> : null
+              </Cell>
           }
           <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
             <CellHeader>

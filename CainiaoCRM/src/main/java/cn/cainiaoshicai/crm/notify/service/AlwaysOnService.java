@@ -27,10 +27,14 @@ public class AlwaysOnService extends BaseService {
         if (isRunning == false) {
             // run something
             backgroundService = Executors.newSingleThreadScheduledExecutor();
-            String accessToken = intent.getStringExtra("accessToken");
-            String storeId = intent.getStringExtra("storeId");
+            if (intent != null) {
+                String accessToken = intent.getStringExtra("accessToken");
+                String storeId = intent.getStringExtra("storeId");
+                if (accessToken != null && storeId != null) {
+                    backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 3, TimeUnit.MINUTES);
+                }
+            }
             backgroundService.scheduleAtFixedRate(new TimerIncreasedRunnable(this), 0, 1000, TimeUnit.MILLISECONDS);
-            backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 3, TimeUnit.MINUTES);
             isRunning = true;
         }
         // the following will return START_STICKY
