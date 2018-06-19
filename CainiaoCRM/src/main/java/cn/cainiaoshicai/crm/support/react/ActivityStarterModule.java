@@ -44,6 +44,7 @@ import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
@@ -128,7 +129,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             } else {
                 callback.invoke(false, "Account is null", null);
             }
+
             Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+
             long store_id = SettingUtility.getListenerStore();
             Map<String, String> serviceExtras = Maps.newHashMap();
             String accessToken = "";
@@ -137,6 +140,8 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             }
             serviceExtras.put("accessToken", accessToken);
             serviceExtras.put("storeId", store_id + "");
+            SettingHelper.setEditor(GlobalCtx.app(), "accessToken", accessToken);
+            SettingHelper.setEditor(GlobalCtx.app(), "storeId", store_id + "");
             Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
