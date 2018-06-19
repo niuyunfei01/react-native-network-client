@@ -308,7 +308,7 @@ class StoreAddScene extends Component {
 	}
 
 	componentWillMount() {
-    const {store_info} = this.props.navigation.state.params || {};
+    let {store_info} = this.props.navigation.state.params || {};
     if (!store_info) {
       let {currStoreId, canReadStores} = this.props.global;
       store_info = canReadStores[currStoreId];
