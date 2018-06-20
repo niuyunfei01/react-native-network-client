@@ -78,11 +78,14 @@ export default function globalReducer (state = initialState, action) {
     case LOGOUT_SUCCESS:
       return {
         ...state,
-        currentUser: '',
+        currentUser: null,
         currStoreId: 0,
         currentUserProfile: {},
         accessToken: '',
         refreshToken: '',
+        canReadStores: {},
+        canReadVendors: {},
+        currentNewProductStoreId: 0
       };
       
     case UPDATE_CFG:

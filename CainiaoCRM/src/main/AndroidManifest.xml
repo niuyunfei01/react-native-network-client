@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="313"
-    android:versionName="2.4.8">
+    android:versionCode="318"
+    android:versionName="2.5.0">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -251,6 +251,24 @@
         <!-- Required  . Enable it you can userTalkStatus statistics data with channel -->
         <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
         <meta-data android:name="JPUSH_APPKEY" android:value="30073ab80a50534d39c84d3c" />
+
+
+        <receiver android:name=".notify.service.RebootBroadcastReceiver">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".notify.service.AlarmBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="wsb.alarm.action" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".notify.service.AlwaysOnService" />
     </application>
 
 </manifest>

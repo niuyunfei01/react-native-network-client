@@ -698,13 +698,12 @@ class OrderScene extends Component {
     const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
     if (remindType === Cts.TASK_TYPE_REFUND_BY_USER) {
-      navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
+        navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
       navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_DELIVERY_FAILED) {
       navigation.navigate(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
-
       this.setState({onSubmitting: true});
       const token = global.accessToken;
       dispatch(markTaskDone(token, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {

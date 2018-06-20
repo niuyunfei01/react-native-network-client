@@ -68,14 +68,14 @@ public class OrderPrinter {
             printer.starLine().highBigText("   估货单").newLine()
                     .newLine().highBigText("  #" + estimate.getDay());
 
-            printer.normalText(GlobalCtx.app().getStoreName(estimate.getStore_id()) ).newLine();
+            printer.normalText(GlobalCtx.app().getStoreName(estimate.getStore_id())).newLine();
 
             printer.normalText("负责人：___________").newLine();
 
             printer.starLine().highText(String.format("品名%22s", "份数")).newLine().splitLine();
 
             int total = 0;
-            for (ProductEstimate.Item item :  estimate.getLists()) {
+            for (ProductEstimate.Item item : estimate.getLists()) {
                 String name = item.getName();
                 for (int idx = 0; idx < name.length(); ) {
 
@@ -158,7 +158,7 @@ public class OrderPrinter {
             printer.starLine().highText(String.format("品名%22s", "数量")).newLine().splitLine();
 
             int total = 0;
-            for (ProductProvideList.Item item :  list.getItems()) {
+            for (ProductProvideList.Item item : list.getItems()) {
                 String name = item.getName();
                 for (int idx = 0; idx < name.length(); ) {
 
@@ -176,7 +176,7 @@ public class OrderPrinter {
 
                     idx += MAX_TITLE_PART;
                 }
-                total ++;
+                total++;
             }
 
             printer.highText(String.format("合计 %27s", "x" + total)).newLine();
@@ -195,6 +195,8 @@ public class OrderPrinter {
     }
 
     public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
+        String mobile = order.getMobile();
+        mobile = mobile.replace("_", "转").replace(",", "转");
         try {
             OutputStream btos = btsocket.getOutputStream();
             BasePrinter printer = new BasePrinter(btos);
@@ -211,9 +213,9 @@ public class OrderPrinter {
             printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
 
             printer.starLine()
-                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + order.getMobile())
-                            .newLine()
-                            .highText(TextUtil.replaceWhiteStr(order.getAddress()));
+                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + mobile)
+                    .newLine()
+                    .highText(TextUtil.replaceWhiteStr(order.getAddress()));
             if (!TextUtils.isEmpty(order.getDirection())) {
                 printer.highText("[" + order.getDirection() + "]");
             }
@@ -225,7 +227,7 @@ public class OrderPrinter {
             }
             printer.starLine().highText("期望送达：" + expectedStr).newLine();
             if (!TextUtils.isEmpty(order.getRemark())) {
-                        printer.highText("用户备注：" + order.getRemark())
+                printer.highText("用户备注：" + order.getRemark())
                         .newLine();
             }
 
@@ -240,6 +242,10 @@ public class OrderPrinter {
             int total = 0;
             for (CartItem item : order.getItems()) {
                 String name = item.getProduct_name();
+                String tagCode = item.getTag_code();
+                if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
+                    name = name + "#" + tagCode;
+                }
                 if (item.getPrice() >= 0) {
                     for (int idx = 0; idx < name.length(); ) {
 
@@ -301,13 +307,13 @@ public class OrderPrinter {
 
 
     /**
-     *  @param order Must contain items!!!!
+     * @param order           Must contain items!!!!
      * @param isAutoPrint
      * @param printedCallback
      */
     public static void _print(final Order order, final boolean isAutoPrint, final BasePrinter.PrintCallback printedCallback) {
 
-        if (order == null || order.getId() <=0 ) {
+        if (order == null || order.getId() <= 0) {
             AppLogger.e("order is null, skip print!");
             return;
         }
@@ -319,7 +325,7 @@ public class OrderPrinter {
 
                 boolean result = false;
                 String reason = "";
-                if (!isAutoPrint || (order.shouldTryAutoPrint()) )
+                if (!isAutoPrint || (order.shouldTryAutoPrint()))
                     if (isAutoPrint && !GlobalCtx.isAutoPrint(order.getStore_id())) {
                         AppLogger.e("[print] auto print failed for store");
                         reason = "此订单不在您设置的自动打印店面中！";
@@ -370,7 +376,7 @@ public class OrderPrinter {
                     reason = "订单已经打印过啦";
                 }
 
-                if(printedCallback != null) {
+                if (printedCallback != null) {
                     printedCallback.run(result, reason);
                 }
 

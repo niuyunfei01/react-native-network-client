@@ -308,10 +308,14 @@ class StoreAddScene extends Component {
 	}
 
 	componentWillMount() {
-		const {store_info} = this.props.navigation.state.params || {};
-		console.log("门店信息:%o", store_info);
-		let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
-		let url = `api/get_tpl_stores?access_token=${
+    let {store_info} = this.props.navigation.state.params || {};
+    if (!store_info) {
+      let {currStoreId, canReadStores} = this.props.global;
+      store_info = canReadStores[currStoreId];
+    }
+    console.log("门店信息:%o", store_info);
+    let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
+    let url = `api/get_tpl_stores?access_token=${
 			this.props.global.accessToken
 			}`;
 		let bdUrl = `api/get_bds?access_token=${this.props.global.accessToken}`;

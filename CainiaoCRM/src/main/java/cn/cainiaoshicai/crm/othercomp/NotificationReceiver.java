@@ -79,10 +79,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 				GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
 
 				if (!TextUtils.isEmpty(notify.getSpeak_word())) {
+					//TODO play new order sound
 					int repeatTimes = Math.min(Math.max(notify.getSpeak_times(), 1), 3);
 					for (int x = 0; x < repeatTimes; x++) {
-						String repeatPrefix = x > 0 ? ("重复" + x + "次：") : "";
-						soundManager.play_by_xunfei(repeatPrefix + notify.getSpeak_word());
+						//String repeatPrefix = x > 0 ? ("重复" + x + "次：") : "";
+						soundManager.play_by_xunfei(notify.getSpeak_word());
 					}
 				} else {
 

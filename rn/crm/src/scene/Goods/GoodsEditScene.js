@@ -21,6 +21,8 @@ import MyBtn from "../../common/MyBtn";
 //组件
 import {Adv, Left} from "../component/All";
 
+import _ from 'lodash';
+
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global};
@@ -38,6 +40,10 @@ function mapDispatchToProps(dispatch) {
       dispatch
     )
   };
+}
+
+function checkImgURL(url) {
+  return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
 let configState = {
@@ -195,16 +201,44 @@ class GoodsEditScene extends PureComponent {
       let vendor_store = this.toStores(
         this.props.mine.vendor_stores[this.state.vendor_id]
       );
-      let {task_id, name} = this.props.navigation.state.params || {};
+      let {task_id, name, images} = this.props.navigation.state.params || {};
       if (vendor_store) {
         this.setState({vendor_stores: vendor_store});
       } else {
         _this.getVendorStore();
       }
       if (task_id && name) {
+        let upload_files = {};
+        let list_img = {};
+        let cover_img = '';
+        if (images && _.isArray(images)) {
+          let validImages = _.filter(images, function (o) {
+            return checkImgURL(o);
+          });
+          if (validImages && validImages.length > 0) {
+            let idx = 0;
+            cover_img = validImages[0];
+            validImages.forEach(function (imgUrl) {
+              idx = idx - 1;
+              let name = imgUrl.replace(/^.*[\\\/]/, '');
+              let imgPath = imgUrl.replace("https://www.cainiaoshicai.cn", "");
+              list_img[idx] = {url: imgUrl, name: name};
+              upload_files[idx] = {
+                id: idx,
+                name: name,
+                path: imgPath,
+                mid_thumb: imgPath
+              }
+            });
+            console.log("task upload files", upload_files);
+          }
+        }
         this.setState({
           task_id: task_id,
-          name: name
+          name: name,
+          upload_files: upload_files,
+          list_img: list_img,
+          cover_img: cover_img
         });
       } else if (type === "scan") {
         let {
@@ -516,11 +550,7 @@ class GoodsEditScene extends PureComponent {
               title="售卖状态"
               info={tool.sellingStatus(this.state.sale_status)}
               right={
-                <Text
-                  style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}
-                >
-                  >
-                </Text>
+                <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>></Text>
               }
             />
           </ModalSelector>
@@ -768,6 +798,7 @@ class GoodsEditScene extends PureComponent {
           {tool.length(this.state.list_img) > 0 ? (
             tool.objectMap(this.state.list_img, (img_data, img_id) => {
               let img_url = img_data["url"];
+              console.log("show img url ", img_url);
               return (
                 <View
                   key={img_id}

@@ -393,19 +393,51 @@ class InvoicingOrderGoodsScene extends Component {
   }
 
   trashSupplyOrder(id, storeId) {
-    this.commonHandleProxy(id, storeId, trashSupplyOrder)
+    Alert.alert(
+      '确认置为无效？',
+      '订货单已无效',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, trashSupplyOrder)},
+      ],
+      {cancelable: false}
+    );
   }
 
   confirmReceivedOrder(id, storeId) {
-    this.commonHandleProxy(id, storeId, receivedSupplyOrder)
+    Alert.alert(
+      '确认收货？',
+      '订货单已经收货',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, receivedSupplyOrder)},
+      ],
+      {cancelable: false}
+    );
   }
 
   reviewOrder(id, storeId) {
-    this.commonHandleProxy(id, storeId, reviewSupplyOrder)
+    Alert.alert(
+      '确认审核？',
+      '订货单已经审核',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, reviewSupplyOrder)},
+      ],
+      {cancelable: false}
+    );
   }
 
   balanceOrder(id, storeId) {
-    this.commonHandleProxy(id, storeId, balanceSupplyOrder)
+    Alert.alert(
+      '确认结算？',
+      '订货单已经结算',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, balanceSupplyOrder)},
+      ],
+      {cancelable: false}
+    );
   }
 
   commonHandleProxy(id, storeId, handle) {

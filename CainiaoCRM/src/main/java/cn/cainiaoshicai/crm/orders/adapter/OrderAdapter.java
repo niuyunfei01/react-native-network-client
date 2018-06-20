@@ -175,7 +175,8 @@ public class OrderAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
                     intent.setAction(Intent.ACTION_SEARCH);
-                    intent.putExtra(SearchManager.QUERY, "uid:" + order.getUser_id());
+                    String searchTerm = "@@" + order.getReal_mobile() + "|||store:" + order.getStore_id();
+                    intent.putExtra(SearchManager.QUERY, searchTerm);
                     intent.putExtra("max_past_day", 10000);
                     v.getContext().startActivity(intent);
                 }

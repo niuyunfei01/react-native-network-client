@@ -253,4 +253,5 @@ public class OrderActionDao<T extends Order> {
         params.put("current", currentSch);
         return wrapUpdateOrder(actionWithResult("/order_edit_group/" + orderId + "/" + shipSch, params), orderId);
     }
+
 }
