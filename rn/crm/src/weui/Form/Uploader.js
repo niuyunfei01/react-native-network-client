@@ -130,9 +130,7 @@ class Uploader extends Component {
   showImagePicker() {
     ImagePicker.showImagePicker(this.options, (response) => {
       if (response.didCancel) {
-        console.log('User cancelled image picker')
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error)
       } else {
         return this.props.onChange &&
         this.props.onChange(concat(this.props.files, response), response)
