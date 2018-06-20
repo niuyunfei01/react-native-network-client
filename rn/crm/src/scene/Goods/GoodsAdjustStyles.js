@@ -118,6 +118,7 @@ export default {
 		borderWidth: 0.5,
 		borderColor: colors.main_color,
 		height: pxToDp(68),
-		marginTop: pxToDp(20)
+		marginTop: pxToDp(20),
+		padding: 0
 	}
 }

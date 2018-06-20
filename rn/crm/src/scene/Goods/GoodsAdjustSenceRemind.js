@@ -115,12 +115,13 @@ class GoodsAdjustRemind extends PureComponent {
 			>
 				<View>
 					<Text style={styles.dialogTopText}>本人批发的不高于线下的价格的9折，采购他人的加价不超过10%。价格高于同商圈可能呗拒绝</Text>
-					<Text style={styles.dialogBottomText}>输入价格/元（当前价格为{this.state.selectItem.product.price}）</Text>
+					<Text style={styles.dialogBottomText}>输入价格/元（当前价格为{this.state.selectItem.product_price}）</Text>
 					<TextInput
 						style={styles.dialogInput}
 						underlineColorAndroid="transparent"
 						value={this.state.price}
-						onChange={(price) => this.setState({price})}
+						onChangeText={(price) => this.setState({price})}
+						keyboardType={'numeric'}
 					/>
 				</View>
 			</Dialog>
@@ -194,6 +195,7 @@ class GoodsAdjustRemind extends PureComponent {
 			let {ok, reason} = resp;
 			if (ok) {
 				ToastShort('操作成功')
+				self.setState({modifyPriceModalVisible: false})
 				self.fetchData()
 			} else {
 				ToastShort(reason)
