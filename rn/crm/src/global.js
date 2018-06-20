@@ -10,10 +10,8 @@ global.hostPort = '';
  */
 function setHostPort(hostPort) {
   if (!hostPort) {
-    console.log(`skip setting global variable 'hostPort' to be ${hostPort}`);
     return;
   }
-  console.log(`set global variable 'hostPort' to be ${hostPort}`);
   global.hostPort = hostPort;
 }
 
