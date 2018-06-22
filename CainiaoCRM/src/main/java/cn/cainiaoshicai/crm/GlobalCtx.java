@@ -689,7 +689,7 @@ public class GlobalCtx extends Application {
             return stores != null ? stores.values() : null;
         } else {
             ArrayList<Store> found = new ArrayList<>();
-            for(Store store: stores.values()) {
+            for (Store store : stores.values()) {
                 if (store.getType() == limitVendorId) {
                     found.add(store);
                 }
@@ -804,7 +804,7 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public void toApplyChangePriceList(Activity ctx, long storeId){
+    public void toApplyChangePriceList(Activity ctx, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "GoodsApplyRecord");
         Bundle params = new Bundle();
@@ -813,6 +813,7 @@ public class GlobalCtx extends Application {
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
+
     //扫描二维码之后跳转到指定界面
     public void toGoodScanSearch(Activity ctx, Map<String, String> data, String storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
@@ -1180,8 +1181,8 @@ public class GlobalCtx extends Application {
             }
         }
 
-        public boolean play_new_simple_order_sound(int storeId) {
-            return this.play_double_sound(getStoreSound(storeId), simpleNewOrderSound);
+        public boolean play_new_simple_order_sound() {
+            return this.play_single_sound(simpleNewOrderSound);
         }
 
         public boolean play_new_ele_order_sound() {
@@ -1221,6 +1222,7 @@ public class GlobalCtx extends Application {
         }
 
         private boolean play_single_sound(final int sound) {
+            if (check_disabled()) return false;
             if (soundLoaded) {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override

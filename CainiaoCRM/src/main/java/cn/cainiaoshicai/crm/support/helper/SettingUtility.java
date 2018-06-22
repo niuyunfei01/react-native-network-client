@@ -496,6 +496,7 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
     }
 
+
     public static void setListenerStores(long selectedStoreId) {
         Set<Long> currSelectedStores = new HashSet<>();
         boolean updated = false;

@@ -20,7 +20,7 @@ public class StoreDao<T> {
     public ResultBean<T> getNewOrderCnt(String accessToken, String storeId) throws ServiceException {
         Map<String, String> params = Maps.newHashMap();
         params.put("access_token", accessToken);
-        String url = URLHelper.API_ROOT() + "/store_to_ready_order_cnt/" + storeId + ".json";
+        String url = URLHelper.API_ROOT() + "/get_to_ready_order_cnt.json";
         String result = HttpUtility.getInstance().executeNormalTask(HttpMethod.Get, url, params);
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         Type t = new TypeToken<ResultBean<List<Map<String, String>>>>() {
