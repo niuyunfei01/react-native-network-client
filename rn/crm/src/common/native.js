@@ -119,6 +119,11 @@ export default {
       NativeModules.ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
   },
 
+  printSmPrinter: async function (order, callback = function (){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.printSmPrinter(JSON.stringify(order), callback));
+  },
+
   ordersByMobileTimes: async function(phone, times) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))

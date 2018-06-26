@@ -90,6 +90,8 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
+import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrinterCallback;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -176,7 +178,6 @@ public class GlobalCtx extends Application {
                         return new HashMap<>();
                     }
                 });
-
     }
 
     @Nullable
@@ -1024,6 +1025,10 @@ public class GlobalCtx extends Application {
                 }
             }.executeOnNormal();
         }
+    }
+
+    public static boolean smPrintIsEnable() {
+        return AidlUtil.getInstance().isConnect();
     }
 
 

@@ -55,6 +55,7 @@ import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
+import cn.cainiaoshicai.crm.utils.AidlUtil;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -151,7 +152,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void setCurrStoreId(@Nonnull String currId, @Nonnull Callback callback){
+    void setCurrStoreId(@Nonnull String currId, @Nonnull Callback callback) {
         try {
             long selectedStoreId = Long.parseLong(currId);
             if (selectedStoreId > 0) {
@@ -289,6 +290,30 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void printSmPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        final Order o = gson.fromJson(orderJson, new TypeToken<Order>() {
+        }.getType());
+        int tryTimes = 3;
+        boolean success = false;
+        while (tryTimes > 0) {
+            AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
+            AidlUtil.getInstance().initPrinter();
+            boolean isEnable = GlobalCtx.smPrintIsEnable();
+            if (isEnable) {
+                AidlUtil.getInstance().initPrinter();
+                OrderPrinter.smPrintOrder(o);
+                success = true;
+                break;
+            }
+            tryTimes--;
+        }
+        if (!success) {
+            callback.invoke(false, "不支持该设备");
+        }
+    }
+
+    @ReactMethod
     void getActivityNameAsPromise(@Nonnull Promise promise) {
         Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
@@ -297,7 +322,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     *
      * @param mobile mobile could be null
      */
     @ReactMethod
@@ -347,7 +371,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 if (!putStack) {
                     intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 }
-                Bundle bundle=new Bundle();
+                Bundle bundle = new Bundle();
                 bundle.putString("jsonData", jsonData);
                 intent.putExtras(bundle);
                 activity.startActivity(intent);

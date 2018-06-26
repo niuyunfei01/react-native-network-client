@@ -97,6 +97,25 @@
             android:text="--"
             android:textAlignment="textEnd" />
 
+        <TextView
+            android:id="@+id/label_sun_mi_printer_status"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/label_printer_status"
+            android:text="商米打印机" />
+
+        <TextView
+            android:id="@+id/sun_mi_printer_status"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/printer_status"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/label_sun_mi_printer_status"
+            android:text="-"
+            android:textAlignment="textEnd" />
+
     </RelativeLayout>
 
     <ListView
