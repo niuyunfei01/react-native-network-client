@@ -1128,7 +1128,7 @@ public class GlobalCtx extends Application {
         }
 
         private boolean check_disabled() {
-            if (SettingUtility.isDisableSoundNotify()) {
+            if (SettingUtility.isDisableSoundNotify() && SettingUtility.isDisableNewOrderSoundNotify()) {
                 AppLogger.w("notify sound is disabled!");
                 return true;
             }

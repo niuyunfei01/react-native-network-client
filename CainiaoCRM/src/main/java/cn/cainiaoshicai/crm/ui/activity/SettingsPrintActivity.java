@@ -74,6 +74,15 @@ public class SettingsPrintActivity extends ListActivity {
             }
         });
 
+        Switch toggleNewSoundNotify = findViewById(R.id.toggleNewSoundNotify);
+        toggleNewSoundNotify.setChecked(!SettingUtility.isDisableNewOrderSoundNotify());
+        toggleNewSoundNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean reading) {
+                SettingUtility.setDisableNewOrderSoundNotify(!reading);
+            }
+        });
+
         GlobalCtx app = GlobalCtx.app();
         boolean isDirect = app.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(app.getVendor().getVersion());
 

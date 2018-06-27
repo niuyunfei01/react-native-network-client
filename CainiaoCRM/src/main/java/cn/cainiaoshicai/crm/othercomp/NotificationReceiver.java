@@ -77,72 +77,73 @@ public class NotificationReceiver extends BroadcastReceiver {
 				}
 
 				GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+			
+				if (!SettingUtility.isDisableSoundNotify()) {
+					if (!TextUtils.isEmpty(notify.getSpeak_word())) {
+						//TODO play new order sound
+						int repeatTimes = Math.min(Math.max(notify.getSpeak_times(), 1), 3);
+						for (int x = 0; x < repeatTimes; x++) {
+							//String repeatPrefix = x > 0 ? ("重复" + x + "次：") : "";
+							soundManager.play_by_xunfei(notify.getSpeak_word());
+						}
+					} else {
 
-				if (!TextUtils.isEmpty(notify.getSpeak_word())) {
-					//TODO play new order sound
-					int repeatTimes = Math.min(Math.max(notify.getSpeak_times(), 1), 3);
-					for (int x = 0; x < repeatTimes; x++) {
-						//String repeatPrefix = x > 0 ? ("重复" + x + "次：") : "";
-						soundManager.play_by_xunfei(notify.getSpeak_word());
-					}
-				} else {
-
-					//仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
-					if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
-						GlobalCtx.newOrderNotifies.add(notificationId);
-						if (GlobalCtx.app().acceptNotifyNew()) {
-							soundManager.play_new_order_sound(notify.getStore_id());
-						}
-						SettingUtility.removeOrderContainerCache(ListType.WAITING_READY);
-					} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
-						int totalLate = notify.getTotal_late();
-						if (totalLate > 10) {
-							totalLate = 10;
-						}
-						if (GlobalCtx.app().acceptReadyTimeoutNotify()) {
-							soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
-						}
-					} else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
-						if (GlobalCtx.app().acceptTechNotify()) {
-							soundManager.play_sync_not_work_sound();
-						}
-					} else if (Cts.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
-						soundManager.play_serious_timeout(notify.getNotify_workers());
-					} else if (Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
-						int store_id = notify.getStore_id();
-						if (store_id > 0) {
-							if ("sold_out".equals(notify.getSound())) {
-								soundManager.play_item_sold_out_sound(store_id);
-							} else if ("check_storage".equals(notify.getSound())) {
-								soundManager.play_storage_check(store_id);
+						//仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
+						if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
+							GlobalCtx.newOrderNotifies.add(notificationId);
+							if (GlobalCtx.app().acceptNotifyNew()) {
+								soundManager.play_new_order_sound(notify.getStore_id());
 							}
-						}
-					} else if (Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
-						String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
-						Gson gson = new GsonBuilder().create();
-						HashMap<String, String> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, String>>() {
-						}.getType());
+							SettingUtility.removeOrderContainerCache(ListType.WAITING_READY);
+						} else if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
+							int totalLate = notify.getTotal_late();
+							if (totalLate > 10) {
+								totalLate = 10;
+							}
+							if (GlobalCtx.app().acceptReadyTimeoutNotify()) {
+								soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
+							}
+						} else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
+							if (GlobalCtx.app().acceptTechNotify()) {
+								soundManager.play_sync_not_work_sound();
+							}
+						} else if (Cts.PUSH_TYPE_SERIOUS_TIMEOUT.equals(notify.getType())) {
+							soundManager.play_serious_timeout(notify.getNotify_workers());
+						} else if (Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())) {
+							int store_id = notify.getStore_id();
+							if (store_id > 0) {
+								if ("sold_out".equals(notify.getSound())) {
+									soundManager.play_item_sold_out_sound(store_id);
+								} else if ("check_storage".equals(notify.getSound())) {
+									soundManager.play_storage_check(store_id);
+								}
+							}
+						} else if (Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
+							String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
+							Gson gson = new GsonBuilder().create();
+							HashMap<String, String> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, String>>() {
+							}.getType());
 
-						if (params != null && "eleme".equals(params.get("notify_sound"))) {
-							String storeIdS = params.get("store_id");
-							if (storeIdS != null && Integer.parseInt(storeIdS) > 0)
-								soundManager.play_ele_status_changed(Integer.parseInt(storeIdS));
+							if (params != null && "eleme".equals(params.get("notify_sound"))) {
+								String storeIdS = params.get("store_id");
+								if (storeIdS != null && Integer.parseInt(storeIdS) > 0)
+									soundManager.play_ele_status_changed(Integer.parseInt(storeIdS));
+							}
+						} else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
+							soundManager.play_customer_new_msg();
+						} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
+							soundManager.play_order_cancelled();
+						} else if (Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
+							soundManager.play_remind_deliver();
+						} else if (Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())) {
+							soundManager.play_order_ask_cancel();
+						} else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
+							soundManager.play_dada_manual_timeout();
+						} else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
 						}
-					} else if (Cts.PUSH_TYPE_USER_TALK.equals(notify.getType())) {
-						soundManager.play_customer_new_msg();
-					} else if (Cts.PUSH_TYPE_ORDER_CANCELLED.equals(notify.getType())) {
-						soundManager.play_order_cancelled();
-					} else if (Cts.PUSH_TYPE_REMIND_DELIVER.equals(notify.getType())) {
-						soundManager.play_remind_deliver();
-					} else if (Cts.PUSH_TYPE_ASK_CANCEL.equals(notify.getType())) {
-						soundManager.play_order_ask_cancel();
-					} else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
-						soundManager.play_dada_manual_timeout();
-					} else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
 					}
 				}
 			}
-
 		} else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
 			Log.d(TAG, "[NotificationReceiver] 用户点击打开了通知");
 

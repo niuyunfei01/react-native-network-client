@@ -64,7 +64,7 @@ public class AlwaysOnService extends BaseService {
 
         @Override
         public void run() {
-            if (SettingUtility.isDisableSoundNotify()) {
+            if (SettingUtility.isDisableNewOrderSoundNotify()) {
                 return;
             }
             StoreDao dao = new StoreDao();

@@ -492,7 +492,15 @@ public class SettingUtility {
         return SettingHelper.getSharedPreferences(getContext(), "disable_sound_notify", false);
     }
 
+    public static boolean isDisableNewOrderSoundNotify(){
+        return SettingHelper.getSharedPreferences(getContext(), "disable_new_order_sound_notify", false);
+    }
+
     public static void setDisableSoundNotify(boolean isChecked) {
+        SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
+    }
+
+    public static void setDisableNewOrderSoundNotify(boolean isChecked) {
         SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
     }
 
