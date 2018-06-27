@@ -23,6 +23,8 @@ import * as tool from "../../common/tool";
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 
+import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
+
 function mapStateToProps(state) {
 	const {mine, global} = state;
 	return {mine: mine, global: global};
@@ -46,50 +48,44 @@ function mapDispatchToProps(dispatch) {
 class StoreScene extends PureComponent {
 	static navigationOptions = ({navigation}) => {
 		const {params = {}} = navigation.state;
-
+		
 		return {
 			headerTitle: "店铺管理",
 			headerRight: ""
 		};
 	};
-
+	
 	constructor(props) {
 		super(props);
-
+		
 		let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-
+		
 		const {vendor_stores, user_list} = this.props.mine;
-		let curr_stores = tool.curr_vendor(vendor_stores, currVendorId);
 		let curr_user_list = tool.curr_vendor(user_list, currVendorId);
-
+		
 		this.state = {
 			isRefreshing: false,
 			showCallStore: false,
 			storeTel: [],
-
 			currVendorId: currVendorId,
 			currVendorName: currVendorName,
-
-			curr_stores: Object.values(curr_stores),
-			curr_user_list: curr_user_list
+			curr_user_list: curr_user_list,
+			cityList: [],
+			storeGroupByCity: []
 		};
-
+		
 		this.getVendorStore = this.getVendorStore.bind(this);
 		this.onSearchWorkers = this.onSearchWorkers.bind(this);
 	}
-
+	
 	componentDidMount() {
-		let {curr_stores, curr_user_list} = this.state;
-		/*if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
-			this.getVendorStore();
-			this.onSearchWorkers();
-		}*/
+		let {curr_user_list} = this.state;
 		this.getVendorStore();
 		if (tool.length(curr_user_list) === 0) {
 			this.onSearchWorkers();
 		}
 	}
-
+	
 	getVendorStore() {
 		const {dispatch} = this.props;
 		const {accessToken} = this.props.global;
@@ -98,16 +94,19 @@ class StoreScene extends PureComponent {
 		dispatch(
 			getVendorStores(currVendorId, accessToken, resp => {
 				if (resp.ok) {
-					let curr_stores = resp.obj;
+					let stores = resp.obj;
+					let storeGroupByCity = tool.storeListGroupByCity(stores)
+					let cityList = Object.keys(storeGroupByCity)
 					_this.setState({
-						curr_stores: Object.values(curr_stores)
+						cityList,
+						storeGroupByCity
 					});
 				}
 				_this.setState({isRefreshing: false});
 			})
 		);
 	}
-
+	
 	onSearchWorkers() {
 		const {dispatch} = this.props;
 		const {accessToken} = this.props.global;
@@ -115,7 +114,6 @@ class StoreScene extends PureComponent {
 		let _this = this;
 		dispatch(
 			fetchWorkers(currVendorId, accessToken, resp => {
-				console.log("user resp -> ", resp.ok, resp.desc);
 				if (resp.ok) {
 					let {user_list} = resp.obj;
 					_this.setState({
@@ -126,32 +124,32 @@ class StoreScene extends PureComponent {
 			})
 		);
 	}
-
+	
 	onHeaderRefresh() {
 		this.setState({isRefreshing: true});
 		this.getVendorStore();
 		this.onSearchWorkers();
 	}
-
+	
 	onPress(route, params = {}) {
 		let _this = this;
 		InteractionManager.runAfterInteractions(() => {
 			_this.props.navigation.navigate(route, params);
 		});
 	}
-
-	renderStores() {
-		let {curr_stores, curr_user_list, currVendorId} = this.state;
-		if (tool.length(curr_stores) === 0 || tool.length(curr_user_list) === 0) {
+	
+	renderStores(stores) {
+		let {curr_user_list, currVendorId} = this.state;
+		if (tool.length(stores) === 0 || tool.length(curr_user_list) === 0) {
 			return <LoadingView/>;
 		}
-
+		
 		let _this = this;
-		return curr_stores.map(function (store, idx) {
+		return stores.map(function (store, idx) {
 			let {nickname} = curr_user_list[store.owner_id] || {};
 			// let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
 			// let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
-
+			
 			let storeTel = [
 				{tel: store.tel, desc: "门店"},
 				{tel: store.mobile, desc: nickname}
@@ -173,7 +171,7 @@ class StoreScene extends PureComponent {
 					}
 				}
 			}
-
+			
 			return (
 				<Cells style={[styles.cells]} key={idx}>
 					<Cell customStyle={[styles.cell_content, styles.cell_height]}>
@@ -248,7 +246,7 @@ class StoreScene extends PureComponent {
 			);
 		});
 	}
-
+	
 	callStoreMenus() {
 		return this.state.storeTel.map(store => {
 			return {
@@ -260,89 +258,110 @@ class StoreScene extends PureComponent {
 			};
 		});
 	}
-
+	
+	renderScrollTabs() {
+		let _this = this;
+		const {cityList} = _this.state
+		let {currVendorName, storeGroupByCity} = _this.state;
+		return cityList.map(function (city, index) {
+			const stores = storeGroupByCity[city]
+			return (
+				<ScrollView
+					key={index} tabLabel={city}
+					refreshControl={
+						<RefreshControl
+							refreshing={_this.state.isRefreshing}
+							onRefresh={() => _this.onHeaderRefresh()}
+							tintColor="gray"
+						/>
+					}
+				>
+					<CellsTitle style={[styles.cell_title]}>新增门店</CellsTitle>
+					<Cells style={[styles.cells]}>
+						<Cell
+							customStyle={[styles.cell_content, styles.cell_height]}
+							onPress={() => {
+								_this.onPress(Config.ROUTE_STORE_ADD, {
+									btn_type: "add",
+									actionBeforeBack: resp => {
+										if (resp.shouldRefresh) {
+											_this.getVendorStore();
+										}
+									}
+								});
+							}}
+						>
+							<CellHeader>
+								<Image
+									style={[styles.add_img]}
+									source={require("../../img/Store/xinzeng_.png")}
+								/>
+							</CellHeader>
+							<CellBody>
+								<TouchableOpacity
+									onPress={() => {
+										_this.onPress(Config.ROUTE_STORE_ADD, {
+											btn_type: "add",
+											actionBeforeBack: resp => {
+												if (resp.shouldRefresh) {
+													_this.getVendorStore();
+												}
+											}
+										});
+									}}
+								>
+									<Text style={[styles.add_store]}>新增门店</Text>
+								</TouchableOpacity>
+							</CellBody>
+							<CellFooter/>
+						</Cell>
+					</Cells>
+					
+					<CellsTitle style={[styles.cell_title]}>
+						{currVendorName} 门店列表
+					</CellsTitle>
+					{_this.renderStores(stores)}
+					
+					<ActionSheet
+						visible={_this.state.showCallStore}
+						onRequestClose={() => {
+							console.log("call_store_contacts action_sheet closed!");
+						}}
+						menus={_this.callStoreMenus()}
+						actions={[
+							{
+								type: "default",
+								label: "取消",
+								onPress: () => {
+									_this.setState({showCallStore: false});
+								}
+							}
+						]}
+					/>
+				</ScrollView>
+			)
+		})
+	}
+	
 	render() {
 		let _this = this;
-		let {currVendorName} = this.state;
 		return (
-			<ScrollView
-				refreshControl={
-					<RefreshControl
-						refreshing={this.state.isRefreshing}
-						onRefresh={() => this.onHeaderRefresh()}
-						tintColor="gray"
-					/>
-				}
-				style={{backgroundColor: colors.main_back}}
+			<ScrollableTabView
+				initialPage={0}
+				tabBarUnderlineColor="#ee394b"
+				tabBarActiveTextColor="#ee394b"
+				tabBarInactiveTextColor={'#333333'}
+				tabBarTextStyle={{paddingBottom: 0, fontSize: 13, marginTop: 0}}
+				tabBarUnderlineStyle={{backgroundColor: '#ee394b', height: 1}}
+				renderTabBar={() => <ScrollableTabBar
+					tabPadding={18}
+					underlineAlignText={false}
+					tabsContainerStyle={styles.tabbarContainer}
+					tabStyle={styles.tab}/>}
 			>
-				<CellsTitle style={[styles.cell_title]}>新增门店</CellsTitle>
-				<Cells style={[styles.cells]}>
-					<Cell
-						customStyle={[styles.cell_content, styles.cell_height]}
-						onPress={() => {
-							this.onPress(Config.ROUTE_STORE_ADD, {
-								btn_type: "add",
-								actionBeforeBack: resp => {
-									console.log("add resp =====> ", resp);
-									if (resp.shouldRefresh) {
-										console.log("add getVendorStore");
-										_this.getVendorStore();
-									}
-								}
-							});
-						}}
-					>
-						<CellHeader>
-							<Image
-								style={[styles.add_img]}
-								source={require("../../img/Store/xinzeng_.png")}
-							/>
-						</CellHeader>
-						<CellBody>
-							<TouchableOpacity
-								onPress={() => {
-									this.onPress(Config.ROUTE_STORE_ADD, {
-										btn_type: "add",
-										actionBeforeBack: resp => {
-											console.log("add resp =====> ", resp);
-											if (resp.shouldRefresh) {
-												console.log("add getVendorStore");
-												_this.getVendorStore();
-											}
-										}
-									});
-								}}
-							>
-								<Text style={[styles.add_store]}>新增门店</Text>
-							</TouchableOpacity>
-						</CellBody>
-						<CellFooter/>
-					</Cell>
-				</Cells>
-
-				<CellsTitle style={[styles.cell_title]}>
-					{currVendorName} 门店列表
-				</CellsTitle>
-				{this.renderStores()}
-
-				<ActionSheet
-					visible={this.state.showCallStore}
-					onRequestClose={() => {
-						console.log("call_store_contacts action_sheet closed!");
-					}}
-					menus={this.callStoreMenus()}
-					actions={[
-						{
-							type: "default",
-							label: "取消",
-							onPress: () => {
-								this.setState({showCallStore: false});
-							}
-						}
-					]}
-				/>
-			</ScrollView>
-		);
+				{_this.renderScrollTabs()}
+			</ScrollableTabView>
+		)
 	}
 }
 
@@ -379,7 +398,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		marginLeft: 0,
 		paddingRight: 0
-
+		
 		// borderColor: 'green',
 		// borderWidth: pxToDp(1),
 	},
@@ -444,20 +463,70 @@ const styles = StyleSheet.create({
 	},
 	owner_name: {
 		marginHorizontal: pxToDp(15),
-		fontSize: pxToDp(30),
-		fontWeight: "bold",
-		color: colors.color333,
-		alignSelf: "flex-end",
-		maxWidth: pxToDp(220)
-	},
-	remind_time: {
-		fontSize: pxToDp(26),
-		color: colors.color999,
-		position: "absolute",
-		right: 0,
-		bottom: 0
-	}
-});
+		fontSize: pxToDp(30), c
+		fontWeight
+:
+"bold",
+	color
+:
+colors.color333,
+	alignSelf
+:
+"flex-end",
+	maxWidth
+:
+pxToDp(220)
+},
+remind_time: {
+	fontSize: pxToDp(26),
+		color
+:
+	colors.color999,
+		position
+:
+	"absolute",
+		right
+:
+	0,
+		bottom
+:
+	0
+}
+,
+tabbarContainer: {
+	borderWidth: 0.5,
+		borderTopWidth
+:
+	0,
+		borderLeftWidth
+:
+	0,
+		borderRightWidth
+:
+	0,
+		borderColor
+:
+	'#dddddd',
+		backgroundColor
+:
+	'white',
+}
+,
+tab: {
+	alignItems: 'center',
+		justifyContent
+:
+	'center',
+		paddingLeft
+:
+	18,
+		paddingRight
+:
+	18,
+}
+,
+})
+;
 
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(StoreScene);

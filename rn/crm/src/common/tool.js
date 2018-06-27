@@ -8,12 +8,12 @@ export function urlByAppendingParams(url: string, params: Object) {
 	if (result.substr(result.length - 1) != "?") {
 		result = result + `?`;
 	}
-
+	
 	for (let key in params) {
 		let value = params[key];
 		result += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
 	}
-
+	
 	result = result.substring(0, result.length - 1);
 	return result;
 }
@@ -23,7 +23,7 @@ export function objectMap(obj, fn) {
 	if (typeof keys === "undefined" || keys.length === 0) {
 		return [];
 	}
-
+	
 	return keys.map(key => fn(obj[key], key));
 }
 
@@ -92,7 +92,7 @@ export function diffDesc(dt) {
 
 export function vendorOfStoreId(storeId, global) {
 	const {canReadStores, canReadVendors} = global;
-
+	
 	const vendorId = canReadStores[storeId] && canReadStores[storeId].vendor_id;
 	return canReadVendors && canReadVendors[vendorId]
 		? canReadVendors[vendorId]
@@ -114,7 +114,7 @@ export function vendor(global) {
 	let currStoreName = currStore["name"];
 	let fnPriceControlled = parseInt(currStore["fn_price_controlled"]);
 	let fnProfitControlled = parseInt(currStore["fn_profit_controlled"]);
-
+	
 	let currVendor =
 		canReadVendors[currVendorId] === undefined
 			? {}
@@ -146,20 +146,20 @@ export function vendor(global) {
 		mgr_ids.push(service_mgr);
 		service_ids.push(service_mgr);
 	}
-
+	
 	let manager = "," + mgr_ids.join(",") + ",";
 	let is_mgr = manager.indexOf("," + currentUser + ",") !== -1;
-
+	
 	let service_manager = "," + service_ids.join(",") + ",";
 	let is_service_mgr = service_manager.indexOf("," + currentUser + ",") !== -1;
-
+	
 	let {help_uid} = config;
 	let is_helper = false;
 	if (!!help_uid) {
 		let helper = "," + help_uid.join(",") + ",";
 		is_helper = helper.indexOf("," + currentUser + ",") !== -1;
 	}
-
+	
 	return {
 		currVendorId: currVendorId,
 		currVendorName: currVendorName,
@@ -229,7 +229,7 @@ export function user_info(mine, currVendorId, currentUser) {
 		// }
 		user_info = mine.user_list[currVendorId][currentUser];
 	}
-
+	
 	return user_info;
 }
 
@@ -239,16 +239,16 @@ export function shortTimestampDesc(timestamp) {
 
 export function shortTimeDesc(datetime) {
 	if (!datetime) return "";
-
+	
 	return _shortTimeDesc(Moment(datetime));
 }
 
 function _shortTimeDesc(dtMoment) {
 	const nowMoment = Moment();
-
+	
 	const dSeconds = nowMoment.unix() - dtMoment.unix();
 	const dYear = nowMoment.year() - dtMoment.year();
-
+	
 	if (dSeconds >= 0 && dSeconds < 60) {
 		if (dSeconds < 10) {
 			return "刚刚";
@@ -277,7 +277,7 @@ export function resetNavStack(navigation, routeName, params = {}) {
 		]
 	});
 	navigation.dispatch(resetAction);
-
+	
 	console.log("_resetNavStack " + routeName);
 }
 
@@ -302,7 +302,7 @@ export function intOf(val) {
 	if (typeof val === "string") {
 		return parseInt(val);
 	}
-
+	
 	return val;
 }
 
@@ -374,7 +374,7 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
 			}
 		};
 	};
-
+	
 	let storeActionSheet = [{key: -999, section: true, label: "选择门店"}];
 	let sortStores = Object.values(canReadStores).sort(
 		by("vendor_id", by("city", by("id")))
@@ -392,7 +392,7 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
 			storeActionSheet.push(item);
 		}
 	}
-
+	
 	return storeActionSheet;
 }
 
@@ -421,9 +421,9 @@ function sortStores(canReadStores) {
 			}
 		};
 	};
-
+	
 	return Object.values(canReadStores).sort(
-       by("vendor_id", by("city", by("district", by("id"))))
+		by("vendor_id", by("city", by("district", by("id"))))
 	);
 }
 
@@ -451,12 +451,12 @@ function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
 			setGroupObj(noteObj[gname], rule, gby, gIndex + 1, maxIndex);
 		}
 	}
-
+	
 	var noteObj = {};
 	for (var i = 0; i < itemlist.length; i++) {
 		setGroupObj(noteObj, itemlist[i], gby, 0, gby.length - 1);
 	}
-
+	
 	var getSubInfo = function (note, p, gIndex, maxIndex) {
 		var newobj = {}
 		newobj[keyName] = p;
@@ -488,31 +488,45 @@ export function storeListOfModalSelector(canReadStores) {
 	const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
 	let return_data = []
 	let return_data_deep = 2
-
+	
 	for (let i in storeListGroup) {
 		let storeListGroupByCity = storeListGroup[i]
-
+		
 		if (storeListGroupByCity.label == 'undefined') {
 			storeListGroup.splice(i, 1)
 			continue
 		}
-
+		
 		storeListGroupByCity.key = i
 		let storeDistrictCityValue = storeListGroupByCity.children
-
+		
 		for (store of storeDistrictCityValue) {
 			store.label = store.vendor + '-' + store.district + '-' + store.name
 			store.key = store.id
 		}
 	}
-
+	
 	return_data = storeListGroup
-
+	
 	if (storeListGroup.length == 1) {
 		return_data_deep = 1
 		return_data = storeListGroup[0].children
 	}
 	return {return_data, return_data_deep}
+}
+
+/**
+ * 按照城市分组门店
+ * @param stores
+ */
+export function storeListGroupByCity(stores) {
+	const storeByCity = ArrayGroupBy(sortStores(stores), ['city'])
+	const obj = {}
+	for (let item of storeByCity) {
+		const key = item.key
+		obj[key] = item.value
+	}
+	return obj
 }
 
 export function first_store_id(canReadStores) {
@@ -553,7 +567,7 @@ export function ship_name(type) {
 	plat[Cts.SHIP_KS_MT] = "美团快送";
 	plat[Cts.SHIP_ZS_ELE] = "饿了么专送";
 	plat[Cts.SHIP_ZS_BD] = "百度专送";
-
+	
 	return plat[type] === undefined ? "未知配送" : plat[type];
 }
 
@@ -566,7 +580,7 @@ export function zs_status(status) {
 	znMap[Cts.ZS_STATUS_ARRIVED] = "已送达";
 	znMap[Cts.ZS_STATUS_CANCEL] = "已取消";
 	znMap[Cts.ZS_STATUS_ABNORMAL] = "异常";
-
+	
 	return znMap[status] === undefined ? "未知状态" : znMap[status];
 }
 
@@ -598,11 +612,11 @@ export function simpleBarrier() {
 		doneCallbacks = 0,
 		startTime = Date.now(),
 		results = [];
-
+	
 	function defaultCallback(err, data) {
 		return data;
 	}
-
+	
 	let instance = {
 		waitOn: function (callback) {
 			let callbackIndex = requiredCallbacks;
@@ -645,7 +659,7 @@ function deepClone(obj) {
 		if (o === undefined) return "Undefined";
 		return Object.prototype.toString.call(o).slice(8, -1);
 	}
-
+	
 	let result;
 	let oClass = isClass(obj);
 	if (oClass === "Object") {

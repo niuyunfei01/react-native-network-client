@@ -9,10 +9,28 @@ import EmptyListView from "../Invoicing/EmptyListView";
 import Dialog from "./Dialog";
 import Constat from "../../Constat";
 import {ToastShort} from "../../util/ToastUtils";
+import {withNavigation} from 'react-navigation'
+import {newProductSave, uploadImg} from "../../reducers/product/productActions";
+import * as globalActions from "../../reducers/global/globalActions";
+import {bindActionCreators} from "redux";
 
 function mapStateToProps(state) {
-	const {invoicing, global} = state;
-	return {invoicing: invoicing, global: global}
+	const {invoicing, global, batch} = state;
+	return {invoicing, global, batch}
+}
+
+function mapDispatchToProps(dispatch) {
+	return {
+		dispatch,
+		...bindActionCreators(
+			{
+				uploadImg,
+				newProductSave,
+				...globalActions
+			},
+			dispatch
+		)
+	};
 }
 
 class GoodsAdjustRemind extends PureComponent {
@@ -31,6 +49,7 @@ class GoodsAdjustRemind extends PureComponent {
 				}
 			},
 			price: '',
+			batch: this.props.batch
 		}
 	}
 	
@@ -38,53 +57,81 @@ class GoodsAdjustRemind extends PureComponent {
 		this.fetchData()
 	}
 	
+	componentWillReceiveProps(nextProps) {
+		console.log(nextProps)
+	}
+	
 	renderItems() {
-		const {dataSource} = this.state
-		let items = []
-		
+		const {dataSource} = this.state;
+		let items = [];
+		const batch = this.props.batch == 1
 		for (let i in dataSource) {
 			items.push(
-				<View style={styles.listItem} key={i}>
-					<View style={styles.listItemTop}>
-						<Image style={styles.listItemImage} source={{uri: (dataSource[i].image)}}/>
-						<View style={{flex: 1}}>
-							<Text style={styles.listItemGoodsName}>{dataSource[i].product_name}</Text>
+				<TouchableWithoutFeedback
+					key={i}
+					delayLongPress={500}
+					onLongPress={() => this.props.navigation.setParams({batch: 1})}
+				>
+					<View style={styles.listItem}>
+						<View style={styles.listItemTop}>
+							{/*批量操作按钮*/}
+							{console.log(batch, dataSource[i])}
+							{
+								batch ?
+									<TouchableWithoutFeedback onPress={() => this.handleSelectItem(i, dataSource[i], dataSource)}>
+										{
+											dataSource[i].batch ?
+												<Image style={styles.listItemBatchImage} source={require('../../img/Goods/xuanzhong_.png')}/>
+												:
+												<Image style={styles.listItemBatchImage} source={require('../../img/Goods/weixuanzhong_.png')}/>
+										}
+									</TouchableWithoutFeedback>
+									: null
+							}
+							<Image style={styles.listItemImage} source={{uri: (dataSource[i].image)}}/>
+							<View style={{flex: 1}}>
+								<Text style={styles.listItemGoodsName}>{dataSource[i].product_name}</Text>
+							</View>
 						</View>
-					</View>
-					<Text style={styles.listItemRemark}>
-						<Text style={styles.listItemRemarkTag}>#{dataSource[i].operation_name}提醒#</Text>
-						<Text style={styles.listItemRemarkDetail}>理由：{dataSource[i].remark}</Text>
-					</Text>
-					{dataSource[i].price && dataSource[i].price !== '0.00' ? <Text style={styles.listItemPrice}>
-						建议价格：¥{dataSource[i].price}
-					</Text> : null}
-					{/*有处理时间则不显示操作按钮*/}
-					{dataSource[i].handle_time ? null : <View style={styles.listItemOperation}>
-						<Text style={styles.operationTime}>{dataSource[i].limit_time}自动执行</Text>
-						<View style={{flexDirection: 'row'}}>
-							<TouchableWithoutFeedback onPress={() => this.handleReject(dataSource[i].id)}>
-								<View>
-									<Text style={[styles.listItemOperationBtn, styles.operationBtnDark]}>拒绝</Text>
-								</View>
-							</TouchableWithoutFeedback>
-							<TouchableWithoutFeedback onPress={() => this.handlePass(dataSource[i].id)}>
-								<View>
-									<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>同意</Text>
-								</View>
-							</TouchableWithoutFeedback>
-							{/*涨价 降价可以自调价格*/}
-							{dataSource[i].operation_type === '1' || dataSource[i].operation_type === '2' ?
-								<TouchableWithoutFeedback onPress={() => {
-									this.setState({modifyPriceModalVisible: true, selectItem: dataSource[i]})
-								}}>
+						<Text style={styles.listItemRemark}>
+							<Text style={styles.listItemRemarkTag}>#{dataSource[i].operation_name}提醒#</Text>
+							<Text style={styles.listItemRemarkDetail}>理由：{dataSource[i].remark}</Text>
+						</Text>
+						{dataSource[i].price && dataSource[i].price !== '0.00' ? <Text style={styles.listItemPrice}>
+							建议价格：¥{dataSource[i].price}
+						</Text> : null}
+						{/*有处理时间则不显示操作按钮*/}
+						{dataSource[i].handle_time ? null : <View style={styles.listItemOperation}>
+							<Text style={styles.operationTime}>{dataSource[i].limit_time}自动执行</Text>
+							<View style={{flexDirection: 'row'}}>
+								<TouchableWithoutFeedback onPress={() => this.handleReject(dataSource[i].id)}>
 									<View>
-										<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>自调价格</Text>
+										<Text style={[styles.listItemOperationBtn, styles.operationBtnDark]}>拒绝</Text>
 									</View>
 								</TouchableWithoutFeedback>
-								: null}
-						</View>
-					</View>}
-				</View>
+								<TouchableWithoutFeedback onPress={() => this.handlePass(dataSource[i].id)}>
+									<View>
+										<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>同意</Text>
+									</View>
+								</TouchableWithoutFeedback>
+								{/*涨价 降价可以自调价格*/}
+								{dataSource[i].operation_type === '1' || dataSource[i].operation_type === '2' ?
+									<TouchableWithoutFeedback onPress={() => {
+										this.setState({
+											modifyPriceModalVisible: true,
+											selectItem: dataSource[i],
+											price: dataSource[i].price
+										})
+									}}>
+										<View>
+											<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>自调价格</Text>
+										</View>
+									</TouchableWithoutFeedback>
+									: null}
+							</View>
+						</View>}
+					</View>
+				</TouchableWithoutFeedback>
 			)
 		}
 		
@@ -114,7 +161,7 @@ class GoodsAdjustRemind extends PureComponent {
 				}}
 			>
 				<View>
-					<Text style={styles.dialogTopText}>本人批发的不高于线下的价格的9折，采购他人的加价不超过10%。价格高于同商圈可能呗拒绝</Text>
+					<Text style={styles.dialogTopText}>本人批发的不高于线下的价格的9折，采购他人的加价不超过10%。价格高于同商圈可能被拒绝</Text>
 					<Text style={styles.dialogBottomText}>输入价格/元（当前价格为{this.state.selectItem.product_price}）</Text>
 					<TextInput
 						style={styles.dialogInput}
@@ -148,23 +195,23 @@ class GoodsAdjustRemind extends PureComponent {
 	}
 	
 	fetchData(options = {}) {
-		let self = this
-		const {global} = this.props
-		const {pageNum, pageSize, dataSource, checkedStoreId} = this.state
-		let token = global['accessToken']
-		let store_id = checkedStoreId ? checkedStoreId : global['currStoreId']
+		let self = this;
+		const {global} = this.props;
+		const {pageNum, pageSize, dataSource, checkedStoreId} = this.state;
+		let token = global['accessToken'];
+		let store_id = checkedStoreId ? checkedStoreId : global['currStoreId'];
 		const url = `api/product_adjust_list?access_token=${token}`;
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {
 			store_id: store_id,
 			page: options.pageNum ? options.pageNum : pageNum,
 			page_size: pageSize
 		})).then(resp => resp.json()).then(resp => {
-			let {ok, reason, obj, error_code} = resp;
+			let {ok, obj} = resp;
 			if (ok) {
-				let next_page = 0
-				let isLastPage = false
-				const data_list = obj.data
-				let data = obj.currPage == 1 ? [] : dataSource
+				let next_page = 0;
+				let isLastPage = false;
+				const data_list = obj.data;
+				let data = obj.currPage == 1 ? [] : dataSource;
 				if (obj.currPage !== obj.totalPage) {
 					next_page = obj.currPage + 1;
 				} else {
@@ -181,11 +228,9 @@ class GoodsAdjustRemind extends PureComponent {
 	}
 	
 	handleBase(adjust_id, handle_result, price = 0) {
-		let self = this
-		const {global} = this.props
-		const {checkedStoreId} = this.state
-		let token = global['accessToken']
-		let store_id = checkedStoreId ? checkedStoreId : global['currStoreId']
+		let self = this;
+		const {global} = this.props;
+		let token = global['accessToken'];
 		const url = `api/adjust_product?access_token=${token}`;
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {
 			adjust_id: adjust_id,
@@ -194,8 +239,8 @@ class GoodsAdjustRemind extends PureComponent {
 		})).then(resp => resp.json()).then(resp => {
 			let {ok, reason} = resp;
 			if (ok) {
-				ToastShort('操作成功')
-				self.setState({modifyPriceModalVisible: false})
+				ToastShort('操作成功');
+				self.setState({modifyPriceModalVisible: false});
 				self.fetchData()
 			} else {
 				ToastShort(reason)
@@ -214,6 +259,13 @@ class GoodsAdjustRemind extends PureComponent {
 	handleModify() {
 		this.handleBase(this.state.selectItem.id, Constat.GOOD_ADJUST.OPERATION_MODIFY, this.state.price)
 	}
+	
+	handleSelectItem(i, data, dataSource) {
+		data.batch = !data.batch;
+		dataSource = dataSource.splice(i, 1, data);
+		this.setState({dataSource})
+	}
 }
 
-export default connect(mapStateToProps)(GoodsAdjustRemind)
+const component = withNavigation(GoodsAdjustRemind);
+export default connect(mapStateToProps, mapDispatchToProps)(component)

@@ -2,6 +2,15 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 
 export default {
+	headerImage: {
+		width: pxToDp(35),
+		height: pxToDp(37),
+		marginLeft: pxToDp(20)
+	},
+	headerRight: {
+		flexDirection: 'row',
+		marginRight: pxToDp(30)
+	},
 	in_cell: {
 		minHeight: pxToDp(100),
 		alignItems: 'center',
@@ -41,6 +50,11 @@ export default {
 	},
 	listItemTop: {
 		flexDirection: 'row'
+	},
+	listItemBatchImage: {
+		height: pxToDp(52),
+		width: pxToDp(52),
+		marginRight: pxToDp(30)
 	},
 	listItemImage: {
 		height: pxToDp(80),
