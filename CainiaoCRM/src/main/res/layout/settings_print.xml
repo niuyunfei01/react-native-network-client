@@ -28,9 +28,8 @@
         android:id="@+id/label_new_sound_notify"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/label_sound_notify"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
         android:text="开启新订单提醒" />
 
     <Switch
@@ -38,20 +37,19 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/toggleSoundNotify"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/label_new_sound_notify" />
 
     <TextView android:text="使用预发布(工程师使用)"
         android:id="@+id/label_use_preview"
-        android:layout_below="@+id/label_sound_notify"
+        android:layout_below="@+id/label_new_sound_notify"
         android:layout_width="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_height="30dp"/>
 
     <Switch android:id="@+id/toggleUsePreview"
-        android:layout_below="@+id/toggleSoundNotify"
+        android:layout_below="@+id/toggleNewSoundNotify"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/label_use_preview"
         android:layout_width="wrap_content"

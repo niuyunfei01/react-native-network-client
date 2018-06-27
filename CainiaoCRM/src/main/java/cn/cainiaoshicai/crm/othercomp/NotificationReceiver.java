@@ -77,7 +77,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 				}
 
 				GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
-			
+
 				if (!SettingUtility.isDisableSoundNotify()) {
 					if (!TextUtils.isEmpty(notify.getSpeak_word())) {
 						//TODO play new order sound

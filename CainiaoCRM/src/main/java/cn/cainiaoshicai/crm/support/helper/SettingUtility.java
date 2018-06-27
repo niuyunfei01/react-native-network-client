@@ -501,7 +501,7 @@ public class SettingUtility {
     }
 
     public static void setDisableNewOrderSoundNotify(boolean isChecked) {
-        SettingHelper.setEditor(getContext(), "disable_sound_notify", isChecked);
+        SettingHelper.setEditor(getContext(), "disable_new_order_sound_notify", isChecked);
     }
 
 
