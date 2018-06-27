@@ -367,166 +367,130 @@ class StoreScene extends PureComponent {
 
 // define your styles
 const styles = StyleSheet.create({
-	store_city: {
-		borderWidth: 1,
-		borderStyle: 'solid',
-		borderColor: 'lightblue',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: 10
-	},
-	cell_title: {
-		marginBottom: pxToDp(10),
-		fontSize: pxToDp(26),
-		color: colors.color999
-	},
-	cells: {
-		marginBottom: pxToDp(10),
-		marginTop: 0,
-		paddingLeft: pxToDp(30),
-		borderTopWidth: pxToDp(1),
-		borderBottomWidth: pxToDp(1),
-		borderColor: colors.color999
-	},
-	cell_body: {
-		flexDirection: "row"
-	},
-	cell_height: {
-		height: pxToDp(90)
-	},
-	cell_content: {
-		justifyContent: "center",
-		marginLeft: 0,
-		paddingRight: 0
-		
-		// borderColor: 'green',
-		// borderWidth: pxToDp(1),
-	},
-	add_img: {
-		width: pxToDp(50),
-		height: pxToDp(50),
-		marginVertical: pxToDp(20)
-	},
-	add_store: {
-		fontSize: pxToDp(30),
-		fontWeight: "bold",
-		color: colors.color333
-	},
-	store_name: {
-		fontSize: pxToDp(34),
-		fontWeight: "bold",
-		color: colors.color333
-	},
-	open_time: {
-		marginLeft: pxToDp(12),
-		fontSize: pxToDp(26),
-		lineHeight: pxToDp(26),
-		fontWeight: "bold",
-		color: colors.color999,
-		alignSelf: "center"
-	},
-	cell_right: {
-		flexDirection: "row",
-		justifyContent: "center"
-	},
-	edit_text: {
-		color: colors.main_color,
-		fontSize: pxToDp(30),
-		fontWeight: "bold",
-		paddingTop: pxToDp(14)
-	},
-	right_btn: {
-		color: colors.main_color,
-		fontSize: pxToDp(30),
-		textAlign: "center",
-		height: pxToDp(70),
-		marginRight: pxToDp(30),
-		marginLeft: pxToDp(5),
-		paddingTop: pxToDp(20)
-	},
-	address: {
-		marginTop: pxToDp(20),
-		marginRight: pxToDp(30),
-		fontSize: pxToDp(30),
-		color: colors.color666,
-		lineHeight: pxToDp(35)
-	},
-	store_footer: {
-		marginTop: pxToDp(30),
-		marginBottom: pxToDp(20),
-		flexDirection: "row",
-		marginRight: pxToDp(30)
-	},
-	call_img: {
-		width: pxToDp(40),
-		height: pxToDp(40)
-	},
-	owner_name: {
-		marginHorizontal: pxToDp(15),
-		fontSize: pxToDp(30), c
-		fontWeight
-:
-"bold",
-	color
-:
-colors.color333,
-	alignSelf
-:
-"flex-end",
-	maxWidth
-:
-pxToDp(220)
-},
-remind_time: {
-	fontSize: pxToDp(26),
-		color
-:
-	colors.color999,
-		position
-:
-	"absolute",
-		right
-:
-	0,
-		bottom
-:
-	0
-}
-,
-tabbarContainer: {
-	borderWidth: 0.5,
-		borderTopWidth
-:
-	0,
-		borderLeftWidth
-:
-	0,
-		borderRightWidth
-:
-	0,
-		borderColor
-:
-	'#dddddd',
-		backgroundColor
-:
-	'white',
-}
-,
-tab: {
-	alignItems: 'center',
-		justifyContent
-:
-	'center',
-		paddingLeft
-:
-	18,
-		paddingRight
-:
-	18,
-}
-,
-})
-;
+		store_city: {
+			borderWidth: 1,
+			borderStyle: 'solid',
+			borderColor: 'lightblue',
+			alignItems: 'center',
+			justifyContent: 'center',
+			marginRight: 10
+		},
+		cell_title: {
+			marginBottom: pxToDp(10),
+			fontSize: pxToDp(26),
+			color: colors.color999
+		},
+		cells: {
+			marginBottom: pxToDp(10),
+			marginTop: 0,
+			paddingLeft: pxToDp(30),
+			borderTopWidth: pxToDp(1),
+			borderBottomWidth: pxToDp(1),
+			borderColor: colors.color999
+		},
+		cell_body: {
+			flexDirection: "row"
+		},
+		cell_height: {
+			height: pxToDp(90)
+		},
+		cell_content: {
+			justifyContent: "center",
+			marginLeft: 0,
+			paddingRight: 0
+			
+			// borderColor: 'green',
+			// borderWidth: pxToDp(1),
+		},
+		add_img: {
+			width: pxToDp(50),
+			height: pxToDp(50),
+			marginVertical: pxToDp(20)
+		},
+		add_store: {
+			fontSize: pxToDp(30),
+			fontWeight: "bold",
+			color: colors.color333
+		},
+		store_name: {
+			fontSize: pxToDp(34),
+			fontWeight: "bold",
+			color: colors.color333
+		},
+		open_time: {
+			marginLeft: pxToDp(12),
+			fontSize: pxToDp(26),
+			lineHeight: pxToDp(26),
+			fontWeight: "bold",
+			color: colors.color999,
+			alignSelf: "center"
+		},
+		cell_right: {
+			flexDirection: "row",
+			justifyContent: "center"
+		},
+		edit_text: {
+			color: colors.main_color,
+			fontSize: pxToDp(30),
+			fontWeight: "bold",
+			paddingTop: pxToDp(14)
+		},
+		right_btn: {
+			color: colors.main_color,
+			fontSize: pxToDp(30),
+			textAlign: "center",
+			height: pxToDp(70),
+			marginRight: pxToDp(30),
+			marginLeft: pxToDp(5),
+			paddingTop: pxToDp(20)
+		},
+		address: {
+			marginTop: pxToDp(20),
+			marginRight: pxToDp(30),
+			fontSize: pxToDp(30),
+			color: colors.color666,
+			lineHeight: pxToDp(35)
+		},
+		store_footer: {
+			marginTop: pxToDp(30),
+			marginBottom: pxToDp(20),
+			flexDirection: "row",
+			marginRight: pxToDp(30)
+		},
+		call_img: {
+			width: pxToDp(40),
+			height: pxToDp(40)
+		},
+		owner_name: {
+			marginHorizontal: pxToDp(15),
+			fontSize: pxToDp(30),
+			fontWeight: "bold",
+			color: colors.color333,
+			alignSelf: "flex-end",
+			maxWidth: pxToDp(220)
+		},
+		remind_time: {
+			fontSize: pxToDp(26),
+			color: colors.color999,
+			position: "absolute",
+			right: 0,
+			bottom: 0
+		},
+		tabbarContainer: {
+			borderWidth: 0.5,
+			borderTopWidth: 0,
+			borderLeftWidth: 0,
+			borderRightWidth: 0,
+			borderColor: '#dddddd',
+			backgroundColor: 'white',
+		},
+		tab: {
+			alignItems: 'center',
+			justifyContent: 'center',
+			paddingLeft: 18,
+			paddingRight: 18,
+		}
+	});
 
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(StoreScene);
