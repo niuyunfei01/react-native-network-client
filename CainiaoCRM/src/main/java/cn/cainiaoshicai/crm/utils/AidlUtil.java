@@ -169,7 +169,7 @@ public class AidlUtil {
      */
     public void initPrinter() {
         if (woyouService == null) {
-            Toast.makeText(context, "服务已断开!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "服务已断开!", Toast.LENGTH_LONG).show();
             return;
         }
 

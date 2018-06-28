@@ -7,6 +7,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
@@ -328,18 +331,20 @@ public class OrderAdapter extends BaseAdapter {
         if (context == null) {
             return;
         }
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-//            Toast.makeText(context, "没有呼叫权限", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
+        if (!isCallingSupported(v.getContext(), callIntent)) {
+            return;
+        }
         context.startActivity(callIntent);
+    }
+
+    private boolean isCallingSupported(Context context, Intent intent) {
+        boolean result = true;
+        PackageManager manager = context.getPackageManager();
+        List<ResolveInfo> infos = manager.queryIntentActivities(intent, 0);
+        if (infos.size() <= 0) {
+            result = false;
+        }
+        return result;
     }
 
     private class ShipWorkerOnClickListener implements View.OnClickListener {

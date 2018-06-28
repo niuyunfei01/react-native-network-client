@@ -33,7 +33,7 @@ public class AlwaysOnService extends BaseService {
                 String accessToken = intent.getStringExtra("accessToken");
                 String storeId = intent.getStringExtra("storeId");
                 if (accessToken != null && storeId != null) {
-                    backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 3, TimeUnit.MINUTES);
+                    backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 5, TimeUnit.MINUTES);
                 }
             }
             backgroundService.scheduleAtFixedRate(new TimerIncreasedRunnable(this), 0, 1000, TimeUnit.MILLISECONDS);
@@ -55,7 +55,6 @@ public class AlwaysOnService extends BaseService {
 
         private String accessToken;
         private String storeId;
-        GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
 
         public NotifyNewOrderRunnable(String accessToken, String storeId) {
             this.accessToken = accessToken;
@@ -92,7 +91,9 @@ public class AlwaysOnService extends BaseService {
             //最大音量
             int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             //当前音量
-            int currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+            int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
             mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
             mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
@@ -110,9 +111,9 @@ public class AlwaysOnService extends BaseService {
                 }
                 Thread.sleep(8000);
             }
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentVolume, 0);
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
+            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
+            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
         }
     }
 
