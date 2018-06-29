@@ -13,7 +13,7 @@ export default {
 		backgroundColor: '#fff',
 		height: pxToDp(80),
 		alignItems: 'center',
-		paddingHorizontal: 'center'
+		paddingHorizontal: pxToDp(20)
 	},
 	headerRight: {
 		flexDirection: 'row'
@@ -22,5 +22,9 @@ export default {
 		marginTop: pxToDp(20),
 		flexDirection: 'row',
 		justifyContent: 'space-between'
+	},
+	orderContentTh: {
+		borderBottomWidth: 0.5,
+		borderColor: '#eee'
 	}
 }

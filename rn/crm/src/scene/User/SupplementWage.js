@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import IconButton from "react-native-vector-icons/Entypo";
-import {View, Text} from "react-native";
+import {View, Text, ScrollView} from "react-native";
 import styles from './SupplementWageStyle'
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
@@ -49,9 +49,18 @@ class SupplementWage extends PureComponent {
 		const self = this
 		const {detail} = self.state.supplementDetail
 		let items = []
+		items.push(
+			<View style={[styles.orderContent, styles.orderContentTh]} key={0}>
+				<Text>店铺名</Text>
+				<Text>人效</Text>
+				<Text>标准</Text>
+				<Text>出勤天数</Text>
+				<Text>预计提成</Text>
+			</View>
+		)
 		for (let i in detail) {
 			items.push(
-				<View style={styles.orderContent} key={i}>
+				<View style={styles.orderContent} key={i + 1}>
 					<Text>{detail[i].store.name}</Text>
 					<Text>{detail[i].daily_apiece_order}/人天</Text>
 					<Text>{detail[i].order_standard}/单</Text>
@@ -86,9 +95,18 @@ class SupplementWage extends PureComponent {
 		const self = this
 		const {detail} = self.state.supplementDetail
 		let items = []
+		items.push(
+			<View style={[styles.orderContent, styles.orderContentTh]} key={0}>
+				<Text>店铺名</Text>
+				<Text>准点率</Text>
+				<Text>标准</Text>
+				<Text>出勤天数</Text>
+				<Text>预计提成</Text>
+			</View>
+		)
 		for (let i in detail) {
 			items.push(
-				<View style={styles.orderContent} key={i}>
+				<View style={styles.orderContent} key={i + 1}>
 					<Text>{detail[i].store.name}</Text>
 					<Text>{detail[i].punctual_percent * 100}%</Text>
 					<Text>{detail[i].punctual_standard}</Text>
@@ -119,20 +137,68 @@ class SupplementWage extends PureComponent {
 		)
 	}
 	
+	renderScoreListHeader(detail) {
+		const self = this
+		const {except_score_supplement, store} = detail
+		return (
+			<View style={styles.orderHeader}>
+				<View>
+					<Text>{store.name}</Text>
+				</View>
+				<View style={styles.headerRight}>
+					<Text>{except_score_supplement}</Text>
+					<IconButton
+						name="chevron-thin-right"
+						style={[styles.right_btn]}
+					/>
+				</View>
+			</View>
+		)
+	}
+	
+	renderScoreListContent(detail) {
+		const self = this
+		const {score, store} = detail
+		let items = []
+		items.push(
+			<View style={[styles.orderContent, styles.orderContentTh]} key={0}>
+				<Text>日期</Text>
+				<Text>店铺</Text>
+				<Text>评分</Text>
+				<Text>标准(1/26)</Text>
+				<Text>预计提成</Text>
+			</View>
+		)
+		for (let i in score) {
+			items.push(
+				<View style={styles.orderContent} key={i + 1}>
+					<Text>{score[i].date}</Text>
+					<Text>{store.name}</Text>
+					<Text>{score[i].bizScore}</Text>
+					<Text>{score[i].standard}</Text>
+					<Text>约{score[i].expect_supplement}元</Text>
+				</View>
+			)
+		}
+		return <View>{items}</View>
+	}
+	
 	renderScoreContent() {
 		const self = this
 		const {detail} = self.state.supplementDetail
 		let items = []
 		for (let i in detail) {
 			items.push(
-				<View style={styles.orderContent} key={i}>
-					<Text>{detail[i].store.name}</Text>
-					<Text>{detail[i].punctual_percent * 100}%</Text>
-					<Text>{detail[i].punctual_standard}</Text>
-					<Text>{detail[i].days}天</Text>
-					<Text>约{detail[i].except_punctual_supplement}元</Text>
-				
-				</View>
+				<Accordion
+					key={i + 1}
+					header={self.renderScoreListHeader(detail[i])}
+					content={self.renderScoreListContent(detail[i])}
+					activeOpacity={0}
+					easing="easeOutCubic"
+					underlayColor='#eee'
+					animationDuration={500}
+					style={{marginTop: pxToDp(20), marginLeft: pxToDp(20)}}
+				/>
 			)
 		}
 		return <View>{items}</View>
@@ -142,7 +208,7 @@ class SupplementWage extends PureComponent {
 		const self = this
 		const {expect_total_supplement} = self.state.supplementDetail
 		return (
-			<View>
+			<ScrollView>
 				<Accordion
 					header={this.renderOrderHeader()}
 					content={this.renderOrderContent()}
@@ -179,7 +245,7 @@ class SupplementWage extends PureComponent {
 						<Text>{expect_total_supplement}</Text>
 					</View>
 				</View>
-			</View>
+			</ScrollView>
 		)
 	}
 }
