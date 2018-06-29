@@ -32,8 +32,6 @@ import Cts from "../../Cts";
 import {tool, native} from "../../common";
 import {NavigationActions} from 'react-navigation';
 import {logout} from "../../reducers/global/globalActions";
-import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
 
 function mapStateToProps(state) {
 	const {mine, global} = state;
@@ -117,6 +115,7 @@ class UserScene extends PureComponent {
 			sign_count: mine.sign_count[currentUser] === undefined ? 0 : mine.sign_count[currentUser],
 			bad_cases_of: mine.bad_cases_of[currentUser] === undefined ? 0 : mine.bad_cases_of[currentUser],
 			exceptSupplement: 0,
+			onGetWage: true,
 			mobile: mobilephone,
 			cover_image: image,
 			screen_name: name,
@@ -173,6 +172,7 @@ class UserScene extends PureComponent {
 		const {dispatch} = this.props;
 		InteractionManager.runAfterInteractions(() => {
 			dispatch(getUserWageData(accessToken, 0, (ok, obj) => {
+				self.setState({onGetWage: false})
 				if (ok) {
 					self.setState({exceptSupplement: obj.expect_total_supplement})
 				}
@@ -248,6 +248,15 @@ class UserScene extends PureComponent {
 					onRequestClose={() => {
 					}}
 				>提交中</Toast>
+				
+				<Toast
+					icon="loading"
+					show={this.state.onGetWage}
+					onRequestClose={() => {
+					}}
+				>
+					获取数据中...
+				</Toast>
 			</ScrollView>
 		);
 	}
