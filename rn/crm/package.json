@@ -19,6 +19,7 @@
     "react": "16.0.0-alpha.12",
     "react-addons-shallow-compare": "^15.6.0",
     "react-native": "0.48.3",
+    "react-native-accordion": "^1.0.1",
     "react-native-autocomplete-input": "^3.4.0",
     "react-native-barcodescanner": "^3.1.1",
     "react-native-ble-manager": "^6.2.4",

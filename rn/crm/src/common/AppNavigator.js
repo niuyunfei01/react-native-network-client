@@ -82,6 +82,7 @@ import InvoicingScene from "../scene/Invoicing/InvoicingScene";
 import InvoicingGatherDetailScene from "../scene/Invoicing/InvoicingGatherDetailScene";
 import InvoicingShippingDetailScene from "../scene/Invoicing/InvoicingShippingDetailScene";
 import InvoicingShippingScene from "../scene/Invoicing/InvoicingShippingScene"
+import SupplementWage from '../scene/User/SupplementWage'
 //扫码创新
 import CreateScan from "../scene/Goods/CreateScan";
 import SearchGoods from "../scene/Goods/SearchGoods";
@@ -330,7 +331,8 @@ class Navigator extends Component {
 				[Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
 				[Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
 				[Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
-				[Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification}
+				[Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
+				[Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage}
 			},
 			stackNavigatorConfigs
 		);

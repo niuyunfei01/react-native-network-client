@@ -158,6 +158,7 @@ const C = {
   ROUTE_SELECT_CITY_LIST: "SelectCity",
   ROUTE_SELECT_QUALIFICATION: "Qualification",
   ROUTE_GOODS_ADJUST: 'GoodsAdjust',
+  ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   serverUrl,
   apiUrl,
   staticUrl,

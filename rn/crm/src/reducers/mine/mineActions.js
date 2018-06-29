@@ -9,7 +9,8 @@ const {
   GET_WORKER,
   GET_VENDOR_STORES,
   GET_STORE_TURNOVER,
-  GET_WM_STORES
+  GET_WM_STORES,
+	GET_USER_WAGE_DATA
 } = require("../../common/constants").default;
 
 export function fetchUserCount(u_id, token, callback) {
@@ -319,4 +320,28 @@ export function userCanChangeStore(store_id, token, callback) {
         callback({ ok: false, desc: error.message });
       });
   };
+}
+
+function receiveUserWageData(wageData = {}) {
+	return {
+		type: GET_USER_WAGE_DATA,
+		wageData: wageData
+	};
+}
+
+export function getUserWageData(token, month, callback) {
+  return dispatch => {
+	  const url = `api/supplement_wage?access_token=${token}`;
+	  
+	  FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {
+		  uid: 830885,
+		  month: '2018-06'
+	  })).then(resp => resp.json()).then(resp => {
+		  let {ok, obj} = resp;
+		  if(ok){
+		    dispatch(receiveUserWageData(obj))
+      }
+		  callback(ok, obj);
+	  })
+  }
 }

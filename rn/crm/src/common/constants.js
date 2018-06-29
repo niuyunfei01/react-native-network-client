@@ -90,6 +90,8 @@ export default keyMirror({
   GET_SHIP_WORKERS: null,
 
   GET_VENDOR_TAGS: null,
+  
+  GET_USER_WAGE_DATA: null,
 
   ACTIVITY_COMMON_RULE: null,
   ACTIVITY_SPECIAL_RULE: null,
