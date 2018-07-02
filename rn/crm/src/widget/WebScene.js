@@ -54,9 +54,20 @@ class WebScene extends PureComponent {
   };
 
   onMessage = (e) => {
+    let _this = this;
     const msg = e.nativeEvent.data;
+    console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
-      this._do_go_back(msg);
+      if (msg.indexOf('http') == 0) {
+        this._do_go_back(msg);
+      } else {
+        let data = JSON.parse(msg);
+        let action = data['action'];
+        let params = data['params'];
+        InteractionManager.runAfterInteractions(() => {
+          _this.props.navigation.navigate(action, params);
+        });
+      }
     }
   };
 
@@ -79,6 +90,7 @@ class WebScene extends PureComponent {
       goBack()
     }
   }
+
 
   _onNavigationStateChange = (navState) => {
     console.log('set nav state', navState);
@@ -193,6 +205,7 @@ class WebScene extends PureComponent {
           style={styles.webView}
           source={this.state.source}
           onLoadEnd={(e) => this.onLoadEnd(e)}
+
           // renderLoading={() => {
           //   return <Toast>加载中</Toast>
           // }}
