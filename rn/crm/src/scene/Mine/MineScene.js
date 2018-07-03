@@ -957,7 +957,7 @@ class MineScene extends PureComponent {
 					<View style={[block_styles.notice_point]}/>
 					<Image
 						style={[block_styles.block_img]}
-						source={require("../../img/Mine/shangpinqingbao_.png")}
+						source={require("../../img/My/shangpinqingbao_.png")}
 					/>
 					<Text style={[block_styles.block_name]}>商品调整</Text>
 				</TouchableOpacity>
