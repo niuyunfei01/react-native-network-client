@@ -36,6 +36,8 @@ import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
 import ModalSelector from "react-native-modal-selector";
+import AppConfig from "../../config.js";
+import FetchEx from "../../util/fetchEx";
 
 function mapStateToProps(state) {
 	const {mine, user, global} = state;
@@ -154,7 +156,8 @@ class MineScene extends PureComponent {
 			
 			storeList: tool.storeListOfModalSelector(canReadStores),
 			storeListSecondModalVisible: false,
-			storeListSecondModalData: []
+			storeListSecondModalData: [],
+      adjust_cnt : 0
 		};
 		
 		this._doChangeStore = this._doChangeStore.bind(this);
@@ -165,6 +168,7 @@ class MineScene extends PureComponent {
 		this.onHeaderRefresh = this.onHeaderRefresh.bind(this);
 		this.onGetUserInfo = this.onGetUserInfo.bind(this);
 		this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
+		this.getNotifyCenter = this.getNotifyCenter.bind(this);
 		
 		if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
 			this.onGetUserCount();
@@ -178,16 +182,17 @@ class MineScene extends PureComponent {
 			this.onGetUserInfo(service_uid);
 		}
 	}
-	
-	componentWillMount() {
-		let {currStoreId, canReadStores} = this.props.global;
-		if (!(currStoreId > 0)) {
-			let first_store_id = tool.first_store_id(canReadStores);
-			if (first_store_id > 0) {
-				this._doChangeStore(first_store_id, false);
-			}
-		}
-	}
+
+  componentWillMount() {
+    let {currStoreId, canReadStores} = this.props.global;
+    if (!(currStoreId > 0)) {
+      let first_store_id = tool.first_store_id(canReadStores);
+      if (first_store_id > 0) {
+        this._doChangeStore(first_store_id, false);
+      }
+    }
+    this.getNotifyCenter();
+  }
 	
 	onGetUserInfo(uid) {
 		const {accessToken} = this.props.global;
@@ -220,7 +225,21 @@ class MineScene extends PureComponent {
 			);
 		});
 	}
-	
+
+  getNotifyCenter() {
+    let _this = this;
+    const {currStoreId, accessToken} = this.props.global;
+    const url = `api/notify_center/${currStoreId}.json?access_token=${accessToken}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let {adjust_cnt} = resp.obj;
+          _this.setState({adjust_cnt: adjust_cnt});
+        }
+      })
+  }
+
 	onGetStoreTurnover() {
 		const {accessToken} = this.props.global;
 		const {dispatch} = this.props;
@@ -954,7 +973,7 @@ class MineScene extends PureComponent {
 					onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
 					activeOpacity={customerOpacity}
 				>
-					<View style={[block_styles.notice_point]}/>
+          {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
 					<Image
 						style={[block_styles.block_img]}
 						source={require("../../img/My/shangpinqingbao_.png")}
