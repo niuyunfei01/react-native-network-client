@@ -143,6 +143,9 @@ public class JavaHttpUtility {
             uRLConnection.setRequestProperty("Connection", "Keep-Alive");
             uRLConnection.setRequestProperty("Charset", "UTF-8");
             uRLConnection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+            String versionCode = Utility.getVersionCode(GlobalCtx.app());
+            String versionName = Utility.getVersionName(GlobalCtx.app());
+            uRLConnection.setRequestProperty("x-request-app-version", versionCode + ":" + versionName);
             uRLConnection.connect();
 
             DataOutputStream out = new DataOutputStream(uRLConnection.getOutputStream());
@@ -307,7 +310,9 @@ public class JavaHttpUtility {
             urlConnection.setRequestProperty("Connection", "Keep-Alive");
             urlConnection.setRequestProperty("Charset", "UTF-8");
             urlConnection.setRequestProperty("Accept-Encoding", "gzip, deflate");
-
+            String versionCode = Utility.getVersionCode(GlobalCtx.app());
+            String versionName = Utility.getVersionName(GlobalCtx.app());
+            urlConnection.setRequestProperty("x-request-app-version", versionCode + ":" + versionName);
             urlConnection.connect();
 
             String res = handleResponse(urlConnection);
