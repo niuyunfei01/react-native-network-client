@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 
 import com.iflytek.cloud.thirdparty.S;
 
@@ -31,7 +32,12 @@ public class Bootstrap {
                     pIntent.putExtra(entry.getKey(), entry.getValue());
                 }
             }
-            context.startService(pIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(pIntent);
+            } else {
+                context.startService(pIntent);
+            }
 
             // enable 10 secs restart
             Intent mIntent = new Intent(context, AlarmBroadcastReceiver.class);

@@ -898,8 +898,11 @@ public class MainActivity extends AbstractActionBarActivity {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             String token = GlobalCtx.app().token();
-            GeneralWebViewActivity.gotoWeb(MainActivity.this,
-                    URLHelper.getStoresPrefix() + "/working_status.html?_v_id="+ vendorId +"&access_token=" + token);
+            String url = URLHelper.getStoresPrefix() + "/working_status.html?_v_id=" + vendorId + "&access_token=" + token;
+//            GeneralWebViewActivity.gotoWeb(MainActivity.this, url);
+            Map<String, String> params = Maps.newHashMap();
+            params.put("url", url);
+            GlobalCtx.app().toRNWebView(MainActivity.this, params);
         }
     }
 }

@@ -828,6 +828,18 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    //跳转到reactnative web页面
+    public void toRNWebView(Activity ctx, Map<String, String> data) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Web");
+        Bundle params = new Bundle();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            params.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
         return new Intent(ctx, MyReactActivity.class);
