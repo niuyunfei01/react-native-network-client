@@ -954,6 +954,7 @@ class MineScene extends PureComponent {
 					onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
 					activeOpacity={customerOpacity}
 				>
+					<View style={[block_styles.notice_point]}/>
 					<Image
 						style={[block_styles.block_img]}
 						source={require("../../img/Mine/shangpinqingbao_.png")}
@@ -1345,6 +1346,16 @@ const block_styles = StyleSheet.create({
 		fontSize: pxToDp(26),
 		lineHeight: pxToDp(28),
 		textAlign: "center"
+	},
+	notice_point: {
+		width: pxToDp(30),
+		height: pxToDp(30),
+		borderRadius: pxToDp(15),
+		backgroundColor: '#f00',
+		position: 'absolute',
+		right: pxToDp(60),
+		top: pxToDp(20),
+		zIndex: 99
 	}
 });
 
