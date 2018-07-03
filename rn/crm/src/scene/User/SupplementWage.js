@@ -4,6 +4,9 @@ import {View, Text, ScrollView} from "react-native";
 import styles from './SupplementWageStyle'
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
+import AppConfig from "../../config";
+import FetchEx from "../../util/fetchEx";
+import {ToastShort} from "../../util/ToastUtils";
 
 var Accordion = require('react-native-accordion')
 
@@ -24,6 +27,28 @@ class SupplementWage extends PureComponent {
 		this.state = {
 			supplementDetail: mine.wage_data
 		}
+		
+		const {uid, date} = this.props.navigation.state.params
+		console.log(`uid => ${uid} ; date => ${date}`)
+		if (uid && date) {
+			this.getExceptSupplement(uid, date)
+		}
+	}
+	
+	getExceptSupplement(uid, month) {
+		const self = this
+		const {accessToken} = this.props.global;
+		const url = `api/supplement_wage?access_token=${accessToken}`;
+		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {
+			uid, month
+		})).then(resp => resp.json()).then(resp => {
+			let {ok, obj, reason} = resp;
+			if (ok) {
+				self.setState({supplementDetail: obj})
+			} else {
+				ToastShort(reason)
+			}
+		})
 	}
 	
 	renderOrderHeader() {
