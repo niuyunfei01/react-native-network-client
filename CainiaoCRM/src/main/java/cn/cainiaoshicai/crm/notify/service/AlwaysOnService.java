@@ -1,13 +1,18 @@
 package cn.cainiaoshicai.crm.notify.service;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +28,21 @@ public class AlwaysOnService extends BaseService {
     private static String LOG_TAG = AlwaysOnService.class.getSimpleName();
     public static boolean isRunning = false;
     private ScheduledExecutorService backgroundService;
+
+    private static final String CHANNEL_ID = "44944";
+    private static final String CHANNEL_NAME = "AlwaysOnServiceChannel";
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel);
+            Notification notification = new Notification.Builder(getApplicationContext(), CHANNEL_ID).build();
+            startForeground(1, notification);
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -146,5 +166,4 @@ public class AlwaysOnService extends BaseService {
                     timeCount).commit();
         }
     }
-
 }

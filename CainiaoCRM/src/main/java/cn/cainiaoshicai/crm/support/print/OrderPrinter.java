@@ -412,15 +412,18 @@ public class OrderPrinter {
         int tryTimes = 3;
         boolean enable = false;
         Context context = GlobalCtx.app();
-        while (tryTimes > 0) {
-            AidlUtil.getInstance().connectPrinterService(context);
-            AidlUtil.getInstance().initPrinter();
-            boolean isEnable = GlobalCtx.smPrintIsEnable();
-            if (isEnable) {
-                enable = isEnable;
-                break;
+        try {
+            while (tryTimes > 0) {
+                AidlUtil.getInstance().connectPrinterService(context);
+                boolean isEnable = GlobalCtx.smPrintIsEnable();
+                if (isEnable) {
+                    enable = isEnable;
+                    break;
+                }
+                tryTimes--;
             }
-            tryTimes--;
+        } catch (Exception e) {
+            AppLogger.e("error check support sun mi", e);
         }
         return enable;
     }
