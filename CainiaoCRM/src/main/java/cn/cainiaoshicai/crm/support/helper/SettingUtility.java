@@ -428,12 +428,16 @@ public class SettingUtility {
     }
 
     public static <T> void putSR(String key, T value, boolean firstCache) {
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String json = gson.toJson(value, new TypeToken<T>(){}.getType());
-        AppLogger.d("putSR: key=" + key + ",json:" + json);
-        SettingHelper.setEditor(getContext(), "ca_" + key, json);
-        if (firstCache) {
-            SettingHelper.setEditor(getContext(), "ca_tl_" + key, System.currentTimeMillis());
+        try{
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            String json = gson.toJson(value, new TypeToken<T>(){}.getType());
+            AppLogger.d("putSR: key=" + key + ",json:" + json);
+            SettingHelper.setEditor(getContext(), "ca_" + key, json);
+            if (firstCache) {
+                SettingHelper.setEditor(getContext(), "ca_tl_" + key, System.currentTimeMillis());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
