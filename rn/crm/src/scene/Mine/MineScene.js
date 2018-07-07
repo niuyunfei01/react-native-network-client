@@ -76,6 +76,8 @@ class MineScene extends PureComponent {
 			canReadStores
 		} = this.props.global;
 
+		console.log('mine scene ',canReadStores);
+
 		let prefer_store = "";
 		let screen_name = "";
 		let mobilephone = "";
@@ -165,10 +167,7 @@ class MineScene extends PureComponent {
 		this.onGetUserInfo = this.onGetUserInfo.bind(this);
 		this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
 
-		if (
-			this.state.sign_count === undefined ||
-			this.state.bad_cases_of === undefined
-		) {
+		if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
 			this.onGetUserCount();
 		}
 		if (is_mgr || is_helper) {
@@ -223,114 +222,108 @@ class MineScene extends PureComponent {
 		});
 	}
 
-	onGetStoreTurnover() {
-		const {accessToken} = this.props.global;
-		const {dispatch} = this.props;
-		let {currStoreId, fnPriceControlled} = this.state;
-		let _this = this;
+  onGetStoreTurnover() {
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {currStoreId, fnPriceControlled} = this.state;
+    let _this = this;
 
-		InteractionManager.runAfterInteractions(() => {
-			if (fnPriceControlled > 0) {
-				dispatch(
-					get_supply_orders(
-						currStoreId,
-						tool.fullDay(new Date()),
-						accessToken,
-						async resp => {
-							//console.log(resp);
-							if (resp.ok) {
-								let {order_num, total_price} = resp.obj;
-								_this.setState({
-									order_num: order_num,
-									turnover: tool.toFixed(total_price)
-								});
-							} else {
-								ToastLong(resp.desc);
-							}
-							_this.setState({isRefreshing: false});
-						}
-					)
-				);
-			} else {
-				dispatch(
-					fetchStoreTurnover(currStoreId, accessToken, resp => {
-						// console.log(resp);
-						if (resp.ok) {
-							let {order_num, turnover} = resp.obj;
-							_this.setState({
-								order_num: order_num,
-								turnover: turnover
-							});
-						}
-						_this.setState({isRefreshing: false});
-					})
-				);
-			}
-		});
-	}
+    InteractionManager.runAfterInteractions(() => {
+      if (fnPriceControlled > 0) {
+        dispatch(
+          get_supply_orders(
+            currStoreId,
+            tool.fullDay(new Date()),
+            accessToken,
+            async resp => {
+              //console.log(resp);
+              if (resp.ok) {
+                let {order_num, total_price} = resp.obj;
+                _this.setState({
+                  order_num: order_num,
+                  turnover: tool.toFixed(total_price)
+                });
+                _this.forceUpdate();
+              } else {
+                ToastLong(resp.desc);
+              }
+              _this.setState({isRefreshing: false});
+            }
+          )
+        );
+      } else {
+        dispatch(
+          fetchStoreTurnover(currStoreId, accessToken, resp => {
+            if (resp.ok) {
+              let {order_num, turnover} = resp.obj;
+              _this.setState({
+                order_num: order_num,
+                turnover: turnover
+              });
+              _this.forceUpdate();
+            }
+            _this.setState({isRefreshing: false});
+          })
+        );
+      }
+    });
+  }
 
-	componentWillReceiveProps() {
-		const {
-			currentUser,
-			currStoreId,
-			currentUserProfile,
-			canReadStores
-		} = this.props.global;
+  componentWillReceiveProps() {
+    const {
+      currentUser,
+      currStoreId,
+      currentUserProfile,
+      canReadStores
+    } = this.props.global;
 
-		let {
-			prefer_store,
-			screen_name,
-			mobilephone,
-			cover_image
-		} = currentUserProfile;
+    let {
+      prefer_store,
+      screen_name,
+      mobilephone,
+      cover_image
+    } = currentUserProfile;
 
-		const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-		let {
-			currStoreName,
-			currVendorName,
-			currVendorId,
-			currVersion,
-			currManager,
-			is_mgr,
-			is_helper,
-			is_service_mgr,
-			fnPriceControlled
-		} = tool.vendor(this.props.global);
+    const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+    let {
+      currStoreName,
+      currVendorName,
+      currVendorId,
+      currVersion,
+      currManager,
+      is_mgr,
+      is_helper,
+      is_service_mgr,
+      fnPriceControlled
+    } = tool.vendor(this.props.global);
 
-		// let storeActionSheet = tool.storeActionSheet(
-		// 	canReadStores,
-		// 	is_service_mgr || is_helper
-		// );
+    cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+    if (cover_image.indexOf("/preview.") !== -1) {
+      cover_image = cover_image.replace("/preview.", "/www.");
+    }
 
-		cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
-		if (cover_image.indexOf("/preview.") !== -1) {
-			cover_image = cover_image.replace("/preview.", "/www.");
-		}
-
-		this.setState({
-			// storeActionSheet: storeActionSheet,
-
-			sign_count: sign_count[currentUser],
-			bad_cases_of: bad_cases_of[currentUser],
-			order_num: fnPriceControlled > 0 ? 0 : order_num[currStoreId],
-			turnover: fnPriceControlled > 0 ? "计算中" : turnover[currStoreId],
-
-			currentUser: currentUser,
-			prefer_store: prefer_store,
-			screen_name: screen_name,
-			mobile_phone: mobilephone,
-			currStoreId: currStoreId,
-			currStoreName: currStoreName,
-			currVendorId: currVendorId,
-			currVersion: currVersion,
-			currManager: currManager,
-			is_mgr: is_mgr,
-			is_helper: is_helper,
-			fnPriceControlled: fnPriceControlled,
-			currVendorName: currVendorName,
-			cover_image: cover_image
-		});
-	}
+    this.setState({
+      sign_count: sign_count[currentUser],
+      bad_cases_of: bad_cases_of[currentUser],
+      order_num: fnPriceControlled > 0 ? 0 : order_num[currStoreId],
+      turnover: fnPriceControlled > 0 ? "计算中" : turnover[currStoreId],
+      currentUser: currentUser,
+      prefer_store: prefer_store,
+      screen_name: screen_name,
+      mobile_phone: mobilephone,
+      currStoreId: currStoreId,
+      currStoreName: currStoreName,
+      currVendorId: currVendorId,
+      currVersion: currVersion,
+      currManager: currManager,
+      is_mgr: is_mgr,
+      is_helper: is_helper,
+      fnPriceControlled: fnPriceControlled,
+      currVendorName: currVendorName,
+      cover_image: cover_image,
+      storeList: tool.storeListOfModalSelector(canReadStores),
+    });
+  }
 
 	onHeaderRefresh() {
 		this.setState({isRefreshing: true});
@@ -410,30 +403,25 @@ class MineScene extends PureComponent {
 		});
 	}
 
-	getTimeoutCommonConfig(
-		store_id,
-		should_refresh = false,
-		callback = () => {
-		}
-	) {
-		const {accessToken, last_get_cfg_ts} = this.props.global;
-		let current_time = Moment(new Date()).unix();
-		let diff_time = current_time - last_get_cfg_ts;
+  getTimeoutCommonConfig(store_id,
+                         should_refresh = false,
+                         callback = () => {
+                         }) {
+    const {accessToken, last_get_cfg_ts} = this.props.global;
+    let current_time = Moment(new Date()).unix();
+    let diff_time = current_time - last_get_cfg_ts;
 
-		if (should_refresh || diff_time > 300) {
-			const {dispatch} = this.props;
-			dispatch(
-				getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
-					callback(ok, msg, obj);
-				})
-			);
-		}
-	}
+    if (should_refresh || diff_time > 300) {
+      const {dispatch} = this.props;
+      dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
+        callback(ok, msg, obj);
+      }));
+    }
+  }
 
 	onCanChangeStore(store_id) {
 		const {accessToken} = this.props.global;
 		const {dispatch} = this.props;
-
 		let _this = this;
 		dispatch(
 			userCanChangeStore(store_id, accessToken, resp => {
@@ -472,7 +460,7 @@ class MineScene extends PureComponent {
 					>
 						<View style={{flexDirection: "row"}}>
 							<Icon name="exchange" style={header_styles.change_shop}/>
-							<Text style={header_styles.change_shop}> 切换门店</Text>
+							<Text style={header_styles.change_shop}>切换门店</Text>
 						</View>
 					</ModalSelector>
 				</View>
@@ -691,19 +679,19 @@ class MineScene extends PureComponent {
 					>
 						切换门店中...
 					</Toast>
+					<ModalSelector
+						initValue={""}
+						onChange={(option) => {
+              this.onCanChangeStore(option.id);
+            }}
+						onModalClose={() => {
+              this.setState({storeListSecondModalVisible: false})
+            }}
+						cancelText={'取消'}
+						visible={this.state.storeListSecondModalVisible}
+						data={this.state.storeListSecondModalData}
+					/>
 				</ScrollView>
-
-				<ModalSelector
-					onChange={(option) => {
-						this.onCanChangeStore(option.id);
-					}}
-					onModalClose={() => {
-						this.setState({storeListSecondModalVisible: false})
-					}}
-					cancelText={'取消'}
-					visible={this.state.storeListSecondModalVisible}
-					data={this.state.storeListSecondModalData}
-				/>
 			</View>
 		);
 	}
