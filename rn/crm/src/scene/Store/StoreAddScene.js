@@ -544,9 +544,7 @@ class StoreAddScene extends Component {
 	
 	copyReceiveSecretKey(text) {
 		Clipboard.setString(text)
-		Clipboard.getString().then(res => {
-			ToastShort('已复制到剪切板')
-		})
+    ToastLong('已复制到剪切板')
 	}
 	
 	renderRemark() {
