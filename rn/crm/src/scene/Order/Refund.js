@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import {
   Platform,
   View,
@@ -16,18 +16,18 @@ import {
   PixelRatio,
   TextInput
 } from "react-native";
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
-import { Styles, Metrics, Colors } from "../../themes";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {Styles, Metrics, Colors} from "../../themes";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 //组件
-import { Button, Line, Yuan, Button1 } from "../component/All";
+import {Button, Line, Yuan, Button1} from "../component/All";
 import LoadingView from "../../widget/LoadingView";
 //请求
-import { getWithTpl, jsonWithTpl } from "../../util/common";
-import { tool } from "../../common";
-import { ToastLong } from "../../util/ToastUtils";
+import {getWithTpl, jsonWithTpl} from "../../util/common";
+import {tool} from "../../common";
+import {ToastLong} from "../../util/ToastUtils";
 
 const one = 1 / PixelRatio.get(); //屏幕密度
 
@@ -36,10 +36,11 @@ const mapStateToProps = state => {
     global: state.global //全局token,
   };
 };
+
 class Refund extends Component {
   //导航
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
       headerLeft: (
         <NavigationItem
@@ -58,6 +59,7 @@ class Refund extends Component {
       )
     };
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -70,6 +72,7 @@ class Refund extends Component {
     };
     this.refundReason = null;
   }
+
   componentWillMount() {
     console.log(
       "this.props.navigation.state.params.orderDetail:%o",
@@ -77,10 +80,11 @@ class Refund extends Component {
     );
     this.fetchResources();
   }
+
   fetchResources = () => {
     let url = `/api/refund_reason?access_token=${
       this.props.global.accessToken
-    }`;
+      }`;
     http: getWithTpl(
       url,
       json => {
@@ -157,7 +161,7 @@ class Refund extends Component {
     this.refundgoodsList = [];
     this.state.goodsList.map(element => {
       if (element.active && element.num !== 0) {
-        this.refundgoodsList.push({ id: element.id, count: element.num });
+        this.refundgoodsList.push({id: element.id, count: element.num});
       }
     });
     let payload = {
@@ -182,13 +186,15 @@ class Refund extends Component {
         console.log("error:%o", error);
         ToastLong("网络错误");
       },
-      action => {}
+      action => {
+      }
     );
   };
+
   render() {
     console.disableYellowBox = true;
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
       <View
         style={{
@@ -198,12 +204,12 @@ class Refund extends Component {
         }}
       >
         <ScrollView>
-          <View style={{ paddingHorizontal: pxToDp(31) }}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{paddingHorizontal: pxToDp(31)}}>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
               <Text style={Styles.h32bf}>
                 {tool.shortOrderDay(this.state.orderDetail.orderTime)}#{
-                  this.state.orderDetail.dayId
-                }
+                this.state.orderDetail.dayId
+              }
               </Text>
               <Button
                 fontStyle={Styles.h22theme}
@@ -212,14 +218,14 @@ class Refund extends Component {
                   this.state.orderDetail.orderStatus == 1
                     ? "已收单"
                     : this.state.orderDetail.orderStatus == 2
-                      ? "已分拣"
-                      : this.state.orderDetail.orderStatus == 3
-                        ? "已出发"
-                        : "已送达"
+                    ? "已分拣"
+                    : this.state.orderDetail.orderStatus == 3
+                      ? "已出发"
+                      : "已送达"
                 }
               />
             </View>
-            <Line mgt={15} />
+            <Line mgt={15}/>
             {/*订单号*/}
             <View
               style={{
@@ -233,8 +239,8 @@ class Refund extends Component {
               </Text>
               <Text style={Styles.h22a2}>
                 期望送达：{tool.orderExpectTime(
-                  this.state.orderDetail.expectTime
-                )}
+                this.state.orderDetail.expectTime
+              )}
               </Text>
             </View>
             <View
@@ -250,18 +256,18 @@ class Refund extends Component {
               </Text>
               <Text style={Styles.h22a2}>
                 下单时间：{tool.orderOrderTimeShort(
-                  this.state.orderDetail.orderTime
-                )}
+                this.state.orderDetail.orderTime
+              )}
               </Text>
             </View>
             {/*下单提示*/}
-            <Text style={[Styles.h18theme, { marginVertical: 15 }]}>
+            <Text style={[Styles.h18theme, {marginVertical: 15}]}>
               提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
             </Text>
           </View>
           {this.title("商品明细")}
           {/*商品明细列表*/}
-          <View style={{ paddingHorizontal: pxToDp(31) }}>
+          <View style={{paddingHorizontal: pxToDp(31)}}>
             {this.state.goodsList.map((element, index) => {
               console.log("element", element);
               return (
@@ -311,8 +317,8 @@ class Refund extends Component {
                         }}
                       >
                         <Image
-                          source={{ uri: element.product_img }}
-                          style={{ width: 40, height: 40 }}
+                          source={{uri: element.product_img}}
+                          style={{width: 40, height: 40}}
                         />
                       </View>
                       <View
@@ -331,21 +337,21 @@ class Refund extends Component {
                             alignItems: "center"
                           }}
                         >
-                          <Text style={[Styles.h223e, { flex: 1 }]}>
+                          <Text style={[Styles.h223e, {flex: 1}]}>
                             {element.gPrice}
                           </Text>
-                          <Text style={[Styles.h16c4, { flex: 1 }]}>
+                          <Text style={[Styles.h16c4, {flex: 1}]}>
                             总价{" "}
                             {(element.price * element.origin_num).toFixed(2)}
                           </Text>
-                          <Text style={[Styles.h16c4, { flex: 1 }]}>
+                          <Text style={[Styles.h16c4, {flex: 1}]}>
                             *{element.origin_num}
                           </Text>
                         </View>
                       </View>
                     </View>
                     <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                      style={{flexDirection: "row", alignItems: "center"}}
                     >
                       <Yuan
                         icon={"md-remove"}
@@ -397,8 +403,8 @@ class Refund extends Component {
               );
             })}
           </View>
-          <Line h={1.2} />
-          <View style={{ paddingVertical: 10, paddingHorizontal: pxToDp(31) }}>
+          <Line h={1.2}/>
+          <View style={{paddingVertical: 10, paddingHorizontal: pxToDp(31)}}>
             <View
               style={{
                 flexDirection: "row",
@@ -455,7 +461,7 @@ class Refund extends Component {
                       this.state.index === index ? Colors.theme : Colors.greyc
                     }
                   />
-                  <Text style={[Styles.h203e, { marginLeft: 20 }]}>
+                  <Text style={[Styles.h203e, {marginLeft: 20}]}>
                     {element}
                   </Text>
                 </View>
@@ -463,7 +469,7 @@ class Refund extends Component {
             );
           })}
           {/*用户自己输入的退款原因*/}
-          <View style={{ paddingHorizontal: pxToDp(31), marginTop: 15 }}>
+          <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
             <TextInput
               style={[
                 {
@@ -489,8 +495,8 @@ class Refund extends Component {
           </View>
         </ScrollView>
         {/*退款按钮*/}
-        <View style={{ paddingHorizontal: pxToDp(31) }}>
-          <Button1 t="确认退款" w="100%" onPress={() => this.refund()} />
+        <View style={{paddingHorizontal: pxToDp(31)}}>
+          <Button1 t="确认退款" w="100%" onPress={() => this.refund()}/>
         </View>
       </View>
     );

@@ -153,7 +153,7 @@ class RootScene extends PureComponent {
       if (diff_time > 300) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-            console.log("getCommonConfig -> ", ok, msg);
+          
           })
         );
       }

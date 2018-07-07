@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.media.Image;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -43,6 +42,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.common.collect.Maps;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
@@ -53,11 +53,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -71,7 +73,6 @@ import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
-import cn.cainiaoshicai.crm.ui.activity.MineActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
@@ -189,6 +190,12 @@ public class MainActivity extends AbstractActionBarActivity {
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
         handleIntent(intent);
+
+        long store_id = SettingUtility.getListenerStore();
+        Map<String, String> serviceExtras = Maps.newHashMap();
+        serviceExtras.put("accessToken", accountBean.getAccess_token());
+        serviceExtras.put("storeId", store_id + "");
+        Bootstrap.startAlwaysOnService(this, "Crm", serviceExtras);
     }
 
     private void resetPrinterStatusBar() {
@@ -891,8 +898,11 @@ public class MainActivity extends AbstractActionBarActivity {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             String token = GlobalCtx.app().token();
-            GeneralWebViewActivity.gotoWeb(MainActivity.this,
-                    URLHelper.getStoresPrefix() + "/working_status.html?_v_id="+ vendorId +"&access_token=" + token);
+            String url = URLHelper.getStoresPrefix() + "/working_status.html?_v_id=" + vendorId + "&access_token=" + token;
+//            GeneralWebViewActivity.gotoWeb(MainActivity.this, url);
+            Map<String, String> params = Maps.newHashMap();
+            params.put("url", url);
+            GlobalCtx.app().toRNWebView(MainActivity.this, params);
         }
     }
 }

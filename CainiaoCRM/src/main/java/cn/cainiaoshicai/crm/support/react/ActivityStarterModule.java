@@ -20,12 +20,14 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -33,6 +35,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.Log;
@@ -41,6 +44,7 @@ import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
@@ -51,6 +55,7 @@ import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
+import cn.cainiaoshicai.crm.utils.AidlUtil;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -88,6 +93,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
+        Bootstrap.stopAlwaysOnService(GlobalCtx.app());
     }
 
     @ReactMethod
@@ -112,7 +118,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback){
+    void updateAfterTokenGot(@Nonnull String token, int expiresInSeconds, @Nonnull Callback callback) {
         try {
             LoginActivity.DBResult r = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
             AccountBean ab = GlobalCtx.app().getAccountBean();
@@ -124,6 +130,20 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             } else {
                 callback.invoke(false, "Account is null", null);
             }
+
+            Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+
+            long store_id = SettingUtility.getListenerStore();
+            Map<String, String> serviceExtras = Maps.newHashMap();
+            String accessToken = "";
+            if (GlobalCtx.app().getAccountBean() != null) {
+                accessToken = GlobalCtx.app().getAccountBean().getAccess_token();
+            }
+            serviceExtras.put("accessToken", accessToken);
+            serviceExtras.put("storeId", store_id + "");
+            SettingHelper.setEditor(GlobalCtx.app(), "accessToken", accessToken);
+            SettingHelper.setEditor(GlobalCtx.app(), "storeId", store_id + "");
+            Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
             String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
@@ -132,7 +152,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void setCurrStoreId(@Nonnull String currId, @Nonnull Callback callback){
+    void setCurrStoreId(@Nonnull String currId, @Nonnull Callback callback) {
         try {
             long selectedStoreId = Long.parseLong(currId);
             if (selectedStoreId > 0) {
@@ -270,6 +290,30 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void printSmPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        final Order o = gson.fromJson(orderJson, new TypeToken<Order>() {
+        }.getType());
+        int tryTimes = 3;
+        boolean success = false;
+        while (tryTimes > 0) {
+            AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
+            AidlUtil.getInstance().initPrinter();
+            boolean isEnable = GlobalCtx.smPrintIsEnable();
+            if (isEnable) {
+                AidlUtil.getInstance().initPrinter();
+                OrderPrinter.smPrintOrder(o);
+                success = true;
+                break;
+            }
+            tryTimes--;
+        }
+        if (!success) {
+            callback.invoke(false, "不支持该设备");
+        }
+    }
+
+    @ReactMethod
     void getActivityNameAsPromise(@Nonnull Promise promise) {
         Context activity = GlobalCtx.app().getCurrentRunningActivity();
         if (activity != null) {
@@ -278,7 +322,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     *
      * @param mobile mobile could be null
      */
     @ReactMethod
@@ -328,7 +371,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 if (!putStack) {
                     intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 }
-                Bundle bundle=new Bundle();
+                Bundle bundle = new Bundle();
                 bundle.putString("jsonData", jsonData);
                 intent.putExtras(bundle);
                 activity.startActivity(intent);

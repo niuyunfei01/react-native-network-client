@@ -359,7 +359,7 @@ export function cancelReasonsList(order_id,token,callback) {
   }
 }
 
-export function cancelShip(order_id,reason_id,data,token,callback) {
+export function cancelShip(order_id, reason_id, data, token, callback) {
   const url = `api/order_dada_cancel/${order_id}/${reason_id}.json?access_token=${token}`;
   return jsonReqThenInvalidate(url, order_id, callback);
   // return jsonWithTpl2(url, data, (json) => {

@@ -54,19 +54,19 @@ class ActivitySelectStoreScene extends PureComponent {
     return {
       headerTitle: '选择店铺',
       headerLeft: (
-          <NavigationItem
-              icon={require('../../img/Register/back_.png')}
-              iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-              onPress={() => {
-                params.confimBack()
-              }}
-          />
+        <NavigationItem
+          icon={require('../../img/Register/back_.png')}
+          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+          onPress={() => {
+            params.confimBack()
+          }}
+        />
       ),
       headerRight: (
-          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
-            <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>品牌</Text>
-            <Image style={{width: pxToDp(80), height: pxToDp(80)}} source={require('../../img/Order/pull_down.png')}/>
-          </TouchableOpacity>
+        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
+          <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>品牌</Text>
+          <Image style={{width: pxToDp(80), height: pxToDp(80)}} source={require('../../img/Order/pull_down.png')}/>
+        </TouchableOpacity>
       )
     }
   };
@@ -123,10 +123,11 @@ class ActivitySelectStoreScene extends PureComponent {
     navigation.setParams({toggle: this.toggle});
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
+
   componentDidMount() {
     this.props.navigation.setParams({
-      confimBack:()=>{
-        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
+      confimBack: () => {
+        this.identical() ? this.props.navigation.goBack() : this.setState({confimBack: true})
       }
     })
   }
@@ -168,7 +169,7 @@ class ActivitySelectStoreScene extends PureComponent {
       } else {
         ToastLong(desc);
       }
-    },1));
+    }, 1));
   }
 
   dataToCheck(arr) {
@@ -194,7 +195,7 @@ class ActivitySelectStoreScene extends PureComponent {
           list.push(item)
         }
       });
-      console.log('list>>>',list)
+      console.log('list>>>', list)
       return list.sort((a, b) => {
         return a.platform - b.platform
       });
@@ -222,39 +223,39 @@ class ActivitySelectStoreScene extends PureComponent {
     let {hide, vendorId, platList, platId, storeList} = this.state;
     if (hide) {
       return (
-          <SelectBox toggle={() => this.toggle()}>
-            {
-              platList.map((item, key) => {
-                return (
-                    <TouchableOpacity
-                        key={key}
-                        onPress={async () => {
-                          if (platId.indexOf(item) < 0) {
-                            this.setState({
-                              platId: [item, ...platId],
-                              checkList: this.getRenderArr([item, ...platId], storeList, 0)
-                            })
-                          } else {
-                            platId.splice(platId.indexOf(item), 1);
-                            await  this.setState({
-                              checkList: this.getRenderArr(platId, storeList, 0)
-                            });
-                            this.forceUpdate()
-                          }
-                        }}
-                    >
-                      <Text
-                          style={platId.indexOf(item) >= 0 ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-                        {tool.get_platform_name(item)}
-                      </Text>
-                    </TouchableOpacity>
-                )
-              })
-            }
-            {
-              platList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
-            }
-          </SelectBox>
+        <SelectBox toggle={() => this.toggle()}>
+          {
+            platList.map((item, key) => {
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={async () => {
+                    if (platId.indexOf(item) < 0) {
+                      this.setState({
+                        platId: [item, ...platId],
+                        checkList: this.getRenderArr([item, ...platId], storeList, 0)
+                      })
+                    } else {
+                      platId.splice(platId.indexOf(item), 1);
+                      await  this.setState({
+                        checkList: this.getRenderArr(platId, storeList, 0)
+                      });
+                      this.forceUpdate()
+                    }
+                  }}
+                >
+                  <Text
+                    style={platId.indexOf(item) >= 0 ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
+                    {tool.get_platform_name(item)}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })
+          }
+          {
+            platList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
+          }
+        </SelectBox>
       )
     } else {
     }
@@ -264,159 +265,159 @@ class ActivitySelectStoreScene extends PureComponent {
   render() {
     let {checkList, ext_store_id, listJson} = this.state;
     return (
-        <View style={{flex: 1, position: 'relative'}}>
-          <ScrollView
-              refreshControl={
-                <RefreshControl
-                    refreshing={false}
-                    onRefresh={() => {
-                      this.setState({query: true})
-                      this.getStoreList()
-                    }}
-                    tintColor='gray'
+      <View style={{flex: 1, position: 'relative'}}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={() => {
+                this.setState({query: true})
+                this.getStoreList()
+              }}
+              tintColor='gray'
+            />
+          }
+        >
+          <Cells style={style.cells}>
+            <Cell customStyle={[style.cell, {paddingRight: pxToDp(10)}]}
+                  onPress={() => {
+                    this.setState({showDialog: true})
+                  }}
+            >
+              <CellHeader>
+                <Text>已选店铺</Text>
+              </CellHeader>
+              <CellFooter>
+                <Text> {this.state.ext_store_id.length}</Text>
+                <Image
+                  style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                  source={require('../../img/Public/xiangxia_.png')}
                 />
-              }
-          >
-            <Cells style={style.cells}>
-              <Cell customStyle={[style.cell, {paddingRight: pxToDp(10)}]}
-                    onPress={() => {
-                      this.setState({showDialog: true})
-                    }}
-              >
-                <CellHeader>
-                  <Text>已选店铺</Text>
-                </CellHeader>
-                <CellFooter>
-                  <Text> {this.state.ext_store_id.length}</Text>
-                  <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
-                  />
-                </CellFooter>
-              </Cell>
-            </Cells>
+              </CellFooter>
+            </Cell>
+          </Cells>
+          {
+            tool.length(checkList) ?
+              <CheckboxCells
+                options={checkList}
+                value={this.state.ext_store_id}
+                onChange={async (checked) => {
+                  await this.setState({
+                    ext_store_id: checked
+                  });
+                  this.identical()
+                }}
+                style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
+              /> : <RenderEmpty/>
+          }
+        </ScrollView>
+        {
+          this.renderSelectBox()
+        }
+        <Dialog onRequestClose={() => {
+        }}
+                visible={this.state.showDialog}
+                title={'已选店铺'}
+                titleStyle={{textAlign: 'center', color: colors.fontBlack}}
+                headerStyle={{
+                  backgroundColor: colors.main_back,
+                  paddingTop: pxToDp(20),
+                  justifyContent: 'center',
+                  paddingBottom: pxToDp(20),
+                }}
+                buttons={[{
+                  type: 'primary',
+                  label: '确定',
+                  onPress: () => {
+                    this.setState({showDialog: false,});
+                  }
+                }]}
+                footerStyle={{
+                  borderTopWidth: pxToDp(1),
+                  borderTopColor: colors.fontGray,
+                }}
+                bodyStyle={{
+                  borderRadius: pxToDp(10),
+                  marginLeft: pxToDp(15),
+                  marginRight: pxToDp(15),
+                  height: pxToDp(800),
+                  marginTop: 0
+                }}
+        >
+          <ScrollView style={{height: pxToDp(700),}}>
             {
-              tool.length(checkList) ?
-                  <CheckboxCells
-                      options={checkList}
-                      value={this.state.ext_store_id}
-                      onChange={async (checked) => {
-                        await this.setState({
-                          ext_store_id: checked
-                        });
-                        this.identical()
+              ext_store_id.map((item, index) => {
+                return (
+                  <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}
+                        first={index == 0}
+                        key={index}
+                  >
+                    <CellHeader>
+                      <Text>{listJson[item]}</Text>
+                    </CellHeader>
+                    <TouchableOpacity
+                      onPress={() => {
+                        ext_store_id.splice(index, 1);
+                        this.forceUpdate();
                       }}
-                      style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
-                  /> : <RenderEmpty/>
+                    >
+                      <Text style={{
+                        fontSize: pxToDp(30),
+                        color: colors.white,
+                        height: pxToDp(60),
+                        backgroundColor: colors.main_color,
+                        width: pxToDp(130),
+                        textAlign: 'center',
+                        textAlignVertical: 'center',
+                        borderRadius: pxToDp(5),
+                      }}>移除</Text>
+                    </TouchableOpacity>
+                  </Cell>
+                )
+              })
             }
           </ScrollView>
-          {
-            this.renderSelectBox()
-          }
-          <Dialog onRequestClose={() => {
-          }}
-                  visible={this.state.showDialog}
-                  title={'已选店铺'}
-                  titleStyle={{textAlign: 'center', color: colors.fontBlack}}
-                  headerStyle={{
-                    backgroundColor: colors.main_back,
-                    paddingTop: pxToDp(20),
-                    justifyContent: 'center',
-                    paddingBottom: pxToDp(20),
-                  }}
-                  buttons={[{
-                    type: 'primary',
-                    label: '确定',
-                    onPress: () => {
-                      this.setState({showDialog: false,});
-                    }
-                  }]}
-                  footerStyle={{
-                    borderTopWidth: pxToDp(1),
-                    borderTopColor: colors.fontGray,
-                  }}
-                  bodyStyle={{
-                    borderRadius: pxToDp(10),
-                    marginLeft: pxToDp(15),
-                    marginRight: pxToDp(15),
-                    height: pxToDp(800),
-                    marginTop: 0
-                  }}
-          >
-            <ScrollView style={{height: pxToDp(700),}}>
-              {
-                ext_store_id.map((item, index) => {
-                  return (
-                      <Cell customStyle={[style.cell, {paddingLeft: pxToDp(15), paddingRight: pxToDp(15)}]}
-                            first={index == 0}
-                            key={index}
-                      >
-                        <CellHeader>
-                          <Text>{listJson[item]}</Text>
-                        </CellHeader>
-                        <TouchableOpacity
-                            onPress={() => {
-                              ext_store_id.splice(index, 1);
-                              this.forceUpdate();
-                            }}
-                        >
-                          <Text style={{
-                            fontSize: pxToDp(30),
-                            color: colors.white,
-                            height: pxToDp(60),
-                            backgroundColor: colors.main_color,
-                            width: pxToDp(130),
-                            textAlign: 'center',
-                            textAlignVertical: 'center',
-                            borderRadius: pxToDp(5),
-                          }}>移除</Text>
-                        </TouchableOpacity>
-                      </Cell>
-                  )
-                })
+        </Dialog>
+        <ActivityAlert
+          showDialog={this.state.confimBack}
+          buttons={[
+            {
+              type: 'default',
+              label: '确认离开',
+              onPress: () => {
+                this.setState({confimBack: false,});
+                this.props.navigation.goBack()
               }
-            </ScrollView>
-          </Dialog>
-          <ActivityAlert
-              showDialog={this.state.confimBack}
-              buttons={[
-                {
-                  type: 'default',
-                  label: '确认离开',
-                  onPress: () => {
-                    this.setState({confimBack: false,});
-                    this.props.navigation.goBack()
-                  }
-                },
-                {
-                  type: 'primary',
-                  label: '继续编辑',
-                  onPress: () => {
-                    this.setState({confimBack: false,});
-                  }
-                }
-              ]}
-          >
-            <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会被保存,确认要离开吗?</Text>
-          </ActivityAlert>
-          <View>
-            <BottomBtn onPress={() => {
-              let {ext_store_id,} = this.state;
-              let {nextSetBefore} = this.props.navigation.state.params;
-              nextSetBefore('ext_store_id', ext_store_id);
-              nextSetBefore('store_id', this.getStoreIds());
-              nextSetBefore('goods_data', []);
-              this.props.navigation.goBack();
-            }}/>
-          </View>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
-
+            },
+            {
+              type: 'primary',
+              label: '继续编辑',
+              onPress: () => {
+                this.setState({confimBack: false,});
+              }
+            }
+          ]}
+        >
+          <Text style={{marginTop: pxToDp(60), paddingHorizontal: pxToDp(30)}}>离开后,操作的内容不会被保存,确认要离开吗?</Text>
+        </ActivityAlert>
+        <View>
+          <BottomBtn onPress={() => {
+            let {ext_store_id,} = this.state;
+            let {nextSetBefore} = this.props.navigation.state.params;
+            nextSetBefore('ext_store_id', ext_store_id);
+            nextSetBefore('store_id', this.getStoreIds());
+            nextSetBefore('goods_data', []);
+            this.props.navigation.goBack();
+          }}/>
         </View>
+        <Toast
+          icon="loading"
+          show={this.state.query}
+          onRequestClose={() => {
+          }}
+        >加载中</Toast>
+
+      </View>
     )
   }
 }

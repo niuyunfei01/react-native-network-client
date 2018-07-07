@@ -83,6 +83,9 @@ public class Order implements Serializable {
     private String line_additional;
     private String line_money_total;
 
+    private String mobile_suffix;
+    private String real_mobile;
+
     public int getId() {
         return id;
     }
@@ -653,6 +656,22 @@ public class Order implements Serializable {
 
     public void setStore_name(String store_name) {
         this.store_name = store_name;
+    }
+
+    public String getMobile_suffix() {
+        return mobile_suffix;
+    }
+
+    public void setMobile_suffix(String mobile_suffix) {
+        this.mobile_suffix = mobile_suffix;
+    }
+
+    public String getReal_mobile() {
+        return real_mobile;
+    }
+
+    public void setReal_mobile(String real_mobile) {
+        this.real_mobile = real_mobile;
     }
 }
 

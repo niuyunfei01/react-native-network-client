@@ -25,11 +25,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderCancelShip extends Component {
-  static navigationOptions =({navigation}) => {
+  static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     let {type} = params;
-    return{
-      headerTitle: type == 'call' ? '撤回呼叫':'强行撤单'
+    return {
+      headerTitle: type == 'call' ? '撤回呼叫' : '强行撤单'
     }
   };
 
@@ -64,7 +64,7 @@ class OrderCancelShip extends Component {
     let option = this.state.option;
     console.log(option);
     if (option === Cts.ORDER_CANCEL_SHIP_REASON) {
-      this.setState({showOtherDialog: true,reason:''})
+      this.setState({showOtherDialog: true, reason: ''})
     } else {
       this.setState({showDialog: true})
     }
@@ -76,15 +76,16 @@ class OrderCancelShip extends Component {
       _this.props.navigation.goBack()
     }, time)
   }
+
   getCancelReasons() {
     let token = this.props.global.accessToken;
     let {id} = this.props.navigation.state.params.order;
     let {dispatch} = this.props;
     dispatch(cancelReasonsList(id, token, async (resp) => {
       this.setState({loading: false});
-      if(resp.ok){
-        this.setState({list: resp.obj,loading: false});
-      }else {
+      if (resp.ok) {
+        this.setState({list: resp.obj, loading: false});
+      } else {
         ToastLong('请检查网络')
       }
 
@@ -122,11 +123,11 @@ class OrderCancelShip extends Component {
     });
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
       <RadioCells
-          style={{marginTop: 2}}
-          options={wayOpts}
-          onChange={this._onTypeSelected}
-          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.option}
+        style={{marginTop: 2}}
+        options={wayOpts}
+        onChange={this._onTypeSelected}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+        value={this.state.option}
       />
 
       <ButtonArea style={{marginTop: 35}}>
@@ -139,17 +140,17 @@ class OrderCancelShip extends Component {
       </ButtonArea>
 
       <Toast
-          icon="loading"
-          show={this.state.loading}
-          onRequestClose={() => {
-          }}
+        icon="loading"
+        show={this.state.loading}
+        onRequestClose={() => {
+        }}
       >加载中</Toast>
 
       <Toast
-          icon="loading"
-          show={this.state.upLoading}
-          onRequestClose={() => {
-          }}
+        icon="loading"
+        show={this.state.upLoading}
+        onRequestClose={() => {
+        }}
       >提交中</Toast>
 
       <Dialog onRequestClose={() => {
@@ -173,12 +174,12 @@ class OrderCancelShip extends Component {
               }]}
       >
         <Input
-            multiline={true}
-            style={{height: pxToDp(90)}}
-            value={this.state.reason}
-            onChangeText={(text) => {
-              this.setState({reason: text})
-            }}
+          multiline={true}
+          style={{height: pxToDp(90)}}
+          value={this.state.reason}
+          onChangeText={(text) => {
+            this.setState({reason: text})
+          }}
         />
       </Dialog>
 

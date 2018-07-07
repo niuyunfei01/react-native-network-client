@@ -90,6 +90,8 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
+import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrinterCallback;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -664,18 +666,21 @@ public class GlobalCtx extends Application {
             new MyAsyncTask<Void, Void, List<Store>>() {
                 @Override
                 protected List<Store> doInBackground(Void... params) {
-                    CommonConfigDao cfgDao = new CommonConfigDao(app().token());
-                    try {
-                        LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
-                        if (s != null) {
-                            storesRef.set(s);
-                        }
-                    } catch (ServiceException e) {
-                        AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
-                        Activity runningActivity = app().getCurrentRunningActivity();
+                    String token = app().token();
+                    if (null != token && token.length() > 0) {
+                        CommonConfigDao cfgDao = new CommonConfigDao(app().token());
+                        try {
+                            LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
+                            if (s != null) {
+                                storesRef.set(s);
+                            }
+                        } catch (ServiceException e) {
+                            AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
+                            Activity runningActivity = app().getCurrentRunningActivity();
 //                        if (runningActivity != null) {
                             //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
 //                        }
+                        }
                     }
                     return null;
                 }
@@ -685,7 +690,7 @@ public class GlobalCtx extends Application {
             return stores != null ? stores.values() : null;
         } else {
             ArrayList<Store> found = new ArrayList<>();
-            for(Store store: stores.values()) {
+            for (Store store : stores.values()) {
                 if (store.getType() == limitVendorId) {
                     found.add(store);
                 }
@@ -800,7 +805,7 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public void toApplyChangePriceList(Activity ctx, long storeId){
+    public void toApplyChangePriceList(Activity ctx, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "GoodsApplyRecord");
         Bundle params = new Bundle();
@@ -809,6 +814,7 @@ public class GlobalCtx extends Application {
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
+
     //扫描二维码之后跳转到指定界面
     public void toGoodScanSearch(Activity ctx, Map<String, String> data, String storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
@@ -818,6 +824,18 @@ public class GlobalCtx extends Application {
         String dataJson = gson.toJson(data);
         params.putString("result", dataJson);
         params.putString("store_id", storeId);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    //跳转到reactnative web页面
+    public void toRNWebView(Activity ctx, Map<String, String> data) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Web");
+        Bundle params = new Bundle();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            params.putString(entry.getKey(), entry.getValue());
+        }
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
@@ -1021,6 +1039,10 @@ public class GlobalCtx extends Application {
         }
     }
 
+    public static boolean smPrintIsEnable() {
+        return AidlUtil.getInstance().isConnect();
+    }
+
 
     public class SoundManager {
         private static final int STORE_SOUND_LEN = 1700;
@@ -1029,6 +1051,7 @@ public class GlobalCtx extends Application {
         private SoundPool soundPool;
         private int newOrderSound;
         private int readyDelayWarnSound;
+        private int simpleNewOrderSound;
         private int storeSoundUnknown;
         private int storeSoundhlg;
         private int storeSoundYyc;
@@ -1045,11 +1068,15 @@ public class GlobalCtx extends Application {
         private int customerRemindDeliverSound;
         private int customerAskCancelSound;
         private int dadaManualTimeoutSound;
+        private int new_mt_order_sound;
+        private int new_jd_order_sound;
+        private int new_ele_order_sound;
         private int todo_complain_sound;
 
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
             newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
+            simpleNewOrderSound = soundPool.load(ctx, R.raw.bell_new_order, 1);
 
             //readyDelayWarnSound = soundPool.load(GlobalCtx.app().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
             readyDelayWarnSound = soundPool.load(ctx, R.raw.should_be_ready, 1);
@@ -1069,6 +1096,10 @@ public class GlobalCtx extends Application {
             customerAskCancelSound = soundPool.load(ctx, R.raw.user_ask_cancel, 1);
             dadaManualTimeoutSound = soundPool.load(ctx, R.raw.manual_dada_timeout, 1);
             todo_complain_sound = soundPool.load(ctx, R.raw.todo_complain, 1);
+
+            new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound1, 1);
+            new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
+            new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1095,9 +1126,9 @@ public class GlobalCtx extends Application {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        soundPool.play(firstSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        soundPool.play(firstSound, 1.0f, 1.0f, 1, 0, 1.0f);
                         pause(STORE_SOUND_LEN);
-                        soundPool.play(suffixSound, 100.0f, 100.0f, 1, 0, 1.0f);
+                        soundPool.play(suffixSound, 1.0f, 1.0f, 1, 0, 1.0f);
                         return null;
                     }
                 }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
@@ -1109,7 +1140,7 @@ public class GlobalCtx extends Application {
         }
 
         private boolean check_disabled() {
-            if (SettingUtility.isDisableSoundNotify()) {
+            if (SettingUtility.isDisableSoundNotify() && SettingUtility.isDisableNewOrderSoundNotify()) {
                 AppLogger.w("notify sound is disabled!");
                 return true;
             }
@@ -1167,6 +1198,22 @@ public class GlobalCtx extends Application {
             }
         }
 
+        public boolean play_new_simple_order_sound() {
+            return this.play_single_sound(simpleNewOrderSound);
+        }
+
+        public boolean play_new_ele_order_sound() {
+            return this.play_single_sound(new_ele_order_sound);
+        }
+
+        public boolean play_new_mt_order_sound() {
+            return this.play_single_sound(new_mt_order_sound);
+        }
+
+        public boolean play_new_jd_order_sound() {
+            return this.play_single_sound(new_jd_order_sound);
+        }
+
         public boolean play_new_order_sound(int store_id) {
             return this.play_double_sound(getStoreSound(store_id), newOrderSound);
         }
@@ -1192,6 +1239,7 @@ public class GlobalCtx extends Application {
         }
 
         private boolean play_single_sound(final int sound) {
+            if (check_disabled()) return false;
             if (soundLoaded) {
                 new MyAsyncTask<Void, Void, Void>() {
                     @Override

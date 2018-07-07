@@ -83,6 +83,13 @@ class AuditRefundScene extends Component {
       }));
   }
 
+  renderPartRefundGood(goodList) {
+    let rowView = goodList.map(item => {
+      return <Text style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price}</Text>
+    });
+    return rowView;
+  }
+
   renderReason() {
     let {tabNum} = this.state;
     if (tabNum === 1) {
@@ -121,7 +128,6 @@ class AuditRefundScene extends Component {
                 borderWidth: pxToDp(1),
                 marginTop: pxToDp(30),
                 borderColor: '#ccc',
-
               }}
             />
           <MyBtn
@@ -139,7 +145,7 @@ class AuditRefundScene extends Component {
         </View>
       )
     }
-
+    return <View/>;
   }
 
   render() {
@@ -180,32 +186,27 @@ class AuditRefundScene extends Component {
             <CellBody/>
             <CellFooter>
               <View>
-                <Text style={styles.text}>期望送达: {
-                  tool.orderExpectTime(expectTime)
-                }</Text>
-                <Text style={styles.text}>下单时间: {
-                  tool.orderExpectTime(orderTime)
-                }</Text>
+                {expectTime && <Text style={styles.text}>期望送达: {tool.orderExpectTime(expectTime)}</Text>}
+                {orderTime && <Text style={styles.text}>下单时间: {tool.orderExpectTime(orderTime)}</Text>}
               </View>
             </CellFooter>
           </Cell>
-          {
-            ship_worker_mobile ? <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
-                <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name}</Text>
-                <Text style={styles.text}>{ship_worker_mobile}</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <MyBtn
-                  text={'呼叫'}
-                  style={styles.btn}
-                  onPress={() => {
-                    native.dialNumber(ship_worker_mobile);
-                  }}
-                />
-              </CellFooter>
-            </Cell> : null
+          {!!ship_worker_mobile && !!ship_worker_name && <Cell customStyle={[styles.my_cell]}>
+            <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
+              <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name}</Text>
+              <Text style={styles.text}>{ship_worker_mobile}</Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <MyBtn
+                text={'呼叫'}
+                style={styles.btn}
+                onPress={() => {
+                  native.dialNumber(ship_worker_mobile);
+                }}
+              />
+            </CellFooter>
+          </Cell>
           }
           <Cell customStyle={styles.my_cell}>
             <CellHeader>
@@ -226,23 +227,29 @@ class AuditRefundScene extends Component {
             </CellFooter>
           </Cell>
           {
-            this.state.chevron ?
+            this.state.chevron &&
               <Cell customStyle={[styles.my_cell]}>
                 <CellHeader style={{marginVertical: pxToDp(15)}}>
                   <Text style={{color: colors.editStatusAdd}}>
                     {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
                   </Text>
-                  {/*<Text style={[styles.text,]}>退款金额 : ￥12.55</Text>*/}
-                  {/*<Text style={[styles.text,]}>退款商品 : 精选土豆500克</Text>*/}
-                  <Text style={[styles.text,]}>退款理由
-                    : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>
+                  {remind_id.hasOwnProperty("total_refund_price") &&
+                  <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']}</Text>}
+                  {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
+                  {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
+                    : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>}
                 </CellHeader>
-              </Cell> : null
+              </Cell>
           }
           <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
             <CellHeader>
               <Text>长时间不处理,系统将自动退款</Text>
             </CellHeader>
+            <CellBody/>
+            <CellFooter/>
+          </Cell>
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader/>
             <CellBody/>
             <CellFooter>
               <MyBtn style={

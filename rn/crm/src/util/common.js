@@ -12,7 +12,7 @@ export function getWithTpl2(url, okFn, failFn) {
   failFn =
     failFn ||
     (error => {
-      console.log("error:", error);
+    
     });
 
   return dispatch => getWithTpl(url, okFn, failFn, dispatch);
@@ -22,7 +22,7 @@ export function jsonWithTpl2(url, data, okFn, failFn) {
   failFn =
     failFn ||
     (error => {
-      console.log("error:", error);
+    
     });
 
   return dispatch => jsonWithTpl(url, data, okFn, failFn, dispatch);
@@ -63,7 +63,6 @@ export function jsonWithTpl(url, data, okFn, failFn, dispatch) {
       okFn(json, dispatch);
     })
     .catch(error => {
-      // console.log("err", error);
       dispatch ? failFn(error, dispatch) : failFn(error);
     });
 }

@@ -8,6 +8,7 @@ public class CartItem {
     private int num;
     private int product_id;
     private double price;
+    private String tag_code;
 
     public String getProduct_name() {
         return product_name;
@@ -39,5 +40,13 @@ public class CartItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getTag_code() {
+        return tag_code;
+    }
+
+    public void setTag_code(String tag_code) {
+        this.tag_code = tag_code;
     }
 }

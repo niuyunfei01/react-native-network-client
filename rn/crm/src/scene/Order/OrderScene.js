@@ -47,7 +47,8 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon, Input,
+import {
+  Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon, Input,
   Cells,
   Cell,
   CellBody,
@@ -61,12 +62,13 @@ import S from '../../stylekit';
 import Entypo from "react-native-vector-icons/Entypo";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
-import { Array } from 'core-js/library/web/timers';
+import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import coalesceNonElementChildren from "../../widget/coalesceNonElementChildren";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
-import { getWithTpl, jsonWithTpl } from "../../util/common";
-import { Metrics, Colors, Styles } from "../../themes";
+import {getWithTpl, jsonWithTpl} from "../../util/common";
+import {Metrics, Colors, Styles} from "../../themes";
+
 const numeral = require('numeral');
 
 function mapStateToProps(state) {
@@ -128,7 +130,7 @@ class OrderScene extends Component {
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
-          if(!!backPage){
+          if (!!backPage) {
             console.log('backPage -> ', backPage);
             native.gotoPage(backPage);
           } else {
@@ -185,23 +187,23 @@ class OrderScene extends Component {
       gotoEditPoi: false,
       showOptionMenu: false,
       showCallStore: false,
-      orderQuery:false,
+      orderQuery: false,
       orderChangeLogs: [],
       orderWayLogs: {},
-      wayLoadingShow:false,
-      changeLoadingShow:false,
+      wayLoadingShow: false,
+      changeLoadingShow: false,
       //remind
       onProcessed: false,
       reminds: {},
       remindFetching: false,
       store_contacts: [],
-      addTipDialog:false,
-      addTipMoney:false,
-      addMoneyNum:'',
-      visible:false,
-      reason:'饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
-      phone:undefined,
-      person:'联系客户'
+      addTipDialog: false,
+      addTipMoney: false,
+      addMoneyNum: '',
+      visible: false,
+      reason: '饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
+      phone: undefined,
+      person: '联系客户'
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -340,7 +342,7 @@ class OrderScene extends Component {
       itemsEdited: OrderScene._extract_edited_items(order.items),
       itemsHided: !shouldShowItems(order.orderStatus),
       ...initialState,
-  });
+    });
 
     this._navSetParams();
   };
@@ -442,7 +444,7 @@ class OrderScene extends Component {
     const {store, dispatch, global} = this.props;
 
     const store_id = this.props.order.order.store_id;
-    const contacts = (store.store_contacts ||{}).store_id;
+    const contacts = (store.store_contacts || {}).store_id;
 
     if (!contacts || contacts.length === 0) {
       this.setState({showContactsLoading: true});
@@ -490,6 +492,7 @@ class OrderScene extends Component {
   _hidePrinterChooser() {
     this.setState({showPrinterChooser: false})
   }
+
   _cloudPrinterSN() {
     const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
@@ -497,6 +500,7 @@ class OrderScene extends Component {
     const printerName = (store && store.cloudPrinter) ? store.cloudPrinter : '未知';
     return `云打印(${printerName})`;
   }
+
   _doCloudPrint() {
     const {dispatch, order} = this.props;
     const {accessToken} = this.props.global;
@@ -510,6 +514,7 @@ class OrderScene extends Component {
       this._hidePrinterChooser();
     }))
   }
+
   _doBluetoothPrint() {
     const order = this.props.order.order;
     native.printBtPrinter(order, (ok, msg) => {
@@ -517,6 +522,15 @@ class OrderScene extends Component {
     });
     this._hidePrinterChooser();
   }
+
+  _doSunMiPint() {
+    const order = this.props.order.order;
+    native.printSmPrinter(order, (ok, msg) => {
+      console.log("printer result:", ok, msg)
+    });
+    this._hidePrinterChooser();
+  }
+
   _onLogin() {
     const orderId = this.props.order.order.id;
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId}})
@@ -603,7 +617,7 @@ class OrderScene extends Component {
     this._recordEdition({...item, num: newNum});
   }
 
-  _doRefund(){
+  _doRefund() {
     const {order} = this.props.order;
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
@@ -612,13 +626,13 @@ class OrderScene extends Component {
       url,
       json => {
         if (json.ok) {
-          this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL,{orderDetail:order})
+          this.props.navigation.navigate(Config.ROUTE_REFUND_DETAIL, {orderDetail: order})
         } else {
           this.setState({
-            visible:true,
-            phone:json.obj&&json.obj.phone?json.obj.phone:this.props.order.order.mobile,
-            person:json.obj&&json.obj.phone?'联系服务经理':'联系客户',
-            reason:json.reason
+            visible: true,
+            phone: json.obj && json.obj.phone ? json.obj.phone : this.props.order.order.mobile,
+            person: json.obj && json.obj.phone ? '联系服务经理' : '联系客户',
+            reason: json.reason
           })
         }
       },
@@ -704,7 +718,6 @@ class OrderScene extends Component {
     } else if (remindType === Cts.TASK_TYPE_DELIVERY_FAILED) {
       navigation.navigate(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
-
       this.setState({onSubmitting: true});
       const token = global.accessToken;
       dispatch(markTaskDone(token, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
@@ -728,11 +741,11 @@ class OrderScene extends Component {
   _fnProvidingOnway() {
     const {order, global} = this.props;
 
-    const storeId = (order.order||{}).store_id;
+    const storeId = (order.order || {}).store_id;
     return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
 
-  _callShip () {
+  _callShip() {
     const {navigation, order} = this.props;
     navigation.navigate(Config.ROUTE_ORDER_CALL_SHIP, {order: order.order});
   }
@@ -747,13 +760,14 @@ class OrderScene extends Component {
     const path = `stores/orders_go_to_buy/${order.order.id}.html?access_token=${global.accessToken}`;
     navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
+
   _getWayRecord() {
-    this.setState({ shipHided: !this.state.shipHided })
+    this.setState({shipHided: !this.state.shipHided})
 
   }
 
   wayRecordQuery() {
-    const { dispatch, global ,navigation} = this.props;
+    const {dispatch, global, navigation} = this.props;
     let {orderId} = navigation.state.params;
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
@@ -762,30 +776,30 @@ class OrderScene extends Component {
       } else {
         Alert.alert(msg)
       }
-      this.setState({ orderWayLogs: mg,wayLoadingShow:false})
+      this.setState({orderWayLogs: mg, wayLoadingShow: false})
     }));
   }
 
-  renderAddTip(){
+  renderAddTip() {
     let {order} = this.props.order;
     let dada = this.state.orderWayLogs.hasOwnProperty(Cts.SHIP_AUTO_NEW_DADA)
-    let {orderStatus,auto_ship_type} = order;
-    if((orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) && dada && auto_ship_type == Cts.SHIP_AUTO_NEW_DADA && (!this.state.shipHided)) {
+    let {orderStatus, auto_ship_type} = order;
+    if ((orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) && dada && auto_ship_type == Cts.SHIP_AUTO_NEW_DADA && (!this.state.shipHided)) {
 
       return (
-          <TouchableOpacity
-              onPress = {()=>{
-                this.setState({addTipDialog:true})
-              }}
-          >
+        <TouchableOpacity
+          onPress={() => {
+            this.setState({addTipDialog: true})
+          }}
+        >
           <View style={{
             height: pxToDp(40),
             backgroundColor: '#59b26a',
             borderRadius: pxToDp(20),
             paddingHorizontal: pxToDp(10),
             paddingVertical: pxToDp(4),
-            marginTop:pxToDp(20),
-            marginRight:pxToDp(30)
+            marginTop: pxToDp(20),
+            marginRight: pxToDp(30)
           }}>
             <Text style={{
               height: pxToDp(24),
@@ -795,7 +809,7 @@ class OrderScene extends Component {
               lineHeight: pxToDp(24)
             }}>加小费</Text>
           </View>
-          </TouchableOpacity>
+        </TouchableOpacity>
       );
     }
   }
@@ -807,25 +821,34 @@ class OrderScene extends Component {
       if (typeof orderWayLogs == 'object' && (tool.length(orderWayLogs) > 0)) {
         return tool.objectMap(this.state.orderWayLogs, (item, index) => {
           return (
-            <View key={index} style={{ flex: 1,flexDirection:"row", backgroundColor: '#fff', paddingLeft: pxToDp(30), paddingRight: pxToDp(30),paddingTop: pxToDp(20), width: '100%' }}>
-              <View style={{ width: pxToDp(124) }}>
+            <View key={index} style={{
+              flex: 1,
+              flexDirection: "row",
+              backgroundColor: '#fff',
+              paddingLeft: pxToDp(30),
+              paddingRight: pxToDp(30),
+              paddingTop: pxToDp(20),
+              width: '100%'
+            }}>
+              <View style={{width: pxToDp(124)}}>
                 <View style={wayRecord.expressName}>
-                  <Text style={{ fontSize: pxToDp(24), textAlign: 'center', color: '#58B169' }}>{tool.disWay()[index]}</Text>
+                  <Text
+                    style={{fontSize: pxToDp(24), textAlign: 'center', color: '#58B169'}}>{tool.disWay()[index]}</Text>
                 </View>
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{flex: 1}}>
                 {
                   item.map((ite, key) => {
                     return (
                       <View key={key}>
-                        <View style={{ paddingBottom: pxToDp(20), flex: 1 }}>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ width: pxToDp(140), fontSize: pxToDp(26), marginRight: pxToDp(20) }}>
+                        <View style={{paddingBottom: pxToDp(20), flex: 1}}>
+                          <View style={{flexDirection: 'row'}}>
+                            <Text style={{width: pxToDp(140), fontSize: pxToDp(26), marginRight: pxToDp(20)}}>
                               {
                                 tool.disWayStatic(index)[ite.order_status]
                               }
                             </Text>
-                            <Text style={{ fontSize: pxToDp(24) }}>{ite.created}</Text>
+                            <Text style={{fontSize: pxToDp(24)}}>{ite.created}</Text>
                           </View>
                         </View>
                       </View>
@@ -838,14 +861,21 @@ class OrderScene extends Component {
           )
         })
       } else if (tool.length(orderWayLogs) == 0 && (typeof orderWayLogs == 'object')) {
-        return <View style={{ height: pxToDp(50), backgroundColor: "#fff", paddingLeft: pxToDp(30), flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
+        return <View style={{
+          height: pxToDp(50),
+          backgroundColor: "#fff",
+          paddingLeft: pxToDp(30),
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}>
+          <Text style={{color: '#59B26A'}}>没有相应的记录</Text>
         </View>
       }
     }
   }
+
   _orderChangeLog() {
-    this.setState({ changeHide: !this.state.changeHide })
+    this.setState({changeHide: !this.state.changeHide})
   }
 
   _orderChangeLogQuery() {
@@ -853,96 +883,135 @@ class OrderScene extends Component {
     let {orderId} = navigation.state.params;
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
-        this.setState({ orderChangeLogs: contacts ,changeLoadingShow:false});
+        this.setState({orderChangeLogs: contacts, changeLoadingShow: false});
       } else {
         Alert.alert(msg)
       }
     }));
   }
+
   renderChangeLogs() {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
-          <View key={index} style={{ width:'100%',paddingHorizontal:pxToDp(30),backgroundColor:'#fff',minHeight:pxToDp(180)}}>
-            <View style={{flex:1,borderBottomWidth:pxToDp(1),borderColor:"#bfbfbf",minHeight:pxToDp(150),justifyContent:'center'}}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35) }}>{item.updated_name}</Text>
-                <Text style={{ flex: 1, color: '#59B26A', fontSize: pxToDp(26), overflow: 'hidden', height: pxToDp(35), marginLeft: pxToDp(24) }}>{item.modified}</Text>
+          <View key={index}
+                style={{width: '100%', paddingHorizontal: pxToDp(30), backgroundColor: '#fff', minHeight: pxToDp(180)}}>
+            <View style={{
+              flex: 1,
+              borderBottomWidth: pxToDp(1),
+              borderColor: "#bfbfbf",
+              minHeight: pxToDp(150),
+              justifyContent: 'center'
+            }}>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={{
+                  color: '#59B26A',
+                  fontSize: pxToDp(26),
+                  overflow: 'hidden',
+                  height: pxToDp(35)
+                }}>{item.updated_name}</Text>
+                <Text style={{
+                  flex: 1,
+                  color: '#59B26A',
+                  fontSize: pxToDp(26),
+                  overflow: 'hidden',
+                  height: pxToDp(35),
+                  marginLeft: pxToDp(24)
+                }}>{item.modified}</Text>
               </View>
-              <View style={{ marginTop: pxToDp(20),width:'100%' ,height:'auto',marginBottom:pxToDp(20)}}>
-                <Text selectable={true} style={{ fontSize: pxToDp(24),height:'auto',lineHeight:pxToDp(28)}}>{item.what}</Text>
+              <View style={{marginTop: pxToDp(20), width: '100%', height: 'auto', marginBottom: pxToDp(20)}}>
+                <Text selectable={true}
+                      style={{fontSize: pxToDp(24), height: 'auto', lineHeight: pxToDp(28)}}>{item.what}</Text>
               </View>
             </View>
           </View>
         )
       })
     } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
-      return <View style={{ height: pxToDp(50), backgroundColor: "#fff", paddingLeft: pxToDp(30), flexDirection: 'row', alignItems: 'center' }}>
-        <Text style={{ color: '#59B26A' }}>没有相应的记录</Text>
+      return <View style={{
+        height: pxToDp(50),
+        backgroundColor: "#fff",
+        paddingLeft: pxToDp(30),
+        flexDirection: 'row',
+        alignItems: 'center'
+      }}>
+        <Text style={{color: '#59B26A'}}>没有相应的记录</Text>
       </View>
     }
   }
-  upAddTip(){
+
+  upAddTip() {
     let {orderId} = this.props.navigation.state.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    if(addMoneyNum > 0){
+    if (addMoneyNum > 0) {
       this.setState({onSubmitting: true});
-      dispatch(addTipMoney(orderId, addMoneyNum,accessToken, async (resp) => {
+      dispatch(addTipMoney(orderId, addMoneyNum, accessToken, async (resp) => {
         if (resp.ok) {
           ToastLong('加小费成功')
         } else {
           ToastLong(resp.desc)
         }
-        await this.setState({onSubmitting: false,addMoneyNum:''});
+        await this.setState({onSubmitting: false, addMoneyNum: ''});
         this._orderChangeLogQuery();
       }));
-    }else {
-      this.setState({addMoneyNum:''});
+    } else {
+      this.setState({addMoneyNum: ''});
       ToastLong('加小费的金额必须大于0')
     }
   }
-  total_goods_num(items){
-    let num=0
-    items.forEach((item)=>{
+
+  total_goods_num(items) {
+    let num = 0
+    items.forEach((item) => {
       num += parseInt(item.num);
     })
     return num
   }
+
   //modal弹出框
-  modal = ()=>{
-    return(
+  modal = () => {
+    return (
       <TouchableWithoutFeedback
-      onPress={() => {
-        this.setState({ visible: false });
-      }}
-    >
-      <View
-        style={[
-          {
-            position: "absolute",
-            width: "100%",
-            height: Metrics.CH - 60,
-            backgroundColor: "rgba(0,0,0,0.1)",
-            zIndex: 200
-          },
-          Styles.center
-        ]}
+        onPress={() => {
+          this.setState({visible: false});
+        }}
       >
-        <View style={{ 
-          width: Metrics.CW * 0.85,
-          paddingVertical:36,
-          paddingHorizontal:18,
-          backgroundColor: Colors.white,
-          borderRadius: 8}}>
-          <Text style={{fontSize:14,color:'#333',fontWeight:'bold',textAlign:'center',lineHeight:20}}>{this.state.reason}</Text>
-          <Button1 t={this.state.person} w="100%" r={5} mgt={10} onPress={()=>Linking.openURL(`tel:${this.state.phone}`)}/>
+        <View
+          style={[
+            {
+              position: "absolute",
+              width: "100%",
+              height: Metrics.CH - 60,
+              backgroundColor: "rgba(0,0,0,0.1)",
+              zIndex: 200
+            },
+            Styles.center
+          ]}
+        >
+          <View style={{
+            width: Metrics.CW * 0.85,
+            paddingVertical: 36,
+            paddingHorizontal: 18,
+            backgroundColor: Colors.white,
+            borderRadius: 8
+          }}>
+            <Text style={{
+              fontSize: 14,
+              color: '#333',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              lineHeight: 20
+            }}>{this.state.reason}</Text>
+            <Button1 t={this.state.person} w="100%" r={5} mgt={10}
+                     onPress={() => Linking.openURL(`tel:${this.state.phone}`)}/>
+          </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     )
   }
+
   render() {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
@@ -972,8 +1041,8 @@ class OrderScene extends Component {
       : (
         <View style={[styles.container, {flex: 1}]}>
           {
-            this.state.visible?
-            this.modal():null
+            this.state.visible ?
+              this.modal() : null
           }
           {this.state.showOptionMenu &&
           <TouchableOpacity style={[top_styles.icon_dropDown]}>
@@ -990,6 +1059,10 @@ class OrderScene extends Component {
                 type: 'default',
                 label: '蓝牙打印',
                 onPress: this._doBluetoothPrint.bind(this),
+              }, {
+                type: 'default',
+                label: '商米打印',
+                onPress: this._doSunMiPint.bind(this),
               }
             ]}
             actions={[
@@ -1021,10 +1094,12 @@ class OrderScene extends Component {
             refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
-            <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip} fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
+          <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}
+                       fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
 
           <Dialog
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
             visible={!!this.state.errorHints}
             buttons={[{
               type: 'default',
@@ -1039,7 +1114,8 @@ class OrderScene extends Component {
 
 
           <Dialog
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
             visible={this.state.addTipMoney}
             title={'加小费'}
             buttons={[{
@@ -1070,7 +1146,8 @@ class OrderScene extends Component {
           </Dialog>
 
           <Dialog
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
             visible={this.state.addTipDialog}
             buttons={[{
               type: 'default',
@@ -1086,7 +1163,7 @@ class OrderScene extends Component {
                 <Text style={{color: "red"}}>最新一次为准</Text>
                 ,新一次金额必须大于上次加小费的金额.
               </Text>
-              <Text style={{color:'#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>
+              <Text style={{color: '#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>
             </View>
           </Dialog>
 
@@ -1128,7 +1205,8 @@ class OrderScene extends Component {
           />
 
           <Dialog
-            onRequestClose={() => {}}
+            onRequestClose={() => {
+            }}
             style={{backgroundColor: '#fff'}}
             visible={this.state.cancel_zs_hint}
             title={'干预配送'}
@@ -1142,10 +1220,10 @@ class OrderScene extends Component {
               type: 'primary',
               label: '确认',
               onPress: () => {
-                if(this.state.select_zs_label === ZS_LABEL_CANCEL){//取消
+                if (this.state.select_zs_label === ZS_LABEL_CANCEL) {//取消
                   this.setState({cancel_zs_hint: false});
                   this.cancelZsDelivery();
-                } else if (this.state.select_zs_label === ZS_LABEL_SEND){//发配送
+                } else if (this.state.select_zs_label === ZS_LABEL_SEND) {//发配送
                   this.setState({cancel_zs_hint: false});
                   this._callShip();
                 } else {
@@ -1167,7 +1245,7 @@ class OrderScene extends Component {
                   ]}>发自配送并保留专送</Text>
                   <Text style={ship_style.cell_tips}>一方先接单后,另一方会被取消</Text>
                 </CellBody>
-                {this.state.select_zs_label === ZS_LABEL_SEND &&<CellFooter>
+                {this.state.select_zs_label === ZS_LABEL_SEND && <CellFooter>
                   <Icon name="success_no_circle" style={ship_style.icon_size}/>
                 </CellFooter>}
               </Cell>
@@ -1192,7 +1270,7 @@ class OrderScene extends Component {
       );
   }
 
-  cancelZsDelivery(){
+  cancelZsDelivery() {
     const {dispatch, global, order} = this.props;
     let {zs_status, id} = order.order;
     zs_status = parseInt(zs_status);
@@ -1221,11 +1299,13 @@ class OrderScene extends Component {
     }
   }
 
-  renderShipStatus(){
-    console.log('order',this.props.order.order);
+  renderShipStatus() {
+    console.log('order', this.props.order.order);
     let {shipCallHided} = this.state;
-    let {ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
-      auto_ship_type, dada_status, dada_distance, dada_fee, dada_tips, dada_mobile = '', dada_dm_name} = this.props.order.order;
+    let {
+      ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
+      auto_ship_type, dada_status, dada_distance, dada_fee, dada_tips, dada_mobile = '', dada_dm_name
+    } = this.props.order.order;
     let {zs_way, ship_site_mobile = '', ship_site_tel = ''} = ext_store;
     auto_ship_type = parseInt(auto_ship_type);
     dada_status = parseInt(dada_status);
@@ -1246,82 +1326,84 @@ class OrderScene extends Component {
 
       auto_ship_view = (
         <View>
-          <View style={[ship_style.ship_box,{flexDirection:'column'}]}>
-            <View style={[ship_style.ship_box,{borderBottomWidth:0}]}>
-            <View style={ship_style.ship_info}>
-              <Text style={ship_style.ship_info_text}>
-                {dada_status === Cts.DADA_STATUS_TO_ACCEPT ?
-                  ship_name + ' - ' + dada_ship_status :
-                  (dada_status === Cts.DADA_STATUS_TO_FETCH ||
-                    dada_status === Cts.DADA_STATUS_SHIPPING ||
-                    dada_status === Cts.DADA_STATUS_ARRIVED) &&
-                  (tool.length(dada_mobile) > 0 ?
-                      `骑手 ${dada_dm_name} ${dada_ship_status}` : ship_name + dada_ship_status
-                  )}
-              </Text>
-              {tool.length(dada_mobile) > 0 &&
-              <Text style={ship_style.ship_diff_time}>
-                {ship_name}({dada_mobile})
-              </Text>}
-            </View>
-            {dada_status === Cts.DADA_STATUS_TO_ACCEPT && (
-              <View style={ship_style.ship_btn_view}>
-                {auto_ship_type === Cts.SHIP_AUTO_NEW_DADA && <ClickBtn
-                  btn_text={'加小费'}
-                  onPress={() => {
-                    this.setState({addTipDialog: true})
-                  }}
-                />}
+          <View style={[ship_style.ship_box, {flexDirection: 'column'}]}>
+            <View style={[ship_style.ship_box, {borderBottomWidth: 0}]}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  {dada_status === Cts.DADA_STATUS_TO_ACCEPT ?
+                    ship_name + ' - ' + dada_ship_status :
+                    (dada_status === Cts.DADA_STATUS_TO_FETCH ||
+                      dada_status === Cts.DADA_STATUS_SHIPPING ||
+                      dada_status === Cts.DADA_STATUS_ARRIVED) &&
+                    (tool.length(dada_mobile) > 0 ?
+                        `骑手 ${dada_dm_name} ${dada_ship_status}` : ship_name + dada_ship_status
+                    )}
+                </Text>
+                {tool.length(dada_mobile) > 0 &&
+                <Text style={ship_style.ship_diff_time}>
+                  {ship_name}({dada_mobile})
+                </Text>}
               </View>
-            )}
-            {(dada_status === Cts.DADA_STATUS_TO_FETCH ||
-              dada_status === Cts.DADA_STATUS_SHIPPING ||
-              dada_status === Cts.DADA_STATUS_ARRIVED) && tool.length(dada_mobile) > 0 &&
-            (<View style={ship_style.ship_btn_view}>
-              {!(zs_way > 0) && (ship_site_mobile !== '' || ship_site_tel !== '') && (
-                <ImageBtn
-                  source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
-                  onPress={() => {
-                    this.setState({shipCallHided: !shipCallHided});
-                  }}
-                  imageStyle={styles.pullImg}
-                />
+              {dada_status === Cts.DADA_STATUS_TO_ACCEPT && (
+                <View style={ship_style.ship_btn_view}>
+                  {auto_ship_type === Cts.SHIP_AUTO_NEW_DADA && <ClickBtn
+                    btn_text={'加小费'}
+                    onPress={() => {
+                      this.setState({addTipDialog: true})
+                    }}
+                  />}
+                </View>
               )}
-              <ClickBtn
-                type={'full'}
-                btn_text={'呼叫'}
-                onPress={() => {
-                  native.dialNumber(dada_mobile)
-                }}
-              />
-            </View>)}
-          </View>
-         <View style={{
-           marginHorizontal:pxToDp(30),
-           flexDirection:"row",
-           alignItems:'center',
-           height:pxToDp(80),
-           borderTopWidth:pxToDp(1),
-           borderColor:colors.back_color,
-           borderStyle : 'dashed'
-         }}>
-           <Text style={[ship_style.ship_diff_time]}>
-             距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
-           </Text>
-         </View>
+              {(dada_status === Cts.DADA_STATUS_TO_FETCH ||
+                dada_status === Cts.DADA_STATUS_SHIPPING ||
+                dada_status === Cts.DADA_STATUS_ARRIVED) && tool.length(dada_mobile) > 0 &&
+              (<View style={ship_style.ship_btn_view}>
+                {!(zs_way > 0) && (ship_site_mobile !== '' || ship_site_tel !== '') && (
+                  <ImageBtn
+                    source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                    onPress={() => {
+                      this.setState({shipCallHided: !shipCallHided});
+                    }}
+                    imageStyle={styles.pullImg}
+                  />
+                )}
+                <ClickBtn
+                  type={'full'}
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(dada_mobile)
+                  }}
+                />
+              </View>)}
+            </View>
+            <View style={{
+              marginHorizontal: pxToDp(30),
+              flexDirection: "row",
+              alignItems: 'center',
+              height: pxToDp(80),
+              borderTopWidth: pxToDp(1),
+              borderColor: colors.back_color,
+              borderStyle: 'dashed'
+            }}>
+              <Text style={[ship_style.ship_diff_time]}>
+                距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
+              </Text>
+            </View>
           </View>
 
           {!shipCallHided && ship_site_mobile !== '' && (
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
                 <Text style={ship_style.ship_info_text}>
-                  站点/客服 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                  站点/客服 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
                 </Text>
               </View>
               <View style={ship_style.ship_btn_view}>
                 <ClickBtn
                   btn_text={'呼叫'}
-                  onPress={() => {native.dialNumber(ship_site_mobile)}}
+                  onPress={() => {
+                    native.dialNumber(ship_site_mobile)
+                  }}
                 />
               </View>
             </View>
@@ -1330,13 +1412,15 @@ class OrderScene extends Component {
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
                 <Text style={ship_style.ship_info_text}>
-                  站点备用电话 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                  站点备用电话 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
                 </Text>
               </View>
               <View style={ship_style.ship_btn_view}>
                 <ClickBtn
                   btn_text={'呼叫'}
-                  onPress={() => {native.dialNumber(ship_site_tel)}}
+                  onPress={() => {
+                    native.dialNumber(ship_site_tel)
+                  }}
                 />
               </View>
             </View>
@@ -1359,106 +1443,110 @@ class OrderScene extends Component {
 
       zs_ship_view = (
         <View>
-          <View style={[ship_style.ship_box,{flexDirection:"column"}]}>
-            <View style={[ship_style.ship_box,{borderBottomWidth:0}]}>
-            <View style={ship_style.ship_info}>
-              <Text style={ship_style.ship_info_text}>
-                {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
-                  zs_status === Cts.ZS_STATUS_ON_WAY ||
-                  zs_status === Cts.ZS_STATUS_ARRIVED) &&
-                tool.length(jd_ship_worker_mobile) > 0 ?
-                  `骑手 ${jd_ship_worker_name} ${zs_ship_status}` : zs_ship
-                }
-              </Text>
-              <Text style={ship_style.ship_diff_time}>
-                {zs_status === Cts.ZS_STATUS_TO_ACCEPT ? '已等待: '+tool.diffDesc(orderTime) : zs_name}
-                {tool.length(jd_ship_worker_mobile) > 0 &&
+          <View style={[ship_style.ship_box, {flexDirection: "column"}]}>
+            <View style={[ship_style.ship_box, {borderBottomWidth: 0}]}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
+                    zs_status === Cts.ZS_STATUS_ON_WAY ||
+                    zs_status === Cts.ZS_STATUS_ARRIVED) &&
+                  tool.length(jd_ship_worker_mobile) > 0 ?
+                    `骑手 ${jd_ship_worker_name} ${zs_ship_status}` : zs_ship
+                  }
+                </Text>
                 <Text style={ship_style.ship_diff_time}>
-                  ({jd_ship_worker_mobile})
-                </Text>}
-              </Text>
-            </View>
+                  {zs_status === Cts.ZS_STATUS_TO_ACCEPT ? '已等待: ' + tool.diffDesc(orderTime) : zs_name}
+                  {tool.length(jd_ship_worker_mobile) > 0 &&
+                  <Text style={ship_style.ship_diff_time}>
+                    ({jd_ship_worker_mobile})
+                  </Text>}
+                </Text>
+              </View>
 
-            {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
-              zs_status === Cts.ZS_STATUS_CANCEL ||
-              zs_status === Cts.ZS_STATUS_ABNORMAL
-            ) && (
-              <View style={ship_style.ship_btn_view}>
-                {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && zs_way === Cts.SHIP_KS_MT) && <ClickBtn
-                  btn_text={'加小费'}
-                  onPress={() => {
-                    this.setState({addTipDialog: true})
-                  }}
-                />}
-                {(zs_status !== Cts.ZS_STATUS_NEVER_START &&
-                  zs_status !== Cts.ZS_STATUS_CANCEL &&
-                  zs_status !== Cts.ZS_STATUS_ABNORMAL
-                ) && <ClickBtn
-                  type={'full'}
-                  btn_text={'转自配送'}
-                  style={{marginLeft: pxToDp(30)}}
-                  onPress={() => {
-                    this.setState({cancel_zs_hint: true});
-                  }}
-                />}
-                {(ship_site_mobile !== '' || ship_site_tel !== '') && (
-                  <ClickBtn
+              {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+                zs_status === Cts.ZS_STATUS_CANCEL ||
+                zs_status === Cts.ZS_STATUS_ABNORMAL
+              ) && (
+                <View style={ship_style.ship_btn_view}>
+                  {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && zs_way === Cts.SHIP_KS_MT) && <ClickBtn
+                    btn_text={'加小费'}
+                    onPress={() => {
+                      this.setState({addTipDialog: true})
+                    }}
+                  />}
+                  {(zs_status !== Cts.ZS_STATUS_NEVER_START &&
+                    zs_status !== Cts.ZS_STATUS_CANCEL &&
+                    zs_status !== Cts.ZS_STATUS_ABNORMAL
+                  ) && <ClickBtn
                     type={'full'}
-                    btn_text={'催单'}
+                    btn_text={'转自配送'}
                     style={{marginLeft: pxToDp(30)}}
+                    onPress={() => {
+                      this.setState({cancel_zs_hint: true});
+                    }}
+                  />}
+                  {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                    <ClickBtn
+                      type={'full'}
+                      btn_text={'催单'}
+                      style={{marginLeft: pxToDp(30)}}
+                      onPress={() => {
+                        this.setState({shipCallHided: !shipCallHided});
+                      }}
+                    />
+                  )}
+                </View>
+              )}
+              {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
+                zs_status === Cts.ZS_STATUS_ON_WAY ||
+                zs_status === Cts.ZS_STATUS_ARRIVED) && tool.length(jd_ship_worker_mobile) > 0 &&
+              (<View style={ship_style.ship_btn_view}>
+                {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                  <ImageBtn
+                    source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
                     onPress={() => {
                       this.setState({shipCallHided: !shipCallHided});
                     }}
+                    imageStyle={styles.pullImg}
                   />
                 )}
-              </View>
-            )}
-            {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
-              zs_status === Cts.ZS_STATUS_ON_WAY ||
-              zs_status === Cts.ZS_STATUS_ARRIVED) && tool.length(jd_ship_worker_mobile) > 0 &&
-            (<View style={ship_style.ship_btn_view}>
-              {(ship_site_mobile !== '' || ship_site_tel !== '') && (
-                <ImageBtn
-                  source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                <ClickBtn
+                  type={'full'}
+                  btn_text={'呼叫'}
                   onPress={() => {
-                    this.setState({shipCallHided: !shipCallHided});
+                    native.dialNumber(jd_ship_worker_mobile)
                   }}
-                  imageStyle={styles.pullImg}
                 />
-              )}
-              <ClickBtn
-                type={'full'}
-                btn_text={'呼叫'}
-                onPress={() => {native.dialNumber(jd_ship_worker_mobile)}}
-              />
-            </View>)}
-          </View>
+              </View>)}
+            </View>
             <View style={{
-              marginHorizontal:pxToDp(30),
-              flexDirection:"row",
-              alignItems:'center',
-              height:pxToDp(80),
-              borderTopWidth:pxToDp(1),
-              borderColor:colors.back_color,
-              borderStyle : 'dashed'
+              marginHorizontal: pxToDp(30),
+              flexDirection: "row",
+              alignItems: 'center',
+              height: pxToDp(80),
+              borderTopWidth: pxToDp(1),
+              borderColor: colors.back_color,
+              borderStyle: 'dashed'
             }}>
               <Text style={[ship_style.ship_diff_time]}>
                 距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
               </Text>
             </View>
-        </View>
+          </View>
 
           {!shipCallHided && ship_site_mobile !== '' && (
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
                 <Text style={ship_style.ship_info_text}>
-                  站点/客服 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                  站点/客服 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
                 </Text>
               </View>
               <View style={ship_style.ship_btn_view}>
                 <ClickBtn
                   btn_text={'呼叫'}
-                  onPress={() => {native.dialNumber(ship_site_mobile)}}
+                  onPress={() => {
+                    native.dialNumber(ship_site_mobile)
+                  }}
                 />
               </View>
             </View>
@@ -1467,13 +1555,15 @@ class OrderScene extends Component {
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
                 <Text style={ship_style.ship_info_text}>
-                  站点备用电话 <Text  style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                  站点备用电话 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
                 </Text>
               </View>
               <View style={ship_style.ship_btn_view}>
                 <ClickBtn
                   btn_text={'呼叫'}
-                  onPress={() => {native.dialNumber(ship_site_tel)}}
+                  onPress={() => {
+                    native.dialNumber(ship_site_tel)
+                  }}
                 />
               </View>
             </View>
@@ -1482,7 +1572,7 @@ class OrderScene extends Component {
       );
     }
 
-    if(zs_ship_view !== null || auto_ship_view !== null){
+    if (zs_ship_view !== null || auto_ship_view !== null) {
       return (
         <View>
           {zs_ship_view}
@@ -1515,7 +1605,8 @@ class OrderScene extends Component {
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
             <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
-            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}} onPress={this._toEditBasic}>
+            <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}}
+                              onPress={this._toEditBasic}>
               <Icons name='edit' size={20} color={colors.main_color}/></TouchableOpacity>
             <View style={{flex: 1}}/>
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
@@ -1590,10 +1681,11 @@ class OrderScene extends Component {
               }件商品</Text>
             </View>
             <View style={{flex: 1}}/>
-            <ImageBtn source={require('../../img/Order/refund.png')} imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doRefund}/>
-         
+            <ImageBtn source={require('../../img/Order/refund.png')}
+                      imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doRefund}/>
+
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
-            
+
               <ImageBtn
                 source={require('../../img/Order/good/queren_.png')}
                 imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
@@ -1625,10 +1717,12 @@ class OrderScene extends Component {
           </View>
           {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
             return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx}
-              nav = {this.props.navigation} isEditing={this.state.isEditing} onInputNumberChange={this._onItemRowNumberChanged}/>);
+                             nav={this.props.navigation} isEditing={this.state.isEditing}
+                             onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
-            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} nav = {this.props.navigation} isEditing={this.state.isEditing}
+            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} nav={this.props.navigation}
+                             isEditing={this.state.isEditing}
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
 
@@ -1709,75 +1803,81 @@ class OrderScene extends Component {
           }
         </View>
         <View>
-        <View style={[CommonStyle.topBottomLine, styles.block]}>
-          <View style={[styles.row, {
-            alignItems: 'center',
-            marginTop: 0,
-            height: pxToDp(65),
-            marginRight: 0,
-          }]}>
-            <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
-            {order.dada_fee > 0 && (
-              <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(15)}}>
-                配送费: {order.dada_fee}元
-              </Text>
-            )}
-            {order.dada_tips > 0 && (
-              <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(20)}}>
-                小费: {order.dada_tips}元
-              </Text>
-            )}
-            <View style={{flex: 1}}/>
-            <ImageBtn
-              source={
-                this.state.shipHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-              } imageStyle={styles.pullImg}
-              onPress={() => {
-                this._getWayRecord()
-              }}
-            />
+          <View style={[CommonStyle.topBottomLine, styles.block]}>
+            <View style={[styles.row, {
+              alignItems: 'center',
+              marginTop: 0,
+              height: pxToDp(65),
+              marginRight: 0,
+            }]}>
+              <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
+              {order.dada_fee > 0 && (
+                <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(15)}}>
+                  配送费: {order.dada_fee}元
+                </Text>
+              )}
+              {order.dada_tips > 0 && (
+                <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(20)}}>
+                  小费: {order.dada_tips}元
+                </Text>
+              )}
+              <View style={{flex: 1}}/>
+              <ImageBtn
+                source={
+                  this.state.shipHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
+                } imageStyle={styles.pullImg}
+                onPress={() => {
+                  this._getWayRecord()
+                }}
+              />
+            </View>
           </View>
-        </View>
-          <View style = {{backgroundColor:'#fff',borderTopWidth:pxToDp(1),borderTopColor:"#D3D3D3",position:'relative'}}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderTopWidth: pxToDp(1),
+            borderTopColor: "#D3D3D3",
+            position: 'relative'
+          }}>
             {
               this.renderWayRecord()
             }
-           <View style = {{position:'absolute',right:pxToDp(0),top:pxToDp(0)}}>
-             {
-               this.renderAddTip()
-             }
-           </View>
+            <View style={{position: 'absolute', right: pxToDp(0), top: pxToDp(0)}}>
+              {
+                this.renderAddTip()
+              }
+            </View>
           </View>
-      </View>
+        </View>
 
-      <View style={{marginBottom:pxToDp(100)}}>
-        <View style={[CommonStyle.topBottomLine, styles.block,]}>
-          <View style={[styles.row, {
-            alignItems: 'center',
-            marginTop: 0,
-            height: pxToDp(65),
-            marginRight: 0,
-          }]}>
-            <Text style={{ color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold',marginBottom:pxToDp(1)}}>修改记录</Text>
-            <View style={{ flex: 1 }} />
-            <ImageBtn source={
-              this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-            }
-              imageStyle={styles.pullImg} onPress={() => {
+        <View style={{marginBottom: pxToDp(100)}}>
+          <View style={[CommonStyle.topBottomLine, styles.block,]}>
+            <View style={[styles.row, {
+              alignItems: 'center',
+              marginTop: 0,
+              height: pxToDp(65),
+              marginRight: 0,
+            }]}>
+              <Text
+                style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold', marginBottom: pxToDp(1)}}>修改记录</Text>
+              <View style={{flex: 1}}/>
+              <ImageBtn source={
+                this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
+              }
+                        imageStyle={styles.pullImg} onPress={() => {
                 this._orderChangeLog()
               }}
-            />
+              />
 
+            </View>
+          </View>
+          <View style={{marginTop: pxToDp(1)}}>
+            {
+              this.renderChangeLogs()
+            }
           </View>
         </View>
-        <View style = {{marginTop:pxToDp(1)}}>
-          {
-            this.renderChangeLogs()
-          }
-        </View>
-      </View>
 
-    </View>
+      </View>
     )
   }
 }
@@ -1858,7 +1958,7 @@ class ItemRow extends PureComponent {
   render() {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
-      }, isEditing = false,nav
+      }, isEditing = false, nav
     } = this.props;
 
     const editNum = _editNum(edited, item);
@@ -1873,16 +1973,16 @@ class ItemRow extends PureComponent {
       borderBottomColor: colors.color999,
       borderBottomWidth: screen.onePixel,
     }]}>
-      <View style={{flex: 1,flexDirection:'row',alignItems:'center'}}>
+      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
-            onPress = {()=>{
-              let {product_id} = item
-              nav.navigate(Config.ROUTE_GOODS_DETAIL,{productId:product_id})
-            }}
+          onPress={() => {
+            let {product_id} = item
+            nav.navigate(Config.ROUTE_GOODS_DETAIL, {productId: product_id})
+          }}
         >
           <Image
-              style={styles.product_img}
-              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+            style={styles.product_img}
+            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
           />
         </TouchableOpacity>
         <View>
@@ -1892,7 +1992,7 @@ class ItemRow extends PureComponent {
             marginBottom: pxToDp(14),
           }}>
             {item.name}
-            <Text style={{fontSize: pxToDp(22),color: colors.fontGray}}>(#{item.product_id})</Text>
+            <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id})</Text>
           </Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
@@ -1904,26 +2004,40 @@ class ItemRow extends PureComponent {
 
       </View>
       {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+          style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
+        <Text
+          style={[styles.editStatus, {
+            backgroundColor: colors.editStatusDeduct,
+            opacity: 0.7,
+          }]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
       </View>) : (showEditAdded && <View style={{alignItems: 'flex-end'}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
+          style={[styles.editStatus, {
+            backgroundColor: colors.editStatusAdd,
+            opacity: 0.7,
+          }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
       </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
-          style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>收{numeral(item.num * item.price).format('0.00')}</Text>
+          style={[styles.editStatus, {
+            backgroundColor: colors.editStatusAdd,
+            opacity: 0.7,
+          }]}>收{numeral(item.num * item.price).format('0.00')}</Text>
       </View>}
 
       {isPromotion &&
       <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={item.num>1?{alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'}:{alignSelf: 'flex-end', fontSize: pxToDp(26), color: colors.color666}}>X{item.num}</Text>}
+      <Text style={item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
+        alignSelf: 'flex-end',
+        fontSize: pxToDp(26),
+        color: colors.color666
+      }}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
       <View style={[{marginLeft: 10}]}>
@@ -1949,7 +2063,7 @@ ItemRow.PropTypes = {
   isAdd: PropTypes.bool,
   edits: PropTypes.object,
   onInputNumberChange: PropTypes.func,
-  nav:PropTypes.object
+  nav: PropTypes.object
 };
 
 class Remark extends PureComponent {
@@ -1966,10 +2080,12 @@ class Remark extends PureComponent {
     </View>)
   }
 }
+
 class ImageBtn extends PureComponent {
   constructor(props) {
     super(props)
   }
+
   render() {
 
     const {source, onPress, imageStyle, ...others} = this.props;
@@ -1984,8 +2100,9 @@ class ClickBtn extends PureComponent {
   constructor(props) {
     super(props)
   }
+
   render() {
-    let {style, type, onPress, btn_text, mobile,text_style} = this.props;
+    let {style, type, onPress, btn_text, mobile, text_style} = this.props;
     return (
       <TouchableOpacity
         onPress={() => onPress()}
@@ -2000,7 +2117,8 @@ class ClickBtn extends PureComponent {
           backgroundColor: type === 'full' ? '#59b26a' : '#fff',
         }, style]}
       >
-        <Text style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToDp(24),...text_style}}>{btn_text}</Text>
+        <Text
+          style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToDp(24), ...text_style}}>{btn_text}</Text>
       </TouchableOpacity>
     );
   }

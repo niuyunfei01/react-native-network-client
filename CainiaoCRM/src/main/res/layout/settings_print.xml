@@ -24,15 +24,32 @@
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/label_sound_notify" />
 
+    <TextView
+        android:id="@+id/label_new_sound_notify"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_sound_notify"
+        android:layout_marginStart="10dp"
+        android:text="开启新订单提醒" />
+
+    <Switch
+        android:id="@+id/toggleNewSoundNotify"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toggleSoundNotify"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_new_sound_notify" />
+
     <TextView android:text="使用预发布(工程师使用)"
         android:id="@+id/label_use_preview"
-        android:layout_below="@+id/label_sound_notify"
+        android:layout_below="@+id/label_new_sound_notify"
         android:layout_width="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_height="30dp"/>
 
     <Switch android:id="@+id/toggleUsePreview"
-        android:layout_below="@+id/toggleSoundNotify"
+        android:layout_below="@+id/toggleNewSoundNotify"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/label_use_preview"
         android:layout_width="wrap_content"
@@ -95,6 +112,25 @@
             android:layout_marginEnd="10dp"
             android:layout_toEndOf="@id/label_printer_status"
             android:text="--"
+            android:textAlignment="textEnd" />
+
+        <TextView
+            android:id="@+id/label_sun_mi_printer_status"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/label_printer_status"
+            android:text="商米打印机" />
+
+        <TextView
+            android:id="@+id/sun_mi_printer_status"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/printer_status"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/label_sun_mi_printer_status"
+            android:text="-"
             android:textAlignment="textEnd" />
 
     </RelativeLayout>

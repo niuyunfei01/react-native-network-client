@@ -288,7 +288,7 @@ class LoginScene extends PureComponent {
                     marginVertical:pxToDp(50),
                     marginHorizontal:'auto'
                   }}
-                  source = {require('../../img/Login/login_logo.jpg')}/>
+                  source = {require('../../img/Login/ic_launcher.png')}/>
             </View>
             <View>
               <TextInput
@@ -399,7 +399,7 @@ class LoginScene extends PureComponent {
           width:'100%',
           bottom:pxToDp(100),
           zIndex:100}}>登录即表示您已同意
-          <Text style={{color:colors.main_color}}>比邻鲜使用协议</Text>
+          <Text style={{color:colors.main_color}}>外送帮使用协议</Text>
         </Text>
         <Image style={{
           bottom: pxToDp(40),
