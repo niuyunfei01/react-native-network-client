@@ -97,10 +97,7 @@ class UserAddScene extends PureComponent {
       worker_id: worker_id,
     };
     this.onUserAdd = this.onUserAdd.bind(this);
-    console.log('vendor_stores.length -> ', vendor_stores.length);
-    if (vendor_stores.length === 0 || vendor_stores.length === undefined) {
-      this.getVendorStore();
-    }
+    this.getVendorStore();
   }
 
   getVendorStore() {
