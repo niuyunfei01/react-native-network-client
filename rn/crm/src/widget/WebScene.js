@@ -61,12 +61,20 @@ class WebScene extends PureComponent {
       if (msg.indexOf('http') == 0) {
         this._do_go_back(msg);
       } else {
-        let data = JSON.parse(msg);
-        let action = data['action'];
-        let params = data['params'];
-        InteractionManager.runAfterInteractions(() => {
-          _this.props.navigation.navigate(action, params);
-        });
+        try {
+          let data = JSON.parse(msg);
+          if (data && data['action'] && data['params']) {
+            let action = data['action'];
+            let params = data['params'];
+            InteractionManager.runAfterInteractions(() => {
+              _this.props.navigation.navigate(action, params);
+            });
+          } else {
+            this._do_go_back(msg);
+          }
+        } catch (e) {
+          this._do_go_back(msg);
+        }
       }
     }
   };
