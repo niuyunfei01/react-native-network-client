@@ -1317,7 +1317,9 @@ class OrderScene extends Component {
     if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
         auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
         auto_ship_type === Cts.SHIP_AUTO_BD ||
-        auto_ship_type === Cts.SHIP_AUTO_SX || auto_ship_type == Cts.SHIP_AUTO_MT) && (
+        auto_ship_type === Cts.SHIP_AUTO_SX ||
+        auto_ship_type == Cts.SHIP_AUTO_MT ||
+        auto_ship_type == Cts.SHIP_AUTO_MT_ZB ) && (
         dada_status !== Cts.DADA_STATUS_CANCEL &&
         dada_status !== Cts.DADA_STATUS_TIMEOUT
       )) {

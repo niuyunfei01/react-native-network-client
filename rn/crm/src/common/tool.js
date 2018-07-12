@@ -340,13 +340,14 @@ export function disWayStatic(index) {
 }
 
 export function disWay() {
-	let map = {};
-	map[Cts.SHIP_AUTO_FN] = "蜂鸟";
-	map[Cts.SHIP_AUTO_NEW_DADA] = "新达达";
-	map[Cts.SHIP_AUTO_BD] = "百度";
-	map[Cts.SHIP_AUTO_SX] = "闪送";
-	map[Cts.SHIP_AUTO_MT] = "美团跑腿";
-	return map;
+  let map = {};
+  map[Cts.SHIP_AUTO_FN] = "蜂鸟";
+  map[Cts.SHIP_AUTO_NEW_DADA] = "新达达";
+  map[Cts.SHIP_AUTO_BD] = "百度";
+  map[Cts.SHIP_AUTO_SX] = "闪送";
+  map[Cts.SHIP_AUTO_MT] = "美团跑腿";
+  map[Cts.SHIP_AUTO_MT_ZB] = "美团众包";
+  return map;
 }
 
 export function storeActionSheet(canReadStores, is_service_mgr = false) {
@@ -566,8 +567,9 @@ export function ship_name(type) {
 	plat[Cts.SHIP_ZS_MT] = "美团专送";
 	plat[Cts.SHIP_KS_MT] = "美团快送";
 	plat[Cts.SHIP_ZS_ELE] = "饿了么专送";
+	plat[Cts.SHIP_KS_ELE] = "饿了么快送";
 	plat[Cts.SHIP_ZS_BD] = "百度专送";
-	
+
 	return plat[type] === undefined ? "未知配送" : plat[type];
 }
 
