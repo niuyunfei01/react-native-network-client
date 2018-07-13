@@ -26,13 +26,13 @@ public class BluetoothConnector {
 
 
     /**
-     * @param device the device
-     * @param secure if connection should be done via a secure socket
-     * @param adapter the Android BT adapter
+     * @param device         the device
+     * @param secure         if connection should be done via a secure socket
+     * @param adapter        the Android BT adapter
      * @param uuidCandidates a list of UUIDs. if null or empty, the Serial PP id is used
      */
     public BluetoothConnector(BluetoothDevice device, boolean secure, BluetoothAdapter adapter,
-            List<UUID> uuidCandidates) {
+                              List<UUID> uuidCandidates) {
         this.device = device;
         this.secure = secure;
         this.adapter = adapter;
@@ -62,10 +62,10 @@ public class BluetoothConnector {
                 //try the fallback
                 try {
                     bluetoothSocket = new FallbackBluetoothSocket(bluetoothSocket.getUnderlyingSocket());
-                    Thread.sleep(500);                  
+                    Thread.sleep(500);
                     bluetoothSocket.connect();
                     success = bluetoothSocket.isConnected();
-                    break;  
+                    break;
                 } catch (Exception e1) {
                     Log.w("BT", "Fallback failed. Cancelling.", e1);
                     if (bluetoothSocket != null) {
@@ -77,7 +77,7 @@ public class BluetoothConnector {
         }
 
         if (!success) {
-            throw new IOException("Could not connect to device: "+ device.getAddress());
+            throw new IOException("Could not connect to device: " + device.getAddress());
         }
 
         return bluetoothSocket;
@@ -91,7 +91,7 @@ public class BluetoothConnector {
         BluetoothSocket tmp;
         UUID uuid = uuidCandidates.get(candidate++);
 
-        Log.i("BT", "Attempting to connect to Protocol: "+ uuid);
+        Log.i("BT", "Attempting to connect to Protocol: " + uuid);
         if (secure) {
             tmp = device.createRfcommSocketToServiceRecord(uuid);
         } else {
@@ -179,16 +179,13 @@ public class BluetoothConnector {
 
         public FallbackBluetoothSocket(BluetoothSocket tmp) throws FallbackException {
             super(tmp);
-            try
-            {
-              Class<?> clazz = tmp.getRemoteDevice().getClass();
-              Class<?>[] paramTypes = new Class<?>[] {Integer.TYPE};
-              Method m = clazz.getMethod("createRfcommSocket", paramTypes);
-              Object[] params = new Object[] {1};
-              fallbackSocket = (BluetoothSocket) m.invoke(tmp.getRemoteDevice(), params);
-            }
-            catch (Exception e)
-            {
+            try {
+                Class<?> clazz = tmp.getRemoteDevice().getClass();
+                Class<?>[] paramTypes = new Class<?>[]{Integer.TYPE};
+                Method m = clazz.getMethod("createRfcommSocket", paramTypes);
+                Object[] params = new Object[]{1};
+                fallbackSocket = (BluetoothSocket) m.invoke(tmp.getRemoteDevice(), params);
+            } catch (Exception e) {
                 throw new FallbackException(e);
             }
         }
@@ -220,7 +217,7 @@ public class BluetoothConnector {
     public static class FallbackException extends Exception {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
 

@@ -1,61 +1,50 @@
-import React, {PureComponent, Component} from 'react'
+import React, {Component, PureComponent} from 'react'
 import {
-  Platform,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ListView,
+  Alert,
   Image,
   InteractionManager,
+  Linking,
+  Platform,
   RefreshControl,
-  Alert,
-  Clipboard,
-  ToastAndroid,
-  Modal,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Linking
+  View
 } from 'react-native'
 import InputNumber from 'rc-input-number';
-import {color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView} from '../../widget'
-import {screen, system, tool, native} from '../../common'
+import {NavigationItem, Separator} from '../../widget'
+import {native, screen, tool} from '../../common'
 import {bindActionCreators} from "redux";
 import Icons from 'react-native-vector-icons/FontAwesome';
-import Config, {serverUrl} from '../../config'
+import Config from '../../config'
 import PropTypes from 'prop-types';
 import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import OrderBottom from './OrderBottom'
 import CommonStyle from '../../common/CommonStyles'
-import LoadingView from "../../widget/LoadingView";
 import {Button1} from '../component/All'
 import {
+  addTipMoney,
+  clearLocalOrder,
   getOrder,
-  printInCloud,
   getRemindForOrderPage,
+  orderCancelZsDelivery,
+  orderChangeLog,
+  orderWayRecord,
+  printInCloud,
   saveOrderDelayShip,
   saveOrderItems,
-  orderWayRecord,
-  orderChangeLog,
-  clearLocalOrder,
-  addTipMoney,
-  orderCancelZsDelivery, orderCallShip,
 } from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon, Input,
-  Cells,
-  Cell,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
+import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input, Toast,} from "../../weui/index";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import {StatusBar} from "react-native";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -64,10 +53,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-import coalesceNonElementChildren from "../../widget/coalesceNonElementChildren";
-import {fetchApplyRocordList} from "../../reducers/product/productActions";
-import {getWithTpl, jsonWithTpl} from "../../util/common";
-import {Metrics, Colors, Styles} from "../../themes";
+import {getWithTpl} from "../../util/common";
+import {Colors, Metrics, Styles} from "../../themes";
 
 const numeral = require('numeral');
 
@@ -247,8 +234,6 @@ class OrderScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps order.order', nextProps.order.order);
-    //
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
@@ -264,8 +249,6 @@ class OrderScene extends Component {
     const o = orderStateToCmp ? orderStateToCmp.order : false;
 
     if (!o || !o.id || o.id !== orderId) {
-
-      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);`
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -278,7 +261,6 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
-            //console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
@@ -1021,11 +1003,9 @@ class OrderScene extends Component {
     />;
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
-    // console.log('noOrder', noOrder, order);
 
     if (noOrder) {
       const {dispatch, global, store} = this.props;
-      //this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
 
     return noOrder ?
@@ -1470,7 +1450,8 @@ class OrderScene extends Component {
                 zs_status === Cts.ZS_STATUS_ABNORMAL
               ) && (
                 <View style={ship_style.ship_btn_view}>
-                  {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && zs_way === Cts.SHIP_KS_MT) && <ClickBtn
+                  {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && (zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT)) &&
+                  <ClickBtn
                     btn_text={'加小费'}
                     onPress={() => {
                       this.setState({addTipDialog: true})
