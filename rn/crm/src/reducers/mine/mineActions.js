@@ -286,10 +286,11 @@ export function setWmStoreStatus(
 	status,
 	token,
 	openTime,
+	remark,
 	callback
 ) {
 	return dispatch => {
-		const url = `api/set_wm_store_status/${vendor_id}/${platform}/${wid}/${status}.json?access_token=${token}&openTime=${openTime}`;
+		const url = `api/set_wm_store_status/${vendor_id}/${platform}/${wid}/${status}.json?access_token=${token}&openTime=${openTime}&remark=${remark}`;
 		console.log("url", url);
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
 			.then(resp => resp.json())
