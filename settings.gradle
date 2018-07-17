@@ -12,5 +12,3 @@ include ':react-native-ble-manager'
 project(':react-native-ble-manager').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-ble-manager/android')
 include ':react-native-image-crop-picker'
 project(':react-native-image-crop-picker').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-image-crop-picker/android')
-include ':react-native-datetime'
-project(':react-native-datetime').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-datetime/android')

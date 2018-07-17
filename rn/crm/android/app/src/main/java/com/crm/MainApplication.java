@@ -42,8 +42,7 @@ public class MainApplication extends Application implements ReactApplication {
                     new VectorIconsPackage(),
                     new ReactNativeI18n(),
                     new RNDeviceInfo(),
-                    new SplashScreenReactPackage(),
-                    new RCTDateTimePickerPackage(this)
+                    new SplashScreenReactPackage()
             );
         }
     };
