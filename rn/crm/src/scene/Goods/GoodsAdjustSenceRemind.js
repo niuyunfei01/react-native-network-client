@@ -102,7 +102,7 @@ class GoodsAdjustRemind extends PureComponent {
 						</Text> : null}
 						{/*有处理时间则不显示操作按钮*/}
 						{dataSource[i].handle_time ? null : <View style={styles.listItemOperation}>
-							<Text style={styles.operationTime}>{dataSource[i].limit_time}自动执行</Text>
+							<Text style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name}</Text>
 							<View style={{flexDirection: 'row'}}>
 								<TouchableWithoutFeedback onPress={() => this.handleReject(dataSource[i].id)}>
 									<View>
