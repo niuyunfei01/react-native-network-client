@@ -34,6 +34,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.i18n.reactnativei18n.ReactNativeI18n;
+import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -284,7 +285,7 @@ public class GlobalCtx extends Application {
                 .build();
 
         // 初始化合成对象
-        SpeechUtility.createUtility(getApplicationContext(), "appid=" + R.string.app_id);
+        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
         AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
