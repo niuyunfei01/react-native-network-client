@@ -100,39 +100,44 @@ class GoodsAdjustRemind extends PureComponent {
 							建议价格：¥{dataSource[i].price}
 						</Text> : null}
 						{/*有处理时间则不显示操作按钮*/}
-						{dataSource[i].handle_time ? <View style={styles.listItemOperation}>
-							{
-								dataSource[i].operation_type === '4' || dataSource[i].operation_type === '2' ?
-									<Text style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name}</Text> :
-									<View/>
-							}
-							<View style={{flexDirection: 'row'}}>
-								<TouchableWithoutFeedback onPress={() => this.handleReject(dataSource[i].id)}>
-									<View>
-										<Text style={[styles.listItemOperationBtn, styles.operationBtnDark]}>拒绝</Text>
-									</View>
-								</TouchableWithoutFeedback>
-								<TouchableWithoutFeedback onPress={() => this.handlePass(dataSource[i].id)}>
-									<View>
-										<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>同意</Text>
-									</View>
-								</TouchableWithoutFeedback>
-								{/*涨价 降价可以自调价格*/}
-								{dataSource[i].operation_type === '1' || dataSource[i].operation_type === '2' ?
-									<TouchableWithoutFeedback onPress={() => {
-										this.setState({
-											modifyPriceModalVisible: true,
-											selectItem: dataSource[i],
-											price: dataSource[i].price
-										})
-									}}>
+						{dataSource[i].handle_time ?
+							<View style={styles.listItemOperation}>
+								<View/>
+								<Text>处理结果：{dataSource[i].handle_name}</Text>
+							</View> : <View style={styles.listItemOperation}>
+								{
+									dataSource[i].operation_type === '4' || dataSource[i].operation_type === '2' ?
+										<Text
+											style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name}</Text> :
+										<View/>
+								}
+								<View style={{flexDirection: 'row'}}>
+									<TouchableWithoutFeedback onPress={() => this.handleReject(dataSource[i].id)}>
 										<View>
-											<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>自调价格</Text>
+											<Text style={[styles.listItemOperationBtn, styles.operationBtnDark]}>拒绝</Text>
 										</View>
 									</TouchableWithoutFeedback>
-									: null}
-							</View>
-						</View>}
+									<TouchableWithoutFeedback onPress={() => this.handlePass(dataSource[i].id)}>
+										<View>
+											<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>同意</Text>
+										</View>
+									</TouchableWithoutFeedback>
+									{/*涨价 降价可以自调价格*/}
+									{dataSource[i].operation_type === '1' || dataSource[i].operation_type === '2' ?
+										<TouchableWithoutFeedback onPress={() => {
+											this.setState({
+												modifyPriceModalVisible: true,
+												selectItem: dataSource[i],
+												price: dataSource[i].price
+											})
+										}}>
+											<View>
+												<Text style={[styles.listItemOperationBtn, styles.operationBtnLight]}>自调价格</Text>
+											</View>
+										</TouchableWithoutFeedback>
+										: null}
+								</View>
+							</View>}
 					</View>
 				</TouchableWithoutFeedback>
 			)
