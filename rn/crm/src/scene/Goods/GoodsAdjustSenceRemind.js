@@ -75,7 +75,6 @@ class GoodsAdjustRemind extends PureComponent {
 					<View style={styles.listItem}>
 						<View style={styles.listItemTop}>
 							{/*批量操作按钮*/}
-							{console.log(batch, dataSource[i])}
 							{
 								batch ?
 									<TouchableWithoutFeedback onPress={() => this.handleSelectItem(i, dataSource[i], dataSource)}>
@@ -101,8 +100,12 @@ class GoodsAdjustRemind extends PureComponent {
 							建议价格：¥{dataSource[i].price}
 						</Text> : null}
 						{/*有处理时间则不显示操作按钮*/}
-						{dataSource[i].handle_time ? null : <View style={styles.listItemOperation}>
-							<Text style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name}</Text>
+						{dataSource[i].handle_time ? <View style={styles.listItemOperation}>
+							{
+								dataSource[i].operation_type === '4' || dataSource[i].operation_type === '2' ?
+									<Text style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name}</Text> :
+									<View/>
+							}
 							<View style={{flexDirection: 'row'}}>
 								<TouchableWithoutFeedback onPress={() => this.handleReject(dataSource[i].id)}>
 									<View>
