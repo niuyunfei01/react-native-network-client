@@ -79,6 +79,7 @@ class TakeOutScene extends Component {
 			isOperating: false,
 			isToggleSubmitting: false,
 			time: undefined,
+			timeStr: '',
 			wm_list: curr_wm_list === undefined ? {} : curr_wm_list,
 			server_mobile: server_info.mobilephone,
 			confirmModalVisible: false, // 确认框
@@ -268,7 +269,7 @@ class TakeOutScene extends Component {
 					{
 						text: '确定', onPress: () => {
 							this.setState({confirmModalVisible: false, isOperating: false}, () => {
-								this.submit(this.platform, "close", this.wid, this.state.time, this.state.remark)
+								this.submit(this.platform, "close", this.wid, this.state.timeStr, this.state.remark)
 							})
 						}
 					}
@@ -276,15 +277,15 @@ class TakeOutScene extends Component {
 			>
 				<List>
 					<DatePicker
-						value={this.state.time ? new Date(this.state.time) : undefined}
+						value={this.state.time ? this.state.time : undefined}
 						mode="datetime"
-						minDate={new Date(Moment().format('YYYY-MM-DD HH:mm'))}
+						minDate={new Date()}
 						onChange={time => {
-							time = Moment(time).format('YYYY-MM-DD HH:mm:ss')
+							let timeStr = Moment(time).format('YYYY-MM-DD HH:mm:ss')
 							console.log(time)
-							this.setState({time})
+							this.setState({time: time, timeStr: timeStr})
 						}}
-						format="YYYY-MM-DD HH:mm"
+						format="YYYY-MM-DD HH:mm:ss"
 					>
 						<List.Item wrap={true}>时间</List.Item>
 					</DatePicker>
