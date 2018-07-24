@@ -772,6 +772,12 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toProductAdjust(Context ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsAdjust");
+        ctx.startActivity(i);
+    }
+
     public void toMineActivity(Activity ctx) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "Tab");

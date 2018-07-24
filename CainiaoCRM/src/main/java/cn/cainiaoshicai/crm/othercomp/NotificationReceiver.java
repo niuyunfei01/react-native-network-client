@@ -25,8 +25,6 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.orders.OrderListFragment;
-import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
@@ -149,7 +147,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 			GlobalCtx.clearNewOrderNotifies(context);
 
-			final Intent i;
+			Intent i = null;
 			Notify notify = getNotifyFromBundle(bundle);
 
 			AppLogger.w("open notify:" + notify);
@@ -198,10 +196,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 					i.putExtra("url", URLHelper.WEB_URL_ROOT + "/market_tools/user_feedback.html?fb_id=" + notify.getFb_id());
 				} else if (Cts.PUSH_TYPE_TASK_REMIND.equals(notify.getType())) {
 					i = GlobalCtx.app().toTaskListIntent(context);
+				} else if (Cts.PUSH_TYPE_PRODUCT_ADJUST.equals(notify.getType())) {
+					GlobalCtx.app().toProductAdjust(context);
+					return;
 				} else {
 					i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
 				}
-
 				if (notify.getStore_id() > 0) {
 					i.putExtra("store_id", notify.getStore_id());
 					if ("sold_out".equals(notify.getSound())) {
@@ -210,7 +210,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 						i.putExtra("filter", StoreStorageActivity.FILTER_SOLD_EMPTY);
 					}
 				}
-
 				if (bundle != null) {
 					i.putExtras(bundle);
 				}
