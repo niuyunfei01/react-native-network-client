@@ -95,8 +95,16 @@ public class AlwaysOnService extends BaseService {
                         String alert = item.get("alert");
                         String plat = item.get("plat");
                         String storeName = item.get("store_name");
+                        int notifyTimes = 1;
+                        if (item.get("notify_times") != null) {
+                            try {
+                                notifyTimes = Integer.parseInt(item.get("notify_times"));
+                            } catch (Exception e) {
+                                notifyTimes = 1;
+                            }
+                        }
                         if (null != alert && !"".equals(alert)) {
-                            play(alert, plat, storeName);
+                            play(alert, plat, storeName, notifyTimes);
                         }
                     }
                 }
@@ -105,7 +113,7 @@ public class AlwaysOnService extends BaseService {
             }
         }
 
-        private void play(String text, String plat, String storeName) throws Exception {
+        private void play(String text, String plat, String storeName, int notifyTimes) throws Exception {
             //获取系统的Audio管理者
             AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             //最大音量
@@ -117,7 +125,7 @@ public class AlwaysOnService extends BaseService {
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
             mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
             mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < notifyTimes; i++) {
                 GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
                 Thread.sleep(1300);
                 if (plat.equals("6")) {
