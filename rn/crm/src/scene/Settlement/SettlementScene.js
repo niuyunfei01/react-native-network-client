@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, {PureComponent} from "react";
 import {
   Image,
   RefreshControl,
@@ -12,26 +12,27 @@ import {
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {
   get_supply_bill_list,
   get_supply_items
 } from "../../reducers/settlement/settlementActions";
 import tool from "../../common/tool.js";
-import { Icon } from "../../weui/index";
+import {Icon} from "../../weui/index";
 import Config from "../../config";
 import Cts from "../../Cts";
-import { ToastLong } from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 import LoadingView from "../../widget/LoadingView";
+import Moment from "moment/moment";
 
-function mapStateToProps(state) {
-  const { global } = state;
-  return { global: global };
+function mapStateToProps (state) {
+  const {global} = state;
+  return {global: global};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
@@ -46,13 +47,13 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SettlementScene extends PureComponent {
-  static navigationOptions = ({ navigation }) => {
+  static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "打款记录"
     };
   };
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props);
     this.state = {
       query: true,
@@ -67,42 +68,42 @@ class SettlementScene extends PureComponent {
     this.renderList = this.renderList.bind(this);
     this.renderBtn = this.renderBtn.bind(this);
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     this.getSupplyList();
   }
-
-  componentDidUpdate() {
-    let { key, params } = this.props.navigation.state;
-    let { isRefreshing } = params || {};
+  
+  componentDidUpdate () {
+    let {key, params} = this.props.navigation.state;
+    let {isRefreshing} = params || {};
     if (isRefreshing) {
       console.log(params);
-      this.setState({ isRefreshing: isRefreshing });
+      this.setState({isRefreshing: isRefreshing});
       const setRefresh = this.props.navigation.setParams({
         isRefreshing: false,
         key: key
       });
       this.props.navigation.dispatch(setRefresh);
-      this.setState({ query: true });
+      this.setState({query: true});
       this.getSupplyList();
     }
   }
-
-  inArray(key) {
+  
+  inArray (key) {
     let checked = this.state.checked;
     let index = checked.indexOf(key);
     if (index >= 0) {
-      return { have: true, index };
+      return {have: true, index};
     } else {
-      return { have: false, index };
+      return {have: false, index};
     }
   }
-
-  getSupplyList() {
+  
+  getSupplyList () {
     let store_id = this.props.global.currStoreId;
-    let { currVendorId } = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
     let token = this.props.global.accessToken;
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     this.setState({
       query: true
     });
@@ -123,19 +124,19 @@ class SettlementScene extends PureComponent {
               }
             });
           });
-          this.setState({ list: list, query: false });
+          this.setState({list: list, query: false});
         } else {
           ToastLong(resp.desc);
         }
-        this.setState({ query: false });
+        this.setState({query: false});
       })
     );
   }
-
-  toggleCheck(key, date, status, id) {
+  
+  toggleCheck (key, date, status, id, profit) {
     let checked = this.state.checked;
     if (this.state.canChecked) {
-      let { have, index } = this.inArray(key);
+      let {have, index} = this.inArray(key);
       if (have) {
         checked.splice(index, 1);
       } else {
@@ -143,35 +144,36 @@ class SettlementScene extends PureComponent {
       }
       this.forceUpdate();
     } else {
-      this.toDetail(date, status, id);
+      this.toDetail(date, status, id, profit);
     }
   }
-
-  toDetail(date, status, id) {
-    let { navigation } = this.props;
+  
+  toDetail (date, status, id, profit) {
+    let {navigation} = this.props;
     navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS, {
       date: date,
       status: status,
       id: id,
+      profit,
       key: navigation.state.key
     });
   }
-
-  toMonthGather(date) {
-    let { navigation } = this.props;
-    let { list } = this.state;
+  
+  toMonthGather (date) {
+    let {navigation} = this.props;
+    let {list} = this.state;
     let dateList = [];
     tool.objectMap(list, (ite, index) => {
-      dateList.push({ label: index, key: index });
+      dateList.push({label: index, key: index});
     });
-
+    
     navigation.navigate(Config.ROUTE_SETTLEMENT_GATHER, {
       date: date,
       dateList: dateList
     });
   }
-
-  renderStatus(status) {
+  
+  renderStatus (status) {
     if (status == Cts.BILL_STATUS_PAID) {
       return (
         <Text
@@ -190,46 +192,46 @@ class SettlementScene extends PureComponent {
       return <Text style={[styles.status]}>{tool.billStatus(status)}</Text>;
     }
   }
-
-  renderProfit(item) {
-    if (item["profit_price"] > 0) {
-      return (
-        <View
-          style={{
-            marginLeft: pxToDp(10),
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Text
-            style={{
-              color: colors.fontGray,
-              fontSize: 16,
-              textAlign: "center"
-            }}
-          >
-            {tool.toFixed(item["profit_price"])}元
-          </Text>
-          <Text
-            style={{
-              marginTop: 5,
-              fontSize: 10,
-              color: "red",
-              textAlign: "center"
-            }}
-          >
-            收益结转
-          </Text>
-        </View>
-      );
-    } else {
-      return <View />;
-    }
-  }
-
-  selectAll() {
+  
+  // renderProfit (item) {
+  //   if (item["profit_price"] > 0) {
+  //     return (
+  //       <View
+  //         style={{
+  //           marginLeft: pxToDp(10),
+  //           flexDirection: "row",
+  //           alignItems: "center"
+  //         }}
+  //       >
+  //         <Text
+  //           style={{
+  //             color: colors.fontGray,
+  //             fontSize: 16,
+  //             textAlign: "center"
+  //           }}
+  //         >
+  //           {tool.toFixed(item["profit_price"])}元
+  //         </Text>
+  //         <Text
+  //           style={{
+  //             marginTop: 5,
+  //             fontSize: 10,
+  //             color: "red",
+  //             textAlign: "center"
+  //           }}
+  //         >
+  //           收益结转
+  //         </Text>
+  //       </View>
+  //     );
+  //   } else {
+  //     return <View/>;
+  //   }
+  // }
+  
+  selectAll () {
     let selectAllList = [];
-    let { checked, list } = this.state;
+    let {checked, list} = this.state;
     if (checked.length == list.length) {
     } else {
       list.forEach(item => {
@@ -239,17 +241,17 @@ class SettlementScene extends PureComponent {
     this.state.checked = selectAllList;
     this.forceUpdate();
   }
-
-  renderBtn() {
-    let { checked, list } = this.state;
+  
+  renderBtn () {
+    let {checked, list} = this.state;
     if (this.state.authority) {
       if (!this.state.canChecked) {
         return (
           <View style={styles.btn_box}>
             <TouchableOpacity
-              style={{ flex: 4.2 }}
+              style={{flex: 4.2}}
               onPress={() => {
-                this.setState({ canChecked: true });
+                this.setState({canChecked: true});
               }}
             >
               <View
@@ -260,7 +262,7 @@ class SettlementScene extends PureComponent {
                 }}
               >
                 <Text
-                  style={{ color: colors.main_color, fontSize: pxToDp(30) }}
+                  style={{color: colors.main_color, fontSize: pxToDp(30)}}
                 >
                   选择
                 </Text>
@@ -275,7 +277,7 @@ class SettlementScene extends PureComponent {
                 alignItems: "center"
               }}
             >
-              <Text style={{ color: "#fff", fontSize: pxToDp(30) }}>
+              <Text style={{color: "#fff", fontSize: pxToDp(30)}}>
                 确认打款
               </Text>
             </View>
@@ -286,12 +288,12 @@ class SettlementScene extends PureComponent {
           <View style={styles.btn_box}>
             <TouchableOpacity
               onPress={() => {
-                this.setState({ canChecked: false });
+                this.setState({canChecked: false});
               }}
             >
               <Text style={[styles.btn_text, styles.cancel]}>取消</Text>
             </TouchableOpacity>
-
+            
             <TouchableOpacity
               onPress={() => {
                 this.selectAll();
@@ -304,23 +306,23 @@ class SettlementScene extends PureComponent {
             >
               <Icon
                 name={checked.length == list.length ? "success" : "circle"}
-                style={{ marginRight: pxToDp(10) }}
+                style={{marginRight: pxToDp(10)}}
               />
               <Text
-                style={[styles.btn_text, styles.all, { width: pxToDp(80) }]}
+                style={[styles.btn_text, styles.all, {width: pxToDp(80)}]}
               >
                 全选
               </Text>
             </TouchableOpacity>
-
+            
             <Text style={[styles.submit]}>确认打款</Text>
           </View>
         );
       }
     }
   }
-
-  renderEmpty() {
+  
+  renderEmpty () {
     return (
       <View
         style={{
@@ -331,7 +333,7 @@ class SettlementScene extends PureComponent {
         }}
       >
         <Image
-          style={{ width: pxToDp(100), height: pxToDp(135) }}
+          style={{width: pxToDp(100), height: pxToDp(135)}}
           source={require("../../img/Goods/zannwujilu.png")}
         />
         <Text
@@ -346,8 +348,8 @@ class SettlementScene extends PureComponent {
       </View>
     );
   }
-
-  renderList() {
+  
+  renderList () {
     let _this = this;
     return tool.objectMap(this.state.list, (item, index) => {
       return (
@@ -361,29 +363,32 @@ class SettlementScene extends PureComponent {
               paddingVertical: pxToDp(10)
             }}
           >
-            <Text numberOfLines={1} style={{ marginRight: pxToDp(10) }}>
-              {index}
-              <Text style={{ color: "#eee" }}>-26</Text>
+            <Text numberOfLines={1} style={{fontSize: pxToDp(22)}}>
+              {Moment(index).format('YY年MM月')}
+              {/*<Text style={{color: "#eee"}}>-26</Text>*/}
             </Text>
-            <Text style={{ width: pxToDp(102), textAlign: "center" }}>
+            <Text style={{width: pxToDp(65), textAlign: "center", fontSize: pxToDp(24)}}>
               状态
             </Text>
             <Text
               numberOfLines={1}
-              style={{
-                width: pxToDp(100),
-                textAlign: "center"
-              }}
+              style={{width: pxToDp(90), textAlign: "center", fontSize: pxToDp(24)}}
             >
               退款
             </Text>
-            <View />
+            <Text
+              numberOfLines={1}
+              style={{width: pxToDp(90), textAlign: "center", fontSize: pxToDp(24)}}
+            >
+              运费
+            </Text>
+            <View/>
             <TouchableOpacity
               onPress={() => {
                 this.toMonthGather(index);
               }}
             >
-              <Text style={styles.to_month} numberOfLines={1}>
+              <Text style={[styles.to_month, {fontSize: pxToDp(24)}]} numberOfLines={1}>
                 本月销量汇总
               </Text>
             </TouchableOpacity>
@@ -398,7 +403,8 @@ class SettlementScene extends PureComponent {
                       ite.key,
                       ite.bill_date,
                       ite.status,
-                      ite.id
+                      ite.id,
+                      ite.profit_price
                     );
                   }}
                 >
@@ -406,7 +412,8 @@ class SettlementScene extends PureComponent {
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      paddingHorizontal: pxToDp(30),
+                      paddingLeft: pxToDp(30),
+                      paddingRight: pxToDp(30),
                       borderBottomColor: "#EEEEEE",
                       borderBottomWidth: 1,
                       justifyContent: "space-between",
@@ -421,20 +428,30 @@ class SettlementScene extends PureComponent {
                       }}
                     >
                       {" "}
-                      {ite.bill_date}
+                      {Moment(ite.bill_date).format('MM-DD')}
                     </Text>
                     {this.renderStatus(ite.status)}
                     <Text
                       style={{
                         fontSize: pxToDp(24),
                         color: "#ff0018",
-                        width: pxToDp(100),
+                        width: pxToDp(90),
                         textAlign: "center"
                       }}
                     >
                       {tool.toFixed(ite.refund_fee)}元
                     </Text>
-                    {this.renderProfit(ite)}
+                    <Text
+                      style={{
+                        fontSize: pxToDp(24),
+                        color: "#ff0018",
+                        width: pxToDp(90),
+                        textAlign: "center"
+                      }}
+                    >
+                      {tool.toFixed(ite.seller_ship_charge)}元
+                    </Text>
+                    {/*{this.renderProfit(ite)}*/}
                     <View
                       style={{
                         flexDirection: "row",
@@ -443,13 +460,13 @@ class SettlementScene extends PureComponent {
                         width: 100
                       }}
                     >
-                      <Text style={{ color: colors.fontGray, fontSize: 16 }}>
+                      <Text style={{color: colors.fontGray, fontSize: pxToDp(24)}}>
                         {tool.toFixed(ite.bill_price)}元
                       </Text>
                       <Image
                         style={{
                           alignItems: "center",
-                          transform: [{ scale: 0.6 }, { rotate: "-90deg" }]
+                          transform: [{scale: 0.6}, {rotate: "-90deg"}]
                         }}
                         source={require("../../img/Public/xiangxia_.png")}
                       />
@@ -463,16 +480,16 @@ class SettlementScene extends PureComponent {
       );
     });
   }
-
-  render() {
+  
+  render () {
     return this.state.query ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
       <View
         style={
           this.state.authority
-            ? { flex: 1, paddingBottom: pxToDp(110) }
-            : { flex: 1 }
+            ? {flex: 1, paddingBottom: pxToDp(110)}
+            : {flex: 1}
         }
       >
         <TouchableHighlight
@@ -497,29 +514,29 @@ class SettlementScene extends PureComponent {
                 <Text style={styles.today_data}>
                   今日数据（{tool.fullDay(new Date())})
                 </Text>
-
-                <View style={{ flexDirection: "row", marginTop: pxToDp(20) }}>
+                
+                <View style={{flexDirection: "row", marginTop: pxToDp(20)}}>
                   <Text style={styles.order_text}>
                     已完成订单 : {this.state.orderNum}
                   </Text>
-                  <Text style={[styles.order_text, { marginLeft: pxToDp(64) }]}>
+                  <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>
                     金额 : {tool.toFixed(this.state.totalPrice)}
                   </Text>
                 </View>
               </View>
             </View>
-
+            
             <Image
               style={{
                 alignItems: "center",
-                transform: [{ scale: 0.7 }, { rotate: "-90deg" }],
+                transform: [{scale: 0.7}, {rotate: "-90deg"}],
                 marginRight: pxToDp(30)
               }}
               source={require("../../img/Public/xiangxia_.png")}
             />
           </View>
         </TouchableHighlight>
-
+        
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -531,7 +548,7 @@ class SettlementScene extends PureComponent {
               tintColor="gray"
             />
           }
-          style={{ flex: 1 }}
+          style={{flex: 1}}
         >
           {this.renderList()}
         </ScrollView>
@@ -561,15 +578,15 @@ const styles = StyleSheet.create({
   },
   status: {
     borderWidth: pxToDp(1),
-    height: pxToDp(40),
+    height: pxToDp(30),
     borderRadius: pxToDp(20),
-    width: pxToDp(100),
-    fontSize: pxToDp(24),
+    width: pxToDp(68),
+    fontSize: pxToDp(16),
     textAlign: "center",
     justifyContent: "center",
     color: colors.fontGray,
     borderColor: colors.fontGray,
-    lineHeight: pxToDp(36)
+    lineHeight: pxToDp(28)
   },
   btn_box: {
     position: "absolute",
