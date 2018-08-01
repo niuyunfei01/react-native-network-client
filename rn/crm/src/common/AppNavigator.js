@@ -40,6 +40,7 @@ import SelectStoreScene from "../scene/Setting/SelectStoreScene";
 import OrderTodoScene from "../scene/Order/OrderTodoScene";
 import OrderCallShip from "../scene/Order/OrderCallShip";
 import OrderSendMoney from '../scene/Order/OrderSendMoney'
+import OrderSurcharge from '../scene/Order/OrderSurcharge'
 import GoodsEditScene from "../scene/Goods/GoodsEditScene";
 import GoodsClassifyScene from "../scene/Goods/GoodsClassifyScene";
 import GoodsBatchPriceScene from "../scene/Goods/GoodsBatchPriceScene";
@@ -271,6 +272,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SHIP_DETAIL]: {screen: OrderShipDetail},
         [Config.ROUTE_ORDER_CANCEL_SHIP]: {screen: OrderCancelShip},
         [Config.ROUTE_ORDER_SEND_MONEY]: {screen: OrderSendMoney},
+        [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},

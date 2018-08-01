@@ -103,6 +103,7 @@ const C = {
   ROUTE_ORDER_TODO: 'OrderTodo',
   ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_ORDER_SEND_MONEY: 'OrderSendMoney',
+  ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_DONE_REMIND: 'DoneRemind',

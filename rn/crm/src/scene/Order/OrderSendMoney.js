@@ -42,7 +42,7 @@ class OrderSendMoney extends PureComponent {
     const {amount, remark} = self.state
     const url = `api/save_store_surcharge?access_token=${global.accessToken}`;
     const formData = JSON.stringify({
-      fee: amount,
+      fee: amount * 100,
       remark: remark,
       order_id: navigation.state.params.orderId,
       store_id: navigation.state.params.storeId
