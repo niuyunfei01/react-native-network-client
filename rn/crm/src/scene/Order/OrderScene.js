@@ -293,7 +293,7 @@ class OrderScene extends Component {
   _navSetParams = () => {
     let {backPage} = (this.props.navigation.state.params || {});
     const {enabled_special_menu = false} = this.props.global.config;
-    
+    const {is_service_mgr} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
@@ -310,9 +310,11 @@ class OrderScene extends Component {
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-    
-    as.push({key: MENU_SEND_MONEY, label: '发红包'})
-    
+
+    if (is_service_mgr) {
+      as.push({key: MENU_SEND_MONEY, label: '发红包'})
+    }
+
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
