@@ -177,17 +177,17 @@ class StoreAddScene extends Component {
 		
 		const {mine} = this.props;
 		let user_list = mine.user_list[currVendorId];
-		
-		let userActionSheet = [];
-		userActionSheet.push({key: -999, section: true, label: "职位任命"});
-		userActionSheet.push({key: 0, label: "不任命任何人"});
-		for (let user_info of mine.normal[currVendorId]) {
-			let item = {
-				key: user_info.id,
-				label: user_info.nickname
-			};
-			userActionSheet.push(item);
-		}
+
+    let userActionSheet = [];
+    userActionSheet.push({key: -999, section: true, label: "职位任命"});
+    userActionSheet.push({key: 0, label: "不任命任何人"});
+    for (let user_info of mine.normal[currVendorId]) {
+      let item = {
+        key: user_info.id,
+        label: user_info.nickname
+      };
+      userActionSheet.push(item);
+    }
 		
 		//门店照片的地址呀
 		let storeImageUrl = undefined;

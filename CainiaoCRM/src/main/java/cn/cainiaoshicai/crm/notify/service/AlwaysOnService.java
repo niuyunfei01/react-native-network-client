@@ -120,11 +120,11 @@ public class AlwaysOnService extends BaseService {
             int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             //当前音量
             int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-            int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
+            //int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+            //int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
+            //mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
+            //mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
             for (int i = 0; i < notifyTimes; i++) {
                 GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
                 Thread.sleep(1300);
@@ -140,8 +140,8 @@ public class AlwaysOnService extends BaseService {
                 Thread.sleep(8000);
             }
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
+//            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
+//            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
         }
     }
 
