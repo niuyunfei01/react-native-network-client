@@ -25,12 +25,12 @@ import native from "../../common/native";
 
 import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
@@ -48,21 +48,21 @@ function mapDispatchToProps(dispatch) {
 class StoreScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-
+    
     return {
       headerTitle: "店铺管理",
       headerRight: ""
     };
   };
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props);
-
+    
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-
+    
     const {vendor_stores, user_list} = this.props.mine;
     let curr_user_list = tool.curr_vendor(user_list, currVendorId);
-
+    
     this.state = {
       isRefreshing: false,
       showCallStore: false,
@@ -73,20 +73,20 @@ class StoreScene extends PureComponent {
       cityList: [],
       storeGroupByCity: []
     };
-
+    
     this.getVendorStore = this.getVendorStore.bind(this);
     this.onSearchWorkers = this.onSearchWorkers.bind(this);
   }
-
-  componentDidMount() {
+  
+  componentDidMount () {
     let {curr_user_list} = this.state;
     this.getVendorStore();
     if (tool.length(curr_user_list) === 0) {
       this.onSearchWorkers();
     }
   }
-
-  getVendorStore() {
+  
+  getVendorStore () {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -106,8 +106,8 @@ class StoreScene extends PureComponent {
       })
     );
   }
-
-  onSearchWorkers() {
+  
+  onSearchWorkers () {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -124,32 +124,32 @@ class StoreScene extends PureComponent {
       })
     );
   }
-
-  onHeaderRefresh() {
+  
+  onHeaderRefresh () {
     this.setState({isRefreshing: true});
     this.getVendorStore();
     this.onSearchWorkers();
   }
-
-  onPress(route, params = {}) {
+  
+  onPress (route, params = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-
-  renderStores(stores) {
+  
+  renderStores (stores) {
     let {curr_user_list, currVendorId} = this.state;
     if (tool.length(stores) === 0 || tool.length(curr_user_list) === 0) {
       return <LoadingView/>;
     }
-
+    
     let _this = this;
     return stores.map(function (store, idx) {
       let {nickname} = curr_user_list[store.owner_id] || {};
       // let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
       // let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
-
+      
       let storeTel = [
         {tel: store.tel, desc: "门店"},
         {tel: store.mobile, desc: nickname}
@@ -171,12 +171,12 @@ class StoreScene extends PureComponent {
           }
         }
       }
-
+      
       return (
         <Cells style={[styles.cells]} key={idx}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody style={styles.cell_body}>
-              <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.city}</Text></View>
+              <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district}</Text></View>
               <Text style={[styles.store_name]}>{store.name}</Text>
               <Text style={[styles.open_time]}>
                 {tool.storeTime(`2000-01-01 ${store.open_start}`)}-{tool.storeTime(
@@ -246,8 +246,8 @@ class StoreScene extends PureComponent {
       );
     });
   }
-
-  callStoreMenus() {
+  
+  callStoreMenus () {
     return this.state.storeTel.map(store => {
       return {
         type: "default",
@@ -258,8 +258,8 @@ class StoreScene extends PureComponent {
       };
     });
   }
-
-  renderScrollTabs() {
+  
+  renderScrollTabs () {
     let _this = this;
     const {cityList} = _this.state
     let {currVendorName, storeGroupByCity} = _this.state;
@@ -316,12 +316,12 @@ class StoreScene extends PureComponent {
               <CellFooter/>
             </Cell>
           </Cells>
-
+          
           <CellsTitle style={[styles.cell_title]}>
             {currVendorName} 门店列表
           </CellsTitle>
           {_this.renderStores(stores)}
-
+          
           <ActionSheet
             visible={_this.state.showCallStore}
             onRequestClose={() => {
@@ -342,8 +342,8 @@ class StoreScene extends PureComponent {
       )
     })
   }
-
-  render() {
+  
+  render () {
     let _this = this;
     return (
       <ScrollableTabView
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 0,
     paddingRight: 0
-
+    
     // borderColor: 'green',
     // borderWidth: pxToDp(1),
   },
