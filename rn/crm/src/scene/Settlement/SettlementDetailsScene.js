@@ -249,7 +249,7 @@ class SettlementScene extends PureComponent {
   
   renderList () {
     this.state.goods_list.forEach((item) => {
-      item.key = item.product_id
+      item.key = item.product_id + '-' + item.supply_price
     });
     return (
       <FlatList
