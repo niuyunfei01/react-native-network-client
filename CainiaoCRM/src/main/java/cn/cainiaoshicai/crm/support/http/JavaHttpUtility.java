@@ -52,8 +52,8 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
  */
 public class JavaHttpUtility {
 
-    private static final int CONNECT_TIMEOUT = 30 * 1000;
-    private static final int READ_TIMEOUT = 30 * 1000;
+    private static final int CONNECT_TIMEOUT = 60 * 1000;
+    private static final int READ_TIMEOUT = 60 * 1000;
     private static final int DOWNLOAD_CONNECT_TIMEOUT = 15 * 1000;
     private static final int DOWNLOAD_READ_TIMEOUT = 60 * 1000;
     private static final int UPLOAD_CONNECT_TIMEOUT = 15 * 1000;

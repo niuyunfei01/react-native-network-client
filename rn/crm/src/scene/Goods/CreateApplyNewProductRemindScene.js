@@ -516,14 +516,15 @@ class CreateApplyNewProductRemindScene extends PureComponent {
               type: "default",
               label: "知道了",
               onPress: () => {
-                this.setState({
-                  goods_name: "",
-                  price_desc: "",
-                  slogan: "",
-                  list_img: {},
-                  upload_files: {},
-                  dialogStatus: false
-                });
+                // this.setState({
+                //   goods_name: "",
+                //   price_desc: "",
+                //   slogan: "",
+                //   list_img: {},
+                //   upload_files: {},
+                //   dialogStatus: false
+                // });
+                this.props.navigation.goBack();
               }
             }
           ]}
