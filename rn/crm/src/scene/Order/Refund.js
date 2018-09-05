@@ -59,8 +59,8 @@ class Refund extends Component {
       )
     };
   };
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props);
     this.state = {
       orderDetail: this.props.navigation.state.params.orderDetail,
@@ -72,15 +72,15 @@ class Refund extends Component {
     };
     this.refundReason = null;
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     console.log(
       "this.props.navigation.state.params.orderDetail:%o",
       this.props.navigation.state.params.orderDetail
     );
     this.fetchResources();
   }
-
+  
   fetchResources = () => {
     let url = `/api/refund_reason?access_token=${
       this.props.global.accessToken
@@ -136,7 +136,7 @@ class Refund extends Component {
   selectRefund = element => {
     let reson = this.state.goodsList;
     element.active = !element.active;
-
+    
     this.setState({
       goodsList: reson
     });
@@ -164,6 +164,10 @@ class Refund extends Component {
         this.refundgoodsList.push({id: element.id, count: element.num});
       }
     });
+    if (this.refundgoodsList.length === this.state.goodsList.length) {
+      return ToastLong("全部商品退单，请联系客户由客户主动发起申请，或联系服务经经理！")
+    }
+    
     let payload = {
       order_id: this.state.orderDetail.id,
       items: this.refundgoodsList,
@@ -190,8 +194,8 @@ class Refund extends Component {
       }
     );
   };
-
-  render() {
+  
+  render () {
     console.disableYellowBox = true;
     return this.state.isLoading ? (
       <LoadingView/>
@@ -265,7 +269,7 @@ class Refund extends Component {
               提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
             </Text>
           </View>
-          {this.title("商品明细")}
+          {this.title("选择要退的商品")}
           {/*商品明细列表*/}
           <View style={{paddingHorizontal: pxToDp(31)}}>
             {this.state.goodsList.map((element, index) => {
@@ -282,7 +286,7 @@ class Refund extends Component {
                       justifyContent: "space-between",
                       alignItems: "center",
                       marginTop: 15,
-
+                      
                       marginBottom:
                         index === this.state.goodsList.length - 1 ? 15 : 0
                     }}
@@ -344,7 +348,7 @@ class Refund extends Component {
                             总价{" "}
                             {(element.price * element.origin_num).toFixed(2)}
                           </Text>
-                          <Text style={[Styles.h16c4, {flex: 1}]}>
+                          <Text style={[Styles.h16c4, {flex: 1, color: 'black'}]}>
                             *{element.origin_num}
                           </Text>
                         </View>
@@ -364,7 +368,7 @@ class Refund extends Component {
                         bc={Colors.greyc}
                         onPress={() => {
                           if (element.num <= 0) return;
-
+                          
                           element.num = element.num - 1;
                           element.active = true;
                           let data = this.state.goodsList;
@@ -425,7 +429,7 @@ class Refund extends Component {
               <Text style={Styles.h16c4}>以平台为准</Text>
             </View>
           </View>
-          {this.title("退款理由")}
+          {this.title("部分退单理由")}
           {this.state.refundReason.map((element, index) => {
             return (
               <TouchableOpacity
@@ -496,7 +500,7 @@ class Refund extends Component {
         </ScrollView>
         {/*退款按钮*/}
         <View style={{paddingHorizontal: pxToDp(31)}}>
-          <Button1 t="确认退款" w="100%" onPress={() => this.refund()}/>
+          <Button1 t="确认退款所选商品" w="100%" onPress={() => this.refund()}/>
         </View>
       </View>
     );

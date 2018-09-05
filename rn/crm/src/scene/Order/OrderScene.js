@@ -310,11 +310,11 @@ class OrderScene extends Component {
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-
+    
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }
-
+    
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
@@ -1949,6 +1949,10 @@ class ItemRow extends PureComponent {
       idx, item, isAdd, edited, onInputNumberChange = () => {
       }, isEditing = false, nav
     } = this.props;
+    
+    if (item.crm_order_detail_hide) {
+      return null
+    }
     
     const editNum = _editNum(edited, item);
     
