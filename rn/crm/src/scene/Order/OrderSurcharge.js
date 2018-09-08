@@ -75,11 +75,17 @@ class OrderSurcharge extends PureComponent {
   
   renderAccordionHeader (item) {
     return (
-      <List style={{width: '100%'}}>
-        <List.Item extra={this.renderAccordionItemStatus(item.status)}>
-          <Text style={{fontSize: pxToDp(24)}}>{Moment(item.created).format('YY-MM-DD HH:mm')} #{item.order_id}</Text>
-        </List.Item>
-      </List>
+      <View style={{
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        width: '95%',
+        height: 40,
+        alignItems: 'center',
+        paddingRight: '5%'
+      }}>
+        <Text>{Moment(item.created).format('YY-MM-DD')} ¥{tool.toFixed(item.total_fee)}</Text>
+        {this.renderAccordionItemStatus(item.status)}
+      </View>
     )
   }
   
@@ -87,21 +93,27 @@ class OrderSurcharge extends PureComponent {
     const {listData} = this.state
     let items = []
     for (let i in listData) {
+      let item = listData[i]
       items.push(
         <Accordion.Panel
-          header={this.renderAccordionHeader(listData[i])}
+          header={this.renderAccordionHeader(item)}
           key={i} index={i}
           style={{backgroundColor: '#fff'}}
         >
           <View style={style.detailBox}>
             <Text>订单号：{listData[i].order_id}</Text>
             <WhiteSpace/>
+            <View style={{flexDirection: 'row'}}>
+              <Text>状态：</Text>
+              {this.renderAccordionItemStatus(item.status)}
+            </View>
+            <WhiteSpace/>
             <Text>金&nbsp;&nbsp;&nbsp;&nbsp;额：{tool.toFixed(listData[i].total_fee)}</Text>
             <WhiteSpace/>
             <View style={style.remarkBox}>
               <Text>备&nbsp;&nbsp;&nbsp;&nbsp;注：</Text>
               <Text style={{flex: 1}}>
-                {listData[i].remark}{listData[i].remark}{listData[i].remark}{listData[i].remark}{listData[i].remark}{listData[i].remark}{listData[i].remark}
+                {listData[i].remark}
               </Text>
             </View>
           </View>
