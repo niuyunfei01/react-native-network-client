@@ -1629,7 +1629,7 @@ class OrderScene extends Component {
           <View style={[styles.row, {marginBottom: pxToDp(14), marginTop: 0, flexDirection: 'column'}]}>
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
             {!!order.user_remark &&
-            <Remark label="客户备注" remark={order.user_remark}/>}
+            <Remark label="客户备注" remark={order.user_remark} style={{fontWeight:'bold', color: 'red', fontSize: pxToDp(2)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
             {!!order.invoice &&
@@ -1949,7 +1949,7 @@ class ItemRow extends PureComponent {
       idx, item, isAdd, edited, onInputNumberChange = () => {
       }, isEditing = false, nav
     } = this.props;
-    
+
     if (item.crm_order_detail_hide) {
       return null
     }
@@ -2060,16 +2060,16 @@ ItemRow.PropTypes = {
 };
 
 class Remark extends PureComponent {
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
   }
-  
-  render () {
-    const {label, remark} = this.props;
+
+  render() {
+    const {label, remark, style} = this.props;
     return (<View style={{flexDirection: 'row'}}>
-      <Text style={styles.remarkText}>{label}:</Text>
-      <Text selectable={true} style={[styles.remarkText, styles.remarkTextBody]}>{remark}</Text>
+      <Text style={[styles.remarkText, style]}>{label}:</Text>
+      <Text selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</Text>
     </View>)
   }
 }

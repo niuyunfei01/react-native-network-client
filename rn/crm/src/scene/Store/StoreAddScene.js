@@ -797,7 +797,7 @@ class StoreAddScene extends Component {
 									</CellBody>
 								</Cell>
 							) : null}
-						{this.state.isBd ? (
+						{this.state.isServiceMgr ? (
 							<Cell customStyle={[styles.cell_row]}>
 								<CellHeader>
 									<Label style={[styles.cell_label]}>门店类型</Label>
@@ -882,7 +882,7 @@ class StoreAddScene extends Component {
 								/>
 							</CellBody>
 						</Cell>
-						{this.state.isBd ? (
+						{this.state.isServiceMgr ? (
 							<Cell customStyle={[styles.cell_row]}>
 								<CellHeader>
 									<Label style={[styles.cell_label]}>选择模板店</Label>
