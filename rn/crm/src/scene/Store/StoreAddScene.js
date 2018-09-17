@@ -758,7 +758,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
             {/*商家资质不是bd不显示*/
-              this.state.isBd ? (
+              this.state.isBd || this.state.isServiceMgr  ? (
                 <Cell customStyle={[styles.cell_row]}>
                   <CellHeader>
                     <Label style={[styles.cell_label]}>商家资质</Label>
@@ -907,7 +907,7 @@ class StoreAddScene extends Component {
                 </CellBody>
               </Cell>
             ) : null}
-            {this.state.isBd ? (
+            {this.state.isBd  ? (
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>选择bd</Label>
@@ -927,7 +927,6 @@ class StoreAddScene extends Component {
                             label: option.label
                           }
                         });
-                        // this.onCheckUser("owner", option.key);
                       }}
                       data={this.state.bdList}
                       skin="customer"

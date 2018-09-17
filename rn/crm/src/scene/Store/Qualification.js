@@ -1,31 +1,15 @@
-import React, { Component } from "react";
-import {
-  ScrollView,
-  RefreshControl,
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  TextInput,
-  Image
-} from "react-native";
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
-import * as globalActions from "../../reducers/global/globalActions";
-import * as tool from "../../common/tool";
-import { Styles, Metrics, Colors } from "../../themes";
+import React, {Component} from "react";
+import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import {connect} from "react-redux";
+import {Colors, Metrics} from "../../themes";
 
 import Icon from "react-native-vector-icons/Ionicons";
-import _ from "lodash";
 import ImagePicker from "react-native-image-crop-picker";
 
-import { Button, Button1 } from "../component/All";
-import { cityList } from "../data";
-import { Line } from "../component/All";
-import { NavigationItem } from "../../widget";
+import {Button1} from "../component/All";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
-import Config from "../../config";
-import { ToastLong } from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 function mapStateToProps(state) {
@@ -95,14 +79,7 @@ class Qualification extends Component {
       removeIds: [] //删除了图片
     };
     this.config = {
-      width: 500,
-      height: 500,
-      cropping: true,
-      cropperCircleOverlay: false,
-      compressImageMaxWidth: 640,
-      compressImageMaxHeight: 480,
-      compressImageQuality: 0.5,
-      compressVideoPreset: "MediumQuality",
+      cropping: false,
       includeExif: true,
       includeBase64: true
     };
@@ -204,7 +181,6 @@ class Qualification extends Component {
   };
 
   pushRemoveIds = img => {
-    console.log("rm img", img);
     if (img && img.id) {
       let rmIds = this.state.removeIds;
       rmIds.push(img.id);
