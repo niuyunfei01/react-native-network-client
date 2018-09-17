@@ -1,16 +1,9 @@
 //import liraries
-import React, {PureComponent, Component} from "react";
-import {
-  InteractionManager,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Clipboard
-} from "react-native";
+import React, {Component} from "react";
+import {Clipboard, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
+import * as tool from "../../common/tool";
 import {simpleBarrier} from "../../common/tool";
 
 import {
@@ -24,39 +17,32 @@ import {
   Icon,
   Input,
   Label,
-  Toast,
-  TextArea
+  TextArea,
+  Toast
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
+import AppConfig from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Cts from "../../Cts";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import {
-  copyStoreGoods,
-  saveOfflineStore
-} from "../../reducers/mine/mineActions";
-import * as tool from "../../common/tool";
+import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
 //组件
 import {Yuan} from "../component/All";
 import {Colors, Metrics} from "../../themes";
-import {
-  uploadImg,
-  newProductSave
-} from "../../reducers/product/productActions";
+import {uploadImg} from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
 
 import _ from "lodash";
 //请求
-import {getWithTpl, getWithTpl2} from "../../util/common";
+import {getWithTpl} from "../../util/common";
 import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -311,8 +297,9 @@ class StoreAddScene extends Component {
       let {currStoreId, canReadStores} = this.props.global;
       store_info = canReadStores[currStoreId];
     }
-    let isBdUrl = `api/is_bd?access_token=${this.props.global.accessToken}`;
-    let url = `api/get_tpl_stores?access_token=${
+    let {currVendorId} = tool.vendor(this.props.global);
+    let isBdUrl = `api/is_bd/${currVendorId}?access_token=${this.props.global.accessToken}`;
+    let url = `api/get_tpl_stores/${currVendorId}?access_token=${
       this.props.global.accessToken
       }`;
     let bdUrl = `api/get_bds?access_token=${this.props.global.accessToken}`;
@@ -758,7 +745,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
             {/*商家资质不是bd不显示*/
-              this.state.isBd || this.state.isServiceMgr  ? (
+              this.state.isBd  ? (
                 <Cell customStyle={[styles.cell_row]}>
                   <CellHeader>
                     <Label style={[styles.cell_label]}>商家资质</Label>
@@ -984,16 +971,6 @@ class StoreAddScene extends Component {
                 <Label style={[styles.cell_label]}>店助</Label>
               </CellHeader>
               <CellBody>
-                {/*<ModalSelector
-                onChange={(option) => {
-                  this.onCheckUser('vice_mgr', option.key)
-                }}
-                data={this.state.userActionSheet}
-                skin='customer'
-                defaultKey={vice_mgr}
-              >
-                <Text style={styles.body_text}>{vice_mgr > 0 ? vice_mgr_name : '点击选择店助'}</Text>
-              </ModalSelector>*/}
                 <TouchableOpacity
                   onPress={() => {
                     let checked = !!vice_mgr ? vice_mgr.split(",") : [];
@@ -1298,10 +1275,10 @@ class StoreAddScene extends Component {
       if (this.state.isServiceMgr) {
         send_data["tpl_store"] = this.state.templateInfo.key;
         send_data["fn_price_controlled"] = this.state.isTrusteeship ? 1 : 0;
+        send_data["service_bd"] = this.state.bdInfo.key;
       }
       if (this.state.isBd) {
         let data = this.state.fileId.join(",");
-        send_data["service_bd"] = this.state.bdInfo.key;
         send_data["attachment"] = data;
       }
       if (store_id > 0) {
