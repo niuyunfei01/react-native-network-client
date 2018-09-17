@@ -1217,7 +1217,12 @@ class StoreAddScene extends Component {
   };
 
   onStoreAdd() {
+    if (this.state.isUploadingImage) {
+      ToastLong("商家资质正在上传！请稍后再提交！");
+      return false;
+    }
     if (this.state.onSubmitting) {
+      ToastLong("正在提交...");
       return false;
     }
     const {dispatch} = this.props;

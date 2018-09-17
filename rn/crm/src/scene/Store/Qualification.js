@@ -238,7 +238,7 @@ class Qualification extends Component {
           >
             {this.state.imageList.map((element, index) => {
               return (
-                <Upload
+                <Upload key={index}
                   desc="上传门头照片"
                   imageUrl={element.imageUrl && element.imageUrl.url}
                   deleteImage={() => {
