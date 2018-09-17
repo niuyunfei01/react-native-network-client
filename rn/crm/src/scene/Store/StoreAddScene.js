@@ -302,7 +302,7 @@ class StoreAddScene extends Component {
     let url = `api/get_tpl_stores/${currVendorId}?access_token=${
       this.props.global.accessToken
       }`;
-    let bdUrl = `api/get_bds?access_token=${this.props.global.accessToken}`;
+    let bdUrl = `api/get_bds/${currVendorId}?access_token=${this.props.global.accessToken}`;
     let isServiceMgrUrl = `api/is_service_mgr/${store_info.type}?access_token=${this.props.global.accessToken}`
     //判断是否是业务人员
     getWithTpl(isServiceMgrUrl, response => {
