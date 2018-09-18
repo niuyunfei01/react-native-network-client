@@ -63,6 +63,8 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+const createUserTag = -100;
+
 // create a component
 class StoreAddScene extends Component {
   static navigationOptions = ({navigation}) => {
@@ -164,6 +166,7 @@ class StoreAddScene extends Component {
 
     let userActionSheet = [];
     userActionSheet.push({key: -999, section: true, label: "职位任命"});
+    userActionSheet.push({key: createUserTag, label: "创建新用户"});
     userActionSheet.push({key: 0, label: "不任命任何人"});
     for (let user_info of mine.normal[currVendorId]) {
       let item = {
@@ -260,15 +263,16 @@ class StoreAddScene extends Component {
       fileId: fileId,
       existImgIds: existImgIds,
       templateList: [], //模板列表
-      templateInfo: {key: 0, label: ''},
+      templateInfo: {key: undefined, label: undefined},
       bdList: [],
-      bdInfo: {key: 0, label: ''},
+      bdInfo: {key: undefined, label: undefined},
       isLoading: true,
       isGetbdList: true,
       isLoadingStoreList: true,
       isServiceMgr: false,  //是否是业务人员 BD+运营
       remark: '',
-      receiveSecretKey: ''
+      receiveSecretKey: '',
+      createUserName: ''
     };
     this.onPress = this.onPress.bind(this);
     this.onCheckUser = this.onCheckUser.bind(this);
@@ -276,6 +280,40 @@ class StoreAddScene extends Component {
     this.onCheckData = this.onCheckData.bind(this);
     this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
     this.fileId = [];
+  }
+
+  getStoreEditData() {
+    let {
+      store_id, type, alias, name, district,
+      owner_name, owner_nation_id, location_long,
+      location_lat, deleted, tel, mobile, dada_address,
+      owner_id, open_end, open_start, vice_mgr, call_not_print,
+      ship_way, isTrusteeship, bdInfo, templateInfo
+    } = this.state;
+    return {
+      store_id: store_id,
+      type: type,
+      alias: alias,
+      name: name,
+      district: district,
+      owner_name: owner_name,
+      owner_nation_id: owner_nation_id,
+      location_long: location_long,
+      location_lat: location_lat,
+      deleted: deleted,
+      tel: tel,
+      mobile: mobile,
+      dada_address: dada_address,
+      owner_id: owner_id,
+      open_end: open_end,
+      open_start: open_start,
+      vice_mgr: vice_mgr,
+      call_not_print: call_not_print,
+      ship_way: ship_way,
+      isTrusteeship: isTrusteeship,
+      bdInfo: bdInfo,
+      templateInfo: templateInfo
+    };
   }
 
   componentDidMount() {
@@ -420,9 +458,31 @@ class StoreAddScene extends Component {
     });
   }
 
+  onCreateUser(userId, userMobile, userName) {
+    console.log("userId : " + userId + " userMobile : " + userMobile + " userName ：" + userName);
+    this.setState({
+      owner_id: userId,
+      mobile: userMobile,
+      createUserName: userName
+    });
+  }
+
   onCheckUser(user_type, user_id) {
     let {user_list} = this.state;
     if (user_type === "owner") {
+      if (user_id == createUserTag) {
+        console.log("to create user");
+        let storeId = this.state.store_id;
+        let storeData = this.getStoreEditData();
+        this.onPress(Config.ROUTE_USER_ADD, {
+          type: 'add',
+          pageFrom: 'storeAdd',
+          storeData: storeData,
+          store_id: storeId,
+          onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName)
+        });
+        return false;
+      }
       this.setState({
         owner_id: user_id,
         mobile: user_id > 0 ? user_list[user_id]["mobilephone"] : ""
@@ -595,9 +655,13 @@ class StoreAddScene extends Component {
       ship_way,
       printer_cfg,
       auto_add_tips,
-      user_list
+      user_list,
+      createUserName
     } = this.state;
     let store_mgr_name = (user_list[owner_id] || {nickname: "-"})["nickname"];
+    if (owner_id > 0 && store_mgr_name == "-" && createUserName) {
+      store_mgr_name = createUserName;
+    }
     let vice_mgr_name = "";
     if (!!vice_mgr && vice_mgr !== "0") {
       for (let vice_mgr_id of vice_mgr.split(",")) {
@@ -743,7 +807,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
             {/*商家资质不是bd不显示*/
-              this.state.isBd  ? (
+              this.state.isBd ? (
                 <Cell customStyle={[styles.cell_row]}>
                   <CellHeader>
                     <Label style={[styles.cell_label]}>商家资质</Label>
@@ -878,7 +942,6 @@ class StoreAddScene extends Component {
                             label: option.label
                           }
                         });
-                        // this.onCheckUser("owner", option.key);
                       }}
                       data={this.state.templateList}
                       skin="customer"
@@ -892,7 +955,7 @@ class StoreAddScene extends Component {
                 </CellBody>
               </Cell>
             ) : null}
-            {this.state.isBd  ? (
+            {this.state.isBd ? (
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>选择bd</Label>

@@ -55,7 +55,6 @@ class UserAddScene extends PureComponent {
     const {params = {}} = navigation.state;
     const page_type = (params || {}).type;
     let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
-
     return {
       headerTitle: pageTitle,
       headerRight: '',
@@ -78,6 +77,12 @@ class UserAddScene extends PureComponent {
     const {type, user_id, mobile, user_name, user_status, store_id, worker_nav_key, user_info_key, worker_id} = (this.props.navigation.state.params || {});
     let route_back = Config.ROUTE_WORKER;
 
+    let {pageFrom, storeData} = this.props.navigation.state.params;
+    let showChooseStore = true;
+    if (pageFrom == 'storeAdd') {
+      showChooseStore = false;
+    }
+
     this.state = {
       type: type,
       isRefreshing: false,
@@ -88,16 +93,20 @@ class UserAddScene extends PureComponent {
       route_back: route_back,
       worker_nav_key: worker_nav_key,
       user_info_key: user_info_key,
-
       user_id: user_id === undefined ? 0 : user_id,
       mobile: mobile === undefined ? '' : mobile,
       user_name: user_name === undefined ? '' : user_name,
       user_status: user_status === undefined ? Cts.WORKER_STATUS_OK : user_status,
       store_id: store_id === undefined ? -1 : store_id,
       worker_id: worker_id,
+      pageFrom: pageFrom,
+      storeData: storeData,
+      showChooseStore: showChooseStore
     };
     this.onUserAdd = this.onUserAdd.bind(this);
-    this.getVendorStore();
+    if (showChooseStore) {
+      this.getVendorStore();
+    }
   }
 
   getVendorStore() {
@@ -173,26 +182,28 @@ class UserAddScene extends PureComponent {
             </CellBody>
           </Cell>
         </Cells>
+        {this.state.showChooseStore ? (<View>
+          <CellsTitle style={styles.cell_title}>限制只能访问某门店</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            {this.state.stores.map((option, idx) =>
+              <Cell
+                key={idx}
+                onPress={() => this.onChooseStore(option.value)}
+                // customStyle = {{paddingTop: 7, paddingBottom: 7}}
+                customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={styles.cell_body}>{option.name || option.value}</Text>
+                </CellBody>
+                <CellFooter>
+                  {this.state.store_id === option.value ? (
+                    <Icon name="success_no_circle" style={{fontSize: 16,}}/>
+                  ) : null}
+                </CellFooter>
+              </Cell>
+            )}
+          </Cells>
+        </View>) : null}
 
-        <CellsTitle style={styles.cell_title}>限制只能访问某门店</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          {this.state.stores.map((option, idx) =>
-            <Cell
-              key={idx}
-              onPress={() => this.onChooseStore(option.value)}
-              // customStyle = {{paddingTop: 7, paddingBottom: 7}}
-              customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={styles.cell_body}>{option.name || option.value}</Text>
-              </CellBody>
-              <CellFooter>
-                {this.state.store_id === option.value ? (
-                  <Icon name="success_no_circle" style={{fontSize: 16,}}/>
-                ) : null}
-              </CellFooter>
-            </Cell>
-          )}
-        </Cells>
         <Button
           onPress={() => this.onUserAdd()} type='primary'
           style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
@@ -246,11 +257,10 @@ class UserAddScene extends PureComponent {
       dispatch(saveVendorUser(data, accessToken, (resp) => {
         console.log('save_resp -> ', resp);
         _this.setState({onSubmitting: false});
-
         if (resp.ok) {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';
           ToastShort(msg);
-
+          let userData = resp.obj;
           const setWorkerAction = NavigationActions.setParams({
             params: {shouldRefresh: true},
             key: worker_nav_key,
@@ -266,9 +276,13 @@ class UserAddScene extends PureComponent {
             key: user_info_key,
           });
           this.props.navigation.dispatch(setUserAction);
-
-          const setSelfParamsAction = NavigationActions.back();
-          this.props.navigation.dispatch(setSelfParamsAction);
+          if (this.state.pageFrom == 'storeAdd' && _this.props.navigation.state.params.onBack) {
+            _this.props.navigation.state.params.onBack(userData.user_id, mobile, user_name);
+            _this.props.navigation.goBack();
+          } else {
+            const setSelfParamsAction = NavigationActions.back();
+            this.props.navigation.dispatch(setSelfParamsAction);
+          }
         } else {
           ToastShort(resp.desc);
         }
