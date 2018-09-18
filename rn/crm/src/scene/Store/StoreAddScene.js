@@ -157,7 +157,7 @@ class StoreAddScene extends Component {
       bd_shop_id,
       city = undefined,
       city_code = undefined,
-      fn_price_controlled = 0
+      fn_price_controlled = 1
     } =
     store_info || {};
 
