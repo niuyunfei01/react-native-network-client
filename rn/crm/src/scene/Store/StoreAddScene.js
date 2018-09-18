@@ -109,7 +109,6 @@ class StoreAddScene extends Component {
       dispatch(
         copyStoreGoods(store_id, force, accessToken, resp => {
           if (resp.ok) {
-            //console.log(resp);
             ToastLong(resp.desc);
           }
           this.setState({
@@ -158,8 +157,7 @@ class StoreAddScene extends Component {
       city = undefined,
       city_code = undefined,
       fn_price_controlled = 1
-    } =
-    store_info || {};
+    } = store_info || {};
 
     const {mine} = this.props;
     let user_list = mine.user_list[currVendorId];
@@ -262,9 +260,9 @@ class StoreAddScene extends Component {
       fileId: fileId,
       existImgIds: existImgIds,
       templateList: [], //模板列表
-      templateInfo: {key: undefined, label: undefined},
+      templateInfo: {key: 0, label: ''},
       bdList: [],
-      bdInfo: {key: undefined, label: undefined},
+      bdInfo: {key: 0, label: ''},
       isLoading: true,
       isGetbdList: true,
       isLoadingStoreList: true,
@@ -633,7 +631,7 @@ class StoreAddScene extends Component {
                   onChangeText={name => this.setState({name})}
                   value={name}
                   style={[styles.cell_input]}
-                  placeholder="8个字符以内"
+                  placeholder="64个字符以内"
                   underlineColorAndroid="transparent" //取消安卓下划线
                 />
               </CellBody>
@@ -1108,6 +1106,55 @@ class StoreAddScene extends Component {
             </Cell>
           </Cells>
 
+          <CellsTitle style={styles.cell_title}>银行卡信息</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>银行卡号</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={v => {
+                    this.setState({bankcard_code: v});
+                  }}
+                  value={this.state.bankcard_code}
+                  style={[styles.cell_input]}
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>开户地址</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={v => {
+                    this.setState({bankcard_address: v});
+                  }}
+                  value={this.state.bankcard_address}
+                  style={[styles.cell_input]}
+                  underlineColorAndroid="transparent"
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>开户人姓名</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                  onChangeText={v => {
+                    this.setState({bankcard_username: v});
+                  }}
+                  value={this.state.bankcard_username}
+                  style={[styles.cell_input]}
+                  underlineColorAndroid="transparent"
+                />
+              </CellBody>
+            </Cell>
+          </Cells>
+
           <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
@@ -1254,6 +1301,9 @@ class StoreAddScene extends Component {
         printer_cfg,
         auto_add_tips,
         isTrusteeship,
+        bankcard_code,
+        bankcard_address,
+        bankcard_username,
         remark
       } = this.state;
 
@@ -1275,12 +1325,15 @@ class StoreAddScene extends Component {
         call_not_print: call_not_print,
         ship_way: ship_way,
         vice_mgr: vice_mgr,
-        remark: remark
+        remark: remark,
+        bankcard_code: bankcard_code,
+        bankcard_address: bankcard_address,
+        bankcard_username: bankcard_username
       };
-      if (this.state.isServiceMgr) {
-        send_data["tpl_store"] = this.state.templateInfo.key;
+      if (this.state.isServiceMgr || this.state.isBd) {
+        send_data["tpl_store"] = this.state.templateInfo.key ? this.state.templateInfo.key : 0;
         send_data["fn_price_controlled"] = this.state.isTrusteeship ? 1 : 0;
-        send_data["service_bd"] = this.state.bdInfo.key;
+        send_data["service_bd"] = this.state.bdInfo.key ? this.state.bdInfo.key : 0;
       }
       if (this.state.isBd) {
         let data = this.state.fileId.join(",");
@@ -1314,15 +1367,12 @@ class StoreAddScene extends Component {
 
   onCheckData() {
     let {
-      store_id,
-      alias,
       name,
       district,
       owner_name,
       owner_nation_id,
       location_long,
       location_lat,
-      deleted,
       tel,
       mobile,
       dada_address,
@@ -1336,8 +1386,8 @@ class StoreAddScene extends Component {
       auto_add_tips
     } = this.state;
     let error_msg = "";
-    if (name.length < 1 || name.length > 8) {
-      error_msg = "店名应在1-8个字符内";
+    if (name.length < 1 || name.length > 64) {
+      error_msg = "店名应在1-64个字符内";
     } else if (tel.length < 8 || tel.length > 11) {
       error_msg = "门店电话格式有误";
     } else if (dada_address.length < 1) {
