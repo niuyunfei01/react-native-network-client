@@ -1726,7 +1726,7 @@ class OrderScene extends Component {
           {order.is_fn_price_controlled ?
             <View style={[styles.row, styles.moneyRow]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-                <Text style={styles.moneyListTitle}>商家所得</Text>
+                <Text style={styles.moneyListTitle}>供货价小计</Text>
                 <TouchableOpacity onPress={() => {
                   this.props.navigation.navigate('SettlementOrder', {
                     order_id: order.id,
