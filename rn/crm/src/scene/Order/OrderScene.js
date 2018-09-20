@@ -266,7 +266,6 @@ class OrderScene extends Component {
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
               dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, desc, data) => {
-                console.log('getRemindForOrderPage -> ', ok, desc);
                 if (ok) {
                   this.setState({reminds: data, remindFetching: false})
                   this._orderChangeLogQuery();
@@ -1629,7 +1628,8 @@ class OrderScene extends Component {
           <View style={[styles.row, {marginBottom: pxToDp(14), marginTop: 0, flexDirection: 'column'}]}>
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
             {!!order.user_remark &&
-            <Remark label="客户备注" remark={order.user_remark} style={{fontWeight:'bold', color: 'red', fontSize: pxToDp(2)}}/>}
+            <Remark label="客户备注" remark={order.user_remark}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(2)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
             {!!order.invoice &&
@@ -1723,6 +1723,27 @@ class OrderScene extends Component {
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
           
+          {order.is_fn_price_controlled ?
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+                <Text style={styles.moneyListTitle}>供货价小计</Text>
+                <TouchableOpacity onPress={() => {
+                  this.props.navigation.navigate('SettlementOrder', {
+                    order_id: order.id,
+                    store_id: order.store_id,
+                    date: order.orderTime.substr(0, 10),
+                    dayId: order.dayId
+                  })
+                }}>
+                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.supply_price / 100).format('0.00')}
+              </Text>
+            </View>
+            : null}
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
@@ -1949,7 +1970,7 @@ class ItemRow extends PureComponent {
       idx, item, isAdd, edited, onInputNumberChange = () => {
       }, isEditing = false, nav
     } = this.props;
-
+    
     if (item.crm_order_detail_hide) {
       return null
     }
@@ -2060,12 +2081,12 @@ ItemRow.PropTypes = {
 };
 
 class Remark extends PureComponent {
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props)
   }
-
-  render() {
+  
+  render () {
     const {label, remark, style} = this.props;
     return (<View style={{flexDirection: 'row'}}>
       <Text style={[styles.remarkText, style]}>{label}:</Text>
