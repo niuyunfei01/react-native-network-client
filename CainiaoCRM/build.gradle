@@ -55,7 +55,7 @@ dependencies {
     compile project(':react-native-ble-manager')
     compile project(':react-native-image-crop-picker')
 
-    releaseCompile 'ch.acra:acra:4.9.2'
+    releaseCompile 'ch.acra:acra:4.11'
 
 }
 

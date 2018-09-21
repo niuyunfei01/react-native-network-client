@@ -96,7 +96,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         final StorageItem item = this.getItem(pos);
         if (item != null) {
-            holder.label.setText(item.nameAndPidStr());
+            holder.label.setText(item.getName());
         }
 
         holder.prodStatus.setText(item.getStatusText(GlobalCtx.app().fnEnabledReqProvide()));

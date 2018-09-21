@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -267,7 +268,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 GlobalCtx.app().toApplyChangePriceList(StoreStorageActivity.this, storeId);
             }
         });
-
+        ImageButton searchBtn = findViewById(R.id.goods_search);
         addNewBtn = findViewById(R.id.add_new_prod);
         addNewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -291,15 +292,15 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         ctv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                CharSequence text = v.getText();
-                String term = !TextUtils.isEmpty(text) ? text.toString() : null;
-                StoreStorageActivity.this.searchTerm = term != null ? term : "";
-                listAdapter.filter(term);
-                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (in != null) {
-                    in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                }
+                _do_search();
                 return true;
+            }
+        });
+
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _do_search();
             }
         });
 
@@ -411,6 +412,17 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         //Must after buttons initialized
         setHeadToolBar();
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+    }
+
+    public void _do_search() {
+        String text = ctv.getText().toString();
+        String term = !TextUtils.isEmpty(text) ? text : null;
+        StoreStorageActivity.this.searchTerm = term != null ? term : "";
+        listAdapter.filter(term);
+        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (in != null) {
+            in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     private void setHeadToolBar() {
