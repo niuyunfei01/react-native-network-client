@@ -1723,27 +1723,6 @@ class OrderScene extends Component {
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
           
-          {order.is_fn_price_controlled ?
-            <View style={[styles.row, styles.moneyRow]}>
-              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-                <Text style={styles.moneyListTitle}>供货价小计</Text>
-                <TouchableOpacity onPress={() => {
-                  this.props.navigation.navigate('SettlementOrder', {
-                    order_id: order.id,
-                    store_id: order.store_id,
-                    date: order.orderTime.substr(0, 10),
-                    dayId: order.dayId
-                  })
-                }}>
-                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{flex: 1}}/>
-              <Text style={styles.moneyListNum}>
-                {numeral(order.supply_price / 100).format('0.00')}
-              </Text>
-            </View>
-            : null}
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
@@ -1787,25 +1766,50 @@ class OrderScene extends Component {
               {numeral(order.orderMoney).format('0.00')}
             </Text>
           </View>
-          {order.addition_to_pay !== 0 &&
-          <View style={[styles.row, styles.moneyRow]}>
-            <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
-              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
-                <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
-                  <Text>收款码</Text>
-                  <Icons name='qrcode'/>
-                </Text>
-              </TouchableOpacity>
-              {(order.additional_to_pay != 0) &&
-              <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
+          
+          {order.is_fn_price_controlled ?
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+                <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
+                <TouchableOpacity
+                  style={[{alignItems: 'center', justifyContent: 'center'}]}
+                  onPress={() => {
+                    this.props.navigation.navigate('SettlementOrder', {
+                      order_id: order.id,
+                      store_id: order.store_id,
+                      date: order.orderTime.substr(0, 10),
+                      dayId: order.dayId
+                    })
+                  }}>
+                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.supply_price / 100).format('0.00')}
+              </Text>
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
-              {numeral(order.additional_to_pay / 100).format('+0.00')}
-            </Text>
-          </View>
-          }
+            : null}
+          
+          {order.additional_to_pay != '0' ?
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={styles.moneyLeft}>
+                <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
+                <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
+                  <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
+                    <Text>收款码</Text>
+                    <Icons name='qrcode'/>
+                  </Text>
+                </TouchableOpacity>
+                {(order.additional_to_pay != 0) &&
+                <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.additional_to_pay / 100).format('+0.00')}
+              </Text>
+            </View>
+            : null}
         </View>
         <View>
           <View style={[CommonStyle.topBottomLine, styles.block]}>
