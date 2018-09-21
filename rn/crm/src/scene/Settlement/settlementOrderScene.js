@@ -195,9 +195,7 @@ class SettlementScene extends PureComponent {
                 marginLeft: pxToDp(80)
               }}>金额:{tool.toFixed(this.state.total_price)}</Text>
             </View>
-            {
-              this.renderStatus(this.state.status)
-            }
+            {this.state.status ? this.renderStatus(this.state.status) : null}
           </View>
         </View>
         <Toast

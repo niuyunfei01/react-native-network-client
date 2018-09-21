@@ -103,6 +103,7 @@ class MineScene extends PureComponent {
       fnPriceControlled,
       fnProfitControlled
     } = tool.vendor(this.props.global);
+    console.log('global => ', this.props.global)
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     
     // let storeActionSheet = tool.storeActionSheet(
