@@ -108,9 +108,11 @@ class RootScene extends PureComponent {
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
           if (_.isEmpty(config) || _.isEmpty(canReadStores) || _.isEmpty(canReadVendors)) {
+            console.log("get common config");
             store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
             }));
           } else {
+            console.log("get common config by native ", canReadStores, canReadVendors, config);
             store.dispatch(updateCfg({
               "canReadStores": canReadStores,
               "canReadVendors": canReadVendors,

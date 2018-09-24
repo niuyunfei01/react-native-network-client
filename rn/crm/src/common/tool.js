@@ -487,30 +487,30 @@ function ArrayGroupBy (itemlist, gby, keyName = 'key', valueName = 'value') {
  * 门店数据 格式化 -> React-Native-Modal-Selector
  * @param canReadStores
  */
-export function storeListOfModalSelector (canReadStores) {
+export function storeListOfModalSelector(canReadStores) {
   const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
   let return_data = []
   let return_data_deep = 2
-  
+
   for (let i in storeListGroup) {
     let storeListGroupByCity = storeListGroup[i]
-    
+
     if (storeListGroupByCity.label == 'undefined') {
       storeListGroup.splice(i, 1)
       continue
     }
-    
+
     storeListGroupByCity.key = i
     let storeDistrictCityValue = storeListGroupByCity.children
-    
+
     for (store of storeDistrictCityValue) {
       store.label = store.vendor + '-' + store.district + '-' + store.name
       store.key = store.id
     }
   }
-  
+
   return_data = storeListGroup
-  
+
   if (storeListGroup.length == 1) {
     return_data_deep = 1
     return_data = storeListGroup[0].children

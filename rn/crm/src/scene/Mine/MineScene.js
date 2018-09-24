@@ -183,8 +183,8 @@ class MineScene extends PureComponent {
       this.onGetUserInfo(service_uid);
     }
   }
-  
-  componentWillMount () {
+
+  componentWillMount() {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
@@ -192,6 +192,10 @@ class MineScene extends PureComponent {
         this._doChangeStore(first_store_id, false);
       }
     }
+    console.log("can read stores ", canReadStores);
+    const storeList = tool.storeListOfModalSelector(canReadStores);
+    console.log("store list ", storeList);
+    this.setState({storeList: storeList});
     this.getNotifyCenter();
   }
   
