@@ -41,6 +41,7 @@ import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
+import _ from "lodash"
 
 const lightContentScenes = ["Home", "Mine"];
 
@@ -106,8 +107,16 @@ class RootScene extends PureComponent {
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
-          store.dispatch(updateCfg({canReadStores, canReadVendors, config}))
-          //store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {}));
+          if (_.isEmpty(config) || _.isEmpty(canReadStores) || _.isEmpty(canReadVendors)) {
+            store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+            }));
+          } else {
+            store.dispatch(updateCfg({
+              "canReadStores": canReadStores,
+              "canReadVendors": canReadVendors,
+              "config": config
+            }))
+          }
         }
         _g.setHostPortNoDef(store.getState().global, native, () => {
           this.setState({rehydrated: true});
