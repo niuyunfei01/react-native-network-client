@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React, { PureComponent } from "react";
+import React, {PureComponent} from "react";
 import {
   StatusBar,
   Platform,
@@ -16,13 +16,13 @@ import {
   ToastAndroid
 } from "react-native";
 
-import { Provider } from "react-redux";
+import {Provider} from "react-redux";
 
 /**
  * ## Actions
  *  The necessary actions for dispatching our bootstrap values
  */
-import { setPlatform, setVersion } from "./reducers/device/deviceActions";
+import {setPlatform, setVersion} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,
@@ -41,6 +41,7 @@ import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
+import _ from "lodash"
 
 const lightContentScenes = ["Home", "Mine"];
 
@@ -82,13 +83,14 @@ class RootScene extends PureComponent {
     this.store = null;
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+  }
 
   componentWillMount() {
     const launchProps = this.props.launchProps;
 
     this.store = configureStore(
-      function(store) {
+      function (store) {
         const {
           access_token,
           currStoreId,
@@ -105,13 +107,21 @@ class RootScene extends PureComponent {
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
-          store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
-          }));
+          if (_.isEmpty(config) || _.isEmpty(canReadStores) || _.isEmpty(canReadVendors)) {
+            console.log("get common config");
+            store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+            }));
+          } else {
+            console.log("get common config by native ", canReadStores, canReadVendors, config);
+            store.dispatch(updateCfg({
+              "canReadStores": canReadStores,
+              "canReadVendors": canReadVendors,
+              "config": config
+            }))
+          }
         }
-
-
         _g.setHostPortNoDef(store.getState().global, native, () => {
-          this.setState({ rehydrated: true });
+          this.setState({rehydrated: true});
         });
       }.bind(this)
     );
@@ -137,23 +147,23 @@ class RootScene extends PureComponent {
           ToastAndroid.CENTER
         );
         initialRouteName = Config.ROUTE_LOGIN;
-        initialRouteParams = { next: "", nextParams: {} };
+        initialRouteParams = {next: "", nextParams: {}};
       } else {
         if (!initialRouteName && orderId) {
           initialRouteName = Config.ROUTE_ORDER;
-          initialRouteParams = { orderId };
+          initialRouteParams = {orderId};
         }
       }
 
-      let { accessToken, currStoreId } = this.store.getState().global;
-      const { last_get_cfg_ts } = this.store.getState().global;
+      let {accessToken, currStoreId} = this.store.getState().global;
+      const {last_get_cfg_ts} = this.store.getState().global;
       let current_time = Moment(new Date()).unix();
       let diff_time = current_time - last_get_cfg_ts;
 
       if (diff_time > 300) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-          
+
           })
         );
       }
@@ -162,16 +172,16 @@ class RootScene extends PureComponent {
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (
-      <View />
+      <View/>
     ) : (
       <Provider store={this.store}>
         <View style={styles.container}>
           <View style={styles.statusBar}>
-            <StatusBar backgroundColor={"transparent"} translucent />
+            <StatusBar backgroundColor={"transparent"} translucent/>
           </View>
           <AppNavigator
             uriPrefix={prefix}
-            store_ = {this.store}
+            store_={this.store}
             ref={nav => {
               this.navigator = nav;
             }}
