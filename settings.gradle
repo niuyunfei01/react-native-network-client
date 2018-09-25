@@ -10,5 +10,3 @@ include ':react-native-sound'
 project(':react-native-sound').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-sound/android')
 include ':react-native-ble-manager'
 project(':react-native-ble-manager').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-ble-manager/android')
-include ':react-native-image-crop-picker'
-project(':react-native-image-crop-picker').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-image-crop-picker/android')
