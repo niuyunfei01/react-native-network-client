@@ -100,6 +100,9 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
 
         if (stores != null) {
             for (Store s : stores) {
+                if (s.getName().equals("未知店")) {
+                    continue;
+                }
                 storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
             }
         }

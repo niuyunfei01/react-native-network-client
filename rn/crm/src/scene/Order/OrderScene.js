@@ -1629,7 +1629,7 @@ class OrderScene extends Component {
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
             {!!order.user_remark &&
             <Remark label="客户备注" remark={order.user_remark}
-                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(2)}}/>}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(24)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
             {!!order.invoice &&
