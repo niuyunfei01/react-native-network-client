@@ -4,7 +4,15 @@
   ],
   "env": {
     "production": {
-      "plugins": ["transform-remove-console"]
+      "plugins": [
+        "transform-remove-console"
+      ]
     }
-  }
+  },
+  "plugins": [
+    // 条件组件
+    [
+      "jsx-control-statements"
+    ]
+  ]
 }

@@ -5,7 +5,7 @@ import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 
-export default class GoodsModifyPriceSupply extends Component {
+export default class GoodsPriceModifySupply extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "修改价格-保底模式",

@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
-import {Image, StyleSheet, Text, View} from "react-native";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 
 export default class BaseItem extends PureComponent {
@@ -10,7 +10,13 @@ export default class BaseItem extends PureComponent {
     price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     wmPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     supplyPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    showModifyPriceBtn: PropTypes.boolean,
+    onPressModifyPrice: PropTypes.func
+  }
+  
+  static defaultProps = {
+    showModifyBtn: false
   }
   
   render () {
@@ -24,6 +30,13 @@ export default class BaseItem extends PureComponent {
             {this.props.supplyPrice ? (<Text style={[styles.goods_price]}>保底价:{this.props.supplyPrice}</Text>) : null}
             {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
             {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
+            <If condition={this.props.showModifyPriceBtn}>
+              <TouchableOpacity>
+                <View>
+                  <Text style={styles.btn}>调价</Text>
+                </View>
+              </TouchableOpacity>
+            </If>
           </View>
         </View>
       </View>
@@ -63,5 +76,14 @@ const styles = StyleSheet.create({
   sku: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  btn: {
+    width: pxToDp(120),
+    height: pxToDp(48),
+    borderRadius: pxToDp(24),
+    textAlign: 'center',
+    lineHeight: pxToDp(48),
+    backgroundColor: '#59b26a',
+    color: '#fefffe'
   }
 })

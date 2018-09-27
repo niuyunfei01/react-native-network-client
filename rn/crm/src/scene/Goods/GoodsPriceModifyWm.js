@@ -5,7 +5,7 @@ import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 
-export default class GoodsModifyPriceWm extends Component {
+export default class GoodsPriceModifyWm extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "修改价格-抽佣模式",
