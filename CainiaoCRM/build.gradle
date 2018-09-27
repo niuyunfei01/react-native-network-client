@@ -58,7 +58,8 @@ dependencies {
     compile project(':react-native-sound')
     compile project(':react-native-ble-manager')
 
-    compile 'ch.acra:acra:4.9.2'
+    releaseCompile 'ch.acra:acra:4.9.2'
+
 }
 
 // The sample build uses multiple directories to
