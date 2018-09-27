@@ -1322,7 +1322,7 @@ class StoreAddScene extends Component {
       return resp;
     };
     if (imageInfo) {
-      uploadImg(imageInfo, barrier.waitOn(handleResp), name);
+      uploadImg(imageInfo, barrier.waitOn(handleResp), name, 1);
     }
   };
 

@@ -411,15 +411,18 @@ class MineScene extends PureComponent {
               onStoreChanging: false
             });
             // _this.onGetStoreTurnover();
+            _this.setState({onStoreChanging: false});
             if (is_skip) {
               native.toOrders();
             }
           } else {
             ToastLong(msg);
+            _this.setState({onStoreChanging: false});
           }
         });
       } else {
         ToastLong(msg);
+        _this.setState({onStoreChanging: false});
       }
     });
   }
