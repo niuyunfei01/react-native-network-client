@@ -161,6 +161,7 @@ const C = {
   ROUTE_SELECT_QUALIFICATION: "Qualification",
   ROUTE_GOODS_ADJUST: 'GoodsAdjust',
   ROUTE_GOODS_MODIFY_PRICE_SUPPLY: 'GoodsModifyPriceSupply',
+  ROUTE_GOODS_MODIFY_PRICE_WM: 'GoodsModifyPriceWm',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   serverUrl,
   apiUrl,

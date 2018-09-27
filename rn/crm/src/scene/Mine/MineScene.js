@@ -1010,6 +1010,17 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>商品调价保底</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_MODIFY_PRICE_WM)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/yunyingshouyi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>商品调价抽佣</Text>
+        </TouchableOpacity>
       </View>
     );
   }

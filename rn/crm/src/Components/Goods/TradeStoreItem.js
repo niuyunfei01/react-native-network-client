@@ -2,14 +2,16 @@ import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
 import {Image, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
+import BaseItem from "./BaseItem";
+
 
 export default class TradeStoreItem extends PureComponent {
   static propTypes = {
     style: PropTypes.any,
     image: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    price: [PropTypes.string, PropTypes.number],
-    monthSale: [PropTypes.string, PropTypes.number],
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     storeName: PropTypes.string.isRequired,
     record: PropTypes.string.isRequired,
   }
@@ -18,7 +20,9 @@ export default class TradeStoreItem extends PureComponent {
     return (
       <View style={this.props.style}>
         <View style={[styles.cell_box]}>
-          <Text style={styles.store_name}>{this.props.storeName}（{this.props.record}份）</Text>
+          <View style={styles.text_box}>
+            <Text style={styles.store_name}>{this.props.storeName}（{this.props.record}份）</Text>
+          </View>
         </View>
         <BaseItem
           image={this.props.image}
@@ -33,10 +37,16 @@ export default class TradeStoreItem extends PureComponent {
 const styles = StyleSheet.create({
   cell_box: {
     paddingHorizontal: pxToDp(30),
-    paddingVertical: pxToDp(26)
+    backgroundColor: '#ffffff'
   },
   store_name: {
     fontSize: pxToDp(28),
     color: '#4a4a4a'
+  },
+  text_box: {
+    borderBottomWidth: 1,
+    borderColor: '#f3f3f3',
+    height: pxToDp(72),
+    justifyContent: 'center'
   }
 })

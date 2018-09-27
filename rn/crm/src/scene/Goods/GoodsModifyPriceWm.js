@@ -5,10 +5,10 @@ import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 
-export default class GoodsModifyPriceSupply extends Component {
+export default class GoodsModifyPriceWm extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: "修改价格-保底模式",
+      headerTitle: "修改价格-抽佣模式",
     }
   }
   
@@ -22,14 +22,14 @@ export default class GoodsModifyPriceSupply extends Component {
         <ScrollView style={styles.scroll_view}>
           <GoodsBaseItem
             name={'北京稻香村玫瑰细沙月饼110g/个'}
-            supplyPrice={'16.50'}
+            wmPrice={'16.50'}
             image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
           />
           
           <InputPrice
             suggestMaxPrice={14}
             suggestMinPrice={12}
-            mode={2}
+            mode={1}
             style={{marginTop: pxToDp(10)}}
           />
           
