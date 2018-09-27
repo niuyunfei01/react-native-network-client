@@ -20,7 +20,7 @@ export default class InputPrice extends PureComponent {
   render () {
     return (
       <View style={[styles.cell_box, this.props.style]}>
-        <View style={style.top}>
+        <View style={styles.top}>
           <Text style={styles.title}>
             {this.props.mode === 1 ? '请输入外卖价格' : `请输入保底价格(建议价格范围${this.props.suggestMinPrice}-${this.props.suggestMinPrice})`}
           </Text>
