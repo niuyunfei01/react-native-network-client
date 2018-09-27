@@ -183,8 +183,8 @@ class MineScene extends PureComponent {
       this.onGetUserInfo(service_uid);
     }
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
@@ -995,6 +995,17 @@ class MineScene extends PureComponent {
             source={require("../../img/My/yunyingshouyi_.png")}
           />
           <Text style={[block_styles.block_name]}>订单补偿</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_MODIFY_PRICE_SUPPLY)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/yunyingshouyi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>商品调价保底</Text>
         </TouchableOpacity>
       </View>
     );
