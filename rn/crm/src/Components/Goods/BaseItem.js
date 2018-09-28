@@ -11,32 +11,34 @@ export default class BaseItem extends PureComponent {
     wmPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     supplyPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    showModifyPriceBtn: PropTypes.boolean,
+    showModifyPriceBtn: PropTypes.bool,
     onPressModifyPrice: PropTypes.func
   }
   
   static defaultProps = {
-    showModifyBtn: false
+    showModifyPriceBtn: false
   }
   
   render () {
     return (
       <View style={[styles.cell_box]}>
-        <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
-        <View style={[styles.item_right]}>
-          <Text style={[styles.goods_name]}>{this.props.name}</Text>
-          <View style={styles.sku}>
-            {this.props.wmPrice ? (<Text style={[styles.goods_price]}>外卖价:{this.props.wmPrice}</Text>) : null}
-            {this.props.supplyPrice ? (<Text style={[styles.goods_price]}>保底价:{this.props.supplyPrice}</Text>) : null}
-            {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
-            {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
-            <If condition={this.props.showModifyPriceBtn}>
-              <TouchableOpacity>
-                <View>
-                  <Text style={styles.btn}>调价</Text>
-                </View>
-              </TouchableOpacity>
-            </If>
+        <View style={styles.cell}>
+          <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
+          <View style={[styles.item_right]}>
+            <Text style={[styles.goods_name]}>{this.props.name}</Text>
+            <View style={styles.sku}>
+              {this.props.wmPrice ? (<Text style={[styles.goods_price]}>外卖价:{this.props.wmPrice}</Text>) : null}
+              {this.props.supplyPrice ? (<Text style={[styles.goods_price]}>保底价:{this.props.supplyPrice}</Text>) : null}
+              {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
+              {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
+              <If condition={this.props.showModifyPriceBtn}>
+                <TouchableOpacity>
+                  <View>
+                    <Text style={styles.btn}>调价</Text>
+                  </View>
+                </TouchableOpacity>
+              </If>
+            </View>
           </View>
         </View>
       </View>
@@ -49,6 +51,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     paddingVertical: pxToDp(26),
     backgroundColor: '#ffffff',
+  },
+  cell: {
+    borderBottomWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#eeeeee',
     flexDirection: 'row',
   },
   goods_image: {
@@ -78,11 +85,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   btn: {
-    width: pxToDp(120),
-    height: pxToDp(48),
-    borderRadius: pxToDp(24),
+    width: pxToDp(100),
+    height: pxToDp(32),
+    borderRadius: pxToDp(16),
+    fontSize: pxToDp(24),
     textAlign: 'center',
-    lineHeight: pxToDp(48),
+    lineHeight: pxToDp(32),
     backgroundColor: '#59b26a',
     color: '#fefffe'
   }

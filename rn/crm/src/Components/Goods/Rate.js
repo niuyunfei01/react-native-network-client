@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp";
 
 export default class Rate extends PureComponent {
   static propTypes = {
-    showRecord: PropTypes.boolean,
+    showRecord: PropTypes.bool,
     maxRecord: PropTypes.number,
     currRecord: PropTypes.number,
     starNum: PropTypes.number,
@@ -21,7 +21,7 @@ export default class Rate extends PureComponent {
   renderLightStar (num) {
     let items = []
     for (let i = 0; i < num; i++) {
-      items.push(<Image source={require('../../img/Goods/xingxingliang_.png')} style={styles.star}/>)
+      items.push(<Image source={require('../../img/Goods/xingxingliang_.png')} style={styles.star} key={i}/>)
     }
     return items
   }
@@ -29,7 +29,7 @@ export default class Rate extends PureComponent {
   renderDarkStar (num) {
     let items = []
     for (let i = 0; i < num; i++) {
-      items.push(<Image source={require('../../img/Goods/xingxinghui_.png')} style={styles.star}/>)
+      items.push(<Image source={require('../../img/Goods/xingxinghui_.png')} style={styles.star} key={i}/>)
     }
     return items
   }

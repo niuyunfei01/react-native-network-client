@@ -1,9 +1,10 @@
 import React, {Component} from "react";
-import {ScrollView, StyleSheet, Text, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
+import ResultDialog from "../../Components/Goods/ResultDialog";
 
 export default class GoodsPriceModifySupply extends Component {
   static navigationOptions = ({navigation}) => {
@@ -14,6 +15,17 @@ export default class GoodsPriceModifySupply extends Component {
   
   constructor (props) {
     super(props)
+    this.state = {
+      resultDialog: true
+    }
+  }
+  
+  fetchData(){
+    
+  }
+  
+  onSave () {
+    this.setState({resultDialog: true})
   }
   
   render () {
@@ -66,10 +78,19 @@ export default class GoodsPriceModifySupply extends Component {
         </ScrollView>
         
         <View style={styles.bottom_box}>
-          <View style={styles.bottom_btn}>
-            <Text style={{color: '#ffffff'}}>保存</Text>
-          </View>
+          <TouchableOpacity onPress={() => this.onSave()}>
+            <View style={styles.bottom_btn}>
+              <Text style={{color: '#ffffff'}}>保存</Text>
+            </View>
+          </TouchableOpacity>
         </View>
+        
+        <ResultDialog
+          visible={this.state.resultDialog}
+          type={'info'}
+          text={'调价失败，请稍后重试'}
+          onPress={() => this.setState({resultDialog: false})}
+        />
       </View>
     )
   }

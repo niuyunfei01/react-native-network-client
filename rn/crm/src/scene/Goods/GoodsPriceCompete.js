@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {StyleSheet, Text, View} from "react-native";
 import Rate from "../../Components/Goods/Rate";
 import pxToDp from "../../util/pxToDp";
+import PriceCompeteItem from "../../Components/Goods/PriceCompeteItem";
 
 export default class GoodsPriceCompete extends Component {
   static navigationOptions = ({navigation}) => {
@@ -22,7 +23,13 @@ export default class GoodsPriceCompete extends Component {
             客户敏感品类偏高，以下商品价格竞争力较弱，请适当调整商品价格，提升店铺整体竞争力
           </Text>
         </View>
-      
+        
+        <PriceCompeteItem
+          image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
+          goods_name={'北京稻香村玫瑰细沙月饼110g/个'}
+          wmPrice={16.50}
+          style={{marginTop: pxToDp(10)}}
+        />
       </View>
     )
   }
