@@ -29,6 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.acra.util.JsonUtils;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -818,8 +823,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 return true;
             case MENU_CONTEXT_TO_CHG_SUPPLY_PRICE:
                 if (item != null&&currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
+                    Gson gson = new Gson();
                     Map<String, String> params = Maps.newHashMap();
-                    params.put("pid", item.getId() + "");
+                    params.put("pid", item.getProduct_id() + "");
+                    params.put("storeId", item.getStore_id() + "");
+                    params.put("storeProduct", gson.toJson(item));
                     if (currStore.getFn_rate_price_controlled() == RATE_PRICE_CONTROLLER_YES) {
                         GlobalCtx.app().toRNChgSupplyPriceView(this, Constants.CHG_PRICE_RATE_TYPE, params);
                     } else {
