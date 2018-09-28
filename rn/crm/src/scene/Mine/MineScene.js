@@ -949,7 +949,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        {(show_goods_monitor && (is_helper || is_service_mgr)) && (
+        {(show_goods_monitor && is_helper) && (
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_GOODS_MANAGE)}
@@ -976,18 +976,18 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>活动加价</Text>
           </TouchableOpacity>
         )}
-        {/*<TouchableOpacity*/}
-        {/*style={[block_styles.block_box]}*/}
-        {/*onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}*/}
-        {/*activeOpacity={customerOpacity}*/}
-        {/*>*/}
-        {/*{this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}*/}
-        {/*<Image*/}
-        {/*style={[block_styles.block_img]}*/}
-        {/*source={require("../../img/My/shangpinqingbao_.png")}*/}
-        {/*/>*/}
-        {/*<Text style={[block_styles.block_name]}>商品调整</Text>*/}
-        {/*</TouchableOpacity>*/}
+        <TouchableOpacity
+        style={[block_styles.block_box]}
+        onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
+        activeOpacity={customerOpacity}
+        >
+        {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
+        <Image
+        style={[block_styles.block_img]}
+        source={require("../../img/My/shangpinqingbao_.png")}
+        />
+        <Text style={[block_styles.block_name]}>商品调整</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
