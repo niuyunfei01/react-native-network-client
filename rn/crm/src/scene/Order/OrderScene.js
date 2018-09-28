@@ -165,7 +165,7 @@ class OrderScene extends Component {
       //good items editing/display
       isEditing: false,
       isEndVisible: false,
-      itemsHided: true,
+      itemsHided: false,
       itemsAdded: {},
       itemsEdited: {},
       itemsSaving: false,
@@ -326,7 +326,7 @@ class OrderScene extends Component {
   _setAfterOrderGot = (order, initialState) => {
     this.setState({
       itemsEdited: OrderScene._extract_edited_items(order.items),
-      itemsHided: !shouldShowItems(order.orderStatus),
+      //itemsHided: !shouldShowItems(order.orderStatus),
       ...initialState,
     });
     
@@ -1722,7 +1722,40 @@ class OrderScene extends Component {
             <ImageBtn source={require('../../img/Order/good/jiahuo_.png')}
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
-          
+          {order.is_fn_price_controlled ?
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+                <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
+                <TouchableOpacity
+                  style={[{alignItems: 'center', justifyContent: 'center'}]}
+                  onPress={() => {
+                    this.props.navigation.navigate('SettlementOrder', {
+                      order_id: order.id,
+                      store_id: order.store_id,
+                      date: order.orderTime.substr(0, 10),
+                      dayId: order.dayId
+                    })
+                  }}>
+                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.supply_price / 100).format('0.00')}
+              </Text>
+            </View>
+            : null}
+          <View style={[styles.row, styles.moneyRow]}>
+            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+              <Text style={styles.moneyListTitle}>用户已付</Text>
+              <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
+              {/*<Text style={styles.moneyListSub}>微信支付</Text>*/}
+            </View>
+            <View style={{flex: 1}}/>
+            <Text style={styles.moneyListNum}>
+              {numeral(order.orderMoney).format('0.00')}
+            </Text>
+          </View>
           <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
@@ -1755,41 +1788,6 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
           </View>
-          <View style={[styles.row, styles.moneyRow]}>
-            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-              <Text style={styles.moneyListTitle}>用户已付</Text>
-              <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
-              <Text style={styles.moneyListSub}>微信支付</Text>
-            </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
-              {numeral(order.orderMoney).format('0.00')}
-            </Text>
-          </View>
-          
-          {order.is_fn_price_controlled ?
-            <View style={[styles.row, styles.moneyRow]}>
-              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-                <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
-                <TouchableOpacity
-                  style={[{alignItems: 'center', justifyContent: 'center'}]}
-                  onPress={() => {
-                    this.props.navigation.navigate('SettlementOrder', {
-                      order_id: order.id,
-                      store_id: order.store_id,
-                      date: order.orderTime.substr(0, 10),
-                      dayId: order.dayId
-                    })
-                  }}>
-                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{flex: 1}}/>
-              <Text style={styles.moneyListNum}>
-                {numeral(order.supply_price / 100).format('0.00')}
-              </Text>
-            </View>
-            : null}
           
           {order.additional_to_pay != '0' ?
             <View style={[styles.row, styles.moneyRow]}>

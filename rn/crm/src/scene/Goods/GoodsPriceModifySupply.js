@@ -5,8 +5,16 @@ import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
+import {connect} from "react-redux";
+import AppConfig from "../../config";
+import FetchEx from "../../util/fetchEx";
 
-export default class GoodsPriceModifySupply extends Component {
+function mapStateToProps (state) {
+  const {global} = state;
+  return {global: global};
+}
+
+class GoodsPriceModifySupply extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "修改价格-保底模式",
@@ -16,12 +24,30 @@ export default class GoodsPriceModifySupply extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      resultDialog: true
+      product_id: this.props.navigation.state.params.pid,
+      store_id: this.props.global.currStoreId,
+      access_token: this.props.global.accessToken,
+      resultDialog: false,
+      product: {
+        store_product: {}
+      },
+      trade_products: []
     }
   }
   
-  fetchData(){
-    
+  componentDidMount () {
+    this.fetchData()
+  }
+  
+  fetchData () {
+    const self = this
+    const {store_id, product_id, access_token} = self.state
+    const url = `api_products/trade_price_mode_supply/${store_id}/${product_id}.json?access_token=${access_token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        self.setState({product: resp.obj.product, trade_products: resp.obj.trade_products})
+      })
   }
   
   onSave () {
@@ -33,9 +59,9 @@ export default class GoodsPriceModifySupply extends Component {
       <View>
         <ScrollView style={styles.scroll_view}>
           <GoodsBaseItem
-            name={'北京稻香村玫瑰细沙月饼110g/个'}
-            supplyPrice={'16.50'}
-            image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
+            name={this.state.product.name}
+            supplyPrice={this.state.product.store_product.supply_price}
+            image={this.state.product.listimg}
           />
           
           <InputPrice
@@ -47,33 +73,18 @@ export default class GoodsPriceModifySupply extends Component {
           
           <View>
             <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
-            <TradeStoreItem
-              style={{marginTop: pxToDp(10)}}
-              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-              name={'北京稻香村玫瑰细沙月饼110g/个'}
-              price={12.50}
-              monthSale={259}
-              storeName={'菜老包沙河店'}
-              record={'4.8'}
-            />
-            <TradeStoreItem
-              style={{marginTop: pxToDp(10)}}
-              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-              name={'北京稻香村玫瑰细沙月饼110g/个'}
-              price={12.50}
-              monthSale={259}
-              storeName={'菜老包沙河店'}
-              record={'4.8'}
-            />
-            <TradeStoreItem
-              style={{marginTop: pxToDp(10)}}
-              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-              name={'北京稻香村玫瑰细沙月饼110g/个'}
-              price={12.50}
-              monthSale={259}
-              storeName={'菜老包沙河店'}
-              record={'4.8'}
-            />
+            <For each="item" index="idx" of={this.state.trade_products}>
+              <TradeStoreItem
+                key={idx}
+                style={{marginTop: pxToDp(10)}}
+                image={item.img}
+                name={item.original_name}
+                price={item.price}
+                monthSale={item.monthSale}
+                storeName={item.trade_store.storeName}
+                record={item.trade_store.rate}
+              />
+            </For>
           </View>
         </ScrollView>
         
@@ -127,3 +138,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   }
 })
+
+export default connect(mapStateToProps)(GoodsPriceModifySupply)
