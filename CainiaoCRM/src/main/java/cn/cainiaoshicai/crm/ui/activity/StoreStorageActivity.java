@@ -30,10 +30,6 @@ import android.widget.Toast;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.acra.util.JsonUtils;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
