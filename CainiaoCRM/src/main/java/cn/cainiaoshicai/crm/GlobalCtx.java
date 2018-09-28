@@ -847,6 +847,29 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    //跳转到reactnative 调价页面
+    public void toRNChgSupplyPriceView(Activity ctx, int type, Map<String, String> data) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        String viewName = null;
+        if (type == Constants.CHG_PRICE_SUPPLY_TYPE) {
+            viewName = "GoodsPriceModifySupply";
+        }
+        if (type == Constants.CHG_PRICE_RATE_TYPE) {
+            viewName = "GoodsPriceModifyWm";
+        }
+        if (viewName == null) {
+            Log.d("GlobalCtx", "toRNChgSupplyPriceView: " + type);
+            return;
+        }
+        i.putExtra("_action", viewName);
+        Bundle params = new Bundle();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            params.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
         return new Intent(ctx, MyReactActivity.class);

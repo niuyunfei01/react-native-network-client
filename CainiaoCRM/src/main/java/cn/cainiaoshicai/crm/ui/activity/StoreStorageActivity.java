@@ -28,9 +28,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.Maps;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
+import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -51,6 +55,7 @@ import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
+import static cn.cainiaoshicai.crm.Cts.RATE_PRICE_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
@@ -64,6 +69,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_TO_AUTO_ON_ID = 10996;
     private static final int MENU_CONTEXT_TO_LOSS = 10997;
     private static final int MENU_CONTEXT_VIEW_DETAIL = 10998;
+    private static final int MENU_CONTEXT_TO_CHG_SUPPLY_PRICE = 10999;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
     private ListView lv;
@@ -685,6 +691,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
             }
 
+            if (currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_CHG_SUPPLY_PRICE, Menu.NONE, "修改保底价");
+            }
+
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
         }
     }
@@ -804,6 +814,17 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item != null) {
                     String url = URLHelper.getStoresPrefix() + "/store_product/" + item.getId();
                     GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, url);
+                }
+                return true;
+            case MENU_CONTEXT_TO_CHG_SUPPLY_PRICE:
+                if (item != null&&currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
+                    Map<String, String> params = Maps.newHashMap();
+                    params.put("pid", item.getId() + "");
+                    if (currStore.getFn_rate_price_controlled() == RATE_PRICE_CONTROLLER_YES) {
+                        GlobalCtx.app().toRNChgSupplyPriceView(this, Constants.CHG_PRICE_RATE_TYPE, params);
+                    } else {
+                        GlobalCtx.app().toRNChgSupplyPriceView(this, Constants.CHG_PRICE_SUPPLY_TYPE, params);
+                    }
                 }
                 return true;
             default:

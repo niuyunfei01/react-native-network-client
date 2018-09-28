@@ -28,6 +28,7 @@ public class Store {
     private int ship_way;
     private int fn_price_controlled;
     private int fn_profit_controlled;
+    private int fn_rate_price_controlled = 0;
     private String alias;
     private String city;
     private String cityCode;
@@ -167,6 +168,14 @@ public class Store {
 
     public void setFn_price_controlled(int fn_price_controlled) {
         this.fn_price_controlled = fn_price_controlled;
+    }
+
+    public int getFn_rate_price_controlled() {
+        return fn_rate_price_controlled;
+    }
+
+    public void setFn_rate_price_controlled(int fn_rate_price_controlled) {
+        this.fn_rate_price_controlled = fn_rate_price_controlled;
     }
 
     public String getMobile() {
