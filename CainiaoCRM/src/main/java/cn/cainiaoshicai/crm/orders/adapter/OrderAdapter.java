@@ -91,6 +91,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView dayNo = vi.findViewById(R.id.feedbackId);
         TextView sourcePlatform = vi.findViewById(R.id.source_platform);
         TextView orderTimesTxt = vi.findViewById(R.id.user_order_times);
+        TextView viewMoreTimes = vi.findViewById(R.id.view_more_details);
         TextView paidWayTxt = vi.findViewById(R.id.fb_status);
         TextView labelExpectTxt = vi.findViewById(R.id.fb_from_user);
 
@@ -113,6 +114,8 @@ public class OrderAdapter extends BaseAdapter {
 
             Date expectTime = order.getExpectTime();
             boolean notTimeToShip = expectTime != null && (expectTime.getTime() - System.currentTimeMillis() > 90 * 60 * 1000);
+
+            viewMoreTimes.setTextColor(lightBlue);
 
             String expectTimeTxt = TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr();
             expect_time.setText(expectTimeTxt);
@@ -184,6 +187,8 @@ public class OrderAdapter extends BaseAdapter {
                     v.getContext().startActivity(intent);
                 }
             });
+
+
 
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
             dayNo.setText("#" + order.getDayId());
