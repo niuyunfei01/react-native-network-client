@@ -56,7 +56,8 @@ class SettlementScene extends PureComponent {
       query: true,
       store_id: store_id ? store_id : this.props.global.currStoreId,
       order_id: order_id,
-      dayId: dayId
+      dayId: dayId,
+      pageMounted: false
     }
     this.renderList = this.renderList.bind(this)
   }
@@ -107,7 +108,10 @@ class SettlementScene extends PureComponent {
     if (this.state.order_list.length > 0) {
       return (this.state.order_list.map((item, key) => {
         let {orderTime, platform, dayId, total_goods_num, total_supply_price, id} = item
-        item.down = this.state.dayId && this.state.dayId === item.dayId
+        if (this.state.dayId && this.state.dayId === item.dayId && !this.state.pageMounted) {
+          this.state.order_list[key].down = true
+          this.setState({pageMounted: true})
+        }
         return (
           <View key={key} style={{backgroundColor: '#fff', borderBottomWidth: pxToDp(1), borderColor: '#f2f2f2'}}>
             <View style={styles.item_title}>
@@ -125,6 +129,11 @@ class SettlementScene extends PureComponent {
               <TouchableOpacity
                 onPress={() => {
                   this.state.order_list[key].down = !item.down
+                  for (let i = 0; i < this.state.order_list.length; i++) {
+                    if (i !== key) {
+                      this.state.order_list[i].down = false
+                    }
+                  }
                   this.forceUpdate()
                 }}
               >
