@@ -1723,7 +1723,7 @@ class OrderScene extends Component {
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
           {order.is_fn_price_controlled ?
-            <View style={[styles.row, styles.moneyRow]}>
+            <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
                 <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
                 <TouchableOpacity
@@ -1754,25 +1754,6 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
               {numeral(order.orderMoney).format('0.00')}
-            </Text>
-          </View>
-          <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
-            <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
-              
-              {totalMoneyEdit !== 0 &&
-              <View><Text
-                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
-                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
-              </Text>
-                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
-                  {numeral(order.total_goods_price / 100).format('0.00')}
-                </Text></View>}
-            
-            </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
-              {numeral(finalTotal).format('0.00')}
             </Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>
@@ -1808,6 +1789,25 @@ class OrderScene extends Component {
               </Text>
             </View>
             : null}
+          <View style={[styles.row, styles.moneyRow, ]}>
+            <View style={styles.moneyLeft}>
+              <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
+
+              {totalMoneyEdit !== 0 &&
+              <View><Text
+                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
+                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+              </Text>
+                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
+                  {numeral(order.total_goods_price / 100).format('0.00')}
+                </Text></View>}
+
+            </View>
+            <View style={{flex: 1}}/>
+            <Text style={styles.moneyListNum}>
+              {numeral(finalTotal).format('0.00')}
+            </Text>
+          </View>
         </View>
         <View>
           <View style={[CommonStyle.topBottomLine, styles.block]}>
