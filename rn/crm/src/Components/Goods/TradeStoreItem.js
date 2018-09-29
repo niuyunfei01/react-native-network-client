@@ -27,7 +27,7 @@ export default class TradeStoreItem extends PureComponent {
         <BaseItem
           image={this.props.image}
           name={this.props.name}
-          price={this.props.price}
+          wmPrice={this.props.price}
           monthSale={this.props.monthSale}/>
       </View>
     )

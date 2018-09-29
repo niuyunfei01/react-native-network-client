@@ -28,7 +28,7 @@ public class Store {
     private int ship_way;
     private int fn_price_controlled;
     private int fn_profit_controlled;
-    private int fn_rate_price_controlled = 0;
+    private int fn_rate_price_controlled = 1;
     private String alias;
     private String city;
     private String cityCode;

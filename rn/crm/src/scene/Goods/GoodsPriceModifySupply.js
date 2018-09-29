@@ -54,7 +54,7 @@ class GoodsPriceModifySupply extends Component {
   fetchData () {
     const self = this
     const {store_id, product_id, access_token} = self.state
-    const url = `api_products/trade_price_mode_supply/${store_id}/${product_id}.json?access_token=${access_token}`;
+    const url = `api_products/trade_product_price/${store_id}/${product_id}／1.json?access_token=${access_token}`;
     Toast.loading('请求中..', 0)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
