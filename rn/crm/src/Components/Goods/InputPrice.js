@@ -7,14 +7,15 @@ export default class InputPrice extends PureComponent {
   static propTypes = {
     mode: PropTypes.oneOf([1, 2]),
     style: PropTypes.any,
-    suggestMinPrice: PropTypes.oneOfType([
+    referPrice: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string
     ]),
-    suggestMaxPrice: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string
-    ])
+    showNotice: PropTypes.bool
+  }
+  
+  static defaultProps = {
+    showNotice: false
   }
   
   render () {
@@ -22,7 +23,15 @@ export default class InputPrice extends PureComponent {
       <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.top}>
           <Text style={styles.title}>
-            {this.props.mode === 1 ? '请输入外卖价格' : `请输入保底价格(建议价格范围${this.props.suggestMinPrice}-${this.props.suggestMinPrice})`}
+            <If condition={this.props.mode === 1}>
+              请输入外卖价格
+            </If>
+            <If condition={this.props.mode !== 1}>
+              请输入保底价格
+            </If>
+            <If condition={this.props.referPrice}>
+              (建议价格{this.props.referPrice})
+            </If>
           </Text>
           <View style={styles.tag}>
             <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`}</Text>
@@ -30,7 +39,9 @@ export default class InputPrice extends PureComponent {
         </View>
         <View style={styles.input_box}>
           <TextInput underlineColorAndroid="transparent" style={{flex: 1}} placeholder={'请输入价格'}/>
-          <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
+          <If condition={this.props.showNotice}>
+            <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
+          </If>
         </View>
         <View style={styles.remark_box}>
           {this.props.mode === 1 ? (

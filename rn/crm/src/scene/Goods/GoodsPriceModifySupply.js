@@ -31,7 +31,9 @@ class GoodsPriceModifySupply extends Component {
       product: {
         store_product: {}
       },
-      trade_products: []
+      trade_products: [],
+      refer_price: 0,
+      wm_proportion: 0
     }
   }
   
@@ -46,7 +48,10 @@ class GoodsPriceModifySupply extends Component {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        self.setState({product: resp.obj.product, trade_products: resp.obj.trade_products})
+        self.setState({
+          product: resp.obj.product,
+          trade_products: resp.obj.trade_products
+        })
       })
   }
   
@@ -56,7 +61,7 @@ class GoodsPriceModifySupply extends Component {
   
   render () {
     return (
-      <View>
+      <View style={{flex: 1}}>
         <ScrollView style={styles.scroll_view}>
           <GoodsBaseItem
             name={this.state.product.name}
@@ -65,27 +70,27 @@ class GoodsPriceModifySupply extends Component {
           />
           
           <InputPrice
-            suggestMaxPrice={14}
-            suggestMinPrice={12}
             mode={2}
             style={{marginTop: pxToDp(10)}}
           />
           
-          <View>
-            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
-            <For each="item" index="idx" of={this.state.trade_products}>
-              <TradeStoreItem
-                key={idx}
-                style={{marginTop: pxToDp(10)}}
-                image={item.img}
-                name={item.original_name}
-                price={item.price}
-                monthSale={item.monthSale}
-                storeName={item.trade_store.storeName}
-                record={item.trade_store.rate}
-              />
-            </For>
-          </View>
+          <If condition={this.state.trade_products.length > 0}>
+            <View>
+              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+              <For each="item" index="idx" of={this.state.trade_products}>
+                <TradeStoreItem
+                  key={idx}
+                  style={{marginTop: pxToDp(10)}}
+                  image={item.img}
+                  name={item.original_name}
+                  price={item.price}
+                  monthSale={item.monthSale}
+                  storeName={item.trade_store.storeName}
+                  record={item.trade_store.rate}
+                />
+              </For>
+            </View>
+          </If>
         </ScrollView>
         
         <View style={styles.bottom_box}>
