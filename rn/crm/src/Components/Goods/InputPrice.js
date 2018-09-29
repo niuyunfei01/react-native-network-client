@@ -11,11 +11,39 @@ export default class InputPrice extends PureComponent {
       PropTypes.number,
       PropTypes.string
     ]),
-    showNotice: PropTypes.bool
+    showNotice: PropTypes.bool,
+    priceRatio: PropTypes.object,
+    onInput: PropTypes.func
   }
   
   static defaultProps = {
     showNotice: false
+  }
+  
+  constructor (props) {
+    super(props)
+    this.state = {
+      wm_price: 0
+    }
+  }
+  
+  onInputPrice (val) {
+    const ratio = this.props.priceRatio
+    let radd = null
+    if (typeof(ratio.radd) === 'object') {
+      for (let i of ratio.radd) {
+        if (val >= i.min && val < i.max) {
+          radd = i.percent;
+          break
+        }
+      }
+    } else {
+      radd = ratio.radd
+    }
+    let wm_price = (val * 1 / (1 - ratio.rs - ratio.ri - ratio.rp) * parseInt(radd) / 100).toFixed(2)
+    this.setState({wm_price})
+    
+    this.props.onInput && this.props.onInput(val)
   }
   
   render () {
@@ -38,7 +66,14 @@ export default class InputPrice extends PureComponent {
           </View>
         </View>
         <View style={styles.input_box}>
-          <TextInput underlineColorAndroid="transparent" style={{flex: 1}} placeholder={'请输入价格'}/>
+          <TextInput
+            defaultValue={'0'}
+            keyboardType={'numeric'}
+            underlineColorAndroid="transparent"
+            style={{flex: 1, padding: 0}}
+            placeholder={'请输入价格'}
+            onChangeText={(val) => this.onInputPrice(val ? parseInt(val) : 0)}
+          />
           <If condition={this.props.showNotice}>
             <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
           </If>
@@ -50,7 +85,11 @@ export default class InputPrice extends PureComponent {
               <Text style={styles.remark}>运营费用：运营费率28%（含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等）</Text>
             </View>
           ) : (
-            <Text style={styles.remark}>根据您修改的保底价，改价成功后，对应的外卖(美团)价格为：#元#</Text>
+            <Text style={styles.remark}>
+              根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
+              <Text style={{color: '#fd5b1b'}}>{this.state.wm_price}</Text>
+              元#
+            </Text>
           )}
         </View>
       </View>
