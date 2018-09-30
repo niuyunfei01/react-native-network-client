@@ -77,6 +77,7 @@ export default class InputPrice extends PureComponent {
   }
   
   render () {
+    const {input_value, supply_price, supply_price_ratio, wm_price} = this.state
     return (
       <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.top}>
@@ -113,16 +114,15 @@ export default class InputPrice extends PureComponent {
             <View>
               <Text style={styles.remark}>
                 商户应得：
-                {this.state.input_value} ÷ {this.state.supply_price_ratio} ≈ <Text
-                style={{color: '#fd5b1b'}}>{this.state.supply_price}</Text>
-                元／份（保底收入）
+                {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price}</Text>
+                元/份（保底收入）
               </Text>
-              <Text style={styles.remark}>运营费用：（含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等）</Text>
+              <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
             </View>
           ) : (
             <Text style={styles.remark}>
               根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
-              <Text style={{color: '#fd5b1b'}}>{this.state.wm_price}</Text>
+              <Text style={{color: '#fd5b1b'}}>{wm_price}</Text>
               元#
             </Text>
           )}
