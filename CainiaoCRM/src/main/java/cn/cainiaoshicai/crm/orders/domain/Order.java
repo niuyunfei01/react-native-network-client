@@ -86,6 +86,9 @@ public class Order implements Serializable {
     private String mobile_suffix;
     private String real_mobile;
 
+    private String ele_id;
+    private int eb_order_from;
+
     public int getId() {
         return id;
     }
@@ -330,6 +333,10 @@ public class Order implements Serializable {
         if (this.getPlatform() == Cts.PLAT_JDDJ.id && (dayNo != null && dayNo.length() > 8)) {
             dayNo = "";
         }
+        //饿百订单显示饿了么信息
+        if (this.getPlatform() == Cts.PLAT_BD.id && this.getEb_order_from() == Cts.EB_ORDER_FROM_ELE) {
+            return String.format("(%s#%s)", Cts.Platform.find(Cts.PLAT_ELEME.id).name, dayNo);
+        }
         return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayNo);
     }
 
@@ -483,6 +490,22 @@ public class Order implements Serializable {
         this.ship_sch_desc = ship_sch_desc;
     }
 
+    public String getEle_id() {
+        return ele_id;
+    }
+
+    public void setEle_id(String ele_id) {
+        this.ele_id = ele_id;
+    }
+
+    public int getEb_order_from() {
+        return eb_order_from;
+    }
+
+    public void setEb_order_from(int eb_order_from) {
+        this.eb_order_from = eb_order_from;
+    }
+
     public void copy(Order updatedO) {
         this.id = updatedO.id;
         user_id = updatedO.user_id;
@@ -542,6 +565,8 @@ public class Order implements Serializable {
         additional_to_pay = updatedO.additional_to_pay;
         ship_worker_mobile = updatedO.ship_worker_mobile;
         remark_warning = updatedO.remark_warning;
+        ele_id = updatedO.ele_id;
+        eb_order_from = updatedO.eb_order_from;
     }
 
     public boolean isRemark_warning() {

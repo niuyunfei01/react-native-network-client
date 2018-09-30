@@ -101,7 +101,6 @@ class RootScene extends PureComponent {
         } = launchProps;
 
         let config = configStr ? JSON.parse(configStr) : {};
-
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
           store.dispatch(setPlatform("android"));
@@ -112,7 +111,6 @@ class RootScene extends PureComponent {
             store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
             }));
           } else {
-            console.log("get common config by native ", canReadStores, canReadVendors, config);
             store.dispatch(updateCfg({
               "canReadStores": canReadStores,
               "canReadVendors": canReadVendors,

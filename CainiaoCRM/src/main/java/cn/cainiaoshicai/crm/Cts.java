@@ -44,6 +44,9 @@ public class Cts {
     public static final String FB_STATUS_FIXED_T = "已解决";
     public static final String FB_STATUS_UNKNOWN_T = "未知";
 
+
+    public static final int EB_ORDER_FORM_BD = 1;
+    public static final int EB_ORDER_FROM_ELE = 2;
     public static final Platform PLAT_BD = new Platform("百度", 1);
     public static final Platform PLAT_WX = new Platform("微信", 2);
     public static final Platform PLAT_MT  = new Platform("美团", 3);
