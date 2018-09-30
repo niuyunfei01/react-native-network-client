@@ -23,11 +23,23 @@ export default class InputPrice extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      wm_price: 0
+      wm_price: '计算中',
+      supply_price: 0,
+      supply_price_ratio: 0,
+      input_value: 0
     }
   }
   
   onInputPrice (val) {
+    if (this.props.mode === 1) {
+      this.onUpdateSupplyPrice(val)
+    }
+    if (this.props.mode === 2) {
+      this.onUpdateWmPrice(val)
+    }
+  }
+  
+  onUpdateWmPrice (val) {
     const ratio = this.props.priceRatio
     let radd = null
     if (typeof(ratio.radd) === 'object') {
@@ -42,8 +54,26 @@ export default class InputPrice extends PureComponent {
     }
     let wm_price = (val * 1 / (1 - ratio.rs - ratio.ri - ratio.rp) * parseInt(radd) / 100).toFixed(2)
     this.setState({wm_price})
-    
     this.props.onInput && this.props.onInput(val)
+  }
+  
+  onUpdateSupplyPrice (val) {
+    const ratio = this.props.priceRatio
+    let radd = null
+    if (typeof(ratio.radd) === 'object') {
+      for (let i of ratio.radd) {
+        if (val >= i.min && val < i.max) {
+          radd = i.percent;
+          break
+        }
+      }
+    } else {
+      radd = ratio.radd
+    }
+    let supply_price_ratio = (1 / (1 - ratio.rs - ratio.ri - ratio.rp) * parseInt(radd) / 100)
+    let supply_price = (val / supply_price_ratio).toFixed(2)
+    this.setState({input_value: val, supply_price, supply_price_ratio: supply_price_ratio.toFixed(1)})
+    this.props.onInput && this.props.onInput(supply_price)
   }
   
   render () {
@@ -81,8 +111,13 @@ export default class InputPrice extends PureComponent {
         <View style={styles.remark_box}>
           {this.props.mode === 1 ? (
             <View>
-              <Text style={styles.remark}>商户应得：* 72%，约元／份（保底收入）</Text>
-              <Text style={styles.remark}>运营费用：运营费率28%（含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等）</Text>
+              <Text style={styles.remark}>
+                商户应得：
+                {this.state.input_value} ÷ {this.state.supply_price_ratio} ≈ <Text
+                style={{color: '#fd5b1b'}}>{this.state.supply_price}</Text>
+                元／份（保底收入）
+              </Text>
+              <Text style={styles.remark}>运营费用：（含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等）</Text>
             </View>
           ) : (
             <Text style={styles.remark}>

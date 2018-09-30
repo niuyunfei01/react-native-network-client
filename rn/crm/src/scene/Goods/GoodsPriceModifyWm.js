@@ -1,11 +1,22 @@
 import React, {Component} from "react";
-import {ScrollView, StyleSheet, Text, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
+import ResultDialog from "../../Components/Goods/ResultDialog";
+import {connect} from "react-redux";
+import AppConfig from "../../config";
+import FetchEx from "../../util/fetchEx";
+import {Modal, Toast} from 'antd-mobile-rn'
 
-export default class GoodsPriceModifyWm extends Component {
+
+function mapStateToProps (state) {
+  const {global} = state;
+  return {global: global};
+}
+
+class GoodsPriceModifyWm extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "修改价格-抽佣模式",
@@ -14,62 +25,138 @@ export default class GoodsPriceModifyWm extends Component {
   
   constructor (props) {
     super(props)
+    
+    this.state = {
+      product_id: this.props.navigation.state.params.pid,
+      store_id: this.props.global.currStoreId,
+      access_token: this.props.global.accessToken,
+      resultDialog: false,
+      resultMsg: '',
+      resultDialogType: '',
+      product: {
+        name: '',
+        listimg: '',
+        waimai_product: {
+          price: 0
+        }
+      },
+      trade_products: [],
+      refer_price: 0,
+      price_ratio: {},
+      supply_price: 0
+    }
+  }
+  
+  componentDidMount () {
+    this.fetchData()
+  }
+  
+  fetchData () {
+    const self = this
+    const {store_id, product_id, access_token} = self.state
+    const url = `api_products/trade_product_price/${store_id}/${product_id}/2.json?access_token=${access_token}`;
+    Toast.loading('请求中..', 0)
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        Toast.hide()
+        self.setState({
+          product: resp.obj.product,
+          trade_products: resp.obj.trade_products,
+          price_ratio: resp.obj.price_ratio
+        })
+      })
+  }
+  
+  onSave () {
+    if (this.state.supply_price) {
+      Modal.prompt('原因', '请输入调价原因', [
+        {
+          text: '关闭',
+        },
+        {
+          text: '确认',
+          onPress: (val) => this.onApplyStorePrice(val)
+        }
+      ])
+    } else {
+      Toast.info('请输入保底价！')
+    }
+  }
+  
+  onApplyStorePrice (remark) {
+    const self = this
+    const {store_id, product_id, access_token, supply_price} = self.state
+    
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm(`api/apply_store_price?access_token=${access_token}`, {
+        store_id: store_id,
+        product_id: product_id,
+        apply_price: supply_price * 100,
+        before_price: self.state.product.store_product.supply_price * 100,
+        remark: remark,
+        auto_on_sale: 0
+      }))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
+        } else {
+          self.setState({resultDialog: true, resultMsg: '调价失败，请稍后重试', resultDialogType: 'info'})
+        }
+      })
   }
   
   render () {
     return (
-      <View>
+      <View style={{flex: 1}}>
         <ScrollView style={styles.scroll_view}>
           <GoodsBaseItem
-            name={'北京稻香村玫瑰细沙月饼110g/个'}
-            wmPrice={'16.50'}
-            image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
+            name={this.state.product.name}
+            wmPrice={this.state.product.waimai_product.price}
+            image={this.state.product.listimg}
           />
           
           <InputPrice
-            suggestMaxPrice={14}
-            suggestMinPrice={12}
             mode={1}
+            referPrice={this.state.refer_price}
+            priceRatio={this.state.price_ratio}
             style={{marginTop: pxToDp(10)}}
+            onInput={(val) => this.setState({supply_price: val})}
           />
           
-          <View>
-            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
-            <TradeStoreItem
-              style={{marginTop: pxToDp(10)}}
-              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-              name={'北京稻香村玫瑰细沙月饼110g/个'}
-              price={12.50}
-              monthSale={259}
-              storeName={'菜老包沙河店'}
-              record={'4.8'}
-            />
-            <TradeStoreItem
-              style={{marginTop: pxToDp(10)}}
-              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-              name={'北京稻香村玫瑰细沙月饼110g/个'}
-              price={12.50}
-              monthSale={259}
-              storeName={'菜老包沙河店'}
-              record={'4.8'}
-            />
-            <TradeStoreItem
-              style={{marginTop: pxToDp(10)}}
-              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-              name={'北京稻香村玫瑰细沙月饼110g/个'}
-              price={12.50}
-              monthSale={259}
-              storeName={'菜老包沙河店'}
-              record={'4.8'}
-            />
-          </View>
+          <If condition={this.state.trade_products.length > 0}>
+            <View>
+              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+              <For each="item" index="idx" of={this.state.trade_products}>
+                <TradeStoreItem
+                  key={idx}
+                  style={{marginTop: pxToDp(10)}}
+                  image={item.img}
+                  name={item.original_name}
+                  price={item.price}
+                  monthSale={item.monthSale}
+                  storeName={item.trade_store.storeName}
+                  record={item.trade_store.rate}
+                />
+              </For>
+            </View>
+          </If>
         </ScrollView>
         
         <View style={styles.bottom_box}>
-          <View style={styles.bottom_btn}>
-            <Text style={{color: '#ffffff'}}>保存</Text>
-          </View>
+          <TouchableOpacity onPress={() => this.onSave()}>
+            <View style={styles.bottom_btn}>
+              <Text style={{color: '#ffffff'}}>保存</Text>
+            </View>
+          </TouchableOpacity>
         </View>
+        
+        <ResultDialog
+          visible={this.state.resultDialog}
+          type={this.state.resultDialogType}
+          text={this.state.resultMsg}
+          onPress={() => this.setState({resultDialog: false})}
+        />
       </View>
     )
   }
@@ -106,3 +193,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   }
 })
+
+export default connect(mapStateToProps)(GoodsPriceModifyWm)
