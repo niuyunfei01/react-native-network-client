@@ -16,9 +16,8 @@ public class OrdersPagerAdapter extends FragmentStatePagerAdapter {
             ListType.WAITING_READY.getName(),
             ListType.WAITING_SENT.getName(),
             ListType.WAITING_ARRIVE.getName(),
-            ListType.ARRIVED.getName(),
+            ListType.DONE.getName(),
     };
-    private OrderListFragment[] fragments = new OrderListFragment[tabTitles.length];
     private int[] counts = new int[]{0, 0, 0, 0};
 
     private Context context;
@@ -48,6 +47,8 @@ public class OrdersPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public void setCount(ListType listType, Integer count) {
-        counts[listType.getValue() - 1] = count;
+        int listV = listType.getValue();
+        int idx = listV >= 4 ? 3 : (listV - 1 >= 0 ? listV - 1 : 0);
+        counts[idx] = count;
     }
 }

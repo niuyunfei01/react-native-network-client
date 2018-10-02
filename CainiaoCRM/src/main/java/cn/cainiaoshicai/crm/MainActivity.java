@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
@@ -85,7 +86,7 @@ import retrofit2.Response;
 public class MainActivity extends AbstractActionBarActivity {
 
     private static final List<ListType> TAB_LIST_TYPES = Arrays.asList(ListType.WAITING_READY,
-            ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
+            ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.DONE);
     public static final int REQUEST_DAY = 1;
     public static final int REQUEST_INFO = 1;
     private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
@@ -93,14 +94,11 @@ public class MainActivity extends AbstractActionBarActivity {
     public static String POSITION = "tab_position";
 
     private Date day = new Date();
-    private AccountBean accountBean;
     private LocationHelper locationHelper;
     private TextView notifCount;
     private int mNotifCount = 1;
-    private BottomBarTab remindIconView;
     private ViewPager ordersViewPager;
     private TabLayout tabLayout;
-    private BottomBar bottomBar;
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.app(), MainActivity.class);
@@ -129,6 +127,7 @@ public class MainActivity extends AbstractActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AccountBean accountBean;
         if (savedInstanceState != null) {
             accountBean = savedInstanceState.getParcelable(BundleArgsConstants.ACCOUNT_EXTRA);
         } else {
@@ -158,11 +157,11 @@ public class MainActivity extends AbstractActionBarActivity {
         setContentView(R.layout.order_list_main);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
+        ordersViewPager = findViewById(R.id.viewpager);
         final OrdersPagerAdapter adapter = new OrdersPagerAdapter(getSupportFragmentManager(),
                 MainActivity.this);
         ordersViewPager.setAdapter(adapter);
-        ordersViewPager.setOffscreenPageLimit(adapter.getCount());
+//        ordersViewPager.setOffscreenPageLimit(adapter.getCount());
         ordersViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -181,7 +180,7 @@ public class MainActivity extends AbstractActionBarActivity {
             }
         });
 
-        tabLayout = (TabLayout) findViewById(R.id.order_list_main);
+        tabLayout = findViewById(R.id.order_list_main);
         tabLayout.setupWithViewPager(ordersViewPager);
         if (savedInstanceState != null) {
             ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
@@ -237,7 +236,9 @@ public class MainActivity extends AbstractActionBarActivity {
         }
         if (app.fnEnabledTmpBuy()) {
             if (params != null) {
-                params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+                }
                 signInTxt.setLayoutParams(params);
             }
 
@@ -307,7 +308,7 @@ public class MainActivity extends AbstractActionBarActivity {
             }
         });
 
-        bottomBar = findViewById(R.id.toolbar_bottom);
+        BottomBar bottomBar = findViewById(R.id.toolbar_bottom);
         bottomBar.setDefaultTab(R.id.menu_process);
         bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
             @Override
@@ -335,7 +336,7 @@ public class MainActivity extends AbstractActionBarActivity {
             bottomBar.selectTabWithId(R.id.menu_process);
         }
 
-        remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
+        BottomBarTab remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
 
 /**
         MenuItem item = menu.findItem(R.id.menu_accept);
@@ -599,7 +600,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                                 initShipAccept(app);
                                                 Utility.toast("操作成功", MainActivity.this);
                                             } else {
-                                                AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + body.getDesc());
+                                                AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + Objects.requireNonNull(body).getDesc());
                                             }
                                         }
 
@@ -658,10 +659,12 @@ public class MainActivity extends AbstractActionBarActivity {
         if (wifiInfo != null) {
 
             envInfos.put("wifi_name", wifiInfo.getSSID());
-            envInfos.put("device_mac", wifiInfo.getMacAddress());
+            if (wifiInfo != null) {
+                envInfos.put("device_mac", wifiInfo.getMacAddress());
+            }
             envInfos.put("wifi_mac", wifiInfo.getBSSID());
 
-            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：" + wifiInfo.getBSSID());
+            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：").append(wifiInfo.getBSSID());
             //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
             sb.append("\n\n获取SSID 是否被隐藏：" + wifiInfo.getHiddenSSID());
             sb.append("\n\n获取IP 地址：" + wifiInfo.getIpAddress());
@@ -679,13 +682,13 @@ public class MainActivity extends AbstractActionBarActivity {
 
         ListType list_type;
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            list_type = ListType.ARRIVED;
+            list_type = ListType.DONE;
         } else {
             list_type = ListType.findByType(intent.getIntExtra("list_type", 0));
         }
 
         if (list_type != null && list_type.getValue() > 0) {
-            this.ordersViewPager.setCurrentItem(list_type.getValue() - 1);
+            this.ordersViewPager.setCurrentItem(list_type.getCurrItem());
         }
         this.resetPrinterStatusBar();
     }
@@ -695,9 +698,13 @@ public class MainActivity extends AbstractActionBarActivity {
         for(ListType listType : TAB_LIST_TYPES) {
             Integer count = totalByStatus.get(listType.getValue());
             if (count == null) count = 0;
-            adapter.setCount(listType, count);
+            if (adapter != null) {
+                adapter.setCount(listType, count);
+            }
         }
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -716,7 +723,7 @@ public class MainActivity extends AbstractActionBarActivity {
         } else if (position == 2) {
             listType = ListType.WAITING_ARRIVE;
         } else if (position == 3) {
-            listType = ListType.ARRIVED;
+            listType = ListType.DONE;
         }
         return listType;
     }

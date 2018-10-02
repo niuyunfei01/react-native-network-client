@@ -146,11 +146,13 @@ public class OrderAdapter extends BaseAdapter {
                 addStrikeThrough(labelExpectTxt);
                 addStrikeThrough(expect_time);
                 addStrikeThrough(paidWayTxt);
+                addStrikeThrough(orderAddr);
             } else {
                 cancelStrikeThrough(dayNo);
                 cancelStrikeThrough(labelExpectTxt);
                 cancelStrikeThrough(expect_time);
                 cancelStrikeThrough(paidWayTxt);
+                cancelStrikeThrough(orderAddr);
             }
 
             final String direction;

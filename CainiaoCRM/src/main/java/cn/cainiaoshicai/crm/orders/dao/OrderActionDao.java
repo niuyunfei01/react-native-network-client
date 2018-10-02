@@ -27,6 +27,8 @@ import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 
 import static cn.cainiaoshicai.crm.ListType.ARRIVED;
+import static cn.cainiaoshicai.crm.ListType.DONE;
+import static cn.cainiaoshicai.crm.ListType.INVALID;
 import static cn.cainiaoshicai.crm.ListType.WAITING_ARRIVE;
 import static cn.cainiaoshicai.crm.ListType.WAITING_READY;
 import static cn.cainiaoshicai.crm.ListType.WAITING_SENT;
@@ -54,7 +56,7 @@ public class OrderActionDao<T extends Order> {
 
     public ResultBean<T> setArrived(long orderId) throws ServiceException {
         return invalidListRequired(actionWithResult("/order_set_arrived_by_id/" + orderId),
-                new ListType[]{WAITING_ARRIVE, ARRIVED});
+                new ListType[]{WAITING_ARRIVE, DONE, INVALID});
     }
 
     public ResultBean<T> setReady(long orderId, List<Integer> workerIds) throws ServiceException {
@@ -156,7 +158,7 @@ public class OrderActionDao<T extends Order> {
 
     public ResultBean setOrderInvalid(int orderId, int currStatus) throws ServiceException {
         return invalidListRequired(actionWithResult("/order_set_invalid/"+orderId),
-                new ListType[]{ListType.findByType(currStatus), ListType.INVALID});
+                new ListType[]{ListType.findByType(currStatus), ListType.INVALID, ListType.DONE});
     }
 
     private ResultBean<T> invalidListRequired(ResultBean<T> resultBean, ListType[] affected) {
@@ -219,7 +221,7 @@ public class OrderActionDao<T extends Order> {
         return actionWithResult("/order_dada_query/" + orderId);
     }
 
-    public ResultBean orderChgStore(int orderId, long storeId, long oldStoreId, int status) throws ServiceException {
+    public ResultBean  orderChgStore(int orderId, long storeId, long oldStoreId, int status) throws ServiceException {
         String path = String.format("/order_chg_store/%d/%d/%d", orderId, storeId, oldStoreId);
         return invalidListRequired(actionWithResult(path), new ListType[]{ListType.findByType(status)});
     }

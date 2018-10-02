@@ -118,7 +118,7 @@ public class OrderListFragment extends Fragment {
     }
 
     public void refresh(boolean byPassCache) {
-        AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter);
+        AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter + ", listTYpe:" + listType);
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
             RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,
