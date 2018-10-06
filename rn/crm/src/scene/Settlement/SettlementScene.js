@@ -109,6 +109,7 @@ class SettlementScene extends PureComponent {
     });
     dispatch(
       get_supply_bill_list(currVendorId, store_id, token, async resp => {
+        console.log("bill list ", resp);
         if (resp.ok) {
           let list = resp.obj;
           tool.objectMap(list, (item, index) => {

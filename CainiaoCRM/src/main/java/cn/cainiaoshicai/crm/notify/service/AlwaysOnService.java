@@ -10,6 +10,8 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.common.base.Strings;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import cn.cainiaoshicai.crm.dao.StoreDao;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 
 public class AlwaysOnService extends BaseService {
     private static String LOG_TAG = AlwaysOnService.class.getSimpleName();
@@ -95,6 +98,7 @@ public class AlwaysOnService extends BaseService {
                         String alert = item.get("alert");
                         String plat = item.get("plat");
                         String storeName = item.get("store_name");
+                        String platOid = item.get("platform_oid");
                         int notifyTimes = 1;
                         if (item.get("notify_times") != null) {
                             try {
@@ -105,6 +109,13 @@ public class AlwaysOnService extends BaseService {
                         }
                         if (null != alert && !"".equals(alert)) {
                             play(alert, plat, storeName, notifyTimes);
+                        }
+                        if (!Strings.isNullOrEmpty(plat) && !Strings.isNullOrEmpty(platOid)) {
+                            try {
+                                OrderPrinter.printWhenNeverPrinted(Integer.parseInt(plat), platOid);
+                            } catch (Exception e) {
+                                Log.e(AlwaysOnService.LOG_TAG, "run: ", e);
+                            }
                         }
                     }
                 }
