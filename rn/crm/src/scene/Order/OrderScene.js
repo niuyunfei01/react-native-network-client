@@ -1580,6 +1580,7 @@ class OrderScene extends Component {
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
     const task_types = this.props.global.config.task_types || {};
+    const mobile_label = order.mobile.replace(',', '转');
     
     return (<View>
         <OrderReminds task_types={task_types} reminds={this.state.reminds.reminds} remindNicks={remindNicks}
@@ -1617,7 +1618,7 @@ class OrderScene extends Component {
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
-            <CallBtn mobile={order.mobile}/>
+            <CallBtn mobile={order.mobile} label={mobile_label}/>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
               <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
@@ -1789,10 +1790,10 @@ class OrderScene extends Component {
               </Text>
             </View>
             : null}
-          <View style={[styles.row, styles.moneyRow, ]}>
+          <View style={[styles.row, styles.moneyRow,]}>
             <View style={styles.moneyLeft}>
               <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
-
+              
               {totalMoneyEdit !== 0 &&
               <View><Text
                 style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
@@ -1801,7 +1802,7 @@ class OrderScene extends Component {
                 <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
                   {numeral(order.total_goods_price / 100).format('0.00')}
                 </Text></View>}
-
+            
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
