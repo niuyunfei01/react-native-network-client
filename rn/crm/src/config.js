@@ -159,6 +159,7 @@ const C = {
   ROUTE_REFUND_DETAIL: 'RefundDetail',
   ROUTE_SELECT_CITY_LIST: "SelectCity",
   ROUTE_SELECT_QUALIFICATION: "Qualification",
+  ROUTE_GOODS_LIST:'GoodsList',
   ROUTE_GOODS_ADJUST: 'GoodsAdjust',
   ROUTE_GOODS_MODIFY_PRICE_SUPPLY: 'GoodsPriceModifySupply',
   ROUTE_GOODS_MODIFY_PRICE_WM: 'GoodsPriceModifyWm',

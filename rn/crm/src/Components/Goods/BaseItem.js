@@ -12,7 +12,8 @@ export default class BaseItem extends PureComponent {
     supplyPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     showModifyPriceBtn: PropTypes.bool,
-    onPressModifyPrice: PropTypes.func
+    onPressModifyPrice: PropTypes.func,
+    style: PropTypes.object
   }
   
   static defaultProps = {
@@ -21,7 +22,7 @@ export default class BaseItem extends PureComponent {
   
   render () {
     return (
-      <View style={[styles.cell_box]}>
+      <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.cell}>
           <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
           <View style={[styles.item_right]}>

@@ -1024,6 +1024,17 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_LIST)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/yunyingshouyi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>商品列表</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_GOODS_PRICE_COMPETE)}
           activeOpacity={customerOpacity}
         >
