@@ -339,7 +339,7 @@ class StoreAddScene extends Component {
       this.props.global.accessToken
       }`;
     let bdUrl = `api/get_bds/${currVendorId}?access_token=${this.props.global.accessToken}`;
-    let isServiceMgrUrl = `api/is_service_mgr/${store_info.type}?access_token=${this.props.global.accessToken}`
+    let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${this.props.global.accessToken}`
     //判断是否是业务人员
     getWithTpl(isServiceMgrUrl, response => {
       if (response.ok) {
