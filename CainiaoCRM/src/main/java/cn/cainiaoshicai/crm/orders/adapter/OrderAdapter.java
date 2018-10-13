@@ -198,16 +198,17 @@ public class OrderAdapter extends BaseAdapter {
 
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
 
-            Vendor v = GlobalCtx.app().getVendor();
+            boolean isDirect = GlobalCtx.app().isDirectVendor();
 
-            if (v.isDirect()) {
+            if (isDirect) {
                 dayNo.setText("#" + order.getDayId());
+                dayNo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
             } else {
                 dayNo.setText(order.platformWithId() + "总#" + order.getDayId());
-                dayNo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f);
+                dayNo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
             }
 
-            if (v.isDirect()) {
+            if (isDirect) {
                 sourcePlatform.setText(order.platformWithId());
                 sourcePlatform.setOnClickListener(new View.OnClickListener() {
                     @Override

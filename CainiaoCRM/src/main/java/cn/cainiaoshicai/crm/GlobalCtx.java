@@ -958,6 +958,10 @@ public class GlobalCtx extends Application {
         return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
     }
 
+    public boolean isDirectVendor() {
+        return this.getVendor() != null && this.getVendor().isDirect();
+    }
+
     public boolean fnEnabledStoreInfoMgr() {
         if (isSuperMgr()) return true;
 

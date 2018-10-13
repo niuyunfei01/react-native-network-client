@@ -23,7 +23,8 @@ public class Vendor {
     private List<Long> store_vice_mgr;
     private boolean fnProvidingOnway;
     private boolean fnProviding;
-    private boolean isDirect;
+    private boolean isDirect = true;
+    private int is_direct;
 
     public Vendor() {
     }
@@ -130,6 +131,14 @@ public class Vendor {
 
     public void setDirect(boolean direct) {
         isDirect = direct;
+    }
+
+    public int getIs_direct() {
+        return is_direct;
+    }
+
+    public void setIs_direct(int is_direct) {
+        this.is_direct = is_direct;
     }
 
     public Bundle toBundle() {

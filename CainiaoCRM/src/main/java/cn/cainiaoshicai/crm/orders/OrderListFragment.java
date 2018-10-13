@@ -78,7 +78,8 @@ public class OrderListFragment extends Fragment {
             return;
         }
         adapter = new OrderAdapter(getActivity(), data, this.listType.getValue());
-		listView.setAdapter(adapter);
+
+        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
