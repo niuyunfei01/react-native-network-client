@@ -164,9 +164,13 @@ public class OrderAdapter extends BaseAdapter {
             } else {
                 direction = " [ " + order.getDirection() + " ]";
             }
-            orderAddr.setText((isInvalid ? "[已无效]" : "") + (listType == ListType.NONE.getValue() ? "["+order.getStore_name()+"]":"") + order.getAddress() + direction);
+            orderAddr.setText((isInvalid ? "[已无效]" : "") + (listType == ListType.NONE.getValue() ? "[" + order.getStore_name() + "]" : "") + order.getAddress() + direction);
             userName.setText(order.getUserName());
-            phone.setText(order.getMobile());
+            String tipMobile = order.getMobile();
+            if (tipMobile != null) {
+                tipMobile = tipMobile.replaceAll(",", "转");
+            }
+            phone.setText(tipMobile);
             phone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
