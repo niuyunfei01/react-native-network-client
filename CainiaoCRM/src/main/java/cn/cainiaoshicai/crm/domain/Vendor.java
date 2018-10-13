@@ -23,6 +23,7 @@ public class Vendor {
     private List<Long> store_vice_mgr;
     private boolean fnProvidingOnway;
     private boolean fnProviding;
+    private boolean isDirect;
 
     public Vendor() {
     }
@@ -123,6 +124,14 @@ public class Vendor {
         this.fnProviding = fnProviding;
     }
 
+    public boolean isDirect() {
+        return isDirect;
+    }
+
+    public void setDirect(boolean direct) {
+        isDirect = direct;
+    }
+
     public Bundle toBundle() {
         Bundle b = new Bundle();
         b.putString("id", String.valueOf(id));
@@ -135,7 +144,7 @@ public class Vendor {
         b.putString("support_tel", this.support_tel);
         b.putBoolean("fnProvidingOnway", this.fnProvidingOnway);
         b.putBoolean("fnProviding", this.fnProviding);
-
+        b.putBoolean("isDirect", this.isDirect);
         return b;
     }
 

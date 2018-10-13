@@ -138,6 +138,7 @@ class UserAddScene extends PureComponent {
   }
 
   render() {
+    let update = this.state.type == 'edit';
     return (
       <ScrollView
         refreshControl={
@@ -157,6 +158,7 @@ class UserAddScene extends PureComponent {
             </CellHeader>
             <CellBody>
               <Input
+                editable = {!update}
                 onChangeText={(mobile) => this.setState({mobile})}
                 value={this.state.mobile}
                 style={[styles.cell_input]}

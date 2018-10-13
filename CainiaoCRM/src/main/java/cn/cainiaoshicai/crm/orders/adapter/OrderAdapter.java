@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -194,21 +196,31 @@ public class OrderAdapter extends BaseAdapter {
                 }
             });
 
-
-
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
-            dayNo.setText("#" + order.getDayId());
 
-            sourcePlatform.setText(order.platformWithId());
-            sourcePlatform.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
-                    intent.setAction(Intent.ACTION_SEARCH);
-                    intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
-                    v.getContext().startActivity(intent);
-                }
-            });
+            Vendor v = GlobalCtx.app().getVendor();
+
+            if (v.isDirect()) {
+                dayNo.setText("#" + order.getDayId());
+            } else {
+                dayNo.setText(order.platformWithId() + "总#" + order.getDayId());
+                dayNo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f);
+            }
+
+            if (v.isDirect()) {
+                sourcePlatform.setText(order.platformWithId());
+                sourcePlatform.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
+                        intent.setAction(Intent.ACTION_SEARCH);
+                        intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
+                        v.getContext().startActivity(intent);
+                    }
+                });
+            } else {
+                sourcePlatform.setVisibility(View.INVISIBLE);
+            }
 
             if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = vi.findViewById(R.id.order_status_state);
