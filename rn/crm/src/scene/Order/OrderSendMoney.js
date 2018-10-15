@@ -41,7 +41,7 @@ class OrderSendMoney extends PureComponent {
     const self = this
     const {global, navigation} = self.props;
     const {amount, remark, submitting} = self.state
-    if(submitting){
+    if (submitting) {
       ToastLong("正在提交，请等待！");
       return false;
     }
@@ -59,14 +59,15 @@ class OrderSendMoney extends PureComponent {
         if (resp.ok) {
           ToastShort('提交成功')
           navigation.goBack()
+          self.setState({submitting: true});
         } else {
           ToastShort('提交失败')
+          self.setState({submitting: false});
         }
-        self.setState({submitting: true});
       })
       .catch(error => {
         ToastLong(error.message);
-        self.setState({submitting: true});
+        self.setState({submitting: false});
       });
   }
   
