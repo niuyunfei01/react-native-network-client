@@ -367,6 +367,7 @@ class OrderBottom extends PureComponent {
         zs_way === Cts.SHIP_KS_MT ||
         zs_way === Cts.SHIP_ZS_MT ||
         zs_way === Cts.SHIP_ZS_ELE ||
+        zs_way === Cts.SHIP_KS_ELE ||
         zs_way === Cts.SHIP_ZS_BD
       ) {
         label = tool.autoPlat(zs_way, zs_status);
@@ -375,6 +376,7 @@ class OrderBottom extends PureComponent {
         auto_ship_type === Cts.SHIP_KS_MT ||
         auto_ship_type === Cts.SHIP_ZS_MT ||
         auto_ship_type === Cts.SHIP_ZS_ELE ||
+        auto_ship_type === Cts.SHIP_KS_ELE ||
         auto_ship_type === Cts.SHIP_ZS_BD
       ) {
         label = tool.autoPlat(auto_ship_type, zs_status);
