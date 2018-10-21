@@ -27,7 +27,7 @@ public class Config {
     private Vendor[] can_read_vendors;
     private HashMap<String, String> v_b;
     private List<Integer> help_uid = new ArrayList<Integer>();
-    private boolean enabled_good_mgr = false;
+    private boolean enabled_good_mgr = true;
 
     private boolean enabled_special_menu = false;
     private boolean show_activity_mgr = false;
