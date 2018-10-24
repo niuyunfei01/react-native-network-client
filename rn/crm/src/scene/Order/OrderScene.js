@@ -1283,14 +1283,15 @@ class OrderScene extends Component {
 
   logOrderViewed() {
     const {order, global} = this.props;
-    let {order_id} = order.order;
+    let {id} = order.order;
     let {accessToken} = global;
-    let url = `/api/log_view_order/${order_id}?access_token=${accessToken}`;
-    getWithTpl2(url, function (json) {
+    let url = `/api/log_view_order/${id}?access_token=${accessToken}`;
+    getWithTpl(url, function (json) {
       if (json.ok) {
         ToastLong(json.desc);
       }
     }, function () {
+      ToastLong("记录订单访问次数错误！");
     });
   }
   
