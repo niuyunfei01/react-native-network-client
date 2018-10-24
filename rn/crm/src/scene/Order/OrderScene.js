@@ -53,7 +53,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-import {getWithTpl} from "../../util/common";
+import {getWithTpl, getWithTpl2} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
 
 const numeral = require('numeral');
@@ -193,7 +193,7 @@ class OrderScene extends Component {
       phone: undefined,
       person: '联系客户'
     };
-    
+
     this._onLogin = this._onLogin.bind(this);
     this.toMap = this.toMap.bind(this);
     this.goToSetMap = this.goToSetMap.bind(this);
@@ -211,18 +211,19 @@ class OrderScene extends Component {
     this._totalEditingCents = this._totalEditingCents.bind(this);
     this._getWayRecord = this._getWayRecord.bind(this);
     this._orderChangeLog = this._orderChangeLog.bind(this);
-    
+
     this._toEditBasic = this._toEditBasic.bind(this);
     this._fnProvidingOnway = this._fnProvidingOnway.bind(this);
     this._onToProvide = this._onToProvide.bind(this);
     this._callShip = this._callShip.bind(this);
     this.cancelZsDelivery = this.cancelZsDelivery.bind(this);
-    
     this._doRefund = this._doRefund.bind(this);
+    this.logOrderViewed = this.logOrderViewed.bind(this);
   }
   
   componentDidMount () {
     this._navSetParams();
+    this.logOrderViewed();
   }
   
   componentWillMount () {
@@ -1278,6 +1279,19 @@ class OrderScene extends Component {
     } else {
       this.setState({errorHints: '错误的订单ID'});
     }
+  }
+
+  logOrderViewed() {
+    const {order, global} = this.props;
+    let {order_id} = order.order;
+    let {accessToken} = global;
+    let url = `/api/log_view_order/${order_id}?access_token=${accessToken}`;
+    getWithTpl2(url, function (json) {
+      if (json.ok) {
+        ToastLong(json.desc);
+      }
+    }, function () {
+    });
   }
   
   renderShipStatus () {

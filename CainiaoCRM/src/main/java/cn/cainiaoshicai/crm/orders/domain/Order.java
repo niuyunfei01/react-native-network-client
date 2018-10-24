@@ -23,6 +23,7 @@ public class Order implements Serializable {
     private String mobile;
     private double orderMoney;
     private double paid_by_user;
+    private double supplyMoney;
     private Date expectTime;
     private String expectTimeStr;
     private Date orderTime;
@@ -697,6 +698,14 @@ public class Order implements Serializable {
 
     public void setReal_mobile(String real_mobile) {
         this.real_mobile = real_mobile;
+    }
+
+    public double getSupplyMoney() {
+        return supplyMoney;
+    }
+
+    public void setSupplyMoney(double supplyMoney) {
+        this.supplyMoney = supplyMoney;
     }
 }
 
