@@ -23,7 +23,7 @@ public class Order implements Serializable {
     private String mobile;
     private double orderMoney;
     private double paid_by_user;
-    private double supplyMoney;
+    private double supplyMoney = 0;
     private Date expectTime;
     private String expectTimeStr;
     private Date orderTime;

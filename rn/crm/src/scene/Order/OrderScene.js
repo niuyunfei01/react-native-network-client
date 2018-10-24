@@ -1283,16 +1283,18 @@ class OrderScene extends Component {
 
   logOrderViewed() {
     const {order, global} = this.props;
-    let {id} = order.order;
-    let {accessToken} = global;
-    let url = `/api/log_view_order/${id}?access_token=${accessToken}`;
-    getWithTpl(url, function (json) {
-      if (json.ok) {
-        ToastLong(json.desc);
-      }
-    }, function () {
-      ToastLong("记录订单访问次数错误！");
-    });
+    let {id, orderStatus} = order.order;
+    if(orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP){
+      let {accessToken} = global;
+      let url = `/api/log_view_order/${id}?access_token=${accessToken}`;
+      getWithTpl(url, function (json) {
+        if (json.ok) {
+          ToastLong(json.desc);
+        }
+      }, function () {
+        ToastLong("记录订单访问次数错误！");
+      });
+    }
   }
   
   renderShipStatus () {

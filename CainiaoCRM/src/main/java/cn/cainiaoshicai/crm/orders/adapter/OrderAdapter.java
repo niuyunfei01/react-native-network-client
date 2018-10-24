@@ -110,6 +110,8 @@ public class OrderAdapter extends BaseAdapter {
         try {
             final Order order = orders.get(i);
 
+            boolean isDirect = GlobalCtx.app().isDirectVendor();
+
 //        thumb_image.setImageUrl(order.getThumbnailUrl(), mImageLoader);
 
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
@@ -181,7 +183,11 @@ public class OrderAdapter extends BaseAdapter {
             });
 
             genderText.setText(order.getGenderText());
-            orderMoney.setText(String.valueOf(order.getOrderMoney()));
+            if (!isDirect && order.getSupplyMoney() > 0) {
+                orderMoney.setText(String.valueOf(order.getSupplyMoney()));
+            } else {
+                orderMoney.setText(String.valueOf(order.getOrderMoney()));
+            }
             orderTimesTxt.setText(order.getOrder_times() > 1 ? "第" + order.getOrder_times() + "次" : "新用户");
 
             orderTimesTxt.setOnClickListener(new View.OnClickListener() {
@@ -197,8 +203,6 @@ public class OrderAdapter extends BaseAdapter {
             });
 
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
-
-            boolean isDirect = GlobalCtx.app().isDirectVendor();
 
             if (isDirect) {
                 dayNo.setText("#" + order.getDayId());
