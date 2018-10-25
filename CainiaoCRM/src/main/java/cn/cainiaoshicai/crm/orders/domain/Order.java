@@ -517,6 +517,7 @@ public class Order implements Serializable {
         address = updatedO.address;
         mobile = updatedO.mobile;
         orderMoney = updatedO.orderMoney;
+        supplyMoney = updatedO.supplyMoney;
         paid_by_user = updatedO.paid_by_user;
         expectTime = updatedO.expectTime;
         expectTimeStr = updatedO.expectTimeStr;
