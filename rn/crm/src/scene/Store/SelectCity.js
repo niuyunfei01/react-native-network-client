@@ -1,57 +1,71 @@
-import React, { Component } from "react";
-import {
-  ScrollView,
-  RefreshControl,
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  TextInput
-} from "react-native";
-import { bindActionCreators } from "redux";
-import CommonStyle from "../../common/CommonStyles";
-import { connect } from "react-redux";
-import { Button, CellsTitle } from "../../weui/index";
-import CheckboxCells from "../../weui/Form/CheckboxCells";
-import * as globalActions from "../../reducers/global/globalActions";
-import * as tool from "../../common/tool";
-import { ToastShort } from "../../util/ToastUtils";
-import { Styles, Metrics, Colors } from "../../themes";
-
-import Icon from "react-native-vector-icons/Ionicons";
+import React, {Component} from "react";
+import {Platform, ScrollView, Text, TextInput, TouchableOpacity, View, AsyncStorage} from "react-native";
+import {connect} from "react-redux";
+import {Colors, Metrics, Styles} from "../../themes";
 import _ from "lodash";
-import { cityList } from "../data";
-import { Line } from "../component/All";
+import {Line} from "../component/All";
+import {ToastLong} from "../../util/ToastUtils";
+import {getWithTpl} from "../../util/common";
+import {Toast} from "antd-mobile-rn"
 
 function mapStateToProps(state) {
-  const { mine, global } = state;
-  return { mine: mine, global: global };
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 class SelectCity extends Component {
   static navigationOptions = {
     headerTitle: "选择城市"
   };
+
   constructor(props) {
     super(props);
     this.state = {
       start: 0,
-      cityList: cityList
+      cityList: [],
+      allCityList: [],
+      loading: false
     };
   }
 
   goTo = index => {
     let start = 0;
-
     for (let i = 0; i < index; i++) {
       start += this.state.cityList[i].cityList.length;
     }
-    this.scrollView.scrollTo({ y: 41 * start });
+    this.scrollView.scrollTo({y: 41 * start});
   };
 
+  initCityList() {
+    let self = this;
+    if (self.state.loading) {
+      return false;
+    }
+    self.setState({loading: true})
+    Toast.loading("获取城市列表中..", 0)
+    getWithTpl("DataDictionary/get_crm_city_list", function (data) {
+      console.log("get crm city list ", data)
+      Toast.hide()
+      if (data.ok) {
+        let cityList = data.obj;
+        self.setState({cityList: cityList, allCityList: cityList, loading: false})
+      }
+    }, function (e) {
+      Toast.hide()
+      self.setState({loading: false})
+      console.error("get crm city list error ", e)
+      ToastLong("获取城市列表错误！")
+    })
+  }
+
+  componentWillMount() {
+    this.initCityList()
+  }
+
   render() {
+    let cityList = this.state.allCityList;
     return (
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={{flex: 1, backgroundColor: "#fff"}}>
         {/*定位当前城市*/}
         <View
           style={[
@@ -80,14 +94,12 @@ class SelectCity extends Component {
           >
             <TextInput
               style={[
-                { width: "90%", textAlign: "center", padding: 0 },
+                {width: "90%", textAlign: "center", padding: 0},
                 Styles.n2grey9
               ]}
               placeholder="请输入城市名字"
-              // selectTextOnFocus={true}
               value={this.state.searchValue}
               autoCapitalize="none"
-              // autoFocus={true}
               ref={textInput => {
                 this.textInput = textInput;
               }}
@@ -121,35 +133,16 @@ class SelectCity extends Component {
             />
           </View>
         </View>
-        {
-          //   <View
-          //   style={[
-          //     { height: 50, marginLeft: 18, marginRight: 18 },
-          //     Styles.between
-          //   ]}
-          // >
-          //   <View style={Styles.startcenter}>
-          //     <Icon name={"ios-pin-outline"} size={17} color={Colors.theme} />
-          //     <Text style={Styles.n1grey9} allowFontScaling={false}>
-          //       {" "}
-          //       当前定位城市
-          //     </Text>
-          //   </View>
-          //   <Text style={Styles.n1b} allowFontScaling={false}>
-          //     {"未获取到城市"}
-          //   </Text>
-          // </View>
-        }
         <ScrollView
-          style={{ flex: 1 }}
+          style={{flex: 1}}
           ref={scrollView => {
             this.scrollView = scrollView;
           }}
         >
           {/*城市列表*/}
-          <View style={{ flexDirection: "row" }}>
+          <View style={{flexDirection: "row"}}>
             {/*按字母显示城市列表 (看下后台是怎么给的数据)*/}
-            <View style={{ width: Metrics.CW * 19 / 20 }}>
+            <View style={{width: Metrics.CW * 19 / 20}}>
               {this.state.cityList.map((item, index) => {
                 return (
                   <View>
@@ -162,7 +155,7 @@ class SelectCity extends Component {
                         }}
                       >
                         <Text
-                          style={[{ paddingLeft: 18 }, Styles.n2grey6]}
+                          style={[{paddingLeft: 18}, Styles.n2grey6]}
                           allowFontScaling={false}
                         >
                           {item.key}
@@ -182,16 +175,16 @@ class SelectCity extends Component {
                           }}
                         >
                           <View
-                            style={{ height: 40, justifyContent: "center" }}
+                            style={{height: 40, justifyContent: "center"}}
                           >
                             <Text
-                              style={[{ paddingLeft: 18 }, Styles.n1]}
+                              style={[{paddingLeft: 18}, Styles.n1]}
                               allowFontScaling={false}
                             >
                               {element.city}
                             </Text>
                           </View>
-                          <Line c={Colors.greyf8} />
+                          <Line c={Colors.greyf8}/>
                         </TouchableOpacity>
                       );
                     })}
@@ -215,7 +208,7 @@ class SelectCity extends Component {
             return (
               <TouchableOpacity onPress={() => this.goTo(index)}>
                 <Text
-                  style={{ textAlign: "center", fontSize: 10, lineHeight: 21 }}
+                  style={{textAlign: "center", fontSize: 10, lineHeight: 21}}
                   allowFontScaling={false}
                 >
                   {item.key}

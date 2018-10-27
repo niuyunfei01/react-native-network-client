@@ -223,7 +223,6 @@ class OrderScene extends Component {
   
   componentDidMount () {
     this._navSetParams();
-    this.logOrderViewed();
   }
   
   componentWillMount () {
@@ -241,24 +240,24 @@ class OrderScene extends Component {
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
     
   }
-  
+
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
     if (!orderId) {
       return;
     }
-    
+
     const sessionToken = global.accessToken;
     const o = orderStateToCmp ? orderStateToCmp.order : false;
-    
+
     if (!o || !o.id || o.id !== orderId) {
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
-          
+
           let state = {
             isFetching: false,
           };
-          
+
           if (!ok) {
             state.errorHints = data;
             this.setState(state)
@@ -271,6 +270,7 @@ class OrderScene extends Component {
                   this.setState({reminds: data, remindFetching: false})
                   this._orderChangeLogQuery();
                   this.wayRecordQuery();
+                  this.logOrderViewed();
                 } else {
                   this.setState({errorHints: desc, remindFetching: false})
                 }
