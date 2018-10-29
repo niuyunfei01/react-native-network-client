@@ -1,8 +1,11 @@
 package cn.cainiaoshicai.crm.othercomp;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -10,6 +13,7 @@ import android.util.Log;
 
 import com.example.jpushdemo.ExampleUtil;
 import com.example.jpushdemo.MainActivity;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -19,13 +23,16 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
@@ -66,6 +73,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 			final Notify notify = getNotifyFromBundle(bundle);
 			if (notify != null) {
+
+				if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
+					int orderId = notify.getOrder_id();
+					String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
+					sendPushStatus(context, orderId, msgId);
+				}
 
 				if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notificationId);
@@ -290,6 +303,41 @@ public class NotificationReceiver extends BroadcastReceiver {
 			}
 			context.sendBroadcast(msgIntent);
 		}
+	}
+
+	/**
+	 * @param context
+	 * @param orderId
+	 * @param msgId
+	 */
+	private void sendPushStatus(Context context, int orderId, String msgId) {
+		try {
+			String allConfigJson = SettingHelper.getAllConfigs(context);
+			boolean bluetoothIsConnected = isBluetoothConnected();
+			boolean acceptNotifyNew = GlobalCtx.app().acceptNotifyNew();
+			Worker currentWorker = GlobalCtx.app().getCurrentWorker();
+			Map<String, Object> deviceStatus = Maps.newHashMap();
+			deviceStatus.put("configs", allConfigJson);
+			deviceStatus.put("bluetoothIsConnected", bluetoothIsConnected);
+			deviceStatus.put("acceptNotifyNew", acceptNotifyNew);
+			deviceStatus.put("currentWorker", currentWorker);
+			deviceStatus.put("orderId", orderId);
+			deviceStatus.put("msgId", msgId);
+			GlobalCtx.app().dao.logPushStatus(deviceStatus);
+		} catch (Exception e) {
+			Log.e("send push status", e.getMessage());
+		}
+	}
+
+	private boolean isBluetoothConnected() {
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		//adapter也有getState(), 可获取ON/OFF...其它状态
+		int a2dp = bluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP);              //可操控蓝牙设备，如带播放暂停功能的蓝牙耳机
+		int headset = bluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET);        //蓝牙头戴式耳机，支持语音输入输出
+		int health = bluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEALTH);
+		return bluetoothAdapter != null && (a2dp == BluetoothAdapter.STATE_CONNECTED ||
+				headset == BluetoothAdapter.STATE_CONNECTED ||
+				health == BluetoothAdapter.STATE_CONNECTED);
 	}
 }
 

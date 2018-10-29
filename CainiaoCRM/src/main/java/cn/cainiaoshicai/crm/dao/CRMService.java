@@ -15,6 +15,7 @@ import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -83,6 +84,11 @@ public interface CRMService {
 
     @GET("/api/query_product_by_code/{code}")
     Call<ResultBean<List<ProductTpl>>> searchByBarCode(@Path("code") String code);
+
+    @POST("/api/log_push_status")
+    Call<ResultBean<String>> logPushStatus(@Body Map<String, Object> status);
+
+
 
     class UploadRes {
         private FileBean file;
