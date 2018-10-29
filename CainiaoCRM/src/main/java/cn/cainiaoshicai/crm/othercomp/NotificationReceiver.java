@@ -312,7 +312,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 	 */
 	private void sendPushStatus(Context context, int orderId, String msgId) {
 		try {
-			String allConfigJson = SettingHelper.getAllConfigs(context);
+			Map<String, ?> allConfigJson = SettingHelper.getAllConfigs(context);
 			boolean bluetoothIsConnected = isBluetoothConnected();
 			boolean acceptNotifyNew = GlobalCtx.app().acceptNotifyNew();
 			Worker currentWorker = GlobalCtx.app().getCurrentWorker();

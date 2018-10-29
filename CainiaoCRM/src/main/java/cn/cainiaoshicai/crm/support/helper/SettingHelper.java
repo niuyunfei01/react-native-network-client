@@ -32,10 +32,9 @@ public class SettingHelper {
         return editor;
     }
 
-    public static String getAllConfigs(Context paramContext) {
+    public static Map<String, ?>  getAllConfigs(Context paramContext) {
         Map<String, ?> allEntries = PreferenceManager.getDefaultSharedPreferences(paramContext).getAll();
-        Gson gson =  new Gson();
-        return gson.toJson(allEntries);
+        return allEntries;
     }
 
     public static int getSharedPreferences(Context paramContext, String paramString, int paramInt) {
