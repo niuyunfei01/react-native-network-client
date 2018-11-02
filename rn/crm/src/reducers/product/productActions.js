@@ -234,7 +234,7 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
     formData.append("keepOrigin", keep_origin_img);
     const url = `uploadfiles/upload`; //上传图片的服务器地址
     console.log("上传的形式:%o", formData);
-    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
+    return FetchEx.timeout(AppConfig.LongFetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())
       .then(resp => {
         let ok = false;

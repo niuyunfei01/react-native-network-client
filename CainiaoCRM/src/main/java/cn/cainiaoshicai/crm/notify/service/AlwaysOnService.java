@@ -70,7 +70,9 @@ public class AlwaysOnService extends BaseService {
     public void onDestroy() {
         // stop running
         isRunning = false;
-        backgroundService.shutdownNow();
+        if (backgroundService != null) {
+            backgroundService.shutdownNow();
+        }
         super.onDestroy();
     }
 

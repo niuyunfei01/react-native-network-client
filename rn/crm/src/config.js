@@ -71,6 +71,7 @@ const C = {
   DownloadUrl: `https://www.cainiaoshicai.cn/util/crm_dl`,
   MAP_WAY_URL: "util/amap_way",
   FetchTimeout: 60000,
+  LongFetchTimeout: 200000,
   
   GRANT_TYP_PASSWORD: "password",
   GRANT_CLIENT_ID: "NTQ5NTE5MGViMTgzMDUw",
