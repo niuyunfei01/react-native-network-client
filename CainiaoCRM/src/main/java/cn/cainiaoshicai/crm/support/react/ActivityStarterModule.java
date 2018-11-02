@@ -269,7 +269,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
 
-        OrderPrinter.resetDeviceStatus(ds);
+        ds = OrderPrinter.resetDeviceStatus(ds);
 
         if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);

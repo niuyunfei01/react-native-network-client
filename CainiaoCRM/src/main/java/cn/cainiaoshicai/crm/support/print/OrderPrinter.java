@@ -43,7 +43,7 @@ public class OrderPrinter {
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
         BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-        resetDeviceStatus(printer);
+        printer = resetDeviceStatus(printer);
         if (printer == null || printer.getSocket() == null || !printer.isConnected()) {
             AppLogger.e("skip to print for printer is not connected!");
             return;
@@ -64,13 +64,15 @@ public class OrderPrinter {
     }
 
     public static BluetoothPrinters.DeviceStatus resetDeviceStatus(BluetoothPrinters.DeviceStatus ds) {
+        boolean shouldReconnect = true;
         if (ds == null) {
             boolean connectSuccess = autoConnectBluetoothPrinters();
             if (connectSuccess) {
-                BluetoothPrinters.INS.getCurrentPrinter();
+                shouldReconnect = false;
+                ds = BluetoothPrinters.INS.getCurrentPrinter();
             }
         }
-        if (ds != null) {
+        if (ds != null && shouldReconnect) {
             try {
                 android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
                 final BluetoothConnector btConnector = new BluetoothConnector(ds.getDevice(), false, btAdapter, null);
