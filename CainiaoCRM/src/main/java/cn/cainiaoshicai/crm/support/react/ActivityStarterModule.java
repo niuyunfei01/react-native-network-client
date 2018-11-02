@@ -47,6 +47,7 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
+import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -266,7 +267,10 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
-        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+        BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
+
+        OrderPrinter.resetDeviceStatus(ds);
+
         if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -274,7 +278,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             callback.invoke(false, "打印机未连接");
         } else {
             new MyAsyncTask<Void, Void, Void>() {
-
                 @Override
                 protected Void doInBackground(Void... params) {
                     OrderPrinter._print(o, false, new BasePrinter.PrintCallback() {

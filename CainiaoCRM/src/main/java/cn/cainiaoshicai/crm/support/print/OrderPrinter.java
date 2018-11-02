@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.support.print;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -8,6 +9,7 @@ import com.facebook.react.ReactActivity;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
@@ -19,10 +21,12 @@ import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 
 /**
@@ -39,7 +43,8 @@ public class OrderPrinter {
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
         BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-        if (printer == null || !printer.isConnected()) {
+        resetDeviceStatus(printer);
+        if (printer == null || printer.getSocket() == null || !printer.isConnected()) {
             AppLogger.e("skip to print for printer is not connected!");
             return;
         }
@@ -56,6 +61,54 @@ public class OrderPrinter {
                 return null;
             }
         }.executeOnNormal();
+    }
+
+    public static BluetoothPrinters.DeviceStatus resetDeviceStatus(BluetoothPrinters.DeviceStatus ds) {
+        if (ds == null) {
+            boolean connectSuccess = autoConnectBluetoothPrinters();
+            if (connectSuccess) {
+                BluetoothPrinters.INS.getCurrentPrinter();
+            }
+        }
+        if (ds != null) {
+            try {
+                android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+                final BluetoothConnector btConnector = new BluetoothConnector(ds.getDevice(), false, btAdapter, null);
+                final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+                ds.resetSocket(socketWrapper);
+            } catch (Exception e) {
+                Log.e("reset bt socket error ", e);
+                ds = null;
+            }
+        }
+        return ds;
+    }
+
+    public static boolean autoConnectBluetoothPrinters() {
+        String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
+        android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> btDeviceList = btAdapter.getBondedDevices();
+        BluetoothDevice lastDevice = null;
+        for (BluetoothDevice device : btDeviceList) {
+            if (device.getAddress().equals(lastAddress)) {
+                lastDevice = device;
+                break;
+            }
+        }
+        if (lastDevice != null) {
+            try {
+                final BluetoothConnector btConnector = new BluetoothConnector(lastDevice, false, btAdapter, null);
+                final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+                BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(lastDevice);
+                deviceStatus.resetSocket(socketWrapper);
+                SettingUtility.setLastConnectedPrinterAddress(lastDevice.getAddress());
+                BluetoothPrinters.INS.setCurrentPrinter(deviceStatus);
+                return true;
+            } catch (Exception e) {
+                Log.e("skip to print for printer is not connected!", e);
+            }
+        }
+        return false;
     }
 
     public static void printEstimate(BluetoothConnector.BluetoothSocketWrapper btsocket,

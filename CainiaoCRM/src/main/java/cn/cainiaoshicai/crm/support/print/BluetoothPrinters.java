@@ -41,6 +41,10 @@ public class BluetoothPrinters {
         return null;
     }
 
+    public void setCurrentPrinter(DeviceStatus currentPrinter) {
+        this.currentPrinter.set(currentPrinter);
+    }
+
     public static class DeviceStatus {
         private BluetoothDevice device;
         private String name;
