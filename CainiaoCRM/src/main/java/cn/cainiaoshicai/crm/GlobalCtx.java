@@ -39,6 +39,7 @@ import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
@@ -71,6 +72,7 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
+import cn.cainiaoshicai.crm.notify.service.KeepAliveService;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -289,6 +291,11 @@ public class GlobalCtx extends Application {
         AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
+
+        //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
+        DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
+        KeepAliveService.sShouldStopService = false;
+        DaemonEnv.startServiceMayBind(KeepAliveService.class);
     }
 
     public void updateAfterGap(final int fiveMin) {
