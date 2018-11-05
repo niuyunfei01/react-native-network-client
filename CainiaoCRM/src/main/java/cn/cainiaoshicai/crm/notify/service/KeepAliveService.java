@@ -7,6 +7,7 @@ import com.xdandroid.hellodaemon.AbsWorkService;
 
 import java.util.concurrent.TimeUnit;
 
+import cn.cainiaoshicai.crm.orders.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
@@ -37,18 +38,18 @@ public class KeepAliveService extends AbsWorkService {
 
     @Override
     public void startWork(Intent intent, int flags, int startId) {
-        System.out.println("检查磁盘中是否有上次销毁时保存的数据");
+        Log.d("检查磁盘中是否有上次销毁时保存的数据");
         sDisposable = Observable
                 .interval(3, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
                 .doOnDispose(() -> {
-                    System.out.println("保存数据到磁盘。");
+                    Log.d("保存数据到磁盘。");
                     cancelJobAlarmSub();
                 })
                 .subscribe(count -> {
-                    System.out.println("每 3 秒采集一次数据... count = " + count);
+                    Log.d("每 3 秒采集一次数据... count = " + count);
                     if (count > 0 && count % 18 == 0)
-                        System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+                        Log.d("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
                 });
     }
 
