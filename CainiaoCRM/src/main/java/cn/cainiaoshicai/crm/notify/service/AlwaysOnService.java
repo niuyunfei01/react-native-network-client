@@ -147,6 +147,8 @@ public class AlwaysOnService extends BaseService {
                     GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
                 } else if (plat.equals("3")) {
                     GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
+                } else if (plat.equals("1")) {
+                    GlobalCtx.app().getSoundManager().play_new_eb_order_sound();
                 } else {
                     GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
                 }

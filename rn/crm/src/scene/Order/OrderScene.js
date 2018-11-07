@@ -301,16 +301,16 @@ class OrderScene extends Component {
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_SET_INVALID, label: '置为无效'},
     ];
-    
-    if (enabled_special_menu) {
+
+    if (is_service_mgr) {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
-    
+
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-    
+
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }

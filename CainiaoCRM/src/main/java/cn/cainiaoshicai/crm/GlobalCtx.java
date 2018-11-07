@@ -1089,6 +1089,7 @@ public class GlobalCtx extends Application {
         private int new_mt_order_sound;
         private int new_jd_order_sound;
         private int new_ele_order_sound;
+        private int new_eb_order_sound;
         private int todo_complain_sound;
 
         public void load(GlobalCtx ctx) {
@@ -1118,6 +1119,7 @@ public class GlobalCtx extends Application {
             new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound1, 1);
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
+            new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1216,8 +1218,13 @@ public class GlobalCtx extends Application {
             }
         }
 
+
         public boolean play_new_simple_order_sound() {
             return this.play_single_sound(simpleNewOrderSound);
+        }
+
+        public boolean play_new_eb_order_sound() {
+            return this.play_single_sound(new_eb_order_sound);
         }
 
         public boolean play_new_ele_order_sound() {
