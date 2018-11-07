@@ -83,6 +83,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 				if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
 					GlobalCtx.newOrderNotifies.add(notificationId);
 					if (GlobalCtx.app().acceptNotifyNew()) {
+						notifyOrder(notify);
 						OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
 					}
 				}
@@ -338,6 +339,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 		return bluetoothAdapter != null && (a2dp == BluetoothAdapter.STATE_CONNECTED ||
 				headset == BluetoothAdapter.STATE_CONNECTED ||
 				health == BluetoothAdapter.STATE_CONNECTED);
+	}
+
+	private void notifyOrder(Notify notify) {
+		String platform = notify.getPlatform() + "";
+		GlobalCtx.app().getSoundManager().notifyNewOrder("", platform, "", 3);
 	}
 }
 

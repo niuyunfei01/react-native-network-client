@@ -78,6 +78,7 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
+import cn.cainiaoshicai.crm.orders.service.Utils;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
@@ -1335,6 +1336,47 @@ public class GlobalCtx extends Application {
 
         public boolean play_by_xunfei(String s) {
             return !check_disabled() && AudioUtils.getInstance().speakText(s);
+        }
+
+        public void notifyNewOrder(String text, String plat, String storeName, int notifyTimes) {
+            try {
+                //获取系统的Audio管理者
+                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                //最大音量
+                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+                //当前音量
+                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+                int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
+
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
+                for (int i = 0; i < notifyTimes; i++) {
+                    if (storeName != null && !storeName.isEmpty()) {
+                        GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
+                        Thread.sleep(1300);
+                    }
+                    if (plat.equals("6")) {
+                        GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
+                    } else if (plat.equals("4")) {
+                        GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
+                    } else if (plat.equals("3")) {
+                        GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
+                    } else if (plat.equals("1")) {
+                        GlobalCtx.app().getSoundManager().play_new_eb_order_sound();
+                    } else {
+                        GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
+                    }
+                    Thread.sleep(8000);
+                }
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
+            } catch (Exception e) {
+                AppLogger.e(e.getMessage());
+            }
         }
     }
 }
