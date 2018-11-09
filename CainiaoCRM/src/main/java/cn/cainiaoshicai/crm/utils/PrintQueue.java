@@ -75,6 +75,9 @@ public class PrintQueue {
             if (null == mQueue || mQueue.size() <= 0) {
                 return;
             }
+            if (!isConnect()) {
+                return;
+            }
             if (null == mAdapter) {
                 mAdapter = BluetoothAdapter.getDefaultAdapter();
             }
@@ -97,6 +100,11 @@ public class PrintQueue {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isConnect() {
+        BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+        return printer != null && printer.getSocket() != null && printer.isConnected();
     }
 
     /**

@@ -41,6 +41,7 @@ import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
 
 public class SettingsPrintActivity extends ListActivity {
 
@@ -131,6 +132,9 @@ public class SettingsPrintActivity extends ListActivity {
                         AppLogger.e("skip to print for printer is not connected!");
                     }
                     showTestDlg(SettingsPrintActivity.this, printer == null ? "打印机未连接？" : "点击测试", printer != null ? printer.getSocket() : null);
+                    if (printer != null) {
+                        PrintQueue.getQueue().print();
+                    }
                 }
             });
         }
