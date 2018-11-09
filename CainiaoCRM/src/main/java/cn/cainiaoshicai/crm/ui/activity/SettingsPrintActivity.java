@@ -27,6 +27,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xdandroid.hellodaemon.IntentWrapper;
+
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -174,6 +176,16 @@ public class SettingsPrintActivity extends ListActivity {
         registerReceiver(mBTReceiver, btIntentFilter);
 
         connectToLastOne();
+
+        final Switch toggleSetAppWhiteList = findViewById(R.id.toggleSetAppWhiteList);
+        toggleSetAppWhiteList.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    IntentWrapper.whiteListMatters(SettingsPrintActivity.this, "外送帮后台运行");
+                }
+            }
+        });
     }
 
     private void updateStoreFilterText(TextView list_store_filter_values, Set<Long> selectedStores) {

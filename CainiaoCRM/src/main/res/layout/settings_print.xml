@@ -56,6 +56,23 @@
         android:layout_marginEnd="10dp"
         android:layout_height="30dp" />
 
+    <TextView
+        android:id="@+id/label_add_app_to_white_list"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/toggleUsePreview"
+        android:layout_marginStart="10dp"
+        android:text="设置应用后台运行" />
+
+    <Switch
+        android:id="@+id/toggleSetAppWhiteList"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toggleUsePreview"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_add_app_to_white_list" />
+
     <RelativeLayout
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
