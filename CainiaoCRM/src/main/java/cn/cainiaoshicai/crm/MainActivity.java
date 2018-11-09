@@ -70,6 +70,7 @@ import cn.cainiaoshicai.crm.support.LocationHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.utils.BundleArgsConstants;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
@@ -287,7 +288,8 @@ public class MainActivity extends AbstractActionBarActivity {
         if (!autoPrintStores.isEmpty()) {
             final String printStatusTxt;
             String autoPrintNames = app.getStoreNames(autoPrintStores);
-            if (SettingsPrintActivity.isPrinterConnected()) {
+            BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+            if (printer != null && printer.getSocket() != null && printer.isConnected()) {
                 printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
                 bgColorResId = R.color.green;
             } else {

@@ -33,6 +33,7 @@ import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -362,8 +363,14 @@ public class NotificationReceiver extends BroadcastReceiver {
     }
 
     private void notifyOrder(Notify notify) {
-        String platform = notify.getPlatform() + "";
-        GlobalCtx.app().getSoundManager().notifyNewOrder("", platform, "", 3);
+        new MyAsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                String platform = notify.getPlatform() + "";
+                GlobalCtx.app().getSoundManager().notifyNewOrder("", platform, "", 3);
+                return null;
+            }
+        }.executeOnNormal();
     }
 }
 

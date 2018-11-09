@@ -28,6 +28,7 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
 
 /**
  * Created by liuzhr on 10/27/16.
@@ -42,21 +43,20 @@ public class OrderPrinter {
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
-        BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-        printer = resetDeviceStatus(printer);
-        if (printer == null || printer.getSocket() == null || !printer.isConnected()) {
-            AppLogger.e("skip to print for printer is not connected!");
-            return;
-        }
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
-                final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                if (order != null) {
-                    OrderPrinter._print(order, true, printedCallback);
-                } else {
-                    AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                PrintQueue.getQueue().tryConnect();
+                try {
+                    final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+                    final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                    if (order != null) {
+                        PrintQueue.getQueue().add(order);
+                    } else {
+                        AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                    }
+                } catch (Exception e) {
+                    Log.e("auto print order error", e);
                 }
                 return null;
             }
@@ -483,7 +483,7 @@ public class OrderPrinter {
         return enable;
     }
 
-    public static void logOrderPrint(Order order){
+    public static void logOrderPrint(Order order) {
         try {
             final String access_token = GlobalCtx.app().token();
             new OrderActionDao(access_token).logOrderPrinted(order.getId());

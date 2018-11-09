@@ -47,7 +47,6 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
-import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -268,8 +267,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
         BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-
-        ds = OrderPrinter.resetDeviceStatus(ds);
 
         if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
