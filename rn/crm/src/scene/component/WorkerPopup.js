@@ -1,0 +1,230 @@
+import React from 'react'
+import PropType from 'prop-types'
+import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Button, Checkbox, Icon, List, SearchBar, Toast} from "antd-mobile-rn";
+import {connect} from "react-redux";
+import FetchEx from "../../util/fetchEx";
+import AppConfig from "../../config";
+import * as tool from "../../common/tool";
+import pxToDp from "../../util/pxToDp";
+import {withNavigation} from "react-navigation";
+
+const ListItem = List.Item
+const CheckboxItem = Checkbox.CheckboxItem
+
+function mapStateToProps (state) {
+  const {global} = state;
+  return {global: global};
+}
+
+class WorkerPopup extends React.Component {
+  
+  static propTypes = {
+    visible: PropType.bool.isRequired,
+    animationType: PropType.oneOf(['slide', 'fade', 'none']),
+    multiple: PropType.bool,
+    onModalClose: PropType.func,
+    onClickWorker: PropType.func,
+    onCancel: PropType.func,
+    onComplete: PropType.func,
+    selectWorkerIds: PropType.array
+  }
+  
+  static defaultProps = {
+    visible: true,
+    animationType: 'slide',
+    multiple: true,
+    onModalClose: () => {
+      console.log('worker list popup is close')
+    },
+    selectWorkerIds: []
+  }
+  
+  constructor (props) {
+    super(props)
+    this.state = {
+      originWorkerList: [],
+      workerList: [],
+      selectWorkers: []
+    }
+  }
+  
+  componentDidMount () {
+    this.fetchWorkerList()
+    this.setSelectWorkers()
+  }
+  
+  fetchWorkerList () {
+    const self = this
+    Toast.loading('数据请求中', 0)
+    let {currVendorId} = tool.vendor(this.props.global);
+    const {accessToken} = this.props.global;
+    const url = `data_dictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        Toast.hide()
+        if (resp.ok) {
+          self.setState({originWorkerList: resp.obj, workerList: resp.obj})
+        }
+      })
+      .catch(e => {
+        Toast.hide()
+      })
+  }
+  
+  setSelectWorkers () {
+    let selectWorkers = []
+    for (let o of this.props.selectWorkerIds) {
+      selectWorkers.push({user_id: o})
+    }
+    this.setState({selectWorkers})
+  }
+  
+  onSelectWorker (item) {
+    let selectWorkers = this.state.selectWorkers
+    for (let i in selectWorkers) {
+      if (selectWorkers[i].user_id === item.user_id) {
+        selectWorkers.splice(i, 1)
+        this.setState({selectWorkers})
+        return
+      }
+    }
+    
+    selectWorkers.push(item)
+    this.setState({selectWorkers})
+  }
+  
+  onClickWorker (item) {
+    console.log(item)
+    this.props.onClickWorker && this.props.onClickWorker(item)
+  }
+  
+  onComplete () {
+    console.log(this.state.selectWorkers)
+    this.props.onComplete && this.props.onComplete(this.state.selectWorkers)
+  }
+  
+  onCancel () {
+    this.props.onCancel && this.props.onCancel()
+  }
+  
+  onSearch (value) {
+    const originWorkerList = this.state.originWorkerList
+    let workerList = originWorkerList.filter(this.createFilter(value))
+    this.setState({workerList})
+  }
+  
+  createFilter (value) {
+    return (worker) => {
+      return worker.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
+    }
+  }
+  
+  renderCheckboxItem = () => {
+    const self = this
+    const workerList = this.state.workerList
+    let elements = []
+    for (let item of workerList) {
+      elements.push(
+        <CheckboxItem
+          key={item.id}
+          onChange={() => self.onSelectWorker(item)}
+          defaultChecked={this.props.selectWorkerIds.includes(item.user_id)}
+        >
+          {item.name}
+        </CheckboxItem>
+      )
+    }
+    return elements
+  }
+  
+  renderListItem () {
+    const self = this
+    const workerList = this.state.workerList
+    let elements = []
+    for (let item of workerList) {
+      elements.push(
+        <ListItem key={item.id} onClick={() => self.onClickWorker(item)}>
+          {item.name}
+        </ListItem>
+      )
+    }
+    return elements
+  }
+  
+  renderHeaderCompleteBtn () {
+    return (
+      <TouchableOpacity onPress={() => this.onComplete()}>
+        <View style={[styles.headerBtnView]}>
+          <Text style={[styles.headerBtn]}>确定</Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+  
+  renderHeader () {
+    return (
+      <View style={[styles.header]}>
+        <TouchableOpacity onPress={() => this.onCancel()}>
+          <View style={[styles.headerBtnView]}>
+            <Text style={[styles.headerBtn]}>
+              取消
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle]}>员工列表</Text>
+        {this.props.multiple ? this.renderHeaderCompleteBtn() : <View style={[styles.headerBtnView]}/>}
+      </View>
+    )
+  }
+  
+  render () {
+    return (
+      <Modal visible={this.props.visible} onRequestClose={() => this.props.onModalClose()}>
+        <View style={[styles.workerPopup]}>
+          {this.renderHeader()}
+          <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
+          
+          <ScrollView>
+            <List>
+              {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
+            </List>
+          </ScrollView>
+        </View>
+      </Modal>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  workerPopup: {
+    flex: 1
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    height: pxToDp(80),
+    alignItems: 'center'
+  },
+  headerTitle: {
+    fontSize: pxToDp(36)
+  },
+  headerBtnView: {
+    width: pxToDp(80),
+    alignItems: 'center'
+  },
+  headerBtn: {
+    color: '#108ee9'
+  },
+  bottomBtnView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: pxToDp(100),
+    borderTopWidth: pxToDp(1),
+    borderStyle: 'solid'
+  }
+})
+
+export default withNavigation(connect(mapStateToProps)(WorkerPopup))
