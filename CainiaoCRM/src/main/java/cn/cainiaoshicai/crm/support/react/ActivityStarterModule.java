@@ -57,6 +57,7 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
+import cn.jpush.android.api.JPushInterface;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -95,6 +96,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
         Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
     }
 
     @ReactMethod

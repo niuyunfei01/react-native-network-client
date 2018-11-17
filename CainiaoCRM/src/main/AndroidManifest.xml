@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="354"
-    android:versionName="2.8.4">
+    android:versionCode="355"
+    android:versionName="2.8.5">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -30,16 +30,14 @@
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA"/>
-
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <!-- Optional for location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application
@@ -234,6 +232,32 @@
         <!-- Required SDK核心功能-->
         <receiver android:name="cn.jpush.android.service.AlarmReceiver" android:exported="false"/>
 
+        <!-- since 3.0.9 Required SDK 核心功能-->
+        <provider
+            tools:replace="android:exported"
+            android:name="cn.jpush.android.service.DataProvider"
+            android:authorities="cn.cainiaoshicai.crm.DataProvider"
+            android:exported="true"/>
+
+        <!-- since 1.8.0 option 可选项。用于同一设备中不同应用的 JPush 服务相互拉起的功能。 -->
+        <!-- 若不启用该功能可删除该组件，或把 enabled 设置成 false ；拉起服务被关闭，App 不会通过拉起服务拉起其他的 App，也不会被其他 App 拉起。 -->
+        <service
+            android:name="cn.jpush.android.service.DaemonService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.DaemonService" />
+                <category android:name="cn.cainiaoshicai.crm" />
+            </intent-filter>
+        </service>
+
+        <!-- since 3.1.0 Required SDK 核心功能-->
+        <provider
+            android:name="cn.jpush.android.service.DownloadProvider"
+            android:authorities="cn.cainiaoshicai.crm.DownloadProvider"
+            android:exported="true" />
+
+
         <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
             android:name=".othercomp.NotificationReceiver"
@@ -253,8 +277,9 @@
 
 
         <!-- Required  . Enable it you can userTalkStatus statistics data with channel -->
-        <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
-        <meta-data android:name="JPUSH_APPKEY" android:value="30073ab80a50534d39c84d3c" />
+        <meta-data android:name="JPUSH_CHANNEL" android:value="${JPUSH_CHANNEL}"/>
+        <meta-data android:name="JPUSH_APPKEY" android:value="${JPUSH_APPKEY}" />
+        <meta-data android:name="JPUSH_PKGNAME" android:value="${JPUSH_PKGNAME}" />
 
 
         <receiver android:name=".notify.service.RebootBroadcastReceiver">

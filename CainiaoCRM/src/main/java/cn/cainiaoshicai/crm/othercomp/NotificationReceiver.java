@@ -89,7 +89,9 @@ public class NotificationReceiver extends BroadcastReceiver {
                 if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
                     GlobalCtx.newOrderNotifies.add(notificationId);
                     if (GlobalCtx.app().acceptNotifyNew()) {
-                        notifyOrder(notify);
+                        if (!SettingUtility.isDisableNewOrderSoundNotify()) {
+                            notifyOrder(notify);
+                        }
                         OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
                     }
                 }

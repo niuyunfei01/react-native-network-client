@@ -40,6 +40,9 @@
 -keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
 -dontoptimize
 
+-dontoptimize
+-dontpreverify
+
 # 保持 native 方法不被混淆
 -keepclasseswithmembernames class * {
     native <methods>;
@@ -101,13 +104,13 @@
 }
 -dontwarn com.google.gson.**
 
--libraryjars libs/x86/libjpush210.so
--libraryjars libs/x86_64/libjpush210.so
--libraryjars libs/mips64/libjpush210.so
--libraryjars libs/mips/libjpush210.so
--libraryjars libs/armeabi-v7a/libjpush210.so
--libraryjars libs/armeabi/libjpush210.so
--libraryjars libs/arm64-v8a/libjpush210.so
+#-libraryjars libs/x86/libjpush210.so
+#-libraryjars libs/x86_64/libjpush210.so
+#-libraryjars libs/mips64/libjpush210.so
+#-libraryjars libs/mips/libjpush210.so
+#-libraryjars libs/armeabi-v7a/libjpush210.so
+#-libraryjars libs/armeabi/libjpush210.so
+#-libraryjars libs/arm64-v8a/libjpush210.so
 #-libraryjars libs/x86/libjpush215.so
 #-libraryjars libs/x86_64/libjpush215.so
 #-libraryjars libs/mips64/libjpush215.so
@@ -118,6 +121,10 @@
 
 -dontwarn cn.jpush.**
 -keep class cn.jpush.** { *; }
+-keep class * extends cn.jpush.android.helpers.JPushMessageReceiver { *; }
+
+-dontwarn cn.jiguang.**
+-keep class cn.jiguang.** { *; }
 
 # 泛型与反射
 -keepattributes Signature
@@ -290,3 +297,9 @@
 -dontwarn com.yalantis.ucrop**
 -keep class com.yalantis.ucrop** { *; }
 -keep interface com.yalantis.ucrop** { *; }
+
+
+#==================gson && protobuf==========================
+-dontwarn com.google.**
+-keep class com.google.gson.** {*;}
+-keep class com.google.protobuf.** {*;}

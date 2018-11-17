@@ -326,7 +326,7 @@ public class GlobalCtx extends Application {
             try {
                 String uid = ctx.getCurrentAccountId();
                 if (!TextUtils.isEmpty(uid)) {
-                    JPushInterface.setAliasAndTags(ctx, "uid_" + uid, null);
+                    JPushInterface.setAlias(ctx, (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
                 }
             } catch (Exception e) {
                 AppLogger.w("error to set jpush alias");
@@ -1191,7 +1191,6 @@ public class GlobalCtx extends Application {
                         return null;
                     }
                 }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
-                ;
                 return true;
             } else {
                 AppLogger.e("no sound");
