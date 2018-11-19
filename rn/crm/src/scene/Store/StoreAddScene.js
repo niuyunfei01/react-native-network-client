@@ -331,7 +331,6 @@ class StoreAddScene extends Component {
       onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName)
     });
     return false;
-    
   }
   
   componentDidMount () {
@@ -488,8 +487,8 @@ class StoreAddScene extends Component {
   onSetOwner (worker) {
     this.setState({
       workerPopupVisible: false,
-      owner_id: worker.user_id,
-      mobile: worker.user.mobilephone ? worker.user.mobilephone : ""
+      owner_id: worker.id,
+      mobile: worker.mobilephone ? worker.mobilephone : ""
     });
   }
   
@@ -1300,15 +1299,18 @@ class StoreAddScene extends Component {
         >
           {this.state.btn_type === "edit" ? "确认修改" : "创建门店"}
         </Button>
-        
+
         {/*员工列表*/}
         <WorkerPopup
           multiple={this.state.workerPopupMulti}
           visible={this.state.workerPopupVisible}
           selectWorkerIds={!!vice_mgr ? vice_mgr.split(",") : []}
-          onClickWorker={(worker) => this.onSetOwner(worker)}
+          onClickWorker={(worker) => {
+            _this.onSetOwner(worker);
+            _this.setState({workerPopupVisible: false});
+          }}
           onComplete={(workers) => {
-            let vice_mgr = _.map(workers, 'user_id').join(",");
+            let vice_mgr = _.map(workers, 'id').join(",");
             _this.setState({vice_mgr, workerPopupVisible: false});
           }}
           onCancel={() => this.setState({workerPopupVisible: false})}
@@ -1552,9 +1554,4 @@ const
   });
 
 //make this component available to the app
-export default connect(mapStateToProps, mapDispatchToProps)
-
-(
-  StoreAddScene
-)
-;
+export default connect(mapStateToProps, mapDispatchToProps)(StoreAddScene);

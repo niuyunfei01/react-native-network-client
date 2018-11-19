@@ -1,10 +1,8 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Button, Checkbox, Icon, List, SearchBar, Toast} from "antd-mobile-rn";
+import {Checkbox, List, SearchBar, Toast} from "antd-mobile-rn";
 import {connect} from "react-redux";
-import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
 import {withNavigation} from "react-navigation";
@@ -12,13 +10,13 @@ import {withNavigation} from "react-navigation";
 const ListItem = List.Item
 const CheckboxItem = Checkbox.CheckboxItem
 
-function mapStateToProps (state) {
-  const {global} = state;
-  return {global: global};
+function mapStateToProps(state) {
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 class WorkerPopup extends React.Component {
-  
+
   static propTypes = {
     visible: PropType.bool.isRequired,
     animationType: PropType.oneOf(['slide', 'fade', 'none']),
@@ -29,7 +27,7 @@ class WorkerPopup extends React.Component {
     onComplete: PropType.func,
     selectWorkerIds: PropType.array
   }
-  
+
   static defaultProps = {
     visible: true,
     animationType: 'slide',
@@ -39,88 +37,87 @@ class WorkerPopup extends React.Component {
     },
     selectWorkerIds: []
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       originWorkerList: [],
       workerList: [],
-      selectWorkers: []
+      selectWorkers: [],
+      initSelectedWorkers: []
     }
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
     this.fetchWorkerList()
     this.setSelectWorkers()
   }
-  
-  fetchWorkerList () {
+
+  fetchWorkerList() {
     const self = this
-    Toast.loading('数据请求中', 0)
     let {currVendorId} = tool.vendor(this.props.global);
-    const {accessToken} = this.props.global;
-    const url = `data_dictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        Toast.hide()
-        if (resp.ok) {
-          self.setState({originWorkerList: resp.obj, workerList: resp.obj})
-        }
-      })
-      .catch(e => {
-        Toast.hide()
-      })
+    const {mine} = this.props;
+    let worker_list = [];
+    worker_list.push({name: '不任命任何人', id: '0'});
+    for (let user_info of mine.normal[currVendorId]) {
+      let item = {
+        name: user_info.name || user_info.nickname,
+        id: user_info.id,
+        mobilephone: user_info.mobilephone
+      };
+      worker_list.push(item);
+    }
+    self.setState({originWorkerList: worker_list, workerList: worker_list})
   }
-  
-  setSelectWorkers () {
+
+  setSelectWorkers() {
     let selectWorkers = []
     for (let o of this.props.selectWorkerIds) {
-      selectWorkers.push({user_id: o})
+      selectWorkers.push({id: o})
     }
     this.setState({selectWorkers})
   }
-  
-  onSelectWorker (item) {
+
+  onSelectWorker(item) {
     let selectWorkers = this.state.selectWorkers
     for (let i in selectWorkers) {
-      if (selectWorkers[i].user_id === item.user_id) {
+      if (selectWorkers[i].id === item.id) {
         selectWorkers.splice(i, 1)
         this.setState({selectWorkers})
         return
       }
     }
-    
+
     selectWorkers.push(item)
     this.setState({selectWorkers})
   }
-  
-  onClickWorker (item) {
+
+  onClickWorker(item) {
     console.log(item)
     this.props.onClickWorker && this.props.onClickWorker(item)
   }
-  
-  onComplete () {
+
+  onComplete() {
     console.log(this.state.selectWorkers)
     this.props.onComplete && this.props.onComplete(this.state.selectWorkers)
   }
-  
-  onCancel () {
+
+  onCancel() {
     this.props.onCancel && this.props.onCancel()
   }
-  
-  onSearch (value) {
+
+  onSearch(value) {
     const originWorkerList = this.state.originWorkerList
     let workerList = originWorkerList.filter(this.createFilter(value))
     this.setState({workerList})
   }
-  
-  createFilter (value) {
+
+  createFilter(value) {
     return (worker) => {
       return worker.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
     }
   }
-  
+
   renderCheckboxItem = () => {
     const self = this
     const workerList = this.state.workerList
@@ -130,7 +127,7 @@ class WorkerPopup extends React.Component {
         <CheckboxItem
           key={item.id}
           onChange={() => self.onSelectWorker(item)}
-          defaultChecked={this.props.selectWorkerIds.includes(item.user_id)}
+          defaultChecked={this.props.selectWorkerIds.includes(item.id)}
         >
           {item.name}
         </CheckboxItem>
@@ -138,8 +135,8 @@ class WorkerPopup extends React.Component {
     }
     return elements
   }
-  
-  renderListItem () {
+
+  renderListItem() {
     const self = this
     const workerList = this.state.workerList
     let elements = []
@@ -152,8 +149,8 @@ class WorkerPopup extends React.Component {
     }
     return elements
   }
-  
-  renderHeaderCompleteBtn () {
+
+  renderHeaderCompleteBtn() {
     return (
       <TouchableOpacity onPress={() => this.onComplete()}>
         <View style={[styles.headerBtnView]}>
@@ -162,8 +159,8 @@ class WorkerPopup extends React.Component {
       </TouchableOpacity>
     )
   }
-  
-  renderHeader () {
+
+  renderHeader() {
     return (
       <View style={[styles.header]}>
         <TouchableOpacity onPress={() => this.onCancel()}>
@@ -178,14 +175,14 @@ class WorkerPopup extends React.Component {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
-      <Modal visible={this.props.visible} onRequestClose={() => this.props.onModalClose()}>
+      <Modal transparent={true} presentationStyle={'fullScreen'} hardwareAccelerated={true} visible={this.props.visible} onRequestClose={() => this.props.onModalClose()}>
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
-          
+
           <ScrollView>
             <List>
               {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}

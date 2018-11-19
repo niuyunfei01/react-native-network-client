@@ -88,6 +88,7 @@ const C = {
   ROUTE_WORKER: 'Worker',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
+  ROUTE_USER_CHOOSE: 'UserChoose',
   ROUTE_Mine: 'Mine',
   ROUTE_SETTING: 'Setting',
   ROUTE_CLOUD_PRINTER: 'CloudPrinter',
