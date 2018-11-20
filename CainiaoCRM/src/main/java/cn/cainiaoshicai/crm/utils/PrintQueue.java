@@ -3,13 +3,27 @@ package cn.cainiaoshicai.crm.utils;
 
 import android.bluetooth.BluetoothAdapter;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.MapMaker;
+
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 
 import static cn.cainiaoshicai.crm.support.print.OrderPrinter.resetDeviceStatus;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 public class PrintQueue {
 
@@ -26,6 +40,16 @@ public class PrintQueue {
      * bluetooth adapter
      */
     private BluetoothAdapter mAdapter;
+
+
+    LoadingCache<Integer, Boolean> graphs = CacheBuilder.newBuilder()
+            .maximumSize(10000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build(new CacheLoader<Integer, Boolean>() {
+                public Boolean load(Integer key) {
+                    return false;
+                }
+            });
 
 
     private PrintQueue() {
@@ -64,7 +88,24 @@ public class PrintQueue {
         if (null != orderList) {
             mQueue.addAll(orderList);
         }
+        mQueue = removeDuplicates(mQueue);
         print();
+    }
+
+    static ArrayList<Order> removeDuplicates(ArrayList<Order> list) {
+        // Store unique items in result.
+        ArrayList<Order> result = new ArrayList<>();
+        // Record encountered Strings in HashSet.
+        HashSet<Integer> set = new HashSet<>();
+        // Loop over argument list.
+        for (Order item : list) {
+            // If String is not in set, add it to the list and the set.
+            if (!set.contains(item)) {
+                result.add(item);
+                set.add(item.getId());
+            }
+        }
+        return result;
     }
 
     /**
@@ -83,7 +124,11 @@ public class PrintQueue {
             }
             while (mQueue.size() > 0) {
                 Order order = mQueue.remove(0);
+                if (graphs.get(order.getId())) {
+                    continue;
+                }
                 OrderPrinter.print(order);
+                graphs.put(order.getId(), true);
             }
         } catch (Exception e) {
             e.printStackTrace();
