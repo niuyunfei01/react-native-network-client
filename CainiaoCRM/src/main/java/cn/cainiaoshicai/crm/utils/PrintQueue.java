@@ -44,7 +44,7 @@ public class PrintQueue {
 
     LoadingCache<Integer, Boolean> graphs = CacheBuilder.newBuilder()
             .maximumSize(10000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
             .build(new CacheLoader<Integer, Boolean>() {
                 public Boolean load(Integer key) {
                     return false;
