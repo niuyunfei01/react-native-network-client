@@ -1426,16 +1426,16 @@ class OrderScene extends Component {
           )}
         </View>
       );
-      
     }
     let zs_ship_view = null;
     if ((zs_way === Cts.SHIP_ZS_JD ||
-      zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
-      zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
-      auto_ship_type === Cts.SHIP_ZS_JD ||
-      auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
-      auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD
-    )) {//专送配送
+        zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
+        zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
+        auto_ship_type === Cts.SHIP_ZS_JD ||
+        auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
+        auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD ||
+        auto_ship_type == Cts.SHIP_KS_ELE
+      )) {//专送配送
       let zs_ship = tool.autoPlat(zs_way, zs_status);
       let zs_ship_status = tool.zs_status(zs_status);
       let zs_name = tool.ship_name(zs_way);
