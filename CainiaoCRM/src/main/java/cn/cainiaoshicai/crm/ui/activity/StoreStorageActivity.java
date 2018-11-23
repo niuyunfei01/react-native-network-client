@@ -29,7 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -87,6 +89,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     public static final String SORT_BY_SOLD = "sold";
     public static final String SORT_BY_DEF = "defined";
+    public static final String SORT_BY_UPDATE = "update";
 
     private int total_in_req;
     private StoreStatusStat stats;
@@ -392,20 +395,48 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }, 50);
         }
 
-        final TextView sortBy = findViewById(R.id.title_total_last_stat);
-        sortBy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String _sort = StoreStorageActivity.this.sortBy;
-                if (SORT_BY_DEF.equals(_sort)) {
-                    StoreStorageActivity.this.sortBy = SORT_BY_SOLD;
-                    sortBy.setText("排序：销量");
-                } else {
-                    StoreStorageActivity.this.sortBy = SORT_BY_DEF;
-                    sortBy.setText("排序：默认");
-                }
+//        final TextView sortBy = findViewById(R.id.title_total_last_stat);
+//        sortBy.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String _sort = StoreStorageActivity.this.sortBy;
+//                if (SORT_BY_DEF.equals(_sort)) {
+//                    StoreStorageActivity.this.sortBy = SORT_BY_SOLD;
+//                    sortBy.setText("排序：销量");
+//                } else if (SORT_BY_UPDATE.equals(_sort)) {
+//                    StoreStorageActivity.this.sortBy = SORT_BY_UPDATE;
+//                    sortBy.setText("排序: 更新");
+//                } else {
+//                    StoreStorageActivity.this.sortBy = SORT_BY_DEF;
+//                    sortBy.setText("排序：默认");
+//                }
+//                refreshData();
+//            }
+//        });
 
+        final Spinner sortBy = findViewById(R.id.prods_sort_spinner);
+
+        final List<String> sortList = new ArrayList<>(Arrays.asList("排序：默认", "排序：销量", "排序：更新"));
+        final ArrayAdapter<String> sortArrayAdapter = new ArrayAdapter<String>(
+                this, R.layout.spinner_item_small, sortList);
+        sortBy.setAdapter(sortArrayAdapter);
+
+        sortBy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                switch (i) {
+                    case 0:
+                        StoreStorageActivity.this.sortBy = SORT_BY_DEF;
+                    case 1:
+                        StoreStorageActivity.this.sortBy = SORT_BY_SOLD;
+                    case 2:
+                        StoreStorageActivity.this.sortBy = SORT_BY_UPDATE;
+                }
                 refreshData();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
 

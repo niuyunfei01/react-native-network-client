@@ -182,12 +182,11 @@ class WorkerPopup extends React.Component {
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
-
-          <ScrollView>
+          {this.state.workerList.length > 0 ? <ScrollView>
             <List>
               {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
             </List>
-          </ScrollView>
+          </ScrollView> : <View style={{alignItems:'center',justifyContent:'center', flex: 1}}><Text>无数据！</Text></View>}
         </View>
       </Modal>
     )
@@ -196,7 +195,8 @@ class WorkerPopup extends React.Component {
 
 const styles = StyleSheet.create({
   workerPopup: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
