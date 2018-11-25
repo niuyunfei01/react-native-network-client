@@ -323,7 +323,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             });
           }
         },
-        "ProductApply"
+        "ProductApply", 1
       )
     );
   }

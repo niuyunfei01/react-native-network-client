@@ -23,7 +23,7 @@
 
         <AutoCompleteTextView
             android:id="@+id/title_product_name"
-            android:layout_width="160dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:hint="@string/search_product_hint"

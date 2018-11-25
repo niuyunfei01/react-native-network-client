@@ -58,8 +58,6 @@ dependencies {
     implementation project(':react-native-i18n')
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-sound')
-    implementation project(':react-native-ble-manager')
-
 
     releaseImplementation 'ch.acra:acra:4.9.2'
 

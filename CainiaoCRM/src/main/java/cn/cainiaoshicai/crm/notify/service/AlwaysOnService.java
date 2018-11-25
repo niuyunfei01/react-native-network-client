@@ -119,6 +119,9 @@ public class AlwaysOnService extends BaseService {
         }
 
         private void play(String text, String plat, String storeName, int notifyTimes) {
+            if (SettingUtility.isDisableNewOrderSoundNotify()) {
+                return;
+            }
             GlobalCtx.app().getSoundManager().notifyNewOrder(text, plat, storeName, notifyTimes);
         }
     }

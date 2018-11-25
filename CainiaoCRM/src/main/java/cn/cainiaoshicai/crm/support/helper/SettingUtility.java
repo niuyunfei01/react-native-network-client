@@ -495,11 +495,11 @@ public class SettingUtility {
     }
 
     public static boolean isDisableSoundNotify() {
-        return SettingHelper.getSharedPreferences(getContext(), "disable_sound_notify", false);
+        return SettingHelper.getSharedPreferences(getContext(), "disable_sound_notify", true);
     }
 
-    public static boolean isDisableNewOrderSoundNotify(){
-        return SettingHelper.getSharedPreferences(getContext(), "disable_new_order_sound_notify", false);
+    public static boolean isDisableNewOrderSoundNotify() {
+        return SettingHelper.getSharedPreferences(getContext(), "disable_new_order_sound_notify", true);
     }
 
     public static void setDisableSoundNotify(boolean isChecked) {

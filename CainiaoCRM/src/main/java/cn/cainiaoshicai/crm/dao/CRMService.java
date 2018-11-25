@@ -88,6 +88,9 @@ public interface CRMService {
     @POST("/api/log_push_status")
     Call<ResultBean<String>> logPushStatus(@Body Map<String, Object> status);
 
+    @GET("/api/query_store_prod_quota/{storeId}")
+    Call<ResultBean<Map<String, String>>> getStoreQuota(@Path("storeId") long storeId);
+
 
 
     class UploadRes {

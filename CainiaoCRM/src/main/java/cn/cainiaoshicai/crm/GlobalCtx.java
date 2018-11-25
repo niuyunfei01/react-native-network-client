@@ -99,7 +99,6 @@ import cn.cainiaoshicai.crm.utils.PrinterCallback;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
-import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -280,9 +279,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new RNSoundPackage())
-                .addPackage(new BleManagerPackage())
                 .addPackage(new PickerPackage())
-
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

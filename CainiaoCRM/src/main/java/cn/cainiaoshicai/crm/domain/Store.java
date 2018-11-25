@@ -28,6 +28,7 @@ public class Store {
     private int ship_way;
     private int fn_price_controlled;
     private int fn_profit_controlled;
+    private int fn_show_quota = 0;
     private String alias;
     private String city;
     private String cityCode;
@@ -270,7 +271,13 @@ public class Store {
         return vendorName + this.getName();
     }
 
+    public int getFn_show_quota() {
+        return fn_show_quota;
+    }
 
+    public void setFn_show_quota(int fn_show_quota) {
+        this.fn_show_quota = fn_show_quota;
+    }
 
     public Bundle toBundle() {
         Bundle b = new Bundle();
@@ -295,6 +302,7 @@ public class Store {
         b.putString("city", city);
         b.putString("city_code", city_code);
         b.putString("district", district);
+        b.putInt("fn_show_quota", fn_show_quota);
         return b;
     }
 }
