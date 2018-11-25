@@ -134,9 +134,6 @@ public class SettingsPrintActivity extends ListActivity {
                         AppLogger.e("skip to print for printer is not connected!");
                     }
                     showTestDlg(SettingsPrintActivity.this, printer == null ? "打印机未连接？" : "点击测试", printer != null ? printer.getSocket() : null);
-                    if (printer != null) {
-                        PrintQueue.getQueue().print();
-                    }
                 }
             });
         }
@@ -348,20 +345,16 @@ public class SettingsPrintActivity extends ListActivity {
         if (btAdapter == null) {
             return;
         }
-
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
         }
-
         String connecting = String.format("正在连接打印机 %s,%s", item.getName(), item.getAddr());
         Toast.makeText(getApplicationContext(),
                 connecting,
                 Toast.LENGTH_SHORT).show();
-
         if (!isConnecting.compareAndSet(false, true)) {
             return;
         }
-
         Thread connectThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -431,7 +424,6 @@ public class SettingsPrintActivity extends ListActivity {
     }
 
     private Runnable socketErrorRunnable = new Runnable() {
-
         @Override
         public void run() {
             Toast.makeText(getApplicationContext(),
@@ -444,22 +436,18 @@ public class SettingsPrintActivity extends ListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-
         menu.add(0, Menu.FIRST, Menu.NONE, "查找附近打印机");
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-
         switch (item.getItemId()) {
             case Menu.FIRST:
                 initDevicesList();
                 break;
         }
-
         return true;
     }
 }
