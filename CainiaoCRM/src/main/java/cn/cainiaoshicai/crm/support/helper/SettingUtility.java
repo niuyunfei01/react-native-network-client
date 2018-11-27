@@ -495,7 +495,7 @@ public class SettingUtility {
     }
 
     public static boolean isDisableSoundNotify() {
-        return SettingHelper.getSharedPreferences(getContext(), "disable_sound_notify", true);
+        return SettingHelper.getSharedPreferences(getContext(), "disable_sound_notify", false);
     }
 
     public static boolean isDisableNewOrderSoundNotify() {

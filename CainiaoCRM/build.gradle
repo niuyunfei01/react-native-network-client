@@ -57,7 +57,6 @@ dependencies {
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-i18n')
     implementation project(':react-native-splash-screen')
-    implementation project(':react-native-sound')
 
     releaseImplementation 'ch.acra:acra:4.9.2'
 
@@ -65,6 +64,7 @@ dependencies {
     implementation 'cn.jiguang.sdk:jcore:1.2.5'  // 此处以JCore 1.2.5 版本为例。
 
     implementation 'com.clj.fastble:FastBleLib:2.3.2'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 
 }
 

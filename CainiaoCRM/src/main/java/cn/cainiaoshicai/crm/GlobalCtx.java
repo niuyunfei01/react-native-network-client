@@ -26,6 +26,7 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
@@ -40,7 +41,6 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
-import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -78,7 +78,6 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
-import cn.cainiaoshicai.crm.orders.service.Utils;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
@@ -95,7 +94,6 @@ import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.cainiaoshicai.crm.utils.PrinterCallback;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -278,7 +276,6 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
-                .addPackage(new RNSoundPackage())
                 .addPackage(new PickerPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
@@ -289,6 +286,13 @@ public class GlobalCtx extends Application {
         AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
+
+        //初始化蓝牙管理
+        BleManager.getInstance().init(this);
+        BleManager.getInstance()
+                .enableLog(true)
+                .setReConnectCount(1, 5000)
+                .setOperateTimeout(5000);
 
         //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
         DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
@@ -305,7 +309,6 @@ public class GlobalCtx extends Application {
             }
         }, fiveMin);
     }
-
 
     public void updateCfgInterval() {
         if (!TextUtils.isEmpty(this.token())) {
@@ -335,7 +338,7 @@ public class GlobalCtx extends Application {
 
             ss.put("printer", SettingUtility.getLastConnectedPrinterAddress());
             ss.put("printer_auto_store", storeId);
-            ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
+            //ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
             Config cfg = ctx.serverCfg.get(storeId);
             final String lastHash = cfg == null ? "" : cfg.getLastHash();
             ss.put("last_hash", lastHash);
@@ -409,19 +412,6 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-//        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_holo_light;
-
-        //.abc_ic_ab_back_mtrl_am_alpha;
-
-//        MQConfig.ui.titleBackgroundResId = R.color.test_red;
-//        MQConfig.ui.titleTextColorResId = R.color.test_blue;
-//        MQConfig.ui.leftChatBubbleColorResId = R.color.test_green;
-//        MQConfig.ui.leftChatTextColorResId = R.color.test_red;
-//        MQConfig.ui.rightChatBubbleColorResId = R.color.test_red;
-//        MQConfig.ui.rightChatTextColorResId = R.color.test_green;
-//        MQConfig.ui.robotEvaluateTextColorResId = R.color.test_red;
-//        MQConfig.ui.robotMenuItemTextColorResId = R.color.test_blue;
-//        MQConfig.ui.robotMenAuTipTextColorResId = R.color.test_blue;
     }
 
     public ReactInstanceManager getmReactInstanceManager() {
@@ -1058,7 +1048,6 @@ public class GlobalCtx extends Application {
     public static boolean smPrintIsEnable() {
         return AidlUtil.getInstance().isConnect();
     }
-
 
     public class SoundManager {
         private static final int STORE_SOUND_LEN = 1700;
