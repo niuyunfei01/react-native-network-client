@@ -26,7 +26,6 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.clj.fastble.BleManager;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
@@ -288,11 +287,7 @@ public class GlobalCtx extends Application {
         this.soundManager.load(this);
 
         //初始化蓝牙管理
-        BleManager.getInstance().init(this);
-        BleManager.getInstance()
-                .enableLog(true)
-                .setReConnectCount(3, 5000)
-                .setOperateTimeout(30000);
+        AppInfo.init(this);
 
         //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
         DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);

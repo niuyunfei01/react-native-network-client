@@ -3,12 +3,7 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,27 +16,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleGattCallback;
-import com.clj.fastble.callback.BleMtuChangedCallback;
-import com.clj.fastble.callback.BleRssiCallback;
-import com.clj.fastble.callback.BleScanCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
-import com.clj.fastble.scan.BleScanRuleConfig;
 import com.xdandroid.hellodaemon.IntentWrapper;
 
 import java.io.IOException;
@@ -49,15 +31,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.ble.adapter.DeviceAdapter;
-import cn.cainiaoshicai.crm.ble.comm.ObserverManager;
-import cn.cainiaoshicai.crm.ble.operation.OperationActivity;
-import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
@@ -71,18 +48,14 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 public class SettingsPrintActivity extends Activity implements View.OnClickListener {
 
     static public final int REQUEST_CONNECT_BT = 0x2300;
-    static private final int REQUEST_ENABLE_BT = 0x1000;
     private static final String TAG = SettingsPrintActivity.class.getSimpleName();
 
     private static final int REQUEST_CODE_OPEN_GPS = 1;
     private static final int REQUEST_CODE_PERMISSION_LOCATION = 2;
 
     private Button btn_scan;
-    private ImageView img_loading;
 
-    private Animation operatingAnim;
-    private DeviceAdapter mDeviceAdapter;
-    private ProgressDialog progressDialog;
+    int PERMISSION_REQUEST_COARSE_LOCATION = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,47 +63,11 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
         this.setContentView(R.layout.settings_print);
         setTitle(R.string.title_setting);
         initView();
-        initBleView();
-    }
 
-    private void initBleView() {
-        btn_scan = findViewById(R.id.btn_scan);
-        btn_scan.setText(getString(R.string.start_scan));
-        btn_scan.setOnClickListener(this);
-
-        img_loading = findViewById(R.id.img_loading);
-        operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        operatingAnim.setInterpolator(new LinearInterpolator());
-        progressDialog = new ProgressDialog(this);
-
-        mDeviceAdapter = new DeviceAdapter(this);
-        mDeviceAdapter.setOnDeviceClickListener(new DeviceAdapter.OnDeviceClickListener() {
-            @Override
-            public void onConnect(BleDevice bleDevice) {
-                if (!BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().cancelScan();
-                    connect(bleDevice);
-                }
-            }
-
-            @Override
-            public void onDisConnect(final BleDevice bleDevice) {
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().disconnect(bleDevice);
-                }
-            }
-
-            @Override
-            public void onDetail(BleDevice bleDevice) {
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    Intent intent = new Intent(SettingsPrintActivity.this, OperationActivity.class);
-                    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
-                    startActivity(intent);
-                }
-            }
-        });
-        ListView listView_device = (ListView) findViewById(R.id.list_device);
-        listView_device.setAdapter(mDeviceAdapter);
+        //6.0以上的手机要地理位置权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+        }
     }
 
     private void initView() {
@@ -236,6 +173,10 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
                 }
             }
         });
+
+        btn_scan = findViewById(R.id.btn_scan);
+
+        btn_scan.setOnClickListener(this);
     }
 
     private void updateStoreFilterText(TextView list_store_filter_values, Set<Long> selectedStores) {
@@ -278,83 +219,12 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
             case R.id.btn_scan:
                 if (btn_scan.getText().equals(getString(R.string.start_scan))) {
                     checkPermissions();
-                } else if (btn_scan.getText().equals(getString(R.string.stop_scan))) {
-                    BleManager.getInstance().cancelScan();
+                    startActivity(new Intent(SettingsPrintActivity.this, SearchBluetoothActivity.class));
                 }
                 break;
         }
     }
 
-
-    private void connect(final BleDevice bleDevice) {
-        BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
-            @Override
-            public void onStartConnect() {
-                progressDialog.show();
-            }
-
-            @Override
-            public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                img_loading.clearAnimation();
-                img_loading.setVisibility(View.INVISIBLE);
-                btn_scan.setText(getString(R.string.start_scan));
-                progressDialog.dismiss();
-                Toast.makeText(SettingsPrintActivity.this, getString(R.string.connect_fail), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                progressDialog.dismiss();
-                mDeviceAdapter.addDevice(bleDevice);
-                mDeviceAdapter.notifyDataSetChanged();
-                SettingUtility.setLastConnectedPrinterAddress(bleDevice.getMac());
-            }
-
-            @Override
-            public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                progressDialog.dismiss();
-
-                mDeviceAdapter.removeDevice(bleDevice);
-                mDeviceAdapter.notifyDataSetChanged();
-
-                if (isActiveDisConnected) {
-                    Toast.makeText(SettingsPrintActivity.this, getString(R.string.active_disconnected), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(SettingsPrintActivity.this, getString(R.string.disconnected), Toast.LENGTH_LONG).show();
-                    ObserverManager.getInstance().notifyObserver(bleDevice);
-                }
-
-            }
-        });
-    }
-
-    private void readRssi(BleDevice bleDevice) {
-        BleManager.getInstance().readRssi(bleDevice, new BleRssiCallback() {
-            @Override
-            public void onRssiFailure(BleException exception) {
-                Log.i(TAG, "onRssiFailure" + exception.toString());
-            }
-
-            @Override
-            public void onRssiSuccess(int rssi) {
-                Log.i(TAG, "onRssiSuccess: " + rssi);
-            }
-        });
-    }
-
-    private void setMtu(BleDevice bleDevice, int mtu) {
-        BleManager.getInstance().setMtu(bleDevice, mtu, new BleMtuChangedCallback() {
-            @Override
-            public void onSetMTUFailure(BleException exception) {
-                Log.i(TAG, "onsetMTUFailure" + exception.toString());
-            }
-
-            @Override
-            public void onMtuChanged(int mtu) {
-                Log.i(TAG, "onMtuChanged: " + mtu);
-            }
-        });
-    }
 
     @Override
     public final void onRequestPermissionsResult(int requestCode,
@@ -422,9 +292,6 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
 
                             .setCancelable(false)
                             .show();
-                } else {
-                    setScanRule();
-                    startScan();
                 }
                 break;
         }
@@ -441,86 +308,7 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_OPEN_GPS) {
-            if (checkGPSIsOpen()) {
-                setScanRule();
-                startScan();
-            }
         }
-    }
-
-    private void setScanRule() {
-        String[] uuids;
-        String str_uuid = "";
-        if (TextUtils.isEmpty(str_uuid)) {
-            uuids = null;
-        } else {
-            uuids = str_uuid.split(",");
-        }
-        UUID[] serviceUuids = null;
-        if (uuids != null && uuids.length > 0) {
-            serviceUuids = new UUID[uuids.length];
-            for (int i = 0; i < uuids.length; i++) {
-                String name = uuids[i];
-                String[] components = name.split("-");
-                if (components.length != 5) {
-                    serviceUuids[i] = null;
-                } else {
-                    serviceUuids[i] = UUID.fromString(uuids[i]);
-                }
-            }
-        }
-
-        String[] names;
-        String str_name = "";
-        if (TextUtils.isEmpty(str_name)) {
-            names = null;
-        } else {
-            names = str_name.split(",");
-        }
-
-        String mac = "";
-
-        boolean isAutoConnect = false;
-
-        BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
-                .setServiceUuids(serviceUuids)      // 只扫描指定的服务的设备，可选
-                .setDeviceName(true, names)   // 只扫描指定广播名的设备，可选
-                .setDeviceMac(mac)                  // 只扫描指定mac的设备，可选
-                .setAutoConnect(isAutoConnect)      // 连接时的autoConnect参数，可选，默认false
-                .setScanTimeOut(10000)              // 扫描超时时间，可选，默认10秒
-                .build();
-        BleManager.getInstance().initScanRule(scanRuleConfig);
-    }
-
-    private void startScan() {
-        BleManager.getInstance().scan(new BleScanCallback() {
-            @Override
-            public void onScanStarted(boolean success) {
-                mDeviceAdapter.clearScanDevice();
-                mDeviceAdapter.notifyDataSetChanged();
-                img_loading.startAnimation(operatingAnim);
-                img_loading.setVisibility(View.VISIBLE);
-                btn_scan.setText(getString(R.string.stop_scan));
-            }
-
-            @Override
-            public void onLeScan(BleDevice bleDevice) {
-                super.onLeScan(bleDevice);
-            }
-
-            @Override
-            public void onScanning(BleDevice bleDevice) {
-                mDeviceAdapter.addDevice(bleDevice);
-                mDeviceAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onScanFinished(List<BleDevice> scanResultList) {
-                img_loading.clearAnimation();
-                img_loading.setVisibility(View.INVISIBLE);
-                btn_scan.setText(getString(R.string.start_scan));
-            }
-        });
     }
 
 }

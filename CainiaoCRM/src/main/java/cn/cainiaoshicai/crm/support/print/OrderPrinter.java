@@ -1,26 +1,14 @@
 package cn.cainiaoshicai.crm.support.print;
 
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.text.TextUtils;
-
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleMtuChangedCallback;
-import com.clj.fastble.callback.BleWriteCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
-import com.facebook.react.ReactActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
@@ -363,18 +351,13 @@ public class OrderPrinter {
     }
 
     public static void printOrderBle(Order order) throws UnsupportedEncodingException {
-        List<BleDevice> bleDeviceList = BleManager.getInstance().getAllConnectedDevice();
-        if (bleDeviceList.isEmpty()) {
-            AudioUtils.getInstance().speakText("订单打印失败，请重新连接打印机，然后手动打印！");
-            return;
-        }
         BasePrinter basePrinter = new BasePrinter();
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
         byte[] write = new byte[]{0x1B, 0x21, 0};
         write = basePrinter.concatenate(write, GPrinterCommand.left);
-        write = basePrinter.concatenate(write,basePrinter.newLineBytes());
-        write = basePrinter.concatenate(write,basePrinter.highBigTextBytes(" " + order.getFullStoreName()));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes(" " + order.getFullStoreName()));
         write = basePrinter.concatenate(write, basePrinter.newLineBytes());
         write = basePrinter.concatenate(write, basePrinter.newLineBytes());
         write = basePrinter.concatenate(write, basePrinter.highBigTextBytes("  #" + order.getDayId()));
@@ -470,37 +453,8 @@ public class OrderPrinter {
         }
 
         write = basePrinter.concatenate(write, new byte[]{0x0D, 0x0D, 0x0D});
-        write = basePrinter.concatenate(write, GPrinterCommand.walkPaper((byte)4));
+        write = basePrinter.concatenate(write, GPrinterCommand.walkPaper((byte) 4));
 
-        for (BleDevice device : bleDeviceList) {
-            if (device.getMac().equals(SettingUtility.getLastConnectedPrinterAddress())) {
-                BluetoothGatt bluetoothGatt = BleManager.getInstance().getBluetoothGatt(device);
-                List<BluetoothGattService> serviceList = bluetoothGatt.getServices();
-                for (BluetoothGattService service : serviceList) {
-                    UUID uuid_service = service.getUuid();
-                    List<BluetoothGattCharacteristic> characteristicList = service.getCharacteristics();
-                    for (BluetoothGattCharacteristic characteristic : characteristicList) {
-                        UUID uuid_chara = characteristic.getUuid();
-                        int charaProp = characteristic.getProperties();
-                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0) {
-                            BleManager.getInstance().write(device, uuid_service.toString(), uuid_chara.toString(), write, true, new BleWriteCallback() {
-                                @Override
-                                public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                    // 发送数据到设备成功
-                                    System.out.println("current : " + current + " total : " + total + " charaProp : " + charaProp);
-                                }
-
-                                @Override
-                                public void onWriteFailure(BleException exception) {
-                                    // 发送数据到设备失败
-                                    AppLogger.e(exception.getDescription());
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
@@ -670,7 +624,7 @@ public class OrderPrinter {
                         Throwable ex = null;
                         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
-                        if (BleManager.getInstance().isConnected(SettingUtility.getLastConnectedPrinterAddress())) {
+                        if (ds.getSocket() != null) {
                             try {
                                 //OrderPrinter.printOrder(ds.getSocket(), order);
                                 OrderPrinter.printOrderBle(order);

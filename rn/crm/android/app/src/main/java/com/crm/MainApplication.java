@@ -35,8 +35,6 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
-                    new RNSoundPackage(),
-                    new BleManagerPackage(),
                     new BarcodeScannerPackage(),
                     new PickerPackage(),
                     new VectorIconsPackage(),
