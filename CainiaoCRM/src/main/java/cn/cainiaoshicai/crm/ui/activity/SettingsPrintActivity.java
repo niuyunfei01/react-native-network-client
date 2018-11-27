@@ -26,6 +26,8 @@ import android.widget.Toast;
 
 import com.xdandroid.hellodaemon.IntentWrapper;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,6 +37,8 @@ import java.util.Set;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.bt.BluetoothActivity;
+import cn.cainiaoshicai.crm.bt.BluetoothController;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
@@ -45,7 +49,7 @@ import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 
 
-public class SettingsPrintActivity extends Activity implements View.OnClickListener {
+public class SettingsPrintActivity extends BluetoothActivity implements View.OnClickListener {
 
     static public final int REQUEST_CONNECT_BT = 0x2300;
     private static final String TAG = SettingsPrintActivity.class.getSimpleName();
@@ -53,9 +57,19 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
     private static final int REQUEST_CODE_OPEN_GPS = 1;
     private static final int REQUEST_CODE_PERMISSION_LOCATION = 2;
 
+    /**
+     *
+     */
+    BluetoothAdapter mAdapter;
+
+    boolean mBtEnable = true;
+
     private Button btn_scan;
 
     int PERMISSION_REQUEST_COARSE_LOCATION = 2;
+
+    TextView tv_bluename;
+    TextView tv_blueadress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -174,9 +188,12 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
             }
         });
 
-        btn_scan = findViewById(R.id.btn_scan);
 
+        btn_scan = findViewById(R.id.btn_scan);
         btn_scan.setOnClickListener(this);
+
+        tv_bluename = findViewById(R.id.tv_bluename);
+        tv_blueadress = findViewById(R.id.tv_blueadress);
     }
 
     private void updateStoreFilterText(TextView list_store_filter_values, Set<Long> selectedStores) {
@@ -311,4 +328,39 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        BluetoothController.init(this);
+    }
+
+    @Override
+    public void btStatusChanged(Intent intent) {
+        super.btStatusChanged(intent);
+        BluetoothController.init(this);
+    }
+
+    public BluetoothAdapter getmAdapter() {
+        return mAdapter;
+    }
+
+    public void setmAdapter(BluetoothAdapter mAdapter) {
+        this.mAdapter = mAdapter;
+    }
+
+    public TextView getTv_bluename() {
+        return tv_bluename;
+    }
+
+    public TextView getTv_blueadress() {
+        return tv_blueadress;
+    }
+
+    public boolean ismBtEnable() {
+        return mBtEnable;
+    }
+
+    public void setmBtEnable(boolean mBtEnable) {
+        this.mBtEnable = mBtEnable;
+    }
 }

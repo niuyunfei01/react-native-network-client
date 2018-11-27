@@ -3,9 +3,6 @@ package com.crm;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.zmxv.RNSound.RNSoundPackage;
-
-import it.innove.BleManagerPackage;
 
 import com.eguma.barcodescanner.BarcodeScannerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;

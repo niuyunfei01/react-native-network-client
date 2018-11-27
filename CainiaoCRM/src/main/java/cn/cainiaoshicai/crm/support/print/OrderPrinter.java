@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
@@ -45,12 +46,12 @@ public class OrderPrinter {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                PrintQueue.getQueue().tryConnect();
+                PrintQueue.getQueue(GlobalCtx.app()).tryConnect();
                 try {
                     final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
                     final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
                     if (order != null) {
-                        PrintQueue.getQueue().add(order);
+                        PrintQueue.getQueue(GlobalCtx.app()).add(order);
                     } else {
                         AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
                     }
@@ -350,7 +351,7 @@ public class OrderPrinter {
         }
     }
 
-    public static void printOrderBle(Order order) throws UnsupportedEncodingException {
+    public static byte[] getOrderBytes(Order order) throws UnsupportedEncodingException {
         BasePrinter basePrinter = new BasePrinter();
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
@@ -454,7 +455,7 @@ public class OrderPrinter {
 
         write = basePrinter.concatenate(write, new byte[]{0x0D, 0x0D, 0x0D});
         write = basePrinter.concatenate(write, GPrinterCommand.walkPaper((byte) 4));
-
+        return write;
     }
 
     public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
@@ -622,21 +623,15 @@ public class OrderPrinter {
                     } else {
                         String speak = "";
                         Throwable ex = null;
-                        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
-                        if (ds.getSocket() != null) {
+                        if (GlobalCtx.app().isConnectPrinter() || null != AppInfo.btAddress) {
                             try {
                                 //OrderPrinter.printOrder(ds.getSocket(), order);
-                                OrderPrinter.printOrderBle(order);
+                                PrintQueue.getQueue(GlobalCtx.app()).write(getOrderBytes(order));
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);
                                 reason = "打印错误：请从运行中程序列表清除CRM，重新启动CRM并连接打印机";
-                                //FIXME: should try to reset the socket
-                                if (e instanceof IOException) {
-                                    ds.closeSocket();
-                                    ds.reconnect();
-                                }
                                 speak = "订单打印发生错误，请重新连接打印机！";
                                 ex = e;
                             }
@@ -659,8 +654,7 @@ public class OrderPrinter {
                         } else {
                             reason = "未连接到打印机";
                             speak = "订单打印失败，请重新连接打印机，然后手动打印！";
-                            String msg = ds == null ? "ds=null," : "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
-                            ex = new Exception(msg);
+                            ex = new Exception(reason);
                         }
 
                         if (ex != null) {

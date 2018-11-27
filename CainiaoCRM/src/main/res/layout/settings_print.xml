@@ -168,15 +168,24 @@
             android:layout_centerInParent="true"
             android:text="@string/start_scan" />
 
-        <ImageView
-            android:id="@+id/img_loading"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:src="@mipmap/ic_loading"
-            android:visibility="invisible" />
+        <TextView
+            android:id="@+id/tv_bluename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_scan"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:id="@+id/tv_blueadress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tv_bluename"
+            android:layout_alignStart="@+id/tv_bluename"
+            android:layout_below="@+id/tv_bluename"
+            android:layout_marginTop="23dp"
+            android:textColor="@color/blue" />
     </RelativeLayout>
 
 

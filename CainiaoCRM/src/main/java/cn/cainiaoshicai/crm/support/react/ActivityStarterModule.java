@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
@@ -270,12 +271,12 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
-        if (!BleManager.getInstance().isConnected(SettingUtility.getLastConnectedPrinterAddress())) {
+        if (!GlobalCtx.app().isConnectPrinter() && null == AppInfo.btAddress) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent, new Bundle());
             callback.invoke(false, "打印机未连接");
-            PrintQueue.getQueue().add(o);
+            PrintQueue.getQueue(GlobalCtx.app()).add(o);
         } else {
             new MyAsyncTask<Void, Void, Void>() {
                 @Override

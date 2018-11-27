@@ -167,7 +167,7 @@ public class BtService {
         setState(STATE_CONNECTED);
 
         // call print queue to print
-        PrintQueue.getQueue().print();
+        PrintQueue.getQueue(mContext).print();
 
     }
 

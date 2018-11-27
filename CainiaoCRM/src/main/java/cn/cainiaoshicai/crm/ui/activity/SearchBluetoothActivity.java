@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import java.lang.reflect.Method;
 
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.bt.BluetoothActivity;
 import cn.cainiaoshicai.crm.bt.BtUtil;
@@ -197,8 +198,8 @@ public class SearchBluetoothActivity extends BluetoothActivity implements Adapte
                                 Method createBondMethod = BluetoothDevice.class.getMethod("createBond");
                                 createBondMethod.invoke(bluetoothDevice);
                             }
-                            PrintQueue.getQueue().disconnect();
-                            String name = bluetoothDevice.getName();
+                            PrintQueue.getQueue(GlobalCtx.app()).disconnect();
+                            bluetoothDevice.getName();
                         } catch (Exception e) {
                             e.printStackTrace();
                             PrintUtil.setDefaultBluetoothDeviceAddress(getApplicationContext(), "");

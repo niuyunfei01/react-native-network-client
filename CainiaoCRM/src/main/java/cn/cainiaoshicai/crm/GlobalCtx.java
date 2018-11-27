@@ -59,6 +59,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
@@ -608,6 +609,11 @@ public class GlobalCtx extends Application {
     public static boolean isAutoPrint(long store_id) {
         return store_id == Cts.STORE_UNKNOWN
                 || (SettingUtility.isAutoPrint(store_id));
+    }
+
+    public boolean isConnectPrinter(){
+        BtService btService = new BtService(this);
+        return btService.getState() == BtService.STATE_CONNECTED;
     }
 
     public SoundManager getSoundManager() {

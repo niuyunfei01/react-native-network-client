@@ -2,28 +2,24 @@ package cn.cainiaoshicai.crm.utils;
 
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.text.TextUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.MapMaker;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
+import cn.cainiaoshicai.crm.AppInfo;
+import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
-
-import static cn.cainiaoshicai.crm.support.print.OrderPrinter.resetDeviceStatus;
-import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 public class PrintQueue {
 
@@ -41,6 +37,16 @@ public class PrintQueue {
      */
     private BluetoothAdapter mAdapter;
 
+    /**
+     * context
+     */
+    private static Context mContext;
+
+    /**
+     * bluetooth service
+     */
+    private BtService mBtService;
+
 
     LoadingCache<Integer, Boolean> graphs = CacheBuilder.newBuilder()
             .maximumSize(10000)
@@ -55,7 +61,10 @@ public class PrintQueue {
     private PrintQueue() {
     }
 
-    public static PrintQueue getQueue() {
+    public static PrintQueue getQueue(Context context) {
+        if (null == mContext) {
+            mContext = context;
+        }
         if (null == mInstance) {
             mInstance = new PrintQueue();
         }
@@ -70,7 +79,7 @@ public class PrintQueue {
      */
     public synchronized void add(Order order) {
         if (null == mQueue) {
-            mQueue = new ArrayList<Order>();
+            mQueue = new ArrayList<>();
         }
         if (null != order) {
             mQueue.add(order);
@@ -122,12 +131,21 @@ public class PrintQueue {
             if (null == mAdapter) {
                 mAdapter = BluetoothAdapter.getDefaultAdapter();
             }
+
+            if (mBtService.getState() != BtService.STATE_CONNECTED) {
+                if (!TextUtils.isEmpty(AppInfo.btAddress)) {
+                    BluetoothDevice device = mAdapter.getRemoteDevice(AppInfo.btAddress);
+                    mBtService.connect(device);
+                    return;
+                }
+            }
             while (mQueue.size() > 0) {
-                Order order = mQueue.remove(0);
+                Order order = mQueue.get(0);
                 if (graphs.get(order.getId())) {
                     continue;
                 }
-                OrderPrinter.print(order);
+                byte[] data = OrderPrinter.getOrderBytes(order);
+                mBtService.write(data);
                 graphs.put(order.getId(), true);
             }
         } catch (Exception e) {
@@ -158,9 +176,23 @@ public class PrintQueue {
      */
     public void tryConnect() {
         try {
-            BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-            if (printer == null || printer.getSocket() == null || !printer.isConnected()) {
-                resetDeviceStatus(printer);
+            if (TextUtils.isEmpty(AppInfo.btAddress)) {
+                return;
+            }
+            if (null == mAdapter) {
+                mAdapter = BluetoothAdapter.getDefaultAdapter();
+            }
+            if (null == mAdapter) {
+                return;
+            }
+            if (null == mBtService) {
+                mBtService = new BtService(mContext);
+            }
+            if (mBtService.getState() != BtService.STATE_CONNECTED) {
+                if (!TextUtils.isEmpty(AppInfo.btAddress)) {
+                    BluetoothDevice device = mAdapter.getRemoteDevice(AppInfo.btAddress);
+                    mBtService.connect(device);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,7 +214,17 @@ public class PrintQueue {
             if (null == mAdapter) {
                 mAdapter = BluetoothAdapter.getDefaultAdapter();
             }
-            BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+            if (null == mBtService) {
+                mBtService = new BtService(mContext);
+            }
+            if (mBtService.getState() != BtService.STATE_CONNECTED) {
+                String deviceAddress = PrintUtil.getDefaultBluethoothDeviceAddress(mContext);
+                if (!TextUtils.isEmpty(deviceAddress)) {
+                    BluetoothDevice device = mAdapter.getRemoteDevice(deviceAddress);
+                    mBtService.connect(device);
+                }
+            }
+            mBtService.write(bytes);
         } catch (Exception e) {
             e.printStackTrace();
         }
