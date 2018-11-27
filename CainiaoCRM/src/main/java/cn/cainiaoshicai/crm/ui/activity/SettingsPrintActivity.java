@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.Manifest;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -50,6 +52,8 @@ public class SettingsPrintActivity extends ListActivity {
     static public final int REQUEST_CONNECT_BT = 0x2300;
 
     static private final int REQUEST_ENABLE_BT = 0x1000;
+
+    int PERMISSION_REQUEST_COARSE_LOCATION = 2;
 
     static private android.bluetooth.BluetoothAdapter btAdapter = null;
 
@@ -183,6 +187,10 @@ public class SettingsPrintActivity extends ListActivity {
                 }
             }
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+        }
     }
 
     private void updateStoreFilterText(TextView list_store_filter_values, Set<Long> selectedStores) {

@@ -22,7 +22,6 @@ import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete.android";
 import SettingScene from "../scene/Setting/SettingScene";
 import CloudPrinterScene from "../scene/Setting/CloudPrinterScene";
-import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 import AuditRefundScene from "../scene/Order/AuditRefundScene";
 import OrderEditScene from "../scene/Order/OrderEditScene";
 import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
@@ -262,7 +261,6 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
         [Config.ROUTE_SETTING]: {screen: SettingScene},
         [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
-        [Config.ROUTE_PRINTER_CONNECT]: {screen: PrinterConnectScene},
         [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},

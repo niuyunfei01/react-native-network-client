@@ -40,7 +40,6 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
-import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -278,7 +277,6 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
-                .addPackage(new RNSoundPackage())
                 .addPackage(new PickerPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
