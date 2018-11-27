@@ -1,15 +1,26 @@
 package cn.cainiaoshicai.crm.support.print;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleMtuChangedCallback;
+import com.clj.fastble.callback.BleWriteCallback;
+import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.exception.BleException;
 import com.facebook.react.ReactActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
@@ -351,6 +362,113 @@ public class OrderPrinter {
         }
     }
 
+    public static void printOrderBle(Order order) throws UnsupportedEncodingException {
+        BasePrinter basePrinter = new BasePrinter();
+        String mobile = order.getMobile();
+        mobile = mobile.replace("_", "转").replace(",", "转");
+        byte[] write = new byte[]{0x1B, 0x21, 0};
+        write = basePrinter.concatenate(write, GPrinterCommand.left);
+        write = basePrinter.concatenate(write,basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write,basePrinter.highBigTextBytes(" " + order.getFullStoreName()));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes("  #" + order.getDayId()));
+
+        write = basePrinter.concatenate(write, basePrinter.normalTextBytes(order.platformWithId()));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes(TextUtil.replaceWhiteStr(order.getUserName()) + " " + mobile));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes(TextUtil.replaceWhiteStr(order.getAddress())));
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes("[" + order.getDirection() + "]"));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+
+        String expectedStr = order.getExpectTimeStr();
+        if (expectedStr == null) {
+            expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+        }
+
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highBigTextBytes(expectedStr));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+
+        if (!TextUtils.isEmpty(order.getRemark())) {
+            write = basePrinter.concatenate(write, basePrinter.highBigTextBytes("用户备注：" + order.getRemark()));
+            write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        }
+
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.normalTextBytes("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid()));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.normalTextBytes("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime())));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highTextBytes(String.format("食材名称%22s", "数量")));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.splitLineBytes());
+
+        int total = 0;
+        for (CartItem item : order.getItems()) {
+            String name = item.getProduct_name();
+            String tagCode = item.getTag_code();
+            if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
+                name = name + "#" + tagCode;
+            }
+            if (item.getPrice() >= 0) {
+                for (int idx = 0; idx < name.length(); ) {
+
+                    String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
+                    boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                    if (isEnd) {
+                        String format = "%s%" + Math.max(32 - (basePrinter.printWidth(text)), 1) + "s";
+                        text = String.format(format, text, "x" + item.getNum());
+                    }
+                    write = basePrinter.concatenate(write, basePrinter.highTextBytes(text));
+                    write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+                    if (isEnd) {
+                        write = basePrinter.concatenate(write, basePrinter.spaceLineBytes());
+                    }
+
+                    idx += MAX_TITLE_PART;
+                }
+                total += item.getNum();
+            }
+        }
+
+        write = basePrinter.concatenate(write, basePrinter.highTextBytes(String.format("合计 %27s", "x" + total)));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+
+        if (!TextUtils.isEmpty(order.getLine_additional())) {
+            write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+            write = basePrinter.concatenate(write, basePrinter.normalTextBytes(order.getLine_additional()));
+        }
+
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.highTextBytes(order.getLine_money_total()));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+
+        write = basePrinter.concatenate(write, basePrinter.startLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.normalTextBytes(order.getPrintFooter1()));
+        write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+        write = basePrinter.concatenate(write, basePrinter.normalTextBytes(order.getPrintFooter2()));
+
+        String printFooter3 = order.getPrintFooter3();
+        if (!TextUtils.isEmpty(printFooter3)) {
+            write = basePrinter.concatenate(write, basePrinter.newLineBytes());
+            write = basePrinter.concatenate(write, basePrinter.normalTextBytes(printFooter3));
+        }
+
+        write = basePrinter.concatenate(write, new byte[]{0x0D, 0x0D, 0x0D});
+        write = basePrinter.concatenate(write, GPrinterCommand.walkPaper((byte)4));
+
+    }
+
     public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
@@ -518,9 +636,10 @@ public class OrderPrinter {
                         Throwable ex = null;
                         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
-                        if (ds != null && ds.getSocket() != null && ds.isConnected()) {
+                        if (BleManager.getInstance().isConnected(SettingUtility.getLastConnectedPrinterAddress())) {
                             try {
-                                OrderPrinter.printOrder(ds.getSocket(), order);
+                                //OrderPrinter.printOrder(ds.getSocket(), order);
+                                OrderPrinter.printOrderBle(order);
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);

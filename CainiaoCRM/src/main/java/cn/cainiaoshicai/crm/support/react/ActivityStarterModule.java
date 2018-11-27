@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.clj.fastble.BleManager;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.CatalystInstance;
@@ -269,9 +270,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
-        BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-
-        if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
+        if (!BleManager.getInstance().isConnected(SettingUtility.getLastConnectedPrinterAddress())) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent, new Bundle());

@@ -291,8 +291,8 @@ public class GlobalCtx extends Application {
         BleManager.getInstance().init(this);
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(1, 5000)
-                .setOperateTimeout(5000);
+                .setReConnectCount(3, 5000)
+                .setOperateTimeout(30000);
 
         //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
         DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);

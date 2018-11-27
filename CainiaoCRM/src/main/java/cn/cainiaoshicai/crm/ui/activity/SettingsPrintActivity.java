@@ -57,6 +57,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.ble.adapter.DeviceAdapter;
 import cn.cainiaoshicai.crm.ble.comm.ObserverManager;
 import cn.cainiaoshicai.crm.ble.operation.OperationActivity;
+import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
@@ -93,11 +94,11 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
     }
 
     private void initBleView() {
-        btn_scan = (Button) findViewById(R.id.btn_scan);
+        btn_scan = findViewById(R.id.btn_scan);
         btn_scan.setText(getString(R.string.start_scan));
         btn_scan.setOnClickListener(this);
 
-        img_loading = (ImageView) findViewById(R.id.img_loading);
+        img_loading = findViewById(R.id.img_loading);
         operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
         operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
@@ -306,6 +307,7 @@ public class SettingsPrintActivity extends Activity implements View.OnClickListe
                 progressDialog.dismiss();
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
+                SettingUtility.setLastConnectedPrinterAddress(bleDevice.getMac());
             }
 
             @Override

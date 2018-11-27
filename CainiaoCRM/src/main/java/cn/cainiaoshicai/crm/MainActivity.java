@@ -42,6 +42,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.clj.fastble.BleManager;
 import com.google.common.collect.Maps;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
@@ -288,8 +289,7 @@ public class MainActivity extends AbstractActionBarActivity {
         if (!autoPrintStores.isEmpty()) {
             final String printStatusTxt;
             String autoPrintNames = app.getStoreNames(autoPrintStores);
-            BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-            if (printer != null && printer.getSocket() != null && printer.isConnected()) {
+            if (BleManager.getInstance().isConnected(SettingUtility.getLastConnectedPrinterAddress())) {
                 printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
                 bgColorResId = R.color.green;
             } else {
@@ -341,27 +341,25 @@ public class MainActivity extends AbstractActionBarActivity {
         BottomBarTab remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
 
 /**
-        MenuItem item = menu.findItem(R.id.menu_accept);
-        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+ MenuItem item = menu.findItem(R.id.menu_accept);
+ MenuItemCompat.setActionView(item, R.layout.feed_update_count);
 
-        View count = item.getActionView();
-        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
-        notifCount.setText(String.valueOf(mNotifCount));
+ View count = item.getActionView();
+ notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
+ notifCount.setText(String.valueOf(mNotifCount));
 
-        GlobalCtx.app().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
-            @Override
-            public void callback(int count) {
-                mNotifCount = count;
-                updateHotCount(mNotifCount);
-            }
-        });
+ GlobalCtx.app().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+@Override public void callback(int count) {
+mNotifCount = count;
+updateHotCount(mNotifCount);
+}
+});
 
-        new MyMenuItemStuffListener(count, "查看任务") {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.app().toTaskListActivity(MainActivity.this);
-            }
-        }; */
+ new MyMenuItemStuffListener(count, "查看任务") {
+@Override public void onClick(View v) {
+GlobalCtx.app().toTaskListActivity(MainActivity.this);
+}
+}; */
     }
 
     private void initSignButton(final GlobalCtx app, final TextView signingText) {
@@ -489,7 +487,7 @@ public class MainActivity extends AbstractActionBarActivity {
             public void run() {
                 locationHelper.removeUpdates();
             }
-        }, 2 *  LocationHelper.MINUTES);
+        }, 2 * LocationHelper.MINUTES);
     }
 
     private void initShipAccept(final GlobalCtx app) {
@@ -518,7 +516,8 @@ public class MainActivity extends AbstractActionBarActivity {
                             app.getAccountBean().setShipAcceptStatus(body.getObj());
                             initShipAccept(app);
                         } else {
-                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());;
+                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());
+                            ;
                         }
                     }
 
@@ -597,7 +596,7 @@ public class MainActivity extends AbstractActionBarActivity {
                                         public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
                                                                Response<ResultBean<ShipAcceptStatus>> response) {
                                             ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body!=null && body.isOk()) {
+                                            if (body != null && body.isOk()) {
                                                 app.getAccountBean().setShipAcceptStatus(body.getObj());
                                                 initShipAccept(app);
                                                 Utility.toast("操作成功", MainActivity.this);
@@ -697,7 +696,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
     public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
         OrdersPagerAdapter adapter = (OrdersPagerAdapter) this.ordersViewPager.getAdapter();
-        for(ListType listType : TAB_LIST_TYPES) {
+        for (ListType listType : TAB_LIST_TYPES) {
             Integer count = totalByStatus.get(listType.getValue());
             if (count == null) count = 0;
             if (adapter != null) {
