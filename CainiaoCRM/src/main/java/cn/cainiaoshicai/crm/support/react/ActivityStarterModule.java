@@ -281,12 +281,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             new MyAsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    OrderPrinter._print(o, false, new BasePrinter.PrintCallback() {
-                        @Override
-                        public void run(boolean result, String desc) {
-                            callback.invoke(result, desc);
-                        }
-                    });
+                    PrintQueue.getQueue(GlobalCtx.app()).add(o);
                     return null;
                 }
             }.executeOnNormal();

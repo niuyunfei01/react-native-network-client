@@ -90,11 +90,14 @@ public class PrintQueue {
         if (null != order) {
             mQueue.add(order);
         }
+        mQueue = removeDuplicates(mQueue);
         print();
     }
 
     /**
      * add print bytes to queue. and call print
+     *
+     * @param orderList
      */
     public synchronized void add(ArrayList<Order> orderList) {
         if (null == mQueue) {
@@ -131,20 +134,21 @@ public class PrintQueue {
             if (null == mQueue || mQueue.size() <= 0) {
                 return;
             }
-            if (!isConnect()) {
-                return;
-            }
             if (null == mAdapter) {
                 mAdapter = BluetoothAdapter.getDefaultAdapter();
             }
-
+            if (null == mBtService) {
+                mBtService = new BtService(mContext);
+            }
             if (mBtService.getState() != BtService.STATE_CONNECTED) {
-                if (!TextUtils.isEmpty(AppInfo.btAddress)) {
-                    BluetoothDevice device = mAdapter.getRemoteDevice(AppInfo.btAddress);
+                String bindPrintAddress = PrintUtil.getDefaultBluethoothDeviceAddress(mContext);
+                if (!TextUtils.isEmpty(bindPrintAddress)) {
+                    BluetoothDevice device = mAdapter.getRemoteDevice(bindPrintAddress);
                     mBtService.connect(device);
                     return;
                 }
             }
+
             if (mBtService.getState() == BtService.STATE_CONNECTED) {
                 while (mQueue.size() > 0) {
                     Order order = mQueue.remove(0);
@@ -177,8 +181,7 @@ public class PrintQueue {
     }
 
     public boolean isConnect() {
-        BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-        return printer != null && printer.getSocket() != null && printer.isConnected();
+        return mBtService.getState() == BtService.STATE_CONNECTED;
     }
 
     /**
