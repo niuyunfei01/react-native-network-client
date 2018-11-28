@@ -34,12 +34,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.bt.BluetoothActivity;
 import cn.cainiaoshicai.crm.bt.BluetoothController;
+import cn.cainiaoshicai.crm.bt.BtService;
+import cn.cainiaoshicai.crm.bt.BtUtil;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -142,16 +146,16 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
 
         if (isDirect) {
             BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
-            boolean connected = GlobalCtx.app().isPrinterConnected() || (p != null && p.isConnected());
-            printerStatus.setText(SettingUtility.getLastConnectedPrinterAddress() + ":" + (connected ? "已连接" : "未连接"));
+            boolean connected = GlobalCtx.app().isConnectPrinter();
+            printerStatus.setText(PrintUtil.getDefaultBluethoothDeviceAddress(this) + ":" + (connected ? "已连接" : "未连接"));
             printerStatus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-                    if (printer == null || !printer.isConnected()) {
+                    if (!GlobalCtx.app().isConnectPrinter()) {
                         AppLogger.e("skip to print for printer is not connected!");
                     }
-                    showTestDlg(SettingsPrintActivity.this, printer == null ? "打印机未连接？" : "点击测试", printer != null ? printer.getSocket() : null);
+                    showTestDlg(SettingsPrintActivity.this, GlobalCtx.app().isConnectPrinter() ? "打印机未连接？" : "点击测试");
                 }
             });
         }
@@ -209,17 +213,13 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         }
     }
 
-    public void showTestDlg(final SettingsPrintActivity act, String msg, final BluetoothConnector.BluetoothSocketWrapper socket) {
+    public void showTestDlg(final SettingsPrintActivity act, String msg) {
         AlertUtil.showAlert(act, R.string.tip_dialog_title, msg, "确定", null,
                 "打印测试", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            if (socket != null) {
-                                OrderPrinter.printTest(socket);
-                            } else {
-                                Utility.toast("打印机端口状态为null", act);
-                            }
+                            OrderPrinter.printTest();
                         } catch (IOException e) {
                             e.printStackTrace();
                             //TODO: 应该自动尝试连接！

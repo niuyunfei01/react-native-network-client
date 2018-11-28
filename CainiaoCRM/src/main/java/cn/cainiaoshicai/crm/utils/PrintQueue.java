@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import cn.cainiaoshicai.crm.AppInfo;
+import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.print.PrintUtil;
@@ -46,6 +47,11 @@ public class PrintQueue {
      * bluetooth service
      */
     private BtService mBtService;
+
+    /**
+     * 打印失败 播放文字
+     */
+    static String SPEAK_WORD = "订单打印失败，请重新连接打印机，然后手动打印！";
 
 
     LoadingCache<Integer, Boolean> graphs = CacheBuilder.newBuilder()
@@ -136,19 +142,23 @@ public class PrintQueue {
                 if (!TextUtils.isEmpty(AppInfo.btAddress)) {
                     BluetoothDevice device = mAdapter.getRemoteDevice(AppInfo.btAddress);
                     mBtService.connect(device);
-                    return;
                 }
             }
-            while (mQueue.size() > 0) {
-                Order order = mQueue.get(0);
-                if (graphs.get(order.getId())) {
-                    continue;
+            if (mBtService.getState() == BtService.STATE_CONNECTED) {
+                while (mQueue.size() > 0) {
+                    Order order = mQueue.remove(0);
+                    if (graphs.get(order.getId())) {
+                        continue;
+                    }
+                    byte[] data = OrderPrinter.getOrderBytes(order);
+                    mBtService.write(data);
+                    graphs.put(order.getId(), true);
                 }
-                byte[] data = OrderPrinter.getOrderBytes(order);
-                mBtService.write(data);
-                graphs.put(order.getId(), true);
+            } else {
+                AudioUtils.getInstance().speakText(SPEAK_WORD);
             }
         } catch (Exception e) {
+            AudioUtils.getInstance().speakText(SPEAK_WORD);
             e.printStackTrace();
         }
     }
@@ -224,8 +234,13 @@ public class PrintQueue {
                     mBtService.connect(device);
                 }
             }
-            mBtService.write(bytes);
+            if (mBtService.getState() == BtService.STATE_CONNECTED) {
+                mBtService.write(bytes);
+            } else {
+                AudioUtils.getInstance().speakText(SPEAK_WORD);
+            }
         } catch (Exception e) {
+            AudioUtils.getInstance().speakText(SPEAK_WORD);
             e.printStackTrace();
         }
     }

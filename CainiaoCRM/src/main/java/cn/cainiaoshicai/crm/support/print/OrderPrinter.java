@@ -168,24 +168,22 @@ public class OrderPrinter {
         }
     }
 
-    public static void printTest(BluetoothConnector.BluetoothSocketWrapper btsocket) throws IOException {
+    public static void printTest() throws IOException {
         try {
-            OutputStream btos = btsocket.getOutputStream();
-            BasePrinter printer = new BasePrinter(btos);
-
-            btos.write(new byte[]{0x1B, 0x21, 0});
-            btos.write(GPrinterCommand.left);
-
-            printer.starLine().highBigText("   打印测试单").newLine();
-            printer.highText(String.format("合计 %27s", "x100")).newLine();
-
-            printer.starLine().normalText("比邻鲜，好生意！").newLine();
-
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(GPrinterCommand.walkPaper((byte) 4));
-            btos.flush();
+            BasePrinter printer = new BasePrinter();
+            byte[] testData = new byte[]{0x1B, 0x21, 0};
+            testData = printer.concatenate(testData, GPrinterCommand.left);
+            testData = printer.concatenate(testData, printer.startLineBytes());
+            testData = printer.concatenate(testData, printer.highTextBytes("   打印测试单"));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, printer.highTextBytes(String.format("合计 %27s", "x100")));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, printer.startLineBytes());
+            testData = printer.concatenate(testData, printer.normalTextBytes("比邻鲜，好生意！"));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, new byte[]{0x0D,0x0D,0x0D});
+            testData = printer.concatenate(testData, GPrinterCommand.walkPaper((byte) 4));
+            PrintQueue.getQueue(GlobalCtx.app()).write(testData);
         } catch (Exception e) {
             AppLogger.e("error in printing test", e);
             throw e;
@@ -600,7 +598,7 @@ public class OrderPrinter {
     }
 
     /**
-     * @param order           Must contain items!!!!
+     * @param order     Must contain items!!!!
      * @param isAutoPrint
      * @param printedCallback
      */
@@ -624,7 +622,7 @@ public class OrderPrinter {
                         String speak = "";
                         Throwable ex = null;
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
-                        if (GlobalCtx.app().isConnectPrinter() || null != AppInfo.btAddress) {
+                        if (GlobalCtx.app().isConnectPrinter()) {
                             try {
                                 //OrderPrinter.printOrder(ds.getSocket(), order);
                                 PrintQueue.getQueue(GlobalCtx.app()).write(getOrderBytes(order));

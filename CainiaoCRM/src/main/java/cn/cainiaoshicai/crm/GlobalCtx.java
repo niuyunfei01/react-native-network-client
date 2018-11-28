@@ -79,6 +79,7 @@ import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -611,9 +612,9 @@ public class GlobalCtx extends Application {
                 || (SettingUtility.isAutoPrint(store_id));
     }
 
-    public boolean isConnectPrinter(){
+    public boolean isConnectPrinter() {
         BtService btService = new BtService(this);
-        return btService.getState() == BtService.STATE_CONNECTED;
+        return btService.getState() == BtService.STATE_CONNECTED || !TextUtil.isEmpty(PrintUtil.getDefaultBluethoothDeviceAddress(this));
     }
 
     public SoundManager getSoundManager() {

@@ -271,7 +271,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
-        if (!GlobalCtx.app().isConnectPrinter() && null == AppInfo.btAddress) {
+        if (!GlobalCtx.app().isConnectPrinter()) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent, new Bundle());
