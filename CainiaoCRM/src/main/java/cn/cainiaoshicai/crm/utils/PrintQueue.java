@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.HashSet;
