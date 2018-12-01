@@ -190,7 +190,8 @@ public class PrintQueue {
      */
     public void tryConnect() {
         try {
-            if (TextUtils.isEmpty(AppInfo.btAddress)) {
+            String address = PrintUtil.getDefaultBluethoothDeviceAddress(mContext);
+            if (TextUtils.isEmpty(address)) {
                 return;
             }
             if (null == mAdapter) {
@@ -203,8 +204,8 @@ public class PrintQueue {
                 mBtService = new BtService(mContext);
             }
             if (mBtService.getState() != BtService.STATE_CONNECTED) {
-                if (!TextUtils.isEmpty(AppInfo.btAddress)) {
-                    BluetoothDevice device = mAdapter.getRemoteDevice(AppInfo.btAddress);
+                if (!TextUtils.isEmpty(address)) {
+                    BluetoothDevice device = mAdapter.getRemoteDevice(address);
                     mBtService.connect(device);
                 }
             }

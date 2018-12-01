@@ -1,25 +1,9 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from 'react-native';
-import colors from "../../styles/colors";
-import pxToDp from "../../util/pxToDp";
+import {StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import Toast from "../../weui/Toast/Toast";
-import {native} from '../../common';
-import NavigationItem from "../../widget/NavigationItem";
-import Config from "../../config";
 import ModalSelector from "../../widget/ModalSelector/index";
 import * as tool from "../../common/tool";
 
