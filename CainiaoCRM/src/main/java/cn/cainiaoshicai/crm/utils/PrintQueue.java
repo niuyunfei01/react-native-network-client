@@ -9,12 +9,12 @@ import android.text.TextUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -116,9 +116,11 @@ public class PrintQueue {
         // Record encountered Strings in HashSet.
         HashSet<Integer> set = new HashSet<>();
         // Loop over argument list.
-        for (Order item : list) {
+        for (int j = list.size() - 1; j >= 0; j--) {
+            // whatever
+            Order item = list.get(j);
             // If String is not in set, add it to the list and the set.
-            if (!set.contains(item)) {
+            if (!set.contains(item.getId())) {
                 result.add(item);
                 set.add(item.getId());
             }
