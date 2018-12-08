@@ -32,7 +32,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
@@ -48,8 +47,6 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.support.print.BasePrinter;
-import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;

@@ -103,6 +103,7 @@
     <string name="remove_successfully">删除成功</string>
     <string name="add_account">添加</string>
     <string name="add_prod">搜索上架</string>
+    <string name="apply_new_prod">申请上新</string>
     <string name="oauth_login">网页授权</string>
     <string name="hack_login">黑魔法授权</string>
     <string name="official_app_login">官方客户端授权</string>

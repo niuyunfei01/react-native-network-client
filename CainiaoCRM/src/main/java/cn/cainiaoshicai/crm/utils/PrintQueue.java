@@ -10,6 +10,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +19,9 @@ import java.util.concurrent.TimeUnit;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.print.PrintMsgEvent;
 import cn.cainiaoshicai.crm.print.PrintUtil;
+import cn.cainiaoshicai.crm.print.PrinterMsgType;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 
@@ -88,22 +92,7 @@ public class PrintQueue {
         }
         if (null != order) {
             mQueue.add(order);
-        }
-        mQueue = removeDuplicates(mQueue);
-        print();
-    }
-
-    /**
-     * add print bytes to queue. and call print
-     *
-     * @param orderList
-     */
-    public synchronized void add(ArrayList<Order> orderList) {
-        if (null == mQueue) {
-            mQueue = new ArrayList<>();
-        }
-        if (null != orderList) {
-            mQueue.addAll(orderList);
+            graphs.put(order.getId(), false);
         }
         mQueue = removeDuplicates(mQueue);
         print();
@@ -149,7 +138,14 @@ public class PrintQueue {
                     return;
                 }
             }
-
+            int times = 1;
+            while (times < 3) {
+                if (mBtService.getState() == BtService.STATE_CONNECTED) {
+                    break;
+                }
+                Thread.sleep(1000);
+                times++;
+            }
             if (mBtService.getState() == BtService.STATE_CONNECTED) {
                 while (mQueue.size() > 0) {
                     Order order = mQueue.remove(0);
@@ -157,8 +153,12 @@ public class PrintQueue {
                         continue;
                     }
                     byte[] data = OrderPrinter.getOrderBytes(order);
-                    mBtService.write(data);
-                    graphs.put(order.getId(), true);
+                    boolean success = mBtService.write(data, 2000);
+                    if (success) {
+                        graphs.put(order.getId(), true);
+                    } else {
+                        mQueue.add(order);
+                    }
                 }
             } else {
                 AudioUtils.getInstance().speakText(SPEAK_WORD);
@@ -205,6 +205,7 @@ public class PrintQueue {
                 mBtService = new BtService(mContext);
             }
             if (mBtService.getState() != BtService.STATE_CONNECTED) {
+                mBtService.stop();
                 if (!TextUtils.isEmpty(address)) {
                     BluetoothDevice device = mAdapter.getRemoteDevice(address);
                     mBtService.connect(device);

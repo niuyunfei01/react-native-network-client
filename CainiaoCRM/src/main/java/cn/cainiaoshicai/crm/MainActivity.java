@@ -27,7 +27,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -42,12 +41,15 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.clj.fastble.BleManager;
 import com.google.common.collect.Maps;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.roughike.bottombar.TabSelectionInterceptor;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +68,8 @@ import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.print.PrintMsgEvent;
+import cn.cainiaoshicai.crm.print.PrinterMsgType;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.LocationHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -80,6 +84,8 @@ import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
+import cn.cainiaoshicai.crm.utils.ToastUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -112,7 +118,7 @@ public class MainActivity extends AbstractActionBarActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (ordersViewPager != null) {
             ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
@@ -120,13 +126,13 @@ public class MainActivity extends AbstractActionBarActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putInt(POSITION, tabLayout.getSelectedTabPosition());
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AccountBean accountBean;
         if (savedInstanceState != null) {
@@ -196,6 +202,10 @@ public class MainActivity extends AbstractActionBarActivity {
         serviceExtras.put("accessToken", accountBean.getAccess_token());
         serviceExtras.put("storeId", store_id + "");
         Bootstrap.startAlwaysOnService(this, "Crm", serviceExtras);
+
+
+        //初始化
+        EventBus.getDefault().register(MainActivity.this);
     }
 
     private void resetPrinterStatusBar() {
@@ -802,9 +812,22 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onMessage(PrintMsgEvent event) {
+        if (event.type == PrinterMsgType.MESSAGE_TOAST) {
+            ToastUtil.showToast(GlobalCtx.app(), event.msg);
+        }
+        if (event.type == PrinterMsgType.MESSAGE_STATE_CHANGE) {
+            if ("已连接".equals(event.msg)) {
+                PrintQueue.getQueue(GlobalCtx.app()).print();
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(MainActivity.this);
     }
 
     private class SignOffOnClickListener implements DialogInterface.OnClickListener {

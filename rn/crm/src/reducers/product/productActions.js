@@ -225,10 +225,17 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
   let formData = new FormData();
   if (image_info && image_info.uri) {
     let {uri, name} = image_info;
+    let fileInfo = name.split('.');
+    if (fileInfo.length > 1) {
+      let fileExt = fileInfo.pop();
+      name = md5.hex_md5(fileInfo[0]) + "." + fileExt;
+    } else {
+      name = md5.hex_md5(name);
+    }
     let photo = {
       uri: uri,
       type: "application/octet-stream",
-      name: md5.hex_md5(name)
+      name: name
     };
     formData.append("file_post_name", "photo"); //上传类型
     formData.append("file_model_name", file_model_name); //理解为模块的名字
@@ -237,7 +244,7 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
     formData.append("data_id", 0); //给个dataid吧
     formData.append("photo", photo);
     formData.append("keepOrigin", keep_origin_img);
-    
+
     const url = `uploadfiles/upload`; //上传图片的服务器地址
     console.log("上传的形式:%o", formData);
     return FetchEx.timeout(AppConfig.LongFetchTimeout, FetchEx.post(url, formData))

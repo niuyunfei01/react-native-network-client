@@ -80,7 +80,7 @@
         android:layout_height="wrap_content" />
 
     <Button android:id="@+id/add_new_prod"
-        android:text="@string/add_prod"
+        android:text="@string/apply_new_prod"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@id/btn_apply_price_list"
         android:paddingStart="6dp"

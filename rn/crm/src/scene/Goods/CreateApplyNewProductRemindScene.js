@@ -77,9 +77,10 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT, {
-              store_id: store_id
-            });
+            // navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT, {
+            //   store_id: store_id
+            // });
+            native.toGoods();
           }}
         />
       )
@@ -529,7 +530,8 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                 //   upload_files: {},
                 //   dialogStatus: false
                 // });
-                this.props.navigation.goBack();
+                //this.props.navigation.goBack();
+                native.toGoods()
               }
             }
           ]}
@@ -545,7 +547,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             提交成功
           </Text>
           <Text style={{width: "100%", textAlign: "center"}}>
-            门店经理会在三个小时内完成上新操作请耐心等候
+            门店经理会在48小时内完成上新操作请耐心等候
           </Text>
         </Dialog>
       </ScrollView>

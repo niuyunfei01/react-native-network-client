@@ -26,9 +26,9 @@ import cn.cainiaoshicai.crm.utils.PrintQueue;
  * connections, a thread for connecting with a device, and a thread for
  * performing data transmissions when connected.
  * 这个类完成所有的设置和管理蓝牙的工作
- *   *与其他设备的连接。 它有一个线程来侦听来电
- *   *连接，用于与设备连接的线程和线程
- *   *连接时执行数据传输。
+ * 与其他设备的连接。 它有一个线程来侦听来电
+ * 连接，用于与设备连接的线程和线程
+ * 连接时执行数据传输。
  */
 public class BtService {
 
@@ -52,7 +52,7 @@ public class BtService {
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private int mState;
+    private volatile int mState;
     // context
     private Context mContext;
 
@@ -68,7 +68,7 @@ public class BtService {
     /**
      * Return the current connection state.
      */
-    public synchronized int getState() {
+    public int getState() {
         return mState;
     }
 
@@ -199,17 +199,18 @@ public class BtService {
      *
      * @param out The bytes to write
      */
-    public void write(byte[] out) {
+    public boolean write(byte[] out) {
         // Create temporary object
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
             if (mState != STATE_CONNECTED)
-                return;
+                return false;
             r = mConnectedThread;
         }
         // Perform the write unsynchronized
         r.write(out);
+        return true;
     }
 
     /**
@@ -218,17 +219,18 @@ public class BtService {
      * @param out       The bytes to write
      * @param sleepTime sleep time
      */
-    public void write(byte[] out, long sleepTime) {
+    public boolean write(byte[] out, long sleepTime) {
         // Create temporary object
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
             if (mState != STATE_CONNECTED)
-                return;
+                return false;
             r = mConnectedThread;
         }
         // Perform the write unsynchronized
         r.write(out, sleepTime);
+        return true;
     }
 
     /**

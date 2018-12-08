@@ -46,7 +46,6 @@ public class OrderPrinter {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                PrintQueue.getQueue(GlobalCtx.app()).tryConnect();
                 try {
                     final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
                     final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);

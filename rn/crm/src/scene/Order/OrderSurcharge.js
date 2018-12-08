@@ -60,15 +60,27 @@ class OrderSurcharge extends PureComponent {
         ToastLong(error.message)
       });
   }
-  
-  renderAccordionItemStatus (status) {
-    if (status === '0') {
+
+  renderAccordionItemStatus(status) {
+    if (status == '0') {
       return (
         <Text style={style.status}>待打款</Text>
       )
-    } else {
+    } else if (status == '1') {
       return (
         <Text style={[style.status, style.success]}>已打款</Text>
+      )
+    } else if (status == '10') {
+      return (
+        <Text style={[style.status, style.warn]}>已作废</Text>
+      )
+    } else if (status == '2') {
+      return (
+        <Text style={[style.status, style.warn]}>支付失败</Text>
+      )
+    } else {
+      return (
+        <Text style={style.status}>待打款</Text>
       )
     }
   }
@@ -150,6 +162,10 @@ const style = StyleSheet.create({
   success: {
     color: colors.main_color,
     borderColor: colors.main_color
+  },
+  warn: {
+    color: colors.orange,
+    borderColor: colors.orange
   },
   detailBox: {
     padding: pxToDp(40),
