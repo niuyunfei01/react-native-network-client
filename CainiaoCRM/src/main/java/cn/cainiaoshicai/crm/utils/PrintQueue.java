@@ -156,6 +156,7 @@ public class PrintQueue {
                     boolean success = mBtService.write(data, 2000);
                     if (success) {
                         graphs.put(order.getId(), true);
+                        OrderPrinter.logOrderPrint(order);
                     } else {
                         mQueue.add(order);
                     }
