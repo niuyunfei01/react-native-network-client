@@ -152,7 +152,7 @@ public class PrintQueue {
                     if (graphs.get(order.getId())) {
                         continue;
                     }
-                    byte[] data = OrderPrinter.getOrderBytes(order);
+                    byte[] data = OrderPrinter.printOrder(order);
                     boolean success = mBtService.write(data, 2000);
                     if (success) {
                         graphs.put(order.getId(), true);
