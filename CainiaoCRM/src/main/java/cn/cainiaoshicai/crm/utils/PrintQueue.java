@@ -159,6 +159,7 @@ public class PrintQueue {
                         OrderPrinter.logOrderPrint(order);
                     } else {
                         mQueue.add(order);
+                        removeDuplicates(mQueue);
                     }
                 }
             } else {
