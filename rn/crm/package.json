@@ -38,7 +38,7 @@
     "react-native-splash-screen": "^3.1.1",
     "react-native-swiper": "^1.5.13",
     "react-native-tab-view": "0.0.69",
-    "react-native-vector-icons": "^4.6.0",
+    "react-native-vector-icons": "^6.1.0",
     "react-navigation": "github:react-community/react-navigation#fe4b1e2",
     "react-number-format": "^2.0.4",
     "react-redux": "^5.0.6",
