@@ -42,9 +42,6 @@ import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,9 +79,7 @@ import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
-import cn.cainiaoshicai.crm.print.PrintMsgEvent;
 import cn.cainiaoshicai.crm.print.PrintUtil;
-import cn.cainiaoshicai.crm.print.PrinterMsgType;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -98,10 +93,7 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.cainiaoshicai.crm.utils.PrintQueue;
-import cn.cainiaoshicai.crm.utils.ToastUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -330,6 +322,7 @@ public class GlobalCtx extends Application {
             try {
                 String uid = ctx.getCurrentAccountId();
                 if (!TextUtils.isEmpty(uid)) {
+                    JPushInterface.resumePush(ctx);
                     JPushInterface.setAlias(ctx, (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
                 }
             } catch (Exception e) {

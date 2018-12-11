@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.base.Strings;
@@ -26,6 +27,7 @@ import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.jpush.android.api.JPushInterface;
 
 public class AlwaysOnService extends BaseService {
     private static String LOG_TAG = AlwaysOnService.class.getSimpleName();
@@ -142,6 +144,14 @@ public class AlwaysOnService extends BaseService {
             int currentEpochTimeInSeconds = (int) (System.currentTimeMillis() / 1000L);
             Log.v(LOG_TAG, "Count:" + timeCount + " at time:"
                     + currentEpochTimeInSeconds);
+
+            if (JPushInterface.isPushStopped(GlobalCtx.app())) {
+                String uid = GlobalCtx.app().getCurrentAccountId();
+                if (!TextUtils.isEmpty(uid)) {
+                    JPushInterface.setAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+                }
+                JPushInterface.resumePush(GlobalCtx.app());
+            }
         }
 
         private int readTimeCount() {
