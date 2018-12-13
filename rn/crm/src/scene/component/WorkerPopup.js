@@ -55,19 +55,21 @@ class WorkerPopup extends React.Component {
 
   fetchWorkerList() {
     const self = this
+    Toast.loading('数据请求中', 0)
     let {currVendorId} = tool.vendor(this.props.global);
-    const {mine} = this.props;
-    let worker_list = [];
-    worker_list.push({name: '不任命任何人', id: '0'});
-    for (let user_info of mine.normal[currVendorId]) {
-      let item = {
-        name: user_info.name || user_info.nickname,
-        id: user_info.id,
-        mobilephone: user_info.mobilephone
-      };
-      worker_list.push(item);
-    }
-    self.setState({originWorkerList: worker_list, workerList: worker_list})
+    const {accessToken} = this.props.global;
+    const url = `data_dictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        Toast.hide()
+        if (resp.ok) {
+          self.setState({originWorkerList: resp.obj, workerList: resp.obj})
+        }
+      })
+      .catch(e => {
+        Toast.hide()
+      })
   }
 
   setSelectWorkers() {
