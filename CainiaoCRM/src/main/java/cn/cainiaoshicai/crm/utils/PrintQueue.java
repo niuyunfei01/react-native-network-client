@@ -92,7 +92,6 @@ public class PrintQueue {
         }
         if (null != order) {
             mQueue.add(order);
-            graphs.put(order.getId(), false);
         }
         mQueue = removeDuplicates(mQueue);
         print();
