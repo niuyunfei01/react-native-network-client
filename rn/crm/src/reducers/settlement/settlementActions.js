@@ -61,14 +61,3 @@ export function to_settlement(id,token,callback) {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -6,6 +6,9 @@ import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
 import {withNavigation} from "react-navigation";
+import FetchEx from "../../util/fetchEx";
+import AppConfig from "../../config";
+
 
 const ListItem = List.Item
 const CheckboxItem = Checkbox.CheckboxItem
@@ -55,16 +58,25 @@ class WorkerPopup extends React.Component {
 
   fetchWorkerList() {
     const self = this
-    Toast.loading('数据请求中', 0)
+    Toast.loading('数据请求中', 10)
     let {currVendorId} = tool.vendor(this.props.global);
     const {accessToken} = this.props.global;
-    const url = `data_dictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
+    const url = `DataDictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
+    console.log("fetch list ", url)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
         Toast.hide()
         if (resp.ok) {
-          self.setState({originWorkerList: resp.obj, workerList: resp.obj})
+          let workerList = resp.obj;
+          let list = [];
+          list.push({name: '不任命任何人', id: '0'});
+          if (workerList && workerList.length > 0) {
+            workerList.forEach(function (item) {
+              list.push({name: item['user']['nickname'], id: item['user']['id']});
+            });
+          }
+          self.setState({originWorkerList: list, workerList: list})
         }
       })
       .catch(e => {

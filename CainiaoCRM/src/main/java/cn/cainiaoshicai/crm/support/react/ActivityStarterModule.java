@@ -273,12 +273,12 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent, new Bundle());
             callback.invoke(false, "打印机未连接");
-            PrintQueue.getQueue(GlobalCtx.app()).add(o);
+            PrintQueue.getQueue(GlobalCtx.app()).addManual(o);
         } else {
             new MyAsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    PrintQueue.getQueue(GlobalCtx.app()).add(o);
+                    PrintQueue.getQueue(GlobalCtx.app()).addManual(o);
                     return null;
                 }
             }.executeOnNormal();

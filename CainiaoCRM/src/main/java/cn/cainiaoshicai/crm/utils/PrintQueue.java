@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.RateLimiter;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import cn.cainiaoshicai.crm.AudioUtils;
+import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.print.PrintMsgEvent;
@@ -24,6 +26,8 @@ import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.print.PrinterMsgType;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+
+import static cn.cainiaoshicai.crm.support.helper.SettingUtility.getAutoPrintSetting;
 
 public class PrintQueue {
 
@@ -36,6 +40,8 @@ public class PrintQueue {
      * print queue
      */
     private ArrayList<Order> mQueue;
+
+    private ArrayList<Order> manualPrintQueue;
     /**
      * bluetooth adapter
      */
@@ -59,13 +65,15 @@ public class PrintQueue {
 
     LoadingCache<Integer, Boolean> graphs = CacheBuilder.newBuilder()
             .maximumSize(10000)
-            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .expireAfterWrite(60, TimeUnit.MINUTES)
             .build(new CacheLoader<Integer, Boolean>() {
                 public Boolean load(Integer key) {
                     return false;
                 }
             });
 
+
+    RateLimiter rateLimiter = RateLimiter.create(3 / (60 * 60));
 
     private PrintQueue() {
     }
@@ -80,6 +88,20 @@ public class PrintQueue {
         return mInstance;
     }
 
+    /**
+     *
+     * @param order
+     */
+    public synchronized void addManual(Order order) {
+        if (null == manualPrintQueue) {
+            manualPrintQueue = new ArrayList<>();
+        }
+        if (null != order) {
+            manualPrintQueue.add(order);
+        }
+        manualPrintQueue = removeDuplicates(manualPrintQueue);
+        printManual();
+    }
 
     /**
      * add print bytes to queue. and call print
@@ -115,12 +137,20 @@ public class PrintQueue {
         return result;
     }
 
+    public synchronized void printManual(){
+        doPrint(manualPrintQueue, false);
+    }
+
     /**
      * print queue
      */
     public synchronized void print() {
+        doPrint(mQueue, true);
+    }
+
+    private void doPrint(ArrayList<Order> queue, boolean checkDupPrint){
         try {
-            if (null == mQueue || mQueue.size() <= 0) {
+            if (null == queue || queue.size() <= 0) {
                 return;
             }
             if (null == mAdapter) {
@@ -146,26 +176,38 @@ public class PrintQueue {
                 times++;
             }
             if (mBtService.getState() == BtService.STATE_CONNECTED) {
-                while (mQueue.size() > 0) {
-                    Order order = mQueue.remove(0);
-                    if (graphs.get(order.getId())) {
+                while (queue.size() > 0) {
+                    Order order = queue.remove(0);
+                    if (order.getPrint_times() > 0) {
+                        continue;
+                    }
+                    if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_TO_READY && order.getOrderStatus() != Cts.WM_ORDER_STATUS_TO_SHIP) {
+                        continue;
+                    }
+                    if (checkDupPrint && graphs.get(order.getId())) {
                         continue;
                     }
                     byte[] data = OrderPrinter.printOrder(order);
                     boolean success = mBtService.write(data, 2000);
                     if (success) {
-                        graphs.put(order.getId(), true);
+                        if (checkDupPrint) {
+                            graphs.put(order.getId(), true);
+                        }
                         OrderPrinter.logOrderPrint(order);
                     } else {
-                        mQueue.add(order);
-                        removeDuplicates(mQueue);
+                        queue.add(order);
+                        removeDuplicates(queue);
                     }
                 }
             } else {
-                AudioUtils.getInstance().speakText(SPEAK_WORD);
+                if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
+                    AudioUtils.getInstance().speakText(SPEAK_WORD);
+                }
             }
         } catch (Exception e) {
-            AudioUtils.getInstance().speakText(SPEAK_WORD);
+            if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
+                AudioUtils.getInstance().speakText(SPEAK_WORD);
+            }
             e.printStackTrace();
         }
     }
@@ -245,10 +287,14 @@ public class PrintQueue {
             if (mBtService.getState() == BtService.STATE_CONNECTED) {
                 mBtService.write(bytes);
             } else {
-                AudioUtils.getInstance().speakText(SPEAK_WORD);
+                if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
+                    AudioUtils.getInstance().speakText(SPEAK_WORD);
+                }
             }
         } catch (Exception e) {
-            AudioUtils.getInstance().speakText(SPEAK_WORD);
+            if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
+                AudioUtils.getInstance().speakText(SPEAK_WORD);
+            }
             e.printStackTrace();
         }
     }
