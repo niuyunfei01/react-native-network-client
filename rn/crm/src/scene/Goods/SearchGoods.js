@@ -1,17 +1,7 @@
 import React, {Component} from "react";
-import {
-	FlatList,
-	Image,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
-	Dimensions
-} from "react-native";
+import {FlatList, Image, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {NavigationActions} from "react-navigation";
-
-import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import LoadingView from "../../widget/LoadingView";
 import {Styles} from "../../themes";
@@ -22,6 +12,7 @@ import Config from "../../config";
 import {NavigationItem1} from "../component/All";
 import tool from "../../common/tool";
 import {ToastLong} from "../../util/ToastUtils";
+import native from "../../common/native";
 
 
 function mapStateToProps(state) {
@@ -53,16 +44,17 @@ class SearchGoods extends Component {
 						marginLeft: pxToDp(31)
 					}}
 					onPress={() => {
-						navigation.dispatch(
-							NavigationActions.reset({
-								index: 0,
-								actions: [
-									NavigationActions.navigate({
-										routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT
-									})
-								]
-							})
-						);
+						// navigation.dispatch(
+						// 	NavigationActions.reset({
+						// 		index: 0,
+						// 		actions: [
+						// 			NavigationActions.navigate({
+						// 				routeName: Config.ROUTE_GOODS_APPLY_NEW_PRODUCT
+						// 			})
+						// 		]
+						// 	})
+						// );
+            native.toGoods()
 					}}
 					children={
 						<View

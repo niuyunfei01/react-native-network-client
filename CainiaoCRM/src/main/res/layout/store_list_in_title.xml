@@ -79,16 +79,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button android:id="@+id/add_new_prod"
-        android:text="@string/apply_new_prod"
+    <Button
+        android:id="@+id/add_new_prod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@id/btn_apply_price_list"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:minWidth="40dp"
         android:minHeight="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:minWidth="40dp"
+        android:paddingEnd="6dp"
+        android:paddingStart="6dp"
+        android:text="@string/add_prod" />
 
     <Button
         android:id="@+id/btn_apply_price_list"

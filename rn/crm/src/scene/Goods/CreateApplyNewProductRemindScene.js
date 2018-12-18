@@ -77,10 +77,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            // navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT, {
-            //   store_id: store_id
-            // });
-            native.toGoods();
+            navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
           }}
         />
       )

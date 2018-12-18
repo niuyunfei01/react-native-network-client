@@ -801,7 +801,7 @@ public class GlobalCtx extends Application {
 
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", /*isPriceControlled ?*/ "CreateApplyNewProductRemind" /*: "GoodsEdit"*/);
+        i.putExtra("_action", /*isPriceControlled ?*/ "SearchGoods" /*: "GoodsEdit"*/);
         Bundle params = new Bundle();
         params.putString("type", "add");
         params.putString("store_id", String.valueOf(storeId));
