@@ -92,6 +92,8 @@ public class BtService {
                 break;
             case STATE_CONNECTED:
                 EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "已连接"));
+                PrintQueue.getQueue(mContext).printManual();
+                PrintQueue.getQueue(mContext).print();
                 break;
             default:
                 EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "未连接"));

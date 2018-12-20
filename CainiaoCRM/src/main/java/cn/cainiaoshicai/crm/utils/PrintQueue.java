@@ -73,7 +73,7 @@ public class PrintQueue {
             });
 
 
-    RateLimiter rateLimiter = RateLimiter.create(3 / (60 * 60));
+    RateLimiter rateLimiter = RateLimiter.create(3.0 / (60 * 60));
 
     private PrintQueue() {
     }
@@ -178,14 +178,16 @@ public class PrintQueue {
             if (mBtService.getState() == BtService.STATE_CONNECTED) {
                 while (queue.size() > 0) {
                     Order order = queue.remove(0);
-                    if (order.getPrint_times() > 0) {
-                        continue;
-                    }
-                    if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_TO_READY && order.getOrderStatus() != Cts.WM_ORDER_STATUS_TO_SHIP) {
-                        continue;
-                    }
-                    if (checkDupPrint && graphs.get(order.getId())) {
-                        continue;
+                    if (checkDupPrint) {
+                        if (order.getPrint_times() > 0) {
+                            continue;
+                        }
+                        if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_TO_READY && order.getOrderStatus() != Cts.WM_ORDER_STATUS_TO_SHIP) {
+                            continue;
+                        }
+                        if (graphs.get(order.getId())) {
+                            continue;
+                        }
                     }
                     byte[] data = OrderPrinter.printOrder(order);
                     boolean success = mBtService.write(data, 2000);

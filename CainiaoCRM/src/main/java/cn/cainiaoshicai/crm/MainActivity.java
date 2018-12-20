@@ -818,9 +818,6 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
             ToastUtil.showToast(GlobalCtx.app(), event.msg);
         }
         if (event.type == PrinterMsgType.MESSAGE_STATE_CHANGE) {
-            if ("已连接".equals(event.msg)) {
-                PrintQueue.getQueue(GlobalCtx.app()).print();
-            }
         }
     }
 
