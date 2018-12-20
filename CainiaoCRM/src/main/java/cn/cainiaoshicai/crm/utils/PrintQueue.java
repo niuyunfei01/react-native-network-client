@@ -73,6 +73,15 @@ public class PrintQueue {
             });
 
 
+    LoadingCache<Integer, Boolean> manualPrintFlag = CacheBuilder.newBuilder()
+            .maximumSize(10000)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .build(new CacheLoader<Integer, Boolean>() {
+                public Boolean load(Integer key) {
+                    return false;
+                }
+            });
+
     RateLimiter rateLimiter = RateLimiter.create(3.0 / (60 * 60));
 
     private PrintQueue() {
@@ -188,12 +197,18 @@ public class PrintQueue {
                         if (graphs.get(order.getId())) {
                             continue;
                         }
+                    } else {
+                        if (manualPrintFlag.get(order.getId())) {
+                            continue;
+                        }
                     }
                     byte[] data = OrderPrinter.printOrder(order);
                     boolean success = mBtService.write(data, 2000);
                     if (success) {
                         if (checkDupPrint) {
                             graphs.put(order.getId(), true);
+                        } else {
+                            manualPrintFlag.put(order.getId(), true);
                         }
                         OrderPrinter.logOrderPrint(order);
                     } else {
