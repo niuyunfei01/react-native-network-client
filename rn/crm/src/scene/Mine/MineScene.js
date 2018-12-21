@@ -178,8 +178,7 @@ class MineScene extends PureComponent {
       this.onGetStoreTurnover();
     }
     
-    let server_info = tool.server_info(this.props);
-    if (tool.length(server_info) === 0 && service_uid > 0) {
+    if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
   }
