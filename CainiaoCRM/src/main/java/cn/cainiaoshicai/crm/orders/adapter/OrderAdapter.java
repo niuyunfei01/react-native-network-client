@@ -141,6 +141,7 @@ public class OrderAdapter extends BaseAdapter {
                 paidWayTxt.setText("在线支付");
                 paidWayTxt.setTextColor(defTextColor);
                 paidWayTxt.setBackground(null);
+                paidWayTxt.setVisibility(View.INVISIBLE);
             }
 
             boolean isInvalid = order.getOrderStatus() == Cts.WM_ORDER_STATUS_INVALID;

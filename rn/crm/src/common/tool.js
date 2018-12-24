@@ -1,7 +1,6 @@
 import Moment from "moment";
 import {NavigationActions} from "react-navigation";
 import Cts from "../Cts";
-import pxToDp from "../util/pxToDp";
 
 export function urlByAppendingParams (url: string, params: Object) {
   let result = url;
@@ -57,6 +56,12 @@ export function shortOrderDay (dt) {
 
 export function orderOrderTimeShort (dt) {
   return Moment(dt).format("M/DD HH:mm");
+}
+
+export function isPreOrder(dt) {
+  let expectSeconds = Moment(dt).unix();
+  let nowSeconds = Moment().unix();
+  return expectSeconds - nowSeconds > 60 * 90
 }
 
 export function orderExpectTime (dt) {
@@ -768,5 +773,6 @@ export default {
   platformsLogo,
   goodSoldStatusImg,
   getTimeStamp,
-  simpleBarrier
+  simpleBarrier,
+  isPreOrder
 };

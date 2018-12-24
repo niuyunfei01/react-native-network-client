@@ -32,6 +32,8 @@ import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Worker;
+import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -368,8 +370,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                String platform = notify.getPlatform() + "";
-                GlobalCtx.app().getSoundManager().notifyNewOrder("", platform, "", 3);
+                try {
+                    int platform = notify.getPlatform();
+                    final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+                    final String platformOid = notify.getPlatform_oid();
+                    final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                    if (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP) {
+                        GlobalCtx.app().getSoundManager().notifyNewOrder("", platform + "", "", 3);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "notifyOrder error", e);
+                }
                 return null;
             }
         }.executeOnNormal();

@@ -56,7 +56,7 @@ class OrderStatusCell extends PureComponent {
       <View style={styles.row}>
         <Text selectable={true} style={[invalidStyle, {color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
         <View style={{flex: 1}}/>
-        <Text style={[invalidStyle, {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
+        <Text style={[invalidStyle, tool.isPreOrder(order.expectTime) ? {color: colors.orange} : {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
         <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>

@@ -49,7 +49,7 @@ public class OrderPrinter {
                 try {
                     final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
                     final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                    if (order != null) {
+                    if (order != null && order.getPrint_times() == 0) {
                         PrintQueue.getQueue(GlobalCtx.app()).add(order);
                     } else {
                         AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
