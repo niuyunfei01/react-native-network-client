@@ -17,6 +17,7 @@ import ApplyScene from "../scene/Apply/ApplyScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerScene from "../scene/Worker/WorkerScene";
+import WorkerListScene from "../scene/Worker/WorkerListScene";
 import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete.android";
@@ -251,7 +252,7 @@ class Navigator extends Component {
         },
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
-        Worker: {screen: WorkerScene},
+        Worker: {screen: WorkerListScene},
         User: {screen: UserScene},
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
