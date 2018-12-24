@@ -90,6 +90,9 @@ public class Order implements Serializable {
     private String ele_id;
     private int eb_order_from;
 
+    //外卖店铺标示
+    private String es_mark_name;
+
     public int getId() {
         return id;
     }
@@ -291,7 +294,7 @@ public class Order implements Serializable {
     }
 
     public void incrPrintTimes() {
-        this.print_times ++;
+        this.print_times++;
     }
 
     public long getStore_id() {
@@ -334,11 +337,16 @@ public class Order implements Serializable {
         if (this.getPlatform() == Cts.PLAT_JDDJ.id && (dayNo != null && dayNo.length() > 8)) {
             dayNo = "";
         }
+        String esMarkName = this.getEs_mark_name();
+        if (esMarkName == null) {
+            esMarkName = "";
+        }
+        esMarkName = esMarkName.trim();
         //饿百订单显示饿了么信息
         if (this.getPlatform() == Cts.PLAT_BD.id && this.getEb_order_from() == Cts.EB_ORDER_FROM_ELE) {
-            return String.format("(%s#%s)", Cts.Platform.find(Cts.PLAT_ELEME.id).name, dayNo);
+            return String.format("(%s %s#%s)", Cts.Platform.find(Cts.PLAT_ELEME.id).name, esMarkName, dayNo);
         }
-        return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayNo);
+        return String.format("(%s %s#%s)", Cts.Platform.find(this.getPlatform()).name, esMarkName, dayNo);
     }
 
     public boolean shouldTryAutoPrint() {
@@ -453,7 +461,7 @@ public class Order implements Serializable {
     public List<Integer> getPackWorkers() {
         ArrayList<Integer> workers = new ArrayList<>();
         String[] w = TextUtils.split(this.pack_workers, ",");
-        for(String sId : w) {
+        for (String sId : w) {
             workers.add(Integer.parseInt(sId));
         }
         return workers;
@@ -505,6 +513,14 @@ public class Order implements Serializable {
 
     public void setEb_order_from(int eb_order_from) {
         this.eb_order_from = eb_order_from;
+    }
+
+    public String getEs_mark_name() {
+        return es_mark_name;
+    }
+
+    public void setEs_mark_name(String es_mark_name) {
+        this.es_mark_name = es_mark_name;
     }
 
     public void copy(Order updatedO) {
@@ -569,6 +585,7 @@ public class Order implements Serializable {
         remark_warning = updatedO.remark_warning;
         ele_id = updatedO.ele_id;
         eb_order_from = updatedO.eb_order_from;
+        es_mark_name = updatedO.es_mark_name;
     }
 
     public boolean isRemark_warning() {
@@ -649,7 +666,7 @@ public class Order implements Serializable {
     }
 
     public int getSelectedCallOptionIdx() {
-        for(int idx = 0; idx < this.callWays.size(); idx++) {
+        for (int idx = 0; idx < this.callWays.size(); idx++) {
             if (this.selected_way == this.callWays.get(idx).getWay()) {
                 return idx;
             }
