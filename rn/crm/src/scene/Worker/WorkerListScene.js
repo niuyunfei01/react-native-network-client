@@ -61,6 +61,7 @@ class WorkerScene extends PureComponent {
       pageSize: 20,
       isLastPage: false,
       filterName: '',
+      isLoading: false
     }
   }
   
@@ -135,12 +136,14 @@ class WorkerScene extends PureComponent {
     const {pageNum, pageSize, currVendorId} = this.state
     let token = global['accessToken']
     const url = `/api/worker_list?access_token=${token}`;
+    this.setState({isLoading: true});
     FetchEx.timeout(Config.FetchTimeout, FetchEx.postJSON(url, {
       vendorId: currVendorId,
       name: self.state.filterName,
       page: options.pageNum ? options.pageNum : pageNum,
       pageSize: pageSize
     })).then(resp => resp.json()).then(resp => {
+      this.setState({isLoading: false});
       let {ok, reason, obj, error_code} = resp;
       if (ok) {
         let isLastPage = true
@@ -156,7 +159,7 @@ class WorkerScene extends PureComponent {
           lists: lists,
           pageNum: obj.page + 1,
           pageSize: obj.pageSize,
-          isLastPage: isLastPage
+          isLastPage: isLastPage,
         })
       }
     })
@@ -209,13 +212,15 @@ class WorkerScene extends PureComponent {
         <View style={{paddingBottom: pxToDp(500)}}>
           <Loadmore
             renderList={this.renderList()}
-            onClickLoadMore={() => {
+            onLoadMore={() => {
               console.log('fetch data on load more')
               this.fetchData()
             }}
+            isLoading={this.state.isLoading}
             onRefresh={() => {
               this.fetchData({pageNum: 1})
             }}
+            loadMoreType={"scroll"}
             isLastPage={this.state.isLastPage}
           />
         </View>

@@ -144,21 +144,19 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         final TextView printerStatus = findViewById(R.id.printer_status);
         printerStatus.setVisibility(isDirect ? View.VISIBLE : View.GONE);
 
-        if (isDirect) {
-            BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
-            boolean connected = GlobalCtx.app().isConnectPrinter();
-            printerStatus.setText(PrintUtil.getDefaultBluethoothDeviceAddress(this) + ":" + (connected ? "已连接" : "未连接"));
-            printerStatus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-                    if (!GlobalCtx.app().isConnectPrinter()) {
-                        AppLogger.e("skip to print for printer is not connected!");
-                    }
-                    showTestDlg(SettingsPrintActivity.this, GlobalCtx.app().isConnectPrinter() ? "打印机未连接？" : "点击测试");
+        BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
+        boolean connected = GlobalCtx.app().isConnectPrinter();
+        printerStatus.setText(PrintUtil.getDefaultBluethoothDeviceAddress(this) + ":" + (connected ? "已连接" : "未连接"));
+        printerStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+                if (!GlobalCtx.app().isConnectPrinter()) {
+                    AppLogger.e("skip to print for printer is not connected!");
                 }
-            });
-        }
+                showTestDlg(SettingsPrintActivity.this, GlobalCtx.app().isConnectPrinter() ? "打印机未连接？" : "点击测试");
+            }
+        });
 
 
         final boolean supportSunMi = OrderPrinter.supportSunMiPrinter();
