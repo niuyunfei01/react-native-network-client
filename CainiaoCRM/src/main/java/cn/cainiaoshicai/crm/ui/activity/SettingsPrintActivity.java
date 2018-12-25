@@ -140,12 +140,12 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         });
         toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
 
-        findViewById(R.id.label_printer_status).setVisibility(isDirect ? View.VISIBLE : View.GONE);
-        final TextView printerStatus = findViewById(R.id.printer_status);
-        printerStatus.setVisibility(isDirect ? View.VISIBLE : View.GONE);
-
         BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
         boolean connected = GlobalCtx.app().isConnectPrinter();
+        findViewById(R.id.label_printer_status).setVisibility(connected ? View.VISIBLE : View.GONE);
+        final TextView printerStatus = findViewById(R.id.printer_status);
+        printerStatus.setVisibility(connected ? View.VISIBLE : View.GONE);
+
         printerStatus.setText(PrintUtil.getDefaultBluethoothDeviceAddress(this) + ":" + (connected ? "已连接" : "未连接"));
         printerStatus.setOnClickListener(new View.OnClickListener() {
             @Override

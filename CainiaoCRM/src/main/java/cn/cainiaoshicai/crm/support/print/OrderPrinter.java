@@ -178,7 +178,7 @@ public class OrderPrinter {
             testData = printer.concatenate(testData, printer.highTextBytes(String.format("合计 %27s", "x100")));
             testData = printer.concatenate(testData, printer.newLineBytes());
             testData = printer.concatenate(testData, printer.startLineBytes());
-            testData = printer.concatenate(testData, printer.normalTextBytes("比邻鲜，好生意！"));
+            testData = printer.concatenate(testData, printer.normalTextBytes("外送帮，好生意！"));
             testData = printer.concatenate(testData, printer.newLineBytes());
             testData = printer.concatenate(testData, new byte[]{0x0D,0x0D,0x0D});
             testData = printer.concatenate(testData, GPrinterCommand.walkPaper((byte) 4));
