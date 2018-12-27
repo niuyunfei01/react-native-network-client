@@ -32,6 +32,7 @@ import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import TakeOutScene from "../scene/Store/TakeOutScene";
+import StoreStatusScene from "../scene/Store/StoreStatusScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
@@ -276,6 +277,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
+        [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},

@@ -110,6 +110,7 @@ const C = {
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_DONE_REMIND: 'DoneRemind',
   ROUTE_TAKE_OUT: 'TakeOut',
+  ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',

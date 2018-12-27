@@ -103,7 +103,6 @@ class MineScene extends PureComponent {
       fnPriceControlled,
       fnProfitControlled
     } = tool.vendor(this.props.global);
-    console.log('global => ', this.props.global)
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     
     // let storeActionSheet = tool.storeActionSheet(
@@ -182,8 +181,8 @@ class MineScene extends PureComponent {
       this.onGetUserInfo(service_uid);
     }
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
@@ -191,9 +190,7 @@ class MineScene extends PureComponent {
         this._doChangeStore(first_store_id, false);
       }
     }
-    console.log("can read stores ", canReadStores);
     const storeList = tool.storeListOfModalSelector(canReadStores);
-    console.log("store list ", storeList);
     this.setState({storeList: storeList});
     this.getNotifyCenter();
   }
@@ -489,7 +486,7 @@ class MineScene extends PureComponent {
         </View>
         <TouchableOpacity
           style={[header_styles.icon_box]}
-          onPress={() => this.onPress(Config.ROUTE_TAKE_OUT)}
+          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS)}
         >
           <Image
             style={[header_styles.icon_open]}
@@ -976,16 +973,16 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         )}
         <TouchableOpacity
-        style={[block_styles.block_box]}
-        onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
-        activeOpacity={customerOpacity}
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
+          activeOpacity={customerOpacity}
         >
-        {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
-        <Image
-        style={[block_styles.block_img]}
-        source={require("../../img/My/shangpinqingbao_.png")}
-        />
-        <Text style={[block_styles.block_name]}>商品调整</Text>
+          {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/shangpinqingbao_.png")}
+          />
+          <Text style={[block_styles.block_name]}>商品调整</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
