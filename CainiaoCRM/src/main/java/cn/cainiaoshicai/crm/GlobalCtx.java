@@ -29,6 +29,10 @@ import android.widget.Toast;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
+import com.fanjun.keeplive.KeepLive;
+import com.fanjun.keeplive.config.ForegroundNotification;
+import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
+import com.fanjun.keeplive.config.KeepLiveService;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -100,6 +104,8 @@ import cn.jpush.android.api.JPushInterface;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import cn.cainiaoshicai.crm.R;
 
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
@@ -290,10 +296,34 @@ public class GlobalCtx extends Application {
         //初始化蓝牙管理
         AppInfo.init(this);
 
+        startKeepAlive();
+
+    }
+
+    public void startKeepAlive() {
         //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
         DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
         KeepAliveService.sShouldStopService = false;
         DaemonEnv.startServiceMayBind(KeepAliveService.class);
+
+        //定义前台服务的默认样式。即标题、描述和图标
+        ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
+            @Override
+            public void foregroundNotificationClick() {
+
+            }
+        });
+
+        //启动保活服务
+        KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
+            @Override
+            public void onWorking(Context context) {
+            }
+
+            @Override
+            public void onStop(Context context) {
+            }
+        });
     }
 
     public void updateAfterGap(final int fiveMin) {
