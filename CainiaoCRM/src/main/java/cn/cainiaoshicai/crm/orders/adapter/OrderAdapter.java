@@ -224,6 +224,7 @@ public class OrderAdapter extends BaseAdapter {
                         v.getContext().startActivity(intent);
                     }
                 });
+                sourcePlatform.setVisibility(View.VISIBLE);
             } else {
                 sourcePlatform.setVisibility(View.INVISIBLE);
             }
