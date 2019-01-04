@@ -728,6 +728,7 @@ class StoreAddScene extends Component {
                   maxLength={18} // 可输入的最大长度
                   keyboardType="numeric" //默认弹出的键盘
                   underlineColorAndroid="transparent" //取消安卓下划线
+                  editable={this.state.isServiceMgr}
                 />
               </CellBody>
             </Cell>
@@ -1062,7 +1063,9 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({isStartVisible: true});
+                    if (this.state.isServiceMgr) {
+                      this.setState({isStartVisible: true});
+                    }
                   }}
                 >
                   <Text style={styles.body_text}>{open_start}</Text>
@@ -1085,9 +1088,10 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({isEndVisible: true});
-                  }}
-                >
+                    if (this.state.isServiceMgr) {
+                      this.setState({isEndVisible: true});
+                    }
+                  }}>
                   <Text style={styles.body_text}>{open_end}</Text>
                 </TouchableOpacity>
                 <DateTimePicker

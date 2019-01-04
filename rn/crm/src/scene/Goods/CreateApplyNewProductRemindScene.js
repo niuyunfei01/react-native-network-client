@@ -77,7 +77,8 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
+            //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
+            native.toGoods();
           }}
         />
       )
