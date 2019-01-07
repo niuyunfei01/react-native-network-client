@@ -11,8 +11,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.RateLimiter;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
@@ -21,9 +19,7 @@ import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.print.PrintMsgEvent;
 import cn.cainiaoshicai.crm.print.PrintUtil;
-import cn.cainiaoshicai.crm.print.PrinterMsgType;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 

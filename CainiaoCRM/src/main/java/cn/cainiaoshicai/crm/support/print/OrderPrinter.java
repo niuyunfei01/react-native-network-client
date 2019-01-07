@@ -352,17 +352,26 @@ public class OrderPrinter {
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
         ByteArrayOutputStream btos = new ByteArrayOutputStream();
+        boolean isDirectVendor = false;
+        try {
+            isDirectVendor = GlobalCtx.app().isDirectVendor();
+        } catch (Exception e) {
+
+        }
         try {
             BasePrinter printer = new BasePrinter(btos);
-
-
             btos.write(new byte[]{0x1B, 0x21, 0});
             btos.write(GPrinterCommand.left);
 
-            printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
-                    .newLine().highBigText("  #" + order.getDayId());
-
-            printer.normalText(order.platformWithId()).newLine();
+            if (isDirectVendor) {
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText("  #" + order.getDayId());
+                printer.highBigText(order.platformWithId()).newLine();
+            } else {
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText(order.platformWithId());
+                printer.highBigText("  #" + order.getDayId()).newLine();
+            }
 
             printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
 
