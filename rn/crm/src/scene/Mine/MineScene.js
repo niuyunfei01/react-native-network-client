@@ -20,12 +20,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import native from "../../common/native";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 import {
   fetchWorkers,
   fetchUserCount,
   fetchStoreTurnover,
-  userCanChangeStore
+  userCanChangeStore,
+  fetchDutyUsers
 } from "../../reducers/mine/mineActions";
 import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
@@ -51,6 +52,7 @@ function mapDispatchToProps (dispatch) {
       {
         fetchUserCount,
         fetchWorkers,
+        fetchDutyUsers,
         fetchStoreTurnover,
         fetchUserInfo,
         upCurrentProfile,
@@ -157,7 +159,8 @@ class MineScene extends PureComponent {
       storeList: tool.storeListOfModalSelector(canReadStores),
       storeListSecondModalVisible: false,
       storeListSecondModalData: [],
-      adjust_cnt: 0
+      adjust_cnt: 0,
+      dutyUsers: []
     };
     
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -169,6 +172,7 @@ class MineScene extends PureComponent {
     this.onGetUserInfo = this.onGetUserInfo.bind(this);
     this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
     this.getNotifyCenter = this.getNotifyCenter.bind(this);
+    this.onGetDutyUser = this.onGetDutyUser.bind(this);
     
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
@@ -180,6 +184,8 @@ class MineScene extends PureComponent {
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
+
+    this.onGetDutyUser();
   }
   
   componentWillMount () {
@@ -199,10 +205,7 @@ class MineScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
-      dispatch(
-        fetchUserInfo(uid, accessToken, resp => {
-        
-        })
+      dispatch(fetchUserInfo(uid, accessToken, resp => {})
       );
     });
   }
@@ -220,6 +223,24 @@ class MineScene extends PureComponent {
               sign_count: sign_count,
               bad_cases_of: bad_cases_of
             });
+          }
+          _this.setState({isRefreshing: false});
+        })
+      );
+    });
+  }
+
+  onGetDutyUser() {
+    const {accessToken, currStoreId} = this.props.global;
+    let _this = this;
+    const {dispatch} = this.props;
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(
+        fetchDutyUsers(currStoreId, accessToken, resp => {
+          if (resp.ok) {
+            _this.setState({
+              dutyUsers: resp.obj
+            })
           }
           _this.setState({isRefreshing: false});
         })
@@ -285,6 +306,20 @@ class MineScene extends PureComponent {
         );
       }
     });
+  }
+
+  callCustomerService() {
+    let server_info = tool.server_info(this.props);
+    let dutyUsers = this.state.dutyUsers;
+    if (dutyUsers && Array.isArray(dutyUsers) && dutyUsers.length > 0) {
+      let key = Math.floor(Math.random() * dutyUsers.length);
+      let u = dutyUsers[key];
+      if (u.mobilephone) {
+        native.dialNumber(u.mobilephone);
+        return;
+      }
+    }
+    native.dialNumber(server_info.mobilephone);
   }
   
   componentWillReceiveProps () {
@@ -1035,7 +1070,7 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            native.dialNumber(server_info.mobilephone);
+            this.callCustomerService()
           }}
           activeOpacity={customerOpacity}
         >

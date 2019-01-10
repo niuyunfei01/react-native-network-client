@@ -10,7 +10,8 @@ const {
 	GET_VENDOR_STORES,
 	GET_STORE_TURNOVER,
 	GET_WM_STORES,
-	GET_USER_WAGE_DATA
+	GET_USER_WAGE_DATA,
+  GET_VENDOR_DUTY_USERS
 } = require("../../common/constants").default;
 
 export function fetchUserCount(u_id, token, callback) {
@@ -43,6 +44,36 @@ function receiveUserCount(u_id, sign_count, bad_cases_of) {
 		sign_count: sign_count,
 		bad_cases_of: bad_cases_of
 	};
+}
+
+export function fetchDutyUsers(storeId, token, callback) {
+  return dispatch => {
+    const url = `api/get_duty_users/${storeId}.json?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let users = resp.obj;
+          dispatch(receiveUserDutyUsers(users));
+        } else {
+          dispatch(receiveUserDutyUsers([]));
+          ToastLong(resp.desc);
+        }
+        callback(resp);
+      })
+      .catch(error => {
+        dispatch(receiveUserCount(0, 0));
+        ToastLong(error.message);
+        callback({ok: false, desc: error.message});
+      });
+  };
+}
+
+function receiveUserDutyUsers(users) {
+  return {
+    type: GET_VENDOR_DUTY_USERS,
+    users: users
+  };
 }
 
 export function fetchWorkers(_v_id, token, callback) {
