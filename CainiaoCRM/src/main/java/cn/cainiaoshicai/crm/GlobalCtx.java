@@ -29,6 +29,10 @@ import android.widget.Toast;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
+import com.fanjun.keeplive.KeepLive;
+import com.fanjun.keeplive.config.ForegroundNotification;
+import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
+import com.fanjun.keeplive.config.KeepLiveService;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -39,7 +43,7 @@ import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
-import com.zmxv.RNSound.RNSoundPackage;
+import com.xdandroid.hellodaemon.DaemonEnv;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -59,6 +63,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
@@ -71,12 +76,14 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
+import cn.cainiaoshicai.crm.notify.service.KeepAliveService;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -90,16 +97,15 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.cainiaoshicai.crm.utils.PrinterCallback;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
-import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import cn.cainiaoshicai.crm.R;
 
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
@@ -276,10 +282,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
-                .addPackage(new RNSoundPackage())
-                .addPackage(new BleManagerPackage())
                 .addPackage(new PickerPackage())
-
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
@@ -289,6 +292,38 @@ public class GlobalCtx extends Application {
         AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
+
+        //初始化蓝牙管理
+        AppInfo.init(this);
+
+        startKeepAlive();
+
+    }
+
+    public void startKeepAlive() {
+        //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
+        DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
+        KeepAliveService.sShouldStopService = false;
+        DaemonEnv.startServiceMayBind(KeepAliveService.class);
+
+        //定义前台服务的默认样式。即标题、描述和图标
+        ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
+            @Override
+            public void foregroundNotificationClick() {
+
+            }
+        });
+
+        //启动保活服务
+        KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
+            @Override
+            public void onWorking(Context context) {
+            }
+
+            @Override
+            public void onStop(Context context) {
+            }
+        });
     }
 
     public void updateAfterGap(final int fiveMin) {
@@ -300,7 +335,6 @@ public class GlobalCtx extends Application {
             }
         }, fiveMin);
     }
-
 
     public void updateCfgInterval() {
         if (!TextUtils.isEmpty(this.token())) {
@@ -318,7 +352,8 @@ public class GlobalCtx extends Application {
             try {
                 String uid = ctx.getCurrentAccountId();
                 if (!TextUtils.isEmpty(uid)) {
-                    JPushInterface.setAliasAndTags(ctx, "uid_" + uid, null);
+                    JPushInterface.resumePush(ctx);
+                    JPushInterface.setAlias(ctx, (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
                 }
             } catch (Exception e) {
                 AppLogger.w("error to set jpush alias");
@@ -330,7 +365,7 @@ public class GlobalCtx extends Application {
 
             ss.put("printer", SettingUtility.getLastConnectedPrinterAddress());
             ss.put("printer_auto_store", storeId);
-            ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
+            //ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
             Config cfg = ctx.serverCfg.get(storeId);
             final String lastHash = cfg == null ? "" : cfg.getLastHash();
             ss.put("last_hash", lastHash);
@@ -404,19 +439,6 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-//        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_holo_light;
-
-        //.abc_ic_ab_back_mtrl_am_alpha;
-
-//        MQConfig.ui.titleBackgroundResId = R.color.test_red;
-//        MQConfig.ui.titleTextColorResId = R.color.test_blue;
-//        MQConfig.ui.leftChatBubbleColorResId = R.color.test_green;
-//        MQConfig.ui.leftChatTextColorResId = R.color.test_red;
-//        MQConfig.ui.rightChatBubbleColorResId = R.color.test_red;
-//        MQConfig.ui.rightChatTextColorResId = R.color.test_green;
-//        MQConfig.ui.robotEvaluateTextColorResId = R.color.test_red;
-//        MQConfig.ui.robotMenuItemTextColorResId = R.color.test_blue;
-//        MQConfig.ui.robotMenAuTipTextColorResId = R.color.test_blue;
     }
 
     public ReactInstanceManager getmReactInstanceManager() {
@@ -620,6 +642,11 @@ public class GlobalCtx extends Application {
                 || (SettingUtility.isAutoPrint(store_id));
     }
 
+    public boolean isConnectPrinter() {
+        BtService btService = new BtService(this);
+        return btService.getState() == BtService.STATE_CONNECTED || !TextUtil.isEmpty(PrintUtil.getDefaultBluethoothDeviceAddress(this));
+    }
+
     public SoundManager getSoundManager() {
         return soundManager;
     }
@@ -804,7 +831,7 @@ public class GlobalCtx extends Application {
 
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", /*isPriceControlled ?*/ "GoodsApplyNewProduct" /*: "GoodsEdit"*/);
+        i.putExtra("_action", /*isPriceControlled ?*/ "SearchGoods" /*: "GoodsEdit"*/);
         Bundle params = new Bundle();
         params.putString("type", "add");
         params.putString("store_id", String.valueOf(storeId));
@@ -981,6 +1008,10 @@ public class GlobalCtx extends Application {
         return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
     }
 
+    public boolean isDirectVendor() {
+        return this.getVendor() != null && this.getVendor().isDirect();
+    }
+
     public boolean fnEnabledStoreInfoMgr() {
         if (isSuperMgr()) return true;
 
@@ -1101,6 +1132,7 @@ public class GlobalCtx extends Application {
         private int new_mt_order_sound;
         private int new_jd_order_sound;
         private int new_ele_order_sound;
+        private int new_eb_order_sound;
         private int todo_complain_sound;
 
         public void load(GlobalCtx ctx) {
@@ -1130,6 +1162,7 @@ public class GlobalCtx extends Application {
             new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound1, 1);
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
+            new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1200,7 +1233,6 @@ public class GlobalCtx extends Application {
                         return null;
                     }
                 }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
-                ;
                 return true;
             } else {
                 AppLogger.e("no sound");
@@ -1228,8 +1260,13 @@ public class GlobalCtx extends Application {
             }
         }
 
+
         public boolean play_new_simple_order_sound() {
             return this.play_single_sound(simpleNewOrderSound);
+        }
+
+        public boolean play_new_eb_order_sound() {
+            return this.play_single_sound(new_eb_order_sound);
         }
 
         public boolean play_new_ele_order_sound() {
@@ -1340,6 +1377,47 @@ public class GlobalCtx extends Application {
 
         public boolean play_by_xunfei(String s) {
             return !check_disabled() && AudioUtils.getInstance().speakText(s);
+        }
+
+        public void notifyNewOrder(String text, String plat, String storeName, int notifyTimes) {
+            try {
+                //获取系统的Audio管理者
+                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                //最大音量
+                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+                //当前音量
+                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+                int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
+
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
+                for (int i = 0; i < notifyTimes; i++) {
+                    if (storeName != null && !storeName.isEmpty()) {
+                        GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
+                        Thread.sleep(1300);
+                    }
+                    if (plat.equals("6")) {
+                        GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
+                    } else if (plat.equals("4")) {
+                        GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
+                    } else if (plat.equals("3")) {
+                        GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
+                    } else if (plat.equals("1")) {
+                        GlobalCtx.app().getSoundManager().play_new_eb_order_sound();
+                    } else {
+                        GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
+                    }
+                    Thread.sleep(8000);
+                }
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
+            } catch (Exception e) {
+                AppLogger.e(e.getMessage());
+            }
         }
     }
 }

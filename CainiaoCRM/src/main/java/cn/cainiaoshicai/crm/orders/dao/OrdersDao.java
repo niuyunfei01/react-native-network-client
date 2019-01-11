@@ -86,7 +86,7 @@ public class OrdersDao {
         }
 
         OrderContainer oc = convert(getJson(map));
-        if (useCache && hasStores && oc != null && listType != ListType.ARRIVED.getValue()) {
+        if (useCache && hasStores && oc != null && listType != ListType.DONE.getValue()) {
             SettingUtility.putOrderContainerCache(cacheKey, oc);
         }
         return oc;

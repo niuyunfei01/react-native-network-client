@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.clj.fastble.BleManager;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.CatalystInstance;
@@ -46,8 +47,6 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.support.print.BasePrinter;
-import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
@@ -56,6 +55,8 @@ import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
+import cn.jpush.android.api.JPushInterface;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -94,6 +95,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
         Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
     }
 
     @ReactMethod
@@ -266,23 +268,17 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
-        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-        if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
+        if (!GlobalCtx.app().isConnectPrinter()) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent, new Bundle());
             callback.invoke(false, "打印机未连接");
+            PrintQueue.getQueue(GlobalCtx.app()).addManual(o);
         } else {
             new MyAsyncTask<Void, Void, Void>() {
-
                 @Override
                 protected Void doInBackground(Void... params) {
-                    OrderPrinter._print(o, false, new BasePrinter.PrintCallback() {
-                        @Override
-                        public void run(boolean result, String desc) {
-                            callback.invoke(result, desc);
-                        }
-                    });
+                    PrintQueue.getQueue(GlobalCtx.app()).addManual(o);
                     return null;
                 }
             }.executeOnNormal();

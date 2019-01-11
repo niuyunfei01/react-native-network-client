@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, {PureComponent} from "react";
 import {
   Image,
   ScrollView,
@@ -20,10 +20,10 @@ import {
   Label,
   Toast
 } from "../../weui/index";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import { getVendorStores } from "../../reducers/mine/mineActions";
+import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
@@ -33,18 +33,18 @@ import {
 } from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
-import { NavigationItem } from "../../widget";
+import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 
-import { ToastLong } from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 //请求
-import { getWithTpl, jsonWithTpl } from "../../util/common";
+import {getWithTpl} from "../../util/common";
 
 function mapStateToProps(state) {
-  const { mine, product, global } = state;
-  return { mine: mine, product: product, global: global };
+  const {mine, product, global} = state;
+  return {mine: mine, product: product, global: global};
 }
 
 function mapDispatchToProps(dispatch) {
@@ -62,9 +62,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class CreateApplyNewProductRemindScene extends PureComponent {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
-    let { type, backPage, store_id } = params;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    let {type, backPage, store_id} = params;
     return {
       headerTitle: "申请上新",
       headerLeft: (
@@ -77,9 +77,8 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT, {
-              store_id: store_id
-            });
+            //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
+            native.toGoods();
           }}
         />
       )
@@ -88,7 +87,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let { currVendorId } = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
     let currStoreId = this.props.navigation.state.params.store_id;
     if (!currStoreId) {
       currStoreId = this.props.global.currStoreId;
@@ -122,9 +121,9 @@ class CreateApplyNewProductRemindScene extends PureComponent {
   }
 
   getVendorStore() {
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
-    let { currVendorId } = tool.vendor(this.props.global);
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
       getVendorStores(currVendorId, accessToken, resp => {
@@ -141,11 +140,12 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       })
     );
   }
+
   componentWillMount() {
-    let { currVendorId } = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
     let url = `api/is_service_mgr/${currVendorId}?access_token=${
       this.props.global.accessToken
-    }`;
+      }`;
     http: getWithTpl(
       url,
       json => {
@@ -167,6 +167,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       }
     );
   }
+
   upLoad = async () => {
     let {
       vendor_id,
@@ -185,15 +186,15 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       upload_files
     };
     let check_res = this.dataValidate(formData);
-    const { dispatch } = this.props;
-    const { accessToken } = this.props.global;
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
     if (check_res) {
-      this.setState({ uploading: true });
+      this.setState({uploading: true});
       dispatch(
         newProductSave(formData, accessToken, async (ok, reason, obj) => {
-          this.setState({ uploading: false });
+          this.setState({uploading: false});
           if (ok) {
-            this.setState({ dialogStatus: true });
+            this.setState({dialogStatus: true});
           } else {
             ToastLong(reason);
           }
@@ -203,7 +204,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
   };
 
   dataValidate(formData) {
-    let { goods_name, price_desc } = formData;
+    let {goods_name, price_desc} = formData;
     let err_msg = "";
     if (goods_name.length <= 0) {
       err_msg = "请输入商品名";
@@ -225,13 +226,14 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     return (
       <ActionSheet
         visible={this.state.opVisible}
-        onRequestClose={() => {}}
+        onRequestClose={() => {
+        }}
         menus={[
           {
             type: "primary",
             label: "照相机",
             onPress: () => {
-              this.setState({ opVisible: false, camera: "openCamera" }, () => {
+              this.setState({opVisible: false, camera: "openCamera"}, () => {
                 this.pickSingleImg();
               });
             }
@@ -257,7 +259,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             type: "default",
             label: "取消",
             onPress: () => {
-              this.setState({ opVisible: false });
+              this.setState({opVisible: false});
             }
           }
         ]}
@@ -293,24 +295,24 @@ class CreateApplyNewProductRemindScene extends PureComponent {
   }
 
   uploadImg(image_info) {
-    const { dispatch } = this.props;
-    let { isUploadImg, list_img, upload_files } = this.state;
+    const {dispatch} = this.props;
+    let {isUploadImg, list_img, upload_files} = this.state;
     if (isUploadImg) {
       return false;
     }
-    this.setState({ isUploadImg: true });
+    this.setState({isUploadImg: true});
     dispatch(
       uploadImg(
         image_info,
         resp => {
           if (resp.ok) {
-            let { name, uri } = image_info;
-            let { file_id, fspath } = resp.obj;
+            let {name} = image_info;
+            let {file_id, fspath} = resp.obj;
             list_img[file_id] = {
               url: Config.staticUrl(fspath),
               name: name
             };
-            upload_files.push({ id: file_id, name: name });
+            upload_files.push({id: file_id, name: name});
             this.setState({
               list_img: list_img,
               upload_files: upload_files,
@@ -323,7 +325,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             });
           }
         },
-        "ProductApply"
+        "ProductApply", 1
       )
     );
   }
@@ -340,7 +342,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             this.upLoad();
           }}
         >
-          <Text style={{ color: colors.white }}>保存</Text>
+          <Text style={{color: colors.white}}>保存</Text>
         </Button>
         {this.state.isShow ? (
           <Button
@@ -357,7 +359,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
               });
             }}
           >
-            <Text style={{ color: colors.main_color }}>直接上新</Text>
+            <Text style={{color: colors.main_color}}>直接上新</Text>
           </Button>
         ) : null}
       </View>
@@ -382,7 +384,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                   style={[styles.input_text]}
                   value={this.state.goods_name}
                   onChangeText={text => {
-                    this.setState({ goods_name: text });
+                    this.setState({goods_name: text});
                   }}
                 />
               </CellBody>
@@ -399,14 +401,14 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                   style={[styles.input_text]}
                   value={`${this.state.price_desc}`}
                   onChangeText={text => {
-                    this.setState({ price_desc: text });
+                    this.setState({price_desc: text});
                   }}
                 />
               </CellBody>
-              <CellFooter />
+              <CellFooter/>
             </Cell>
 
-            <View style={[styles.area_cell, { height: pxToDp(250) }]}>
+            <View style={[styles.area_cell, {height: pxToDp(250)}]}>
               <View>
                 <Text style={[styles.area_input_title]}>商品介绍</Text>
               </View>
@@ -423,14 +425,14 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                   placeholder="请输入商品介绍"
                   style={[
                     styles.input_text,
-                    { flex: 1, textAlignVertical: "top" }
+                    {flex: 1, textAlignVertical: "top"}
                   ]}
                   value={this.state.slogan}
                   onChangeText={text => {
-                    this.setState({ slogan: text });
+                    this.setState({slogan: text});
                   }}
                 />
-                <Text style={{ alignSelf: "flex-end" }}>
+                <Text style={{alignSelf: "flex-end"}}>
                   {this.state.slogan.length}/50
                 </Text>
               </View>
@@ -451,7 +453,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                   alignItems: "flex-end"
                 }}
               >
-                <Image style={styles.img_add} source={{ uri: img_url }} />
+                <Image style={styles.img_add} source={{uri: img_url}}/>
                 <TouchableOpacity
                   style={{
                     position: "absolute",
@@ -467,7 +469,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                   <Icon
                     name={"clear"}
                     size={pxToDp(40)}
-                    style={{ backgroundColor: "#fff" }}
+                    style={{backgroundColor: "#fff"}}
                     color={"#d81e06"}
                     msg={false}
                   />
@@ -484,7 +486,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             }}
           >
             <TouchableOpacity
-              style={[styles.img_add, styles.img_add_box, { flexWrap: "wrap" }]}
+              style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
               // onPress={() => this.pickSingleImg()}
               onPress={() =>
                 this.setState({
@@ -492,7 +494,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                 })
               }
             >
-              <Text style={{ fontSize: pxToDp(36), color: "#bfbfbf" }}>+</Text>
+              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -504,12 +506,14 @@ class CreateApplyNewProductRemindScene extends PureComponent {
         <Toast
           icon="loading"
           show={this.state.uploading}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           提交中
         </Toast>
         <Dialog
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
           visible={this.state.dialogStatus}
           buttons={[
             {
@@ -524,7 +528,8 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                 //   upload_files: {},
                 //   dialogStatus: false
                 // });
-                this.props.navigation.goBack();
+                //this.props.navigation.goBack();
+                native.toGoods()
               }
             }
           ]}
@@ -539,8 +544,8 @@ class CreateApplyNewProductRemindScene extends PureComponent {
           >
             提交成功
           </Text>
-          <Text style={{ width: "100%", textAlign: "center" }}>
-            门店经理会在三个小时内完成上新操作请耐心等候
+          <Text style={{width: "100%", textAlign: "center"}}>
+            门店经理会在48小时内完成上新操作请耐心等候
           </Text>
         </Dialog>
       </ScrollView>

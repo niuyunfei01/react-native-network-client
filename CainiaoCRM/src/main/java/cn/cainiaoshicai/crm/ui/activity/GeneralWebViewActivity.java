@@ -78,6 +78,12 @@ public class GeneralWebViewActivity extends AppCompatActivity {
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         String url = this.getIntent().getStringExtra("url");
+        String token = GlobalCtx.app().getAccountBean().getAccess_token();
+        if (url.indexOf("?") >= 0) {
+            url = url + "&access_token=" + token;
+        } else {
+            url = url + "?access_token=" + token;
+        }
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }

@@ -17,12 +17,12 @@ import ApplyScene from "../scene/Apply/ApplyScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerScene from "../scene/Worker/WorkerScene";
+import WorkerListScene from "../scene/Worker/WorkerListScene";
 import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete.android";
 import SettingScene from "../scene/Setting/SettingScene";
 import CloudPrinterScene from "../scene/Setting/CloudPrinterScene";
-import PrinterConnectScene from "../scene/Setting/PrinterConnectScene";
 import AuditRefundScene from "../scene/Order/AuditRefundScene";
 import OrderEditScene from "../scene/Order/OrderEditScene";
 import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
@@ -32,6 +32,7 @@ import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import TakeOutScene from "../scene/Store/TakeOutScene";
+import StoreStatusScene from "../scene/Store/StoreStatusScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
@@ -151,7 +152,7 @@ const tabDef = function (store_) {
         ),
         tabBarOnPress: (scene, jumpToIndex) => {
           console.log("do navigateToGoods");
-          const {enabled_good_mgr = false} = store_.getState().global.config;
+          const {enabled_good_mgr = true} = store_.getState().global.config;
           if (enabled_good_mgr) {
             native.toGoods();
           } else {
@@ -256,7 +257,7 @@ class Navigator extends Component {
         },
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
-        Worker: {screen: WorkerScene},
+        Worker: {screen: WorkerListScene},
         User: {screen: UserScene},
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
@@ -266,7 +267,6 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
         [Config.ROUTE_SETTING]: {screen: SettingScene},
         [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
-        [Config.ROUTE_PRINTER_CONNECT]: {screen: PrinterConnectScene},
         [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
@@ -281,6 +281,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
+        [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},

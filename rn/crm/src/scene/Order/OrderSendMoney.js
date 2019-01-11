@@ -33,13 +33,19 @@ class OrderSendMoney extends PureComponent {
     this.state = {
       amount: '',
       remark: '',
+      submitting: false
     }
   }
   
   handleSubmit () {
     const self = this
     const {global, navigation} = self.props;
-    const {amount, remark} = self.state
+    const {amount, remark, submitting} = self.state
+    if (submitting) {
+      ToastLong("正在提交，请等待！");
+      return false;
+    }
+    self.setState({submitting: true});
     const url = `api/save_store_surcharge?access_token=${global.accessToken}`;
     const formData = JSON.stringify({
       fee: amount * 100,
@@ -53,12 +59,15 @@ class OrderSendMoney extends PureComponent {
         if (resp.ok) {
           ToastShort('提交成功')
           navigation.goBack()
+          self.setState({submitting: true});
         } else {
           ToastShort('提交失败')
+          self.setState({submitting: false});
         }
       })
       .catch(error => {
         ToastLong(error.message);
+        self.setState({submitting: false});
       });
   }
   

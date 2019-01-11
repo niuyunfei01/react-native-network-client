@@ -1,32 +1,13 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Switch
-} from "../../weui/index";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 

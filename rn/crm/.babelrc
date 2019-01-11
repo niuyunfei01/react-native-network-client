@@ -2,17 +2,16 @@
   "presets": [
     "react-native"
   ],
-  "env": {
-    "production": {
-      "plugins": [
-        "transform-remove-console"
-      ]
-    }
-  },
   "plugins": [
     // 条件组件
     [
       "jsx-control-statements"
     ]
-  ]
+  ],
+  "env": {
+    "production": {
+      "plugins": ["transform-remove-console", ["import", { "libraryName": "antd-mobile-rn" }]]
+    }
+  },
+
 }

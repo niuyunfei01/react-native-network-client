@@ -1,37 +1,49 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import android.app.ListActivity;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import cn.cainiaoshicai.crm.CrashReportHelper;
+import com.xdandroid.hellodaemon.IntentWrapper;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.bt.BluetoothActivity;
+import cn.cainiaoshicai.crm.bt.BluetoothController;
+import cn.cainiaoshicai.crm.bt.BtService;
+import cn.cainiaoshicai.crm.bt.BtUtil;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -39,32 +51,44 @@ import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
-import cn.cainiaoshicai.crm.ui.adapter.BluetoothItemAdapter;
-import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 
-public class SettingsPrintActivity extends ListActivity {
+
+public class SettingsPrintActivity extends BluetoothActivity implements View.OnClickListener {
 
     static public final int REQUEST_CONNECT_BT = 0x2300;
+    private static final String TAG = SettingsPrintActivity.class.getSimpleName();
 
-    static private final int REQUEST_ENABLE_BT = 0x1000;
+    private static final int REQUEST_CODE_OPEN_GPS = 1;
+    private static final int REQUEST_CODE_PERMISSION_LOCATION = 2;
 
-    static private android.bluetooth.BluetoothAdapter btAdapter = null;
+    /**
+     *
+     */
+    BluetoothAdapter mAdapter;
 
-    static private BluetoothItemAdapter<BluetoothPrinters.DeviceStatus> listAdapter;
+    boolean mBtEnable = true;
 
-    private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9b66");
-    private BluetoothPrinters.DeviceStatus lastDevice;
+    private Button btn_scan;
+
+    int PERMISSION_REQUEST_COARSE_LOCATION = 2;
+
+    TextView tv_bluename;
+    TextView tv_blueadress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         this.setContentView(R.layout.settings_print);
-
         setTitle(R.string.title_setting);
-        listAdapter = new BluetoothItemAdapter<>(this, R.layout.print_list, R.id.text1, R.id.storage_item_status);
-        setListAdapter(listAdapter);
+        initView();
 
+        //6.0以上的手机要地理位置权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+        }
+    }
+
+    private void initView() {
         Switch toggleSoundNotify = findViewById(R.id.toggleSoundNotify);
         toggleSoundNotify.setChecked(!SettingUtility.isDisableSoundNotify());
         toggleSoundNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -116,28 +140,29 @@ public class SettingsPrintActivity extends ListActivity {
         });
         toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
 
-        findViewById(R.id.label_printer_status).setVisibility(isDirect ? View.VISIBLE : View.GONE);
+        BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
+        boolean connected = GlobalCtx.app().isConnectPrinter();
+        findViewById(R.id.label_printer_status).setVisibility(connected ? View.VISIBLE : View.GONE);
         final TextView printerStatus = findViewById(R.id.printer_status);
-        printerStatus.setVisibility(isDirect ? View.VISIBLE : View.GONE);
-        if (isDirect) {
-            BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
-            boolean connected = GlobalCtx.app().isPrinterConnected() || (p != null && p.isConnected());
-            printerStatus.setText(SettingUtility.getLastConnectedPrinterAddress() + ":" + (connected ? "已连接" : "未连接"));
-            printerStatus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-                    if (printer == null || !printer.isConnected()) {
-                        AppLogger.e("skip to print for printer is not connected!");
-                    }
-                    showTestDlg(SettingsPrintActivity.this, printer == null ? "打印机未连接？" : "点击测试", printer != null ? printer.getSocket() : null);
+        printerStatus.setVisibility(connected ? View.VISIBLE : View.GONE);
+
+        printerStatus.setText(PrintUtil.getDefaultBluethoothDeviceAddress(this) + ":" + (connected ? "已连接" : "未连接"));
+        printerStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
+                if (!GlobalCtx.app().isConnectPrinter()) {
+                    AppLogger.e("skip to print for printer is not connected!");
                 }
-            });
-        }
+                showTestDlg(SettingsPrintActivity.this, GlobalCtx.app().isConnectPrinter() ? "打印机未连接？" : "点击测试");
+            }
+        });
+
 
         final boolean supportSunMi = OrderPrinter.supportSunMiPrinter();
         final TextView labelSunMiPrinterStatus = findViewById(R.id.label_sun_mi_printer_status);
         final TextView sunMiPrinterStatus = findViewById(R.id.sun_mi_printer_status);
+
         if (supportSunMi) {
             sunMiPrinterStatus.setText("已经连接商米");
             sunMiPrinterStatus.setVisibility(View.VISIBLE);
@@ -150,26 +175,27 @@ public class SettingsPrintActivity extends ListActivity {
         final TextView list_store_filter_values = findViewById(R.id.list_store_filter_values);
         ((ImageView) findViewById(R.id.list_store_filter_arrow)).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.arrow));
 
-
         final long selectedStores = SettingUtility.getListenerStore();
         HashSet<Long> longs = new HashSet<>();
         longs.add(selectedStores);
         updateStoreFilterText(list_store_filter_values, longs);
 
-        try {
-            if (initDevicesList() != 0) {
-                this.finish();
-                return;
+        final Switch toggleSetAppWhiteList = findViewById(R.id.toggleSetAppWhiteList);
+        toggleSetAppWhiteList.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    IntentWrapper.whiteListMatters(SettingsPrintActivity.this, "外送帮后台运行");
+                }
             }
-        } catch (Exception ex) {
-            this.finish();
-            return;
-        }
+        });
 
-        IntentFilter btIntentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mBTReceiver, btIntentFilter);
 
-        connectToLastOne();
+        btn_scan = findViewById(R.id.btn_scan);
+        btn_scan.setOnClickListener(this);
+
+        tv_bluename = findViewById(R.id.tv_bluename);
+        tv_blueadress = findViewById(R.id.tv_blueadress);
     }
 
     private void updateStoreFilterText(TextView list_store_filter_values, Set<Long> selectedStores) {
@@ -185,226 +211,13 @@ public class SettingsPrintActivity extends ListActivity {
         }
     }
 
-    private void connectToLastOne() {
-        String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
-        if (!TextUtils.isEmpty(lastAddress)) {
-            for (int pos = 0; pos < listAdapter.getCount(); pos++) {
-                BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
-                if (item != null && lastAddress.equals(item.getAddr())) {
-                    connectPrinter(item);
-                    break;
-                }
-            }
-        }
-    }
-
-    public static boolean isPrinterConnected() {
-        String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
-        if (!TextUtils.isEmpty(lastAddress) && listAdapter != null) {
-            for (int pos = 0; pos < listAdapter.getCount(); pos++) {
-                BluetoothPrinters.DeviceStatus item = listAdapter.getItem(pos);
-                if (item != null && lastAddress.equals(item.getAddr())) {
-                    boolean connected = item.isConnected();
-                    GlobalCtx.app().setPrinterConnected(connected);
-                    return connected;
-                }
-            }
-        }
-
-        GlobalCtx.app().setPrinterConnected(false);
-        return false;
-    }
-
-    private void flushData() {
-        try {
-            if (btAdapter != null) {
-                btAdapter.cancelDiscovery();
-            }
-
-            if (listAdapter != null) {
-                listAdapter.clear();
-                listAdapter.notifyDataSetChanged();
-                listAdapter.notifyDataSetInvalidated();
-            }
-        } catch (Throwable e) {
-            AppLogger.e("exception to flush data:" + e.getMessage(), e);
-        }
-
-    }
-
-    private int initDevicesList() {
-
-        flushData();
-
-        btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter == null) {
-            Toast.makeText(getApplicationContext(),
-                    "手机没有开启蓝牙，请先开启", Toast.LENGTH_LONG).show();
-            return -1;
-        }
-
-        if (btAdapter.isDiscovering()) {
-            btAdapter.cancelDiscovery();
-        }
-
-        Intent enableBtIntent = new Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        try {
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } catch (Exception ex) {
-            AppLogger.e("error to enable bluetooth:", ex);
-            return -2;
-        }
-
-        Toast.makeText(getApplicationContext(),
-                "正在查找蓝牙打印机...", Toast.LENGTH_SHORT)
-                .show();
-
-        return 0;
-
-    }
-
-    @Override
-    protected void onActivityResult(int reqCode, int resultCode, Intent intent) {
-        super.onActivityResult(reqCode, resultCode, intent);
-
-        switch (reqCode) {
-            case REQUEST_ENABLE_BT:
-                if (resultCode == RESULT_OK) {
-                    Set<BluetoothDevice> btDeviceList = btAdapter.getBondedDevices();
-                    try {
-                        if (btDeviceList.size() > 0) {
-                            for (BluetoothDevice device : btDeviceList) {
-                                BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(device);
-                                if (listAdapter.getPosition(deviceStatus) < 0) {
-                                    listAdapter.add(deviceStatus);
-                                }
-                            }
-
-                            connectToLastOne();
-                            listAdapter.notifyDataSetInvalidated();
-                        }
-                    } catch (Exception ex) {
-                        AppLogger.e("error to enable bluebooth", ex);
-                    }
-                }
-
-                break;
-        }
-
-        btAdapter.startDiscovery();
-
-    }
-
-    private final BroadcastReceiver mBTReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent
-                        .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                try {
-                    BluetoothPrinters.DeviceStatus ds = new BluetoothPrinters.DeviceStatus(device);
-                    if (listAdapter.getPosition(ds) < 0) {
-                        listAdapter.add(ds);
-                        listAdapter.notifyDataSetInvalidated();
-                    }
-                } catch (Exception ex) {
-                    ex.fillInStackTrace();
-                    throw ex;
-                }
-            }
-        }
-    };
-
-    @Override
-    protected void onListItemClick(ListView l, View v, final int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        connectPrinter(listAdapter.getItem(position));
-    }
-
-    private ProgressFragment progressFragment;
-    private AtomicBoolean isConnecting = new AtomicBoolean(false);
-
-    private void connectPrinter(final BluetoothPrinters.DeviceStatus item) {
-        if (btAdapter == null) {
-            return;
-        }
-
-        if (btAdapter.isDiscovering()) {
-            btAdapter.cancelDiscovery();
-        }
-
-        String connecting = String.format("正在连接打印机 %s,%s", item.getName(), item.getAddr());
-        Toast.makeText(getApplicationContext(),
-                connecting,
-                Toast.LENGTH_SHORT).show();
-
-        if (!isConnecting.compareAndSet(false, true)) {
-            return;
-        }
-
-        Thread connectThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final BluetoothDevice device = item.getDevice();
-                    try {
-                        final BluetoothConnector btConnector = new BluetoothConnector(device, false, btAdapter, null);
-                        final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
-                        item.resetSocket(socketWrapper);
-
-                        final SettingsPrintActivity act = SettingsPrintActivity.this;
-                        SettingUtility.setLastConnectedPrinterAddress(device.getAddress());
-                        act.lastDevice = item;
-
-                        AppLogger.e("connect with wrapper: connected");
-                        final String msg = String.format("已连接到 %s", item.getName());
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showTestDlg(act, msg, item.getSocket());
-                            }
-                        });
-
-                    } catch (IOException ex) {
-                        AppLogger.e("exception to connect BT device:" + device.getName(), ex);
-                        CrashReportHelper.handleUncaughtException(null, ex);
-                        runOnUiThread(socketErrorRunnable);
-                    } finally {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                listAdapter.notifyDataSetChanged();
-                                if (progressFragment != null) {
-                                    progressFragment.dismissAllowingStateLoss();
-                                }
-                            }
-                        });
-                    }
-                } finally {
-                    isConnecting.compareAndSet(true, false);
-                }
-            }
-        });
-
-        connectThread.start();
-    }
-
-    public void showTestDlg(final SettingsPrintActivity act, String msg, final BluetoothConnector.BluetoothSocketWrapper socket) {
+    public void showTestDlg(final SettingsPrintActivity act, String msg) {
         AlertUtil.showAlert(act, R.string.tip_dialog_title, msg, "确定", null,
                 "打印测试", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            if (socket != null) {
-                                OrderPrinter.printTest(socket);
-                            } else {
-                                Utility.toast("打印机端口状态为null", act);
-                            }
+                            OrderPrinter.printTest();
                         } catch (IOException e) {
                             e.printStackTrace();
                             //TODO: 应该自动尝试连接！
@@ -414,36 +227,138 @@ public class SettingsPrintActivity extends ListActivity {
                 });
     }
 
-    private Runnable socketErrorRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            Toast.makeText(getApplicationContext(),
-                    "连接打印机时发生错误", Toast.LENGTH_SHORT).show();
-            btAdapter.startDiscovery();
-
-        }
-    };
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_scan:
+                if (btn_scan.getText().equals(getString(R.string.start_scan))) {
+                    checkPermissions();
+                    startActivity(new Intent(SettingsPrintActivity.this, SearchBluetoothActivity.class));
+                }
+                break;
+        }
+    }
 
-        menu.add(0, Menu.FIRST, Menu.NONE, "查找附近打印机");
 
-        return true;
+    @Override
+    public final void onRequestPermissionsResult(int requestCode,
+                                                 @NonNull String[] permissions,
+                                                 @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_CODE_PERMISSION_LOCATION:
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            onPermissionGranted(permissions[i]);
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    private void checkPermissions() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!bluetoothAdapter.isEnabled()) {
+            Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+        List<String> permissionDeniedList = new ArrayList<>();
+        for (String permission : permissions) {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, permission);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                onPermissionGranted(permission);
+            } else {
+                permissionDeniedList.add(permission);
+            }
+        }
+        if (!permissionDeniedList.isEmpty()) {
+            String[] deniedPermissions = permissionDeniedList.toArray(new String[permissionDeniedList.size()]);
+            ActivityCompat.requestPermissions(this, deniedPermissions, REQUEST_CODE_PERMISSION_LOCATION);
+        }
+    }
+
+    private void onPermissionGranted(String permission) {
+        switch (permission) {
+            case Manifest.permission.ACCESS_FINE_LOCATION:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkGPSIsOpen()) {
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.notifyTitle)
+                            .setMessage(R.string.gpsNotifyMsg)
+                            .setNegativeButton(R.string.cancel,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            finish();
+                                        }
+                                    })
+                            .setPositiveButton(R.string.setting,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                            startActivityForResult(intent, REQUEST_CODE_OPEN_GPS);
+                                        }
+                                    })
+
+                            .setCancelable(false)
+                            .show();
+                }
+                break;
+        }
+    }
+
+    private boolean checkGPSIsOpen() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager == null)
+            return false;
+        return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-
-        switch (item.getItemId()) {
-            case Menu.FIRST:
-                initDevicesList();
-                break;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_OPEN_GPS) {
         }
+    }
 
-        return true;
+    @Override
+    protected void onStart() {
+        super.onStart();
+        BluetoothController.init(this);
+    }
+
+    @Override
+    public void btStatusChanged(Intent intent) {
+        super.btStatusChanged(intent);
+        BluetoothController.init(this);
+    }
+
+    public BluetoothAdapter getmAdapter() {
+        return mAdapter;
+    }
+
+    public void setmAdapter(BluetoothAdapter mAdapter) {
+        this.mAdapter = mAdapter;
+    }
+
+    public TextView getTv_bluename() {
+        return tv_bluename;
+    }
+
+    public TextView getTv_blueadress() {
+        return tv_blueadress;
+    }
+
+    public boolean ismBtEnable() {
+        return mBtEnable;
+    }
+
+    public void setmBtEnable(boolean mBtEnable) {
+        this.mBtEnable = mBtEnable;
     }
 }

@@ -33,6 +33,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
+import {Modal} from 'antd-mobile-rn'
 //组件
 import {Yuan} from "../component/All";
 import {Colors, Metrics} from "../../themes";
@@ -43,13 +44,14 @@ import _ from "lodash";
 //请求
 import {getWithTpl} from "../../util/common";
 import FetchEx from "../../util/fetchEx";
+import WorkerPopup from "../component/WorkerPopup";
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
@@ -69,14 +71,14 @@ const createUserTag = -100;
 class StoreAddScene extends Component {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-
+    
     let title = params.btn_type === "add" ? "新增门店" : "门店信息/修改";
     let ActionSheet = [
       {key: -999, section: true, label: "操作"},
       {key: 1, label: "初始化商品"}, //force -> true
       {key: 2, label: "复制商品"} //force -> false
     ];
-
+    
     return {
       headerTitle: title,
       headerRight:
@@ -97,8 +99,8 @@ class StoreAddScene extends Component {
         )
     };
   };
-
-  onStoreCopyGoods(force) {
+  
+  onStoreCopyGoods (force) {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     let {store_id} = this.state;
@@ -121,10 +123,10 @@ class StoreAddScene extends Component {
       );
     });
   }
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props);
-
+    
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
     const {btn_type, store_info} = this.props.navigation.state.params || {};
     let {
@@ -160,10 +162,10 @@ class StoreAddScene extends Component {
       city_code = undefined,
       fn_price_controlled = 1
     } = store_info || {};
-
+    
     const {mine} = this.props;
     let user_list = mine.user_list[currVendorId];
-
+    
     let userActionSheet = [];
     userActionSheet.push({key: -999, section: true, label: "职位任命"});
     userActionSheet.push({key: createUserTag, label: "创建新用户"});
@@ -175,7 +177,7 @@ class StoreAddScene extends Component {
       };
       userActionSheet.push(item);
     }
-
+    
     //门店照片的地址呀
     let storeImageUrl = undefined;
     let bossImageUrl = undefined;
@@ -187,7 +189,7 @@ class StoreAddScene extends Component {
       //初始化已有图片
       files.map(element => {
         existImgIds.push(element.id);
-
+        
         if (element.modelclass === "StoreImage") {
           storeImageUrl = {
             url: Config.staticUrl(element.thumb),
@@ -206,7 +208,7 @@ class StoreAddScene extends Component {
         }
       });
     }
-
+    
     this.state = {
       isRefreshing: false,
       btn_type: btn_type,
@@ -215,7 +217,7 @@ class StoreAddScene extends Component {
       goToReset: false,
       user_list: user_list,
       userActionSheet: userActionSheet,
-
+      
       isStartVisible: false,
       isEndVisible: false,
       selectCity: {
@@ -272,17 +274,18 @@ class StoreAddScene extends Component {
       isServiceMgr: false,  //是否是业务人员 BD+运营
       remark: '',
       receiveSecretKey: '',
-      createUserName: ''
+      createUserName: '',
+      workerPopupVisible: false,
+      workerPopupMulti: false
     };
     this.onPress = this.onPress.bind(this);
-    this.onCheckUser = this.onCheckUser.bind(this);
     this.onStoreAdd = this.onStoreAdd.bind(this);
     this.onCheckData = this.onCheckData.bind(this);
     this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
     this.fileId = [];
   }
-
-  getStoreEditData() {
+  
+  getStoreEditData () {
     let {
       store_id, type, alias, name, district,
       owner_name, owner_nation_id, location_long,
@@ -315,8 +318,22 @@ class StoreAddScene extends Component {
       templateInfo: templateInfo
     };
   }
-
-  componentDidMount() {
+  
+  onAddUser () {
+    console.log("to create user");
+    let storeId = this.state.store_id;
+    let storeData = this.getStoreEditData();
+    this.onPress(Config.ROUTE_USER_ADD, {
+      type: 'add',
+      pageFrom: 'storeAdd',
+      storeData: storeData,
+      store_id: storeId,
+      onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName)
+    });
+    return false;
+  }
+  
+  componentDidMount () {
     this.props.navigation.setParams({
       goToCopy: () => {
         this.setState({goToCopy: true});
@@ -326,8 +343,8 @@ class StoreAddScene extends Component {
       }
     });
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     let {store_info} = this.props.navigation.state.params || {};
     if (!store_info) {
       let {currStoreId, canReadStores} = this.props.global;
@@ -339,7 +356,7 @@ class StoreAddScene extends Component {
       this.props.global.accessToken
       }`;
     let bdUrl = `api/get_bds/${currVendorId}?access_token=${this.props.global.accessToken}`;
-    let isServiceMgrUrl = `api/is_service_mgr/${store_info.type}?access_token=${this.props.global.accessToken}`
+    let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${this.props.global.accessToken}`
     //判断是否是业务人员
     getWithTpl(isServiceMgrUrl, response => {
       if (response.ok) {
@@ -351,7 +368,7 @@ class StoreAddScene extends Component {
     }, error => {
       console.log("error:%o", error);
     })
-
+    
     getWithTpl(
       isBdUrl,
       response => {
@@ -366,7 +383,7 @@ class StoreAddScene extends Component {
         console.log("error:%o", error);
       }
     );
-
+    
     //获取模板店列表
     getWithTpl(
       url,
@@ -416,7 +433,7 @@ class StoreAddScene extends Component {
           for (let i in response.obj) {
             arr.push(response.obj[i]); //属性
           }
-
+          
           let selectTemp = [];
           let data = _.toPairs(response.obj);
           selectTemp.push({key: -999, section: true, label: "选择bd"});
@@ -450,15 +467,15 @@ class StoreAddScene extends Component {
       }
     );
   }
-
-  onPress(route, params = {}) {
+  
+  onPress (route, params = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-
-  onCreateUser(userId, userMobile, userName) {
+  
+  onCreateUser (userId, userMobile, userName) {
     console.log("userId : " + userId + " userMobile : " + userMobile + " userName ：" + userName);
     this.setState({
       owner_id: userId,
@@ -466,40 +483,21 @@ class StoreAddScene extends Component {
       createUserName: userName
     });
   }
-
-  onCheckUser(user_type, user_id) {
-    let {user_list} = this.state;
-    if (user_type === "owner") {
-      if (user_id == createUserTag) {
-        console.log("to create user");
-        let storeId = this.state.store_id;
-        let storeData = this.getStoreEditData();
-        this.onPress(Config.ROUTE_USER_ADD, {
-          type: 'add',
-          pageFrom: 'storeAdd',
-          storeData: storeData,
-          store_id: storeId,
-          onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName)
-        });
-        return false;
-      }
-      this.setState({
-        owner_id: user_id,
-        mobile: user_id > 0 ? user_list[user_id]["mobilephone"] : ""
-      });
-    } else {
-      this.setState({
-        vice_mgr: user_id
-      });
-    }
+  
+  onSetOwner (worker) {
+    this.setState({
+      workerPopupVisible: false,
+      owner_id: worker.id,
+      mobile: worker.mobilephone ? worker.mobilephone : ""
+    });
   }
-
+  
   _hideDateTimePicker = () =>
     this.setState({
       isStartVisible: false,
       isEndVisible: false
     });
-
+  
   _handleDatePicked = (date, press_type) => {
     console.log("params -> ", date, press_type);
     let Hours = date.getHours();
@@ -522,10 +520,10 @@ class StoreAddScene extends Component {
         this.setState({open_end: confirm_time});
       }
     }
-
+    
     this._hideDateTimePicker();
   };
-
+  
   doUploadImg = qualification => {
     this.setState({
       isUploadingImage: true
@@ -562,8 +560,8 @@ class StoreAddScene extends Component {
       doneUpload();
     }
   };
-
-  getReceiveSecretKey() {
+  
+  getReceiveSecretKey () {
     const {store_id} = this.state
     const self = this
     const {accessToken} = this.props.global;
@@ -577,13 +575,30 @@ class StoreAddScene extends Component {
       }
     })
   }
-
-  copyReceiveSecretKey(text) {
+  
+  copyReceiveSecretKey (text) {
     Clipboard.setString(text)
     ToastLong('已复制到剪切板')
   }
-
-  renderRemark() {
+  
+  showWorkerPopup (multi) {
+    Modal.alert('提示', '请选择方式', [
+      {'text': '取消'},
+      {
+        'text': '搜索员工',
+        onPress: () => this.setState({workerPopupMulti: multi}, () => {
+          this.setState({workerPopupVisible: true})
+        })
+      },
+      {
+        'text': '添加员工',
+        onPress: () => this.onAddUser()
+      }
+    ])
+    
+  }
+  
+  renderRemark () {
     const {isServiceMgr} = this.state
     return isServiceMgr ? (
       <View>
@@ -607,8 +622,8 @@ class StoreAddScene extends Component {
       </View>
     ) : null
   }
-
-  renderReceiveSecretKey() {
+  
+  renderReceiveSecretKey () {
     let {isServiceMgr, receiveSecretKey} = this.state
     return isServiceMgr ? (
       <Cell>
@@ -632,8 +647,8 @@ class StoreAddScene extends Component {
       </Cell>
     ) : null
   }
-
-  render() {
+  
+  render () {
     let {
       store_id,
       alias,
@@ -713,6 +728,7 @@ class StoreAddScene extends Component {
                   maxLength={18} // 可输入的最大长度
                   keyboardType="numeric" //默认弹出的键盘
                   underlineColorAndroid="transparent" //取消安卓下划线
+                  editable={this.state.isServiceMgr}
                 />
               </CellBody>
             </Cell>
@@ -989,7 +1005,7 @@ class StoreAddScene extends Component {
               </Cell>
             ) : null}
           </Cells>
-
+          
           <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
@@ -997,18 +1013,13 @@ class StoreAddScene extends Component {
                 <Label style={[styles.cell_label]}>店长</Label>
               </CellHeader>
               <CellBody>
-                <ModalSelector
-                  onChange={option => {
-                    this.onCheckUser("owner", option.key);
-                  }}
-                  data={this.state.userActionSheet}
-                  skin="customer"
-                  defaultKey={owner_id}
-                >
-                  <Text style={styles.body_text}>
-                    {owner_id > 0 ? store_mgr_name : "点击选择店长"}
-                  </Text>
-                </ModalSelector>
+                <TouchableOpacity onPress={() => this.showWorkerPopup(false)}>
+                  <View>
+                    <Text style={styles.body_text}>
+                      {owner_id > 0 ? store_mgr_name : "点击选择店长"}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </CellBody>
             </Cell>
             <Cell customStyle={[styles.cell_row]}>
@@ -1032,26 +1043,7 @@ class StoreAddScene extends Component {
                 <Label style={[styles.cell_label]}>店助</Label>
               </CellHeader>
               <CellBody>
-                <TouchableOpacity
-                  onPress={() => {
-                    let checked = !!vice_mgr ? vice_mgr.split(",") : [];
-                    let params = {
-                      checked: checked,
-                      actionBeforeBack: resp => {
-                        console.log(
-                          "actionBeforeBack resp => ",
-                          resp.checked_users
-                        );
-                        let vice_mgr = resp.checked_users.join(",");
-                        _this.setState({vice_mgr});
-                      }
-                    };
-                    this.props.navigation.navigate(
-                      Config.ROUTE_SELECT_WORKER,
-                      params
-                    );
-                  }}
-                >
+                <TouchableOpacity onPress={() => this.showWorkerPopup(true)}>
                   <Text style={styles.body_text}>
                     {!!vice_mgr && vice_mgr !== "0"
                       ? vice_mgr_name
@@ -1061,7 +1053,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
           </Cells>
-
+          
           <CellsTitle style={styles.cell_title}>营业时间</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
@@ -1071,7 +1063,9 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({isStartVisible: true});
+                    if (this.state.isServiceMgr) {
+                      this.setState({isStartVisible: true});
+                    }
                   }}
                 >
                   <Text style={styles.body_text}>{open_start}</Text>
@@ -1094,9 +1088,10 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({isEndVisible: true});
-                  }}
-                >
+                    if (this.state.isServiceMgr) {
+                      this.setState({isEndVisible: true});
+                    }
+                  }}>
                   <Text style={styles.body_text}>{open_end}</Text>
                 </TouchableOpacity>
                 <DateTimePicker
@@ -1111,7 +1106,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
           </Cells>
-
+          
           <CellsTitle style={styles.cell_title}>
             电话催单间隔(0为不催单)
           </CellsTitle>
@@ -1134,7 +1129,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
           </Cells>
-
+          
           <CellsTitle style={styles.cell_title}>排单方式</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell
@@ -1168,7 +1163,7 @@ class StoreAddScene extends Component {
               </CellFooter>
             </Cell>
           </Cells>
-
+          
           <CellsTitle style={styles.cell_title}>银行卡信息</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
@@ -1217,7 +1212,7 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
           </Cells>
-
+          
           <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
@@ -1237,10 +1232,10 @@ class StoreAddScene extends Component {
             </Cell>
             {this.renderReceiveSecretKey()}
           </Cells>
-
+          
           {this.renderRemark()}
-
-
+          
+          
           <Toast
             icon="loading"
             show={this.state.onSubmitting}
@@ -1249,7 +1244,7 @@ class StoreAddScene extends Component {
           >
             提交中
           </Toast>
-
+          
           <Dialog
             onRequestClose={() => {
             }}
@@ -1308,10 +1303,26 @@ class StoreAddScene extends Component {
         >
           {this.state.btn_type === "edit" ? "确认修改" : "创建门店"}
         </Button>
+
+        {/*员工列表*/}
+        <WorkerPopup
+          multiple={this.state.workerPopupMulti}
+          visible={this.state.workerPopupVisible}
+          selectWorkerIds={!!vice_mgr ? vice_mgr.split(",") : []}
+          onClickWorker={(worker) => {
+            _this.onSetOwner(worker);
+            _this.setState({workerPopupVisible: false});
+          }}
+          onComplete={(workers) => {
+            let vice_mgr = _.map(workers, 'id').join(",");
+            _this.setState({vice_mgr, workerPopupVisible: false});
+          }}
+          onCancel={() => this.setState({workerPopupVisible: false})}
+        />
       </View>
     );
   }
-
+  
   upload = (imageInfo, name, barrier) => {
     let handleResp = resp => {
       if (resp.ok) {
@@ -1325,8 +1336,8 @@ class StoreAddScene extends Component {
       uploadImg(imageInfo, barrier.waitOn(handleResp), name, 1);
     }
   };
-
-  onStoreAdd() {
+  
+  onStoreAdd () {
     if (this.state.isUploadingImage) {
       ToastLong("商家资质正在上传！请稍后再提交！");
       return false;
@@ -1369,7 +1380,7 @@ class StoreAddScene extends Component {
         bankcard_username,
         remark
       } = this.state;
-
+      
       let send_data = {
         type: type, //品牌id
         name: name,
@@ -1414,7 +1425,7 @@ class StoreAddScene extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-
+              
               const {goBack, state} = _this.props.navigation;
               const params = state.params;
               if (params.actionBeforeBack) {
@@ -1427,8 +1438,8 @@ class StoreAddScene extends Component {
       });
     }
   }
-
-  onCheckData() {
+  
+  onCheckData () {
     let {
       name,
       district,
@@ -1485,65 +1496,66 @@ class StoreAddScene extends Component {
 }
 
 // define your styles
-const styles = StyleSheet.create({
-  btn_select: {
-    marginRight: pxToDp(20),
-    height: pxToDp(60),
-    width: pxToDp(60),
-    fontSize: pxToDp(40),
-    color: colors.color666,
-    textAlign: "center",
-    textAlignVertical: "center"
-  },
-  cell_title: {
-    marginBottom: pxToDp(10),
-    fontSize: pxToDp(26),
-    color: colors.color999
-  },
-  cell_box: {
-    marginTop: 0,
-    borderTopWidth: pxToDp(1),
-    borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999
-  },
-  cell_row: {
-    height: pxToDp(70),
-    justifyContent: "center"
-  },
-  cell_input: {
-    //需要覆盖完整这4个元素
-    fontSize: pxToDp(30),
-    height: pxToDp(90)
-  },
-  cell_label: {
-    width: pxToDp(234),
-    fontSize: pxToDp(30),
-    fontWeight: "bold",
-    color: colors.color333
-  },
-  btn_submit: {
-    margin: pxToDp(30),
-    marginBottom: pxToDp(50),
-    backgroundColor: "#6db06f"
-  },
-  map_icon: {
-    fontSize: pxToDp(40),
-    color: colors.color666,
-    height: pxToDp(60),
-    width: pxToDp(40),
-    textAlignVertical: "center"
-  },
-  body_text: {
-    paddingLeft: pxToDp(8),
-    fontSize: pxToDp(30),
-    color: colors.color333,
-    height: pxToDp(60),
-    textAlignVertical: "center"
-
-    // borderColor: 'green',
-    // borderWidth: 1,
-  }
-});
+const
+  styles = StyleSheet.create({
+    btn_select: {
+      marginRight: pxToDp(20),
+      height: pxToDp(60),
+      width: pxToDp(60),
+      fontSize: pxToDp(40),
+      color: colors.color666,
+      textAlign: "center",
+      textAlignVertical: "center"
+    },
+    cell_title: {
+      marginBottom: pxToDp(10),
+      fontSize: pxToDp(26),
+      color: colors.color999
+    },
+    cell_box: {
+      marginTop: 0,
+      borderTopWidth: pxToDp(1),
+      borderBottomWidth: pxToDp(1),
+      borderColor: colors.color999
+    },
+    cell_row: {
+      height: pxToDp(70),
+      justifyContent: "center"
+    },
+    cell_input: {
+      //需要覆盖完整这4个元素
+      fontSize: pxToDp(30),
+      height: pxToDp(90)
+    },
+    cell_label: {
+      width: pxToDp(234),
+      fontSize: pxToDp(30),
+      fontWeight: "bold",
+      color: colors.color333
+    },
+    btn_submit: {
+      margin: pxToDp(30),
+      marginBottom: pxToDp(50),
+      backgroundColor: "#6db06f"
+    },
+    map_icon: {
+      fontSize: pxToDp(40),
+      color: colors.color666,
+      height: pxToDp(60),
+      width: pxToDp(40),
+      textAlignVertical: "center"
+    },
+    body_text: {
+      paddingLeft: pxToDp(8),
+      fontSize: pxToDp(30),
+      color: colors.color333,
+      height: pxToDp(60),
+      textAlignVertical: "center"
+      
+      // borderColor: 'green',
+      // borderWidth: 1,
+    }
+  });
 
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(StoreAddScene);

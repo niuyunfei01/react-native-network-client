@@ -3,11 +3,13 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.telecom.Call;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -22,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -32,7 +35,9 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.Constants;
@@ -45,6 +50,8 @@ import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
+import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -54,6 +61,8 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
 import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.Cts.RATE_PRICE_CONTROLLER_YES;
@@ -94,6 +103,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
     public static final String SORT_BY_SOLD = "sold";
     public static final String SORT_BY_DEF = "defined";
+    public static final String SORT_BY_UPDATE = "update";
 
     private int total_in_req;
     private StoreStatusStat stats;
@@ -115,7 +125,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         static final StatusItem[] STATUS_PRICE_CONTROLLED = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
                 new StatusItem(FILTER_SOLD_OUT, " 缺货"),
-                new StatusItem(FILTER_SET_PROVIDE_PRICE, " 设置保底价"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
                 new StatusItem(FILTER_FREQ_PRODUCT, "平价品"),
         };
@@ -204,20 +213,20 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         Toolbar parent = (Toolbar) titleBar.getParent();
         parent.setContentInsetsAbsolute(0, 0);
 
-        Spinner currStoreSpinner = titleBar.findViewById(R.id.spinner_curr_store);
-        StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
-            @Override
-            public void changed(Store newStore) {
-                if (newStore != null) {
-                    if (currStore == null || currStore.getId() != newStore.getId()) {
-                        currStore = newStore;
-                        AppLogger.d("start refresh data:");
-                        setHeadToolBar();
-                        refreshData();
-                    }
-                }
-            }
-        }, false, currStoreSpinner);
+//        Spinner currStoreSpinner = titleBar.findViewById(R.id.spinner_curr_store);
+//        StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
+//            @Override
+//            public void changed(Store newStore) {
+//                if (newStore != null) {
+//                    if (currStore == null || currStore.getId() != newStore.getId()) {
+//                        currStore = newStore;
+//                        AppLogger.d("start refresh data:");
+//                        setHeadToolBar();
+//                        refreshData();
+//                    }
+//                }
+//            }
+//        }, false, currStoreSpinner);
 
         lv = findViewById(R.id.list_storage_status);
         registerForContextMenu(lv);
@@ -348,7 +357,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     refreshData();
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -399,26 +407,60 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }, 50);
         }
 
-        final TextView sortBy = findViewById(R.id.title_total_last_stat);
-        sortBy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String _sort = StoreStorageActivity.this.sortBy;
-                if (SORT_BY_DEF.equals(_sort)) {
-                    StoreStorageActivity.this.sortBy = SORT_BY_SOLD;
-                    sortBy.setText("排序：销量");
-                } else {
-                    StoreStorageActivity.this.sortBy = SORT_BY_DEF;
-                    sortBy.setText("排序：默认");
-                }
+//        final TextView sortBy = findViewById(R.id.title_total_last_stat);
+//        sortBy.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String _sort = StoreStorageActivity.this.sortBy;
+//                if (SORT_BY_DEF.equals(_sort)) {
+//                    StoreStorageActivity.this.sortBy = SORT_BY_SOLD;
+//                    sortBy.setText("排序：销量");
+//                } else if (SORT_BY_UPDATE.equals(_sort)) {
+//                    StoreStorageActivity.this.sortBy = SORT_BY_UPDATE;
+//                    sortBy.setText("排序: 更新");
+//                } else {
+//                    StoreStorageActivity.this.sortBy = SORT_BY_DEF;
+//                    sortBy.setText("排序：默认");
+//                }
+//                refreshData();
+//            }
+//        });
 
+        final Spinner sortBy = findViewById(R.id.prods_sort_spinner);
+
+        final List<String> sortList = new ArrayList<>(Arrays.asList("按:默认", "按:销量", "按:更新"));
+        final ArrayAdapter<String> sortArrayAdapter = new ArrayAdapter<String>(
+                this, R.layout.spinner_item_small, sortList);
+        sortBy.setAdapter(sortArrayAdapter);
+
+        sortBy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                StoreStorageActivity.this.sortBy = getSortType(sortArrayAdapter.getItem(i));
                 refreshData();
             }
-        });
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        initStoreProdQuota();
         //Must after buttons initialized
         setHeadToolBar();
         updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+    }
+
+    private String getSortType(String label) {
+        if (label.equals("按:默认")) {
+            return SORT_BY_DEF;
+        }
+        if (label.equals("按:销量")) {
+            return SORT_BY_SOLD;
+        }
+        if (label.equals("按:更新")) {
+            return SORT_BY_UPDATE;
+        }
+        return SORT_BY_DEF;
     }
 
     public void _do_search() {
@@ -429,6 +471,40 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (in != null) {
             in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    private void initStoreProdQuota() {
+        final LinearLayout storeProdQuota = findViewById(R.id.store_prod_quota);
+        storeProdQuota.setVisibility(View.INVISIBLE);
+        if (currStore != null && currStore.getFn_show_quota() == 1) {
+            final TextView storeProdPriceScore = findViewById(R.id.store_prod_price_score);
+            final TextView storeProdScoreDetail = findViewById(R.id.store_prod_score_detail);
+            try {
+                retrofit2.Call<ResultBean<Map<String, String>>> resultBean = GlobalCtx.app().dao.getStoreQuota(currStore.getId());
+                resultBean.enqueue(new Callback<ResultBean<Map<String, String>>>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<ResultBean<Map<String, String>>> call, Response<ResultBean<Map<String, String>>> response) {
+                        ResultBean<Map<String, String>> r = response.body();
+                        if (r != null && r.isOk()) {
+                            Map<String, String> obj = r.getObj();
+                            double score = Double.parseDouble(obj.get("score"));
+                            String color = obj.get("color");
+                            storeProdQuota.setBackgroundColor(Color.parseColor(color));
+                            storeProdPriceScore.setText("价格: " + score + " 分");
+                            storeProdScoreDetail.setText(obj.get("high") + " 个高于同行");
+                            storeProdQuota.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<ResultBean<Map<String, String>>> call, Throwable t) {
+
+                    }
+                });
+            } catch (Exception e) {
+                AppLogger.e(e.getMessage(), e);
+            }
         }
     }
 

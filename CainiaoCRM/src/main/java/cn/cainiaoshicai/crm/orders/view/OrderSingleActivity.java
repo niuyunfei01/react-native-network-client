@@ -64,6 +64,7 @@ import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -544,7 +545,8 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     } else {
                         orderRef.set(order);
                         try {
-                            OrderPrinter.printOrder(ds.getSocket(), order);
+                            //OrderPrinter.printOrder(ds.getSocket(), order);
+                            PrintQueue.getQueue(GlobalCtx.app()).add(order);
                         } catch (Exception e) {
                             this.error = "打印错误: 请重新连接打印机";
                             gotoConnecting = true;

@@ -71,6 +71,7 @@ public class RefreshOrderListTask
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        swipeRefreshLayout.setRefreshing(true);
         if (progressFragment != null) {
             if (this.activity != null) {
                 Utility.forceShowDialog(this.activity, progressFragment);
@@ -85,7 +86,7 @@ public class RefreshOrderListTask
             String token = GlobalCtx.app().token();
             OrdersDao ordersDao = new OrdersDao(token);
             int listValue = this.listType.getValue();
-            int limit = listValue == ListType.ARRIVED.getValue() ? 100 : 0;
+            int limit = listValue == ListType.DONE.getValue() ? 100 : 0;
             int offset = 0;
             if (TextUtils.isEmpty(searchTerm)) {
                 return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset, this.maxPastDays);

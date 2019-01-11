@@ -71,6 +71,7 @@ const C = {
   DownloadUrl: `https://www.cainiaoshicai.cn/util/crm_dl`,
   MAP_WAY_URL: "util/amap_way",
   FetchTimeout: 60000,
+  LongFetchTimeout: 200000,
   
   GRANT_TYP_PASSWORD: "password",
   GRANT_CLIENT_ID: "NTQ5NTE5MGViMTgzMDUw",
@@ -87,6 +88,7 @@ const C = {
   ROUTE_WORKER: 'Worker',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
+  ROUTE_USER_CHOOSE: 'UserChoose',
   ROUTE_Mine: 'Mine',
   ROUTE_SETTING: 'Setting',
   ROUTE_CLOUD_PRINTER: 'CloudPrinter',
@@ -108,6 +110,7 @@ const C = {
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_DONE_REMIND: 'DoneRemind',
   ROUTE_TAKE_OUT: 'TakeOut',
+  ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
