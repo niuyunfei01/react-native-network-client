@@ -2,12 +2,7 @@
   "presets": [
     "react-native"
   ],
-  "plugins": [
-    // 条件组件
-    [
-      "jsx-control-statements"
-    ]
-  ],
+  "plugins": ["jsx-control-statements"],
   "env": {
     "production": {
       "plugins": ["transform-remove-console", ["import", { "libraryName": "antd-mobile-rn" }]]
