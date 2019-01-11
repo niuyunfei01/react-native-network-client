@@ -17,14 +17,16 @@ export default class BaseItem extends PureComponent {
   }
   
   static defaultProps = {
-    showModifyPriceBtn: false
+    showModifyPriceBtn: false,
   }
   
   render () {
     return (
       <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.cell}>
-          <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
+          <If condition={this.props.image}>
+            <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
+          </If>
           <View style={[styles.item_right]}>
             <Text style={[styles.goods_name]}>{this.props.name}</Text>
             <View style={styles.sku}>

@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp";
 
 export default class InputPrice extends PureComponent {
   static propTypes = {
-    mode: PropTypes.oneOf([1, 2]),
+    mode: PropTypes.oneOf([1, 2]),// 1抽佣模式 2保底模式
     style: PropTypes.any,
     referPrice: PropTypes.oneOfType([
       PropTypes.number,
@@ -13,7 +13,11 @@ export default class InputPrice extends PureComponent {
     ]),
     showNotice: PropTypes.bool,
     priceRatio: PropTypes.object,
-    onInput: PropTypes.func
+    onInput: PropTypes.func,
+    initPrice: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string
+    ])
   }
   
   static defaultProps = {
@@ -26,21 +30,28 @@ export default class InputPrice extends PureComponent {
       wm_price: '计算中',
       supply_price: 0,
       supply_price_ratio: 0,
-      input_value: 0
+      input_value: 0,
+      initPrice: '0'
     }
   }
   
-  onInputPrice (val) {
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
+      this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
+    }
+  }
+  
+  onInputPrice (val, ratio) {
     if (this.props.mode === 1) {
-      this.onUpdateSupplyPrice(val)
+      this.onUpdateSupplyPrice(val, ratio)
     }
     if (this.props.mode === 2) {
-      this.onUpdateWmPrice(val)
+      this.onUpdateWmPrice(val, ratio)
     }
   }
   
-  onUpdateWmPrice (val) {
-    const ratio = this.props.priceRatio
+  onUpdateWmPrice (val, ratio) {
+    ratio = ratio ? ratio : this.props.priceRatio
     let radd = null
     if (typeof(ratio.radd) === 'object') {
       for (let i of ratio.radd) {
@@ -57,8 +68,8 @@ export default class InputPrice extends PureComponent {
     this.props.onInput && this.props.onInput(val)
   }
   
-  onUpdateSupplyPrice (val) {
-    const ratio = this.props.priceRatio
+  onUpdateSupplyPrice (val, ratio) {
+    ratio = ratio ? ratio : this.props.priceRatio
     let radd = null
     if (typeof(ratio.radd) === 'object') {
       for (let i of ratio.radd) {
@@ -86,7 +97,7 @@ export default class InputPrice extends PureComponent {
               请输入外卖价格
             </If>
             <If condition={this.props.mode !== 1}>
-              请输入保底价格
+              请输入您期望应得
             </If>
             <If condition={this.props.referPrice}>
               (建议价格{this.props.referPrice})
@@ -98,7 +109,7 @@ export default class InputPrice extends PureComponent {
         </View>
         <View style={styles.input_box}>
           <TextInput
-            defaultValue={'0'}
+            defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
             keyboardType={'numeric'}
             underlineColorAndroid="transparent"
             style={{flex: 1, padding: 0}}
@@ -117,7 +128,6 @@ export default class InputPrice extends PureComponent {
                 {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price}</Text>
                 元/份（保底收入）
               </Text>
-              <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
             </View>
           ) : (
             <Text style={styles.remark}>
@@ -126,6 +136,7 @@ export default class InputPrice extends PureComponent {
               元#
             </Text>
           )}
+          <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
         </View>
       </View>
     )

@@ -9,6 +9,7 @@ import {connect} from "react-redux";
 import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
 import {Modal, Toast} from 'antd-mobile-rn'
+import HttpUtils from "../../util/http";
 
 
 function mapStateToProps (state) {
@@ -27,17 +28,19 @@ class GoodsPriceModifySupply extends Component {
     super(props)
     
     this.state = {
-      product_id: this.props.navigation.state.params.pid,
-      store_id: this.props.global.currStoreId,
+      // product_id: this.props.navigation.state.params.pid,
+      // store_id: this.props.global.currStoreId,
+      product_id: 62093,
+      store_id: 928,
       access_token: this.props.global.accessToken,
       resultDialog: false,
       resultMsg: '',
-      resultDialogType: '',
+      resultDialogType: 'info',
       product: {
         name: '',
         listimg: '',
-        store_product: {
-          supply_price: 0
+        waimai_product: {
+          price: 0
         }
       },
       trade_products: [],
@@ -54,19 +57,15 @@ class GoodsPriceModifySupply extends Component {
   fetchData () {
     const self = this
     const {store_id, product_id, access_token} = self.state
-    const url = `api_products/trade_product_price/${store_id}/${product_id}／1.json?access_token=${access_token}`;
-    Toast.loading('请求中..', 0)
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        Toast.hide()
-        self.setState({
-          product: resp.obj.product,
-          trade_products: resp.obj.trade_products,
-          refer_price: resp.obj.refer_price,
-          price_ratio: resp.obj.price_ratio
-        })
+    const url = `api_products/trade_product_price/${store_id}/${product_id}/2.json?access_token=${access_token}`;
+    HttpUtils.post(url).then(res => {
+      self.setState({
+        product: res.product,
+        trade_products: res.trade_products,
+        refer_price: res.refer_price,
+        price_ratio: res.price_ratio
       })
+    })
   }
   
   onSave () {
@@ -110,24 +109,24 @@ class GoodsPriceModifySupply extends Component {
   render () {
     return (
       <View style={{flex: 1}}>
-        <ScrollView style={styles.scroll_view}>
-          <GoodsBaseItem
-            name={this.state.product.name}
-            supplyPrice={this.state.product.store_product.supply_price}
-            image={this.state.product.listimg}
-          />
-          
-          <InputPrice
-            mode={2}
-            referPrice={this.state.refer_price}
-            priceRatio={this.state.price_ratio}
-            style={{marginTop: pxToDp(10)}}
-            onInput={(val) => this.setState({supply_price: val})}
-          />
-          
-          <If condition={this.state.trade_products.length > 0}>
-            <View>
-              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+        <GoodsBaseItem
+          name={this.state.product.name}
+          wmPrice={this.state.product.waimai_product.price}
+          image={this.state.product.listimg}
+          showWmTip={true}
+        />
+        
+        <InputPrice
+          mode={2}
+          referPrice={this.state.refer_price}
+          priceRatio={this.state.price_ratio}
+          style={{marginTop: pxToDp(10)}}
+          onInput={(val) => this.setState({supply_price: val})}
+        />
+        <If condition={this.state.trade_products.length > 0}>
+          <View>
+            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+            <ScrollView style={styles.scroll_view}>
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
@@ -136,13 +135,14 @@ class GoodsPriceModifySupply extends Component {
                   name={item.original_name}
                   price={item.price}
                   monthSale={item.monthSale}
-                  storeName={item.trade_store.storeName}
-                  record={item.trade_store.rate}
+                  storeName={item.store_name}
+                  record={item.month_sales}
                 />
               </For>
-            </View>
-          </If>
-        </ScrollView>
+            </ScrollView>
+          </View>
+        </If>
+        
         
         <View style={styles.bottom_box}>
           <TouchableOpacity onPress={() => this.onSave()}>
