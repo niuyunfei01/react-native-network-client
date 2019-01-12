@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,10 +33,7 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
-import static cn.cainiaoshicai.crm.Cts.BLX_TYPE_BASIC;
-import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_NO;
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
-import static cn.cainiaoshicai.crm.Cts.PROFIT_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_BLX;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
@@ -120,7 +118,9 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 public void onClick(View view) {
                     int storeVendor = store == null ? 0 : store.getType();
                     if (storeVendor == STORE_VENDOR_BLX) {
-                        GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPrice());
+                        Gson gson = new Gson();
+                        String json = gson.toJson(item);
+                        GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), json);
                     } else {
                         StoreStorageChanged ssc = (StoreStorageChanged) getContext();
                         AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
@@ -144,7 +144,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.salePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                    StoreStorageChanged ssc = (StoreStorageChanged) getContext();
                     AlertDialog dlg = StoreStorageHelper.createEditPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
                     dlg.show();
                 }
@@ -154,7 +154,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.leftNumber.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    StoreStorageChanged ssc = (StoreStorageChanged)getContext();
+                    StoreStorageChanged ssc = (StoreStorageChanged) getContext();
                     AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
                     dlg.show();
                 }
@@ -168,7 +168,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.req_total.setVisibility(View.GONE);
         }
 
-        if(item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT){
+        if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
             holder.reOnSale.setVisibility(View.VISIBLE);
             int bg;
             if (item.getWhen_sale_again() > 0) {
@@ -190,7 +190,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.wmElema.setVisibility(View.INVISIBLE);
 
         boolean allInvisible = true;
-        for(Map.Entry<Integer, StorageStatusResults.WMPrice> en: item.getWm().entrySet()) {
+        for (Map.Entry<Integer, StorageStatusResults.WMPrice> en : item.getWm().entrySet()) {
             Button btn = null;
             if (en.getKey() == Cts.PLAT_BD.id) {
                 btn = holder.wmBaidu;
@@ -203,7 +203,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             }
 
             if (btn != null) {
-                String price = String.format("%.2f", (double)(en.getValue().getPrice() / 100.0));
+                String price = String.format("%.2f", (double) (en.getValue().getPrice() / 100.0));
                 btn.setText(price);
                 btn.setTextSize(10);
                 final int color;
@@ -228,7 +228,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             @Override
             public void onClick(View v) {
                 Context ctx = v.getContext();
-                if (ctx  == null) {
+                if (ctx == null) {
                     return;
                 }
 
@@ -261,7 +261,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     public void filter(String text) {
         this.clear();
 
-        for(int i = 0; i < this.getCount(); i++) {
+        for (int i = 0; i < this.getCount(); i++) {
             this.remove(this.getItem(i));
         }
 

@@ -894,17 +894,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
                 return true;
             case MENU_CONTEXT_TO_CHG_SUPPLY_PRICE:
-                if (item != null&&currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
+                if (item != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
                     Gson gson = new Gson();
-                    Map<String, String> params = Maps.newHashMap();
-                    params.put("pid", item.getProduct_id() + "");
-                    params.put("storeId", item.getStore_id() + "");
-                    params.put("storeProduct", gson.toJson(item));
-                    if (currStore.getFn_rate_price_controlled() == RATE_PRICE_CONTROLLER_YES) {
-                        GlobalCtx.app().toRNChgSupplyPriceView(this, Constants.CHG_PRICE_RATE_TYPE, params);
-                    } else {
-                        GlobalCtx.app().toRNChgSupplyPriceView(this, Constants.CHG_PRICE_SUPPLY_TYPE, params);
-                    }
+                    String json = gson.toJson(item);
+                    GlobalCtx.app().toSupplyPriceApplyView(this, Cts.STORE_CONTROL_MODE_SUPPLY, item.getStore_id(), item.getProduct_id(), json);
                 }
                 return true;
             default:

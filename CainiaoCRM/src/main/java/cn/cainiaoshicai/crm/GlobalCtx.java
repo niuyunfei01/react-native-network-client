@@ -874,29 +874,6 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    //跳转到reactnative 调价页面
-    public void toRNChgSupplyPriceView(Activity ctx, int type, Map<String, String> data) {
-        Intent i = new Intent(ctx, MyReactActivity.class);
-        String viewName = null;
-        if (type == Constants.CHG_PRICE_SUPPLY_TYPE) {
-            viewName = "GoodsPriceModifySupply";
-        }
-        if (type == Constants.CHG_PRICE_RATE_TYPE) {
-            viewName = "GoodsPriceModifyWm";
-        }
-        if (viewName == null) {
-            Log.d("GlobalCtx", "toRNChgSupplyPriceView: " + type);
-            return;
-        }
-        i.putExtra("_action", viewName);
-        Bundle params = new Bundle();
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            params.putString(entry.getKey(), entry.getValue());
-        }
-        i.putExtra("_action_params", params);
-        ctx.startActivity(i);
-    }
-
     /**
      * 跳转到新的调价页面
      *
@@ -904,16 +881,16 @@ public class GlobalCtx extends Application {
      * @param mod
      * @param storeId
      * @param productId
-     * @param oldSupplyPrice
+     * @param json
      */
-    public void toSupplyPriceApplyView(Activity ctx, int mod, int storeId, int productId, int oldSupplyPrice) {
+    public void toSupplyPriceApplyView(Activity ctx, int mod, int storeId, int productId, String json) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "GoodsApplyPrice");
         Bundle params = new Bundle();
         params.putInt("mode", mod);
         params.putInt("pid", productId);
-        params.putInt("store_id", storeId);
-        params.putInt("old_supply_price", oldSupplyPrice);
+        params.putInt("storeId", storeId);
+        params.putString("detail", json);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
