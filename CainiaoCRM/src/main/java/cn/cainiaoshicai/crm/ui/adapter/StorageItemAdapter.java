@@ -32,9 +32,11 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
+import static cn.cainiaoshicai.crm.Cts.BLX_TYPE_BASIC;
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_NO;
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.Cts.PROFIT_CONTROLLER_YES;
+import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_BLX;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
@@ -116,9 +118,14 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-                    AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                    dlg.show();
+                    int storeVendor = store == null ? 0 : store.getType();
+                    if (storeVendor == STORE_VENDOR_BLX) {
+                        GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPrice());
+                    } else {
+                        StoreStorageChanged ssc = (StoreStorageChanged) getContext();
+                        AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                        dlg.show();
+                    }
                 }
             });
             if (item.getApplyingPrice() > 0) {

@@ -897,6 +897,27 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    /**
+     * 跳转到新的调价页面
+     *
+     * @param ctx
+     * @param mod
+     * @param storeId
+     * @param productId
+     * @param oldSupplyPrice
+     */
+    public void toSupplyPriceApplyView(Activity ctx, int mod, int storeId, int productId, int oldSupplyPrice) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsApplyPrice");
+        Bundle params = new Bundle();
+        params.putInt("mode", mod);
+        params.putInt("pid", productId);
+        params.putInt("store_id", storeId);
+        params.putInt("old_supply_price", oldSupplyPrice);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     @NonNull
     public Intent toTaskListIntent(Context ctx) {
         return new Intent(ctx, MyReactActivity.class);

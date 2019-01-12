@@ -18,6 +18,13 @@ public class Cts {
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 
+
+    //比邻鲜品牌
+    public static final int STORE_VENDOR_BLX = 5;
+
+    //保底模式
+    public static final int STORE_CONTROL_MODE_SUPPLY = 2;
+
     public static final String BLX_TYPE_BASIC = "basic";
     public static final String BLX_TYPE_PRO = "pro"; //带基本连锁功能
     public static final String BLX_TYPE_FULL = "full"; //带完整连锁功能
