@@ -17,10 +17,10 @@ function mapStateToProps (state) {
   return {global: global};
 }
 
-class GoodsPriceModifySupply extends Component {
+class GoodsApplyPrice extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: "修改价格-保底模式",
+      headerTitle: `修改价格`,
     }
   }
   
@@ -30,8 +30,10 @@ class GoodsPriceModifySupply extends Component {
     this.state = {
       // product_id: this.props.navigation.state.params.pid,
       // store_id: this.props.global.currStoreId,
+      // mode: this.props.navigation.state.params.mode,
       product_id: 62093,
       store_id: 928,
+      mode: 2,
       access_token: this.props.global.accessToken,
       resultDialog: false,
       resultMsg: '',
@@ -56,7 +58,7 @@ class GoodsPriceModifySupply extends Component {
   
   fetchData () {
     const self = this
-    const {store_id, product_id, access_token} = self.state
+    const {store_id, product_id, access_token, mode} = self.state
     const url = `api_products/trade_product_price/${store_id}/${product_id}/2.json?access_token=${access_token}`;
     HttpUtils.post(url).then(res => {
       self.setState({
@@ -101,7 +103,7 @@ class GoodsPriceModifySupply extends Component {
         if (resp.ok) {
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
         } else {
-          self.setState({resultDialog: true, resultMsg: '调价失败，请稍后重试', resultDialogType: 'info'})
+          self.setState({resultDialog: true, resultMsg: `调价失败，请稍后重试。${resp.reason}`, resultDialogType: 'info'})
         }
       })
   }
@@ -117,7 +119,7 @@ class GoodsPriceModifySupply extends Component {
         />
         
         <InputPrice
-          mode={2}
+          mode={this.state.mode}
           referPrice={this.state.refer_price}
           priceRatio={this.state.price_ratio}
           style={{marginTop: pxToDp(10)}}
@@ -195,4 +197,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default connect(mapStateToProps)(GoodsPriceModifySupply)
+export default connect(mapStateToProps)(GoodsApplyPrice)

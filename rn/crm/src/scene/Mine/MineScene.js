@@ -184,7 +184,7 @@ class MineScene extends PureComponent {
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
-
+    
     this.onGetDutyUser();
   }
   
@@ -205,7 +205,8 @@ class MineScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
-      dispatch(fetchUserInfo(uid, accessToken, resp => {})
+      dispatch(fetchUserInfo(uid, accessToken, resp => {
+        })
       );
     });
   }
@@ -229,8 +230,8 @@ class MineScene extends PureComponent {
       );
     });
   }
-
-  onGetDutyUser() {
+  
+  onGetDutyUser () {
     const {accessToken, currStoreId} = this.props.global;
     let _this = this;
     const {dispatch} = this.props;
@@ -307,8 +308,8 @@ class MineScene extends PureComponent {
       }
     });
   }
-
-  callCustomerService() {
+  
+  callCustomerService () {
     let server_info = tool.server_info(this.props);
     let dutyUsers = this.state.dutyUsers;
     if (dutyUsers && Array.isArray(dutyUsers) && dutyUsers.length > 0) {
@@ -1033,7 +1034,7 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_MODIFY_PRICE_SUPPLY)}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_PRICE, {mode: 2})}
           activeOpacity={customerOpacity}
         >
           <Image
@@ -1044,7 +1045,7 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_MODIFY_PRICE_WM)}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_PRICE, {mode: 1})}
           activeOpacity={customerOpacity}
         >
           <Image

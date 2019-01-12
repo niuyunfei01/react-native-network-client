@@ -52,8 +52,7 @@ import GoodsWorkNewProductScene from "../scene/Goods/GoodsWorkNewProductScene";
 import GoodsManageScene from "../scene/Goods/GoodsManageScene";
 import GoodsPriceDetailsScene from "../scene/Goods/GoodsPriceDetailsScene";
 import GoodsAdjustScene from '../scene/Goods/GoodsAdjustScene'
-import GoodsPriceModifySupply from '../scene/Goods/GoodsPriceModifySupply'
-import GoodsPriceModifyWm from '../scene/Goods/GoodsPriceModifyWm'
+import GoodsApplyPrice from '../scene/Goods/GoodsApplyPrice'
 import GoodsPriceCompete from '../scene/Goods/GoodsPriceCompete'
 import GoodsList from '../scene/Goods/GoodsList'
 
@@ -292,7 +291,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_APPLY_NEW_PRODUCT]: {screen: GoodsApplyNewProductScene},
         [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
         [Config.ROUTE_GOODS_ADJUST]: {screen: GoodsAdjustScene},
-        [Config.ROUTE_GOODS_MODIFY_PRICE_SUPPLY]: {screen: GoodsPriceModifySupply},
+        [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
         [Config.ROUTE_GOODS_MODIFY_PRICE_WM]: {screen: GoodsPriceModifyWm},
         [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
         [Config.ROUTE_GOODS_PRICE_COMPETE]: {screen: GoodsPriceCompete},
