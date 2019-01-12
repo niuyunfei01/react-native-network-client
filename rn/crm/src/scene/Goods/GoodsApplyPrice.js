@@ -17,6 +17,9 @@ function mapStateToProps (state) {
   return {global: global};
 }
 
+/**
+ * mode: 1抽佣模式 2保底模式
+ */
 class GoodsApplyPrice extends Component {
   static navigationOptions = ({navigation}) => {
     return {
@@ -28,12 +31,12 @@ class GoodsApplyPrice extends Component {
     super(props)
     
     this.state = {
-      // product_id: this.props.navigation.state.params.pid,
-      // store_id: this.props.global.currStoreId,
-      // mode: this.props.navigation.state.params.mode,
-      product_id: 62093,
-      store_id: 928,
-      mode: 2,
+      product_id: this.props.navigation.state.params.pid,
+      store_id: this.props.global.currStoreId,
+      mode: this.props.navigation.state.params.mode,
+      // product_id: 62093,
+      // store_id: 928,
+      // mode: 2,
       access_token: this.props.global.accessToken,
       resultDialog: false,
       resultMsg: '',

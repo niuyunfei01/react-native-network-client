@@ -292,7 +292,6 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
         [Config.ROUTE_GOODS_ADJUST]: {screen: GoodsAdjustScene},
         [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
-        [Config.ROUTE_GOODS_MODIFY_PRICE_WM]: {screen: GoodsPriceModifyWm},
         [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
         [Config.ROUTE_GOODS_PRICE_COMPETE]: {screen: GoodsPriceCompete},
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
