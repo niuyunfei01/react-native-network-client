@@ -16,7 +16,6 @@ import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
-import WorkerScene from "../scene/Worker/WorkerScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
 import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
@@ -95,7 +94,6 @@ import SearchGoods from "../scene/Goods/SearchGoods";
 //新产品详情
 import NewProductDetail from "../scene/Goods/NewProductDetail";
 import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProductRemindScene"
-
 //退款详情
 import Refund from "../scene/Order/Refund";
 import SelectCity from "../scene/Store/SelectCity";

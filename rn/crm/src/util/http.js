@@ -1,7 +1,7 @@
 import DeviceInfo from 'react-native-device-info';
 import {Toast} from 'antd-mobile-rn'
 import {ToastShort} from './ToastUtils';
-import {NavigationActions, StackActions} from "react-navigation";
+import native from '../common/native'
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -90,11 +90,7 @@ class HttpUtils {
       ToastShort('权限错误')
     } else if (response.error_code === 21327) {
       ToastShort('登录信息过期')
-      const resetAction = StackActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({routeName: 'Login'})],
-      });
-      navigation.dispatch(resetAction);
+      native.logout()
     } else if (response.error_code === 30001) {
       ToastShort('客户端版本过低')
     } else {

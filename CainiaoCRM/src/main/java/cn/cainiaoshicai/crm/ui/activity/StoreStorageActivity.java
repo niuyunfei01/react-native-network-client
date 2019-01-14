@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -761,11 +762,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
             }
-
-            if (currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
-                menu.add(Menu.NONE, MENU_CONTEXT_TO_CHG_SUPPLY_PRICE, Menu.NONE, "修改保底价");
-            }
-
+            
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
         }
     }
@@ -885,13 +882,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item != null) {
                     String url = URLHelper.getStoresPrefix() + "/store_product/" + item.getId();
                     GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, url);
-                }
-                return true;
-            case MENU_CONTEXT_TO_CHG_SUPPLY_PRICE:
-                if (item != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(item);
-                    GlobalCtx.app().toSupplyPriceApplyView(this, Cts.STORE_CONTROL_MODE_SUPPLY, item.getStore_id(), item.getProduct_id(), json);
                 }
                 return true;
             default:
