@@ -10,6 +10,8 @@ import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
 import {Modal, Toast} from 'antd-mobile-rn'
 import HttpUtils from "../../util/http";
+import native from "../../common/native";
+import NavigationItem from "../../widget/NavigationItem";
 
 
 function mapStateToProps (state) {
@@ -24,6 +26,20 @@ class GoodsApplyPrice extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: `修改价格`,
+      headerLeft: (
+        <NavigationItem
+          icon={require("../../img/Register/back_.png")}
+          iconStyle={{
+            width: pxToDp(48),
+            height: pxToDp(48),
+            marginLeft: pxToDp(31),
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => {
+            native.toGoods();
+          }}
+        />
+      )
     }
   }
   
@@ -46,6 +62,9 @@ class GoodsApplyPrice extends Component {
         listimg: '',
         waimai_product: {
           price: 0
+        },
+        store_product: {
+          supply_price: 0
         }
       },
       trade_products: [],
@@ -61,8 +80,8 @@ class GoodsApplyPrice extends Component {
   
   fetchData () {
     const self = this
-    const {store_id, product_id, access_token, mode} = self.state
-    const url = `api_products/trade_product_price/${store_id}/${product_id}/2.json?access_token=${access_token}`;
+    const {store_id, product_id, access_token} = self.state
+    const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
     HttpUtils.post(url).then(res => {
       self.setState({
         product: res.product,
@@ -128,9 +147,12 @@ class GoodsApplyPrice extends Component {
           style={{marginTop: pxToDp(10)}}
           onInput={(val) => this.setState({supply_price: val})}
         />
-        <If condition={this.state.trade_products.length > 0}>
-          <View>
-            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+        
+        <View style={{flex: 1}}>
+          <If condition={this.state.trade_products.length > 0}>
+            <View>
+              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+            </View>
             <ScrollView style={styles.scroll_view}>
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
@@ -145,11 +167,10 @@ class GoodsApplyPrice extends Component {
                 />
               </For>
             </ScrollView>
-          </View>
-        </If>
+          </If>
+        </View>
         
-        
-        <View style={styles.bottom_box}>
+        <View style={[styles.bottom_box]}>
           <TouchableOpacity onPress={() => this.onSave()}>
             <View style={styles.bottom_btn}>
               <Text style={{color: '#ffffff'}}>保存</Text>
@@ -170,7 +191,8 @@ class GoodsApplyPrice extends Component {
 
 const styles = StyleSheet.create({
   scroll_view: {
-    marginBottom: pxToDp(110)
+    marginBottom: pxToDp(110),
+    flex: 1
   },
   trade_title: {
     marginLeft: pxToDp(10),

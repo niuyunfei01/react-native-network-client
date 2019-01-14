@@ -17,40 +17,39 @@ export default class ResultDialog extends React.Component {
   
   render () {
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Modal
-          visible={this.props.visible}
-          animationType={'fade'}
-          transparent={true}
-          onRequestClose={() => {
-            this.props.onPress && this.props.onPress()
-          }}
-        >
-          <View style={styles.modal}>
-            <View style={styles.inner_box}>
-              <View style={styles.content}>
-                <If condition={this.props.type === 'info'}>
-                  <Image source={require('../../img/Goods/shibai_.png')} style={styles.image}/>
-                </If>
-                <If condition={this.props.type === 'success'}>
-                  <Image source={require('../../img/Goods/wancheng_.png')} style={styles.image}/>
-                </If>
-                <If condition={this.props.type === 'trophy'}>
-                  <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>
-                </If>
-                <Text style={styles.text}>{this.props.text}</Text>
-              </View>
-              <TouchableOpacity onPress={() => {
-                this.props.onPress && this.props.onPress()
-              }}>
-                <View style={styles.confirm_btn}>
-                  <Text style={styles.confirm_btn_text}>知道了</Text>
-                </View>
-              </TouchableOpacity>
+      <Modal
+        visible={this.props.visible}
+        style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+        animationType={'fade'}
+        transparent={true}
+        onRequestClose={() => {
+          this.props.onPress && this.props.onPress()
+        }}
+      >
+        <View style={styles.modal}>
+          <View style={styles.inner_box}>
+            <View style={styles.content}>
+              <If condition={this.props.type === 'info'}>
+                <Image source={require('../../img/Goods/shibai_.png')} style={styles.image}/>
+              </If>
+              <If condition={this.props.type === 'success'}>
+                <Image source={require('../../img/Goods/wancheng_.png')} style={styles.image}/>
+              </If>
+              <If condition={this.props.type === 'trophy'}>
+                <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>
+              </If>
+              <Text style={styles.text}>{this.props.text}</Text>
             </View>
+            <TouchableOpacity onPress={() => {
+              this.props.onPress && this.props.onPress()
+            }}>
+              <View style={styles.confirm_btn}>
+                <Text style={styles.confirm_btn_text}>知道了</Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
     )
   }
 }

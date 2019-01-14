@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   cell_box: {
     paddingHorizontal: pxToDp(30),
     paddingVertical: pxToDp(26),
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff'
   },
   cell: {
     borderBottomWidth: 1,
