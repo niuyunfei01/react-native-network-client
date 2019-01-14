@@ -13,11 +13,14 @@ export default class BaseItem extends PureComponent {
     monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     showModifyPriceBtn: PropTypes.bool,
     onPressModifyPrice: PropTypes.func,
-    style: PropTypes.object
+    style: PropTypes.object,
+    newPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    remark: PropTypes.string
   }
   
   static defaultProps = {
     showModifyPriceBtn: false,
+    newPrice: 0
   }
   
   render () {
@@ -30,8 +33,11 @@ export default class BaseItem extends PureComponent {
           <View style={[styles.item_right]}>
             <Text style={[styles.goods_name]}>{this.props.name}</Text>
             <View style={styles.sku}>
-              {this.props.wmPrice ? (<Text style={[styles.goods_price]}>外卖价:{this.props.wmPrice}</Text>) : null}
-              {this.props.supplyPrice ? (<Text style={[styles.goods_price]}>保底价:{this.props.supplyPrice}</Text>) : null}
+              <Text style={[styles.goods_price]}>
+                {this.props.wmPrice ? `外卖价:${this.props.wmPrice}` : null}
+                {this.props.supplyPrice ? `保底价:${this.props.supplyPrice}` : null}
+                {this.props.newPrice ? ` => ${this.props.newPrice}` : null}
+              </Text>
               {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
               {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
               <If condition={this.props.showModifyPriceBtn}>
@@ -44,6 +50,9 @@ export default class BaseItem extends PureComponent {
             </View>
           </View>
         </View>
+        <If condition={this.props.remark}>
+          <Text>{this.props.remark}</Text>
+        </If>
       </View>
     )
   }

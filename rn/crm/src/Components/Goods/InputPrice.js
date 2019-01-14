@@ -17,11 +17,15 @@ export default class InputPrice extends PureComponent {
     initPrice: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string
-    ])
+    ]),
+    showModeName: PropTypes.bool,
+    showRemark: PropTypes.bool,
   }
   
   static defaultProps = {
-    showNotice: false
+    showNotice: false,
+    showModeName: false,
+    showRemark: false,
   }
   
   constructor (props) {
@@ -65,7 +69,7 @@ export default class InputPrice extends PureComponent {
     }
     let wm_price = (val * 1 / (1 - ratio.rs - ratio.ri - ratio.rp) * parseInt(radd) / 100).toFixed(2)
     this.setState({wm_price})
-    this.props.onInput && this.props.onInput(val)
+    this.props.onInput && this.props.onInput(val,wm_price)
   }
   
   onUpdateSupplyPrice (val, ratio) {
@@ -103,9 +107,11 @@ export default class InputPrice extends PureComponent {
               (建议价格{this.props.referPrice})
             </If>
           </Text>
-          <View style={styles.tag}>
-            <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`}</Text>
-          </View>
+          <If condition={this.props.showModeName}>
+            <View style={styles.tag}>
+              <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`}</Text>
+            </View>
+          </If>
         </View>
         <View style={styles.input_box}>
           <TextInput
@@ -120,24 +126,26 @@ export default class InputPrice extends PureComponent {
             <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
           </If>
         </View>
-        <View style={styles.remark_box}>
-          {this.props.mode === 1 ? (
-            <View>
+        <If condition={this.props.showRemark}>
+          <View style={styles.remark_box}>
+            {this.props.mode === 1 ? (
+              <View>
+                <Text style={styles.remark}>
+                  商户应得：
+                  {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price}</Text>
+                  元/份（保底收入）
+                </Text>
+              </View>
+            ) : (
               <Text style={styles.remark}>
-                商户应得：
-                {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price}</Text>
-                元/份（保底收入）
+                根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
+                <Text style={{color: '#fd5b1b'}}>{wm_price}</Text>
+                元#
               </Text>
-            </View>
-          ) : (
-            <Text style={styles.remark}>
-              根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
-              <Text style={{color: '#fd5b1b'}}>{wm_price}</Text>
-              元#
-            </Text>
-          )}
-          <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
-        </View>
+            )}
+            <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
+          </View>
+        </If>
       </View>
     )
   }

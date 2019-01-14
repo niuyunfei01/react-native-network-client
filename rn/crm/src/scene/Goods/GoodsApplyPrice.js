@@ -70,7 +70,8 @@ class GoodsApplyPrice extends Component {
       trade_products: [],
       refer_price: 0,
       price_ratio: {},
-      supply_price: 0
+      supply_price: 0,
+      wmPrice: 0
     }
   }
   
@@ -138,14 +139,17 @@ class GoodsApplyPrice extends Component {
           wmPrice={this.state.product.waimai_product.price}
           image={this.state.product.listimg}
           showWmTip={true}
+          newPrice={this.state.wmPrice}
+          remark={'（含平台费，活动费，耗材费，运营费用等）'}
         />
         
         <InputPrice
           mode={this.state.mode}
+          showModeName={false}
           referPrice={this.state.refer_price}
           priceRatio={this.state.price_ratio}
           style={{marginTop: pxToDp(10)}}
-          onInput={(val) => this.setState({supply_price: val})}
+          onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
         />
         
         <View style={{flex: 1}}>
