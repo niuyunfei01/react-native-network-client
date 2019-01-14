@@ -116,8 +116,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int storeVendor = store == null ? 0 : store.getType();
-                    if (storeVendor == STORE_VENDOR_BLX) {
+                    boolean auditPriceByCompetitor = store == null ? false : store.isAuditPriceByCompetitor();
+                    if (auditPriceByCompetitor) {
                         Gson gson = new Gson();
                         String json = gson.toJson(item);
                         GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), json);

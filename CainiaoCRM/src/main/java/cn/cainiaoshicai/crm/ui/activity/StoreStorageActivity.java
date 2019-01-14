@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.telecom.Call;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -31,7 +30,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import cn.cainiaoshicai.crm.Constants;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
@@ -51,7 +48,6 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -60,12 +56,10 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.ui.helper.PicassoScrollListener;
-import cn.cainiaoshicai.crm.ui.helper.StoreSpinnerHelper;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
-import static cn.cainiaoshicai.crm.Cts.RATE_PRICE_CONTROLLER_YES;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;

@@ -16,6 +16,7 @@ public class Store {
     private String loc_lng;
     private String loc_lat;
     private boolean shipCapable;
+    private boolean auditPriceByCompetitor = false;
     private String cloudPrinter;
     private boolean cloudPrinterWorking;
     private int type;
@@ -288,6 +289,14 @@ public class Store {
         this.fn_show_quota = fn_show_quota;
     }
 
+    public boolean isAuditPriceByCompetitor() {
+        return auditPriceByCompetitor;
+    }
+
+    public void setAuditPriceByCompetitor(boolean auditPriceByCompetitor) {
+        this.auditPriceByCompetitor = auditPriceByCompetitor;
+    }
+
     public Bundle toBundle() {
         Bundle b = new Bundle();
         b.putString("name", name);
@@ -312,6 +321,7 @@ public class Store {
         b.putString("city_code", city_code);
         b.putString("district", district);
         b.putInt("fn_show_quota", fn_show_quota);
+        b.putBoolean("auditPriceByCompetitor", auditPriceByCompetitor);
         return b;
     }
 }
