@@ -92,7 +92,7 @@ class HttpUtils {
       ToastShort('登录信息过期')
       const resetAction = StackActions.reset({
         index: 0,
-        actions: [NavigationActions.navigate({routeName: 'UserLogin'})],
+        actions: [NavigationActions.navigate({routeName: 'Login'})],
       });
       navigation.dispatch(resetAction);
     } else if (response.error_code === 30001) {
