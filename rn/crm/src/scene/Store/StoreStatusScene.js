@@ -28,6 +28,7 @@ class StoreStatusScene extends React.Component {
         {label: '2小时', value: 120, key: 120},
         {label: '4小时', value: 240, key: 240},
         {label: '8小时', value: 480, key: 480},
+        {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
       ],
       all_close: false,
       all_open: false,

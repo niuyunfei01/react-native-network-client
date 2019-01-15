@@ -712,6 +712,7 @@ class StoreAddScene extends Component {
                   style={[styles.cell_input]}
                   placeholder="64个字符以内"
                   underlineColorAndroid="transparent" //取消安卓下划线
+                  editable={this.state.isServiceMgr}
                 />
               </CellBody>
             </Cell>
@@ -728,7 +729,6 @@ class StoreAddScene extends Component {
                   maxLength={18} // 可输入的最大长度
                   keyboardType="numeric" //默认弹出的键盘
                   underlineColorAndroid="transparent" //取消安卓下划线
-                  editable={this.state.isServiceMgr}
                 />
               </CellBody>
             </Cell>
