@@ -91,6 +91,7 @@ import SupplementWage from '../scene/User/SupplementWage'
 //扫码创新
 import CreateScan from "../scene/Goods/CreateScan";
 import SearchGoods from "../scene/Goods/SearchGoods";
+import OnlineStoreProduct from "../scene/Goods/OnlineStoreProduct";
 //新产品详情
 import NewProductDetail from "../scene/Goods/NewProductDetail";
 import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProductRemindScene"
@@ -330,6 +331,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
         [Config.ROUTE_CREATE_SCAN]: {screen: CreateScan},
         [Config.ROUTE_SEARCH_GOODS]: {screen: SearchGoods},
+        [Config.ROUTE_ONLINE_STORE_PRODUCT]: {screen: OnlineStoreProduct},
         [Config.ROUTE_NEW_PRODUCT]: {screen: NewProduct},
         [Config.ROUTE_NEW_PRODUCT_DETAIL]: {screen: NewProductDetail},
         [Config.ROUTE_CREATE_NEW_GOOD_REMIND]: {screen: CreateApplyNewProductRemindScene},

@@ -153,6 +153,7 @@ const C = {
   ROUTE_GOODS_SCAN_SEARCH: 'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
+  ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_NEW_PRODUCT: 'NewProduct',
   ROUTE_NEW_PRODUCT_DETAIL: 'NewProductDetail',
   ROUTE_INVOICING: 'Invoicing',
