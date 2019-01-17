@@ -883,13 +883,14 @@ public class GlobalCtx extends Application {
      * @param productId
      * @param json
      */
-    public void toSupplyPriceApplyView(Activity ctx, int mod, int storeId, int productId, String json) {
+    public void toSupplyPriceApplyView(Activity ctx, int mod, int storeId, int productId, String currentSupplyPrice, String json) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "GoodsApplyPrice");
         Bundle params = new Bundle();
         params.putInt("mode", mod);
         params.putInt("pid", productId);
         params.putInt("storeId", storeId);
+        params.putString("supplyPrice", currentSupplyPrice);
         params.putString("detail", json);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);

@@ -120,7 +120,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                     if (auditPriceByCompetitor) {
                         Gson gson = new Gson();
                         String json = gson.toJson(item);
-                        GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), json);
+                        GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPricePrecision(),json);
                     } else {
                         StoreStorageChanged ssc = (StoreStorageChanged) getContext();
                         AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());

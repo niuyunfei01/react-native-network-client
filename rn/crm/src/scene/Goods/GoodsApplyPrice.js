@@ -5,6 +5,7 @@ import GoodsBaseItem from '../../Components/Goods/BaseItem'
 import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
+import colors from "../../styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
@@ -70,7 +71,7 @@ class GoodsApplyPrice extends Component {
       trade_products: [],
       refer_price: 0,
       price_ratio: {},
-      supply_price: 0,
+      supply_price: this.props.navigation.state.params.supplyPrice,
       wmPrice: 0
     }
   }
@@ -150,14 +151,15 @@ class GoodsApplyPrice extends Component {
           referPrice={this.state.refer_price}
           priceRatio={this.state.price_ratio}
           style={{marginTop: pxToDp(10)}}
+          initPrice={this.state.product.store_product.supply_price}
           onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
         />
         
         <View style={{flex: 1}}>
+          <View>
+            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+          </View>
           <If condition={this.state.trade_products.length > 0}>
-            <View>
-              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
-            </View>
             <ScrollView style={styles.scroll_view}>
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
@@ -172,6 +174,11 @@ class GoodsApplyPrice extends Component {
                 />
               </For>
             </ScrollView>
+          </If>
+          <If condition={this.state.trade_products.length == 0}>
+            <View style={styles.no_prod_tip}>
+              <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
+            </View>
           </If>
         </View>
         
@@ -224,6 +231,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#59b26a',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  no_prod_tip: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  no_prod_tip_text: {
+    fontSize: pxToDp(40),
+    color: colors.main_color
   }
 })
 
