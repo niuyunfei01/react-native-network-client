@@ -9,7 +9,7 @@ import colors from "../../styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
-import {Modal, Toast} from 'antd-mobile-rn'
+import {Toast} from 'antd-mobile-rn'
 import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
@@ -86,6 +86,7 @@ class GoodsApplyPrice extends Component {
     const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
     HttpUtils.post(url, {}, navigation).then(res => {
+      console.log(res)
       self.setState({
         product: res.product,
         trade_products: res.trade_products,
@@ -94,18 +95,19 @@ class GoodsApplyPrice extends Component {
       })
     })
   }
-  
-  onSave () {
+
+  onSave() {
     if (this.state.supply_price) {
-      Modal.prompt('原因', '请输入调价原因', [
-        {
-          text: '关闭',
-        },
-        {
-          text: '确认',
-          onPress: (val) => this.onApplyStorePrice(val)
-        }
-      ])
+      // Modal.prompt('原因', '请输入调价原因', [
+      //   {
+      //     text: '关闭',
+      //   },
+      //   {
+      //     text: '确认',
+      //     onPress: (val) => this.onApplyStorePrice(val)
+      //   }
+      // ])
+      this.onApplyStorePrice("自助调价")
     } else {
       Toast.info('请输入保底价！')
     }

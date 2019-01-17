@@ -53,10 +53,10 @@ export default class InputPrice extends PureComponent {
       this.onUpdateWmPrice(val, ratio)
     }
   }
-  
-  onUpdateWmPrice (val, ratio) {
+
+  onUpdateWmPrice(val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
-    let radd = null
+    let radd = 1
     if (typeof(ratio.radd) === 'object') {
       for (let i of ratio.radd) {
         if (val >= i.min && val < i.max) {
@@ -67,9 +67,10 @@ export default class InputPrice extends PureComponent {
     } else {
       radd = ratio.radd
     }
-    let wm_price = (val * 1 / (1 - ratio.rs - ratio.ri - ratio.rp) * parseInt(radd) / 100).toFixed(2)
+    console.log("onUpdateWmPrice", val, ratio, radd)
+    let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
     this.setState({wm_price})
-    this.props.onInput && this.props.onInput(val,wm_price)
+    this.props.onInput && this.props.onInput(val, wm_price)
   }
   
   onUpdateSupplyPrice (val, ratio) {
@@ -120,7 +121,7 @@ export default class InputPrice extends PureComponent {
             underlineColorAndroid="transparent"
             style={{flex: 1, padding: 0}}
             placeholder={'请输入价格'}
-            onChangeText={(val) => this.onInputPrice(val ? parseInt(val) : 0)}
+            onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
           />
           <If condition={this.props.showNotice}>
             <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
