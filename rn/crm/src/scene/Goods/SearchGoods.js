@@ -10,6 +10,7 @@ import color from "../../widget/color";
 import HttpUtils from "../../util/http";
 import NoFoundDataView from "../component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
+import {CachedImage} from "react-native-img-cache";
 
 
 function mapStateToProps (state) {
@@ -116,7 +117,7 @@ class SearchGoods extends Component {
     const self = this
     return (
       <View style={styles.productRow} key={product.id}>
-        <Image source={{uri: Config.staticUrl(product.coverimg)}} style={{width: pxToDp(150), height: pxToDp(150)}}/>
+        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={{width: pxToDp(150), height: pxToDp(150)}}/>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>
             <Text

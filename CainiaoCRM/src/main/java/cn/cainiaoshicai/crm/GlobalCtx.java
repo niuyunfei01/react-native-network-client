@@ -26,6 +26,7 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.shell.MainReactPackage;
@@ -283,6 +284,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
+                .addPackage(new RNFetchBlobPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

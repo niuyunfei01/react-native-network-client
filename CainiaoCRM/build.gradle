@@ -65,6 +65,7 @@ dependencies {
     implementation 'com.clj.fastble:FastBleLib:2.3.2'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
+    compile project(path: ':rn-fetch-blob')
 }
 
 // The sample build uses multiple directories to
