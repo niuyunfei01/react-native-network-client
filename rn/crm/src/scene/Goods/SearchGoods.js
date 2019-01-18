@@ -50,7 +50,9 @@ class SearchGoods extends Component {
       isLastPage: false,
       selectTagId: 0,
       showCategory: true,
-      text: ''
+      text: '',
+      // 上线类型: 浏览(browse)、搜索(search)
+      onlineType: 'browse'
     }
   }
   
@@ -58,7 +60,6 @@ class SearchGoods extends Component {
     //设置函数
     this.props.navigation.setParams({search: this.searchWithKeyword})
     this.fetchCategories()
-    this.search()
   }
   
   fetchCategories () {
@@ -66,14 +67,19 @@ class SearchGoods extends Component {
     let accessToken = this.props.global.accessToken;
     let storeId = this.state.storeId
     HttpUtils.get(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`).then(res => {
-      self.setState({categories: res})
+      self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
   
   searchWithKeyword = (text) => {
     const self = this
     let showCategory = !text
-    self.setState({page: 1, showCategory: showCategory, text: text, selectTagId: 0}, () => self.search())
+    self.setState({
+      page: 1,
+      showCategory: showCategory,
+      text: text, selectTagId: 0,
+      onlineType: showCategory ? 'browse' : 'search'
+    }, () => self.search())
   }
   
   search = () => {
@@ -110,14 +116,25 @@ class SearchGoods extends Component {
   }
   
   onSelectCategory (category) {
-    this.setState({selectTagId: category.id, page: 1}, () => this.search())
+    this.setState({
+      selectTagId: category.id,
+      page: 1,
+      onlineType: 'browse'
+    }, () => this.search())
   }
   
-  renderRow = (product) => {
+  changeRowExist (idx) {
+    const products = this.state.goods
+    products[idx].is_exist = true
+    this.setState({goods: products})
+  }
+  
+  renderRow = (product, idx) => {
     const self = this
     return (
       <View style={styles.productRow} key={product.id}>
-        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={{width: pxToDp(150), height: pxToDp(150)}}/>
+        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
+                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>
             <Text
@@ -139,7 +156,8 @@ class SearchGoods extends Component {
                 store_id: this.state.storeId,
                 product_id: product.id,
                 mode: 2,
-                onBack: () => self.onRefresh()
+                onlineType: this.state.onlineType,
+                onBack: () => this.changeRowExist(idx)
               })}>
                 <View style={styles.toOnlineBtn}>
                   <Text style={styles.toOnlineBtnText}>上架</Text>
@@ -171,8 +189,8 @@ class SearchGoods extends Component {
   renderList () {
     const products = this.state.goods
     let items = []
-    for (var product of products) {
-      items.push(this.renderRow(product))
+    for (var idx in products) {
+      items.push(this.renderRow(products[idx], idx))
     }
     if (this.state.isLastPage) {
       items.push(this.renderNoFoundBtn())
@@ -220,8 +238,8 @@ class SearchGoods extends Component {
               renderList={this.renderList()}
               onRefresh={() => this.onRefresh()}
               onLoadMore={() => this.onLoadMore()}
-              isLastPage={false}
-              isLoading={false}
+              isLastPage={this.state.isLastPage}
+              isLoading={this.state.isLoading}
             />
           </If>
           

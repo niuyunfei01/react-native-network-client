@@ -34,6 +34,7 @@ class OnlineStoreProduct extends Component {
       product_id: this.props.navigation.state.params.product_id,
       store_id: this.props.navigation.state.params.store_id,
       mode: this.props.navigation.state.params.mode,
+      onlineType: this.props.navigation.state.params.onlineType,
       access_token: this.props.global.accessToken,
       resultDialog: false,
       resultMsg: '',
@@ -81,7 +82,8 @@ class OnlineStoreProduct extends Component {
     HttpUtils.post(`api/online_store_product?access_token=${access_token}`, {
       store_id: store_id,
       product_id: product_id,
-      price: supply_price * 100
+      price: supply_price * 100,
+      onlineType: this.state.onlineType
     }).then(res => {
       self.props.navigation.state.params.onBack()
       self.props.navigation.goBack()
