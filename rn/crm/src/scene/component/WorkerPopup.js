@@ -128,7 +128,10 @@ class WorkerPopup extends React.Component {
 
   createFilter(value) {
     return (worker) => {
-      return worker.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
+      if(worker&&worker.name){
+        return worker.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
+      }
+      return false;
     }
   }
 
