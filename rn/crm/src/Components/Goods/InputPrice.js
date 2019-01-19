@@ -2,6 +2,7 @@ import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
 import {Image, StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
+import tool from "../../common/tool";
 
 export default class InputPrice extends PureComponent {
   static propTypes = {
@@ -53,8 +54,8 @@ export default class InputPrice extends PureComponent {
       this.onUpdateWmPrice(val, ratio)
     }
   }
-
-  onUpdateWmPrice(val, ratio) {
+  
+  onUpdateWmPrice (val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = 1
     if (typeof(ratio.radd) === 'object') {
@@ -69,6 +70,7 @@ export default class InputPrice extends PureComponent {
     }
     console.log("onUpdateWmPrice", val, ratio, radd)
     let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
+    wm_price = tool.priceOptimize(wm_price * 100) / 100
     this.setState({wm_price})
     this.props.onInput && this.props.onInput(val, wm_price)
   }
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff'
   },
   top: {
-    marginTop: pxToDp(26),
+    // marginTop: pxToDp(26),
     flexDirection: 'row',
     justifyContent: 'space-between'
   },

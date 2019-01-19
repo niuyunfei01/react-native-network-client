@@ -58,7 +58,7 @@ export function orderOrderTimeShort (dt) {
   return Moment(dt).format("M/DD HH:mm");
 }
 
-export function isPreOrder(dt) {
+export function isPreOrder (dt) {
   let expectSeconds = Moment(dt).unix();
   let nowSeconds = Moment().unix();
   return expectSeconds - nowSeconds > 60 * 90
@@ -492,30 +492,30 @@ function ArrayGroupBy (itemlist, gby, keyName = 'key', valueName = 'value') {
  * 门店数据 格式化 -> React-Native-Modal-Selector
  * @param canReadStores
  */
-export function storeListOfModalSelector(canReadStores) {
+export function storeListOfModalSelector (canReadStores) {
   const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
   let return_data = []
   let return_data_deep = 2
-
+  
   for (let i in storeListGroup) {
     let storeListGroupByCity = storeListGroup[i]
-
+    
     if (storeListGroupByCity.label == 'undefined') {
       storeListGroup.splice(i, 1)
       continue
     }
-
+    
     storeListGroupByCity.key = i
     let storeDistrictCityValue = storeListGroupByCity.children
-
+    
     for (store of storeDistrictCityValue) {
       store.label = store.vendor + '-' + store.district + '-' + store.name
       store.key = store.id
     }
   }
-
+  
   return_data = storeListGroup
-
+  
   if (storeListGroup.length == 1) {
     return_data_deep = 1
     return_data = storeListGroup[0].children
@@ -731,6 +731,29 @@ function getTimeStamp (str) {
   return new Date(str.replace(/-/g, "/")).getTime();
 }
 
+/**
+ * 价格尾数优化（需要和mobileweb项目 __priceWithExtra 方法保持一致）
+ * @param $spPrice 分
+ * @return float|int
+ */
+function priceOptimize ($spPrice) {
+  $jiao = Math.floor($spPrice / 10);
+  if ($spPrice >= 200) { //超过此价才处理尾数
+    $jiao_mod = $jiao % 10;
+    if ($jiao_mod < 3) {
+      $spPrice = Math.floor($jiao / 10) * 100 - 1;
+    } else if ($jiao_mod < 5) {
+      $spPrice = Math.floor($jiao / 10) * 100 + 50;
+    } else if ($jiao_mod == 7) {
+      $spPrice = Math.floor($jiao / 10) * 100 + 80;
+    } else {
+      $spPrice = $jiao * 10;
+    }
+  }
+  
+  return $spPrice
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -774,5 +797,6 @@ export default {
   goodSoldStatusImg,
   getTimeStamp,
   simpleBarrier,
-  isPreOrder
+  isPreOrder,
+  priceOptimize
 };

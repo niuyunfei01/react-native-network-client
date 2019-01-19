@@ -95,8 +95,8 @@ class GoodsApplyPrice extends Component {
       })
     })
   }
-
-  onSave() {
+  
+  onSave () {
     if (this.state.supply_price) {
       // Modal.prompt('原因', '请输入调价原因', [
       //   {
@@ -139,12 +139,13 @@ class GoodsApplyPrice extends Component {
     return (
       <View style={{flex: 1}}>
         <GoodsBaseItem
+          wmText={'美团价'}
           name={this.state.product.name}
           wmPrice={this.state.product.waimai_product.price}
           image={this.state.product.listimg}
           showWmTip={true}
           newPrice={this.state.wmPrice}
-          remark={'（含平台费，活动费，耗材费，运营费用等）'}
+          remark={'(含平台费，活动费，耗材费，运营费用等)'}
         />
         
         <InputPrice

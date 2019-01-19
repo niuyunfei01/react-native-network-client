@@ -15,12 +15,14 @@ export default class BaseItem extends PureComponent {
     onPressModifyPrice: PropTypes.func,
     style: PropTypes.object,
     newPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    remark: PropTypes.string
+    remark: PropTypes.string,
+    wmText: PropTypes.string
   }
   
   static defaultProps = {
     showModifyPriceBtn: false,
-    newPrice: 0
+    newPrice: 0,
+    wmText: '外卖价'
   }
   
   render () {
@@ -34,7 +36,7 @@ export default class BaseItem extends PureComponent {
             <Text style={[styles.goods_name]}>{this.props.name}</Text>
             <View style={styles.sku}>
               <Text style={[styles.goods_price]}>
-                {this.props.wmPrice ? `外卖价:${this.props.wmPrice}` : null}
+                {this.props.wmPrice ? `${this.props.wmText}:${this.props.wmPrice}` : null}
                 {this.props.supplyPrice ? `保底价:${this.props.supplyPrice}` : null}
                 {this.props.newPrice ? ` => ${this.props.newPrice}` : null}
               </Text>
@@ -48,11 +50,11 @@ export default class BaseItem extends PureComponent {
                 </TouchableOpacity>
               </If>
             </View>
+            <If condition={this.props.remark}>
+              <Text style={styles.remark}>{this.props.remark}</Text>
+            </If>
           </View>
         </View>
-        <If condition={this.props.remark}>
-          <Text>{this.props.remark}</Text>
-        </If>
       </View>
     )
   }
@@ -105,5 +107,8 @@ const styles = StyleSheet.create({
     lineHeight: pxToDp(32),
     backgroundColor: '#59b26a',
     color: '#fefffe'
+  },
+  remark: {
+    fontSize: pxToDp(24)
   }
 })
