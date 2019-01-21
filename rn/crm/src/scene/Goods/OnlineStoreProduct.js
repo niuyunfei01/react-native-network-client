@@ -6,12 +6,7 @@ import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
 import {connect} from "react-redux";
-import AppConfig from "../../config";
-import FetchEx from "../../util/fetchEx";
-import {Modal, Toast} from 'antd-mobile-rn'
 import HttpUtils from "../../util/http";
-import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import colors from "../../styles/colors";
 
 

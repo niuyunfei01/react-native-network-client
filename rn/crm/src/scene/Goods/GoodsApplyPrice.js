@@ -129,6 +129,7 @@ class GoodsApplyPrice extends Component {
       .then(resp => {
         if (resp.ok) {
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
+          native.toGoods();
         } else {
           self.setState({resultDialog: true, resultMsg: `调价失败，请稍后重试。${resp.reason}`, resultDialogType: 'info'})
         }
