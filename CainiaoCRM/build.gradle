@@ -65,7 +65,9 @@ dependencies {
     implementation 'com.clj.fastble:FastBleLib:2.3.2'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
-    compile project(path: ':rn-fetch-blob')
+    implementation project(path: ':rn-fetch-blob')
+
+    implementation 'com.llew.huawei:verifier:1.1.1'
 }
 
 // The sample build uses multiple directories to

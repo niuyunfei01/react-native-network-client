@@ -42,6 +42,7 @@ import com.i18n.reactnativei18n.ReactNativeI18n;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
@@ -303,6 +304,7 @@ public class GlobalCtx extends Application {
     }
 
     public void startKeepAlive() {
+        LoadedApkHuaWei.hookHuaWeiVerifier(this);
         //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
         DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
         KeepAliveService.sShouldStopService = false;
