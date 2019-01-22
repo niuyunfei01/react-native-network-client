@@ -470,7 +470,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private void initStoreProdQuota() {
         final LinearLayout storeProdQuota = findViewById(R.id.store_prod_quota);
         storeProdQuota.setVisibility(View.INVISIBLE);
-        if (currStore != null && currStore.getFn_show_quota() == 1) {
+        if (currStore != null && currStore.isFn_show_quota()) {
             final TextView storeProdPriceScore = findViewById(R.id.store_prod_price_score);
             final TextView storeProdScoreDetail = findViewById(R.id.store_prod_score_detail);
             try {
