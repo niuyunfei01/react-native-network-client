@@ -138,14 +138,18 @@ class SearchGoods extends Component {
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>
             <Text
-              numberOfLines={1}
+              numberOfLines={2}
               style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
             >
               {product.name}
             </Text>
           </View>
           <View style={styles.productRowBottom}>
-            <View/>
+            <View>
+              <If condition={product.sales}>
+                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
+              </If>
+            </View>
             <If condition={product.is_exist}>
               <View style={styles.isOnlineBtn}>
                 <Text style={styles.isOnlineBtnText}>已上架</Text>
