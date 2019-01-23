@@ -11,6 +11,7 @@ import HttpUtils from "../../util/http";
 import NoFoundDataView from "../component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache";
+import BigImage from "../component/BigImage";
 
 
 function mapStateToProps (state) {
@@ -52,7 +53,9 @@ class SearchGoods extends Component {
       showCategory: true,
       text: '',
       // 上线类型: 浏览(browse)、搜索(search)
-      onlineType: 'browse'
+      onlineType: 'browse',
+      bigImageVisible: false,
+      bigImageUri: []
     }
   }
   
@@ -129,12 +132,28 @@ class SearchGoods extends Component {
     this.setState({goods: products})
   }
   
+  showBigImage (product) {
+    this.setState({
+      bigImageUri: [{url: Config.staticUrl(product.coverimg)}],
+      bigImageVisible: true
+    })
+  }
+  
+  closeBigImage () {
+    this.setState({
+      bigImageUri: [],
+      bigImageVisible: false
+    })
+  }
+  
   renderRow = (product, idx) => {
     const self = this
     return (
       <View style={styles.productRow} key={product.id}>
-        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
+        <TouchableOpacity onPress={() => this.showBigImage(product)}>
+          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
+                       style={{width: pxToDp(150), height: pxToDp(150)}}/>
+        </TouchableOpacity>
         <View style={styles.productRight}>
           <View style={styles.productRowTop}>
             <Text
@@ -252,6 +271,12 @@ class SearchGoods extends Component {
             {this.renderNoFoundBtn()}
           </If>
         </View>
+        
+        <BigImage
+          visible={this.state.bigImageVisible}
+          urls={this.state.bigImageUri}
+          onClickModal={() => this.closeBigImage()}
+        />
       </View>
     );
   }

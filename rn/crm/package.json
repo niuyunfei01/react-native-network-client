@@ -31,6 +31,7 @@
     "react-native-i18n": "1.0.0",
     "react-native-image-crop-picker": "^0.21.3",
     "react-native-image-picker": "^0.26.7",
+    "react-native-image-zoom-viewer": "^2.2.25",
     "react-native-img-cache": "^1.6.0",
     "react-native-loadmore": "^0.2.4",
     "react-native-modal-datetime-picker": "^4.13.0",
