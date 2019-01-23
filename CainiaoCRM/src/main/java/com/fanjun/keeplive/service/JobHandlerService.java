@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,24 +30,21 @@ public final class JobHandlerService extends JobService {
         startService(new Intent(this, RemoteService.class));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobInfo.Builder builder = new JobInfo.Builder(startId++,
-                    new ComponentName(getPackageName(), JobHandlerService.class.getName()));
-            if (Build.VERSION.SDK_INT >= 24) {
-                builder.setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS); //执行的最小延迟时间
-                builder.setOverrideDeadline(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);  //执行的最长延时时间
-                builder.setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);
-                builder.setBackoffCriteria(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS, JobInfo.BACKOFF_POLICY_LINEAR);//线性重试方案
-            } else {
-                builder.setPeriodic(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);
+            int jobId = startId + 1;
+            if (jobId <= 100) {
+                JobInfo.Builder builder = new JobInfo.Builder(jobId, new ComponentName(getPackageName(), JobHandlerService.class.getName()));
+                if (Build.VERSION.SDK_INT >= 24) {
+                    builder.setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS); //执行的最小延迟时间
+                    builder.setOverrideDeadline(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);  //执行的最长延时时间
+                    builder.setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);
+                    builder.setBackoffCriteria(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS, JobInfo.BACKOFF_POLICY_LINEAR);//线性重试方案
+                } else {
+                    builder.setPeriodic(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS);
+                }
+                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+                builder.setRequiresCharging(true); // 当插入充电器，执行该任务
+                mJobScheduler.schedule(builder.build());
             }
-            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-            builder.setRequiresCharging(true); // 当插入充电器，执行该任务
-            mJobScheduler.schedule(builder.build());
-            /*if (mJobScheduler.schedule(builder.build()) <= 0) {
-                Log.e("JobHandlerService", "工作失败");
-            } else {
-                Log.e("JobHandlerService", "工作成功");
-            }*/
         }
         return START_STICKY;
     }
