@@ -13,6 +13,7 @@ import {Toast} from 'antd-mobile-rn'
 import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
+import Cts from "../../Cts";
 
 
 function mapStateToProps (state) {
@@ -72,7 +73,8 @@ class GoodsApplyPrice extends Component {
       refer_price: 0,
       price_ratio: {},
       supply_price: this.props.navigation.state.params.supplyPrice,
-      wmPrice: 0
+      wmPrice: 0,
+      autoOnline: true
     }
   }
   
@@ -123,7 +125,8 @@ class GoodsApplyPrice extends Component {
         apply_price: supply_price * 100,
         before_price: self.state.product.store_product.supply_price * 100,
         remark: remark,
-        auto_on_sale: 0
+        auto_on_sale: 0,
+        autoOnline: this.state.autoOnline
       }))
       .then(resp => resp.json())
       .then(resp => {
@@ -134,6 +137,11 @@ class GoodsApplyPrice extends Component {
           self.setState({resultDialog: true, resultMsg: `调价失败，请稍后重试。${resp.reason}`, resultDialogType: 'info'})
         }
       })
+  }
+  
+  onAutoOnlineChange (val) {
+    console.log('onAutoOnlineChange => ', val)
+    this.setState({autoOnline: val})
   }
   
   render () {
@@ -157,6 +165,8 @@ class GoodsApplyPrice extends Component {
           style={{marginTop: pxToDp(10)}}
           initPrice={this.state.product.store_product.supply_price}
           onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
+          showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
+          onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
         />
         
         <View style={{flex: 1}}>

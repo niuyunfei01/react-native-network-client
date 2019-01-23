@@ -1,9 +1,11 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
-import {Image, StyleSheet, Text, TextInput, View} from "react-native";
+import {StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import tool from "../../common/tool";
+import {Checkbox} from 'antd-mobile-rn';
 
+const AgreeItem = Checkbox.AgreeItem;
 export default class InputPrice extends PureComponent {
   static propTypes = {
     mode: PropTypes.oneOf([1, 2]),// 1抽佣模式 2保底模式
@@ -21,12 +23,15 @@ export default class InputPrice extends PureComponent {
     ]),
     showModeName: PropTypes.bool,
     showRemark: PropTypes.bool,
+    showAutoOnline: PropTypes.bool,
+    onAutoOnlineChange: PropTypes.func
   }
   
   static defaultProps = {
     showNotice: false,
     showModeName: false,
     showRemark: false,
+    showAutoOnline: false
   }
   
   constructor (props) {
@@ -68,7 +73,6 @@ export default class InputPrice extends PureComponent {
     } else {
       radd = ratio.radd
     }
-    console.log("onUpdateWmPrice", val, ratio, radd)
     let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
     wm_price = tool.priceOptimize(wm_price * 100) / 100
     this.setState({wm_price})
@@ -129,6 +133,16 @@ export default class InputPrice extends PureComponent {
             <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
           </If>
         </View>
+        <If condition={this.props.showAutoOnline}>
+          <View style={{marginTop: pxToDp(30), marginLeft: pxToDp(-30)}}>
+            <AgreeItem
+              onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
+              defaultChecked={true}
+            >
+              价格生效后自动上架
+            </AgreeItem>
+          </View>
+        </If>
         <If condition={this.props.showRemark}>
           <View style={styles.remark_box}>
             {this.props.mode === 1 ? (
