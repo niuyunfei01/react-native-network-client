@@ -27,6 +27,7 @@ import OrderEditScene from "../scene/Order/OrderEditScene";
 import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
+import StoreRate from "../scene/Store/StoreRate";
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
@@ -52,7 +53,7 @@ import GoodsManageScene from "../scene/Goods/GoodsManageScene";
 import GoodsPriceDetailsScene from "../scene/Goods/GoodsPriceDetailsScene";
 import GoodsAdjustScene from '../scene/Goods/GoodsAdjustScene'
 import GoodsApplyPrice from '../scene/Goods/GoodsApplyPrice'
-import GoodsPriceCompete from '../scene/Goods/GoodsPriceCompete'
+import GoodsPriceIndex from '../scene/Goods/GoodsPriceIndex'
 import GoodsList from '../scene/Goods/GoodsList'
 
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
@@ -277,6 +278,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
+        [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
@@ -292,7 +294,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_ADJUST]: {screen: GoodsAdjustScene},
         [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
         [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
-        [Config.ROUTE_GOODS_PRICE_COMPETE]: {screen: GoodsPriceCompete},
+        [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
         [Config.ROUTE_SETTLEMENT_ORDER]: {screen: SettlementOrderScene},

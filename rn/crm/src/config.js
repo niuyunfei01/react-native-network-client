@@ -108,6 +108,7 @@ const C = {
   ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
+  ROUTE_STORE_RATE: 'StoreRate',
   ROUTE_DONE_REMIND: 'DoneRemind',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
@@ -166,7 +167,7 @@ const C = {
   ROUTE_GOODS_LIST: 'GoodsList',
   ROUTE_GOODS_ADJUST: 'GoodsAdjust',
   ROUTE_GOODS_APPLY_PRICE: 'GoodsApplyPrice',
-  ROUTE_GOODS_PRICE_COMPETE: 'GoodsPriceCompete',
+  ROUTE_GOODS_PRICE_INDEX: 'GoodsPriceIndex',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   serverUrl,
   apiUrl,
