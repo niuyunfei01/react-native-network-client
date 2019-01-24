@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import cn.cainiaoshicai.crm.AudioUtils;
+import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -153,7 +154,8 @@ public class PrintQueue {
         doPrint(mQueue, true);
     }
 
-    private void doPrint(ArrayList<Order> queue, boolean checkDupPrint){
+    private void doPrint(ArrayList<Order> queue, boolean checkDupPrint) {
+        Order pOrder = null;
         try {
             if (null == queue || queue.size() <= 0) {
                 return;
@@ -193,6 +195,7 @@ public class PrintQueue {
                         if (graphs.get(order.getId())) {
                             continue;
                         }
+                        pOrder = order;
                     } else {
                         if (manualPrintFlag.get(order.getId())) {
                             continue;
@@ -221,7 +224,11 @@ public class PrintQueue {
             if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
                 AudioUtils.getInstance().speakText(SPEAK_WORD);
             }
-            e.printStackTrace();
+            if (pOrder != null) {
+                queue.add(pOrder);
+                removeDuplicates(queue);
+            }
+            CrashReportHelper.handleUncaughtException(null, e);
         }
     }
 
@@ -233,7 +240,7 @@ public class PrintQueue {
             BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
             printer.closeSocket();
         } catch (Exception e) {
-            e.printStackTrace();
+            CrashReportHelper.handleUncaughtException(null, e);
         }
     }
 
@@ -308,7 +315,7 @@ public class PrintQueue {
             if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
                 AudioUtils.getInstance().speakText(SPEAK_WORD);
             }
-            e.printStackTrace();
+            CrashReportHelper.handleUncaughtException(null, e);
         }
     }
 }

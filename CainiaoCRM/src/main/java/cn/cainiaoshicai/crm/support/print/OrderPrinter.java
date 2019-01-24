@@ -464,7 +464,7 @@ public class OrderPrinter {
             btos = null;
             return data;
         } catch (Exception e) {
-            AppLogger.e("error in printing order", e);
+            CrashReportHelper.handleUncaughtException(null, e);
         } finally {
             if (btos != null) {
                 btos.flush();
