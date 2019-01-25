@@ -1,8 +1,11 @@
 import React from 'react'
-import {View, StyleSheet, Text, ScrollView} from "react-native";
+import {View, StyleSheet, Text, ScrollView, TouchableOpacity, InteractionManager} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import TabButton from "../component/TabButton";
 import color from "../../widget/color";
+import Rate from "../../Components/Goods/Rate";
+import native from "../../common/native";
+import Config from "../../config";
 
 export default class StoreRate extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -13,94 +16,54 @@ export default class StoreRate extends React.Component {
   
   constructor (props) {
     super(props)
-    this.state = {
-      tabData: [{label: '美团', value: 'mt'}, {label: '饿百', value: 'eb'}]
-    }
+    this.state = {}
   }
   
-  onClickTab (value) {
-  
-  }
-  
-  renderStoreRate () {
-    return (
-      <View style={styles.cell}>
-        <View style={styles.rateBox}>
-          <View style={styles.rateItem}>
-            <Text style={[styles.striking]}>3.7</Text>
-            <Text>您的店铺评分</Text>
-          </View>
-          <View style={styles.rateItem}>
-            <Text style={[styles.striking]}>4.7</Text>
-            <Text>商圈同行平均评分</Text>
-          </View>
-        </View>
-        <Text style={styles.tip}>
-          每天邀请好评至少2个，有效提升排名到商圈平均值
-        </Text>
-      </View>
-    )
-  }
-  
-  renderStoreEvaluation () {
-    return (
-      <View style={styles.cell}>
-        <View style={styles.rateBox}>
-          <View style={styles.rateItem}>
-            <Text style={styles.rateItemTop}><Text style={[styles.striking]}>8</Text>个</Text>
-            <Text>您的店铺评分</Text>
-          </View>
-          <View style={styles.rateItem}>
-            <Text style={styles.rateItemTop}>≤<Text style={[styles.striking]}>3</Text>个</Text>
-            <Text>商圈同行平均评分</Text>
-          </View>
-        </View>
-        <Text style={styles.tip}>
-          每天及时回复差评，提高排名最有效；
-        </Text>
-      </View>
-    )
-  }
-  
-  renderStoreRank () {
-    return (
-      <View style={styles.cell}>
-        <Text style={[styles.striking]}>店铺商圈排名<Text style={styles.redText}>第10名</Text></Text>
-        <Text>店铺休息或关店，排名会沉到底部</Text>
-        <Text>经常关店会直接影响排名，尽量减少</Text>
-      </View>
-    )
-  }
-  
-  renderTrackRate () {
-    return (
-      <View style={styles.trackRate}>
-        <Text>同行评分：</Text>
-        <ScrollView>
-          <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
-            <View key={idx} style={styles.trackRateItem}>
-              <Text>菜老包</Text>
-              <Text>评分4.5</Text>
-            </View>
-          </For>
-        </ScrollView>
-      </View>
-    )
+  routeTo (route, params = {}) {
+    let _this = this;
+    
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params);
+    });
   }
   
   render () {
     return (
       <View style={styles.container}>
-        <TabButton
-          data={this.state.tabData}
-          onClick={(value) => this.onClickTab(value)}
-          disableBackgroundTint={color.background}
-        />
-        
-        {this.renderStoreRate()}
-        {this.renderStoreEvaluation()}
-        {this.renderStoreRank()}
-        {this.renderTrackRate()}
+        <View style={styles.storeRateRow}>
+          <Text>店铺评分</Text>
+          <Rate showRecord={true} currRecord={1} maxRecord={5} style={styles.rate}/>
+        </View>
+        <View>
+          <Text style={styles.tip}>评分未达到5分，每单扣除1元满减补贴费。</Text>
+        </View>
+        <View style={styles.cell}>
+          <Text style={styles.title}>完成5.0评分，只需3步</Text>
+          <View style={styles.stepItem}>
+            <Text>第1步：在美团做3~5个好评；</Text>
+            <TouchableOpacity>
+              <View>
+                <Text style={styles.linkText}>如何做评价</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.stepItem}>
+            <Text>第2步：价格指数调整在4.2分以上；</Text>
+            <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_PRICE_INDEX)}>
+              <View>
+                <Text style={styles.linkText}>查看价格指数</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.stepItem}>
+            <Text>第3步：上架热销新品；</Text>
+            <TouchableOpacity>
+              <View>
+                <Text style={styles.linkText}>上架新品</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     )
   }
@@ -109,52 +72,41 @@ export default class StoreRate extends React.Component {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: pxToDp(20),
-    paddingVertical: pxToDp(10),
+    paddingVertical: pxToDp(30),
     flex: 1
   },
   cell: {
     backgroundColor: '#fff',
     paddingVertical: pxToDp(30),
     marginBottom: pxToDp(10),
-    alignItems: 'center'
-  },
-  rateBox: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-around'
-  },
-  rateItem: {
-    alignItems: 'center'
-  },
-  rateItemTop: {
-    fontSize: pxToDp(25)
-  },
-  striking: {
-    fontSize: pxToDp(40),
-    fontWeight: 'bold'
-  },
-  tip: {
-    color: color.fontOrigin,
-    fontSize: pxToDp(20),
+    alignItems: 'center',
     marginTop: pxToDp(20)
   },
-  redText: {
-    color: color.fontRed
-  },
-  succText: {
-    color: color.theme
-  },
-  trackRate: {
-    marginTop: pxToDp(15),
-    flex: 1
-  },
-  trackRateItem: {
-    height: pxToDp(60),
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: pxToDp(20),
-    borderBottomWidth: pxToDp(1),
-    backgroundColor: '#fff',
+  storeRateRow: {
     flexDirection: 'row'
+  },
+  rate: {
+    marginLeft: pxToDp(15)
+  },
+  tip: {
+    color: color.red,
+    fontSize: pxToDp(25),
+    marginTop: pxToDp(20)
+  },
+  title: {
+    backgroundColor: color.yellow,
+    fontWeight: '600',
+    marginBottom: pxToDp(30)
+  },
+  stepItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: pxToDp(20),
+    paddingHorizontal: pxToDp(10)
+  },
+  linkText: {
+    color: color.blue_link,
+    textDecorationLine: 'underline'
   }
 })
