@@ -18,6 +18,13 @@ public class Cts {
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 
+
+    //比邻鲜品牌
+    public static final int STORE_VENDOR_BLX = 5;
+
+    //保底模式
+    public static final int STORE_CONTROL_MODE_SUPPLY = 2;
+
     public static final String BLX_TYPE_BASIC = "basic";
     public static final String BLX_TYPE_PRO = "pro"; //带基本连锁功能
     public static final String BLX_TYPE_FULL = "full"; //带完整连锁功能
@@ -44,6 +51,9 @@ public class Cts {
     public static final String FB_STATUS_FIXED_T = "已解决";
     public static final String FB_STATUS_UNKNOWN_T = "未知";
 
+
+    public static final int EB_ORDER_FORM_BD = 1;
+    public static final int EB_ORDER_FROM_ELE = 2;
     public static final Platform PLAT_BD = new Platform("百度", 1);
     public static final Platform PLAT_WX = new Platform("微信", 2);
     public static final Platform PLAT_MT  = new Platform("美团", 3);
@@ -61,6 +71,9 @@ public class Cts {
 
     public static final int PRICE_CONTROLLER_NO = 0;
     public static final int PRICE_CONTROLLER_YES = 1;
+
+    public static final int RATE_PRICE_CONTROLLER_NO = 0;
+    public static final int RATE_PRICE_CONTROLLER_YES = 1;
 
     public static final int PROFIT_CONTROLLER_NO = 0;
     public static final int PROFIT_CONTROLLER_YES = 1;
@@ -188,7 +201,8 @@ public class Cts {
     public static final String PUSH_TYPE_ORDER_UPDATE = "order_update";
     public static final String PUSH_TYPE_TODO_COMPLAIN = "task_complain";
     public static final String PUSH_TYPE_SYS_ERROR = "system_error";
-    public static final String  PUSH_TYPE_TASK_REMIND = "task_remind";
+    public static final String PUSH_TYPE_TASK_REMIND = "task_remind";
+    public static final String PUSH_TYPE_PRODUCT_ADJUST = "product_adjust";
 
     public static final String PUSH_TYPE_USER_TALK = "talk";
 }

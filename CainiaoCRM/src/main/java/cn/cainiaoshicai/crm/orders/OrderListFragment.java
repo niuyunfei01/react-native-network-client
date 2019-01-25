@@ -78,7 +78,8 @@ public class OrderListFragment extends Fragment {
             return;
         }
         adapter = new OrderAdapter(getActivity(), data, this.listType.getValue());
-		listView.setAdapter(adapter);
+
+        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -118,7 +119,7 @@ public class OrderListFragment extends Fragment {
     }
 
     public void refresh(boolean byPassCache) {
-        AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter);
+        AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter + ", listTYpe:" + listType);
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
             RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,

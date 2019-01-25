@@ -2,13 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="325"
-    android:versionName="2.5.7">
+    android:versionCode="378"
+    android:versionName="3.0.7-goods">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <!-- Required  一些系统要求的权限，如访问网络等-->
@@ -19,7 +20,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
@@ -27,30 +28,38 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- Optional for location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
     <application
-        android:largeHeap="true"
+        android:name=".GlobalCtx"
         android:hardwareAccelerated="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Styled"
-        android:name=".GlobalCtx">
+        android:largeHeap="true"
+        android:theme="@style/Theme.Styled">
 
-        <meta-data android:name="android.app.default_searchable" android:value=".ui.activity.OrderQueryActivity" />
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".ui.activity.OrderQueryActivity" />
 
-        <activity android:name=".ui.activity.LoginActivity"
+        <activity
+            android:name=".ui.activity.LoginActivity"
             android:configChanges="keyboardHidden|orientation"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -59,85 +68,169 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" android:screenOrientation="portrait" android:launchMode="singleTop"
-            android:theme="@style/Theme.Styled.NoActionBar">
-        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Styled.NoActionBar"></activity>
 
-        <activity android:name=".ui.activity.RemindersActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.RemindersActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.StoreStorageActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.StoreStorageActivity"
+            android:parentActivityName=".ui.activity.MineActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.PrePackageCheckActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.PrePackageCheckActivity"
+            android:parentActivityName=".ui.activity.MineActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.OrderQueryActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.MineActivity">
+        <activity
+            android:name=".ui.activity.OrderQueryActivity"
+            android:parentActivityName=".ui.activity.MineActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.MineActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.MineActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.MonthPerfActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.MonthPerfActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.InTimeStatsActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.InTimeStatsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.UserCommentsActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.UserCommentsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.QualityCaseActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
+        <activity
+            android:name=".ui.activity.QualityCaseActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name=".ui.activity.GeneralWebViewActivity" android:screenOrientation="portrait"
-            android:theme="@style/Theme.Styled.NoActionBar">
-        </activity>
-        <activity android:name=".ui.activity.TowerActivity" android:parentActivityName=".ui.activity.MineActivity"
+        <activity
+            android:name=".ui.activity.GeneralWebViewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Styled">
-        </activity>
-        <activity android:name=".ui.activity.FeedBackEditActivity" android:screenOrientation="portrait"
-            android:parentActivityName=".ui.activity.FeedbackListsActivity">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
-        </activity>
-        <activity android:name=".ui.activity.FeedbackListsActivity" android:screenOrientation="portrait">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
-        </activity>
-        <activity android:name=".ui.activity.FeedbackViewActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
-            <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow"/>
-        </activity>
-        <activity android:name=".ui.activity.FeedbackWebViewActivity" android:screenOrientation="portrait" android:parentActivityName=".ui.activity.FeedbackListsActivity">
-        </activity>
-        <activity android:name=".ui.activity.StorageProvideActivity" android:screenOrientation="portrait"
-            android:parentActivityName=".ui.activity.StoreStorageActivity">
-        </activity>
-        <activity android:name=".ui.activity.DataActivity" android:screenOrientation="portrait">
-        </activity>
-
-        <activity android:name=".ui.activity.CustomizedMQConversationActivity"
+            android:theme="@style/Theme.Styled.NoActionBar"></activity>
+        <activity
+            android:name=".ui.activity.TowerActivity"
+            android:parentActivityName=".ui.activity.MineActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustResize"/>
+            android:theme="@style/Theme.Styled"></activity>
+        <activity
+            android:name=".ui.activity.FeedBackEditActivity"
+            android:parentActivityName=".ui.activity.FeedbackListsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
+        <activity
+            android:name=".ui.activity.FeedbackListsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
+        <activity
+            android:name=".ui.activity.FeedbackViewActivity"
+            android:parentActivityName=".ui.activity.FeedbackListsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
+        <activity
+            android:name=".ui.activity.FeedbackWebViewActivity"
+            android:parentActivityName=".ui.activity.FeedbackListsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ui.activity.StorageProvideActivity"
+            android:parentActivityName=".ui.activity.StoreStorageActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ui.activity.DataActivity"
+            android:screenOrientation="portrait"></activity>
 
-        <activity android:name="com.example.btprinter.BlueToothPrinterApp"/>
-        <activity android:name=".ui.activity.SettingsPrintActivity" android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.activity.CustomizedMQConversationActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
-        <activity android:name=".ui.activity.DatepickerActivity" android:screenOrientation="portrait"/>
+        <activity android:name="com.example.btprinter.BlueToothPrinterApp" />
+        <activity
+            android:name=".ui.activity.SettingsPrintActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".orders.view.OrderSingleActivity" android:screenOrientation="portrait" android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".ui.activity.DatepickerActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".orders.view.OrderSingleActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.activity.SearchBluetoothActivity"
+            android:screenOrientation="portrait"></activity>
 
         <!-- For test only 测试的主程序-->
-        <activity android:name="com.example.jpushdemo.MainActivity" android:label="@string/app_name"  android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.example.jpushdemo.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
         <!-- For test only 测试高级功能 -->
-        <activity android:name="com.example.jpushdemo.PushSetActivity" android:label="@string/app_name"/>
+        <activity
+            android:name="com.example.jpushdemo.PushSetActivity"
+            android:label="@string/app_name" />
         <!-- For test only 测试设置 -->
-        <activity android:name="com.example.jpushdemo.SettingActivity" android:label="@string/app_name"/>
+        <activity
+            android:name="com.example.jpushdemo.SettingActivity"
+            android:label="@string/app_name" />
         <!-- For test only 测试状态通知栏，需要打开的Activity -->
-        <activity android:name="com.example.jpushdemo.TestActivity" android:exported="false">
+        <activity
+            android:name="com.example.jpushdemo.TestActivity"
+            android:exported="false">
             <intent-filter>
                 <action android:name="jpush.testAction" />
                 <category android:name="jpush.testCategory" />
@@ -146,17 +239,17 @@
         <!-- Rich push 核心功能 since 2.0.6-->
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
 
         <!-- Required SDK核心功能-->
         <activity
             android:name="cn.jpush.android.ui.PushActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="cn.jpush.android.ui.PushActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="cn.cainiaoshicai.crm" />
             </intent-filter>
@@ -172,25 +265,28 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:host="blx" android:scheme="blx-crm" />
+                <data
+                    android:host="blx"
+                    android:scheme="blx-crm" />
             </intent-filter>
         </activity>
 
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
 
-        <activity android:name=".ui.scanner.FullScannerActivity"
+        <activity
+            android:name=".ui.scanner.FullScannerActivity"
+            android:label="@string/scanner_activity"
             android:theme="@style/AppOverlayTheme"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:label="@string/scanner_activity">
-            <meta-data android:name="android.support.UI_OPTIONS"
+            android:uiOptions="splitActionBarWhenNarrow">
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
 
         <service
             android:name="cn.jpush.android.service.DownloadService"
             android:enabled="true"
-            android:exported="false" >
-        </service>
+            android:exported="false"></service>
 
 
         <!-- Required SDK 核心功能-->
@@ -224,19 +320,48 @@
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
                 <data android:scheme="package" />
             </intent-filter>
 
         </receiver>
 
         <!-- Required SDK核心功能-->
-        <receiver android:name="cn.jpush.android.service.AlarmReceiver" android:exported="false"/>
+        <receiver
+            android:name="cn.jpush.android.service.AlarmReceiver"
+            android:exported="false" />
+
+        <!-- since 3.0.9 Required SDK 核心功能-->
+        <provider
+            android:name="cn.jpush.android.service.DataProvider"
+            android:authorities="cn.cainiaoshicai.crm.DataProvider"
+            android:exported="true"
+            tools:replace="android:exported" />
+
+        <!-- since 1.8.0 option 可选项。用于同一设备中不同应用的 JPush 服务相互拉起的功能。 -->
+        <!-- 若不启用该功能可删除该组件，或把 enabled 设置成 false ；拉起服务被关闭，App 不会通过拉起服务拉起其他的 App，也不会被其他 App 拉起。 -->
+        <service
+            android:name="cn.jpush.android.service.DaemonService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.DaemonService" />
+                <category android:name="cn.cainiaoshicai.crm" />
+            </intent-filter>
+        </service>
+
+        <!-- since 3.1.0 Required SDK 核心功能-->
+        <provider
+            android:name="cn.jpush.android.service.DownloadProvider"
+            android:authorities="cn.cainiaoshicai.crm.DownloadProvider"
+            android:exported="true" />
+
 
         <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
             android:name=".othercomp.NotificationReceiver"
-            android:exported="false"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.REGISTRATION" /> <!--Required  用户注册SDK的intent-->
                 <action android:name="cn.jpush.android.intent.UNREGISTRATION" />
@@ -251,13 +376,21 @@
 
 
         <!-- Required  . Enable it you can userTalkStatus statistics data with channel -->
-        <meta-data android:name="JPUSH_CHANNEL" android:value="developer-default"/>
-        <meta-data android:name="JPUSH_APPKEY" android:value="30073ab80a50534d39c84d3c" />
+        <meta-data
+            android:name="JPUSH_CHANNEL"
+            android:value="${JPUSH_CHANNEL}" />
+        <meta-data
+            android:name="JPUSH_APPKEY"
+            android:value="${JPUSH_APPKEY}" />
+        <meta-data
+            android:name="JPUSH_PKGNAME"
+            android:value="${JPUSH_PKGNAME}" />
 
 
         <receiver android:name=".notify.service.RebootBroadcastReceiver">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
@@ -271,6 +404,35 @@
         </receiver>
 
         <service android:name=".notify.service.AlwaysOnService" />
+
+        <service android:name=".notify.service.KeepAliveService" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <receiver android:name="com.fanjun.keeplive.receiver.NotificationClickReceiver" />
+        <activity android:name="com.fanjun.keeplive.activity.OnePixelActivity" />
+
+        <service android:name="com.fanjun.keeplive.service.LocalService" />
+        <service android:name="com.fanjun.keeplive.service.HideForegroundService" />
+        <service
+            android:name="com.fanjun.keeplive.service.JobHandlerService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.fanjun.keeplive.service.RemoteService"
+            android:process=":remote" />
+
     </application>
 
 </manifest>

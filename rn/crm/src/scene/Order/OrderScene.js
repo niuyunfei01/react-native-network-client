@@ -1,61 +1,50 @@
-import React, {PureComponent, Component} from 'react'
+import React, {Component, PureComponent} from 'react'
 import {
-  Platform,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ListView,
+  Alert,
   Image,
   InteractionManager,
+  Linking,
+  Platform,
   RefreshControl,
-  Alert,
-  Clipboard,
-  ToastAndroid,
-  Modal,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Linking
+  View
 } from 'react-native'
 import InputNumber from 'rc-input-number';
-import {color, NavigationItem, RefreshListView, RefreshState, Separator, SpacingView} from '../../widget'
-import {screen, system, tool, native} from '../../common'
+import {NavigationItem, Separator} from '../../widget'
+import {native, screen, tool} from '../../common'
 import {bindActionCreators} from "redux";
 import Icons from 'react-native-vector-icons/FontAwesome';
-import Config, {serverUrl} from '../../config'
+import Config from '../../config'
 import PropTypes from 'prop-types';
 import OrderStatusCell from './OrderStatusCell'
 import CallBtn from './CallBtn'
 import OrderBottom from './OrderBottom'
 import CommonStyle from '../../common/CommonStyles'
-import LoadingView from "../../widget/LoadingView";
 import {Button1} from '../component/All'
 import {
+  addTipMoney,
+  clearLocalOrder,
   getOrder,
-  printInCloud,
   getRemindForOrderPage,
+  orderCancelZsDelivery,
+  orderChangeLog,
+  orderWayRecord,
+  printInCloud,
   saveOrderDelayShip,
   saveOrderItems,
-  orderWayRecord,
-  orderChangeLog,
-  clearLocalOrder,
-  addTipMoney,
-  orderCancelZsDelivery, orderCallShip,
 } from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon, Input,
-  Cells,
-  Cell,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
+import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input, Toast,} from "../../weui/index";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import {StatusBar} from "react-native";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -64,14 +53,12 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-import coalesceNonElementChildren from "../../widget/coalesceNonElementChildren";
-import {fetchApplyRocordList} from "../../reducers/product/productActions";
-import {getWithTpl, jsonWithTpl} from "../../util/common";
-import {Metrics, Colors, Styles} from "../../themes";
+import {getWithTpl, getWithTpl2} from "../../util/common";
+import {Colors, Metrics, Styles} from "../../themes";
 
 const numeral = require('numeral');
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   return {
     order: state.order,
     global: state.global,
@@ -79,7 +66,7 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   return {
     dispatch, ...bindActionCreators({
       getContacts,
@@ -116,12 +103,13 @@ const MENU_SET_INVALID = 5;
 const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
+const MENU_SEND_MONEY = 9;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
 
 class OrderScene extends Component {
-
+  
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     let {backPage} = params;
@@ -158,30 +146,30 @@ class OrderScene extends Component {
       </View>),
     }
   };
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props);
-
+    
     this.state = {
-
+      
       isFetching: false,
       orderReloading: false,
-
+      
       errorHints: '',
       select_zs_label: '',
       cancel_zs_hint: false,
-
+      
       doingUpdate: false,
       shipCallHided: true,
-
+      
       //good items editing/display
       isEditing: false,
       isEndVisible: false,
-      itemsHided: true,
+      itemsHided: false,
       itemsAdded: {},
       itemsEdited: {},
       itemsSaving: false,
-
+      
       shipHided: true,
       changeHide: true,
       gotoEditPoi: false,
@@ -229,30 +217,28 @@ class OrderScene extends Component {
     this._onToProvide = this._onToProvide.bind(this);
     this._callShip = this._callShip.bind(this);
     this.cancelZsDelivery = this.cancelZsDelivery.bind(this);
-
     this._doRefund = this._doRefund.bind(this);
+    this.logOrderViewed = this.logOrderViewed.bind(this);
   }
-
-  componentDidMount() {
+  
+  componentDidMount () {
     this._navSetParams();
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
     this.wayRecordQuery();
-
+    
   }
-
-  componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps order.order', nextProps.order.order);
-    //
+  
+  componentWillReceiveProps (nextProps) {
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
-
+    
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -264,8 +250,6 @@ class OrderScene extends Component {
     const o = orderStateToCmp ? orderStateToCmp.order : false;
 
     if (!o || !o.id || o.id !== orderId) {
-
-      //console.log('__getDataIfRequired refresh, isFetching', orderId, this.state.isFetching);`
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
@@ -278,16 +262,15 @@ class OrderScene extends Component {
             state.errorHints = data;
             this.setState(state)
           } else {
-            //console.log('__getDataIfRequired refresh, isFetching');
             this._setAfterOrderGot(data, state);
             if (!this.state.remindFetching) {
               this.setState({remindFetching: true});
               dispatch(getRemindForOrderPage(sessionToken, orderId, (ok, desc, data) => {
-                console.log('getRemindForOrderPage -> ', ok, desc);
                 if (ok) {
                   this.setState({reminds: data, remindFetching: false})
                   this._orderChangeLogQuery();
                   this.wayRecordQuery();
+                  this.logOrderViewed();
                 } else {
                   this.setState({errorHints: desc, remindFetching: false})
                 }
@@ -298,19 +281,19 @@ class OrderScene extends Component {
       }
     }
   };
-
-  static _extract_edited_items(items) {
+  
+  static _extract_edited_items (items) {
     const edits = {};
     (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
       edits[item.id] = item;
     });
     return edits;
   }
-
+  
   _navSetParams = () => {
     let {backPage} = (this.props.navigation.state.params || {});
     const {enabled_special_menu = false} = this.props.global.config;
-
+    const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
@@ -319,15 +302,19 @@ class OrderScene extends Component {
       {key: MENU_SET_INVALID, label: '置为无效'},
     ];
 
-    if (enabled_special_menu) {
-      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
+    if (is_service_mgr) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
 
     if (this._fnProvidingOnway()) {
+      as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
 
+    if (is_service_mgr) {
+      as.push({key: MENU_SEND_MONEY, label: '发红包'})
+    }
+    
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
@@ -336,43 +323,43 @@ class OrderScene extends Component {
     };
     this.props.navigation.setParams(params);
   };
-
+  
   _setAfterOrderGot = (order, initialState) => {
     this.setState({
       itemsEdited: OrderScene._extract_edited_items(order.items),
-      itemsHided: !shouldShowItems(order.orderStatus),
+      //itemsHided: !shouldShowItems(order.orderStatus),
       ...initialState,
     });
-
+    
     this._navSetParams();
   };
-
-  onPrint() {
-
+  
+  onPrint () {
+    
     const order = this.props.order.order;
-
+    
     const store = tool.store(order.store_id, this.props.global);
-
+    
     if (store && store.cloudPrinter) {
       this.setState({showPrinterChooser: true})
     } else {
       this._doBluetoothPrint()
     }
   }
-
-  onToggleMenuOption() {
+  
+  onToggleMenuOption () {
     this.setState((prevState) => {
       return {showOptionMenu: !prevState.showOptionMenu}
     })
   }
-
-  onMenuOptionSelected(option) {
-
+  
+  onMenuOptionSelected (option) {
+    
     const {accessToken} = this.props.global;
     const {navigation, order, global, dispatch} = this.props;
-
+    
     if (option.key === MENU_EDIT_BASIC) {
-
+      
       this._toEditBasic();
     } else if (option.key === MENU_EDIT_EXPECT_TIME) {//修改配送时间
       if (this.state.doingUpdate) {
@@ -383,10 +370,10 @@ class OrderScene extends Component {
         isEndVisible: true,
       });
     } else if (option.key === MENU_EDIT_STORE) {
-
+      
       navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order.order});
     } else if (option.key === MENU_FEEDBACK) {
-
+      
       const _o = order.order;
       const vm_path = _o.feedback && _o.feedback.id ? "#!/feedback/view/" + _o.feedback.id
         : "#!/feedback/order/" + _o.id;
@@ -394,27 +381,26 @@ class OrderScene extends Component {
       const url = Config.serverUrl(path, Config.https);
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
-
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
     } else if (option.key === MENU_ADD_TODO) {
-
       navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order.order});
     } else if (option.key === MENU_OLD_VERSION) {
-
       native.toNativeOrder(order.order.id);
     } else if (option.key === MENU_PROVIDING) {
       this._onToProvide();
+    } else if (option.key === MENU_SEND_MONEY) {
+      navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
     } else {
       ToastShort('未知的操作');
     }
   }
-
-  onSaveDelayShip(date) {
+  
+  onSaveDelayShip (date) {
     // let Hours = date.getHours();
     // let Minutes = date.getMinutes();
     let expect_time = tool.fullDate(date);
     const {order} = this.props.order;
-
+    
     let wm_id = order.id;
     let send_data = {
       wm_id: wm_id,
@@ -438,17 +424,17 @@ class OrderScene extends Component {
       }));
     });
   }
-
-  _onShowStoreCall() {
-
+  
+  _onShowStoreCall () {
+    
     const {store, dispatch, global} = this.props;
-
+    
     const store_id = this.props.order.order.store_id;
     const contacts = (store.store_contacts || {}).store_id;
-
+    
     if (!contacts || contacts.length === 0) {
       this.setState({showContactsLoading: true});
-
+      
       dispatch(getContacts(global.accessToken, store_id, (ok, msg, contacts) => {
         console.log("getContacts: ok=", ok, "msg", msg);
         this.setState({store_contacts: contacts, showContactsLoading: false, showCallStore: true})
@@ -457,8 +443,8 @@ class OrderScene extends Component {
       this.setState({showCallStore: true})
     }
   }
-
-  _contacts2menus() {
+  
+  _contacts2menus () {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
     return (this.state.store_contacts || []).map((contact, idx) => {
       console.log(contact, idx);
@@ -472,36 +458,36 @@ class OrderScene extends Component {
       }
     });
   }
-
-  _toEditBasic() {
+  
+  _toEditBasic () {
     const {navigation, order} = this.props;
     navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order.order});
   }
-
-  _hideCallStore() {
+  
+  _hideCallStore () {
     this.setState({showCallStore: false});
   }
-
-  _dispatchToInvalidate() {
+  
+  _dispatchToInvalidate () {
     const {dispatch, order} = this.props;
     dispatch(clearLocalOrder(order.order.id));
     this.wayRecordQuery();
     this._orderChangeLogQuery();
   }
-
-  _hidePrinterChooser() {
+  
+  _hidePrinterChooser () {
     this.setState({showPrinterChooser: false})
   }
-
-  _cloudPrinterSN() {
+  
+  _cloudPrinterSN () {
     const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
     const store = stores[order.id];
     const printerName = (store && store.cloudPrinter) ? store.cloudPrinter : '未知';
     return `云打印(${printerName})`;
   }
-
-  _doCloudPrint() {
+  
+  _doCloudPrint () {
     const {dispatch, order} = this.props;
     const {accessToken} = this.props.global;
     dispatch(printInCloud(accessToken, order.order.id, (ok, msg, data) => {
@@ -514,36 +500,36 @@ class OrderScene extends Component {
       this._hidePrinterChooser();
     }))
   }
-
-  _doBluetoothPrint() {
+  
+  _doBluetoothPrint () {
     const order = this.props.order.order;
     native.printBtPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
     });
     this._hidePrinterChooser();
   }
-
-  _doSunMiPint() {
+  
+  _doSunMiPint () {
     const order = this.props.order.order;
     native.printSmPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
     });
     this._hidePrinterChooser();
   }
-
-  _onLogin() {
+  
+  _onLogin () {
     const orderId = this.props.order.order.id;
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId}})
   }
-
-  _doSaveItemsEdit() {
-
+  
+  _doSaveItemsEdit () {
+    
     const {dispatch, order, global} = this.props;
     const items = {
       ...this.state.itemsAdded,
       ...this.state.itemsEdited,
     };
-
+    
     this.setState({onSubmitting: true});
     const token = global.accessToken;
     const wmId = order.order.id;
@@ -556,7 +542,7 @@ class OrderScene extends Component {
           isEditing: false,
           onSubmitting: true,
         });
-
+        
         dispatch(getOrder(token, wmId, (ok, data) => {
           const ps = {
             onSubmitting: false,
@@ -574,12 +560,12 @@ class OrderScene extends Component {
       }
     }));
   }
-
-  _doSaveItemsCancel() {
+  
+  _doSaveItemsCancel () {
     this.setState({isEditing: false})
   }
-
-  _openAddGood() {
+  
+  _openAddGood () {
     const {navigation, dispatch} = this.props;
     const order = this.props.order.order;
     const params = {
@@ -597,8 +583,8 @@ class OrderScene extends Component {
     };
     navigation.navigate('ProductAutocomplete', params);
   }
-
-  _doAddItem(item) {
+  
+  _doAddItem (item) {
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
       let msg;
       if (item.num > 0) {
@@ -610,14 +596,14 @@ class OrderScene extends Component {
     }
     this._recordEdition(item)
   }
-
-  _onItemRowNumberChanged(item, newNum) {
-
+  
+  _onItemRowNumberChanged (item, newNum) {
+    
     console.log('accept a item:', item, 'to new', newNum);
     this._recordEdition({...item, num: newNum});
   }
-
-  _doRefund() {
+  
+  _doRefund () {
     const {order} = this.props.order;
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
@@ -641,21 +627,21 @@ class OrderScene extends Component {
       }
     );
   }
-
-  _recordEdition(item) {
+  
+  _recordEdition (item) {
     if (item.id) {
       this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
     } else {
       this.setState({itemsAdded: {...this.state.itemsAdded, [item.product_id]: item}});
     }
   }
-
-  _totalEditingCents() {
+  
+  _totalEditingCents () {
     const {order} = this.props.order;
     const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0 ?
       tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
       : 0;
-
+    
     let totalEdit = 0;
     if (this.state.itemsEdited) {
       (order.items || []).map((item) => {
@@ -666,32 +652,32 @@ class OrderScene extends Component {
         }
       });
     }
-
+    
     const totalChanged = totalAdd + totalEdit;
-
+    
     if (totalChanged < 0) {
       //退款金额： [(退款菜品现价 + 餐盒费)/(全部菜品现价总和 + 餐盒费)] * (最终支付价格 - 配送费)
       //退款规则：
-
+      
       return totalChanged;
     } else {
       return totalChanged;
     }
-
+    
   }
-
-  goToSetMap() {
+  
+  goToSetMap () {
     this.setState({gotoEditPoi: false});
-
+    
     const {order} = this.props.order;
     this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
   }
-
-  toMap() {
+  
+  toMap () {
     const {dispatch, global} = this.props;
     const {order} = this.props.order;
     const validPoi = order.gd_lng && order.gd_lat;
-
+    
     if (validPoi) {
       const store = this.props.global.canReadStores[order.store_id] || {};
       const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
@@ -706,8 +692,8 @@ class OrderScene extends Component {
       this.goToSetMap();
     }
   }
-
-  _doProcessRemind(remind) {
+  
+  _doProcessRemind (remind) {
     const {order} = this.props.order;
     const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
@@ -737,36 +723,36 @@ class OrderScene extends Component {
       this.setState({errorHints: '暂不支持该处理类型'})
     }
   }
-
-  _fnProvidingOnway() {
+  
+  _fnProvidingOnway () {
     const {order, global} = this.props;
-
+    
     const storeId = (order.order || {}).store_id;
     return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
-
-  _callShip() {
+  
+  _callShip () {
     const {navigation, order} = this.props;
     navigation.navigate(Config.ROUTE_ORDER_CALL_SHIP, {order: order.order});
   }
-
-  _onToProvide() {
+  
+  _onToProvide () {
     const {order, global, dispatch, navigation} = this.props;
     if (order.order.store_id <= 0) {
       ToastLong("所属门店未知，请先设置好订单所属门店！");
       return false;
     }
-
+    
     const path = `stores/orders_go_to_buy/${order.order.id}.html?access_token=${global.accessToken}`;
     navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
-
-  _getWayRecord() {
+  
+  _getWayRecord () {
     this.setState({shipHided: !this.state.shipHided})
-
+    
   }
-
-  wayRecordQuery() {
+  
+  wayRecordQuery () {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = navigation.state.params;
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
@@ -779,13 +765,13 @@ class OrderScene extends Component {
       this.setState({orderWayLogs: mg, wayLoadingShow: false})
     }));
   }
-
-  renderAddTip() {
+  
+  renderAddTip () {
     let {order} = this.props.order;
     let dada = this.state.orderWayLogs.hasOwnProperty(Cts.SHIP_AUTO_NEW_DADA)
     let {orderStatus, auto_ship_type} = order;
     if ((orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) && dada && auto_ship_type == Cts.SHIP_AUTO_NEW_DADA && (!this.state.shipHided)) {
-
+      
       return (
         <TouchableOpacity
           onPress={() => {
@@ -813,8 +799,8 @@ class OrderScene extends Component {
       );
     }
   }
-
-  renderWayRecord() {
+  
+  renderWayRecord () {
     let order = this.props.order.order
     let orderWayLogs = this.state.orderWayLogs
     if (!this.state.shipHided) {
@@ -855,7 +841,7 @@ class OrderScene extends Component {
                     )
                   })
                 }
-
+              
               </View>
             </View>
           )
@@ -873,12 +859,12 @@ class OrderScene extends Component {
       }
     }
   }
-
-  _orderChangeLog() {
+  
+  _orderChangeLog () {
     this.setState({changeHide: !this.state.changeHide})
   }
-
-  _orderChangeLogQuery() {
+  
+  _orderChangeLogQuery () {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = navigation.state.params;
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
@@ -889,8 +875,8 @@ class OrderScene extends Component {
       }
     }));
   }
-
-  renderChangeLogs() {
+  
+  renderChangeLogs () {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
@@ -939,8 +925,8 @@ class OrderScene extends Component {
       </View>
     }
   }
-
-  upAddTip() {
+  
+  upAddTip () {
     let {orderId} = this.props.navigation.state.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
@@ -961,15 +947,15 @@ class OrderScene extends Component {
       ToastLong('加小费的金额必须大于0')
     }
   }
-
-  total_goods_num(items) {
+  
+  total_goods_num (items) {
     let num = 0
     items.forEach((item) => {
       num += parseInt(item.num);
     })
     return num
   }
-
+  
   //modal弹出框
   modal = () => {
     return (
@@ -1011,8 +997,8 @@ class OrderScene extends Component {
       </TouchableWithoutFeedback>
     )
   }
-
-  render() {
+  
+  render () {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}
@@ -1021,13 +1007,11 @@ class OrderScene extends Component {
     />;
     const orderId = (this.props.navigation.state.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
-    // console.log('noOrder', noOrder, order);
-
+    
     if (noOrder) {
       const {dispatch, global, store} = this.props;
-      //this.__getDataIfRequired(dispatch, global, this.props.order, orderId);
     }
-
+    
     return noOrder ?
       <ScrollView
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
@@ -1073,7 +1057,7 @@ class OrderScene extends Component {
               }
             ]}
           />
-
+          
           <ActionSheet
             visible={this.state.showCallStore}
             onRequestClose={() => {
@@ -1088,15 +1072,15 @@ class OrderScene extends Component {
               }
             ]}
           />
-
-
+          
+          
           <ScrollView
             refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
           <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
-
+          
           <Dialog
             onRequestClose={() => {
             }}
@@ -1111,8 +1095,8 @@ class OrderScene extends Component {
           >
             <Text>{this.state.errorHints}</Text>
           </Dialog>
-
-
+          
+          
           <Dialog
             onRequestClose={() => {
             }}
@@ -1144,7 +1128,7 @@ class OrderScene extends Component {
               }}
             />
           </Dialog>
-
+          
           <Dialog
             onRequestClose={() => {
             }}
@@ -1166,21 +1150,21 @@ class OrderScene extends Component {
               <Text style={{color: '#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>
             </View>
           </Dialog>
-
+          
           <Toast
             icon="loading"
             show={this.state.onSubmitting}
             onRequestClose={() => {
             }}
           >处理中</Toast>
-
+          
           <Toast
             icon="loading"
             show={this.state.orderQuery}
             onRequestClose={() => {
             }}
           >加载中</Toast>
-
+          
           <Toast
             icon="success"
             show={this.state.onProcessed}
@@ -1188,7 +1172,7 @@ class OrderScene extends Component {
               this.setState({onProcessed: false})
             }}
           >已处理</Toast>
-
+          
           <DateTimePicker
             date={new Date(order.expectTime)}
             mode='datetime'
@@ -1203,7 +1187,7 @@ class OrderScene extends Component {
               });
             }}
           />
-
+          
           <Dialog
             onRequestClose={() => {
             }}
@@ -1269,8 +1253,8 @@ class OrderScene extends Component {
         </View>
       );
   }
-
-  cancelZsDelivery() {
+  
+  cancelZsDelivery () {
     const {dispatch, global, order} = this.props;
     let {zs_status, id} = order.order;
     zs_status = parseInt(zs_status);
@@ -1278,8 +1262,6 @@ class OrderScene extends Component {
     if (this.state.onSubmitting) {
       return false;
     }
-
-    console.log('wm_id -> ', wm_id);
     if (wm_id > 0) {
       if (zs_status === Cts.ZS_STATUS_CANCEL || zs_status === Cts.ZS_STATUS_ABNORMAL) {
         this.setState({errorHints: '专送已是取消状态'});
@@ -1299,8 +1281,23 @@ class OrderScene extends Component {
     }
   }
 
-  renderShipStatus() {
-    console.log('order', this.props.order.order);
+  logOrderViewed() {
+    const {order, global} = this.props;
+    let {id, orderStatus} = order.order;
+    if(orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP){
+      let {accessToken} = global;
+      let url = `/api/log_view_order/${id}?access_token=${accessToken}`;
+      getWithTpl(url, function (json) {
+        if (json.ok) {
+          ToastLong(json.desc);
+        }
+      }, function () {
+        ToastLong("记录订单访问次数错误！");
+      });
+    }
+  }
+  
+  renderShipStatus () {
     let {shipCallHided} = this.state;
     let {
       ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
@@ -1312,18 +1309,20 @@ class OrderScene extends Component {
     zs_status = parseInt(zs_status);
     zs_way = parseInt(zs_way);
     orderStatus = parseInt(orderStatus);
-
+    
     let auto_ship_view = null;
     if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
-        auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
-        auto_ship_type === Cts.SHIP_AUTO_BD ||
-        auto_ship_type === Cts.SHIP_AUTO_SX || auto_ship_type == Cts.SHIP_AUTO_MT) && (
-        dada_status !== Cts.DADA_STATUS_CANCEL &&
-        dada_status !== Cts.DADA_STATUS_TIMEOUT
-      )) {
+      auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
+      auto_ship_type === Cts.SHIP_AUTO_BD ||
+      auto_ship_type === Cts.SHIP_AUTO_SX ||
+      auto_ship_type == Cts.SHIP_AUTO_MT ||
+      auto_ship_type == Cts.SHIP_AUTO_MT_ZB) && (
+      dada_status !== Cts.DADA_STATUS_CANCEL &&
+      dada_status !== Cts.DADA_STATUS_TIMEOUT
+    )) {
       let ship_name = tool.disWay()[auto_ship_type];
       let dada_ship_status = tool.disWayStatic(Cts.SHIP_AUTO_NEW_DADA)[dada_status];
-
+      
       auto_ship_view = (
         <View>
           <View style={[ship_style.ship_box, {flexDirection: 'column'}]}>
@@ -1390,7 +1389,7 @@ class OrderScene extends Component {
               </Text>
             </View>
           </View>
-
+          
           {!shipCallHided && ship_site_mobile !== '' && (
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
@@ -1427,7 +1426,6 @@ class OrderScene extends Component {
           )}
         </View>
       );
-
     }
     let zs_ship_view = null;
     if ((zs_way === Cts.SHIP_ZS_JD ||
@@ -1435,12 +1433,13 @@ class OrderScene extends Component {
         zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
         auto_ship_type === Cts.SHIP_ZS_JD ||
         auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
-        auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD
+        auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD ||
+        auto_ship_type == Cts.SHIP_KS_ELE
       )) {//专送配送
       let zs_ship = tool.autoPlat(zs_way, zs_status);
       let zs_ship_status = tool.zs_status(zs_status);
       let zs_name = tool.ship_name(zs_way);
-
+      
       zs_ship_view = (
         <View>
           <View style={[ship_style.ship_box, {flexDirection: "column"}]}>
@@ -1462,13 +1461,14 @@ class OrderScene extends Component {
                   </Text>}
                 </Text>
               </View>
-
+              
               {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
                 zs_status === Cts.ZS_STATUS_CANCEL ||
                 zs_status === Cts.ZS_STATUS_ABNORMAL
               ) && (
                 <View style={ship_style.ship_btn_view}>
-                  {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && zs_way === Cts.SHIP_KS_MT) && <ClickBtn
+                  {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && (zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT)) &&
+                  <ClickBtn
                     btn_text={'加小费'}
                     onPress={() => {
                       this.setState({addTipDialog: true})
@@ -1533,7 +1533,7 @@ class OrderScene extends Component {
               </Text>
             </View>
           </View>
-
+          
           {!shipCallHided && ship_site_mobile !== '' && (
             <View style={ship_style.ship_box}>
               <View style={ship_style.ship_info}>
@@ -1571,7 +1571,7 @@ class OrderScene extends Component {
         </View>
       );
     }
-
+    
     if (zs_ship_view !== null || auto_ship_view !== null) {
       return (
         <View>
@@ -1583,21 +1583,22 @@ class OrderScene extends Component {
       return null;
     }
   }
-
-  renderHeader() {
+  
+  renderHeader () {
     const {order} = this.props.order;
-
+    
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
-
+    
     const totalMoneyEdit = this.state.isEditing ? this._totalEditingCents() : 0;
     const finalTotal = (tool.intOf(order.total_goods_price) + totalMoneyEdit) / 100;
-
+    
     //console.log(finalTotal, totalMoneyEdit, order.total_goods_price, this.state);
     const _items = order.items || {};
     const remindNicks = this.state.reminds.nicknames || {};
     const task_types = this.props.global.config.task_types || {};
-
+    const mobile_label = order.mobile.replace(',', '转');
+    
     return (<View>
         <OrderReminds task_types={task_types} reminds={this.state.reminds.reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind}/>
@@ -1634,18 +1635,19 @@ class OrderScene extends Component {
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
-            <CallBtn mobile={order.mobile}/>
+            <CallBtn mobile={order.mobile} label={mobile_label}/>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
               <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
             </TouchableOpacity>
           </View>
-
+          
           {hasRemarkOrTax(order) &&
           <View style={[styles.row, {marginBottom: pxToDp(14), marginTop: 0, flexDirection: 'column'}]}>
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
             {!!order.user_remark &&
-            <Remark label="客户备注" remark={order.user_remark}/>}
+            <Remark label="客户备注" remark={order.user_remark}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(24)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
             {!!order.invoice &&
@@ -1653,12 +1655,12 @@ class OrderScene extends Component {
             {!!order.taxer_id &&
             <Remark label="税号" remark={order.taxer_id}/>}
           </View>}
-
+        
         </View>
-
+        
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
         {this.renderShipStatus()}
-
+        
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
             marginRight: 0,
@@ -1683,9 +1685,9 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
             <ImageBtn source={require('../../img/Order/refund.png')}
                       imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doRefund}/>
-
+            
             {this.state.isEditing && <View style={{flexDirection: 'row', paddingRight: pxToDp(30)}}>
-
+              
               <ImageBtn
                 source={require('../../img/Order/good/queren_.png')}
                 imageStyle={{width: pxToDp(152), height: pxToDp(40)}} onPress={this._doSaveItemsEdit}/>
@@ -1693,7 +1695,7 @@ class OrderScene extends Component {
                 source={require('../../img/Order/good/quxiao_.png')}
                 imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
-
+            
             {!this.state.isEditing && (
               order._op_edit_goods ?
                 <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={() => {
@@ -1701,7 +1703,7 @@ class OrderScene extends Component {
                 }}/>
                 : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>)
             }
-
+            
             {!this.state.isEditing && (this.state.itemsHided ?
               <ImageBtn source={require('../../img/Order/pull_up.png')} onPress={
                 () => {
@@ -1725,7 +1727,7 @@ class OrderScene extends Component {
                              isEditing={this.state.isEditing}
                              onInputNumberChange={this._onItemRowNumberChanged}/>);
           })}
-
+          
           {!this.state.itemsHided && this.state.isEditing &&
           <View style={[styles.row, {
             height: pxToDp(100),
@@ -1738,24 +1740,38 @@ class OrderScene extends Component {
             <ImageBtn source={require('../../img/Order/good/jiahuo_.png')}
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
-
-          <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
-            <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>商品总额</Text>
-
-              {totalMoneyEdit !== 0 &&
-              <View><Text
-                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
-                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+          {order.is_fn_price_controlled ?
+            <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
+              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+                <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
+                <TouchableOpacity
+                  style={[{alignItems: 'center', justifyContent: 'center'}]}
+                  onPress={() => {
+                    this.props.navigation.navigate('SettlementOrder', {
+                      order_id: order.id,
+                      store_id: order.store_id,
+                      date: order.orderTime.substr(0, 10),
+                      dayId: order.dayId
+                    })
+                  }}>
+                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.supply_price / 100).format('0.00')}
               </Text>
-                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
-                  {numeral(order.total_goods_price / 100).format('0.00')}
-                </Text></View>}
-
+            </View>
+            : null}
+          <View style={[styles.row, styles.moneyRow]}>
+            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+              <Text style={styles.moneyListTitle}>用户已付</Text>
+              <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
+              {/*<Text style={styles.moneyListSub}>微信支付</Text>*/}
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
-              {numeral(finalTotal).format('0.00')}
+              {numeral(order.orderMoney).format('0.00')}
             </Text>
           </View>
           <View style={[styles.row, styles.moneyRow]}>
@@ -1771,36 +1787,45 @@ class OrderScene extends Component {
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
           </View>
-          <View style={[styles.row, styles.moneyRow]}>
-            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-              <Text style={styles.moneyListTitle}>用户已付</Text>
-              <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
-              <Text style={styles.moneyListSub}>微信支付</Text>
+          
+          {order.additional_to_pay != '0' ?
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={styles.moneyLeft}>
+                <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
+                <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
+                  <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
+                    <Text>收款码</Text>
+                    <Icons name='qrcode'/>
+                  </Text>
+                </TouchableOpacity>
+                {(order.additional_to_pay != 0) &&
+                <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.additional_to_pay / 100).format('+0.00')}
+              </Text>
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
-              {numeral(order.orderMoney).format('0.00')}
-            </Text>
-          </View>
-          {order.addition_to_pay !== 0 &&
-          <View style={[styles.row, styles.moneyRow]}>
+            : null}
+          <View style={[styles.row, styles.moneyRow,]}>
             <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
-              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
-                <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
-                  <Text>收款码</Text>
-                  <Icons name='qrcode'/>
-                </Text>
-              </TouchableOpacity>
-              {(order.additional_to_pay != 0) &&
-              <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
+              <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
+              
+              {totalMoneyEdit !== 0 &&
+              <View><Text
+                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
+                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+              </Text>
+                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
+                  {numeral(order.total_goods_price / 100).format('0.00')}
+                </Text></View>}
+            
             </View>
             <View style={{flex: 1}}/>
             <Text style={styles.moneyListNum}>
-              {numeral(order.additional_to_pay / 100).format('+0.00')}
+              {numeral(finalTotal).format('0.00')}
             </Text>
           </View>
-          }
         </View>
         <View>
           <View style={[CommonStyle.topBottomLine, styles.block]}>
@@ -1848,7 +1873,7 @@ class OrderScene extends Component {
             </View>
           </View>
         </View>
-
+        
         <View style={{marginBottom: pxToDp(100)}}>
           <View style={[CommonStyle.topBottomLine, styles.block,]}>
             <View style={[styles.row, {
@@ -1858,7 +1883,12 @@ class OrderScene extends Component {
               marginRight: 0,
             }]}>
               <Text
-                style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold', marginBottom: pxToDp(1)}}>修改记录</Text>
+                style={{
+                  color: colors.title_color,
+                  fontSize: pxToDp(30),
+                  fontWeight: 'bold',
+                  marginBottom: pxToDp(1)
+                }}>修改记录</Text>
               <View style={{flex: 1}}/>
               <ImageBtn source={
                 this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
@@ -1867,7 +1897,7 @@ class OrderScene extends Component {
                 this._orderChangeLog()
               }}
               />
-
+            
             </View>
           </View>
           <View style={{marginTop: pxToDp(1)}}>
@@ -1876,27 +1906,27 @@ class OrderScene extends Component {
             }
           </View>
         </View>
-
+      
       </View>
     )
   }
 }
 
 class OrderReminds extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
-
-  render() {
-
+  
+  render () {
+    
     const {reminds, task_types, remindNicks, processRemind} = this.props;
-
+    
     return <View>{(reminds || []).map((remind, idx) => {
       const type = parseInt(remind.type);
       const taskType = task_types['' + type];
       const status = parseInt(remind.status);
       const quick = parseInt(remind.quick);
-
+      
       return <View key={remind.id} style={{
         borderBottomWidth: screen.onePixel,
         borderBottomColor: colors.color999,
@@ -1910,7 +1940,7 @@ class OrderReminds extends PureComponent {
         }}>
           <Text>{taskType ? taskType.name : '待办'}</Text>
           <Text style={{marginLeft: pxToDp(20),}}>{tool.shortTimeDesc(remind.created)}</Text>
-
+          
           <View style={{flex: 1}}/>
           {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
           <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
@@ -1933,7 +1963,7 @@ class OrderReminds extends PureComponent {
             <Text style={{color: colors.white,}}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'}</Text>
           </TouchableOpacity>
           }
-
+          
           {status === Cts.TASK_STATUS_DONE && <View style={{flexDirection: 'row'}}>
             <Text>{tool.shortTimeDesc(remind.resolved_at)}</Text>
             {remind.resolved_by &&
@@ -1951,21 +1981,25 @@ class OrderReminds extends PureComponent {
 }
 
 class ItemRow extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props);
   }
-
-  render() {
+  
+  render () {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
       }, isEditing = false, nav
     } = this.props;
-
+    
+    if (item.crm_order_detail_hide) {
+      return null
+    }
+    
     const editNum = _editNum(edited, item);
-
+    
     const showEditAdded = isEditing && !isAdd && edited && editNum !== 0;
     const isPromotion = Math.abs(item.price * 100 - item.normal_price) >= 1;
-
+    
     return <View key={idx} style={[styles.row, {
       marginTop: 0,
       paddingTop: pxToDp(14),
@@ -2001,7 +2035,7 @@ class ItemRow extends PureComponent {
             }
           </View>
         </View>
-
+      
       </View>
       {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
         <Text
@@ -2019,7 +2053,7 @@ class ItemRow extends PureComponent {
             opacity: 0.7,
           }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
       </View>)}
-
+      
       {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
@@ -2028,7 +2062,7 @@ class ItemRow extends PureComponent {
             opacity: 0.7,
           }]}>收{numeral(item.num * item.price).format('0.00')}</Text>
       </View>}
-
+      
       {isPromotion &&
       <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
       }
@@ -2038,7 +2072,7 @@ class ItemRow extends PureComponent {
         fontSize: pxToDp(26),
         color: colors.color666
       }}>X{item.num}</Text>}
-
+      
       {isEditing && !isPromotion &&
       <View style={[{marginLeft: 10}]}>
         <InputNumber
@@ -2067,29 +2101,29 @@ ItemRow.PropTypes = {
 };
 
 class Remark extends PureComponent {
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props)
   }
-
-  render() {
-    const {label, remark} = this.props;
+  
+  render () {
+    const {label, remark, style} = this.props;
     return (<View style={{flexDirection: 'row'}}>
-      <Text style={styles.remarkText}>{label}:</Text>
-      <Text selectable={true} style={[styles.remarkText, styles.remarkTextBody]}>{remark}</Text>
+      <Text style={[styles.remarkText, style]}>{label}:</Text>
+      <Text selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</Text>
     </View>)
   }
 }
 
 class ImageBtn extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
-
-  render() {
-
+  
+  render () {
+    
     const {source, onPress, imageStyle, ...others} = this.props;
-
+    
     return <TouchableOpacity onPress={onPress} others>
       <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
     </TouchableOpacity>
@@ -2097,11 +2131,11 @@ class ImageBtn extends PureComponent {
 }
 
 class ClickBtn extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
-
-  render() {
+  
+  render () {
     let {style, type, onPress, btn_text, mobile, text_style} = this.props;
     return (
       <TouchableOpacity

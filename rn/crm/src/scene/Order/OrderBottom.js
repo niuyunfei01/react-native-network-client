@@ -20,7 +20,7 @@ function mapStateToProps(state) {
   return {
     global: state.global,
     store: state.store,
-    onSubmitting:false,
+    onSubmitting: false,
 
   };
 }
@@ -74,7 +74,7 @@ class OrderBottom extends PureComponent {
   _cancelShip = (title) => {
     const {navigation, order} = this.props;
     this.setState({dlgShipVisible: false});
-    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order,type:title});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, type: title});
   };
 
   _setOrderArrived = () => {
@@ -116,9 +116,11 @@ class OrderBottom extends PureComponent {
     return (iStatus === Cts.ORDER_STATUS_TO_READY || iStatus === Cts.ORDER_STATUS_TO_SHIP) && fnProvidingOnway
   }
 
-  _visibleShipInfoBtn () {
-    let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      dada_call_at} = this.props.order;
+  _visibleShipInfoBtn() {
+    let {
+      dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
+      dada_call_at
+    } = this.props.order;
     dada_status = parseInt(dada_status);
     orderStatus = parseInt(orderStatus);
 
@@ -134,7 +136,9 @@ class OrderBottom extends PureComponent {
     return {
       type: 'default',
       label: title,
-      onPress: () => { this.setState({dlgShipVisible: false}) }
+      onPress: () => {
+        this.setState({dlgShipVisible: false})
+      }
     }
   };
 
@@ -151,8 +155,9 @@ class OrderBottom extends PureComponent {
     }));
   }
 
-  _onShipInfoBtnClicked () {
-    let {dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
+  _onShipInfoBtnClicked() {
+    let {
+      dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
       auto_ship_type, zs_status = Cts.ZS_STATUS_TO_ACCEPT_EX, dada_call_at
     } = this.props.order;
     dada_status = parseInt(dada_status);
@@ -167,7 +172,7 @@ class OrderBottom extends PureComponent {
     } else {
 
       if (auto_ship_type === Cts.SHIP_ZS_JD || auto_ship_type === Cts.SHIP_ZS_MT || auto_ship_type === Cts.SHIP_KS_MT
-          || auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD) {
+        || auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD) {
         /*switch (zs_status) {
           case Cts.ZS_STATUS_CANCEL:
           case Cts.ZS_STATUS_NEVER_START:
@@ -202,7 +207,7 @@ class OrderBottom extends PureComponent {
             break;
         }*/
 
-        if(auto_ship_type === Cts.SHIP_ZS_JD && zs_status === Cts.ZS_STATUS_NEVER_START){
+        if (auto_ship_type === Cts.SHIP_ZS_JD && zs_status === Cts.ZS_STATUS_NEVER_START) {
           title = tool.autoPlat(auto_ship_type, zs_status);
           msg = '确认召唤京东专送?';
           buttons = [
@@ -233,7 +238,7 @@ class OrderBottom extends PureComponent {
           buttons = [
             {
               label: '撤回呼叫',
-              onPress: () =>this._cancelShip('call')
+              onPress: () => this._cancelShip('call')
             },
             this._defCloseBtn('继续等待'),
             {
@@ -248,7 +253,7 @@ class OrderBottom extends PureComponent {
           buttons = [
             {
               label: '强行撤单',
-              onPress: ()=>this._cancelShip('order'),
+              onPress: () => this._cancelShip('order'),
             },
             {
               label: '呼叫配送员',
@@ -321,7 +326,10 @@ class OrderBottom extends PureComponent {
       if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
           auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
           auto_ship_type === Cts.SHIP_AUTO_BD ||
-          auto_ship_type === Cts.SHIP_AUTO_SX) && (
+          auto_ship_type === Cts.SHIP_AUTO_SX ||
+          auto_ship_type === Cts.SHIP_AUTO_MT ||
+          auto_ship_type === Cts.SHIP_AUTO_MT_ZB
+        ) && (
           dada_status !== Cts.DADA_STATUS_CANCEL &&
           dada_status !== Cts.DADA_STATUS_TIMEOUT
         )) {
@@ -355,20 +363,22 @@ class OrderBottom extends PureComponent {
             label = dada_status;
         }
       } else if (
-          zs_way === Cts.SHIP_ZS_JD ||
-          zs_way === Cts.SHIP_KS_MT ||
-          zs_way === Cts.SHIP_ZS_MT ||
-          zs_way === Cts.SHIP_ZS_ELE ||
-          zs_way === Cts.SHIP_ZS_BD
-        ) {
+        zs_way === Cts.SHIP_ZS_JD ||
+        zs_way === Cts.SHIP_KS_MT ||
+        zs_way === Cts.SHIP_ZS_MT ||
+        zs_way === Cts.SHIP_ZS_ELE ||
+        zs_way === Cts.SHIP_KS_ELE ||
+        zs_way === Cts.SHIP_ZS_BD
+      ) {
         label = tool.autoPlat(zs_way, zs_status);
       } else if (
-          auto_ship_type === Cts.SHIP_ZS_JD ||
-          auto_ship_type === Cts.SHIP_KS_MT ||
-          auto_ship_type === Cts.SHIP_ZS_MT ||
-          auto_ship_type === Cts.SHIP_ZS_ELE ||
-          auto_ship_type === Cts.SHIP_ZS_BD
-        ) {
+        auto_ship_type === Cts.SHIP_ZS_JD ||
+        auto_ship_type === Cts.SHIP_KS_MT ||
+        auto_ship_type === Cts.SHIP_ZS_MT ||
+        auto_ship_type === Cts.SHIP_ZS_ELE ||
+        auto_ship_type === Cts.SHIP_KS_ELE ||
+        auto_ship_type === Cts.SHIP_ZS_BD
+      ) {
         label = tool.autoPlat(auto_ship_type, zs_status);
       } else {
         if (dada_status === Cts.DADA_STATUS_NEVER_START || zs_status === Cts.ZS_STATUS_NEVER_START) {
@@ -442,7 +452,8 @@ class OrderBottom extends PureComponent {
       </Dialog>
       <Toast show={this.state.onSubmitting}>提交中</Toast>
       <Toast icon="success" show={this.state.doneSubmitting}>保存成功</Toast>
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -453,7 +464,7 @@ class OrderBottom extends PureComponent {
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
 
-      { (this._actionBtnVisible() || this._visibleProviding() || this._visibleShipInfoBtn()) &&
+      {(this._actionBtnVisible() || this._visibleProviding() || this._visibleShipInfoBtn()) &&
       <View style={{
         flexDirection: 'row', justifyContent: 'space-around',
         paddingTop: pxToDp(10),
@@ -472,18 +483,21 @@ class OrderBottom extends PureComponent {
         shadowRadius: 4,
         height: pxToDp(90),
       }}>
-      {this._visibleProviding() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'} size={'small'}
-                                           onPress={this._onToProvide}>备货</Button>}
-      {this._actionBtnVisible() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
-                                           onPress={this._onActionBtnClicked}>{this._actionBtnText()}</Button>}
-      {this._visibleShipInfoBtn() && <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
-                                             onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
-    </View>}
+        {this._visibleProviding() &&
+        <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'default'} size={'small'}
+                onPress={this._onToProvide}>备货</Button>}
+        {this._actionBtnVisible() &&
+        <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
+                onPress={this._onActionBtnClicked}>{this._actionBtnText()}</Button>}
+        {this._visibleShipInfoBtn() &&
+        <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
+                onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
+      </View>}
       <Toast
-          icon="loading"
-          show={this.state.onSubmitting}
-          onRequestClose={() => {
-          }}
+        icon="loading"
+        show={this.state.onSubmitting}
+        onRequestClose={() => {
+        }}
       >提交中</Toast>
       <Dialog onRequestClose={() => {
       }}

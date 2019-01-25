@@ -49,13 +49,14 @@ public class StoreStorageHelper {
 
     static AlertDialog createSetOnSaleDlg(final Activity activity, final StorageItem item,
                                           final StoreStorageActivity.ItemStatusUpdated setOkCallback, boolean selfProvided) {
-
         final int checked[] = new int[1];
         checked[0] = 0;
-
+        if (GlobalCtx.app().fnEnabledReqProvide()) {
+            checked[0] = 1;
+        }
         final String[] items = new String[]{
-                activity.getString(R.string.store_on_sale_after_off_work),
                 activity.getString(R.string.store_on_sale_after_have_storage),
+                activity.getString(R.string.store_on_sale_after_off_work),
                 activity.getString(R.string.store_on_sale_none)
         };
 

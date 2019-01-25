@@ -106,7 +106,8 @@ class ActivityManageScene extends PureComponent {
   getRuleList = () => {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchRuleList('active', accessToken, (ok, desc, obj) => {
+    let {currVendorId} = tool.vendor(this.props.global);
+    dispatch(fetchRuleList('active', currVendorId, accessToken, (ok, desc, obj) => {
       if (ok) {
         let operatingList = this.differentiateList(obj, true);
         let willOperatingList = this.differentiateList(obj, false);

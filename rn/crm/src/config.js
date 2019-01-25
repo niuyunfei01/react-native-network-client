@@ -11,7 +11,7 @@ import ActivityManageScene from "./scene/Activity/ActivityManageScene";
 import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
 import ActivityListScene from "./scene/Activity/ActivityListScene";
 
-const { HOST_UPDATED } = require("./common/constants").default;
+const {HOST_UPDATED} = require("./common/constants").default;
 
 /**
  * if none in global, return the default host and try to update from settings into global
@@ -21,26 +21,26 @@ const { HOST_UPDATED } = require("./common/constants").default;
  * @returns {*}
  * @deprecated 直接使用 apiUrl
  */
-export function host(globalRed, dispatch, native) {
+export function host (globalRed, dispatch, native) {
   if (globalRed.host) {
     return globalRed.host;
   } else {
     native.host(host => {
       if (host) {
-        dispatch({ type: HOST_UPDATED, host: host });
+        dispatch({type: HOST_UPDATED, host: host});
       }
     });
-
+    
     return C.defaultHost;
   }
 }
 
-export function apiUrl(path) {
+export function apiUrl (path) {
   const hp = global.hostPort ? global.hostPort : C.defaultHost;
   return `https://${hp}/${path}`;
 }
 
-export function staticUrl(path) {
+export function staticUrl (path) {
   let isFullUrl = path.indexOf("http");
   return isFullUrl === -1 ? serverUrl(path, true) : path;
 }
@@ -52,7 +52,7 @@ export function staticUrl(path) {
  * @param useHttps
  * @returns {string}
  */
-export function serverUrl(path, useHttps = true) {
+export function serverUrl (path, useHttps = true) {
   const proto = useHttps ? "https" : "http";
   const hp = global.hostPort ? global.hostPort : C.defaultHost;
   path = path[0] === "/" ? path.substr(1) : path;
@@ -67,18 +67,19 @@ const C = {
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
   defaultHost: "www.cainiaoshicai.cn",
   AppName: "Crm",
-
+  
   DownloadUrl: `https://www.cainiaoshicai.cn/util/crm_dl`,
   MAP_WAY_URL: "util/amap_way",
-  FetchTimeout: 30000,
-
+  FetchTimeout: 60000,
+  LongFetchTimeout: 200000,
+  
   GRANT_TYP_PASSWORD: "password",
   GRANT_CLIENT_ID: "NTQ5NTE5MGViMTgzMDUw",
-
+  
   ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
-
+  
   LOC_PICKER: "loc_picker",
-
+  
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
@@ -87,6 +88,7 @@ const C = {
   ROUTE_WORKER: 'Worker',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
+  ROUTE_USER_CHOOSE: 'UserChoose',
   ROUTE_Mine: 'Mine',
   ROUTE_SETTING: 'Setting',
   ROUTE_CLOUD_PRINTER: 'CloudPrinter',
@@ -102,10 +104,14 @@ const C = {
   ROUTE_ORDER_SHIP_DETAIL: 'OrderShipDetail',
   ROUTE_ORDER_TODO: 'OrderTodo',
   ROUTE_ORDER_STORE: 'OrderChgStore',
+  ROUTE_ORDER_SEND_MONEY: 'OrderSendMoney',
+  ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
+  ROUTE_STORE_RATE: 'StoreRate',
   ROUTE_DONE_REMIND: 'DoneRemind',
   ROUTE_TAKE_OUT: 'TakeOut',
+  ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
@@ -117,47 +123,51 @@ const C = {
   ROUTE_GOODS_EDIT: 'GoodsEdit',
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
-  ROUTE_GOODS_APPLY_RECORD:'GoodsApplyRecord',
+  ROUTE_GOODS_APPLY_RECORD: 'GoodsApplyRecord',
   ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
-  ROUTE_HELP:'Help',
-  ROUTE_SETTLEMENT:'Settlement',
-  ROUTE_SETTLEMENT_DETAILS:'SettlementDetails',
-  ROUTE_SETTLEMENT_ORDER:'SettlementOrder',
-  ROUTE_SELECT_WORKER:'SelectWorkerScene',
+  ROUTE_HELP: 'Help',
+  ROUTE_SETTLEMENT: 'Settlement',
+  ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
+  ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
+  ROUTE_SELECT_WORKER: 'SelectWorkerScene',
   ROUTE_GOODS_RELATE: 'GoodsRelate',
-  ROUTE_GOODS_APPLY_NEW_PRODUCT:'GoodsApplyNewProduct',
-  ROUTE_GOODS_WORK_NEW_PRODUCT:'GoodsWorkNewProduct',
-  ROUTE_OPERATE_PROFIT:'OperateProfit',
-  ROUTE_OPERATE_DETAIL:'OperateDetail',
-  ROUTE_OPERATE_INCOME_DETAIL:'OperateIncomeDetail',
-  ROUTE_OPERATE_EXPEND_DETAIL:'OperateExpendDetail',
-  ROUTE_OPERATE_OTHER_EXPEND_DETAIL:'OperateOtherExpendDetail',
-  ROUTE_GOODS_MANAGE:'GoodsManage',
-  ROUTE_GOODS_PRICE_DETAIL:'GoodsPriceDetails',
-  ROUTE_SETTLEMENT_GATHER:'SettlementGather',
-  ROUTE_ACTIVITY_RULE:'ActivityRule',
-  ROUTE_ACTIVITY_EDIT_RULE:'ActivityEditRule',
-  ROUTE_ACTIVITY_SELECT_STORE:'ActivitySelectStore',
-  ROUTE_ACTIVITY_MANAGE:'ActivityManage',
-  ROUTE_ACTIVITY_SELECT_GOOD:'ActivitySelectGood',
-  ROUTE_ACTIVITY_CLASSIFY:'ActivitySelectClassify',
-  ROUTE_ACTIVITY_LIST:'ActivityList',
-  ROUTE_JD_AUDIT_DELIVERY:'JdAuditDelivery',
-  ROUTE_SCAN:'Scan',
+  ROUTE_GOODS_APPLY_NEW_PRODUCT: 'GoodsApplyNewProduct',
+  ROUTE_GOODS_WORK_NEW_PRODUCT: 'GoodsWorkNewProduct',
+  ROUTE_OPERATE_PROFIT: 'OperateProfit',
+  ROUTE_OPERATE_DETAIL: 'OperateDetail',
+  ROUTE_OPERATE_INCOME_DETAIL: 'OperateIncomeDetail',
+  ROUTE_OPERATE_EXPEND_DETAIL: 'OperateExpendDetail',
+  ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
+  ROUTE_GOODS_MANAGE: 'GoodsManage',
+  ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
+  ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
+  ROUTE_ACTIVITY_RULE: 'ActivityRule',
+  ROUTE_ACTIVITY_EDIT_RULE: 'ActivityEditRule',
+  ROUTE_ACTIVITY_SELECT_STORE: 'ActivitySelectStore',
+  ROUTE_ACTIVITY_MANAGE: 'ActivityManage',
+  ROUTE_ACTIVITY_SELECT_GOOD: 'ActivitySelectGood',
+  ROUTE_ACTIVITY_CLASSIFY: 'ActivitySelectClassify',
+  ROUTE_ACTIVITY_LIST: 'ActivityList',
+  ROUTE_JD_AUDIT_DELIVERY: 'JdAuditDelivery',
+  ROUTE_SCAN: 'Scan',
   ROUTE_CREATE_NEW_GOOD_REMIND: 'CreateApplyNewProductRemind',
-  ROUTE_GOODS_SCAN_SEARCH:'GoodsScanSearch',
+  ROUTE_GOODS_SCAN_SEARCH: 'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
+  ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_NEW_PRODUCT: 'NewProduct',
   ROUTE_NEW_PRODUCT_DETAIL: 'NewProductDetail',
-  ROUTE_INVOICING:'Invoicing',
-  ROUTE_INVOICING_GATHER_DETAIL:'InvoicingGatherDetail',
-  ROUTE_INVOICING_SHIPPING_DETAIL:'InvoicingShippingDetail',
+  ROUTE_INVOICING: 'Invoicing',
+  ROUTE_INVOICING_GATHER_DETAIL: 'InvoicingGatherDetail',
+  ROUTE_INVOICING_SHIPPING_DETAIL: 'InvoicingShippingDetail',
   ROUTE_INVOICING_SHIPPING_LIST: 'InvoicingShippingList',
   ROUTE_REFUND_DETAIL: 'RefundDetail',
   ROUTE_SELECT_CITY_LIST: "SelectCity",
   ROUTE_SELECT_QUALIFICATION: "Qualification",
+  ROUTE_GOODS_LIST: 'GoodsList',
   ROUTE_GOODS_ADJUST: 'GoodsAdjust',
+  ROUTE_GOODS_APPLY_PRICE: 'GoodsApplyPrice',
+  ROUTE_GOODS_PRICE_INDEX: 'GoodsPriceIndex',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   serverUrl,
   apiUrl,

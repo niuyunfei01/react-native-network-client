@@ -81,7 +81,8 @@ export default {
   SHIP_AUTO_NEW_DADA: 2,//新达达
   SHIP_AUTO_BD: 5,//百度
   SHIP_AUTO_SX: 6,//闪送
-  SHIP_AUTO_MT: 7,//美团配送
+  SHIP_AUTO_MT: 7,//美团跑腿
+  SHIP_AUTO_MT_ZB: 8, //美团众包
 
   ID_DADA_SHIP_WORKER: -999,
   ID_DADA_MANUAL_WORKER: -998,

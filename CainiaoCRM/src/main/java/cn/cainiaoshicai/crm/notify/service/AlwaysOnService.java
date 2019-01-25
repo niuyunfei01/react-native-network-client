@@ -8,7 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.google.common.base.Strings;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +26,8 @@ import cn.cainiaoshicai.crm.dao.StoreDao;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.cainiaoshicai.crm.support.print.OrderPrinter;
+import cn.jpush.android.api.JPushInterface;
 
 public class AlwaysOnService extends BaseService {
     private static String LOG_TAG = AlwaysOnService.class.getSimpleName();
@@ -53,7 +58,7 @@ public class AlwaysOnService extends BaseService {
                 String accessToken = intent.getStringExtra("accessToken");
                 String storeId = intent.getStringExtra("storeId");
                 if (accessToken != null && storeId != null) {
-                    backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 5, TimeUnit.MINUTES);
+                    backgroundService.scheduleAtFixedRate(new NotifyNewOrderRunnable(accessToken, storeId), 0, 2, TimeUnit.MINUTES);
                 }
             }
             backgroundService.scheduleAtFixedRate(new TimerIncreasedRunnable(this), 0, 1000, TimeUnit.MILLISECONDS);
@@ -67,7 +72,9 @@ public class AlwaysOnService extends BaseService {
     public void onDestroy() {
         // stop running
         isRunning = false;
-        backgroundService.shutdownNow();
+        if (backgroundService != null) {
+            backgroundService.shutdownNow();
+        }
         super.onDestroy();
     }
 
@@ -95,8 +102,16 @@ public class AlwaysOnService extends BaseService {
                         String alert = item.get("alert");
                         String plat = item.get("plat");
                         String storeName = item.get("store_name");
+                        int notifyTimes = 1;
+                        if (item.get("notify_times") != null) {
+                            try {
+                                notifyTimes = Integer.parseInt(item.get("notify_times"));
+                            } catch (Exception e) {
+                                notifyTimes = 1;
+                            }
+                        }
                         if (null != alert && !"".equals(alert)) {
-                            play(alert, plat, storeName);
+                            play(alert, plat, storeName, notifyTimes);
                         }
                     }
                 }
@@ -105,35 +120,11 @@ public class AlwaysOnService extends BaseService {
             }
         }
 
-        private void play(String text, String plat, String storeName) throws Exception {
-            //获取系统的Audio管理者
-            AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            //最大音量
-            int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            //当前音量
-            int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-            int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
-            for (int i = 0; i < 3; i++) {
-                GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
-                Thread.sleep(1300);
-                if (plat.equals("6")) {
-                    GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
-                } else if (plat.equals("4")) {
-                    GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
-                } else if (plat.equals("3")) {
-                    GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
-                } else {
-                    GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
-                }
-                Thread.sleep(8000);
+        private void play(String text, String plat, String storeName, int notifyTimes) {
+            if (SettingUtility.isDisableNewOrderSoundNotify()) {
+                return;
             }
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
+            GlobalCtx.app().getSoundManager().notifyNewOrder(text, plat, storeName, notifyTimes);
         }
     }
 
@@ -153,6 +144,14 @@ public class AlwaysOnService extends BaseService {
             int currentEpochTimeInSeconds = (int) (System.currentTimeMillis() / 1000L);
             Log.v(LOG_TAG, "Count:" + timeCount + " at time:"
                     + currentEpochTimeInSeconds);
+
+            if (JPushInterface.isPushStopped(GlobalCtx.app())) {
+                String uid = GlobalCtx.app().getCurrentAccountId();
+                if (!TextUtils.isEmpty(uid)) {
+                    JPushInterface.setAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+                }
+                JPushInterface.resumePush(GlobalCtx.app());
+            }
         }
 
         private int readTimeCount() {

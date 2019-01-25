@@ -16,6 +16,7 @@ public class Store {
     private String loc_lng;
     private String loc_lat;
     private boolean shipCapable;
+    private boolean auditPriceByCompetitor = false;
     private String cloudPrinter;
     private boolean cloudPrinterWorking;
     private int type;
@@ -28,6 +29,15 @@ public class Store {
     private int ship_way;
     private int fn_price_controlled;
     private int fn_profit_controlled;
+    private int fn_rate_price_controlled = 1;
+    private int fn_show_quota = 0;
+    private String alias;
+    private String city;
+    private String cityCode;
+    private String owner_name;
+    private String district;
+    private String city_code;
+
 
     public Store() {
     }
@@ -162,9 +172,129 @@ public class Store {
         this.fn_price_controlled = fn_price_controlled;
     }
 
+    public int getFn_rate_price_controlled() {
+        return fn_rate_price_controlled;
+    }
+
+    public void setFn_rate_price_controlled(int fn_rate_price_controlled) {
+        this.fn_rate_price_controlled = fn_rate_price_controlled;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public float getLocation_long() {
+        return location_long;
+    }
+
+    public void setLocation_long(float location_long) {
+        this.location_long = location_long;
+    }
+
+    public float getLocation_lat() {
+        return location_lat;
+    }
+
+    public void setLocation_lat(float location_lat) {
+        this.location_lat = location_lat;
+    }
+
+    public String getLoc_lng() {
+        return loc_lng;
+    }
+
+    public void setLoc_lng(String loc_lng) {
+        this.loc_lng = loc_lng;
+    }
+
+    public String getLoc_lat() {
+        return loc_lat;
+    }
+
+    public void setLoc_lat(String loc_lat) {
+        this.loc_lat = loc_lat;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCityCode() {
+        return cityCode;
+    }
+
+    public void setCityCode(String cityCode) {
+        this.cityCode = cityCode;
+    }
+
+    public String getOwner_name() {
+        return owner_name;
+    }
+
+    public void setOwner_name(String owner_name) {
+        this.owner_name = owner_name;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getCity_code() {
+        return city_code;
+    }
+
+    public void setCity_code(String city_code) {
+        this.city_code = city_code;
+    }
+
     public String namePrefixVendor() {
         String vendorName = TextUtils.isEmpty(this.vendor) ? "" : (this.vendor + ":");
         return vendorName + this.getName();
+    }
+
+    public int getFn_show_quota() {
+        return fn_show_quota;
+    }
+
+    public void setFn_show_quota(int fn_show_quota) {
+        this.fn_show_quota = fn_show_quota;
+    }
+
+    public boolean isAuditPriceByCompetitor() {
+        return auditPriceByCompetitor;
+    }
+
+    public void setAuditPriceByCompetitor(boolean auditPriceByCompetitor) {
+        this.auditPriceByCompetitor = auditPriceByCompetitor;
     }
 
     public Bundle toBundle() {
@@ -187,6 +317,11 @@ public class Store {
         b.putString("id", String.valueOf(id));
         b.putInt("fnPriceControlled", fn_price_controlled);
         b.putInt("fn_price_controlled", fn_price_controlled);
+        b.putString("city", city);
+        b.putString("city_code", city_code);
+        b.putString("district", district);
+        b.putInt("fn_show_quota", fn_show_quota);
+        b.putBoolean("auditPriceByCompetitor", auditPriceByCompetitor);
         return b;
     }
 }

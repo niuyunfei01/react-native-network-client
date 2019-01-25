@@ -27,7 +27,12 @@ public class Config {
     private Vendor[] can_read_vendors;
     private HashMap<String, String> v_b;
     private List<Integer> help_uid = new ArrayList<Integer>();
-    private boolean enabled_good_mgr = false;
+    private boolean enabled_good_mgr = true;
+
+    private boolean enabled_special_menu = false;
+    private boolean show_activity_mgr = false;
+    private boolean show_goods_monitor = false;
+    private boolean show_expense_center = false;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
@@ -137,6 +142,38 @@ public class Config {
 
     public void setEnabled_good_mgr(boolean enabled_good_mgr) {
         this.enabled_good_mgr = enabled_good_mgr;
+    }
+
+    public boolean isEnabled_special_menu() {
+        return enabled_special_menu;
+    }
+
+    public void setEnabled_special_menu(boolean enabled_special_menu) {
+        this.enabled_special_menu = enabled_special_menu;
+    }
+
+    public boolean isShow_activity_mgr() {
+        return show_activity_mgr;
+    }
+
+    public void setShow_activity_mgr(boolean show_activity_mgr) {
+        this.show_activity_mgr = show_activity_mgr;
+    }
+
+    public boolean isShow_goods_monitor() {
+        return show_goods_monitor;
+    }
+
+    public void setShow_goods_monitor(boolean show_goods_monitor) {
+        this.show_goods_monitor = show_goods_monitor;
+    }
+
+    public boolean isShow_expense_center() {
+        return show_expense_center;
+    }
+
+    public void setShow_expense_center(boolean show_expense_center) {
+        this.show_expense_center = show_expense_center;
     }
 
     private class TaskType {

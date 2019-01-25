@@ -110,7 +110,6 @@ export default function orderReducer(state = initialState, action) {
      * mung it up through some other mechanism
      */
     case GET_ORDER_SUCCESS:
-      console.log('get_order_success: order_id', action.payload.id)
       return {
         ...state,
         order: action.payload,

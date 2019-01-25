@@ -3,6 +3,11 @@ package cn.cainiaoshicai.crm.support.helper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.google.gson.Gson;
+
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 
@@ -25,6 +30,11 @@ public class SettingHelper {
             editor = PreferenceManager.getDefaultSharedPreferences(paramContext).edit();
         }
         return editor;
+    }
+
+    public static Map<String, ?>  getAllConfigs(Context paramContext) {
+        Map<String, ?> allEntries = PreferenceManager.getDefaultSharedPreferences(paramContext).getAll();
+        return allEntries;
     }
 
     public static int getSharedPreferences(Context paramContext, String paramString, int paramInt) {

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import com.iflytek.cloud.thirdparty.S;
 
 import java.util.Calendar;
 import java.util.Map;

@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -29,6 +31,7 @@ import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
+import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -49,6 +52,21 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     Callback mPermissionsCallback;
     private @Nullable
     PermissionListener mPermissionListener;
+
+
+    private static final int OVERLAY_PERMISSION_REQUEST_CODE = 2;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void _askForOverlayPermission() {
+        if (!BuildConfig.DEBUG || android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+        if (!Settings.canDrawOverlays(this)) {
+            Intent settingsIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(settingsIntent, OVERLAY_PERMISSION_REQUEST_CODE);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +118,9 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
 
         if (stores != null) {
             for (Store s : stores) {
+                if (s.getName().equals("未知店")) {
+                    continue;
+                }
                 storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
             }
         }

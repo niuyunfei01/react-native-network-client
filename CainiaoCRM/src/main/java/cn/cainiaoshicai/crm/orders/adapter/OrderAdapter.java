@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -91,6 +93,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView dayNo = vi.findViewById(R.id.feedbackId);
         TextView sourcePlatform = vi.findViewById(R.id.source_platform);
         TextView orderTimesTxt = vi.findViewById(R.id.user_order_times);
+        TextView viewMoreTimes = vi.findViewById(R.id.view_more_details);
         TextView paidWayTxt = vi.findViewById(R.id.fb_status);
         TextView labelExpectTxt = vi.findViewById(R.id.fb_from_user);
 
@@ -107,12 +110,16 @@ public class OrderAdapter extends BaseAdapter {
         try {
             final Order order = orders.get(i);
 
+            boolean isDirect = GlobalCtx.app().isDirectVendor();
+
 //        thumb_image.setImageUrl(order.getThumbnailUrl(), mImageLoader);
 
             DateTimeUtils instance = DateTimeUtils.getInstance(vi.getContext());
 
             Date expectTime = order.getExpectTime();
             boolean notTimeToShip = expectTime != null && (expectTime.getTime() - System.currentTimeMillis() > 90 * 60 * 1000);
+
+            viewMoreTimes.setTextColor(lightBlue);
 
             String expectTimeTxt = TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr();
             expect_time.setText(expectTimeTxt);
@@ -134,6 +141,7 @@ public class OrderAdapter extends BaseAdapter {
                 paidWayTxt.setText("在线支付");
                 paidWayTxt.setTextColor(defTextColor);
                 paidWayTxt.setBackground(null);
+                paidWayTxt.setVisibility(View.INVISIBLE);
             }
 
             boolean isInvalid = order.getOrderStatus() == Cts.WM_ORDER_STATUS_INVALID;
@@ -143,11 +151,13 @@ public class OrderAdapter extends BaseAdapter {
                 addStrikeThrough(labelExpectTxt);
                 addStrikeThrough(expect_time);
                 addStrikeThrough(paidWayTxt);
+                addStrikeThrough(orderAddr);
             } else {
                 cancelStrikeThrough(dayNo);
                 cancelStrikeThrough(labelExpectTxt);
                 cancelStrikeThrough(expect_time);
                 cancelStrikeThrough(paidWayTxt);
+                cancelStrikeThrough(orderAddr);
             }
 
             final String direction;
@@ -159,9 +169,13 @@ public class OrderAdapter extends BaseAdapter {
             } else {
                 direction = " [ " + order.getDirection() + " ]";
             }
-            orderAddr.setText((isInvalid ? "[已无效]" : "") + (listType == ListType.NONE.getValue() ? "["+order.getStore_name()+"]":"") + order.getAddress() + direction);
+            orderAddr.setText((isInvalid ? "[已无效]" : "") + (listType == ListType.NONE.getValue() ? "[" + order.getStore_name() + "]" : "") + order.getAddress() + direction);
             userName.setText(order.getUserName());
-            phone.setText(order.getMobile());
+            String tipMobile = order.getMobile();
+            if (tipMobile != null) {
+                tipMobile = tipMobile.replaceAll(",", "转");
+            }
+            phone.setText(tipMobile);
             phone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -170,7 +184,11 @@ public class OrderAdapter extends BaseAdapter {
             });
 
             genderText.setText(order.getGenderText());
-            orderMoney.setText(String.valueOf(order.getOrderMoney()));
+            if (!isDirect && order.getSupplyMoney() > 0) {
+                orderMoney.setText(String.valueOf(order.getSupplyMoney()));
+            } else {
+                orderMoney.setText(String.valueOf(order.getOrderMoney()));
+            }
             orderTimesTxt.setText(order.getOrder_times() > 1 ? "第" + order.getOrder_times() + "次" : "新用户");
 
             orderTimesTxt.setOnClickListener(new View.OnClickListener() {
@@ -186,18 +204,30 @@ public class OrderAdapter extends BaseAdapter {
             });
 
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
-            dayNo.setText("#" + order.getDayId());
 
-            sourcePlatform.setText(order.platformWithId());
-            sourcePlatform.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
-                    intent.setAction(Intent.ACTION_SEARCH);
-                    intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
-                    v.getContext().startActivity(intent);
-                }
-            });
+            if (isDirect) {
+                dayNo.setText("#" + order.getDayId());
+                dayNo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+            } else {
+                dayNo.setText(order.platformWithId() + "总#" + order.getDayId());
+                dayNo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+            }
+
+            if (isDirect) {
+                sourcePlatform.setText(order.platformWithId());
+                sourcePlatform.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
+                        intent.setAction(Intent.ACTION_SEARCH);
+                        intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
+                        v.getContext().startActivity(intent);
+                    }
+                });
+                sourcePlatform.setVisibility(View.VISIBLE);
+            } else {
+                sourcePlatform.setVisibility(View.INVISIBLE);
+            }
 
             if (order.getOrderStatus() != Cts.WM_ORDER_STATUS_INVALID) {
                 LinearLayout ll = vi.findViewById(R.id.order_status_state);

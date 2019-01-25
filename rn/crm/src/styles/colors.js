@@ -21,5 +21,5 @@ export default {
   fontBlack: '#3e3e3e',
   fontBlue:'#00a2ff',
   yellow:'#fff45c',
-  orange:'#ffab50'
+  orange:'#ffab50',
 };

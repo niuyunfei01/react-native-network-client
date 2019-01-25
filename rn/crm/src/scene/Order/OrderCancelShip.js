@@ -86,9 +86,9 @@ class OrderCancelShip extends Component {
       if (resp.ok) {
         this.setState({list: resp.obj, loading: false});
       } else {
+        //TODO
         ToastLong('请检查网络')
       }
-
     }));
   }
 
@@ -106,13 +106,13 @@ class OrderCancelShip extends Component {
       reason_text: this.state.reason
     };
 
-    dispatch(cancelShip(id, reason_id, data, token, async (ok) => {
+    dispatch(cancelShip(id, reason_id, data, token, async (ok, reason) => {
       this.setState({upLoading: false});
       if (ok) {
         ToastLong('撤回成功,即将返回订单详情页');
         this.timeOutBack(3000);
       } else {
-        ToastLong('请检查网络')
+        ToastLong(reason)
       }
     }));
   }

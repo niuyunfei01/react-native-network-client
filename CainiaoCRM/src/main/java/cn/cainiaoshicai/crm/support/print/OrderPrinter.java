@@ -1,14 +1,16 @@
 package cn.cainiaoshicai.crm.support.print;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.text.TextUtils;
-
-import com.facebook.react.ReactActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Set;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
@@ -19,11 +21,14 @@ import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
 
 /**
  * Created by liuzhr on 10/27/16.
@@ -38,24 +43,73 @@ public class OrderPrinter {
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
-        BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-        if (printer == null || !printer.isConnected()) {
-            AppLogger.e("skip to print for printer is not connected!");
-            return;
-        }
         new MyAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
-                final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                if (order != null) {
-                    OrderPrinter._print(order, true, printedCallback);
-                } else {
-                    AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                try {
+                    final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+                    final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                    if (order != null && order.getPrint_times() == 0) {
+                        PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                    } else {
+                        AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                    }
+                } catch (Exception e) {
+                    Log.e("auto print order error", e);
                 }
                 return null;
             }
         }.executeOnNormal();
+    }
+
+    public static BluetoothPrinters.DeviceStatus resetDeviceStatus(BluetoothPrinters.DeviceStatus ds) {
+        boolean shouldReconnect = true;
+        if (ds == null) {
+            boolean connectSuccess = autoConnectBluetoothPrinters();
+            if (connectSuccess) {
+                shouldReconnect = false;
+                ds = BluetoothPrinters.INS.getCurrentPrinter();
+            }
+        }
+        if (ds != null && shouldReconnect) {
+            try {
+                android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+                final BluetoothConnector btConnector = new BluetoothConnector(ds.getDevice(), false, btAdapter, null);
+                final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+                ds.resetSocket(socketWrapper);
+            } catch (Exception e) {
+                Log.e("reset bt socket error ", e);
+                ds = null;
+            }
+        }
+        return ds;
+    }
+
+    public static boolean autoConnectBluetoothPrinters() {
+        String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
+        android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> btDeviceList = btAdapter.getBondedDevices();
+        BluetoothDevice lastDevice = null;
+        for (BluetoothDevice device : btDeviceList) {
+            if (device.getAddress().equals(lastAddress)) {
+                lastDevice = device;
+                break;
+            }
+        }
+        if (lastDevice != null) {
+            try {
+                final BluetoothConnector btConnector = new BluetoothConnector(lastDevice, false, btAdapter, null);
+                final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+                BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(lastDevice);
+                deviceStatus.resetSocket(socketWrapper);
+                SettingUtility.setLastConnectedPrinterAddress(lastDevice.getAddress());
+                BluetoothPrinters.INS.setCurrentPrinter(deviceStatus);
+                return true;
+            } catch (Exception e) {
+                Log.e("skip to print for printer is not connected!", e);
+            }
+        }
+        return false;
     }
 
     public static void printEstimate(BluetoothConnector.BluetoothSocketWrapper btsocket,
@@ -113,24 +167,22 @@ public class OrderPrinter {
         }
     }
 
-    public static void printTest(BluetoothConnector.BluetoothSocketWrapper btsocket) throws IOException {
+    public static void printTest() throws IOException {
         try {
-            OutputStream btos = btsocket.getOutputStream();
-            BasePrinter printer = new BasePrinter(btos);
-
-            btos.write(new byte[]{0x1B, 0x21, 0});
-            btos.write(GPrinterCommand.left);
-
-            printer.starLine().highBigText("   打印测试单").newLine();
-            printer.highText(String.format("合计 %27s", "x100")).newLine();
-
-            printer.starLine().normalText("比邻鲜，好生意！").newLine();
-
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(GPrinterCommand.walkPaper((byte) 4));
-            btos.flush();
+            BasePrinter printer = new BasePrinter();
+            byte[] testData = new byte[]{0x1B, 0x21, 0};
+            testData = printer.concatenate(testData, GPrinterCommand.left);
+            testData = printer.concatenate(testData, printer.startLineBytes());
+            testData = printer.concatenate(testData, printer.highTextBytes("   打印测试单"));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, printer.highTextBytes(String.format("合计 %27s", "x100")));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, printer.startLineBytes());
+            testData = printer.concatenate(testData, printer.normalTextBytes("外送帮，好生意！"));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, new byte[]{0x0D,0x0D,0x0D});
+            testData = printer.concatenate(testData, GPrinterCommand.walkPaper((byte) 4));
+            PrintQueue.getQueue(GlobalCtx.app()).write(testData);
         } catch (Exception e) {
             AppLogger.e("error in printing test", e);
             throw e;
@@ -296,21 +348,30 @@ public class OrderPrinter {
         }
     }
 
-    public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
+    public static byte[] printOrder(Order order) throws IOException {
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
+        ByteArrayOutputStream btos = new ByteArrayOutputStream();
+        boolean isDirectVendor = false;
         try {
-            OutputStream btos = btsocket.getOutputStream();
+            isDirectVendor = GlobalCtx.app().isDirectVendor();
+        } catch (Exception e) {
+
+        }
+        try {
             BasePrinter printer = new BasePrinter(btos);
-
-
             btos.write(new byte[]{0x1B, 0x21, 0});
             btos.write(GPrinterCommand.left);
 
-            printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
-                    .newLine().highBigText("  #" + order.getDayId());
-
-            printer.normalText(order.platformWithId()).newLine();
+            if (isDirectVendor) {
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText("  #" + order.getDayId());
+                printer.highBigText(order.platformWithId()).newLine();
+            } else {
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText(order.platformWithId());
+                printer.highBigText("  #" + order.getDayId()).newLine();
+            }
 
             printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
 
@@ -395,11 +456,23 @@ public class OrderPrinter {
             btos.write(0x0D);
             btos.write(0x0D);
             btos.write(GPrinterCommand.walkPaper((byte) 4));
+
+            byte[] data;
             btos.flush();
+            data = btos.toByteArray();
+            btos.close();
+            btos = null;
+            return data;
         } catch (Exception e) {
-            AppLogger.e("error in printing order", e);
-            throw e;
+            CrashReportHelper.handleUncaughtException(null, e);
+        } finally {
+            if (btos != null) {
+                btos.flush();
+                btos.close();
+                btos = null;
+            }
         }
+        return new byte[]{};
     }
 
 
@@ -428,7 +501,7 @@ public class OrderPrinter {
         return enable;
     }
 
-    public static void logOrderPrint(Order order){
+    public static void logOrderPrint(Order order) {
         try {
             final String access_token = GlobalCtx.app().token();
             new OrderActionDao(access_token).logOrderPrinted(order.getId());
@@ -438,7 +511,7 @@ public class OrderPrinter {
     }
 
     /**
-     * @param order           Must contain items!!!!
+     * @param order     Must contain items!!!!
      * @param isAutoPrint
      * @param printedCallback
      */
@@ -461,20 +534,15 @@ public class OrderPrinter {
                     } else {
                         String speak = "";
                         Throwable ex = null;
-                        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
-                        if (ds != null && ds.getSocket() != null && ds.isConnected()) {
+                        if (GlobalCtx.app().isConnectPrinter()) {
                             try {
-                                OrderPrinter.printOrder(ds.getSocket(), order);
+                                //OrderPrinter.printOrder(ds.getSocket(), order);
+                                PrintQueue.getQueue(GlobalCtx.app()).write(printOrder(order));
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);
                                 reason = "打印错误：请从运行中程序列表清除CRM，重新启动CRM并连接打印机";
-                                //FIXME: should try to reset the socket
-                                if (e instanceof IOException) {
-                                    ds.closeSocket();
-                                    ds.reconnect();
-                                }
                                 speak = "订单打印发生错误，请重新连接打印机！";
                                 ex = e;
                             }
@@ -497,8 +565,7 @@ public class OrderPrinter {
                         } else {
                             reason = "未连接到打印机";
                             speak = "订单打印失败，请重新连接打印机，然后手动打印！";
-                            String msg = ds == null ? "ds=null," : "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
-                            ex = new Exception(msg);
+                            ex = new Exception(reason);
                         }
 
                         if (ex != null) {

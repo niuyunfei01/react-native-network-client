@@ -81,10 +81,10 @@ class OrderEditStoreScene extends Component {
 
     const currStoreId = order.store_id;
     const currVendorId = (tool.store(currStoreId, global) || {}).vendor_id;
-
-    const availableStores = tool.objectFilter(global.canReadStores, (store) => store.vendor_id === currVendorId && store.id !== currStoreId );
+    //菜鸟和菜鸟食材视作同一个品牌
+    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.vendor_id === currVendorId || (currVendorId === 1 && store.vendor_id == 2)) && store.id !== currStoreId);
     const availableOptions = Object.keys(availableStores).map(store_id => {
-      if(store_id > 0){
+      if (store_id > 0) {
         return {label: availableStores[store_id].name, value: store_id};
       }
     });
