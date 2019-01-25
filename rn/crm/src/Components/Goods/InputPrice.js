@@ -62,17 +62,20 @@ export default class InputPrice extends PureComponent {
   
   onUpdateWmPrice (val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
-    let radd = 1
+    let radd = 100
     if (typeof(ratio.radd) === 'object') {
       for (let i of ratio.radd) {
-        if (val >= i.min && val < i.max) {
+        if (Number(val) >= Number(i.min) && Number(val) < Number(i.max)) {
           radd = i.percent;
           break
         }
       }
     } else {
-      radd = ratio.radd
+      if (!isNaN(ratio.add)) {
+        radd = parseInt(ratio.add)
+      }
     }
+    console.log('apply price  val ===> ', val)
     console.log('apply price  ratio ===> ',ratio)
     let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
     wm_price = tool.priceOptimize(wm_price * 100) / 100
