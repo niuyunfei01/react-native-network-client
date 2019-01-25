@@ -36,9 +36,9 @@ import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
-import ModalSelector from "react-native-modal-selector";
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
+import SearchStore from "../component/SearchStore";
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
@@ -77,7 +77,6 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
-      canReadStores
     } = this.props.global;
     
     
@@ -155,12 +154,9 @@ class MineScene extends PureComponent {
       fnProfitControlled: fnProfitControlled,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? cover_image : "",
-      
-      storeList: tool.storeListOfModalSelector(canReadStores),
-      storeListSecondModalVisible: false,
-      storeListSecondModalData: [],
       adjust_cnt: 0,
-      dutyUsers: []
+      dutyUsers: [],
+      searchStoreVisible : false
     };
     
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -196,8 +192,6 @@ class MineScene extends PureComponent {
         this._doChangeStore(first_store_id, false);
       }
     }
-    const storeList = tool.storeListOfModalSelector(canReadStores);
-    this.setState({storeList: storeList});
     this.getNotifyCenter();
   }
   
@@ -328,7 +322,6 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
-      canReadStores
     } = this.props.global;
     
     let {
@@ -375,7 +368,6 @@ class MineScene extends PureComponent {
       fnPriceControlled: fnPriceControlled,
       currVendorName: currVendorName,
       cover_image: cover_image,
-      storeList: tool.storeListOfModalSelector(canReadStores),
     });
   }
   
@@ -498,27 +490,12 @@ class MineScene extends PureComponent {
           <Text style={header_styles.shop_name}>
             {this.state.currStoreName}
           </Text>
-          <ModalSelector
-            onChange={option => {
-              if (this.state.storeList.return_data_deep == 1) {
-                this.onCanChangeStore(option.key);
-              } else if (this.state.storeList.return_data_deep == 2) {
-                this.setState({
-                  storeListSecondModalVisible: true,
-                  storeListSecondModalData: option.children
-                })
-              }
-            }}
-            cancelText={'取消'}
-            skin="customer"
-            defaultKey={currStoreId}
-            data={this.state.storeList.return_data}
-          >
+          <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <Icon name="exchange" style={header_styles.change_shop}/>
               <Text style={header_styles.change_shop}>切换门店</Text>
             </View>
-          </ModalSelector>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           style={[header_styles.icon_box]}
@@ -726,7 +703,6 @@ class MineScene extends PureComponent {
               </TouchableOpacity>
             </View>
           </Dialog>
-          
           <Toast
             icon="loading"
             show={this.state.onStoreChanging}
@@ -735,19 +711,10 @@ class MineScene extends PureComponent {
           >
             切换门店中...
           </Toast>
-          <ModalSelector
-            initValue={""}
-            onChange={(option) => {
-              this.onCanChangeStore(option.id);
-            }}
-            onModalClose={() => {
-              this.setState({storeListSecondModalVisible: false})
-            }}
-            cancelText={'取消'}
-            visible={this.state.storeListSecondModalVisible}
-            data={this.state.storeListSecondModalData}
-          />
         </ScrollView>
+        <SearchStore visible={this.state.searchStoreVisible}
+                     onClose={() => this.setState({searchStoreVisible: false})}
+                     onSelect={(item) => {this.onCanChangeStore(item.id); this.setState({searchStoreVisible: false})}}/>
       </View>
     );
   }
@@ -981,21 +948,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        
-        {/*{(show_goods_monitor && (is_helper || is_service_mgr)) && (*/}
-        {/*<TouchableOpacity*/}
-        {/*style={[block_styles.block_box]}*/}
-        {/*onPress={() => this.onPress(Config.ROUTE_GOODS_MANAGE)}*/}
-        {/*activeOpacity={customerOpacity}*/}
-        {/*>*/}
-        {/*<Image*/}
-        {/*style={[block_styles.block_img]}*/}
-        {/*source={require("../../img/My/jiagejianguan_.png")}*/}
-        {/*/>*/}
-        {/*<Text style={[block_styles.block_name]}>商品管理</Text>*/}
-        {/*</TouchableOpacity>*/}
-        {/*)}*/}
-        
+
         {(show_activity_mgr && (is_helper || is_service_mgr)) && (
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -1032,18 +985,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>订单补偿</Text>
         </TouchableOpacity>
-        
-        {/*<TouchableOpacity*/}
-        {/*style={[block_styles.block_box]}*/}
-        {/*onPress={() => this.onPress(Config.ROUTE_GOODS_LIST)}*/}
-        {/*activeOpacity={customerOpacity}*/}
-        {/*>*/}
-        {/*<Image*/}
-        {/*style={[block_styles.block_img]}*/}
-        {/*source={require("../../img/My/yunyingshouyi_.png")}*/}
-        {/*/>*/}
-        {/*<Text style={[block_styles.block_name]}>商品列表</Text>*/}
-        {/*</TouchableOpacity>*/}
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_GOODS_PRICE_INDEX)}
@@ -1055,17 +997,6 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>价格指数</Text>
         </TouchableOpacity>
-        {/*<TouchableOpacity*/}
-        {/*style={[block_styles.block_box]}*/}
-        {/*onPress={() => this.onPress(Config.ROUTE_STORE_RATE)}*/}
-        {/*activeOpacity={customerOpacity}*/}
-        {/*>*/}
-        {/*<Image*/}
-        {/*style={[block_styles.block_img]}*/}
-        {/*source={require("../../img/My/yunyingshouyi_.png")}*/}
-        {/*/>*/}
-        {/*<Text style={[block_styles.block_name]}>店铺评分</Text>*/}
-        {/*</TouchableOpacity>*/}
       </View>
     );
   }
