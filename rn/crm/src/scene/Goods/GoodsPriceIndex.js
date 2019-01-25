@@ -9,6 +9,8 @@ import BigImage from "../component/BigImage";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import Config from "../../config";
+import native from "../../common/native";
+import NavigationItem from "../../widget/NavigationItem";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -18,7 +20,21 @@ function mapStateToProps (state) {
 class GoodsPriceIndex extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: "价格指数",
+      headerTitle: `价格指数`,
+      headerLeft: (
+        <NavigationItem
+          icon={require("../../img/Register/back_.png")}
+          iconStyle={{
+            width: pxToDp(48),
+            height: pxToDp(48),
+            marginLeft: pxToDp(31),
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => {
+            native.toGoods();
+          }}
+        />
+      )
     }
   }
   
@@ -93,13 +109,21 @@ class GoodsPriceIndex extends Component {
     })
   }
   
-  toApplyPrice (productId) {
+  toApplyPrice (productId, idx, product) {
     const self = this
     InteractionManager.runAfterInteractions(() => {
       self.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_PRICE, {
         pid: productId,
         storeId: self.state.store_id,
-        mode: 2
+        mode: 2,
+        onBack: () => {
+          let list = self.state.list
+          product.hasApply = true
+          list.splice(idx, 1, product)
+          self.setState({
+            list: list
+          })
+        }
       });
     })
   }
@@ -156,11 +180,20 @@ class GoodsPriceIndex extends Component {
           <Text style={styles.goodsPrice}>￥{product.supply_price}</Text>
         </View>
         <View style={styles.goodsRight}>
-          <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id)}>
+          <If condition={!product.hasApply}>
+          <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
             <View style={styles.opBtn}>
               <Text style={styles.opText}>比价/调价</Text>
             </View>
           </TouchableOpacity>
+          </If>
+          <If condition={product.hasApply}>
+            <TouchableOpacity>
+              <View style={[styles.opBtn, styles.opBtnDisable]}>
+                <Text style={[styles.opText, styles.opTextDisable]}>已改价</Text>
+              </View>
+            </TouchableOpacity>
+          </If>
         </View>
       </View>
     )
@@ -282,6 +315,13 @@ const styles = StyleSheet.create({
   opText: {
     color: color.theme,
     fontSize: pxToDp(20)
+  },
+  opBtnDisable: {
+    backgroundColor: color.fontGray,
+    borderColor: color.fontGray
+  },
+  opTextDisable: {
+    color: '#fff'
   }
 })
 

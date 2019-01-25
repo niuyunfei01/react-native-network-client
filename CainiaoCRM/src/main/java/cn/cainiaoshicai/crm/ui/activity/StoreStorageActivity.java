@@ -30,6 +30,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.Maps;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -487,6 +489,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             storeProdPriceScore.setText("价格: " + score + " 分");
                             storeProdScoreDetail.setText(obj.get("high") + " 个高于同行");
                             storeProdQuota.setVisibility(View.VISIBLE);
+                            storeProdQuota.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Map<String, String> params = Maps.newHashMap();
+                                    GlobalCtx.app().toStoreProductIndex(StoreStorageActivity.this, params);
+                                }
+                            });
                         }
                     }
 

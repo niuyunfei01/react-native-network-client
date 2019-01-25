@@ -878,6 +878,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toStoreProductIndex(Activity ctx, Map<String, String> data){
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsPriceIndex");
+        Bundle params = new Bundle();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            params.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     /**
      * 跳转到新的调价页面
      *
@@ -896,6 +907,7 @@ public class GlobalCtx extends Application {
         params.putInt("storeId", storeId);
         params.putString("supplyPrice", currentSupplyPrice);
         params.putString("detail", json);
+        params.putString("from", "native");
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }

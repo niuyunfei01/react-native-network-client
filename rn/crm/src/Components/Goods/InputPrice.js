@@ -73,6 +73,7 @@ export default class InputPrice extends PureComponent {
     } else {
       radd = ratio.radd
     }
+    console.log('apply price  ratio ===> ',ratio)
     let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
     wm_price = tool.priceOptimize(wm_price * 100) / 100
     this.setState({wm_price})
