@@ -55,7 +55,7 @@ export default class StoreRate extends React.Component {
           </View>
           <View style={styles.stepItem}>
             <Text>第3步：上架热销新品；</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>
               <View>
                 <Text style={styles.linkText}>上架新品</Text>
               </View>
