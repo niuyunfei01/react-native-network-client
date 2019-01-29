@@ -1,10 +1,8 @@
 import React from 'react'
-import {View, StyleSheet, Text, ScrollView, TouchableOpacity, InteractionManager} from "react-native";
+import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import TabButton from "../component/TabButton";
 import color from "../../widget/color";
 import Rate from "../../Components/Goods/Rate";
-import native from "../../common/native";
 import Config from "../../config";
 
 export default class StoreRate extends React.Component {
