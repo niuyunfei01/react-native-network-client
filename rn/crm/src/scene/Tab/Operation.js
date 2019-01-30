@@ -103,7 +103,7 @@ class Operation extends React.Component {
           this.state.competition.BusinessCircleChg.show,
           (<Text>商圈调研</Text>),
           (<Text>{this.state.competition.BusinessCircleChg.tip}</Text>),
-          () => this.navigate(Config.ROUTE_GOODS_PRICE_AREA)
+          () => this.navigate(Config.ROUTE_AREA_GOODS_PRICE)
         )}
         
         {this.renderItem(

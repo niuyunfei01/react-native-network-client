@@ -50,7 +50,7 @@ import GoodsPriceDetailsScene from "../scene/Goods/GoodsPriceDetailsScene";
 import GoodsAdjustScene from '../scene/Goods/GoodsAdjustScene'
 import GoodsApplyPrice from '../scene/Goods/GoodsApplyPrice'
 import GoodsPriceIndex from '../scene/Goods/GoodsPriceIndex'
-import GoodsPriceArea from "../scene/Goods/GoodsPriceArea";
+import GoodsPriceArea from "../scene/Goods/AreaGoodsPrice";
 import GoodsList from '../scene/Goods/GoodsList'
 import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
 
@@ -322,7 +322,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
         [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
         [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
-        [Config.ROUTE_GOODS_PRICE_AREA]: {screen: GoodsPriceArea},
+        [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
         
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},

@@ -149,4 +149,8 @@ export default {
   RULE_TYPE_GENERAL : 1,//1-通用规则
   RULE_TYPE_SPECIAL : 2,//2-特殊分类规则
   Rule_PRICE_UPPER:1000000,
+  
+  // 同行商品变动类型
+  TRACK_PROD_CHG_UP: 3,
+  TRACK_PROD_CHG_DOWN: 4
 }

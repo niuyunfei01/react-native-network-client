@@ -9,5 +9,6 @@ export default {
   orange: '#F09438',
   red: '#E14044',
   blue_link: '#1126F3',
-  yellow: '#F7C339'
+  yellow: '#F7C339',
+  green: '#67D446'
 }
