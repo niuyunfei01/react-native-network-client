@@ -173,7 +173,7 @@ class GoodsApplyPrice extends Component {
           referPrice={this.state.refer_price}
           priceRatio={this.state.price_ratio}
           style={{marginTop: pxToDp(10)}}
-          initPrice={this.state.product.store_product.supply_price}
+          initPrice={String(this.state.product.store_product.supply_price)}
           onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
           showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
           onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
