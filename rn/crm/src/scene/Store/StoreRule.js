@@ -10,11 +10,18 @@ class StoreRule extends React.Component {
     }
   }
   
+  constructor (props) {
+    super(props)
+    this.state = {
+      cnt: this.props.navigation.state.params.cnt
+    }
+  }
+  
   render () {
     return (
       <View style={styles.container}>
         <View style={styles.cell}>
-          <Text style={styles.fontOrange}>待处理差评5个</Text>
+          <Text style={styles.fontOrange}>待处理差评{this.state.cnt}个</Text>
           <Text>当天未处理，扣除1元活动补贴，如有疑问联系商服</Text>
         </View>
         <View style={styles.cell}>

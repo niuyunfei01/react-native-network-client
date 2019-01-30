@@ -14,7 +14,9 @@ export default class StoreRate extends React.Component {
   
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      score: Number(this.props.navigation.state.params.score)
+    }
   }
   
   routeTo (route, params = {}) {
@@ -30,7 +32,7 @@ export default class StoreRate extends React.Component {
       <View style={styles.container}>
         <View style={styles.storeRateRow}>
           <Text>店铺评分</Text>
-          <Rate showRecord={true} currRecord={1} maxRecord={5} style={styles.rate}/>
+          <Rate showRecord={true} currRecord={this.state.score} maxRecord={5} style={styles.rate}/>
         </View>
         <View>
           <Text style={styles.tip}>评分未达到5分，每单扣除1元满减补贴费。</Text>
