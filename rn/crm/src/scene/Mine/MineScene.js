@@ -483,7 +483,6 @@ class MineScene extends PureComponent {
   }
   
   renderHeader () {
-    let {currStoreId} = this.state;
     return (
       <View style={header_styles.container}>
         <View style={[header_styles.main_box]}>
