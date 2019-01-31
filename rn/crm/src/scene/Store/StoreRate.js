@@ -4,8 +4,15 @@ import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
 import Rate from "../../Components/Goods/Rate";
 import Config from "../../config";
+import {connect} from "react-redux";
+import * as tool from "../../common/tool";
 
-export default class StoreRate extends React.Component {
+function mapStateToProps (state) {
+  const {global} = state;
+  return {global: global};
+}
+
+class StoreRate extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "店铺评分",
@@ -14,8 +21,11 @@ export default class StoreRate extends React.Component {
   
   constructor (props) {
     super(props)
+    const {currVendorId} = tool.vendor(this.props.global)
     this.state = {
-      score: Number(this.props.navigation.state.params.score)
+      score: Number(this.props.navigation.state.params.score),
+      accessToken: this.props.global.accessToken,
+      vendorId: currVendorId
     }
   }
   
@@ -25,6 +35,13 @@ export default class StoreRate extends React.Component {
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
+  }
+  
+  toCrmWebEvaluation () {
+    const {accessToken, vendorId} = this.state
+    let path = `/crm_mobile/evaluation.html?access_token=${accessToken}&_v_id=${vendorId}`;
+    let url = Config.serverUrl(path, Config.https);
+    this.routeTo(Config.ROUTE_WEB, {url: url});
   }
   
   render () {
@@ -41,7 +58,7 @@ export default class StoreRate extends React.Component {
           <Text style={styles.title}>完成5.0评分，只需3步</Text>
           <View style={styles.stepItem}>
             <Text>第1步：在美团做3~5个好评；</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => this.toCrmWebEvaluation()}>
               <View>
                 <Text style={styles.linkText}>如何做评价</Text>
               </View>
@@ -55,14 +72,14 @@ export default class StoreRate extends React.Component {
               </View>
             </TouchableOpacity>
           </View>
-          <View style={styles.stepItem}>
-            <Text>第3步：上架热销新品；</Text>
-            <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>
-              <View>
-                <Text style={styles.linkText}>上架新品</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          {/*<View style={styles.stepItem}>*/}
+          {/*<Text>第3步：上架热销新品；</Text>*/}
+          {/*<TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>*/}
+          {/*<View>*/}
+          {/*<Text style={styles.linkText}>上架新品</Text>*/}
+          {/*</View>*/}
+          {/*</TouchableOpacity>*/}
+          {/*</View>*/}
         </View>
       </View>
     )
@@ -110,3 +127,5 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline'
   }
 })
+
+export default connect(mapStateToProps)(StoreRate)

@@ -52,7 +52,7 @@ class HttpUtils {
     }
   }
   
-  static apiBase (method, url, params, navigation) {
+  static apiBase (method, url, params) {
     Toast.loading('请求中', 0)
     return new Promise((resolve, reject) => {
       fetch(method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {}), this.getOptions(method, params))
@@ -72,7 +72,7 @@ class HttpUtils {
             if (response.ok) {
               resolve(response.obj)
             } else {
-              this.error(response, navigation)
+              this.error(response)
             }
           }
         })
@@ -85,7 +85,7 @@ class HttpUtils {
     })
   }
   
-  static error (response, navigation) {
+  static error (response) {
     if (response.error_code === 10001) {
       ToastShort('权限错误')
     } else if (response.error_code === 21327) {
@@ -98,12 +98,12 @@ class HttpUtils {
     }
   }
   
-  static get (url, params, navigation) {
-    return this.apiBase('GET', url, params, navigation)
+  static get (url, params) {
+    return this.apiBase('GET', url, params)
   }
   
-  static post (url, params, navigation) {
-    return this.apiBase('POST', url, params, navigation)
+  static post (url, params) {
+    return this.apiBase('POST', url, params)
   }
   
   static put (url, params) {

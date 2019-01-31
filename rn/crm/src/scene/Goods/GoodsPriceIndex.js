@@ -31,7 +31,11 @@ class GoodsPriceIndex extends Component {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            native.toGoods();
+            if (navigation.state.params.from == 'rn') {
+              navigation.goBack()
+            } else {
+              native.toGoods();
+            }
           }}
         />
       )

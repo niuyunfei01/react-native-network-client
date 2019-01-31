@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.NotificationUtils;
@@ -50,16 +49,18 @@ public final class LocalService extends Service {
         //播放无声音乐
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer.create(this, R.raw.novioce);
-            mediaPlayer.setVolume(0f, 0f);
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    if (!isPause) {
-                        play();
+            if(mediaPlayer!=null){
+                mediaPlayer.setVolume(0f, 0f);
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        if (!isPause) {
+                            play();
+                        }
                     }
-                }
-            });
-            play();
+                });
+                play();
+            }
         }
         //像素保活
         if (mOnepxReceiver == null) {
