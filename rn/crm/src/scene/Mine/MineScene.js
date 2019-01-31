@@ -39,6 +39,7 @@ import {Dialog, Toast} from "../../weui/index";
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
 import SearchStore from "../component/SearchStore";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
@@ -156,7 +157,8 @@ class MineScene extends PureComponent {
       cover_image: !!cover_image ? cover_image : "",
       adjust_cnt: 0,
       dutyUsers: [],
-      searchStoreVisible: false
+      searchStoreVisible: false,
+      storeStatus: {}
     };
     
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -193,6 +195,7 @@ class MineScene extends PureComponent {
       }
     }
     this.getNotifyCenter();
+    this.getStoreStatus()
   }
   
   onGetUserInfo (uid) {
@@ -255,6 +258,16 @@ class MineScene extends PureComponent {
           _this.setState({adjust_cnt: adjust_cnt});
         }
       })
+  }
+  
+  getStoreStatus () {
+    const self = this
+    const access_token = this.props.global.accessToken
+    const store_id = this.props.global.currStoreId
+    const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
+    HttpUtils.get(api).then(res => {
+      self.setState({storeStatus: res})
+    })
   }
   
   onGetStoreTurnover () {
@@ -500,11 +513,20 @@ class MineScene extends PureComponent {
           style={[header_styles.icon_box]}
           onPress={() => this.onPress(Config.ROUTE_STORE_STATUS)}
         >
-          <Image
-            style={[header_styles.icon_open]}
-            source={require("../../img/My/open_.png")}
-          />
-          <Text style={header_styles.open_text}>营业中</Text>
+          <If condition={!this.state.storeStatus.all_close}>
+            <Image
+              style={[header_styles.icon_open]}
+              source={require("../../img/My/open_.png")}
+            />
+            <Text style={header_styles.open_text}>营业中</Text>
+          </If>
+          <If condition={this.state.storeStatus.all_close}>
+            <Image
+              style={[header_styles.icon_open]}
+              source={require("../../img/My/close_.png")}
+            />
+            <Text style={header_styles.close_text}>休息中</Text>
+          </If>
         </TouchableOpacity>
       </View>
     );
@@ -1255,7 +1277,9 @@ const header_styles = StyleSheet.create({
     textAlign: "center"
   },
   close_text: {
-    color: "#999"
+    color: "#999",
+    fontSize: pxToDp(20),
+    textAlign: "center"
   }
 });
 

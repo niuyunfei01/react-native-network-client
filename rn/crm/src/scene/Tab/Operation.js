@@ -58,7 +58,7 @@ class Operation extends React.Component {
   
   renderItem (isShow, title, extra, onClick) {
     return (
-      <If condition={isShow == 1}>
+      <If condition={isShow}>
         <List>
           <Item arrow="horizontal" extra={extra} onClick={() => onClick && onClick()}>
             {title}
