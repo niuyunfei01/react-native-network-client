@@ -91,7 +91,7 @@ class Operation extends React.Component {
             this.state.competition.PriceScore.show,
             (<Text>价格指数 <Text style={styles.fontRed}>{this.state.competition.PriceScore.score}</Text></Text>),
             (<Text>{this.state.competition.PriceScore.tip}</Text>),
-            () => this.navigate(Config.ROUTE_GOODS_PRICE_INDEX)
+            () => this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})
           )}
           
           {this.renderItem(
