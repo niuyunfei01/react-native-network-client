@@ -374,7 +374,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
-        [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage}
+        [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
+        [Config.ROUTE_OPERATION] : {screen: TabOperation}
       },
       stackNavigatorConfigs
     );

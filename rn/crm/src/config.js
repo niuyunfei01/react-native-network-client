@@ -1,15 +1,4 @@
 'use strict';
-import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
-import OperateProfitScene from "./scene/OperateProfit/OperateProfitScene";
-import OperateIncomeDetailScene from "./scene/OperateProfit/OperateIncomeDetailScene";
-import OperateExpendDetailScene from "./scene/OperateProfit/OperateExpendDetailScene";
-import GoodsPriceDetailsScene from "./scene/Goods/GoodsPriceDetailsScene";
-import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
-import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
-import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
-import ActivityManageScene from "./scene/Activity/ActivityManageScene";
-import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
-import ActivityListScene from "./scene/Activity/ActivityListScene";
 
 const {HOST_UPDATED} = require("./common/constants").default;
 
@@ -172,6 +161,7 @@ const C = {
   ROUTE_GOODS_ANALYSIS: 'GoodsAnalysis',
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
+  ROUTE_OPERATION: 'Operation',
   serverUrl,
   apiUrl,
   staticUrl,

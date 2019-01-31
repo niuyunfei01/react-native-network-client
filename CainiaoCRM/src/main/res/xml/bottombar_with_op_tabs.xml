@@ -23,6 +23,11 @@
         /-->
 
     <tab
+        icon="@drawable/src_img_tabbar_tab_operation"
+        id="@+id/menu_store_operation"
+        title="@string/menu_operation" />
+
+    <tab
         icon="@drawable/ic_settings_applications_black_24dp"
         id="@+id/menu_mine"
         title="@string/menu_mine" />
