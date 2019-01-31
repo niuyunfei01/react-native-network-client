@@ -55,7 +55,7 @@ class StoreRate extends React.Component {
           <Text style={styles.tip}>评分未达到5分，每单扣除1元满减补贴费。</Text>
         </View>
         <View style={styles.cell}>
-          <Text style={styles.title}>完成5.0评分，只需3步</Text>
+          <Text style={styles.title}>完成5.0评分，只需2步</Text>
           <View style={styles.stepItem}>
             <Text>第1步：在美团做3~5个好评；</Text>
             <TouchableOpacity onPress={() => this.toCrmWebEvaluation()}>
