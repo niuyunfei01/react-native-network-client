@@ -145,7 +145,7 @@ const tabDef = function (store_) {
 				),
 				tabBarOnPress: (scene, jumpToIndex) => {
 					console.log("do navigateToGoods");
-					const {enabled_good_mgr = false} = store_.getState().global.config;
+					const {enabled_good_mgr = true} = store_.getState().global.config;
 					if (enabled_good_mgr) {
 						native.toGoods();
 					} else {

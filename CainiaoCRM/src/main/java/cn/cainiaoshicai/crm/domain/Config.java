@@ -27,7 +27,7 @@ public class Config {
     private Vendor[] can_read_vendors;
     private HashMap<String, String> v_b;
     private List<Integer> help_uid = new ArrayList<Integer>();
-    private boolean enabled_good_mgr = false;
+    private boolean enabled_good_mgr = true;
 
     public Config(SortedMap<Integer, Worker> workers, String[] delayReasons, HashMap<String, String> configUrls) {
         this.workers = workers;
