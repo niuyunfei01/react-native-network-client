@@ -23,7 +23,7 @@
         /-->
 
     <tab
-        icon="@drawable/tab_operation"
+        icon="@drawable/ic_tab_operation"
         id="@+id/menu_store_operation"
         title="@string/menu_operation" />
 

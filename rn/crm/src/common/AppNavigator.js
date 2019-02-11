@@ -106,8 +106,18 @@ import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
 import Cts from "../Cts";
 
+
+import _ from "lodash"
+
 const tabDef = function (store_) {
-  let isBlx = store_.getState().global.config.vendor.id == Cts.STORE_TYPE_BLX
+  let isBlx = false;
+  if (store_ && store_.getState()) {
+    let storeState = store_.getState();
+    let storeVendorId = _.get(storeState, 'global.config.vendor.id');
+    if (storeVendorId && storeVendorId == Cts.STORE_TYPE_BLX) {
+      isBlx = true;
+    }
+  }
   let tab = {
     Remind: {
       screen: RemindScene,
