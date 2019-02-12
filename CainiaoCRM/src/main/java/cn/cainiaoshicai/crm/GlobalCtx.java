@@ -818,6 +818,15 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toOperationActivity(Activity ctx){
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Operation");
+        Bundle params = new Bundle();
+        params.putString("initTab", "Operation");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     public void toGoodsEditProdStores(Activity ctx) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "GoodMultiEdit");

@@ -194,6 +194,7 @@
     <string name="menu_accept_order">接单</string>
     <string name="menu_store_manage">店铺</string>
     <string name="menu_mine">我的</string>
+    <string name="menu_operation">运营</string>
     <string name="menu_reminders">提醒</string>
     <string name="auth_mobilephone">手机号</string>
     <string name="auth_password">密码</string>

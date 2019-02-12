@@ -11,7 +11,7 @@ import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
 import GoodsScene from "../scene/Goods/GoodsScene";
-
+import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
 import native from "./native";
@@ -28,20 +28,16 @@ import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
+import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import TakeOutScene from "../scene/Store/TakeOutScene";
 import StoreStatusScene from "../scene/Store/StoreStatusScene";
 import GoodsDetailScene from "../scene/Goods/GoodsDetailScene";
-import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
-import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import VersionScene from "../scene/Mine/VersionScene";
 import SelectStoreScene from "../scene/Setting/SelectStoreScene";
-import OrderTodoScene from "../scene/Order/OrderTodoScene";
-import OrderCallShip from "../scene/Order/OrderCallShip";
-import OrderSendMoney from '../scene/Order/OrderSendMoney'
-import OrderSurcharge from '../scene/Order/OrderSurcharge'
+
 import GoodsEditScene from "../scene/Goods/GoodsEditScene";
 import GoodsClassifyScene from "../scene/Goods/GoodsClassifyScene";
 import GoodsBatchPriceScene from "../scene/Goods/GoodsBatchPriceScene";
@@ -54,8 +50,16 @@ import GoodsPriceDetailsScene from "../scene/Goods/GoodsPriceDetailsScene";
 import GoodsAdjustScene from '../scene/Goods/GoodsAdjustScene'
 import GoodsApplyPrice from '../scene/Goods/GoodsApplyPrice'
 import GoodsPriceIndex from '../scene/Goods/GoodsPriceIndex'
+import GoodsPriceArea from "../scene/Goods/AreaGoodsPrice";
 import GoodsList from '../scene/Goods/GoodsList'
+import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
 
+import OrderSearchScene from "../scene/Order/OrderSearchScene";
+import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
+import OrderTodoScene from "../scene/Order/OrderTodoScene";
+import OrderCallShip from "../scene/Order/OrderCallShip";
+import OrderSendMoney from '../scene/Order/OrderSendMoney'
+import OrderSurcharge from '../scene/Order/OrderSurcharge'
 import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
@@ -100,9 +104,21 @@ import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProdu
 import Refund from "../scene/Order/Refund";
 import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
+import Cts from "../Cts";
+
+
+import _ from "lodash"
 
 const tabDef = function (store_) {
-  return {
+  let isBlx = false;
+  if (store_ && store_.getState()) {
+    let storeState = store_.getState();
+    let storeVendorId = _.get(storeState, 'global.config.vendor.id');
+    if (storeVendorId && storeVendorId == Cts.STORE_TYPE_BLX) {
+      isBlx = true;
+    }
+  }
+  let tab = {
     Remind: {
       screen: RemindScene,
       navigationOptions: ({navigation}) => ({
@@ -151,32 +167,52 @@ const tabDef = function (store_) {
         ),
         tabBarOnPress: (scene, jumpToIndex) => {
           console.log("do navigateToGoods");
-          const {enabled_good_mgr = true} = store_.getState().global.config;
-          if (enabled_good_mgr) {
+          //const {enabled_good_mgr = true} = store_.getState().global.config;
+          //if (enabled_good_mgr) {
             native.toGoods();
-          } else {
-            jumpToIndex(scene.index);
-          }
+          //} else {
+            //jumpToIndex(scene.index);
+          //}
         }
       })
-    },
-    
-    Mine: {
-      screen: MineScene,
+    }
+  }
+  
+  if (isBlx) {
+    tab.Operation = {
+      screen: TabOperation,
       navigationOptions: ({navigation}) => ({
-        tabBarLabel: "我的",
+        tabBarLabel: "运营",
         tabBarIcon: ({focused, tintColor}) => (
           <TabBarItem
             tintColor={tintColor}
             focused={focused}
-            normalImage={require("../img/tabbar/tab_me.png")}
-            selectedImage={require("../img/tabbar/tab_me_pre.png")}
+            normalImage={require("../img/tabbar/tab_operation.png")}
+            selectedImage={require("../img/tabbar/tab_operation_pre.png")}
           />
         )
       })
     }
   }
+  
+  tab.Mine = {
+    screen: MineScene,
+    navigationOptions: ({navigation}) => ({
+      tabBarLabel: "我的",
+      tabBarIcon: ({focused, tintColor}) => (
+        <TabBarItem
+          tintColor={tintColor}
+          focused={focused}
+          normalImage={require("../img/tabbar/tab_me.png")}
+          selectedImage={require("../img/tabbar/tab_me_pre.png")}
+        />
+      )
+    })
+  }
+  
+  return tab
 };
+
 const tabInit = {
   initialRouteName: "Remind",
   tabBarComponent: TabBarBottom,
@@ -279,6 +315,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
+        [Config.ROUTE_STORE_RULE]: {screen: StoreRule},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
@@ -295,6 +332,9 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
         [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
         [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
+        [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
+        [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
+        
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
         [Config.ROUTE_SETTLEMENT_ORDER]: {screen: SettlementOrderScene},
@@ -344,7 +384,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
-        [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage}
+        [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
+        [Config.ROUTE_OPERATION] : {screen: TabOperation}
       },
       stackNavigatorConfigs
     );

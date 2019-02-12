@@ -31,7 +31,11 @@ class GoodsPriceIndex extends Component {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
-            native.toGoods();
+            if (navigation.state.params.from == 'rn') {
+              navigation.goBack()
+            } else {
+              native.toGoods();
+            }
           }}
         />
       )
@@ -136,11 +140,10 @@ class GoodsPriceIndex extends Component {
           <Text style={styles.message}>
             价格指数：
             <Text style={styles.striking}>{storeScore.score}</Text>
-            （优秀价格指数{storeScore.excellent_range.min}-{storeScore.excellent_range.max}）
           </Text>
         </View>
         <View>
-          <Text style={styles.message}>建议优化一下商品价格提升指数</Text>
+          <Text style={styles.message}>{storeScore.excellent_range.min}以上为优秀价格指数，调价系统自动通过</Text>
         </View>
       </View>
     )
@@ -181,11 +184,11 @@ class GoodsPriceIndex extends Component {
         </View>
         <View style={styles.goodsRight}>
           <If condition={!product.hasApply}>
-          <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
-            <View style={styles.opBtn}>
-              <Text style={styles.opText}>比价/调价</Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
+              <View style={styles.opBtn}>
+                <Text style={styles.opText}>比价/调价</Text>
+              </View>
+            </TouchableOpacity>
           </If>
           <If condition={product.hasApply}>
             <TouchableOpacity>
