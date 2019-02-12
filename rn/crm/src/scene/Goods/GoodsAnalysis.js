@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
-import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, InteractionManager, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import TabButton from "../component/TabButton";
 import LoadMore from 'react-native-loadmore'
 import color from "../../widget/color";
 import {CachedImage} from "react-native-img-cache";
@@ -9,6 +8,8 @@ import BigImage from "../component/BigImage";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import Config from "../../config";
+import {Accordion} from "antd-mobile-rn";
+import Dialog from "../component/Dialog";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -24,60 +25,44 @@ class GoodsAnalysis extends Component {
   
   constructor (props) {
     super(props)
-    console.log(this.props.global)
     this.state = {
       access_token: this.props.global.accessToken,
       store_id: this.props.global.currStoreId,
-      tabOptions: [{label: '热销新品上架', value: 'HOT_NEW'}],
       bigImageUri: [],
       bigImageVisible: false,
-      tabActiveValue: 'HOT_NEW',
       isLoading: false,
-      list: []
+      page: 1,
+      pageSize: 20,
+      isLastPage: false,
+      list: [],
+      skuProdList: [],
+      productListModal: false
     }
   }
   
   componentWillMount () {
-    this.fetchStoreScore()
     this.fetchList()
-  }
-  
-  fetchStoreScore () {
-    const self = this
-    const {access_token, store_id} = this.state
-    HttpUtils.get(`/api/store_price_score/${store_id}?access_token=${access_token}`).then(res => {
-      self.setState({storeScore: res})
-    })
   }
   
   fetchList () {
     const self = this
-    const {access_token, store_id, tabActiveValue} = this.state
-    let uri = ''
-    switch (tabActiveValue) {
-      case 'HOT_NEW':
-        uri = `/api/area_hot_new_prod/${store_id}`
-        break
-      case 'HOT_7_DAY':
-        uri = `/api/area_7_day_hot_sale/${store_id}`
-        break
-      default:
-        uri = null
-        break
-    }
-    if (uri) {
-      uri = `${uri}?access_token=${access_token}`
-      this.setState({isLoading: true})
-      HttpUtils.get(uri).then(res => {
-        self.setState({list: res, isLoading: false})
+    const {access_token, store_id, page, pageSize} = this.state
+    uri = `/api/area_hot_new_sku/${store_id}?access_token=${access_token}`
+    this.setState({isLoading: true})
+    HttpUtils.get(uri, {page, pageSize}).then(res => {
+      if (page !== 1) {
+        lists = this.state.list.concat(res.lists)
+      } else {
+        lists = res.lists
+      }
+      self.setState({
+        list: lists,
+        page: res.page + 1,
+        pageSize: res.pageSize,
+        isLastPage: res.isLastPage,
+        isLoading: false
       })
-    } else {
-    
-    }
-  }
-  
-  onClickTab (value) {
-    this.setState({tabActiveValue: value}, () => this.fetchList())
+    })
   }
   
   showBigImage (coverimg) {
@@ -94,8 +79,13 @@ class GoodsAnalysis extends Component {
     })
   }
   
+  onProductListModalClose () {
+    this.setState({productListModal: false, skuProdList: []})
+  }
+  
   toOnlineProduct (productId, idx, product) {
     const self = this
+    self.onProductListModalClose()
     InteractionManager.runAfterInteractions(() => {
       self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
         store_id: this.state.store_id,
@@ -107,14 +97,20 @@ class GoodsAnalysis extends Component {
     })
   }
   
-  renderTab () {
-    return (
-      <TabButton
-        data={this.state.tabOptions}
-        onClick={(value) => this.onClickTab(value)}
-        containerStyle={styles.tabBtnContainer}
-      />
-    )
+  onRefresh () {
+    this.setState({page: 1}, () => {
+      this.fetchList()
+    })
+  }
+  
+  onClickSkuCell (skuId) {
+    if (skuId) {
+      const self = this
+      const {access_token, store_id} = this.state
+      HttpUtils.get(`/api/area_hot_new_prod/${store_id}/${skuId}?access_token=${access_token}`).then(res => {
+        self.setState({skuProdList: res, productListModal: true})
+      })
+    }
   }
   
   renderHotNewRow (product, idx) {
@@ -137,21 +133,27 @@ class GoodsAnalysis extends Component {
               </View>
             </If>
           </View>
-          <Text>商圈月销{product.sales}</Text>
-          <Text>建议价<Text style={styles.goodsPrice}>￥{product.supply_price}</Text></Text>
+          <Text>建议价
+            <If condition={product.price}>
+              <Text style={styles.goodsPrice}>￥{product.price}</Text>
+            </If>
+            <If condition={!product.price}>
+              <Text style={styles.goodsPrice}>-</Text>
+            </If>
+          </Text>
         </View>
         <View style={styles.goodsRight}>
-          <If condition={!product.hasApply}>
+          <If condition={!product.exist}>
             <TouchableOpacity onPress={() => this.toOnlineProduct(product.product_id, idx, product)}>
               <View style={styles.opBtn}>
                 <Text style={styles.opText}>上架</Text>
               </View>
             </TouchableOpacity>
           </If>
-          <If condition={product.hasApply}>
+          <If condition={product.exist}>
             <TouchableOpacity>
               <View style={[styles.opBtn, styles.opBtnDisable]}>
-                <Text style={[styles.opText, styles.opTextDisable]}>已改价</Text>
+                <Text style={[styles.opText, styles.opTextDisable]}>已上架</Text>
               </View>
             </TouchableOpacity>
           </If>
@@ -160,62 +162,49 @@ class GoodsAnalysis extends Component {
     )
   }
   
-  renderHotSaleRow (item, idx) {
+  renderSkuCell (item) {
     return (
-      <View key={idx} style={styles.goodsRow}>
-        <View style={styles.goodsImageBox}>
-          <TouchableOpacity onPress={() => this.showBigImage(item.coverImage)}>
-            <CachedImage
-              style={styles.goodsImage}
-              source={{uri: item.coverImage}}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.hotSaleRight}>
-          <Text style={styles.goodsName}>{item.productName}</Text>
-          <View style={styles.saleInfo}>
-            <View style={styles.saleInfoColumn}>
-              <Text>我的销量:{item.sold_7day}</Text>
-              <Text>同行销量:{item.trackTotalSales}</Text>
-            </View>
-            <View>
-              <Text>我的价格:￥{item.wmPrice}</Text>
-              <Text>同行价格:￥{item.trackMaxSalePrice}</Text>
-            </View>
-          </View>
-        </View>
+      <View style={styles.accordionHeader} key={item.sku_id}>
+        <Text>{item.sku_name}(月销量：{item.sales})</Text>
+        <Image
+          source={require('../../img/Public/arrow.png')}
+          style={styles.accordionHeaderArrow}
+        />
+      </View>
+    )
+  }
+  
+  renderProductList () {
+    return (
+      <View>
+        <For each="product" index="prodIdx" of={this.state.skuProdList}>
+          {this.renderHotNewRow(product, prodIdx)}
+        </For>
       </View>
     )
   }
   
   renderList () {
-    let res = null
-    if (this.state.tabActiveValue == 'HOT_NEW') {
-      res = (
-        <For each="item" index="idx" of={this.state.list}>
-          {this.renderHotNewRow(item, idx)}
-        </For>
-      )
-    } else if (this.state.tabActiveValue == 'HOT_7_DAY') {
-      res = (
-        <For each="item" index="idx" of={this.state.list}>
-          {this.renderHotSaleRow(item, idx)}
-        </For>
-      )
-    }
-    return res
+    return (
+      <For each="item" index="idx" of={this.state.list}>
+        <TouchableOpacity key={idx} onPress={() => this.onClickSkuCell(item.sku_id)}>
+          {this.renderSkuCell(item)}
+        </TouchableOpacity>
+      </For>
+    )
   }
   
   render () {
     return (
       <View style={styles.container}>
-        {/*{this.renderTab()}*/}
         
         <LoadMore
           renderList={this.renderList()}
-          onRefresh={() => this.fetchList()}
-          isLastPage={true}
+          onRefresh={() => this.onRefresh()}
+          isLastPage={this.state.isLastPage}
           isLoading={this.state.isLoading}
+          loadMoreType={'scroll'}
+          onLoadMore={() => this.fetchList()}
         />
         
         <BigImage
@@ -223,6 +212,15 @@ class GoodsAnalysis extends Component {
           urls={this.state.bigImageUri}
           onClickModal={() => this.closeBigImage()}
         />
+        
+        <Dialog
+          visible={this.state.productListModal}
+          onRequestClose={() => this.onProductListModalClose()}
+        >
+          <ScrollView>
+            {this.renderProductList()}
+          </ScrollView>
+        </Dialog>
       </View>
     )
   }
@@ -230,8 +228,6 @@ class GoodsAnalysis extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: pxToDp(20),
-    paddingVertical: pxToDp(10),
     flex: 1
   },
   message: {
@@ -251,7 +247,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: pxToDp(160),
     // backgroundColor: '#fff',
-    marginTop: pxToDp(20)
+    marginVertical: pxToDp(10)
   },
   goodsImageBox: {
     width: pxToDp(160),
@@ -286,10 +282,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: pxToDp(20)
   },
-  goodsSales: {
-    fontSize: pxToDp(25),
-    color: 'rgb(138,138,138)'
-  },
   goodsPrice: {
     fontSize: pxToDp(30),
     color: 'rgb(225,64,68)',
@@ -319,16 +311,19 @@ const styles = StyleSheet.create({
   opTextDisable: {
     color: '#fff'
   },
-  saleInfo: {
-    flexDirection: 'row',
-    width: '100%'
-  },
-  saleInfoColumn: {
-    width: '50%'
-  },
-  hotSaleRight: {
+  accordionHeader: {
+    flexDirection: "row",
     justifyContent: 'space-between',
-    marginLeft: pxToDp(10)
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    paddingHorizontal: pxToDp(20),
+    marginTop: pxToDp(10),
+    backgroundColor: '#fff'
+  },
+  accordionHeaderArrow: {
+    width: pxToDp(16),
+    height: pxToDp(27)
   }
 })
 

@@ -7,9 +7,9 @@ export default class BaseItem extends PureComponent {
   static propTypes = {
     image: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    wmPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    supplyPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    price: PropTypes.any,
+    wmPrice: PropTypes.any,
+    supplyPrice: PropTypes.any,
     monthSale: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     showModifyPriceBtn: PropTypes.bool,
     onPressModifyPrice: PropTypes.func,
@@ -36,9 +36,9 @@ export default class BaseItem extends PureComponent {
             <Text style={[styles.goods_name]}>{this.props.name}</Text>
             <View style={styles.sku}>
               <Text style={[styles.goods_price]}>
-                {this.props.wmPrice ? `${this.props.wmText}:${this.props.wmPrice}` : null}
-                {this.props.supplyPrice ? `保底价:${this.props.supplyPrice}` : null}
-                {this.props.newPrice ? ` => ${this.props.newPrice}` : null}
+                {this.props.wmPrice || this.props.wmPrice === 0 ? `${this.props.wmText}:${this.props.wmPrice}` : null}
+                {this.props.supplyPrice || this.props.supplyPrice === 0 ? `保底价:${this.props.supplyPrice}` : null}
+                {this.props.newPrice || this.props.newPrice === 0 ? ` => ${this.props.newPrice}` : null}
               </Text>
               {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
               {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
