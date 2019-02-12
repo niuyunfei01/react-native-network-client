@@ -6,6 +6,7 @@ import Rate from "../../Components/Goods/Rate";
 import Config from "../../config";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -25,8 +26,25 @@ class StoreRate extends React.Component {
     this.state = {
       score: Number(this.props.navigation.state.params.score),
       accessToken: this.props.global.accessToken,
-      vendorId: currVendorId
+      vendorId: currVendorId,
+      info: {
+        tips: [],
+        title: '',
+        steps: {
+          1: {},
+          2: {},
+          3: {}
+        }
+      }
     }
+  }
+  
+  componentWillMount () {
+    const self = this
+    const access_token = this.props.global.accessToken
+    HttpUtils.get(`/api/store_rate?access_token=${access_token}`).then(res => {
+      self.setState({info: res})
+    })
   }
   
   routeTo (route, params = {}) {
@@ -52,34 +70,42 @@ class StoreRate extends React.Component {
           <Rate showRecord={true} currRecord={this.state.score} maxRecord={5} style={styles.rate}/>
         </View>
         <View>
-          <Text style={styles.tip}>评分未达到5分，每单扣除1元满减补贴费。</Text>
+          <For each="item" index="idx" of={this.state.info.tips}>
+            <Text style={[styles.tip, {color: item.color ? item.color : '#000'}]} key={idx}>{item.text}</Text>
+          </For>
         </View>
         <View style={styles.cell}>
-          <Text style={styles.title}>完成5.0评分，只需2步</Text>
-          <View style={styles.stepItem}>
-            <Text>第1步：在美团做3~5个好评；</Text>
-            <TouchableOpacity onPress={() => this.toCrmWebEvaluation()}>
-              <View>
-                <Text style={styles.linkText}>如何做评价</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.stepItem}>
-            <Text>第2步：价格指数调整在4.2分以上；</Text>
-            <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_PRICE_INDEX)}>
-              <View>
-                <Text style={styles.linkText}>查看价格指数</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          {/*<View style={styles.stepItem}>*/}
-          {/*<Text>第3步：上架热销新品；</Text>*/}
-          {/*<TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>*/}
-          {/*<View>*/}
-          {/*<Text style={styles.linkText}>上架新品</Text>*/}
-          {/*</View>*/}
-          {/*</TouchableOpacity>*/}
-          {/*</View>*/}
+          <Text style={styles.title}>{this.state.info.title}</Text>
+          <If condition={this.state.info.steps[1].show}>
+            <View style={styles.stepItem}>
+              <Text>{this.state.info.steps[1].title}</Text>
+              <TouchableOpacity onPress={() => this.toCrmWebEvaluation()}>
+                <View>
+                  <Text style={styles.linkText}>如何做评价</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </If>
+          <If condition={this.state.info.steps[2].show}>
+            <View style={styles.stepItem}>
+              <Text>{this.state.info.steps[2].title}</Text>
+              <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_PRICE_INDEX)}>
+                <View>
+                  <Text style={styles.linkText}>查看价格指数</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </If>
+          <If condition={this.state.info.steps[3].show}>
+            <View style={styles.stepItem}>
+              <Text>{this.state.info.steps[3].title}</Text>
+              <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>
+                <View>
+                  <Text style={styles.linkText}>上架新品</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </If>
         </View>
       </View>
     )
@@ -106,7 +132,6 @@ const styles = StyleSheet.create({
     marginLeft: pxToDp(15)
   },
   tip: {
-    color: color.red,
     fontSize: pxToDp(25),
     marginTop: pxToDp(20)
   },
