@@ -133,7 +133,7 @@ class GoodsAnalysis extends Component {
               </View>
             </If>
           </View>
-          <Text>建议价
+          <Text>建议外卖价：
             <If condition={product.price}>
               <Text style={styles.goodsPrice}>￥{product.price}</Text>
             </If>
