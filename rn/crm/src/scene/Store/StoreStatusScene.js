@@ -111,26 +111,41 @@ class StoreStatusScene extends React.Component {
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
-          <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
+        <If condition={canOpen}>
+          <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
+            <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
+              <Text style={styles.footerBtnText}>开店接单</Text>
+            </View>
+          </TouchableOpacity>
+        </If>
+        <If condition={!canOpen}>
+          <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
             <Text style={styles.footerBtnText}>开店接单</Text>
           </View>
-        </TouchableOpacity>
+        </If>
         
-        <ModalSelector
-          style={[styles.footerItem, {flex: 1}]}
-          touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-          childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-          onChange={(option) => {
-            this.closeStore(option.value);
-          }}
-          cancelText={'取消'}
-          data={this.state.timeOptions}
-        >
-          <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
+        
+        <If condition={canClose}>
+          <ModalSelector
+            style={[styles.footerItem, {flex: 1}]}
+            touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+            childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+            onChange={(option) => {
+              this.closeStore(option.value);
+            }}
+            cancelText={'取消'}
+            data={this.state.timeOptions}
+          >
+            <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
+              <Text style={styles.footerBtnText}>紧急关店</Text>
+            </View>
+          </ModalSelector>
+        </If>
+        <If condition={!canClose}>
+          <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
             <Text style={styles.footerBtnText}>紧急关店</Text>
           </View>
-        </ModalSelector>
+        </If>
       </View>
     )
   }

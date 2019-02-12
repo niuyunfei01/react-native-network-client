@@ -1,15 +1,4 @@
 'use strict';
-import GoodsRelateScene from "./scene/Goods/GoodsRelateScene";
-import OperateProfitScene from "./scene/OperateProfit/OperateProfitScene";
-import OperateIncomeDetailScene from "./scene/OperateProfit/OperateIncomeDetailScene";
-import OperateExpendDetailScene from "./scene/OperateProfit/OperateExpendDetailScene";
-import GoodsPriceDetailsScene from "./scene/Goods/GoodsPriceDetailsScene";
-import SettlementGatherScene from "./scene/Settlement/SettlementGatherScene";
-import ActivityEditRuleScene from "./scene/Activity/ActivityEditRuleScene";
-import ActivitySelectStoreScene from "./scene/Activity/ActivitySelectStoreScene";
-import ActivityManageScene from "./scene/Activity/ActivityManageScene";
-import ActivitySelectClassifyScene from "./scene/Activity/ActivitySelectClassifyScene";
-import ActivityListScene from "./scene/Activity/ActivityListScene";
 
 const {HOST_UPDATED} = require("./common/constants").default;
 
@@ -109,6 +98,7 @@ const C = {
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
+  ROUTE_STORE_RULE: 'StoreRule',
   ROUTE_DONE_REMIND: 'DoneRemind',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
@@ -168,7 +158,10 @@ const C = {
   ROUTE_GOODS_ADJUST: 'GoodsAdjust',
   ROUTE_GOODS_APPLY_PRICE: 'GoodsApplyPrice',
   ROUTE_GOODS_PRICE_INDEX: 'GoodsPriceIndex',
+  ROUTE_GOODS_ANALYSIS: 'GoodsAnalysis',
+  ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
+  ROUTE_OPERATION: 'Operation',
   serverUrl,
   apiUrl,
   staticUrl,

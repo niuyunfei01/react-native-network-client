@@ -134,12 +134,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   tip: {
-    color: color.fontOrigin,
+    color: color.orange,
     fontSize: pxToDp(20),
     marginTop: pxToDp(20)
   },
   redText: {
-    color: color.fontRed
+    color: color.red
   },
   succText: {
     color: color.theme
