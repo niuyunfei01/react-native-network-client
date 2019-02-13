@@ -117,12 +117,20 @@ public class MainActivity extends AbstractActionBarActivity {
         return intent;
     }
 
+    private void setViewPagerCurrentItem(Bundle savedInstanceState) {
+        if (ordersViewPager != null && savedInstanceState != null) {
+            try {
+                ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
+            } catch (Exception e) {
+                ordersViewPager.setCurrentItem(1);
+            }
+        }
+    }
+
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (ordersViewPager != null) {
-            ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
-        }
+        this.setViewPagerCurrentItem(savedInstanceState);
     }
 
     @Override
@@ -189,9 +197,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
         tabLayout = findViewById(R.id.order_list_main);
         tabLayout.setupWithViewPager(ordersViewPager);
-        if (savedInstanceState != null) {
-            ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
-        }
+        this.setViewPagerCurrentItem(savedInstanceState);
 
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();

@@ -40,7 +40,7 @@ class GoodsApplyPrice extends Component {
           onPress={() => {
             let from = navigation.state.params.from;
             if ('native' == from) {
-              native.toGoods();
+              native.nativeBack();
             } else {
               navigation.goBack();
             }
@@ -141,7 +141,7 @@ class GoodsApplyPrice extends Component {
             this.props.navigation.state.params.onBack()
             this.props.navigation.goBack()
           } else {
-            native.toGoods();
+            native.nativeBack();
           }
         } else {
           self.setState({resultDialog: true, resultMsg: `调价失败，请稍后重试。${resp.reason}`, resultDialogType: 'info'})
