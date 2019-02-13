@@ -820,7 +820,7 @@ public class GlobalCtx extends Application {
 
     public void toOperationActivity(Activity ctx){
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "Operation");
+        i.putExtra("_action", "Tab");
         Bundle params = new Bundle();
         params.putString("initTab", "Operation");
         i.putExtra("_action_params", params);

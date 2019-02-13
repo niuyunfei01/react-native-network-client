@@ -169,9 +169,9 @@ const tabDef = function (store_) {
           console.log("do navigateToGoods");
           //const {enabled_good_mgr = true} = store_.getState().global.config;
           //if (enabled_good_mgr) {
-            native.toGoods();
+          native.toGoods();
           //} else {
-            //jumpToIndex(scene.index);
+          //jumpToIndex(scene.index);
           //}
         }
       })
@@ -385,7 +385,7 @@ class Navigator extends Component {
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
         [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
-        [Config.ROUTE_OPERATION] : {screen: TabOperation}
+        [Config.ROUTE_OPERATION]: {screen: TabOperation}
       },
       stackNavigatorConfigs
     );
