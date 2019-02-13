@@ -180,7 +180,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     protected void onPause() {
         super.onPause();
         if (mReactInstanceManager != null) {
-            mReactInstanceManager.onHostPause();
+            mReactInstanceManager.onHostPause(this);
         }
     }
 
@@ -188,7 +188,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     protected void onDestroy() {
         super.onDestroy();
         if (mReactInstanceManager != null) {
-            mReactInstanceManager.onHostDestroy();
+            mReactInstanceManager.onHostDestroy(this);
         }
     }
 

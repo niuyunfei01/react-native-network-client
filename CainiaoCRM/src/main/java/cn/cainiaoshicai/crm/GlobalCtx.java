@@ -277,7 +277,7 @@ public class GlobalCtx extends Application {
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(this)
                 .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("index.android")
+                .setJSMainModulePath("index.android")
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())
@@ -298,9 +298,7 @@ public class GlobalCtx extends Application {
 
         //初始化蓝牙管理
         AppInfo.init(this);
-
         startKeepAlive();
-
     }
 
     public void startKeepAlive() {

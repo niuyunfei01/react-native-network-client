@@ -20,8 +20,7 @@ const {
   InteractionManager,
   ActivityIndicator,
   Image,
-  View,
-  StatusBar
+  View
 } = ReactNative;
 
 const {PureComponent, PropTypes} = React;
@@ -382,11 +381,6 @@ class RemindScene extends PureComponent {
         data={dataSource}
         legacyImplementation={false}
         directionalLockEnabled={true}
-        viewabilityConfig={{
-          minimumViewTime: 3000,
-          viewAreaCoveragePercentThreshold: 100,
-          waitForInteraction: true,
-        }}
         onTouchStart={(e) => {
           this.pageX = e.nativeEvent.pageX;
           this.pageY = e.nativeEvent.pageY;
