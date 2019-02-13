@@ -16,6 +16,11 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import Cts from "../../Cts";
+
+import AppConfig from "../../config.js";
+import FetchEx from "../../util/fetchEx";
+import HttpUtils from "../../util/http";
+
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -36,10 +41,7 @@ import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
-import AppConfig from "../../config.js";
-import FetchEx from "../../util/fetchEx";
 import SearchStore from "../component/SearchStore";
-import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
