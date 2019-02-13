@@ -208,7 +208,7 @@ class ActivitySelectStoreScene extends PureComponent {
     try {
       ext_store_id.forEach((item) => {
         storeList.forEach((ite) => {
-          if (item == ite.id && (arr.indexOf(ite.store_id) < 0)) {
+          if (item == ite.id && (ite && ite.store_id && arr.indexOf(ite.store_id) < 0)) {
             arr.push(ite.store_id)
           }
         })

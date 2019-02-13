@@ -104,7 +104,6 @@ class WorkerScene extends PureComponent {
                 navigation_key: this.props.navigation.state.key,
                 store_id: parseInt(user.store_id),
                 currVendorId: this.state.currVendorId,
-                
                 mobile: user.mobilephone,
                 cover_image: user.image,
                 user_name: user.nickname,
@@ -118,15 +117,16 @@ class WorkerScene extends PureComponent {
       </Cell>
     );
   }
-  
-  renderList () {
+
+  renderList() {
     let _this = this
     const {lists} = _this.state
     let items = []
-    for (var i in lists) {
-      items.push(_this.renderUser(lists[i]))
+    for (let i in lists) {
+      if (lists[i]) {
+        items.push(_this.renderUser(lists[i]))
+      }
     }
-    
     return items
   }
   

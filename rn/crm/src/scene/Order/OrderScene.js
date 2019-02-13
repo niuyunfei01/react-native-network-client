@@ -335,17 +335,16 @@ class OrderScene extends Component {
     
     this._navSetParams();
   };
-  
-  onPrint () {
-    
-    const order = this.props.order.order;
-    
-    const store = tool.store(order.store_id, this.props.global);
-    
-    if (store && store.cloudPrinter) {
-      this.setState({showPrinterChooser: true})
-    } else {
-      this._doBluetoothPrint()
+
+  onPrint() {
+    const order = this.props.order.order
+    if (order) {
+      const store = tool.store(order.store_id, this.props.global)
+      if (store && store.cloudPrinter) {
+        this.setState({showPrinterChooser: true})
+      } else {
+        this._doBluetoothPrint()
+      }
     }
   }
   
@@ -566,9 +565,9 @@ class OrderScene extends Component {
   _doSaveItemsCancel () {
     this.setState({isEditing: false})
   }
-  
-  _openAddGood () {
-    const {navigation, dispatch} = this.props;
+
+  _openAddGood() {
+    const {navigation} = this.props;
     const order = this.props.order.order;
     const params = {
       esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
@@ -674,25 +673,25 @@ class OrderScene extends Component {
     const {order} = this.props.order;
     this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
   }
-  
-  toMap () {
-    const {dispatch, global} = this.props;
+
+  toMap() {
     const {order} = this.props.order;
-    const validPoi = order.gd_lng && order.gd_lat;
-    
-    if (validPoi) {
-      const store = this.props.global.canReadStores[order.store_id] || {};
-      const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
-      const uri = Config.serverUrl(path);
-      this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-      console.log(uri)
-    } else {
-      //a page to set the location for this url!!
-      this.setState({
-        gotoEditPoi: true
-      });
-      this.goToSetMap();
+    if (order) {
+      const validPoi = order.gd_lng && order.gd_lat;
+      if (validPoi) {
+        const store = this.props.global.canReadStores[order.store_id] || {};
+        const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
+        const uri = Config.serverUrl(path);
+        this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
+        console.log(uri)
+        return;
+      }
     }
+    //a page to set the location for this url!!
+    this.setState({
+      gotoEditPoi: true
+    });
+    this.goToSetMap();
   }
   
   _doProcessRemind (remind) {
@@ -725,12 +724,11 @@ class OrderScene extends Component {
       this.setState({errorHints: '暂不支持该处理类型'})
     }
   }
-  
-  _fnProvidingOnway () {
+
+  _fnProvidingOnway() {
     const {order, global} = this.props;
-    
     const storeId = (order.order || {}).store_id;
-    return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
+    return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
   
   _callShip () {

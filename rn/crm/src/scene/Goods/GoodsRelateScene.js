@@ -105,8 +105,8 @@ class GoodsRelatedScene extends PureComponent {
   }
   deleteFromArr(id){
     this.state.storesList.forEach((item,index)=>{
-      if(item.store_id == id){
-        this.state.storesList.splice(index,1);
+      if (item && item.store_id == id) {
+        this.state.storesList.splice(index, 1);
         this.forceUpdate()
       }
     })
