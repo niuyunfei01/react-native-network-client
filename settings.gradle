@@ -8,3 +8,4 @@ include ':react-native-i18n'
 project(':react-native-i18n').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-i18n/android')
 include ':rn-fetch-blob'
 project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/rn-fetch-blob/android')
+include 'ReactAndroid'

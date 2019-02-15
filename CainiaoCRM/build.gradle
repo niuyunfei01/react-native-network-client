@@ -20,7 +20,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$ANDROID_LIB_VERSION"
     implementation "com.android.support:design:$ANDROID_LIB_VERSION"
 
-    implementation "com.facebook.react:react-native:+" // From node_modules.
+    compile project(':ReactAndroid') // From node_modules.
 
 //    compile 'com.github.lzyzsd:jsbridge:1.0.4'
     implementation "com.github.johnpersano:supertoasts:$SUPPER_TOAST_VERSION"
@@ -191,4 +191,8 @@ android {
         }
 
     }
+}
+
+configurations.all {
+    exclude group: 'com.facebook.react', module: 'react-native'
 }
