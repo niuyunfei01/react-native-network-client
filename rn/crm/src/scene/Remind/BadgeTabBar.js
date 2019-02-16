@@ -6,6 +6,8 @@ const ReactNative = require('react-native');
 import IconBadge from '../../widget/IconBadge';
 import utils from '../../util/common'
 
+const PropTypes = require('prop-types');
+
 const {
   StyleSheet,
   Text,

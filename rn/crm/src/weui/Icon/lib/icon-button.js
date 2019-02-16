@@ -3,10 +3,7 @@ import isString from 'lodash/isString';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 
-import React, {
-  Component,
-  PropTypes,
-} from 'react';
+import React, {  Component} from 'react';const PropTypes = require('prop-types');
 
 import {
   StyleSheet,
