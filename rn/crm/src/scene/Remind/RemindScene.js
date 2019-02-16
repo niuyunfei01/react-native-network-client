@@ -39,7 +39,7 @@ import RNButton from '../../widget/RNButton';
 import Config from '../../config'
 import Cts from '../../Cts'
 
-const BadgeTabBar = require('./BadgeTabBar');
+import BadgeTabBar from './BadgeTabBar';
 import {Dialog, ActionSheet} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";

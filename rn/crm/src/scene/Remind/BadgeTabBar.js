@@ -23,8 +23,8 @@ const Button = (props) => {
 };
 
 
-const BadgeTabBar = React.createClass({
-  propTypes: {
+exports default class BadgeTabBar extends React.Component{
+  static propTypes = {
     goToPage: PropTypes.func,
     activeTab: PropTypes.number,
     tabs: PropTypes.array,
@@ -39,12 +39,10 @@ const BadgeTabBar = React.createClass({
     countIndex: PropTypes.array
   },
 
-  getDefaultProps() {
-    return {
+  static defaultProps = {
       activeTextColor: 'navy',
       inactiveTextColor: 'black',
       backgroundColor: null,
-    };
   },
 
   renderTabOption(name, page) {
@@ -138,6 +136,4 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
 });
-
-module.exports = BadgeTabBar;
 
