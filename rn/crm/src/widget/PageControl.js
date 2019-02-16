@@ -14,15 +14,15 @@ import assign from 'object-assign';
 class PageControl extends PureComponent {
 
     static propTypes = {
-        numberOfPages: React.PropTypes.number.isRequired,
-        currentPage: React.PropTypes.number,
-        hidesForSinglePage: React.PropTypes.bool,
-        pageIndicatorTintColor: React.PropTypes.string,
-        currentPageIndicatorTintColor: React.PropTypes.string,
-        indicatorSize: React.PropTypes.object,
+        numberOfPages: PropTypes.number.isRequired,
+        currentPage: PropTypes.number,
+        hidesForSinglePage: PropTypes.bool,
+        pageIndicatorTintColor: PropTypes.string,
+        currentPageIndicatorTintColor: PropTypes.string,
+        indicatorSize: PropTypes.object,
         indicatorStyle: View.propTypes.style,
         currentIndicatorStyle: View.propTypes.style,
-        onPageIndicatorPress: React.PropTypes.func
+        onPageIndicatorPress: PropTypes.func
     }
 
     static defaultProps = {

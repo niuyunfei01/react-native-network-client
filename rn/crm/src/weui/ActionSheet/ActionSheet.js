@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react';import PropTypes from 'prop-types';
 import {
   Modal,
   View,
@@ -202,8 +202,8 @@ class ActionSheet extends Component {
 }
 
 ActionSheet.propTypes = {
-  menus: React.PropTypes.array,
-  actions: React.PropTypes.array,
+  menus: PropTypes.array,
+  actions: PropTypes.array,
   visible: PropTypes.bool,
   onShow: PropTypes.func,
   onRequestClose: PropTypes.func,

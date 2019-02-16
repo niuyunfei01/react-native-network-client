@@ -23,8 +23,8 @@ const {
   View
 } = ReactNative;
 
-const {PureComponent, PropTypes} = React;
-
+const {PureComponent} = React;
+import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ScrollableTabView from 'react-native-scrollable-tab-view';

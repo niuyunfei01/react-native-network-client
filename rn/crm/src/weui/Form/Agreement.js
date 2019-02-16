@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react';import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback, View, Text, StyleSheet } from 'react-native'
 import { Icon } from '../Icon'
 import V from '../variable'

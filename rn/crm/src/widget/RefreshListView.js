@@ -6,8 +6,8 @@ import RefreshState from './RefreshState'
 // create a component
 class RefreshListView extends PureComponent {
     static propTypes = {
-        onHeaderRefresh: React.PropTypes.func,
-        onFooterRefresh: React.PropTypes.func,
+        onHeaderRefresh: PropTypes.func,
+        onFooterRefresh: PropTypes.func,
     }
 
     static defaultProps = {
