@@ -251,10 +251,21 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+//    sourceSets.main {
+//        jni.srcDirs = []
+//        jniLibs.srcDir "$buildDir/react-ndk/exported"
+//        res.srcDirs = ['src/main/res/devsupport', 'src/main/res/shell', 'src/main/res/views/modal', 'src/main/res/views/uimanager']
+//        java {
+//            srcDirs = ['src/main/java', 'src/main/libraries/soloader/java', 'src/main/jni/first-party/fb/jni/java']
+//            exclude 'com/facebook/react/processing'
+//            exclude 'com/facebook/react/module/processing'
+//        }
+//    }
+
     sourceSets.main {
         jni.srcDirs = []
-        jniLibs.srcDir "$buildDir/react-ndk/exported"
-        res.srcDirs = ['src/main/res/devsupport', 'src/main/res/shell', 'src/main/res/views/modal', 'src/main/res/views/uimanager']
+        jniLibs.srcDir "react-ndk/exported" //so库目录
+        res.srcDirs = ['src/main/res/devsupport', 'src/main/res/shell', 'src/main/res/views/modal']
         java {
             srcDirs = ['src/main/java', 'src/main/libraries/soloader/java', 'src/main/jni/first-party/fb/jni/java']
             exclude 'com/facebook/react/processing'
@@ -262,11 +273,11 @@ android {
         }
     }
 
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn packageReactNdkLibs
-    }
-
-    clean.dependsOn cleanReactNdkLib
+//    tasks.withType(JavaCompile) {
+//        compileTask -> compileTask.dependsOn packageReactNdkLibs
+//    }
+//
+//    clean.dependsOn cleanReactNdkLib
 
     lintOptions {
         abortOnError false
