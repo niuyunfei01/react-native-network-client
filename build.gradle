@@ -24,9 +24,10 @@ allprojects {
         mavenCentral()
         google()
         //All of React Native (JS, Android binaries) is installed from npm
-//        maven {
-//            url "$rootDir/rn/crm/node_modules/react-native/android"
-//        }
+        //第三方库编译的时候需要使用
+        maven {
+            url "$rootDir/rn/crm/node_modules/react-native/android"
+        }
     }
 }
 

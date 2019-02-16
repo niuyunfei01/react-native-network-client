@@ -6,6 +6,10 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+configurations.all {
+    exclude group: 'com.facebook.react', module: 'react-native'
+}
+
 dependencies {
 
     final SUPPER_TOAST_VERSION = '1.3.4@aar'
@@ -191,8 +195,4 @@ android {
         }
 
     }
-}
-
-configurations.all {
-    exclude group: 'com.facebook.react', module: 'react-native'
 }
