@@ -1,5 +1,6 @@
 //include ':customerservsdk', 'CainiaoCRM'
 include 'CainiaoCRM'
+include 'ReactAndroid'
 include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-splash-screen/android')
 include ':react-native-vector-icons'
@@ -8,4 +9,3 @@ include ':react-native-i18n'
 project(':react-native-i18n').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-i18n/android')
 include ':rn-fetch-blob'
 project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/rn-fetch-blob/android')
-include 'ReactAndroid'
