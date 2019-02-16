@@ -23,18 +23,18 @@ const Button = (props) => {
 
 const BadgeTabBar = React.createClass({
   propTypes: {
-    goToPage: React.PropTypes.func,
-    activeTab: React.PropTypes.number,
-    tabs: React.PropTypes.array,
-    backgroundColor: React.PropTypes.string,
-    activeTextColor: React.PropTypes.string,
-    inactiveTextColor: React.PropTypes.string,
+    goToPage: PropTypes.func,
+    activeTab: PropTypes.number,
+    tabs: PropTypes.array,
+    backgroundColor: PropTypes.string,
+    activeTextColor: PropTypes.string,
+    inactiveTextColor: PropTypes.string,
     textStyle: Text.propTypes.style,
     tabStyle: View.propTypes.style,
-    renderTab: React.PropTypes.func,
+    renderTab: PropTypes.func,
     underlineStyle: View.propTypes.style,
-    count: React.PropTypes.object,
-    countIndex: React.PropTypes.array
+    count: PropTypes.object,
+    countIndex: PropTypes.array
   },
 
   getDefaultProps() {

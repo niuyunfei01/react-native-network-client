@@ -1,6 +1,6 @@
 // Usage: <Icon name="icon-name" size={20} color="#4F8EF7" />
 
-import React, { PropTypes } from 'react'
+import React from 'react';import PropTypes from 'prop-types';
 import { Text, StyleSheet } from 'react-native'
 import WeuiIcon from './Weui'
 

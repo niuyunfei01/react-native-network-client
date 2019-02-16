@@ -1,4 +1,5 @@
-import React, {PureComponent, PropTypes} from 'react'
+import React, {PureComponent} from 'react'
+import PropTypes from 'prop-types';
 import {View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native'
 import {List, SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
