@@ -20,7 +20,7 @@
     "numeral": "^2.0.6",
     "prop-types": "^15.6.2",
     "rc-input-number": "^3.6.8",
-    "react": "16.0.0-alpha.12",
+    "react": "16.3.1",
     "react-addons-shallow-compare": "^15.6.0",
     "react-dom": "^16.7.0",
     "react-native": "0.55",
@@ -59,12 +59,12 @@
     "validate.js": "0.10.0"
   },
   "devDependencies": {
-    "babel-jest": "21.0.2",
+    "babel-jest": "24.1.0",
     "babel-plugin-import": "^1.11.0",
     "babel-plugin-transform-remove-console": "^6.9.2",
-    "babel-preset-react-native": "4.0.0",
-    "jest": "21.1.0",
-    "react-test-renderer": "16.0.0-alpha.12"
+    "babel-preset-react-native": "4.0.1",
+    "jest": "24.1.0",
+    "react-test-renderer": "16.3.1"
   },
   "jest": {
     "preset": "react-native"
