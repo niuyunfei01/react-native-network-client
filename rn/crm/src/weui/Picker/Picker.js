@@ -1,6 +1,7 @@
-import React, {Component} from 'react';import PropTypes from 'prop-types';
-import { View, StyleSheet } from 'react-native'
-import { Popup, PopupHeader } from '../Popup'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {View, StyleSheet, ViewPropTypes} from 'react-native'
+import {Popup, PopupHeader} from '../Popup'
 import PickerSection from './PickerSection'
 
 /*
@@ -34,11 +35,11 @@ const styles = StyleSheet.create({
 class Picker extends Component {
   constructor(props) {
     super(props)
-    this.state = { value: props.value }
+    this.state = {value: props.value}
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ value: nextProps.value })
+    this.setState({value: nextProps.value})
   }
 
   render() {
@@ -50,7 +51,7 @@ class Picker extends Component {
       style,
       ...others
     } = this.props
-    let { value } = this.state
+    let {value} = this.state
 
     const cascade = options.filter(item => item.children).length
 
@@ -71,7 +72,7 @@ class Picker extends Component {
         })
       }
 
-      this.setState({ value: result })
+      this.setState({value: result})
     }
 
     // HACK: 设置初始值
@@ -122,7 +123,7 @@ Picker.propTypes = {
   options: PropTypes.array,
   onChange: PropTypes.func,
   onClose: PropTypes.func,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
 }
 
 export default Picker

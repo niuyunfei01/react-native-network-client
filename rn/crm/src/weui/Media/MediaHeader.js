@@ -1,7 +1,9 @@
-import React from 'react';import PropTypes from 'prop-types';
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 import $V from '../variable'
 
@@ -26,7 +28,7 @@ const MediaHeader = (props) => {
 
   const childrenWithProps = React.Children.map(children, child => {
     if (child.type.displayName === 'Image' && !child.props.style) {
-      return React.cloneElement(child, { style: [styles.mediaAppmsgThumb, child.props.style] })
+      return React.cloneElement(child, {style: [styles.mediaAppmsgThumb, child.props.style]})
     }
     return child
   })
@@ -37,7 +39,7 @@ const MediaHeader = (props) => {
 }
 
 MediaHeader.propTypes = {
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
 }
 

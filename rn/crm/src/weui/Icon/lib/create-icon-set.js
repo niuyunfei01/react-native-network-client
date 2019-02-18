@@ -1,4 +1,4 @@
-import React, {  Component} from 'react';const PropTypes = require('prop-types');
+import React, {  Component} from 'react';import PropTypes from 'prop-types';
 
 import {
   NativeModules,

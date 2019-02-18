@@ -1,5 +1,5 @@
 import React from 'react';import PropTypes from 'prop-types';
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, ViewPropTypes, Text } from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -49,7 +49,7 @@ const Badge = ({ dot = false, preset = 'default', style, children, ...others }) 
 Badge.propTypes = {
   dot: PropTypes.bool,
   preset: PropTypes.oneOf(['default', 'header', 'body', 'footer']),
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
 }
 

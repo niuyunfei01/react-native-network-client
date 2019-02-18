@@ -1,6 +1,7 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { View, StyleSheet } from 'react-native'
-import { Icon } from '../Icon'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, StyleSheet, ViewPropTypes} from 'react-native'
+import {Icon} from '../Icon'
 import CellText from './CellText'
 import $V from '../variable'
 
@@ -14,26 +15,28 @@ const styles = StyleSheet.create({
   },
 })
 const CellBody = (props) => {
-  const { error, children, style, ...others } = props
+  const {error, children, style, ...others} = props
   const childrenWithProps = React.Children.map(children, (child) => {
     if (typeof child === 'string') {
       return <CellText style={[error ? styles.error : null]}>{child}</CellText>
     }
-    return React.cloneElement(child, { style: [child.props.style,
-      error ? styles.error : null
-    ] })
+    return React.cloneElement(child, {
+      style: [child.props.style,
+        error ? styles.error : null
+      ]
+    })
   })
   return (
-    <View style={[styles.cellBody, style, error ? { flexDirection: 'row' } : null]} {...others}>
+    <View style={[styles.cellBody, style, error ? {flexDirection: 'row'} : null]} {...others}>
       {childrenWithProps}
-      {error ? <Icon name="warn" /> : false}
+      {error ? <Icon name="warn"/> : false}
     </View>
   )
 }
 CellBody.propTypes = {
   error: PropTypes.bool,
   children: PropTypes.node,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   others: PropTypes.object
 }
 

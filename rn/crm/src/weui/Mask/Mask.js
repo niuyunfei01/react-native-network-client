@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, TouchableWithoutFeedback, View, ViewPropTypes} from 'react-native'
 
 const styles = StyleSheet.create({
   mask: {
@@ -8,10 +9,10 @@ const styles = StyleSheet.create({
   }
 })
 
-const Mask = ({ transparent = false, style, onPress, children }) =>
+const Mask = ({transparent = false, style, onPress, children}) =>
   <TouchableWithoutFeedback onPress={onPress}>
     <View
-      style={[styles.mask, { backgroundColor: transparent ? 'transparent' : 'rgba(0,0,0,.6)' }, style]}
+      style={[styles.mask, {backgroundColor: transparent ? 'transparent' : 'rgba(0,0,0,.6)'}, style]}
     >
       <TouchableWithoutFeedback>{children}</TouchableWithoutFeedback>
     </View>
@@ -19,7 +20,7 @@ const Mask = ({ transparent = false, style, onPress, children }) =>
 
 Mask.propTypes = {
   transparent: PropTypes.bool,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
   onPress: PropTypes.func
 }

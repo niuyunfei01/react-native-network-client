@@ -1,8 +1,9 @@
-import React, {Component} from 'react';import PropTypes from 'prop-types';
-import { StyleSheet, Modal, Dimensions, Animated, View, Text, StatusBar, Easing } from 'react-native'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Modal, Dimensions, Animated, View, Text, StatusBar, Easing, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
-const { width, height } = Dimensions.get('window')
+const {width, height} = Dimensions.get('window')
 const styles = StyleSheet.create({
   toptips: {
     position: 'absolute',
@@ -31,28 +32,28 @@ const styles = StyleSheet.create({
 class Toptips extends Component {
   constructor(props) {
     super(props)
-    this.state = { visible: false, translateY: new Animated.Value(-height) }
+    this.state = {visible: false, translateY: new Animated.Value(-height)}
     this.handleLayout = this.handleLayout.bind(this)
   }
 
   componentWillReceiveProps(nextProp) {
     if (this.props.visible !== nextProp.visible) {
       if (nextProp.visible) {
-        this.setState({ visible: true })
+        this.setState({visible: true})
         return
       }
       Animated.timing(this.state.translateY, {
         toValue: -this.height,
         duration: 150,
         easing: Easing.easeInOut,
-      }).start(() => this.setState({ visible: false }))
+      }).start(() => this.setState({visible: false}))
     }
   }
 
   handleLayout() {
     this.toptips.measure((x, y, w, h) => {
       this.height = h
-      this.setState({ translateY: new Animated.Value(-h) })
+      this.setState({translateY: new Animated.Value(-h)})
       Animated.timing(this.state.translateY, {
         toValue: 0,
         duration: 150,
@@ -62,7 +63,7 @@ class Toptips extends Component {
   }
 
   render() {
-    const { type = 'primary', onShow, onClose, style, textStyle, children } = this.props
+    const {type = 'primary', onShow, onClose, style, textStyle, children} = this.props
 
     return (
       <Modal
@@ -71,14 +72,16 @@ class Toptips extends Component {
         onShow={onShow}
         onRequestClose={onClose}
       >
-        <StatusBar hidden={!false} />
+        <StatusBar hidden={!false}/>
         <Animated.View
           style={[styles.toptips, styles[`${type}Toptips`], style, {
-            transform: [{ translateY: this.state.translateY }]
+            transform: [{translateY: this.state.translateY}]
           }]}
         >
           <View
-            ref={(ref) => { this.toptips = ref }}
+            ref={(ref) => {
+              this.toptips = ref
+            }}
             onLayout={this.handleLayout}
           >
             <Text numberOfLines={2} style={[styles.toptipsText, textStyle]}>{children}</Text>
@@ -94,7 +97,7 @@ Toptips.propTypes = {
   visible: PropTypes.bool,
   onShow: PropTypes.func,
   onClose: PropTypes.func,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node,
 }

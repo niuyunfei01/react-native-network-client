@@ -8,7 +8,7 @@ import CallBtn from './CallBtn'
 import {padNum} from "../../util/common"
 import numeral from "numeral";
 import _ from "lodash"
-const PropTypes = require('prop-types');
+import PropTypes from 'prop-types';
 import Constant from "../../Constat"
 
 class OrderComponent extends PureComponent {

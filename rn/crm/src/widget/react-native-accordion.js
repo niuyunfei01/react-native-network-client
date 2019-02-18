@@ -3,14 +3,9 @@
 import React from 'react';
 import tweenState from 'react-tween-state';
 
-const PropTypes = require('prop-types');
+import PropTypes from 'prop-types';
 
-import {
-  StyleSheet,
-  TouchableHighlight,
-  View,
-  Text
-} from 'react-native';
+import {TouchableHighlight, View} from 'react-native';
 
 export default class Accordion extends React.Component {
 

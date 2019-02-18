@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {View, StyleSheet} from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, StyleSheet, ViewPropTypes} from 'react-native'
 import $V from '../variable'
 
 const styles = StyleSheet.create({
@@ -35,7 +36,7 @@ const CellHeader = (props) => {
 CellHeader.propTypes = {
   error: PropTypes.bool,
   children: PropTypes.node,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   others: PropTypes.object
 }
 

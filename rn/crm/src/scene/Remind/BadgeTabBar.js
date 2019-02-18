@@ -1,19 +1,17 @@
 import pxToDp from "../../util/pxToDp";
+import React from 'react'
+import ReactNative from 'react-native'
 
-const React = require('react');
-const ReactNative = require('react-native');
-
+const {Component} = React;
 import IconBadge from '../../widget/IconBadge';
-import utils from '../../util/common'
-
-const PropTypes = require('prop-types');
+import PropTypes from 'prop-types';
 
 const {
   StyleSheet,
   Text,
   View,
-  Animated,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewPropTypes
 } = ReactNative;
 
 const Button = (props) => {
@@ -23,7 +21,12 @@ const Button = (props) => {
 };
 
 
-export default class BadgeTabBar extends React.Component{
+export default class BadgeTabBar extends Component {
+
+  constructor(props) {
+    super(props)
+  }
+
   static propTypes = {
     goToPage: PropTypes.func,
     activeTab: PropTypes.number,
@@ -32,23 +35,21 @@ export default class BadgeTabBar extends React.Component{
     activeTextColor: PropTypes.string,
     inactiveTextColor: PropTypes.string,
     textStyle: Text.propTypes.style,
-    tabStyle: View.propTypes.style,
+    tabStyle: ViewPropTypes.style,
     renderTab: PropTypes.func,
-    underlineStyle: View.propTypes.style,
+    underlineStyle: ViewPropTypes.style,
     count: PropTypes.object,
     countIndex: PropTypes.array
   }
 
   static defaultProps = {
-      activeTextColor: 'navy',
-      inactiveTextColor: 'black',
-      backgroundColor: null,
-  }
-
-  renderTabOption(name, page) {
+    activeTextColor: 'navy',
+    inactiveTextColor: 'black',
+    backgroundColor: null,
   }
 
   renderTab(name, page, isTabActive, onPressHandler) {
+    console.log('render tab ', this)
     const {activeTextColor, inactiveTextColor, textStyle, count, countIndex} = this.props;
     const textColor = isTabActive ? activeTextColor : inactiveTextColor;
     const fontWeight = isTabActive ? 'bold' : 'normal';
@@ -74,7 +75,7 @@ export default class BadgeTabBar extends React.Component{
           </View>
         }
         BadgeElement={
-          <Text style={{color: '#FFFFFF',fontSize:pxToDp(18)}}>{quick >99 ? '99+':quick}</Text>
+          <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
         }
         MainViewStyle={
           [styles.flexOne]
@@ -88,8 +89,9 @@ export default class BadgeTabBar extends React.Component{
   }
 
   render() {
-    const containerWidth = this.props.containerWidth;
-    const numberOfTabs = this.props.tabs.length;
+    let _this = this;
+    const containerWidth = _this.props.containerWidth;
+    const numberOfTabs = _this.props.tabs.length;
     const tabUnderlineStyle = {
       position: 'absolute',
       width: containerWidth / numberOfTabs,
@@ -102,13 +104,13 @@ export default class BadgeTabBar extends React.Component{
       inputRange: [0, 1,], outputRange: [0, containerWidth / numberOfTabs,],
     });
     return (
-      <View style={[styles.tabs, {backgroundColor: this.props.backgroundColor,}, this.props.style,]}>
+      <View style={[styles.tabs, {backgroundColor: _this.props.backgroundColor,}, _this.props.style,]}>
         {this.props.tabs.map((name, page) => {
-          const isTabActive = this.props.activeTab === page;
-          const renderTab = this.props.renderTab || this.renderTab;
-          return renderTab(name, page, isTabActive, this.props.goToPage);
+          const isTabActive = _this.props.activeTab === page;
+          const renderTab = _this.props.renderTab || _this.renderTab;
+          return renderTab(name, page, isTabActive, _this.props.goToPage);
         })}
-        <Animated.View style={[tabUnderlineStyle, {left,}, this.props.underlineStyle,]}/>
+        <Animated.View style={[tabUnderlineStyle, {left,}, _this.props.underlineStyle,]}/>
       </View>
     );
   }

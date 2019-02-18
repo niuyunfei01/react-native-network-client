@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import pick from 'lodash/pick';
 
-import React, {  Component} from 'react';const PropTypes = require('prop-types');
+import React, {  Component} from 'react';import PropTypes from 'prop-types';
 
 import {
   ToolbarAndroid,

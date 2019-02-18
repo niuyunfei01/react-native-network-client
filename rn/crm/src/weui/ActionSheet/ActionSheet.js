@@ -1,4 +1,5 @@
-import React, {Component} from 'react';import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   Modal,
   View,
@@ -8,6 +9,7 @@ import {
   Easing,
   StyleSheet,
   Dimensions,
+  ViewPropTypes
 } from 'react-native'
 import $V from '../variable'
 
@@ -208,8 +210,8 @@ ActionSheet.propTypes = {
   onShow: PropTypes.func,
   onRequestClose: PropTypes.func,
   duration: PropTypes.number,
-  style: View.propTypes.style,
-  wrapperStyle: View.propTypes.style,
+  style: ViewPropTypes.style,
+  wrapperStyle: ViewPropTypes.style,
   children: PropTypes.node
 }
 

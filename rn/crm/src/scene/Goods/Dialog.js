@@ -1,4 +1,5 @@
-import React, {Component} from 'react';import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   Modal,
   View,
@@ -8,6 +9,7 @@ import {
   Animated,
   Easing,
   Dimensions,
+  ViewPropTypes
 } from 'react-native'
 import StyleSheet from '../../weui/StyleSheet'
 import $V from '../../weui/variable'
@@ -274,13 +276,13 @@ Dialog.propTypes = {
   onShow: PropTypes.func,
   duration: PropTypes.number,
   onRequestClose: PropTypes.func,
-  style: View.propTypes.style,
-  wrapperStyle: View.propTypes.style,
-  headerStyle: View.propTypes.style,
+  style: ViewPropTypes.style,
+  wrapperStyle: ViewPropTypes.style,
+  headerStyle: ViewPropTypes.style,
   titleStyle: Text.propTypes.style,
-  bodyStyle: View.propTypes.style,
+  bodyStyle: ViewPropTypes.style,
   bodyTextStyle: Text.propTypes.style,
-  footerStyle: View.propTypes.style,
+  footerStyle: ViewPropTypes.style,
   children: PropTypes.node
 }
 

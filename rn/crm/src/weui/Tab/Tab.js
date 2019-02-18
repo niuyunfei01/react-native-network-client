@@ -1,5 +1,6 @@
 // notice: Tab 不能有外层容器，否则不支持手势滑动
-import React from 'react';import PropTypes from 'prop-types';
+import React from 'react';
+import PropTypes from 'prop-types';
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 import NavBar from './NavBar'
 
@@ -29,7 +30,7 @@ const Tab = (props) => {
             paddingLeft: 20,
             paddingRight: 20,
           }}
-          textStyle={{ fontSize: 15 }}
+          textStyle={{fontSize: 15}}
         />)}
     >
       {children}

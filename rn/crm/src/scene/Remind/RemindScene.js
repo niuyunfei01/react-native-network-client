@@ -455,7 +455,7 @@ class RemindScene extends PureComponent {
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeIds}/>}
+          renderTabBar={() => (<BadgeTabBar activeTextColor={"navy"} inactiveTextColor={"black"} count={remindCount} countIndex={_typeIds}/>)}
           locked={true || remind.processing || this.state.scrollLocking}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}

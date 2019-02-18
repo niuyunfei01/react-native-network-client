@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, RefreshControl, ListView, ActivityIndicator, TouchableOpacity } from 'react-native'
 import RefreshState from './RefreshState'
-const PropTypes = require('prop-types');
+import PropTypes from 'prop-types';
 
 // create a component
 class RefreshListView extends PureComponent {
