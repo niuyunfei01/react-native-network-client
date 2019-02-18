@@ -11,7 +11,8 @@ const {
   Text,
   View,
   TouchableOpacity,
-  ViewPropTypes
+  ViewPropTypes,
+  Animated
 } = ReactNative;
 
 const Button = (props) => {
@@ -48,9 +49,8 @@ export default class BadgeTabBar extends Component {
     backgroundColor: null,
   }
 
-  renderTab(name, page, isTabActive, onPressHandler) {
-    console.log('render tab ', this)
-    const {activeTextColor, inactiveTextColor, textStyle, count, countIndex} = this.props;
+  renderTab(name, page, isTabActive, onPressHandler, props) {
+    const {activeTextColor, inactiveTextColor, textStyle, count, countIndex, tabStyle} = props;
     const textColor = isTabActive ? activeTextColor : inactiveTextColor;
     const fontWeight = isTabActive ? 'bold' : 'normal';
     let indexKey = countIndex[page];
@@ -59,6 +59,7 @@ export default class BadgeTabBar extends Component {
     let total = !countData ? 0 : countData['total'];
     let quick = !countData ? 0 : countData['quick'];
     let label = total == 0 ? name : name + "(" + total + ")";
+
     return <Button
       style={styles.flexOne}
       key={indexKey}
@@ -68,7 +69,7 @@ export default class BadgeTabBar extends Component {
       onPress={() => onPressHandler(page)}>
       <IconBadge
         MainElement={
-          <View style={[styles.tab, this.props.tabStyle,]}>
+          <View style={[styles.tab, tabStyle,]}>
             <Text style={[{color: textColor, fontWeight,}, textStyle,]}>
               {label}
             </Text>
@@ -100,19 +101,27 @@ export default class BadgeTabBar extends Component {
       bottom: 0,
     };
 
-    const left = this.props.scrollValue.interpolate({
-      inputRange: [0, 1,], outputRange: [0, containerWidth / numberOfTabs,],
-    });
+    // const left = _this.props.scrollValue.interpolate({
+    //   inputRange: [0, 1,], outputRange: [0, containerWidth / numberOfTabs,],
+    // });
     return (
       <View style={[styles.tabs, {backgroundColor: _this.props.backgroundColor,}, _this.props.style,]}>
-        {this.props.tabs.map((name, page) => {
-          const isTabActive = _this.props.activeTab === page;
-          const renderTab = _this.props.renderTab || _this.renderTab;
-          return renderTab(name, page, isTabActive, _this.props.goToPage);
-        })}
-        <Animated.View style={[tabUnderlineStyle, {left,}, _this.props.underlineStyle,]}/>
+        {_this.renderTabs()}
+        <Animated.View style={[tabUnderlineStyle, {}, _this.props.underlineStyle,]}/>
       </View>
     );
+  }
+
+  renderTabs() {
+    let _this = this
+    let tabs = [];
+    let propTabs = this.props.tabs;
+    propTabs.map((name, page) => {
+      const isTabActive = _this.props.activeTab === page;
+      const renderTab = _this.props.renderTab || _this.renderTab;
+      tabs.push(renderTab(name, page, isTabActive, _this.props.goToPage, _this.props));
+    })
+    return tabs;
   }
 }
 
