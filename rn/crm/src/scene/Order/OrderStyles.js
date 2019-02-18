@@ -122,6 +122,12 @@ const styles = StyleSheet.create({
     width: pxToDp(25),
     fontSize: pxToDp(20),
     textAlign: 'center'
+  },
+  goodsItem:{
+    paddingTop: pxToDp(14),
+    paddingBottom: pxToDp(14),
+    borderBottomColor: colors.color999,
+    borderBottomWidth: screen.onePixel
   }
 });
 

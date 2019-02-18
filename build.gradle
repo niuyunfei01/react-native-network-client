@@ -2,10 +2,13 @@
 
 buildscript {
     repositories {
-        jcenter()
+//        jcenter()
+//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+//        maven { url 'https://dl.google.com/dl/android/maven2' }
+//        google()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url 'https://dl.google.com/dl/android/maven2' }
-        google()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0'
@@ -18,9 +21,12 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
-        mavenCentral()
-        google()
+//        jcenter()
+//        mavenCentral()
+//        google()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
         maven {
             // All of React Native (JS, Android binaries) is installed from npm
             url "$rootDir/rn/crm/node_modules/react-native/android"

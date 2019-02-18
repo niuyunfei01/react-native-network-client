@@ -1749,7 +1749,14 @@ class OrderScene extends Component {
               />
             );
           })}
-          
+
+          <If condition={order.largess}>
+            <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12),justifyContent:'space-between'},styles.goodsItem]}>
+                <Text style={[styles.moneyListTitle]}>赠品信息</Text>
+                <Text style={styles.moneyListNum}>{order.largess}</Text>
+            </View>
+          </If>
+
           {!this.state.itemsHided && this.state.isEditing &&
           <View style={[styles.row, {
             height: pxToDp(100),
