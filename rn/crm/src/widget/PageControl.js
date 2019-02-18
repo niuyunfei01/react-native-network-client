@@ -10,6 +10,7 @@
 import React, { PureComponent } from 'react'
 import { View, StyleSheet, TouchableWithoutFeedback } from 'react-native'
 import assign from 'object-assign';
+const PropTypes = require('prop-types');
 
 class PageControl extends PureComponent {
 

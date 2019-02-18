@@ -277,7 +277,7 @@ public class GlobalCtx extends Application {
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(this)
                 .setBundleAssetName("index.android.bundle")
-                .setJSMainModulePath("index.android")
+                .setJSMainModulePath("index")
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())

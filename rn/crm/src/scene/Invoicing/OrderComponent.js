@@ -1,4 +1,4 @@
-import React, {PropTypes, PureComponent} from 'react';
+import React, {PureComponent} from 'react';
 import pxToDp from "../../util/pxToDp";
 import font from "./fontStyles";
 import colors from "../../styles/colors";
@@ -8,7 +8,7 @@ import CallBtn from './CallBtn'
 import {padNum} from "../../util/common"
 import numeral from "numeral";
 import _ from "lodash"
-
+const PropTypes = require('prop-types');
 import Constant from "../../Constat"
 
 class OrderComponent extends PureComponent {

@@ -23,7 +23,7 @@ const Button = (props) => {
 };
 
 
-exports default class BadgeTabBar extends React.Component{
+export default class BadgeTabBar extends React.Component{
   static propTypes = {
     goToPage: PropTypes.func,
     activeTab: PropTypes.number,
@@ -37,16 +37,16 @@ exports default class BadgeTabBar extends React.Component{
     underlineStyle: View.propTypes.style,
     count: PropTypes.object,
     countIndex: PropTypes.array
-  },
+  }
 
   static defaultProps = {
       activeTextColor: 'navy',
       inactiveTextColor: 'black',
       backgroundColor: null,
-  },
+  }
 
   renderTabOption(name, page) {
-  },
+  }
 
   renderTab(name, page, isTabActive, onPressHandler) {
     const {activeTextColor, inactiveTextColor, textStyle, count, countIndex} = this.props;
@@ -85,7 +85,7 @@ exports default class BadgeTabBar extends React.Component{
         }
       />
     </Button>
-  },
+  }
 
   render() {
     const containerWidth = this.props.containerWidth;
@@ -111,8 +111,8 @@ exports default class BadgeTabBar extends React.Component{
         <Animated.View style={[tabUnderlineStyle, {left,}, this.props.underlineStyle,]}/>
       </View>
     );
-  },
-});
+  }
+}
 
 const styles = StyleSheet.create({
   tab: {
