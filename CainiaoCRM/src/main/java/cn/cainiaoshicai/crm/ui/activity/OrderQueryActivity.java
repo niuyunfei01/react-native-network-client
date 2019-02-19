@@ -138,8 +138,11 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 public void done(OrderContainer value, String error) {
                     if (value != null) {
                         OrderQueryActivity.this.data.clear();
-                        OrderQueryActivity.this.data.addAll(value.getOrders());
-                        adapter.notifyDataSetChanged();
+                        ArrayList<Order> orders = value.getOrders();
+                        if(orders!=null&&orders.size() > 0){
+                            OrderQueryActivity.this.data.addAll(value.getOrders());
+                            adapter.notifyDataSetChanged();
+                        }
                     }
                 }
             };

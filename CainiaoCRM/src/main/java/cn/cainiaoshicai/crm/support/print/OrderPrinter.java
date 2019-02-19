@@ -47,12 +47,17 @@ public class OrderPrinter {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
+                    final boolean supportSunMiPrinter = supportSunMiPrinter();
                     final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
                     final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                    if (order != null && order.getPrint_times() == 0) {
-                        PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                    if (supportSunMiPrinter) {
+                        smPrintOrder(order);
                     } else {
-                        AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                        if (order != null && order.getPrint_times() == 0) {
+                            PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                        } else {
+                            AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                        }
                     }
                 } catch (Exception e) {
                     Log.e("auto print order error", e);
@@ -551,7 +556,7 @@ public class OrderPrinter {
                             }
                         } else if (supportSunMiPrinter) {
                             try {
-                                OrderPrinter.smPrintOrder(order);
+                                smPrintOrder(order);
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);
