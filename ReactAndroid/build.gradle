@@ -233,7 +233,7 @@ task packageReactNdkLibsForBuck(dependsOn: packageReactNdkLibs, type: Copy) {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '28.0.2'
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         minSdkVersion 16
@@ -261,7 +261,6 @@ android {
             exclude 'com/facebook/react/module/processing'
         }
     }
-
 
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn packageReactNdkLibs
@@ -299,7 +298,7 @@ dependencies {
     testCompile "org.mockito:mockito-core:${MOCKITO_CORE_VERSION}"
     testCompile "org.easytesting:fest-assert-core:${FEST_ASSERT_CORE_VERSION}"
     testCompile "org.robolectric:robolectric:${ROBOLECTRIC_VERSION}"
-
+    
     androidTestCompile fileTree(dir: 'src/main/third-party/java/buck-android-support/', include: ['*.jar'])
     androidTestCompile 'com.android.support.test:runner:0.3'
     androidTestCompile "org.mockito:mockito-core:${MOCKITO_CORE_VERSION}"
