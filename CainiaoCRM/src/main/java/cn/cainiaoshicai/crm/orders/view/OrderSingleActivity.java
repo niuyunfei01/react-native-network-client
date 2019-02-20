@@ -525,12 +525,11 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
     protected void connectAndPrint(final int platform, final String platformOid) {
         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-        if(ds == null || ds.getSocket() == null || !ds.isConnected()){
+        if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
             Intent BTIntent = new Intent(this, SettingsPrintActivity.class);
             this.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
-        }
-        else{
-            new MyAsyncTask<Void,Order, Boolean>(){
+        } else {
+            new MyAsyncTask<Void, Order, Boolean>() {
                 private String error;
                 private boolean gotoConnecting = false;
                 OrderSingleActivity context = OrderSingleActivity.this;
@@ -550,7 +549,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                         } catch (Exception e) {
                             this.error = "打印错误: 请重新连接打印机";
                             gotoConnecting = true;
-                            if (e instanceof IOException) {
+                            if ((e instanceof IOException) && ds != null) {
                                 ds.closeSocket();
                             }
                             return false;

@@ -394,6 +394,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 //手机要地理位置权限
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
                 }
                 final Long signInStore = SettingUtility.getSignInStore();
                 final Integer signInStatus = SettingUtility.getSignInStatus();
