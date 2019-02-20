@@ -55,6 +55,7 @@ import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import {getWithTpl, getWithTpl2} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
+import Refund from "./_OrderScene/Refund";
 
 const numeral = require('numeral');
 
@@ -335,8 +336,8 @@ class OrderScene extends Component {
     
     this._navSetParams();
   };
-
-  onPrint() {
+  
+  onPrint () {
     const order = this.props.order.order
     if (order) {
       const store = tool.store(order.store_id, this.props.global)
@@ -565,8 +566,8 @@ class OrderScene extends Component {
   _doSaveItemsCancel () {
     this.setState({isEditing: false})
   }
-
-  _openAddGood() {
+  
+  _openAddGood () {
     const {navigation} = this.props;
     const order = this.props.order.order;
     const params = {
@@ -673,8 +674,8 @@ class OrderScene extends Component {
     const {order} = this.props.order;
     this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
   }
-
-  toMap() {
+  
+  toMap () {
     const {order} = this.props.order;
     if (order) {
       const validPoi = order.gd_lng && order.gd_lat;
@@ -724,8 +725,8 @@ class OrderScene extends Component {
       this.setState({errorHints: '暂不支持该处理类型'})
     }
   }
-
-  _fnProvidingOnway() {
+  
+  _fnProvidingOnway () {
     const {order, global} = this.props;
     const storeId = (order.order || {}).store_id;
     return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
@@ -1749,14 +1750,7 @@ class OrderScene extends Component {
               />
             );
           })}
-
-          <If condition={order.largess}>
-            <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12),justifyContent:'space-between'},styles.goodsItem]}>
-                <Text style={[styles.moneyListTitle]}>赠品信息</Text>
-                <Text style={styles.moneyListNum}>{order.largess}</Text>
-            </View>
-          </If>
-
+          
           {!this.state.itemsHided && this.state.isEditing &&
           <View style={[styles.row, {
             height: pxToDp(100),
@@ -1852,6 +1846,14 @@ class OrderScene extends Component {
             </View>
           </If>
         </View>
+        
+        <Refund
+          orderId={order.id}
+          platform={order.platform}
+          isFnPriceControl={order.is_fn_price_controlled}
+          isServiceMgr={isServiceMgr}
+        />
+        
         <View>
           <View style={[CommonStyle.topBottomLine, styles.block]}>
             <View style={[styles.row, {
