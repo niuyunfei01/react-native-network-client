@@ -85,6 +85,7 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         //6.0以上的手机要地理位置权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
         }
     }
 
