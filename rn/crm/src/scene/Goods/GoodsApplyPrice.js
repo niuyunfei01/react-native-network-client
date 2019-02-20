@@ -157,34 +157,35 @@ class GoodsApplyPrice extends Component {
   render () {
     return (
       <View style={{flex: 1}}>
-        <GoodsBaseItem
-          wmText={'美团价'}
-          name={this.state.product.name}
-          wmPrice={this.state.product.waimai_product.price}
-          image={this.state.product.listimg}
-          showWmTip={true}
-          newPrice={this.state.wmPrice}
-          remark={'(含平台费，活动费，耗材费，运营费用等)'}
-        />
-        
-        <InputPrice
-          mode={this.state.mode}
-          showModeName={false}
-          referPrice={this.state.refer_price}
-          priceRatio={this.state.price_ratio}
-          style={{marginTop: pxToDp(10)}}
-          initPrice={String(this.state.product.store_product.supply_price)}
-          onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
-          showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
-          onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
-        />
-        
-        <View style={{flex: 1}}>
-          <View>
-            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
-          </View>
-          <If condition={this.state.trade_products.length > 0}>
-            <ScrollView style={styles.scroll_view}>
+        <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
+          <GoodsBaseItem
+            wmText={'美团价'}
+            name={this.state.product.name}
+            wmPrice={this.state.product.waimai_product.price}
+            image={this.state.product.listimg}
+            showWmTip={true}
+            newPrice={this.state.wmPrice}
+            remark={'(含平台费，活动费，耗材费，运营费用等)'}
+          />
+          
+          <InputPrice
+            mode={this.state.mode}
+            showModeName={false}
+            referPrice={this.state.refer_price}
+            priceRatio={this.state.price_ratio}
+            style={{marginTop: pxToDp(10)}}
+            initPrice={String(this.state.product.store_product.supply_price)}
+            onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
+            showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
+            onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
+          />
+          
+          <View style={{flex: 1}}>
+            <View>
+              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+            </View>
+            <If condition={this.state.trade_products.length > 0}>
+              {/*<ScrollView style={styles.scroll_view}>*/}
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
@@ -197,14 +198,15 @@ class GoodsApplyPrice extends Component {
                   record={item.month_sales}
                 />
               </For>
-            </ScrollView>
-          </If>
-          <If condition={this.state.trade_products.length == 0}>
-            <View style={styles.no_prod_tip}>
-              <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
-            </View>
-          </If>
-        </View>
+              {/*</ScrollView>*/}
+            </If>
+            <If condition={this.state.trade_products.length == 0}>
+              <View style={styles.no_prod_tip}>
+                <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
+              </View>
+            </If>
+          </View>
+        </ScrollView>
         
         <View style={[styles.bottom_box]}>
           <TouchableOpacity onPress={() => this.onSave()}>
