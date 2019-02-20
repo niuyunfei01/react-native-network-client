@@ -55,6 +55,7 @@ import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import {getWithTpl, getWithTpl2} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
+import Refund from "./_OrderScene/Refund";
 
 const numeral = require('numeral');
 
@@ -1727,6 +1728,7 @@ class OrderScene extends Component {
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
+                fnShowWmPrice={order.is_fn_show_wm_price}
                 fnPriceControlled={order.is_fn_price_controlled}
                 isServiceMgr={isServiceMgr}
               />
@@ -1742,13 +1744,13 @@ class OrderScene extends Component {
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
+                fnShowWmPrice={order.is_fn_show_wm_price}
                 fnPriceControlled={order.is_fn_price_controlled}
                 isServiceMgr={isServiceMgr}
               />
             );
           })}
-
-
+          
           {!this.state.itemsHided && this.state.isEditing &&
           <View style={[styles.row, {
             height: pxToDp(100),
@@ -1761,18 +1763,18 @@ class OrderScene extends Component {
             <ImageBtn source={require('../../img/Order/good/jiahuo_.png')}
                       imageStyle={{width: pxToDp(70), height: pxToDp(70)}} onPress={this._openAddGood}/>
           </View>}
-          
-          {/*托管店才显示 供货价小计*/}
-          <If condition={order.is_fn_price_controlled}>
+          {order.is_fn_price_controlled ?
             <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
                 <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
               </View>
               <View style={{flex: 1}}/>
-              <Text style={styles.moneyListNum}>{numeral(order.supply_price / 100).format('0.00')}</Text>
+              {/*直营店显示外卖价，管理员显示保底价，非直营店根据模式显示*/}
+              <Text style={styles.moneyListNum}>
+                {!isServiceMgr && order.is_fn_show_wm_price ? numeral(order.wm_price).format('0.00') : numeral(order.supply_price / 100).format('0.00')}
+              </Text>
             </View>
-          </If>
-          
+            : null}
           {/*管理员 和 直营店 可看*/}
           <If condition={isServiceMgr || !order.is_fn_price_controlled}>
             <View style={[styles.row, styles.moneyRow]}>
@@ -1844,6 +1846,14 @@ class OrderScene extends Component {
             </View>
           </If>
         </View>
+        
+        <Refund
+          orderId={order.id}
+          platform={order.platform}
+          isFnPriceControl={order.is_fn_price_controlled}
+          isServiceMgr={isServiceMgr}
+        />
+        
         <View>
           <View style={[CommonStyle.topBottomLine, styles.block]}>
             <View style={[styles.row, {
@@ -2005,7 +2015,7 @@ class ItemRow extends PureComponent {
   render () {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
-      }, isEditing = false, nav, fnPriceControlled, isServiceMgr = false
+      }, isEditing = false, nav, fnShowWmPrice, fnPriceControlled, isServiceMgr = false
     } = this.props;
     
     if (item.crm_order_detail_hide) {
@@ -2046,38 +2056,41 @@ class ItemRow extends PureComponent {
             <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id})</Text>
           </Text>
           
-          
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            {/*管理员看到的*/}
-            <If condition={isServiceMgr}>
-              <Text style={styles.priceMode}>保</Text>
-              <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
-              <View style={{marginLeft: 30}}/>
-              <Text style={styles.priceMode}>外</Text>
-              <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
-            </If>
-            {/*商户看到的*/}
-            <If condition={!isServiceMgr}>
-              {/*保底模式*/}
-              <If condition={fnPriceControlled}>
+          {/*非直营店*/}
+          <If condition={fnPriceControlled}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              {/*管理员看到的*/}
+              <If condition={isServiceMgr}>
                 <Text style={styles.priceMode}>保</Text>
                 <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
-                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
-                  总价 {numeral(item.supply_price / 100 * item.num).format('0.00')}
-                </Text>
-              </If>
-              {/*联营模式*/}
-              <If condition={!fnPriceControlled}>
+                <View style={{marginLeft: 30}}/>
                 <Text style={styles.priceMode}>外</Text>
                 <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
-                <If condition={!isAdd}>
-                  <Text style={{color: '#f9b5b2', marginLeft: 30}}>
-                    总价 {numeral(item.price * item.num).format('0.00')}
-                  </Text>
-                </If>
               </If>
-            </If>
-          </View>
+              {/*商户看到的*/}
+              <If condition={!isServiceMgr}>
+                <Text style={styles.priceMode}>{fnShowWmPrice ? '外' : '保'}</Text>
+                <Text style={{color: '#f44140'}}>
+                  {fnShowWmPrice ? numeral(item.price).format('0.00') : numeral(item.supply_price / 100).format('0.00')}
+                </Text>
+                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
+                  总价 {fnShowWmPrice ? numeral(item.price * item.num).format('0.00') : numeral(item.supply_price * item.num).format('0.00')}
+                </Text>
+              </If>
+            </View>
+          </If>
+          
+          {/*直营店*/}
+          <If condition={!fnPriceControlled}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+              <If condition={!isAdd}>
+                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
+                  总价 {numeral(item.price * item.num).format('0.00')}
+                </Text>
+              </If>
+            </View>
+          </If>
         </View>
       
       </View>
@@ -2141,7 +2154,8 @@ ItemRow.PropTypes = {
   isAdd: PropTypes.bool,
   edits: PropTypes.object,
   onInputNumberChange: PropTypes.func,
-  nav: PropTypes.object
+  nav: PropTypes.object,
+  fnShowWmPrice: PropTypes.bool
 };
 
 class Remark
