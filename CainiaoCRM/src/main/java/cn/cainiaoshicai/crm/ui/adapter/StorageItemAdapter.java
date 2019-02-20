@@ -46,11 +46,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         this.context = context;
     }
 
-    @Override
-    public int getCount(){
-        return backendData!=null ? backendData.size() : 0;
-    }
-
     public Store getStore() {
         return store;
     }
@@ -120,7 +115,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             }
             holder.salePrice.setVisibility(View.INVISIBLE);
             holder.supplyPrice.setText(item.getSupplyPricePrecision());
-            if (item.getApplyingPrice() > 0) {
+            if (item.getApplyingPrice() > 0 && !GlobalCtx.app().isDirectVendor()) {
                 holder.applyingPrice.setVisibility(View.VISIBLE);
                 holder.applyingPrice.setText(item.getApplyingPricePrecision());
             } else {
