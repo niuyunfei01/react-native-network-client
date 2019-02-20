@@ -825,6 +825,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public boolean onContextItemSelected(MenuItem mi) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) mi.getMenuInfo();
         AppLogger.d("reset storage item pos=" + info.position);
+        if (info.position >= this.listAdapter.getCount()) {
+            return false;
+        }
         final StorageItem item = this.listAdapter.getItem(info.position);
         final GlobalCtx app = GlobalCtx.app();
         ItemStatusUpdated changed = new ItemStatusUpdated(this);
