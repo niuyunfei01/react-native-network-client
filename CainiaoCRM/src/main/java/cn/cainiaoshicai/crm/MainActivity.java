@@ -139,7 +139,8 @@ public class MainActivity extends AbstractActionBarActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(POSITION, tabLayout.getSelectedTabPosition());
+        if (tabLayout != null)
+            outState.putInt(POSITION, tabLayout.getSelectedTabPosition());
     }
 
     @Override

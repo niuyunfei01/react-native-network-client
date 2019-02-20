@@ -530,6 +530,8 @@ public class GlobalCtx extends Application {
             String id = SettingUtility.getDefaultAccountId();
             if (!TextUtils.isEmpty(id)) {
                 accountBean = AccountDBTask.getAccount(id);
+            } else {
+                startActivity(LoginActivity.newIntent());
             }
         }
 

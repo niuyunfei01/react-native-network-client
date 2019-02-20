@@ -1,7 +1,6 @@
 package cn.cainiaoshicai.crm.ui.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -26,28 +25,22 @@ import android.widget.Toast;
 
 import com.xdandroid.hellodaemon.IntentWrapper;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.bt.BluetoothActivity;
 import cn.cainiaoshicai.crm.bt.BluetoothController;
-import cn.cainiaoshicai.crm.bt.BtService;
-import cn.cainiaoshicai.crm.bt.BtUtil;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.support.print.BluetoothConnector;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
@@ -151,7 +144,6 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         printerStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
                 if (!GlobalCtx.app().isConnectPrinter()) {
                     AppLogger.e("skip to print for printer is not connected!");
                 }
