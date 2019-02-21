@@ -1245,19 +1245,20 @@ const header_styles = StyleSheet.create({
     marginBottom: pxToDp(14)
   },
   main_box: {
+    marginTop: pxToDp(15),
     marginRight: pxToDp(134),
     height: pxToDp(170)
   },
   shop_name: {
     color: colors.title_color,
-    fontSize: pxToDp(36),
+    fontSize: pxToDp(30),
     fontWeight: "bold",
     marginVertical: pxToDp(30),
     lineHeight: pxToDp(36)
   },
   change_shop: {
     color: colors.main_color,
-    fontSize: pxToDp(34),
+    fontSize: pxToDp(30),
     fontWeight: "bold",
     lineHeight: pxToDp(35)
   },
