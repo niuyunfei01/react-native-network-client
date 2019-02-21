@@ -215,7 +215,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
         Store store = GlobalCtx.app().findStore(store_id);
         BottomBar bottomBar = findViewById(R.id.toolbar_bottom);
-        if (store != null && store.getType() == Cts.STORE_VENDOR_BLX) {
+        if (store != null && (store.getType() == Cts.STORE_VENDOR_BLX || store.getType() == Cts.STORE_VENDOR_CN) && store.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES) {
             bottomBar.setItems(R.xml.bottombar_with_op_tabs);
         }
         //初始化
