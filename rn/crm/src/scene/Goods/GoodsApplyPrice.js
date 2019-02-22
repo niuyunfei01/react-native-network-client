@@ -14,6 +14,7 @@ import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import Cts from "../../Cts";
+import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";
 
 
 function mapStateToProps (state) {
@@ -181,15 +182,23 @@ class GoodsApplyPrice extends Component {
           />
           
           <View style={{flex: 1}}>
-            <View>
+            <View style={styles.tradeTitleRow}>
               <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+              <If condition={this.state.trade_products.length > 0}>
+                <ReportErrorDialog
+                  storeId={this.state.store_id}
+                  productId={this.state.product_id}
+                  productImg={this.state.product.listimg}
+                  productName={this.state.product.name}
+                />
+              </If>
             </View>
             <If condition={this.state.trade_products.length > 0}>
               {/*<ScrollView style={styles.scroll_view}>*/}
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
-                  style={{marginTop: pxToDp(10)}}
+                  style={{marginBottom: pxToDp(10)}}
                   image={item.img}
                   name={item.original_name}
                   price={item.price}
@@ -222,6 +231,8 @@ class GoodsApplyPrice extends Component {
           text={this.state.resultMsg}
           onPress={() => this.setState({resultDialog: false})}
         />
+      
+      
       </View>
     )
   }
@@ -232,9 +243,14 @@ const styles = StyleSheet.create({
     marginBottom: pxToDp(110),
     flex: 1
   },
+  tradeTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: pxToDp(20),
+    height: pxToDp(60)
+  },
   trade_title: {
-    marginLeft: pxToDp(10),
-    marginTop: pxToDp(10),
     fontSize: pxToDp(28),
     color: '#a3a3a3'
   },
