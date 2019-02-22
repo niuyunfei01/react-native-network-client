@@ -73,6 +73,12 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         Bundle init = new Bundle();
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
+        AccountBean ab = GlobalCtx.app().getAccountBean();
+        if (ab != null && ab.getInfo() != null) {
+            init.putBundle("userProfile", ab.getInfo().toBundle());
+        } else {
+            toRoute = "Login";
+        }
         if ("Login".equals(toRoute)) {
             SplashScreen.show(this);
         }
@@ -97,11 +103,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             if (TextUtils.isEmpty(toRoute)) {
                 toRoute = "GoodsDetail";
             }
-        }
-
-        AccountBean ab = GlobalCtx.app().getAccountBean();
-        if (ab != null && ab.getInfo() != null) {
-            init.putBundle("userProfile", ab.getInfo().toBundle());
         }
 
         Collection<Store> stores = GlobalCtx.app().listStores();
