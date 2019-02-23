@@ -1771,7 +1771,8 @@ class OrderScene extends Component {
               <View style={{flex: 1}}/>
               {/*直营店显示外卖价，管理员显示保底价，非直营店根据模式显示*/}
               <Text style={styles.moneyListNum}>
-                {!isServiceMgr && order.is_fn_show_wm_price ? numeral(order.wm_price).format('0.00') : numeral(order.supply_price / 100).format('0.00')}
+                {/*直接显示保底价总计*/}
+                {numeral(order.supply_price / 100).format('0.00')}
               </Text>
             </View>
             : null}
