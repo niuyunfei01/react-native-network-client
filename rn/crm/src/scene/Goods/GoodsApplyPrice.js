@@ -38,7 +38,14 @@ class GoodsApplyPrice extends Component {
             marginLeft: pxToDp(31),
             marginTop: pxToDp(20)
           }}
-          onPress={() => navigation.state.params.onBack()}
+          onPress={() => {
+            let from = navigation.state.params.from;
+            if ('native' == from) {
+              native.nativeBack();
+            } else {
+              navigation.goBack();
+            }
+          }}
         />
       )
     }
@@ -80,7 +87,6 @@ class GoodsApplyPrice extends Component {
   
   componentDidMount () {
     this.fetchData()
-    this.props.navigation.setParams({onBack: this.onBack()})
   }
   
   fetchData () {
@@ -99,7 +105,7 @@ class GoodsApplyPrice extends Component {
     })
   }
   
-  onBack () {
+  onBack = () => {
     let from = this.props.navigation.state.params.from;
     if ('native' == from) {
       native.nativeBack();
