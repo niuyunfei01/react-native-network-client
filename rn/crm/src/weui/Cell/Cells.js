@@ -1,7 +1,9 @@
-import React, { PropTypes } from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
-  StyleSheet
+  StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 import V from '../variable'
 
@@ -16,10 +18,10 @@ const styles = StyleSheet.create({
   }
 })
 const Cells = (props) => {
-  const { children, style, ...others } = props
+  const {children, style, ...others} = props
   const childrenWithProps = React.Children.map(children, (child, idx) => {
     if (idx === 0) {
-      return React.cloneElement(child, { first: true })
+      return React.cloneElement(child, {first: true})
     }
     return child
   })
@@ -31,7 +33,7 @@ const Cells = (props) => {
 }
 Cells.propTypes = {
   children: PropTypes.node,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   others: PropTypes.object
 }
 

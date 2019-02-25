@@ -2,9 +2,7 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,12 +20,10 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
-import com.google.gson.Gson;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
 import java.util.Collection;
-import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
@@ -37,7 +33,6 @@ import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
-import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
@@ -70,7 +65,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= 20) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             setTranslucent();
         }
         super.onCreate(savedInstanceState);
@@ -78,6 +73,12 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         Bundle init = new Bundle();
         Intent intent = getIntent();
         String toRoute = intent.getStringExtra("_action");
+        AccountBean ab = GlobalCtx.app().getAccountBean();
+        if (ab != null && ab.getInfo() != null) {
+            init.putBundle("userProfile", ab.getInfo().toBundle());
+        } else {
+            toRoute = "Login";
+        }
         if ("Login".equals(toRoute)) {
             SplashScreen.show(this);
         }
@@ -102,11 +103,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             if (TextUtils.isEmpty(toRoute)) {
                 toRoute = "GoodsDetail";
             }
-        }
-
-        AccountBean ab = GlobalCtx.app().getAccountBean();
-        if (ab != null && ab.getInfo() != null) {
-            init.putBundle("userProfile", ab.getInfo().toBundle());
         }
 
         Collection<Store> stores = GlobalCtx.app().listStores();
@@ -185,7 +181,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     protected void onPause() {
         super.onPause();
         if (mReactInstanceManager != null) {
-            mReactInstanceManager.onHostPause();
+            mReactInstanceManager.onHostPause(this);
         }
     }
 
@@ -193,7 +189,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     protected void onDestroy() {
         super.onDestroy();
         if (mReactInstanceManager != null) {
-            mReactInstanceManager.onHostDestroy();
+            mReactInstanceManager.onHostDestroy(this);
         }
     }
 

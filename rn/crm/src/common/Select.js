@@ -4,9 +4,9 @@ import {TouchableWithoutFeedback, View, Text, StyleSheet, ScrollView} from 'reac
 
 class Option extends Component {
   static propTypes = {
-    children: React.PropTypes.string.isRequired,
-    onSelect: React.PropTypes.func.isRequired,
-    optionTextStyle: React.PropTypes.object,
+    children: PropTypes.string.isRequired,
+    onSelect: PropTypes.func.isRequired,
+    optionTextStyle: PropTypes.object,
   };
 
   render() {
@@ -26,11 +26,11 @@ class Option extends Component {
 
 export default class Select extends Component {
   static propTypes = {
-    options: React.PropTypes.array,
-    onSelect: React.PropTypes.func.isRequired,
-    containerStyle: React.PropTypes.object,
-    optionTextStyle: React.PropTypes.object,
-    scrollStyle: React.PropTypes.object,
+    options: PropTypes.array,
+    onSelect: PropTypes.func.isRequired,
+    containerStyle: PropTypes.object,
+    optionTextStyle: PropTypes.object,
+    scrollStyle: PropTypes.object,
   };
 
   constructor(props) {

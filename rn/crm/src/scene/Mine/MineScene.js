@@ -16,6 +16,11 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import Cts from "../../Cts";
+
+import AppConfig from "../../config.js";
+import FetchEx from "../../util/fetchEx";
+import HttpUtils from "../../util/http";
+
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -36,10 +41,7 @@ import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
-import AppConfig from "../../config.js";
-import FetchEx from "../../util/fetchEx";
 import SearchStore from "../component/SearchStore";
-import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
@@ -1243,19 +1245,20 @@ const header_styles = StyleSheet.create({
     marginBottom: pxToDp(14)
   },
   main_box: {
+    marginTop: pxToDp(15),
     marginRight: pxToDp(134),
     height: pxToDp(170)
   },
   shop_name: {
     color: colors.title_color,
-    fontSize: pxToDp(36),
+    fontSize: pxToDp(30),
     fontWeight: "bold",
     marginVertical: pxToDp(30),
     lineHeight: pxToDp(36)
   },
   change_shop: {
     color: colors.main_color,
-    fontSize: pxToDp(34),
+    fontSize: pxToDp(30),
     fontWeight: "bold",
     lineHeight: pxToDp(35)
   },

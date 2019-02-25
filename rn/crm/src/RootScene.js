@@ -43,12 +43,12 @@ import native from "./common/native";
 import Moment from "moment/moment";
 import _ from "lodash"
 
-const lightContentScenes = ["Home", "Mine"];
+const lightContentScenes = ["Home", "Mine", "Operation"];
 
 //global exception handlers
 const caught = new Caught();
 
-function getCurrentRouteName(navigationState) {
+function getCurrentRouteName (navigationState) {
   if (!navigationState) {
     return null;
   }
@@ -72,23 +72,23 @@ const styles = StyleSheet.create({
 
 // create a component
 class RootScene extends PureComponent {
-  constructor() {
+  constructor () {
     super();
     StatusBar.setBarStyle("light-content");
-
+    
     this.state = {
       rehydrated: false
     };
-
+    
     this.store = null;
   }
-
-  componentDidMount() {
+  
+  componentDidMount () {
   }
-
-  componentWillMount() {
+  
+  componentWillMount () {
     const launchProps = this.props.launchProps;
-
+    
     this.store = configureStore(
       function (store) {
         const {
@@ -99,7 +99,7 @@ class RootScene extends PureComponent {
           canReadVendors,
           configStr
         } = launchProps;
-
+        
         let config = configStr ? JSON.parse(configStr) : {};
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
@@ -124,8 +124,8 @@ class RootScene extends PureComponent {
       }.bind(this)
     );
   }
-
-  render() {
+  
+  render () {
     const launchProps = this.props.launchProps;
     const orderId = launchProps["order_id"];
     let backPage = launchProps["backPage"];
@@ -134,7 +134,7 @@ class RootScene extends PureComponent {
       launchProps["_action_params"]["backPage"] = backPage;
     }
     let initialRouteParams = launchProps["_action_params"] || {};
-
+    
     if (this.state.rehydrated) {
       //hiding after state recovered
       SplashScreen.hide();
@@ -152,21 +152,21 @@ class RootScene extends PureComponent {
           initialRouteParams = {orderId};
         }
       }
-
+      
       let {accessToken, currStoreId} = this.store.getState().global;
       const {last_get_cfg_ts} = this.store.getState().global;
       let current_time = Moment(new Date()).unix();
       let diff_time = current_time - last_get_cfg_ts;
-
+      
       if (diff_time > 300) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-
+          
           })
         );
       }
     }
-
+    
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (

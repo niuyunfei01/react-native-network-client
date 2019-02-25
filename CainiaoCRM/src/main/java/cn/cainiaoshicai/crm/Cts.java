@@ -18,9 +18,11 @@ public class Cts {
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 
-
+    //菜鸟品牌
+    public static final int STORE_VENDOR_CN = 1;
     //比邻鲜品牌
     public static final int STORE_VENDOR_BLX = 5;
+
 
     //保底模式
     public static final int STORE_CONTROL_MODE_SUPPLY = 2;

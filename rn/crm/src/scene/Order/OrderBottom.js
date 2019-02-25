@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {TouchableOpacity, Text, View} from 'react-native'
+import {Text, View, ViewPropTypes} from 'react-native'
 import {Button, Dialog} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
 import {native, tool} from "../../common"
@@ -520,7 +520,7 @@ OrderBottom.PropTypes = {
   mobile: PropTypes.string,
   label: PropTypes.string,
   onPress: PropTypes.func,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderBottom)

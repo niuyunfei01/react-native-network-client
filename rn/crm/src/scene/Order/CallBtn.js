@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {TouchableOpacity, Text, View} from 'react-native'
+import {TouchableOpacity, Text, View, ViewPropTypes} from 'react-native'
 import CallImg from './CallImg'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -41,7 +41,7 @@ CallBtn.PropTypes = {
   mobile: PropTypes.string,
   label: PropTypes.string,
   onPress: PropTypes.func,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
 }
 
 export default CallBtn

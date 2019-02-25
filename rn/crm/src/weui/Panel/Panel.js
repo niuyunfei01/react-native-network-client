@@ -1,7 +1,9 @@
-import React, { PropTypes } from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
-  StyleSheet
+  StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 
 const lineColor = '#E5E5E5'
@@ -17,7 +19,7 @@ const styles = StyleSheet.create({
   }
 })
 const Panel = (props) => {
-  const { children, style, ...others } = props
+  const {children, style, ...others} = props
   return (
     <View style={[styles.panel, style]} {...others} >
       {children}
@@ -26,7 +28,7 @@ const Panel = (props) => {
 }
 Panel.propTypes = {
   children: PropTypes.node,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   others: PropTypes.object
 }
 

@@ -34,7 +34,6 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
-import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_BLX;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private List<StorageItem> backendData = new ArrayList<>();
@@ -108,27 +107,15 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
-            holder.leftNumber.setVisibility(View.INVISIBLE);
+            if (GlobalCtx.app().isDirectVendor()) {
+                holder.leftNumber.setVisibility(View.VISIBLE);
+                holder.leftNumber.setText(item.leftNumberStr());
+            } else {
+                holder.leftNumber.setVisibility(View.INVISIBLE);
+            }
             holder.salePrice.setVisibility(View.INVISIBLE);
-
             holder.supplyPrice.setText(item.getSupplyPricePrecision());
-
-            holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    boolean auditPriceByCompetitor = store == null ? false : store.isAuditPriceByCompetitor();
-                    if (auditPriceByCompetitor) {
-                        Gson gson = new Gson();
-                        String json = gson.toJson(item);
-                        GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPricePrecision(),json);
-                    } else {
-                        StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-                        AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                        dlg.show();
-                    }
-                }
-            });
-            if (item.getApplyingPrice() > 0) {
+            if (item.getApplyingPrice() > 0 && !GlobalCtx.app().isDirectVendor()) {
                 holder.applyingPrice.setVisibility(View.VISIBLE);
                 holder.applyingPrice.setText(item.getApplyingPricePrecision());
             } else {
@@ -139,7 +126,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.applyingPrice.setVisibility(View.INVISIBLE);
             holder.leftNumber.setVisibility(View.VISIBLE);
             holder.salePrice.setVisibility(View.VISIBLE);
-
+            holder.leftNumber.setText(item.leftNumberStr());
             holder.salePrice.setText(item.getPricePrecision());
             holder.salePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -149,17 +136,32 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                     dlg.show();
                 }
             });
+        }
 
-            holder.leftNumber.setText(item.leftNumberStr());
-            holder.leftNumber.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        holder.leftNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StoreStorageChanged ssc = (StoreStorageChanged) getContext();
+                AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                dlg.show();
+            }
+        });
+
+        holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean auditPriceByCompetitor = store == null ? false : store.isAuditPriceByCompetitor();
+                if (auditPriceByCompetitor) {
+                    Gson gson = new Gson();
+                    String json = gson.toJson(item);
+                    GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPricePrecision(), json);
+                } else {
                     StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                    AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
                     dlg.show();
                 }
-            });
-        }
+            }
+        });
 
         if (item.getSelf_provided() == 0 && item.getTotalInReq() > 0) {
             holder.req_total.setText("订货:" + item.getTotalInReq());
@@ -167,7 +169,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         } else {
             holder.req_total.setVisibility(View.GONE);
         }
-
         if (item.getStatus() == StorageItem.STORE_PROD_SOLD_OUT) {
             holder.reOnSale.setVisibility(View.VISIBLE);
             int bg;

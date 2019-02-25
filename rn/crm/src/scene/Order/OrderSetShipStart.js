@@ -43,9 +43,7 @@ class OrderSetShipStart extends Component {
   componentWillMount() {
     const {dispatch, global, navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
-
     this.setState({notAutoConfirmed: order.ship_worker_id !== `${Cts.ID_DADA_SHIP_WORKER}`});
-
     const shipWorkers = store && store.shipWorkers ? store.shipWorkers[order.store_id] : null;
     if (!shipWorkers || shipWorkers.length === 0) {
       this.setState({loadingShippers: true});
@@ -88,11 +86,9 @@ class OrderSetShipStart extends Component {
   };
 
   render() {
-    const {dispatch, global, navigation, store} = this.props;
+    const {navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
-
     const workers = (store && store.shipWorkers && store.shipWorkers[order.store_id] || []);
-
     const shipperOpts = workers ? workers.map((worker, idx) => {
       const mobile = worker.id === '' + Cts.ID_DADA_SHIP_WORKER ? order.ship_worker_mobile : worker.mobilephone;
       return {label: `${worker.nickname}-${mobile}`, value: worker.id}
@@ -104,10 +100,11 @@ class OrderSetShipStart extends Component {
     const shipAuto = order.ship_worker_id === `${Cts.ID_DADA_SHIP_WORKER}`
       && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
       && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
-    
+
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -125,7 +122,7 @@ class OrderSetShipStart extends Component {
           <Cell>
             <CellBody><Text style={{color: 'red'}}>已通过系统呼叫过配送，确定要改为手动管理吗？</Text></CellBody>
             <CellFooter>
-            <Switch value={this.state.notAutoConfirmed} onChange={(v) => this.setState({notAutoConfirmed: v})}/>
+              <Switch value={this.state.notAutoConfirmed} onChange={(v) => this.setState({notAutoConfirmed: v})}/>
             </CellFooter>
           </Cell>
         </Cells>
@@ -133,7 +130,7 @@ class OrderSetShipStart extends Component {
       }
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择配送员</CellsTitle>
-       <RadioCells
+      <RadioCells
         style={{marginTop: 2}}
         options={shipperOpts}
         onChange={(checked) => this.setState({checked})}
@@ -142,7 +139,8 @@ class OrderSetShipStart extends Component {
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>通知用户已出发</Button>
+        <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()}
+                onPress={this._doReply} style={[S.mlr15]}>通知用户已出发</Button>
       </ButtonArea>
 
       <Toast show={this.state.onSubmitting}>提交中</Toast>

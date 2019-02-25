@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react'
-import { StyleSheet, View } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, View, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -29,12 +30,12 @@ const styles = StyleSheet.create({
   },
 })
 
-const PreviewItem = ({ style, children, preset = 'body', ...others }) => {
+const PreviewItem = ({style, children, preset = 'body', ...others}) => {
   const childrenWithProps = React.Children.map(children, (child) => {
     if (child.type.name === 'PreviewLabel') {
-      return React.cloneElement(child, { style: [child.props.style, styles[`${preset}PreviewLabel`]] })
+      return React.cloneElement(child, {style: [child.props.style, styles[`${preset}PreviewLabel`]]})
     } else if (child.type.name === 'PreviewValue') {
-      return React.cloneElement(child, { style: [child.props.style, styles[`${preset}PreviewValue`]] })
+      return React.cloneElement(child, {style: [child.props.style, styles[`${preset}PreviewValue`]]})
     }
     return child
   })
@@ -45,7 +46,7 @@ const PreviewItem = ({ style, children, preset = 'body', ...others }) => {
 }
 
 PreviewItem.propTypes = {
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
   preset: PropTypes.string,
 }

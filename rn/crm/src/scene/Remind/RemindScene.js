@@ -20,12 +20,11 @@ const {
   InteractionManager,
   ActivityIndicator,
   Image,
-  View,
-  StatusBar
+  View
 } = ReactNative;
 
-const {PureComponent, PropTypes} = React;
-
+const {PureComponent} = React;
+import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ScrollableTabView from 'react-native-scrollable-tab-view';
@@ -40,7 +39,7 @@ import RNButton from '../../widget/RNButton';
 import Config from '../../config'
 import Cts from '../../Cts'
 
-const BadgeTabBar = require('./BadgeTabBar');
+import BadgeTabBar from './BadgeTabBar';
 import {Dialog, ActionSheet} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";
@@ -382,11 +381,6 @@ class RemindScene extends PureComponent {
         data={dataSource}
         legacyImplementation={false}
         directionalLockEnabled={true}
-        viewabilityConfig={{
-          minimumViewTime: 3000,
-          viewAreaCoveragePercentThreshold: 100,
-          waitForInteraction: true,
-        }}
         onTouchStart={(e) => {
           this.pageX = e.nativeEvent.pageX;
           this.pageY = e.nativeEvent.pageY;
@@ -461,7 +455,7 @@ class RemindScene extends PureComponent {
       <View style={{flex: 1}}>
         <ScrollableTabView
           initialPage={0}
-          renderTabBar={() => <BadgeTabBar count={remindCount} countIndex={_typeIds}/>}
+          renderTabBar={() => (<BadgeTabBar activeTextColor={"navy"} inactiveTextColor={"black"} count={remindCount} countIndex={_typeIds}/>)}
           locked={true || remind.processing || this.state.scrollLocking}
           tabBarActiveTextColor={"#333"}
           tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}

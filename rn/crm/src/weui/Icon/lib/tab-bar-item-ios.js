@@ -1,10 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import pick from 'lodash/pick';
 
-import React, {
-  Component,
-  PropTypes,
-} from 'react';
+import React, {  Component} from 'react';import PropTypes from 'prop-types';
 
 import {
   TabBarIOS,

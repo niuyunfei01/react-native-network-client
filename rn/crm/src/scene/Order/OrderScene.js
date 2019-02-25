@@ -55,6 +55,7 @@ import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import {getWithTpl, getWithTpl2} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
+import Refund from "./_OrderScene/Refund";
 
 const numeral = require('numeral');
 
@@ -191,9 +192,10 @@ class OrderScene extends Component {
       visible: false,
       reason: '饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
       phone: undefined,
-      person: '联系客户'
+      person: '联系客户',
+      isServiceMgr: false
     };
-
+    
     this._onLogin = this._onLogin.bind(this);
     this.toMap = this.toMap.bind(this);
     this.goToSetMap = this.goToSetMap.bind(this);
@@ -211,7 +213,7 @@ class OrderScene extends Component {
     this._totalEditingCents = this._totalEditingCents.bind(this);
     this._getWayRecord = this._getWayRecord.bind(this);
     this._orderChangeLog = this._orderChangeLog.bind(this);
-
+    
     this._toEditBasic = this._toEditBasic.bind(this);
     this._fnProvidingOnway = this._fnProvidingOnway.bind(this);
     this._onToProvide = this._onToProvide.bind(this);
@@ -240,24 +242,24 @@ class OrderScene extends Component {
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
     
   }
-
+  
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
     if (!orderId) {
       return;
     }
-
+    
     const sessionToken = global.accessToken;
     const o = orderStateToCmp ? orderStateToCmp.order : false;
-
+    
     if (!o || !o.id || o.id !== orderId) {
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
-
+          
           let state = {
             isFetching: false,
           };
-
+          
           if (!ok) {
             state.errorHints = data;
             this.setState(state)
@@ -301,16 +303,16 @@ class OrderScene extends Component {
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_SET_INVALID, label: '置为无效'},
     ];
-
+    
     if (is_service_mgr) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
-
+    
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-
+    
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }
@@ -322,6 +324,7 @@ class OrderScene extends Component {
       ActionSheet: as
     };
     this.props.navigation.setParams(params);
+    this.setState({isServiceMgr: is_service_mgr})
   };
   
   _setAfterOrderGot = (order, initialState) => {
@@ -335,15 +338,14 @@ class OrderScene extends Component {
   };
   
   onPrint () {
-    
-    const order = this.props.order.order;
-    
-    const store = tool.store(order.store_id, this.props.global);
-    
-    if (store && store.cloudPrinter) {
-      this.setState({showPrinterChooser: true})
-    } else {
-      this._doBluetoothPrint()
+    const order = this.props.order.order
+    if (order) {
+      const store = tool.store(order.store_id, this.props.global)
+      if (store && store.cloudPrinter) {
+        this.setState({showPrinterChooser: true})
+      } else {
+        this._doBluetoothPrint()
+      }
     }
   }
   
@@ -566,7 +568,7 @@ class OrderScene extends Component {
   }
   
   _openAddGood () {
-    const {navigation, dispatch} = this.props;
+    const {navigation} = this.props;
     const order = this.props.order.order;
     const params = {
       esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
@@ -674,23 +676,23 @@ class OrderScene extends Component {
   }
   
   toMap () {
-    const {dispatch, global} = this.props;
     const {order} = this.props.order;
-    const validPoi = order.gd_lng && order.gd_lat;
-    
-    if (validPoi) {
-      const store = this.props.global.canReadStores[order.store_id] || {};
-      const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
-      const uri = Config.serverUrl(path);
-      this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-      console.log(uri)
-    } else {
-      //a page to set the location for this url!!
-      this.setState({
-        gotoEditPoi: true
-      });
-      this.goToSetMap();
+    if (order) {
+      const validPoi = order.gd_lng && order.gd_lat;
+      if (validPoi) {
+        const store = this.props.global.canReadStores[order.store_id] || {};
+        const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
+        const uri = Config.serverUrl(path);
+        this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
+        console.log(uri)
+        return;
+      }
     }
+    //a page to set the location for this url!!
+    this.setState({
+      gotoEditPoi: true
+    });
+    this.goToSetMap();
   }
   
   _doProcessRemind (remind) {
@@ -726,9 +728,8 @@ class OrderScene extends Component {
   
   _fnProvidingOnway () {
     const {order, global} = this.props;
-    
     const storeId = (order.order || {}).store_id;
-    return storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
+    return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
   
   _callShip () {
@@ -1280,11 +1281,11 @@ class OrderScene extends Component {
       this.setState({errorHints: '错误的订单ID'});
     }
   }
-
-  logOrderViewed() {
+  
+  logOrderViewed () {
     const {order, global} = this.props;
     let {id, orderStatus} = order.order;
-    if(orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP){
+    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
       let {accessToken} = global;
       let url = `/api/log_view_order/${id}?access_token=${accessToken}`;
       getWithTpl(url, function (json) {
@@ -1429,13 +1430,13 @@ class OrderScene extends Component {
     }
     let zs_ship_view = null;
     if ((zs_way === Cts.SHIP_ZS_JD ||
-        zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
-        zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
-        auto_ship_type === Cts.SHIP_ZS_JD ||
-        auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
-        auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD ||
-        auto_ship_type == Cts.SHIP_KS_ELE
-      )) {//专送配送
+      zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
+      zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
+      auto_ship_type === Cts.SHIP_ZS_JD ||
+      auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
+      auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD ||
+      auto_ship_type == Cts.SHIP_KS_ELE
+    )) {//专送配送
       let zs_ship = tool.autoPlat(zs_way, zs_status);
       let zs_ship_status = tool.zs_status(zs_status);
       let zs_name = tool.ship_name(zs_way);
@@ -1586,7 +1587,7 @@ class OrderScene extends Component {
   
   renderHeader () {
     const {order} = this.props.order;
-    
+    const {isServiceMgr} = this.state
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
     
@@ -1696,7 +1697,7 @@ class OrderScene extends Component {
                 imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
             
-            {!this.state.isEditing && (
+            {!order.is_fn_price_controlled && !this.state.isEditing && (
               order._op_edit_goods ?
                 <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={() => {
                   this.setState({isEditing: true, itemsHided: false})
@@ -1704,7 +1705,7 @@ class OrderScene extends Component {
                 : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>)
             }
             
-            {!this.state.isEditing && (this.state.itemsHided ?
+            {!order.is_fn_price_controlled && !this.state.isEditing && (this.state.itemsHided ?
               <ImageBtn source={require('../../img/Order/pull_up.png')} onPress={
                 () => {
                   this.setState({itemsHided: false});
@@ -1718,14 +1719,36 @@ class OrderScene extends Component {
             }
           </View>
           {!this.state.itemsHided && tool.objectMap(_items, (item, idx) => {
-            return (<ItemRow key={idx} item={item} edited={this.state.itemsEdited[item.id]} idx={idx}
-                             nav={this.props.navigation} isEditing={this.state.isEditing}
-                             onInputNumberChange={this._onItemRowNumberChanged}/>);
+            return (
+              <ItemRow
+                key={idx}
+                item={item}
+                edited={this.state.itemsEdited[item.id]}
+                idx={idx}
+                nav={this.props.navigation}
+                isEditing={this.state.isEditing}
+                onInputNumberChange={this._onItemRowNumberChanged}
+                fnShowWmPrice={order.is_fn_show_wm_price}
+                fnPriceControlled={order.is_fn_price_controlled}
+                isServiceMgr={isServiceMgr}
+              />
+            );
           })}
           {!this.state.itemsHided && tool.objectMap(this.state.itemsAdded, (item, idx) => {
-            return (<ItemRow key={idx} item={item} isAdd={true} idx={idx} nav={this.props.navigation}
-                             isEditing={this.state.isEditing}
-                             onInputNumberChange={this._onItemRowNumberChanged}/>);
+            return (
+              <ItemRow
+                key={idx}
+                item={item}
+                isAdd={true}
+                idx={idx}
+                nav={this.props.navigation}
+                isEditing={this.state.isEditing}
+                onInputNumberChange={this._onItemRowNumberChanged}
+                fnShowWmPrice={order.is_fn_show_wm_price}
+                fnPriceControlled={order.is_fn_price_controlled}
+                isServiceMgr={isServiceMgr}
+              />
+            );
           })}
           
           {!this.state.itemsHided && this.state.isEditing &&
@@ -1744,49 +1767,42 @@ class OrderScene extends Component {
             <View style={[styles.row, styles.moneyRow, {marginTop: pxToDp(12)}]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
                 <Text style={[styles.moneyListTitle, {flex: 1}]}>供货价小计</Text>
-                <TouchableOpacity
-                  style={[{alignItems: 'center', justifyContent: 'center'}]}
-                  onPress={() => {
-                    this.props.navigation.navigate('SettlementOrder', {
-                      order_id: order.id,
-                      store_id: order.store_id,
-                      date: order.orderTime.substr(0, 10),
-                      dayId: order.dayId
-                    })
-                  }}>
-                  <Text style={[styles.moneyListSub, {fontSize: pxToDp(24)}]}>详情</Text>
-                </TouchableOpacity>
               </View>
               <View style={{flex: 1}}/>
+              {/*直营店显示外卖价，管理员显示保底价，非直营店根据模式显示*/}
               <Text style={styles.moneyListNum}>
+                {/*直接显示保底价总计*/}
                 {numeral(order.supply_price / 100).format('0.00')}
               </Text>
             </View>
             : null}
-          <View style={[styles.row, styles.moneyRow]}>
-            <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
-              <Text style={styles.moneyListTitle}>用户已付</Text>
-              <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
-              {/*<Text style={styles.moneyListSub}>微信支付</Text>*/}
+          {/*管理员 和 直营店 可看*/}
+          <If condition={isServiceMgr || !order.is_fn_price_controlled}>
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
+                <Text style={styles.moneyListTitle}>用户已付</Text>
+                <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
+                {/*<Text style={styles.moneyListSub}>微信支付</Text>*/}
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(order.orderMoney).format('0.00')}
+              </Text>
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
-              {numeral(order.orderMoney).format('0.00')}
-            </Text>
-          </View>
-          <View style={[styles.row, styles.moneyRow]}>
-            <Text style={[styles.moneyListTitle, {width: pxToDp(480)}]}>配送费</Text>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')}</Text>
-          </View>
-          <View style={[styles.row, styles.moneyRow]}>
-            <View style={[styles.moneyLeft, {alignItems: 'center'}]}>
-              <Text style={styles.moneyListTitle}>优惠</Text>
-              <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'/></TouchableOpacity>
+            <View style={[styles.row, styles.moneyRow]}>
+              <Text style={[styles.moneyListTitle, {width: pxToDp(480)}]}>配送费</Text>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')}</Text>
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
-          </View>
+            <View style={[styles.row, styles.moneyRow]}>
+              <View style={[styles.moneyLeft, {alignItems: 'center'}]}>
+                <Text style={styles.moneyListTitle}>优惠</Text>
+                <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'/></TouchableOpacity>
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
+            </View>
+          </If>
           
           {order.additional_to_pay != '0' ?
             <View style={[styles.row, styles.moneyRow]}>
@@ -1807,26 +1823,38 @@ class OrderScene extends Component {
               </Text>
             </View>
             : null}
-          <View style={[styles.row, styles.moneyRow,]}>
-            <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
+          
+          {/*管理员可看*/}
+          <If condition={isServiceMgr || !order.is_fn_price_controlled}>
+            <View style={[styles.row, styles.moneyRow,]}>
+              <View style={styles.moneyLeft}>
+                <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
+                
+                {totalMoneyEdit !== 0 &&
+                <View><Text
+                  style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
+                  {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+                </Text>
+                  <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
+                    {numeral(order.total_goods_price / 100).format('0.00')}
+                  </Text></View>}
               
-              {totalMoneyEdit !== 0 &&
-              <View><Text
-                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
-                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+              </View>
+              <View style={{flex: 1}}/>
+              <Text style={styles.moneyListNum}>
+                {numeral(finalTotal).format('0.00')}
               </Text>
-                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
-                  {numeral(order.total_goods_price / 100).format('0.00')}
-                </Text></View>}
-            
             </View>
-            <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
-              {numeral(finalTotal).format('0.00')}
-            </Text>
-          </View>
+          </If>
         </View>
+        
+        <Refund
+          orderId={order.id}
+          platform={order.platform}
+          isFnPriceControl={order.is_fn_price_controlled}
+          isServiceMgr={isServiceMgr}
+        />
+        
         <View>
           <View style={[CommonStyle.topBottomLine, styles.block]}>
             <View style={[styles.row, {
@@ -1988,7 +2016,7 @@ class ItemRow extends PureComponent {
   render () {
     const {
       idx, item, isAdd, edited, onInputNumberChange = () => {
-      }, isEditing = false, nav
+      }, isEditing = false, nav, fnShowWmPrice, fnPriceControlled, isServiceMgr = false
     } = this.props;
     
     if (item.crm_order_detail_hide) {
@@ -2028,12 +2056,42 @@ class ItemRow extends PureComponent {
             {item.name}
             <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id})</Text>
           </Text>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
-            {!isAdd &&
-            <Text style={{color: '#f9b5b2', marginLeft: 30}}>总价 {numeral(item.price * item.num).format('0.00')}</Text>
-            }
-          </View>
+          
+          {/*非直营店*/}
+          <If condition={fnPriceControlled}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              {/*管理员看到的*/}
+              <If condition={isServiceMgr}>
+                <Text style={styles.priceMode}>保</Text>
+                <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
+                <View style={{marginLeft: 30}}/>
+                <Text style={styles.priceMode}>外</Text>
+                <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+              </If>
+              {/*商户看到的*/}
+              <If condition={!isServiceMgr}>
+                <Text style={styles.priceMode}>{fnShowWmPrice ? '外' : '保'}</Text>
+                <Text style={{color: '#f44140'}}>
+                  {fnShowWmPrice ? numeral(item.price).format('0.00') : numeral(item.supply_price / 100).format('0.00')}
+                </Text>
+                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
+                  总价 {fnShowWmPrice ? numeral(item.price * item.num).format('0.00') : numeral(item.supply_price * item.num).format('0.00')}
+                </Text>
+              </If>
+            </View>
+          </If>
+          
+          {/*直营店*/}
+          <If condition={!fnPriceControlled}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+              <If condition={!isAdd}>
+                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
+                  总价 {numeral(item.price * item.num).format('0.00')}
+                </Text>
+              </If>
+            </View>
+          </If>
         </View>
       
       </View>
@@ -2097,10 +2155,12 @@ ItemRow.PropTypes = {
   isAdd: PropTypes.bool,
   edits: PropTypes.object,
   onInputNumberChange: PropTypes.func,
-  nav: PropTypes.object
+  nav: PropTypes.object,
+  fnShowWmPrice: PropTypes.bool
 };
 
-class Remark extends PureComponent {
+class Remark
+  extends PureComponent {
   
   constructor (props) {
     super(props)

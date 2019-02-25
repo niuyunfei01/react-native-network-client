@@ -58,21 +58,23 @@ class OrderEditStoreScene extends Component {
 
   _doReply() {
     const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
-    this.setState({onSubmitting: true});
-    dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
-      console.log(ok, msg, data);
-      this.setState({onSubmitting: false});
-      if (ok) {
-        this.setState({doneSubmitting: true});
-        setTimeout(() => {
-          this.setState({doneSubmitting: false});
-          navigation.goBack();
-        }, 1000);
-      } else {
-        this.setState({errorHints: msg});
-      }
-    }))
+    const {order} = (navigation.state.params || {});
+    if (order) {
+      this.setState({onSubmitting: true});
+      dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
+        console.log(ok, msg, data);
+        this.setState({onSubmitting: false});
+        if (ok) {
+          this.setState({doneSubmitting: true});
+          setTimeout(() => {
+            this.setState({doneSubmitting: false});
+            navigation.goBack();
+          }, 1000);
+        } else {
+          this.setState({errorHints: msg});
+        }
+      }))
+    }
   }
 
   render() {

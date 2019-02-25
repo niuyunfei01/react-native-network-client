@@ -107,7 +107,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import cn.cainiaoshicai.crm.R;
 
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
@@ -277,15 +276,15 @@ public class GlobalCtx extends Application {
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(this)
                 .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("index.android")
+                .setJSMainModulePath("index")
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())
+                .addPackage(new RNFetchBlobPackage())
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
-                .addPackage(new RNFetchBlobPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
@@ -298,9 +297,7 @@ public class GlobalCtx extends Application {
 
         //初始化蓝牙管理
         AppInfo.init(this);
-
         startKeepAlive();
-
     }
 
     public void startKeepAlive() {
@@ -535,7 +532,6 @@ public class GlobalCtx extends Application {
                 accountBean = AccountDBTask.getAccount(id);
             }
         }
-
         return accountBean;
     }
 
@@ -820,7 +816,7 @@ public class GlobalCtx extends Application {
 
     public void toOperationActivity(Activity ctx){
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "Operation");
+        i.putExtra("_action", "Tab");
         Bundle params = new Bundle();
         params.putString("initTab", "Operation");
         i.putExtra("_action_params", params);
@@ -917,6 +913,18 @@ public class GlobalCtx extends Application {
         params.putString("supplyPrice", currentSupplyPrice);
         params.putString("detail", json);
         params.putString("from", "native");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    /**
+     * 跳转到开关店页面
+     * @param ctx
+     */
+    public void toSetStoreStatusView(Activity ctx){
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "StoreStatus");
+        Bundle params = new Bundle();
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }

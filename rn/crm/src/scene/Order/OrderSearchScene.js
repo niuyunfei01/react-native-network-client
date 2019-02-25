@@ -93,6 +93,7 @@ class OrderSearchScene extends PureComponent {
         <SearchBar
           placeholder="序号/编号/收货手机姓名/地址/备注/发票/商品"
           onBlurSearch={this.onSearch.bind(this)}
+          lang={{cancel: '搜索'}}
         />
         <View style={styles.label_box}>
           <Text style={styles.alert_msg}>

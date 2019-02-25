@@ -14,6 +14,7 @@ import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import Cts from "../../Cts";
+import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";
 
 
 function mapStateToProps (state) {
@@ -40,7 +41,7 @@ class GoodsApplyPrice extends Component {
           onPress={() => {
             let from = navigation.state.params.from;
             if ('native' == from) {
-              native.toGoods();
+              native.nativeBack();
             } else {
               navigation.goBack();
             }
@@ -141,7 +142,7 @@ class GoodsApplyPrice extends Component {
             this.props.navigation.state.params.onBack()
             this.props.navigation.goBack()
           } else {
-            native.toGoods();
+            native.nativeBack();
           }
         } else {
           self.setState({resultDialog: true, resultMsg: `调价失败，请稍后重试。${resp.reason}`, resultDialogType: 'info'})
@@ -157,38 +158,47 @@ class GoodsApplyPrice extends Component {
   render () {
     return (
       <View style={{flex: 1}}>
-        <GoodsBaseItem
-          wmText={'美团价'}
-          name={this.state.product.name}
-          wmPrice={this.state.product.waimai_product.price}
-          image={this.state.product.listimg}
-          showWmTip={true}
-          newPrice={this.state.wmPrice}
-          remark={'(含平台费，活动费，耗材费，运营费用等)'}
-        />
-        
-        <InputPrice
-          mode={this.state.mode}
-          showModeName={false}
-          referPrice={this.state.refer_price}
-          priceRatio={this.state.price_ratio}
-          style={{marginTop: pxToDp(10)}}
-          initPrice={String(this.state.product.store_product.supply_price)}
-          onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
-          showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
-          onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
-        />
-        
-        <View style={{flex: 1}}>
-          <View>
-            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
-          </View>
-          <If condition={this.state.trade_products.length > 0}>
-            <ScrollView style={styles.scroll_view}>
+        <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
+          <GoodsBaseItem
+            wmText={'美团价'}
+            name={this.state.product.name}
+            wmPrice={this.state.product.waimai_product.price}
+            image={this.state.product.listimg}
+            showWmTip={true}
+            newPrice={this.state.wmPrice}
+            remark={'(含平台费，活动费，耗材费，运营费用等)'}
+          />
+          
+          <InputPrice
+            mode={this.state.mode}
+            showModeName={false}
+            referPrice={this.state.refer_price}
+            priceRatio={this.state.price_ratio}
+            style={{marginTop: pxToDp(10)}}
+            initPrice={String(this.state.product.store_product.supply_price)}
+            onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
+            showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
+            onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
+          />
+          
+          <View style={{flex: 1}}>
+            <View style={styles.tradeTitleRow}>
+              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+              <If condition={this.state.trade_products.length > 0}>
+                <ReportErrorDialog
+                  storeId={this.state.store_id}
+                  productId={this.state.product_id}
+                  productImg={this.state.product.listimg}
+                  productName={this.state.product.name}
+                />
+              </If>
+            </View>
+            <If condition={this.state.trade_products.length > 0}>
+              {/*<ScrollView style={styles.scroll_view}>*/}
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
-                  style={{marginTop: pxToDp(10)}}
+                  style={{marginBottom: pxToDp(10)}}
                   image={item.img}
                   name={item.original_name}
                   price={item.price}
@@ -197,14 +207,15 @@ class GoodsApplyPrice extends Component {
                   record={item.month_sales}
                 />
               </For>
-            </ScrollView>
-          </If>
-          <If condition={this.state.trade_products.length == 0}>
-            <View style={styles.no_prod_tip}>
-              <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
-            </View>
-          </If>
-        </View>
+              {/*</ScrollView>*/}
+            </If>
+            <If condition={this.state.trade_products.length == 0}>
+              <View style={styles.no_prod_tip}>
+                <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
+              </View>
+            </If>
+          </View>
+        </ScrollView>
         
         <View style={[styles.bottom_box]}>
           <TouchableOpacity onPress={() => this.onSave()}>
@@ -220,6 +231,8 @@ class GoodsApplyPrice extends Component {
           text={this.state.resultMsg}
           onPress={() => this.setState({resultDialog: false})}
         />
+      
+      
       </View>
     )
   }
@@ -230,9 +243,14 @@ const styles = StyleSheet.create({
     marginBottom: pxToDp(110),
     flex: 1
   },
+  tradeTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: pxToDp(20),
+    height: pxToDp(60)
+  },
   trade_title: {
-    marginLeft: pxToDp(10),
-    marginTop: pxToDp(10),
     fontSize: pxToDp(28),
     color: '#a3a3a3'
   },

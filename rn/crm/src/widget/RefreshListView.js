@@ -2,12 +2,13 @@
 import React, { PureComponent } from 'react'
 import { View, Text, StyleSheet, RefreshControl, ListView, ActivityIndicator, TouchableOpacity } from 'react-native'
 import RefreshState from './RefreshState'
+import PropTypes from 'prop-types';
 
 // create a component
 class RefreshListView extends PureComponent {
     static propTypes = {
-        onHeaderRefresh: React.PropTypes.func,
-        onFooterRefresh: React.PropTypes.func,
+        onHeaderRefresh: PropTypes.func,
+        onFooterRefresh: PropTypes.func,
     }
 
     static defaultProps = {

@@ -8,7 +8,7 @@ import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
 import {ToastShort} from "../../util/ToastUtils";
 
-var Accordion = require('react-native-accordion')
+const Accordion = require('../../widget/react-native-accordion')
 
 function mapStateToProps(state) {
 	const {global, mine} = state;

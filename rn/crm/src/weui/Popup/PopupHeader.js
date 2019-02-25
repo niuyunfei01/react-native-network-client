@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react'
-import { View, StyleSheet, Text } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, StyleSheet, Text, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
   }
 })
 
-const PopupHeader = ({ style, left = {}, right = {} }) =>
+const PopupHeader = ({style, left = {}, right = {}}) =>
   <View style={[styles.popupHeader, style]}>
     <Text
       style={[styles.popupActionLeft, left.style]}
@@ -43,7 +44,7 @@ const PopupHeader = ({ style, left = {}, right = {} }) =>
   </View>
 
 PopupHeader.propTypes = {
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   left: PropTypes.object,
   right: PropTypes.object,
 }

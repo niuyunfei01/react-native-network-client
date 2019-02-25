@@ -211,7 +211,7 @@ class GoodsApplyRecordScene extends Component {
                     </View>
                     <View>
                       <Text style={styles.name_time}>
-                        #{item.product_id} {tool.orderExpectTime(item.updated)}
+                        #{item.product_id} {tool.orderExpectTime(item.created)}
                       </Text>
                     </View>
                   </View>

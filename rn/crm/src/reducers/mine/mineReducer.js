@@ -94,17 +94,23 @@ function vendor_stores(state, action) {
 }
 
 function order_num(state, action) {
-	state.order_num[action.store_id] = action.order_num;
-	return state.order_num;
+  if (action && action.store_id) {
+    state.order_num[action.store_id] = action.order_num;
+  }
+  return state.order_num;
 }
 
 function turnover(state, action) {
-	state.turnover[action.store_id] = action.turnover;
-	return state.turnover;
+  if (action && action.store_id) {
+    state.turnover[action.store_id] = action.turnover;
+  }
+  return state.turnover;
 }
 
 function wm_list(state, action) {
-	state.wm_list[action.store_id] = action.wm_list;
+  if(action&&action.store_id){
+    state.wm_list[action.store_id] = action.wm_list;
+  }
 	return state.wm_list;
 }
 

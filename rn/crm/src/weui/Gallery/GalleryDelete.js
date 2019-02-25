@@ -1,6 +1,6 @@
 import React from 'react'
-import { TouchableWithoutFeedback, View, StyleSheet } from 'react-native'
-import { Icon } from '../Icon'
+import {TouchableWithoutFeedback, View, StyleSheet, ViewPropTypes} from 'react-native'
+import {Icon} from '../Icon'
 
 const styles = StyleSheet.create({
   galleryDelete: {
@@ -11,13 +11,13 @@ const styles = StyleSheet.create({
   }
 })
 
-const GalleryDelete = ({ style, ...others }) =>
+const GalleryDelete = ({style, ...others}) =>
   <TouchableWithoutFeedback {...others}>
-    <View style={[styles.galleryDelete, style]}><Icon name="delete" /></View>
+    <View style={[styles.galleryDelete, style]}><Icon name="delete"/></View>
   </TouchableWithoutFeedback>
 
 GalleryDelete.propTypes = {
-  style: View.propTypes.style
+  style: ViewPropTypes.style
 }
 
 export default GalleryDelete

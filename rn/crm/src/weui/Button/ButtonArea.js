@@ -1,7 +1,9 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 import V from '../variable'
 
@@ -43,6 +45,6 @@ export default class ButtonArea extends Component {
 
 ButtonArea.propTypes = {
   direction: PropTypes.oneOf(['horizontal', 'vertical']),
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
 }

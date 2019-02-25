@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -60,8 +60,8 @@ class OrderSurcharge extends PureComponent {
         ToastLong(error.message)
       });
   }
-
-  renderAccordionItemStatus(status) {
+  
+  renderAccordionItemStatus (status) {
     if (status == '0') {
       return (
         <Text style={style.status}>待打款</Text>
@@ -137,11 +137,11 @@ class OrderSurcharge extends PureComponent {
   
   render () {
     return (
-      <View>
+      <ScrollView>
         <Accordion accordion defaultActiveKey="0">
           {this.renderAccordionItems()}
         </Accordion>
-      </View>
+      </ScrollView>
     )
   }
 }

@@ -1,12 +1,14 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
-import { Icon } from '../Icon'
+import {Icon} from '../Icon'
 
 const styles = StyleSheet.create({
   searchBar: {
@@ -97,33 +99,33 @@ class SearchBar extends Component {
   }
 
   changeHandle(text) {
-    this.setState({ text })
+    this.setState({text})
     if (this.props.onChange) this.props.onChange(text)
   }
 
   cancelHandle(e) {
-    this.setState({ focus: false })
+    this.setState({focus: false})
     this.blur()
     if (this.props.onCancel) this.props.onCancel(e)
   }
 
   clearHandle(e) {
-    this.setState({ text: '' })
+    this.setState({text: ''})
     if (this.props.onClear) this.props.onClear(e)
     if (this.props.onChange) this.props.onChange('')
   }
 
   handleFocus() {
-    this.setState({ focus: true })
+    this.setState({focus: true})
   }
 
   handleBlur() {
-    this.setState({ focus: false });
+    this.setState({focus: false});
     const {focus, text} = this.state;
     console.log('focus -> ', focus);
     let SearchText = text;
     let {onBlurSearch} = this.props;
-    if(typeof(onBlurSearch) === "function" && !!SearchText){
+    if (typeof(onBlurSearch) === "function" && !!SearchText) {
       this.props.onBlurSearch(SearchText);
     }
   }
@@ -142,13 +144,13 @@ class SearchBar extends Component {
       lang,
       style,
     } = this.props;
-    const { focus, text } = this.state;
+    const {focus, text} = this.state;
 
     return (
       <View style={[styles.searchBar, style]}>
         <View style={styles.searchOuter}>
           <View style={styles.searchInner}>
-            <Icon name="search" />
+            <Icon name="search"/>
             <TextInput
               ref="searchInput"
               style={styles.searchInput}
@@ -164,13 +166,13 @@ class SearchBar extends Component {
             />
             {text ? (
               <Text onPress={this.clearHandle}>
-                <Icon name="clear" style={styles.clearIcon} />
+                <Icon name="clear" style={styles.clearIcon}/>
               </Text>
             ) : null}
           </View>
           {(focus || text) ? null :
             <TouchableOpacity style={styles.searchCover} onPress={this.focus}>
-              <Icon name="search" />
+              <Icon name="search"/>
               <Text style={styles.searchCoverText}>{placeholder}</Text>
             </TouchableOpacity>
           }
@@ -188,7 +190,7 @@ SearchBar.propTypes = {
   onCancel: PropTypes.func,
   onBlurSearch: PropTypes.func,
   lang: PropTypes.object,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   placeholder: PropTypes.string,
 }
 

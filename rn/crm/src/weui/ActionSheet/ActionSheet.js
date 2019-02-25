@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   Modal,
   View,
@@ -8,6 +9,7 @@ import {
   Easing,
   StyleSheet,
   Dimensions,
+  ViewPropTypes
 } from 'react-native'
 import $V from '../variable'
 
@@ -202,14 +204,14 @@ class ActionSheet extends Component {
 }
 
 ActionSheet.propTypes = {
-  menus: React.PropTypes.array,
-  actions: React.PropTypes.array,
+  menus: PropTypes.array,
+  actions: PropTypes.array,
   visible: PropTypes.bool,
   onShow: PropTypes.func,
   onRequestClose: PropTypes.func,
   duration: PropTypes.number,
-  style: View.propTypes.style,
-  wrapperStyle: View.propTypes.style,
+  style: ViewPropTypes.style,
+  wrapperStyle: ViewPropTypes.style,
   children: PropTypes.node
 }
 

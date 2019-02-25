@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Animated,
@@ -9,35 +10,13 @@ import {
   Platform,
   findNodeHandle,
   Dimensions,
+  ViewPropTypes
 } from 'react-native'
-
-const styles = StyleSheet.create({
-  tab: {
-    height: 35,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: 30,
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  container: {
-    height: 35,
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-    borderBottomColor: '#ccc',
-  },
-  tabs: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-})
-
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 
 class NavBar extends Component {
+
   static defaultProps = {
     scrollOffset: 52,
     activeTextColor: 'navy',
@@ -74,7 +53,7 @@ class NavBar extends Component {
     if (width < WINDOW_WIDTH) {
       width = WINDOW_WIDTH
     }
-    this.setState({ _containerWidth: width, })
+    this.setState({_containerWidth: width,})
   }
 
   onContainerLayout(e) {
@@ -108,12 +87,12 @@ class NavBar extends Component {
     newScrollX = newScrollX >= 0 ? newScrollX : 0
 
     if (Platform.OS === 'android') {
-      this._scrollView.scrollTo({ x: newScrollX, y: 0 })
+      this._scrollView.scrollTo({x: newScrollX, y: 0})
     } else {
       const rightBoundScroll = this._tabContainerMeasurements.width -
-      (this._containerMeasurements.width)
+        (this._containerMeasurements.width)
       newScrollX = newScrollX > rightBoundScroll ? rightBoundScroll : newScrollX
-      this._scrollView.scrollTo({ x: newScrollX, y: 0 })
+      this._scrollView.scrollTo({x: newScrollX, y: 0})
     }
   }
 
@@ -146,13 +125,13 @@ class NavBar extends Component {
           width,
           height,
         }
-        this.updateView({ value: this.props.scrollValue._value })
+        this.updateView({value: this.props.scrollValue._value})
       })
   }
 
   renderTabOption(name, page) {
     const isTabActive = this.props.activeTab === page
-    const { activeTextColor, inactiveTextColor, textStyle, } = this.props
+    const {activeTextColor, inactiveTextColor, textStyle} = this.props
     const textColor = isTabActive ? activeTextColor : inactiveTextColor
     const fontWeight = isTabActive ? 'bold' : 'normal'
 
@@ -168,7 +147,7 @@ class NavBar extends Component {
         onLayout={() => this.measureTab(page)}
       >
         <View>
-          <Text style={[{ color: textColor, fontWeight }, textStyle]}>
+          <Text style={[{color: textColor, fontWeight}, textStyle]}>
             {name}
           </Text>
         </View>
@@ -193,12 +172,14 @@ class NavBar extends Component {
     return (
       <View
         style={[styles.container,
-          { backgroundColor: this.props.backgroundColor },
+          {backgroundColor: this.props.backgroundColor},
           this.props.style]}
         onLayout={this.onContainerLayout}
       >
         <ScrollView
-          ref={(scrollView) => { this._scrollView = scrollView }}
+          ref={(scrollView) => {
+            this._scrollView = scrollView
+          }}
           horizontal={!false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
@@ -208,13 +189,13 @@ class NavBar extends Component {
         >
           <View
             style={[styles.tabs,
-              { width: this.state._containerWidth },
+              {width: this.state._containerWidth},
               this.props.tabsContainerStyle]}
             ref={'tabContainer'}
             onLayout={this.onTabContainerLayout}
           >
             {this.props.tabs.map((tab, i) => this.renderTabOption(tab, i))}
-            <Animated.View style={[tabUnderlineStyle, dynamicTabUnderline]} />
+            <Animated.View style={[tabUnderlineStyle, dynamicTabUnderline]}/>
           </View>
         </ScrollView>
       </View>
@@ -232,11 +213,35 @@ NavBar.propTypes = {
   activeTextColor: PropTypes.string,
   inactiveTextColor: PropTypes.string,
   scrollOffset: PropTypes.number,
-  style: View.propTypes.style,
-  tabStyle: View.propTypes.style,
-  tabsContainerStyle: View.propTypes.style,
+  style: ViewPropTypes.style,
+  tabStyle: ViewPropTypes.style,
+  tabsContainerStyle: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   scrollValue: PropTypes.object,
 }
+
+
+const styles = StyleSheet.create({
+  tab: {
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 30,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  container: {
+    height: 35,
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    borderBottomColor: '#ccc',
+  },
+  tabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+})
 
 export default NavBar

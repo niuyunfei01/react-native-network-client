@@ -14,7 +14,7 @@ export default class BaseItem extends PureComponent {
     showModifyPriceBtn: PropTypes.bool,
     onPressModifyPrice: PropTypes.func,
     style: PropTypes.object,
-    newPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    newPrice: PropTypes.any,
     remark: PropTypes.string,
     wmText: PropTypes.string
   }

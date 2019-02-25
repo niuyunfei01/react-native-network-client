@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react'
-import { View, StyleSheet } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, StyleSheet, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -10,12 +11,12 @@ const styles = StyleSheet.create({
   }
 })
 const GridIcon = (props) => {
-  const { children, style, ...others } = props
+  const {children, style, ...others} = props
   return <View style={[styles.gridIcon, style]} {...others}>{children}</View>
 }
 GridIcon.propTypes = {
   children: PropTypes.node,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   others: PropTypes.object
 }
 
