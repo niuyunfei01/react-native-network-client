@@ -49,3 +49,5 @@ echo "build android apk..."
 
 export BABEL_ENV=dev
 
+echo "编译完成，切换至工作分支"
+git checkout dev

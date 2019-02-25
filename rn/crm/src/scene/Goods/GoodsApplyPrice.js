@@ -80,7 +80,8 @@ class GoodsApplyPrice extends Component {
       price_ratio: {},
       supply_price: this.props.navigation.state.params.supplyPrice,
       wmPrice: 0,
-      autoOnline: true
+      autoOnline: true,
+      originPrice: this.props.navigation.state.params.supplyPrice
     }
   }
   
@@ -102,6 +103,15 @@ class GoodsApplyPrice extends Component {
         price_ratio: res.price_ratio
       })
     })
+  }
+  
+  onBack = () => {
+    let from = this.props.navigation.state.params.from;
+    if ('native' == from) {
+      native.nativeBack();
+    } else {
+      this.props.navigation.goBack();
+    }
   }
   
   onSave () {
@@ -156,6 +166,9 @@ class GoodsApplyPrice extends Component {
   }
   
   render () {
+    const {supply_price, originPrice} = this.state
+    let priceIsChange = parseFloat(supply_price) != parseFloat(originPrice)
+    console.log(`old price => ${originPrice}; new price => ${supply_price}`)
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
@@ -218,9 +231,21 @@ class GoodsApplyPrice extends Component {
         </ScrollView>
         
         <View style={[styles.bottom_box]}>
-          <TouchableOpacity onPress={() => this.onSave()}>
-            <View style={styles.bottom_btn}>
+          <If condition={priceIsChange}>
+            <TouchableOpacity onPress={() => this.onSave()}>
+              <View style={[styles.bottom_btn]}>
+                <Text style={{color: '#ffffff'}}>保存</Text>
+              </View>
+            </TouchableOpacity>
+          </If>
+          <If condition={!priceIsChange}>
+            <View style={[styles.bottom_btn, styles.disabledBtn]}>
               <Text style={{color: '#ffffff'}}>保存</Text>
+            </View>
+          </If>
+          <TouchableOpacity onPress={() => this.onBack()}>
+            <View style={styles.bottom_btn}>
+              <Text style={{color: '#ffffff'}}>返回</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -257,7 +282,8 @@ const styles = StyleSheet.create({
   bottom_box: {
     height: pxToDp(114),
     backgroundColor: '#ffffff',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
     position: 'absolute',
     bottom: 0,
@@ -267,12 +293,15 @@ const styles = StyleSheet.create({
     borderColor: '#f3f3f3'
   },
   bottom_btn: {
-    width: pxToDp(620),
+    width: pxToDp(310),
     height: pxToDp(80),
     borderRadius: pxToDp(40),
     backgroundColor: '#59b26a',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  disabledBtn: {
+    backgroundColor: colors.fontGray,
   },
   no_prod_tip: {
     flex: 1,

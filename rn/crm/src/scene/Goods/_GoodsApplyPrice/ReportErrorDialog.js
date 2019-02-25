@@ -1,13 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {View, TouchableOpacity, Text, StyleSheet, ScrollView} from 'react-native'
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../../../styles/colors";
 import {connect} from "react-redux";
 import ConfirmDialog from "../../component/ConfirmDialog";
 import GoodsBaseItem from '../../../Components/Goods/BaseItem'
-import {List, InputItem, WhiteSpace, TextareaItem, Toast} from 'antd-mobile-rn'
+import {Toast} from 'antd-mobile-rn'
 import pxToDp from "../../../util/pxToDp";
 import HttpUtils from "../../../util/http";
+import {Cell, CellBody, Input, TextArea} from "../../../weui"
+import {ToastShort} from "../../../util/ToastUtils";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -37,6 +39,10 @@ class ReportErrorDialog extends React.Component {
     const self = this
     const {storeId, productId} = this.props
     const {price, remark, access_token} = this.state
+    if (!price) {
+      ToastShort('请输入市场单价')
+      return
+    }
     HttpUtils.post(`/api/report_track_product_err/${storeId}/${productId}?access_token=${access_token}`, {
       price, remark
     }).then(res => {
@@ -64,22 +70,30 @@ class ReportErrorDialog extends React.Component {
             newPrice={false}
           />
           
-          <List renderHeader={'请输入市场单价'}>
-            <InputItem
-              styles={styles.inputItem}
-              placeholder={'点击输入市场单价'}
-              onChange={(text) => self.setState({price: text})}
-            />
-          </List>
-          <WhiteSpace/>
-          <List renderHeader={'理由(选填)'}>
-            <TextareaItem
-              styles={styles.inputItem}
-              rows={5}
-              placeholder={'点击请输入理由'}
-              onChange={(text) => self.setState({remark: text})}
-            />
-          </List>
+          <View>
+            <Cell customStyle={{borderTopWidth: 0}}>
+              <CellBody>
+                <Input
+                  onChangeText={price => this.setState({price})}
+                  style={[styles.cell_input]}
+                  placeholder="请输入市场单价(必填)"
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={{borderTopWidth: 0}}>
+              <CellBody>
+							    <TextArea
+                    value={this.state.remark}
+                    onChange={(remark) => self.setState({remark: remark})}
+                    showCounter={false}
+                    placeholder="请输入备注(选填)"
+                    underlineColorAndroid="transparent" //取消安卓下划线
+                    style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
+                  />
+              </CellBody>
+            </Cell>
+          </View>
         </ScrollView>
       </ConfirmDialog>
     )
@@ -112,6 +126,17 @@ const styles = StyleSheet.create({
   inputItem: {
     borderWidth: pxToDp(1),
     borderColor: colors.fontGray
+  },
+  cell_title: {
+    marginBottom: pxToDp(10),
+    fontSize: pxToDp(26),
+    color: colors.color999
+  },
+  cell_input: {
+    fontSize: pxToDp(30),
+    height: pxToDp(90),
+    borderWidth: 1,
+    borderColor: '#efefef'
   }
 })
 
