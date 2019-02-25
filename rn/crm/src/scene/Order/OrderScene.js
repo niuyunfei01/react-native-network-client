@@ -1697,7 +1697,7 @@ class OrderScene extends Component {
                 imageStyle={{width: pxToDp(110), height: pxToDp(40)}} onPress={this._doSaveItemsCancel}/>
             </View>}
             
-            {!order.is_fn_price_controlled && !this.state.isEditing && (
+            {!this.state.isEditing && (
               order._op_edit_goods ?
                 <ImageBtn source={require('../../img/Order/items_edit.png')} onPress={() => {
                   this.setState({isEditing: true, itemsHided: false})
@@ -1705,7 +1705,7 @@ class OrderScene extends Component {
                 : <ImageBtn source={require('../../img/Order/items_edit_disabled.png')}/>)
             }
             
-            {!order.is_fn_price_controlled && !this.state.isEditing && (this.state.itemsHided ?
+            {!this.state.isEditing && (this.state.itemsHided ?
               <ImageBtn source={require('../../img/Order/pull_up.png')} onPress={
                 () => {
                   this.setState({itemsHided: false});
