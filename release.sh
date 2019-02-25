@@ -10,6 +10,7 @@ if [[ "$curr_branch" != "$build_branch" ]];then
 fi
 
 #xargs 实现 trim 功能
+git pull --tags
 latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` | xargs)
 app_version=`sed -n "6p" ./CainiaoCRM/src/main/AndroidManifest.xml | sed -e 's/android:versionName=\"\(.*\)\">/\1/' | xargs`
 echo "最新tag：$latest_tag"
@@ -33,6 +34,7 @@ if [[ "$latest_tag" != "$app_version" ]];then
         echo "结束编译"
         exit
     else
+        git tag ${app_version}
         git push origin ${app_version}
     fi
 fi
