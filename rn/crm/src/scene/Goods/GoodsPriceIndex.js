@@ -120,6 +120,7 @@ class GoodsPriceIndex extends Component {
         pid: productId,
         storeId: self.state.store_id,
         mode: 2,
+        type: this.state.tabActiveValue,
         supplyPrice: product.supply_price,
         onBack: () => {
           let list = self.state.list
