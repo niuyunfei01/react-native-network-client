@@ -101,7 +101,9 @@ class GoodsApplyPrice extends Component {
         product: res.product,
         trade_products: res.trade_products,
         refer_price: res.refer_price,
-        price_ratio: res.price_ratio
+        price_ratio: res.price_ratio,
+        supplyPrice: String(res.product.store_product.supply_price),
+        originPrice: String(res.product.store_product.supply_price)
       })
     })
   }
