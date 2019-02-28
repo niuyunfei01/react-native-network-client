@@ -57,6 +57,7 @@ class GoodsApplyPrice extends Component {
     this.state = {
       product_id: this.props.navigation.state.params.pid,
       store_id: this.props.navigation.state.params.storeId,
+      type: this.props.navigation.state.params.type,
       mode: this.props.navigation.state.params.mode,
       // product_id: 62093,
       // store_id: 928,
@@ -91,16 +92,18 @@ class GoodsApplyPrice extends Component {
   
   fetchData () {
     const self = this
-    const {store_id, product_id, access_token} = self.state
+    const {store_id, product_id, access_token, type} = self.state
     const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
-    HttpUtils.post(url, {}, navigation).then(res => {
+    HttpUtils.get(url, {sortType: type}).then(res => {
       console.log(res)
       self.setState({
         product: res.product,
         trade_products: res.trade_products,
         refer_price: res.refer_price,
-        price_ratio: res.price_ratio
+        price_ratio: res.price_ratio,
+        supplyPrice: String(res.product.store_product.supply_price),
+        originPrice: String(res.product.store_product.supply_price)
       })
     })
   }

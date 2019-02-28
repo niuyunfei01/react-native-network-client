@@ -251,11 +251,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Store cs = StoreStorageActivity.this.currStore;
+                //Store cs = StoreStorageActivity.this.currStore;
                 //boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
-                boolean isDirect = cs != null && cs.getType() == Cts.STORE_VENDOR_CN;
+                boolean isDirect = !filterBtnControlled();
                 if (isDirect) {
-                    filter = StatusItem.find(FILTER_SOLD_EMPTY, isDirect).status;
+                    filter = StatusItem.find(FILTER_SOLD_EMPTY, !isDirect).status;
                     currStatusSpinner.setSelection(StatusItem.findIdx(filter, false));
                     searchTerm = "";
                     Tag tag = new Tag();
