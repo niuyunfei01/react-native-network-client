@@ -26,82 +26,16 @@ function mapStateToProps (state) {
   return {global: global}
 }
 
-function mapDispatchToProps (dispatch) {
-  return {
-    dispatch, ...bindActionCreators({
-      get_supply_orders,
-      ...globalActions
-    }, dispatch)
-  }
-}
-
-class SettlementScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    return {
-      headerTitle: '订单详情',
-    }
-  };
-  
+class SettlementOrderScene extends PureComponent {
   constructor (props) {
     super(props);
-    let {date, status, store_id, order_id, dayId} = this.props.navigation.state.params || {};
     this.state = {
-      total_price: 0,
-      order_num: 0,
-      date: date,
-      status: status,
-      order_list: [],
-      query: true,
-      store_id: store_id ? store_id : this.props.global.currStoreId,
-      order_id: order_id,
-      dayId: dayId,
-      pageMounted: false
+      order_list: []
     }
-    this.renderList = this.renderList.bind(this)
   }
   
-  componentWillMount () {
-    this.getSettleOrders()
-  }
-  
-  getSettleOrders () {
-    let store_id = this.state.store_id;
-    let date = this.state.date
-    let token = this.props.global.accessToken;
-    const {dispatch} = this.props;
-    dispatch(get_supply_orders(store_id, date, token, async (resp) => {
-      console.log(resp);
-      if (resp.ok) {
-        this.setState({
-          order_list: resp.obj.order_list,
-          total_price: resp.obj.total_price,
-          order_num: resp.obj.order_num,
-        })
-      } else {
-        ToastLong(resp.desc)
-      }
-      this.setState({query: false})
-    }));
-  }
-  
-  renderStatus (status) {
-    
-    if (status == Cts.BILL_STATUS_PAID) {
-      return (
-        <Text style={[styles.status, {
-          borderColor: colors.main_color,
-          color: colors.main_color
-        }]}>已打款</Text>
-      )
-      
-    } else {
-      return (
-        <Text style={[styles.status, {}]}>{tool.billStatus(status)}</Text>
-      )
-    }
-    
+  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+    this.setState({order_list: nextProps.orderList})
   }
   
   renderList () {
@@ -186,50 +120,40 @@ class SettlementScene extends PureComponent {
     }
   }
   
+  renderHeader () {
+    return (
+      <View style={styles.header}>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>订单:{this.state.order_num}笔</Text>
+          <Text>￥100.00</Text>
+        </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>退款:{this.state.order_num}笔</Text>
+          <Text>￥100.00</Text>
+        </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>其他:{this.state.order_num}笔</Text>
+          <Text>￥100.00</Text>
+        </View>
+      </View>
+    )
+  }
+  
   render () {
     return (
       <View style={{flex: 1}}>
-        <View style={{
-          height: pxToDp(140),
-          backgroundColor: '#fff',
-          paddingHorizontal: pxToDp(30)
-        }}>
-          <Text style={{fontSize: pxToDp(24), color: '#bfbfbf', marginTop: pxToDp(20)}}>{this.state.date}</Text>
-          <View style={{flexDirection: 'row', marginTop: pxToDp(20), justifyContent: "space-between"}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: '#3e3e3e'}}>订单:{this.state.order_num}</Text>
-              <Text style={{
-                fontSize: pxToDp(30),
-                color: '#3e3e3e',
-                marginLeft: pxToDp(80)
-              }}>金额:{tool.toFixed(this.state.total_price)}</Text>
-            </View>
-            {this.state.status ? this.renderStatus(this.state.status) : null}
-          </View>
-        </View>
+        {this.renderHeader()}
+        
+        <ScrollView style={{marginTop: pxToDp(20)}}>
+          {this.renderList()}
+        </ScrollView>
+        
         <Toast
           icon="loading"
           show={this.state.query}
           onRequestClose={() => {
           }}
         >加载中</Toast>
-        <Toast
-          icon="loading"
-          show={this.state.query}
-          onRequestClose={() => {
-          }}
-        >提交中</Toast>
-        
-        
-        <ScrollView style={{marginTop: pxToDp(20)}}>
-          
-          {
-            this.renderList()
-          }
-        
-        </ScrollView>
-      
-      
       </View>
     
     )
@@ -252,18 +176,21 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     
   },
-  status: {
-    fontSize: pxToDp(24),
-    borderWidth: pxToDp(1),
-    paddingHorizontal: pxToDp(20),
-    borderRadius: pxToDp(20),
-    lineHeight: pxToDp(34),
-    height: pxToDp(36),
-    textAlign: 'center',
-    marginTop: pxToDp(5),
+  header: {
+    backgroundColor: '#fff',
+    paddingHorizontal: pxToDp(30)
+  },
+  headerItem: {
+    flexDirection: 'row',
+    marginTop: pxToDp(20),
+    justifyContent: "space-between",
+    alignItems: 'center'
+  },
+  headerItemLabel: {
+    fontSize: pxToDp(30),
+    color: '#3e3e3e'
   }
-  
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettlementScene)
+export default connect(mapStateToProps)(SettlementOrderScene)
