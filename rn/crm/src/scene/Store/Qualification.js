@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import {ImageBackground, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {Colors, Metrics} from "../../themes";
 
@@ -320,7 +320,7 @@ class Upload extends Component {
   render() {
     const {desc, onPress, width, height, imageUrl, deleteImage} = this.props;
     return imageUrl ? (
-      <Image
+      <ImageBackground
         source={{uri: imageUrl}}
         style={{
           width: width ? width : (Metrics.CW - pxToDp(31) * 2 - 20) / 3,
@@ -340,7 +340,7 @@ class Upload extends Component {
         >
           <Icon name={"md-close-circle"} size={pxToDp(40)}/>
         </TouchableOpacity>
-      </Image>
+      </ImageBackground>
     ) : (
       <TouchableOpacity
         onPress={onPress}
