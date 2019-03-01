@@ -16,6 +16,12 @@ function mapStateToProps (state) {
 }
 
 class SettlementDetailsScene extends React.Component {
+  static navigationOptions = ({navigation}) => {
+    return {
+      headerTitle: '结算详情',
+    }
+  }
+  
   constructor (props) {
     super(props)
     let {date, status, id, key, profit} = this.props.navigation.state.params || {};
@@ -25,10 +31,17 @@ class SettlementDetailsScene extends React.Component {
       id: id,
       key: key,
       profit: profit,
+      goodsList: [],
+      orderList: [],
+      refundList: [],
+      otherList: [],
       totalPrice: 0,
       orderNum: 0,
-      goodsList: [],
-      orderList: []
+      orderAmount: 0,
+      refundNum: 0,
+      refundAmount: 0,
+      otherNum: 0,
+      otherAmount: 0
     }
   }
   
@@ -44,10 +57,17 @@ class SettlementDetailsScene extends React.Component {
     
     HttpUtils.get(`/api/settlement_detail/${store_id}/${date}?access_token=${token}`).then(res => {
       self.setState({
+        goodsList: res.goods_list,
+        orderList: res.order_list,
+        refundList: res.refund_list,
+        otherList: res.other_list,
         totalPrice: res.total_price,
         orderNum: res.order_num,
-        goodsList: res.goods_list,
-        orderList: res.order_list
+        orderAmount: res.order_amount,
+        refundNum: res.refund_order_num,
+        refundAmount: res.refund_amount,
+        otherNum: res.other_num,
+        otherAmount: res.other_amount
       })
     })
   }
@@ -82,6 +102,7 @@ class SettlementDetailsScene extends React.Component {
   }
   
   render () {
+    console.log('order list =>', this.state.orderList)
     return (
       <View style={styles.container}>
         {this.renderHeader()}
@@ -102,6 +123,14 @@ class SettlementDetailsScene extends React.Component {
           <SettlementOrderScene
             tabLabel='订单详情'
             orderList={this.state.orderList}
+            orderNum={this.state.orderNum}
+            orderAmount={this.state.orderAmount}
+            refundList={this.state.refundList}
+            refundNum={this.state.refundNum}
+            refundAmount={this.state.refundAmount}
+            otherList={this.state.otherList}
+            otherNum={this.state.otherNum}
+            otherAmount={this.state.otherAmount}
           />
         </ScrollableTabView>
       </View>

@@ -1,28 +1,8 @@
 //import liraries
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-  Image,
-} from 'react-native';
-import colors from "../../styles/colors";
+import {FlatList, Image, ScrollView, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../util/pxToDp";
-
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as globalActions from '../../reducers/global/globalActions';
-import {get_supply_items, to_settlement} from '../../reducers/settlement/settlementActions'
 import tool from '../../common/tool.js'
-import {Toast, Dialog} from "../../weui/index";
-import DateTimePicker from 'react-native-modal-datetime-picker';
-import Config from "../../config";
-import {Button} from "../../weui/index";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import Cts from '../../Cts'
 import {NavigationActions} from 'react-navigation';
 
 class SettlementGoodsScene extends PureComponent {
