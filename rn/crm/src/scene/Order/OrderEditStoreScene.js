@@ -83,9 +83,10 @@ class OrderEditStoreScene extends Component {
 
     const currStoreId = order.store_id;
     const currVendorId = (tool.store(currStoreId, global) || {}).vendor_id;
-    //菜鸟和菜鸟食材视作同一个品牌
 
-    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.vendor_id == currVendorId || (currVendorId == 1 && store.vendor_id == 2)) && store.id != currStoreId);
+    //菜鸟和菜鸟食材视作同一个品牌
+    //以后要在服务器端实现
+    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.vendor_id == currVendorId || (currVendorId == 1 && store.vendor_id == 2) || (currVendorId == 2 && store.vendor_id == 1)) && store.id != currStoreId);
 
     const availableOptions = Object.keys(availableStores).map(store_id => {
       if (store_id > 0) {
