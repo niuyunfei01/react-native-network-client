@@ -53,9 +53,10 @@ class SettlementDetailsScene extends React.Component {
     const self = this
     let store_id = this.props.global.currStoreId;
     let date = this.state.date;
+    let id = this.state.id;
     let token = this.props.global.accessToken;
-    
-    HttpUtils.get(`/api/settlement_detail/${store_id}/${date}?access_token=${token}`).then(res => {
+  
+    HttpUtils.get(`/api/settlement_detail/${id}/${store_id}/${date}?access_token=${token}`).then(res => {
       self.setState({
         goodsList: res.goods_list,
         orderList: res.order_list,

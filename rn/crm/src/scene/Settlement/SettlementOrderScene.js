@@ -48,19 +48,20 @@ class SettlementOrderScene extends PureComponent {
   }
   
   renderHeader () {
+    const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount} = this.props
     return (
       <View style={styles.header}>
         <View style={styles.headerItem}>
-          <Text style={styles.headerItemLabel}>订单:{this.props.orderNum}笔</Text>
-          <Text>￥{tool.toFixed(this.props.orderAmount)}</Text>
+          <Text style={styles.headerItemLabel}>订单:{orderNum}笔</Text>
+          <Text>￥{tool.toFixed(orderAmount)}</Text>
         </View>
         <View style={styles.headerItem}>
-          <Text style={styles.headerItemLabel}>退款:{this.props.refundNum}笔</Text>
-          <Text>-￥{tool.toFixed(this.props.refundAmount)}</Text>
+          <Text style={styles.headerItemLabel}>退款:{refundNum}笔</Text>
+          <Text>{refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)}</Text>
         </View>
         <View style={styles.headerItem}>
-          <Text style={styles.headerItemLabel}>其他:{this.props.otherNum}笔</Text>
-          <Text>￥{tool.toFixed(this.props.otherAmount)}</Text>
+          <Text style={styles.headerItemLabel}>其他:{otherNum}笔</Text>
+          <Text>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)}</Text>
         </View>
       </View>
     )
@@ -112,8 +113,8 @@ class SettlementOrderScene extends PureComponent {
               <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})}>
                 <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`}</Text>
               </TouchableOpacity>
-              <Text style={styles.num}>商品数量:{total_goods_num}</Text>
-              <Text style={styles.price}>金额:{tool.toFixed(total_supply_price)}</Text>
+              <Text>商品数量:{total_goods_num}</Text>
+              <Text>金额:{tool.toFixed(total_supply_price)}</Text>
               <TouchableOpacity onPress={() => this.toggleDropdown(key, 'order_list', item)}>
                 {self.renderDropdownImage(item)}
               </TouchableOpacity>
@@ -132,19 +133,21 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.state.refund_list}
-        renderItem={({item, key}) => {
+        ItemSeparatorComponent={<View style={styles.listSeparator}/>}
+        ListEmptyComponent={<EmptyData/>}
+        renderItem={({item, index}) => {
           let {orderTime, dayId, id} = item
           if (this.state.dayId && this.state.dayId === item.dayId && !this.state.pageMounted) {
-            this.state.order_list[key].down = true
+            this.state.order_list[index].down = true
             this.setState({pageMounted: true})
           }
           return (
-            <View key={key} style={styles.listRow}>
+            <View key={index} style={styles.itemRow}>
               <View style={styles.item_title}>
                 <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})}>
                   <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.toggleDropdown(key, 'refund_list', item)}>
+                <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refund_list', item)}>
                   {self.renderDropdownImage(item)}
                 </TouchableOpacity>
               </View>
@@ -154,10 +157,6 @@ class SettlementOrderScene extends PureComponent {
             </View>
           )
         }}
-        ItemSeparatorComponent={() => {
-          return (<View style={{borderColor: '#E2E2E2', borderBottomWidth: pxToDp(1)}}/>)
-        }}
-        ListEmptyComponent={<EmptyData/>}
       />
     )
   }
@@ -166,13 +165,18 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.state.other_list}
-        renderItem={({item, key}) => {
-          return (<View/>)
-        }}
-        ItemSeparatorComponent={() => {
-          return (<View style={{borderColor: '#E2E2E2', borderBottomWidth: pxToDp(1)}}/>)
-        }}
+        ItemSeparatorComponent={<View style={styles.listSeparator}/>}
         ListEmptyComponent={<EmptyData/>}
+        renderItem={({item, index}) => {
+          return (
+            <View key={index} style={styles.otherRow}>
+              <View style={styles.otherRowItem}>
+                <Text style={styles.goodsName}>{item.remark}</Text>
+                <Text style={styles.goodsPrice}>{item.fee < 0 ? '-' : ''}￥{tool.toFixed(item.fee, '', true)}</Text>
+              </View>
+            </View>
+          )
+        }}
       />
     )
   }
@@ -222,8 +226,7 @@ const styles = StyleSheet.create({
     minWidth: pxToDp(200),
     fontSize: pxToDp(32),
     color: colors.main_color,
-    fontWeight: '900',
-    
+    fontWeight: '900'
   },
   header: {
     backgroundColor: '#fff',
@@ -243,6 +246,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: pxToDp(1),
     borderColor: '#f2f2f2'
+  },
+  listSeparator: {
+    borderColor: '#E2E2E2',
+    borderBottomWidth: pxToDp(1)
   },
   dropdown: {
     height: pxToDp(1),
@@ -275,6 +282,21 @@ const styles = StyleSheet.create({
     width: pxToDp(130),
     color: '#ff0101',
     fontSize: pxToDp(24)
+  },
+  otherRow: {
+    backgroundColor: '#fff',
+    borderBottomWidth: pxToDp(1),
+    borderColor: '#f2f2f2',
+    flexDirection: 'row',
+    flex: 1,
+    height: pxToDp(100),
+    alignItems: 'center',
+    paddingHorizontal: pxToDp(30)
+  },
+  otherRowItem: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   }
 });
 
