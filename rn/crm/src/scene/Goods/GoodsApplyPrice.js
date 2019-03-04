@@ -2,8 +2,8 @@ import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import GoodsBaseItem from '../../Components/Goods/BaseItem'
-import InputPrice from "../../Components/Goods/InputPrice";
-import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
+import InputPrice from "./_GoodsApplyPrice/InputPrice";
+import TradeStoreItem from "./_GoodsApplyPrice/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
 import colors from "../../styles/colors"
 import {connect} from "react-redux";
@@ -82,7 +82,8 @@ class GoodsApplyPrice extends Component {
       supply_price: this.props.navigation.state.params.supplyPrice,
       wmPrice: 0,
       autoOnline: true,
-      originPrice: this.props.navigation.state.params.supplyPrice
+      originPrice: this.props.navigation.state.params.supplyPrice,
+      rankMax: 0
     }
   }
   
@@ -103,7 +104,8 @@ class GoodsApplyPrice extends Component {
         refer_price: res.refer_price,
         price_ratio: res.price_ratio,
         supplyPrice: String(res.product.store_product.supply_price),
-        originPrice: String(res.product.store_product.supply_price)
+        originPrice: String(res.product.store_product.supply_price),
+        rankMax: res.product_count
       })
     })
   }
@@ -168,33 +170,55 @@ class GoodsApplyPrice extends Component {
     this.setState({autoOnline: val})
   }
   
-  render () {
+  renderBtn () {
     const {supply_price, originPrice} = this.state
     let priceIsChange = parseFloat(supply_price) != parseFloat(originPrice)
-    console.log(`old price => ${originPrice}; new price => ${supply_price}`)
+    return (
+      <View style={[styles.bottom_box]}>
+        <If condition={priceIsChange}>
+          <TouchableOpacity onPress={() => this.onSave()}>
+            <View style={[styles.bottom_btn]}>
+              <Text style={{color: '#ffffff'}}>保存</Text>
+            </View>
+          </TouchableOpacity>
+        </If>
+        <If condition={!priceIsChange}>
+          <View style={[styles.bottom_btn, styles.disabledBtn]}>
+            <Text style={{color: '#ffffff'}}>保存</Text>
+          </View>
+        </If>
+        <TouchableOpacity onPress={() => this.onBack()}>
+          <View style={styles.bottom_btn}>
+            <Text style={{color: '#ffffff'}}>返回</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+  
+  render () {
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
           <GoodsBaseItem
-            wmText={'美团价'}
+            wmText={'当前外卖价'}
             name={this.state.product.name}
             wmPrice={this.state.product.waimai_product.price}
             image={this.state.product.listimg}
-            showWmTip={true}
-            newPrice={this.state.wmPrice}
+            newPrice={false}
             remark={'(含平台费，活动费，耗材费，运营费用等)'}
           />
           
           <InputPrice
             mode={this.state.mode}
-            showModeName={false}
-            referPrice={this.state.refer_price}
             priceRatio={this.state.price_ratio}
-            style={{marginTop: pxToDp(10)}}
             initPrice={String(this.state.product.store_product.supply_price)}
             onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
             showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
             onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
+            spec={this.state.product.spec_mark === 'g' ? this.state.product.spec : null}
+            rank={this.state.product.rank}
+            rankMax={this.state.rankMax}
           />
           
           <View style={{flex: 1}}>
@@ -210,7 +234,6 @@ class GoodsApplyPrice extends Component {
               </If>
             </View>
             <If condition={this.state.trade_products.length > 0}>
-              {/*<ScrollView style={styles.scroll_view}>*/}
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
@@ -221,9 +244,11 @@ class GoodsApplyPrice extends Component {
                   monthSale={item.monthSale}
                   storeName={item.store_name}
                   record={item.month_sales}
+                  unit_price={item.unit_price}
+                  rank={item.rank}
+                  rankMax={this.state.rankMax}
                 />
               </For>
-              {/*</ScrollView>*/}
             </If>
             <If condition={this.state.trade_products.length == 0}>
               <View style={styles.no_prod_tip}>
@@ -232,26 +257,8 @@ class GoodsApplyPrice extends Component {
             </If>
           </View>
         </ScrollView>
-        
-        <View style={[styles.bottom_box]}>
-          <If condition={priceIsChange}>
-            <TouchableOpacity onPress={() => this.onSave()}>
-              <View style={[styles.bottom_btn]}>
-                <Text style={{color: '#ffffff'}}>保存</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-          <If condition={!priceIsChange}>
-            <View style={[styles.bottom_btn, styles.disabledBtn]}>
-              <Text style={{color: '#ffffff'}}>保存</Text>
-            </View>
-          </If>
-          <TouchableOpacity onPress={() => this.onBack()}>
-            <View style={styles.bottom_btn}>
-              <Text style={{color: '#ffffff'}}>返回</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+  
+        {this.renderBtn()}
         
         <ResultDialog
           visible={this.state.resultDialog}

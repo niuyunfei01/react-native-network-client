@@ -554,6 +554,8 @@ export function toFixed (num, type = "", abs = false) {
   }
   if (type == "int") {
     return parseInt(num) / 100;
+  } else if (type === 'yuan') {
+    return Number(num).toFixed(2);
   } else {
     return (parseInt(num) / 100).toFixed(2);
   }

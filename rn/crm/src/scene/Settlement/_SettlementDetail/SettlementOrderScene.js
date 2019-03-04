@@ -1,15 +1,15 @@
 //import liraries
 import React, {PureComponent} from 'react';
 import {FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../../util/pxToDp";
 
 import {connect} from "react-redux";
-import tool from '../../common/tool.js'
-import {Toast} from "../../weui/index";
-import Config from '../../config'
-import colors from "../../styles/colors";
-import TabButton from "../component/TabButton";
-import EmptyData from "../component/EmptyData";
+import tool from '../../../common/tool.js'
+import {Toast} from "../../../weui";
+import Config from '../../../config'
+import colors from "../../../styles/colors";
+import TabButton from "../../component/TabButton";
+import EmptyData from "../../component/EmptyData";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -71,7 +71,7 @@ class SettlementOrderScene extends PureComponent {
     return (
       <Image
         style={[{width: pxToDp(80), height: pxToDp(80)}]}
-        source={item.down ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+        source={item.down ? require('../../../img/Order/pull_up.png') : require('../../../img/Order/pull_down.png')}
       />
     )
   }

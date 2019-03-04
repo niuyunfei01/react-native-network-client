@@ -1,14 +1,15 @@
 import React from 'react'
 import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view'
-import SettlementGoodsScene from './SettlementGoodsScene'
-import SettlementOrderScene from './SettlementOrderScene'
+import SettlementGoodsScene from './_SettlementDetail/SettlementGoodsScene'
+import SettlementOrderScene from './_SettlementDetail/SettlementOrderScene'
 import {connect} from "react-redux";
-import {Text, View, StyleSheet} from "react-native";
+import {Text, View, StyleSheet, ScrollView} from "react-native";
 import HttpUtils from "../../util/http";
 import Cts from "../../Cts";
 import colors from "../../styles/colors";
 import tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
+import TabButton from "../component/TabButton";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -41,7 +42,12 @@ class SettlementDetailsScene extends React.Component {
       refundNum: 0,
       refundAmount: 0,
       otherNum: 0,
-      otherAmount: 0
+      otherAmount: 0,
+      tab: [
+        {label: '商品详情', value: 'goods'},
+        {label: '订单详情', value: 'order'}
+      ],
+      activeTab: 'goods',
     }
   }
   
@@ -106,34 +112,45 @@ class SettlementDetailsScene extends React.Component {
     console.log('order list =>', this.state.orderList)
     return (
       <View style={styles.container}>
-        {this.renderHeader()}
-    
-        <ScrollableTabView
-          renderTabBar={() => <DefaultTabBar
-            activeTextColor={colors.main_color}
-            underlineStyle={{backgroundColor: colors.main_color}}
-          />}
-          initialPage={0}
-          page={0}
-          
-        >
-          <SettlementGoodsScene
-            tabLabel='商品详情'
-            goodsList={this.state.goodsList}
+        <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
+          {this.renderHeader()}
+          <TabButton
+            data={this.state.tab}
+            onClick={(value) => this.setState({activeTab: value})}
+            containerStyle={{marginTop: pxToDp(10)}}
           />
-          <SettlementOrderScene
-            tabLabel='订单详情'
-            orderList={this.state.orderList}
-            orderNum={this.state.orderNum}
-            orderAmount={this.state.orderAmount}
-            refundList={this.state.refundList}
-            refundNum={this.state.refundNum}
-            refundAmount={this.state.refundAmount}
-            otherList={this.state.otherList}
-            otherNum={this.state.otherNum}
-            otherAmount={this.state.otherAmount}
-          />
-        </ScrollableTabView>
+          {/*<ScrollableTabView*/}
+          {/*renderTabBar={() => <DefaultTabBar*/}
+          {/*activeTextColor={colors.main_color}*/}
+          {/*underlineStyle={{backgroundColor: colors.main_color}}*/}
+          {/*/>}*/}
+          {/*initialPage={0}*/}
+          {/*page={0}*/}
+          {/*style={{backgroundColor: 'red'}}*/}
+          {/*>*/}
+          <If condition={this.state.activeTab === 'goods'}>
+            <SettlementGoodsScene
+              tabLabel='商品详情'
+              goodsList={this.state.goodsList}
+              orderAmount={this.state.orderAmount}
+            />
+          </If>
+          <If condition={this.state.activeTab === 'order'}>
+            <SettlementOrderScene
+              tabLabel='订单详情'
+              orderList={this.state.orderList}
+              orderNum={this.state.orderNum}
+              orderAmount={this.state.orderAmount}
+              refundList={this.state.refundList}
+              refundNum={this.state.refundNum}
+              refundAmount={this.state.refundAmount}
+              otherList={this.state.otherList}
+              otherNum={this.state.otherNum}
+              otherAmount={this.state.otherAmount}
+            />
+          </If>
+          {/*</ScrollableTabView>*/}
+        </ScrollView>
       </View>
     )
   }

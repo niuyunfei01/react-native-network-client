@@ -14,7 +14,6 @@ export default class BaseItem extends PureComponent {
     showModifyPriceBtn: PropTypes.bool,
     onPressModifyPrice: PropTypes.func,
     style: PropTypes.object,
-    newPrice: PropTypes.any,
     remark: PropTypes.string,
     wmText: PropTypes.string
   }
@@ -38,7 +37,6 @@ export default class BaseItem extends PureComponent {
               <Text style={[styles.goods_price]}>
                 {this.props.wmPrice || this.props.wmPrice === 0 ? `${this.props.wmText}:${this.props.wmPrice}` : null}
                 {this.props.supplyPrice || this.props.supplyPrice === 0 ? `保底价:${this.props.supplyPrice}` : null}
-                {this.props.newPrice || this.props.newPrice === 0 ? ` => ${this.props.newPrice}` : null}
               </Text>
               {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
               {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}

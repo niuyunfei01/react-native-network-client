@@ -68,7 +68,7 @@ import OrderCancelShip from "../scene/Order/OrderCancelShip";
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
 import SettlementDetailsScene from "../scene/Settlement/SettlementDetailsScene";
-import SettlementOrderScene from "../scene/Settlement/SettlementOrderScene";
+import SettlementOrderScene from "../scene/Settlement/_SettlementDetail/SettlementOrderScene";
 import SettlementGatherScene from "../scene/Settlement/SettlementGatherScene";
 
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
