@@ -1,5 +1,4 @@
 import React from 'react'
-import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view'
 import SettlementGoodsScene from './_SettlementDetail/SettlementGoodsScene'
 import SettlementOrderScene from './_SettlementDetail/SettlementOrderScene'
 import {connect} from "react-redux";
@@ -109,7 +108,6 @@ class SettlementDetailsScene extends React.Component {
   }
   
   render () {
-    console.log('order list =>', this.state.orderList)
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
@@ -119,15 +117,6 @@ class SettlementDetailsScene extends React.Component {
             onClick={(value) => this.setState({activeTab: value})}
             containerStyle={{marginTop: pxToDp(10)}}
           />
-          {/*<ScrollableTabView*/}
-          {/*renderTabBar={() => <DefaultTabBar*/}
-          {/*activeTextColor={colors.main_color}*/}
-          {/*underlineStyle={{backgroundColor: colors.main_color}}*/}
-          {/*/>}*/}
-          {/*initialPage={0}*/}
-          {/*page={0}*/}
-          {/*style={{backgroundColor: 'red'}}*/}
-          {/*>*/}
           <If condition={this.state.activeTab === 'goods'}>
             <SettlementGoodsScene
               tabLabel='商品详情'
@@ -149,7 +138,6 @@ class SettlementDetailsScene extends React.Component {
               otherAmount={this.state.otherAmount}
             />
           </If>
-          {/*</ScrollableTabView>*/}
         </ScrollView>
       </View>
     )
