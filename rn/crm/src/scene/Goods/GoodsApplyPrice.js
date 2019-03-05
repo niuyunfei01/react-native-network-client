@@ -15,7 +15,7 @@ import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import Cts from "../../Cts";
 import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";
-
+import _ from 'lodash'
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -83,7 +83,7 @@ class GoodsApplyPrice extends Component {
       wmPrice: 0,
       autoOnline: true,
       originPrice: this.props.navigation.state.params.supplyPrice,
-      rankMax: 0
+      unitPrices: []
     }
   }
   
@@ -97,15 +97,15 @@ class GoodsApplyPrice extends Component {
     const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
     HttpUtils.get(url, {sortType: type}).then(res => {
-      console.log(res)
       self.setState({
         product: res.product,
         trade_products: res.trade_products,
         refer_price: res.refer_price,
         price_ratio: res.price_ratio,
         supplyPrice: String(res.product.store_product.supply_price),
-        originPrice: String(res.product.store_product.supply_price),
-        rankMax: res.product_count
+        originPrice: String(res.product.store_product.supply_price)
+      }, () => {
+        self.sortPrice()
       })
     })
   }
@@ -166,8 +166,27 @@ class GoodsApplyPrice extends Component {
   }
   
   onAutoOnlineChange (val) {
-    console.log('onAutoOnlineChange => ', val)
     this.setState({autoOnline: val})
+  }
+  
+  sortPrice () {
+    const {trade_products, product, wmPrice} = this.state
+    let unitPrices = _.map(trade_products, 'unit_price')
+    if (product.spec_mark === 'g' && product.spec && wmPrice) {
+      unitPrices.push(wmPrice / product.spec * 500)
+    }
+    unitPrices.sort()
+    this.setState({unitPrices})
+  }
+  
+  onInputNewPrice (supplyPrice, wmPrice) {
+    const self = this
+    self.setState({
+      supply_price: supplyPrice,
+      wmPrice: wmPrice
+    }, () => {
+      self.sortPrice()
+    })
   }
   
   renderBtn () {
@@ -197,6 +216,7 @@ class GoodsApplyPrice extends Component {
   }
   
   render () {
+    let unitWmPrice = this.state.wmPrice / this.state.product.spec * 500
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
@@ -213,12 +233,12 @@ class GoodsApplyPrice extends Component {
             mode={this.state.mode}
             priceRatio={this.state.price_ratio}
             initPrice={String(this.state.product.store_product.supply_price)}
-            onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
+            onInput={(supplyPrice, wmPrice) => this.onInputNewPrice(supplyPrice, wmPrice)}
             showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
             onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
             spec={this.state.product.spec_mark === 'g' ? this.state.product.spec : null}
-            rank={this.state.product.rank}
-            rankMax={this.state.rankMax}
+            rank={this.state.unitPrices.indexOf(unitWmPrice) + 1}
+            rankMax={this.state.unitPrices.length}
           />
           
           <View style={{flex: 1}}>
@@ -245,8 +265,8 @@ class GoodsApplyPrice extends Component {
                   storeName={item.store_name}
                   record={item.month_sales}
                   unit_price={item.unit_price}
-                  rank={item.rank}
-                  rankMax={this.state.rankMax}
+                  rank={this.state.unitPrices.indexOf(item.unit_price) + 1}
+                  rankMax={this.state.unitPrices.length}
                 />
               </For>
             </If>

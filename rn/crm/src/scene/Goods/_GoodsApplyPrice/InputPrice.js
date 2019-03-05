@@ -38,7 +38,6 @@ export default class InputPrice extends PureComponent {
     if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
       this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
     }
-    console.log('next props ', nextProps)
   }
   
   onInputPrice (val, ratio) {
@@ -65,10 +64,8 @@ export default class InputPrice extends PureComponent {
         radd = parseInt(ratio.add)
       }
     }
-    console.log('apply price  val ===> ', val)
-    console.log('apply price  ratio ===> ', ratio)
     let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
-    wm_price = tool.priceOptimize(wm_price * 100)
+    wm_price = tool.priceOptimize(wm_price * 100) / 100
     this.setState({wm_price})
     this.props.onInput && this.props.onInput(val, wm_price)
   }
@@ -93,17 +90,16 @@ export default class InputPrice extends PureComponent {
   }
   
   render () {
-    console.log('wm price', this.state.wm_price, 'spec ', this.props.spec)
     return (
       <View style={[styles.cell_box]}>
         <View style={styles.top}>
           <View style={styles.input_box}>
             <Text style={styles.title}>
               <If condition={this.props.mode === 1}>
-                请输入外卖价格
+                请输入
               </If>
               <If condition={this.props.mode !== 1}>
-                请输入供货价
+                请输入
               </If>
             </Text>
             <TextInput
@@ -119,7 +115,7 @@ export default class InputPrice extends PureComponent {
           
           <If condition={this.props.spec}>
             <Text style={styles.unit_price}>
-              外卖价约{tool.toFixed(this.state.wm_price / this.props.spec * 500)}元/斤
+              外卖价约{tool.toFixed(this.state.wm_price / this.props.spec * 500, 'yuan')}元/斤
             </Text>
           </If>
         </View>
@@ -132,13 +128,13 @@ export default class InputPrice extends PureComponent {
           >
             <Text>价格生效后自动上架</Text>
           </AgreeItem>
-          
-          {/*<If condition={this.props.rank}>*/}
-            {/*<Text style={styles.rank}>您的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/10</Text>*/}
-          {/*</If>*/}
-          {/*<If condition={!this.props.rank}>*/}
-            {/*<Text style={styles.rank}>无法计算排名</Text>*/}
-          {/*</If>*/}
+  
+          <If condition={this.props.rank}>
+            <Text style={styles.rank}>您的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/10</Text>
+          </If>
+          <If condition={!this.props.rank}>
+            <Text style={styles.rank}>无法计算排名</Text>
+          </If>
         </View>
       </View>
     )

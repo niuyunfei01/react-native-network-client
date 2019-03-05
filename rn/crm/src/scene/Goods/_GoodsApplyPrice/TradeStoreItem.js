@@ -27,15 +27,15 @@ export default class TradeStoreItem extends PureComponent {
           <View style={[styles.item_right]}>
             <View style={styles.top}>
               <Text style={[styles.goods_name]} numberOfLines={2}>{this.props.name}</Text>
-              
-              {/*<If condition={this.props.rank}>*/}
-              {/*<Text style={styles.rank}>*/}
-              {/*TA的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/{this.props.rankMax}*/}
-              {/*</Text>*/}
-              {/*</If>*/}
-              {/*<If condition={!this.props.rank}>*/}
-              {/*<Text style={styles.rank}>无法计算排名</Text>*/}
-              {/*</If>*/}
+  
+              <If condition={this.props.rank}>
+                <Text style={styles.rank}>
+                  TA的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/{this.props.rankMax}
+                </Text>
+              </If>
+              <If condition={!this.props.rank}>
+                <Text style={styles.rank}>无法计算排名</Text>
+              </If>
             </View>
             <View style={styles.sku}>
               <Text style={[styles.goods_price]}>外卖价:￥{tool.toFixed(this.props.price, 'yuan')}</Text>
