@@ -86,7 +86,7 @@ class GoodsPriceIndex extends Component {
     this.setState({isLoading: true})
     HttpUtils.get(`/api/get_store_should_adjust_prods_new/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
       const list = (this.state.page === 1 ? [] : this.state.list).concat(res.list)
-      self.setState({isLastPage: !res.has_more, list: list, isLoading: false, page: page})
+      self.setState({isLastPage: !res.has_more, list: list, isLoading: false, page: res.page})
     })
   }
   
@@ -128,7 +128,7 @@ class GoodsPriceIndex extends Component {
         supplyPrice: product.supply_price,
         onBack: () => {
           let list = self.state.list
-          product.hasApply = true
+          product.isAuditing = true
           list.splice(idx, 1, product)
           self.setState({
             list: list
@@ -227,23 +227,14 @@ class GoodsPriceIndex extends Component {
           <Text style={styles.goodsPrice}>￥{product.supply_price}</Text>
         </View>
         <View style={styles.goodsRight}>
-          <If condition={!product.hasApply}>
-            <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
-              <View style={styles.opBtn}>
-                <Text style={styles.opText}>比价/调价</Text>
-                <If condition={product.isAuditing}>
-                  <Text style={styles.auditing}>调价中</Text>
-                </If>
-              </View>
-            </TouchableOpacity>
-          </If>
-          <If condition={product.hasApply}>
-            <TouchableOpacity>
-              <View style={[styles.opBtn, styles.opBtnDisable]}>
-                <Text style={[styles.opText, styles.opTextDisable]}>已改价</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
+          <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
+            <View style={styles.opBtn}>
+              <Text style={styles.opText}>比价/调价</Text>
+              <If condition={product.isAuditing}>
+                <Text style={styles.auditing}>调价中</Text>
+              </If>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -257,15 +248,23 @@ class GoodsPriceIndex extends Component {
     )
   }
   
+  renderContent () {
+    return (
+      <View>
+        {this.renderMessage()}
+        {this.renderList()}
+      </View>
+    )
+  }
+  
   render () {
     return (
       <View style={styles.container}>
-        {this.renderMessage()}
         {this.renderTab()}
         
         <LoadMore
           loadMoreType={'scroll'}
-          renderList={this.renderList()}
+          renderList={this.renderContent()}
           onRefresh={() => this.onRefresh()}
           isLastPage={this.state.isLastPage}
           isLoading={this.state.isLoading}
