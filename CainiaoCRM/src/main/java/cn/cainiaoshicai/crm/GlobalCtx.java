@@ -301,30 +301,34 @@ public class GlobalCtx extends Application {
     }
 
     public void startKeepAlive() {
-        LoadedApkHuaWei.hookHuaWeiVerifier(this);
-        //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
-        DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
-        KeepAliveService.sShouldStopService = false;
-        DaemonEnv.startServiceMayBind(KeepAliveService.class);
+        try {
+            LoadedApkHuaWei.hookHuaWeiVerifier(this);
+            //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
+            DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
+            KeepAliveService.sShouldStopService = false;
+            DaemonEnv.startServiceMayBind(KeepAliveService.class);
 
-        //定义前台服务的默认样式。即标题、描述和图标
-        ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
-            @Override
-            public void foregroundNotificationClick() {
+            //定义前台服务的默认样式。即标题、描述和图标
+            ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
+                @Override
+                public void foregroundNotificationClick() {
 
-            }
-        });
+                }
+            });
 
-        //启动保活服务
-        KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
-            @Override
-            public void onWorking(Context context) {
-            }
+            //启动保活服务
+            KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
+                @Override
+                public void onWorking(Context context) {
+                }
 
-            @Override
-            public void onStop(Context context) {
-            }
-        });
+                @Override
+                public void onStop(Context context) {
+                }
+            });
+        } catch (Exception e) {
+
+        }
     }
 
     public void updateAfterGap(final int fiveMin) {
