@@ -194,42 +194,6 @@ class SettlementScene extends PureComponent {
     }
   }
   
-  // renderProfit (item) {
-  //   if (item["profit_price"] > 0) {
-  //     return (
-  //       <View
-  //         style={{
-  //           marginLeft: pxToDp(10),
-  //           flexDirection: "row",
-  //           alignItems: "center"
-  //         }}
-  //       >
-  //         <Text
-  //           style={{
-  //             color: colors.fontGray,
-  //             fontSize: 16,
-  //             textAlign: "center"
-  //           }}
-  //         >
-  //           {tool.toFixed(item["profit_price"])}元
-  //         </Text>
-  //         <Text
-  //           style={{
-  //             marginTop: 5,
-  //             fontSize: 10,
-  //             color: "red",
-  //             textAlign: "center"
-  //           }}
-  //         >
-  //           收益结转
-  //         </Text>
-  //       </View>
-  //     );
-  //   } else {
-  //     return <View/>;
-  //   }
-  // }
-  
   selectAll () {
     let selectAllList = [];
     let {checked, list} = this.state;
@@ -366,28 +330,10 @@ class SettlementScene extends PureComponent {
           >
             <Text numberOfLines={1} style={{fontSize: pxToDp(22)}}>
               {Moment(index).format('YY年MM月')}
-              {/*<Text style={{color: "#eee"}}>-26</Text>*/}
             </Text>
-            <Text style={{width: pxToDp(65), textAlign: "center", fontSize: pxToDp(24)}}>
-              状态
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={{width: pxToDp(90), textAlign: "center", fontSize: pxToDp(24)}}
-            >
-              退款
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={{width: pxToDp(90), textAlign: "center", fontSize: pxToDp(24)}}
-            >
-              运费
-            </Text>
-            <View/>
             <TouchableOpacity
-              onPress={() => {
-                this.toMonthGather(index);
-              }}
+              style={{flex: 1}}
+              onPress={() => this.toMonthGather(index)}
             >
               <Text style={[styles.to_month, {fontSize: pxToDp(24)}]} numberOfLines={1}>
                 本月销量汇总
@@ -432,33 +378,12 @@ class SettlementScene extends PureComponent {
                       {Moment(ite.bill_date).format('MM-DD')}
                     </Text>
                     {this.renderStatus(ite.status)}
-                    <Text
-                      style={{
-                        fontSize: pxToDp(24),
-                        color: "#ff0018",
-                        width: pxToDp(90),
-                        textAlign: "center"
-                      }}
-                    >
-                      {tool.toFixed(ite.refund_fee)}元
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: pxToDp(24),
-                        color: "#ff0018",
-                        width: pxToDp(90),
-                        textAlign: "center"
-                      }}
-                    >
-                      {tool.toFixed(ite.seller_ship_charge)}元
-                    </Text>
-                    {/*{this.renderProfit(ite)}*/}
                     <View
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "flex-end",
-                        width: 100
+                        flex: 1
                       }}
                     >
                       <Text style={{color: colors.fontGray, fontSize: pxToDp(24)}}>
@@ -587,7 +512,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: colors.fontGray,
     borderColor: colors.fontGray,
-    lineHeight: pxToDp(28)
+    lineHeight: pxToDp(28),
   },
   btn_box: {
     position: "absolute",
@@ -628,7 +553,7 @@ const styles = StyleSheet.create({
     color: colors.main_color,
     fontSize: pxToDp(30),
     textAlign: "right",
-    width: 100
+    flex: 1
   }
 });
 

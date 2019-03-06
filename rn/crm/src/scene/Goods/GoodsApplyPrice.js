@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import GoodsBaseItem from '../../Components/Goods/BaseItem'
-import InputPrice from "../../Components/Goods/InputPrice";
-import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
+import GoodsItem from './_GoodsApplyPrice/GoodsItem'
+import InputPrice from "./_GoodsApplyPrice/InputPrice";
+import TradeStoreItem from "./_GoodsApplyPrice/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
 import colors from "../../styles/colors"
 import {connect} from "react-redux";
@@ -15,7 +15,7 @@ import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import Cts from "../../Cts";
 import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";
-
+import _ from 'lodash'
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -82,7 +82,8 @@ class GoodsApplyPrice extends Component {
       supply_price: this.props.navigation.state.params.supplyPrice,
       wmPrice: 0,
       autoOnline: true,
-      originPrice: this.props.navigation.state.params.supplyPrice
+      originPrice: this.props.navigation.state.params.supplyPrice,
+      unitPrices: []
     }
   }
   
@@ -96,7 +97,6 @@ class GoodsApplyPrice extends Component {
     const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
     HttpUtils.get(url, {sortType: type}).then(res => {
-      console.log(res)
       self.setState({
         product: res.product,
         trade_products: res.trade_products,
@@ -104,6 +104,8 @@ class GoodsApplyPrice extends Component {
         price_ratio: res.price_ratio,
         supplyPrice: String(res.product.store_product.supply_price),
         originPrice: String(res.product.store_product.supply_price)
+      }, () => {
+        self.sortPrice()
       })
     })
   }
@@ -164,37 +166,85 @@ class GoodsApplyPrice extends Component {
   }
   
   onAutoOnlineChange (val) {
-    console.log('onAutoOnlineChange => ', val)
     this.setState({autoOnline: val})
   }
   
-  render () {
+  sortPrice () {
+    const {trade_products, product, wmPrice} = this.state
+    let unitPrices = _.map(trade_products, 'unit_price')
+    if (product.spec_mark === 'g' && product.spec && wmPrice) {
+      unitPrices.push(wmPrice / product.spec * 500)
+    }
+  
+    unitPrices = _.uniq(unitPrices)
+    unitPrices.sort(function (a, b) {
+      return a - b
+    })
+    console.log('sort ', unitPrices)
+    this.setState({unitPrices})
+  }
+  
+  onInputNewPrice (supplyPrice, wmPrice) {
+    const self = this
+    self.setState({
+      supply_price: supplyPrice,
+      wmPrice: wmPrice
+    }, () => {
+      self.sortPrice()
+    })
+  }
+  
+  renderBtn () {
     const {supply_price, originPrice} = this.state
     let priceIsChange = parseFloat(supply_price) != parseFloat(originPrice)
-    console.log(`old price => ${originPrice}; new price => ${supply_price}`)
+    return (
+      <View style={[styles.bottom_box]}>
+        <If condition={priceIsChange}>
+          <TouchableOpacity onPress={() => this.onSave()}>
+            <View style={[styles.bottom_btn]}>
+              <Text style={{color: '#ffffff'}}>保存</Text>
+            </View>
+          </TouchableOpacity>
+        </If>
+        <If condition={!priceIsChange}>
+          <View style={[styles.bottom_btn, styles.disabledBtn]}>
+            <Text style={{color: '#ffffff'}}>保存</Text>
+          </View>
+        </If>
+        <TouchableOpacity onPress={() => this.onBack()}>
+          <View style={styles.bottom_btn}>
+            <Text style={{color: '#ffffff'}}>返回</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+  
+  render () {
+    let unitWmPrice = this.state.wmPrice / this.state.product.spec * 500
+    console.log(this.state.unitPrices)
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
-          <GoodsBaseItem
-            wmText={'美团价'}
+          <GoodsItem
+            wmText={'当前外卖价'}
             name={this.state.product.name}
             wmPrice={this.state.product.waimai_product.price}
             image={this.state.product.listimg}
-            showWmTip={true}
-            newPrice={this.state.wmPrice}
+            newPrice={false}
             remark={'(含平台费，活动费，耗材费，运营费用等)'}
           />
           
           <InputPrice
             mode={this.state.mode}
-            showModeName={false}
-            referPrice={this.state.refer_price}
             priceRatio={this.state.price_ratio}
-            style={{marginTop: pxToDp(10)}}
             initPrice={String(this.state.product.store_product.supply_price)}
-            onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
+            onInput={(supplyPrice, wmPrice) => this.onInputNewPrice(supplyPrice, wmPrice)}
             showAutoOnline={this.state.product.store_product.status != Cts.STORE_PROD_ON_SALE}
             onAutoOnlineChange={(val) => this.onAutoOnlineChange(val)}
+            spec={this.state.product.spec_mark === 'g' ? this.state.product.spec : null}
+            rank={this.state.unitPrices.indexOf(unitWmPrice) + 1}
+            rankMax={this.state.unitPrices.length}
           />
           
           <View style={{flex: 1}}>
@@ -210,7 +260,6 @@ class GoodsApplyPrice extends Component {
               </If>
             </View>
             <If condition={this.state.trade_products.length > 0}>
-              {/*<ScrollView style={styles.scroll_view}>*/}
               <For each="item" index="idx" of={this.state.trade_products}>
                 <TradeStoreItem
                   key={idx}
@@ -221,9 +270,11 @@ class GoodsApplyPrice extends Component {
                   monthSale={item.monthSale}
                   storeName={item.store_name}
                   record={item.month_sales}
+                  unit_price={item.unit_price}
+                  rank={this.state.unitPrices.indexOf(item.unit_price) + 1}
+                  rankMax={this.state.unitPrices.length}
                 />
               </For>
-              {/*</ScrollView>*/}
             </If>
             <If condition={this.state.trade_products.length == 0}>
               <View style={styles.no_prod_tip}>
@@ -232,26 +283,8 @@ class GoodsApplyPrice extends Component {
             </If>
           </View>
         </ScrollView>
-        
-        <View style={[styles.bottom_box]}>
-          <If condition={priceIsChange}>
-            <TouchableOpacity onPress={() => this.onSave()}>
-              <View style={[styles.bottom_btn]}>
-                <Text style={{color: '#ffffff'}}>保存</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-          <If condition={!priceIsChange}>
-            <View style={[styles.bottom_btn, styles.disabledBtn]}>
-              <Text style={{color: '#ffffff'}}>保存</Text>
-            </View>
-          </If>
-          <TouchableOpacity onPress={() => this.onBack()}>
-            <View style={styles.bottom_btn}>
-              <Text style={{color: '#ffffff'}}>返回</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+  
+        {this.renderBtn()}
         
         <ResultDialog
           visible={this.state.resultDialog}

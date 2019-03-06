@@ -1,9 +1,9 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../../util/pxToDp";
 
-export default class BaseItem extends PureComponent {
+export default class GoodsItem extends PureComponent {
   static propTypes = {
     image: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -34,10 +34,7 @@ export default class BaseItem extends PureComponent {
           <View style={[styles.item_right]}>
             <Text style={[styles.goods_name]}>{this.props.name}</Text>
             <View style={styles.sku}>
-              <Text style={[styles.goods_price]}>
-                {this.props.wmPrice || this.props.wmPrice === 0 ? `${this.props.wmText}:${this.props.wmPrice}` : null}
-                {this.props.supplyPrice || this.props.supplyPrice === 0 ? `保底价:${this.props.supplyPrice}` : null}
-              </Text>
+              <Text style={[styles.goods_price]}>当前外卖价:{this.props.wmPrice}</Text>
               {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
               {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
               <If condition={this.props.showModifyPriceBtn}>
@@ -85,8 +82,8 @@ const styles = StyleSheet.create({
     color: '#4a4a4a'
   },
   goods_price: {
-    fontSize: pxToDp(30),
-    color: '#fd5b1b'
+    fontSize: pxToDp(24),
+    color: '#666666'
   },
   goods_month_sale: {
     fontSize: pxToDp(24),

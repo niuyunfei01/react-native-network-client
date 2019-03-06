@@ -548,9 +548,14 @@ export function first_store_id (canReadStores) {
   return first_store_id;
 }
 
-export function toFixed (num, type = "") {
+export function toFixed (num, type = "", abs = false) {
+  if (abs) {
+    num = Math.abs(num)
+  }
   if (type == "int") {
     return parseInt(num) / 100;
+  } else if (type === 'yuan') {
+    return Number(num).toFixed(2);
   } else {
     return (parseInt(num) / 100).toFixed(2);
   }
