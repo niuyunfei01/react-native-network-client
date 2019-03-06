@@ -84,9 +84,9 @@ class GoodsPriceIndex extends Component {
     const self = this
     const {access_token, store_id, tabActiveValue, page, pageSize} = this.state
     this.setState({isLoading: true})
-    HttpUtils.get(`/api/get_store_should_adjust_prods/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
+    HttpUtils.get(`/api/get_store_should_adjust_prods_new/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
       const list = (this.state.page === 1 ? [] : this.state.list).concat(res.list)
-      self.setState({isLastPage: !res.has_more, list: list, isLoading: false})
+      self.setState({isLastPage: !res.has_more, list: list, isLoading: false, page: page})
     })
   }
   
