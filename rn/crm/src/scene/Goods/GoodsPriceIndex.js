@@ -231,6 +231,9 @@ class GoodsPriceIndex extends Component {
             <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
               <View style={styles.opBtn}>
                 <Text style={styles.opText}>比价/调价</Text>
+                <If condition={product.isAuditing}>
+                  <Text style={styles.auditing}>调价中</Text>
+                </If>
               </View>
             </TouchableOpacity>
           </If>
@@ -367,6 +370,10 @@ const styles = StyleSheet.create({
   opText: {
     color: color.theme,
     fontSize: pxToDp(20)
+  },
+  auditing: {
+    color: color.fontGray,
+    fontSize: pxToDp(18)
   },
   opBtnDisable: {
     backgroundColor: color.fontGray,
