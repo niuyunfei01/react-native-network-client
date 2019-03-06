@@ -9,7 +9,6 @@ import color from '../../../widget/color'
 const AgreeItem = Checkbox.AgreeItem;
 export default class InputPrice extends PureComponent {
   static propTypes = {
-    mode: PropTypes.oneOf([1, 2]),// 1抽佣模式 2保底模式
     style: PropTypes.any,
     referPrice: PropTypes.oneOfType([
       PropTypes.number,
@@ -41,12 +40,7 @@ export default class InputPrice extends PureComponent {
   }
   
   onInputPrice (val, ratio) {
-    if (this.props.mode === 1) {
-      this.onUpdateSupplyPrice(val, ratio)
-    }
-    if (this.props.mode === 2) {
       this.onUpdateWmPrice(val, ratio)
-    }
   }
   
   onUpdateWmPrice (val, ratio) {
@@ -94,14 +88,7 @@ export default class InputPrice extends PureComponent {
       <View style={[styles.cell_box]}>
         <View style={styles.top}>
           <View style={styles.input_box}>
-            <Text style={styles.title}>
-              <If condition={this.props.mode === 1}>
-                请输入
-              </If>
-              <If condition={this.props.mode !== 1}>
-                请输入
-              </If>
-            </Text>
+            <Text style={styles.title}>请输入供货价</Text>
             <TextInput
               defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
               keyboardType={'numeric'}
@@ -130,7 +117,9 @@ export default class InputPrice extends PureComponent {
           </AgreeItem>
   
           <If condition={this.props.rank}>
-            <Text style={styles.rank}>您的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/10</Text>
+            <Text style={styles.rank}>
+              您的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/{this.props.rankMax}
+            </Text>
           </If>
           <If condition={!this.props.rank}>
             <Text style={styles.rank}>无法计算排名</Text>
@@ -187,10 +176,11 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(20)
   },
   rankTip: {
-    color: color.red
+    color: color.red,
+    fontSize: pxToDp(30)
   },
   unit_price: {
-    color: color.fontGray,
+    color: '#ff6600',
     fontSize: pxToDp(24)
   }
 })

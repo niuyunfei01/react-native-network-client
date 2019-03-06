@@ -133,13 +133,13 @@ const styles = StyleSheet.create({
   },
   rank: {
     color: color.fontGray,
-    fontSize: pxToDp(20)
+    fontSize: pxToDp(24)
   },
   rankTip: {
     color: color.red
   },
   unit_price:{
-    color: color.fontGray,
+    color: '#ff6600',
     fontSize: pxToDp(24)
   }
 })
