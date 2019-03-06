@@ -486,7 +486,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             String color = obj.get("color");
                             storeProdQuota.setBackgroundColor(Color.parseColor(color));
                             storeProdPriceScore.setText("价格: " + score + " 分");
-                            storeProdScoreDetail.setText(obj.get("high") + " 个高于同行");
+                            storeProdScoreDetail.setText(obj.get("highRate") + " 高于同行");
                             storeProdQuota.setVisibility(View.VISIBLE);
                             storeProdQuota.setOnClickListener(new View.OnClickListener() {
                                 @Override

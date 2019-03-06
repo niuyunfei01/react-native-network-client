@@ -354,6 +354,9 @@ public class OrderPrinter {
     }
 
     public static byte[] printOrder(Order order) throws IOException {
+        if (order != null) {
+            return new byte[]{};
+        }
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
         ByteArrayOutputStream btos = new ByteArrayOutputStream();

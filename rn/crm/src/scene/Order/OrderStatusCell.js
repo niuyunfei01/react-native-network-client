@@ -59,7 +59,12 @@ class OrderStatusCell extends PureComponent {
         <Text style={[invalidStyle, tool.isPreOrder(order.expectTime) ? {color: colors.orange} : {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
-        <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>{order.pl_name}#{order.platformId} {order.platform_oid}</Text>
+        <View>
+          <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>{order.pl_name}#{order.platform_dayId} {order.platform_oid}</Text>
+          <If condition={order.eb_order_from == '1'}>
+            <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
+          </If>
+        </View>
         <View style={{flex: 1}}/>
         <Text style={[invalidStyle, {color: colors.color666}]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
       </View>

@@ -250,8 +250,14 @@ public class ReactModalHostView extends ViewGroup implements LifecycleEventListe
     if (mHardwareAccelerated) {
       mDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
     }
-    if (currentActivity == null || !currentActivity.isFinishing()) {
+    if (currentActivity != null && !currentActivity.isFinishing()) {
       mDialog.show();
+      if (context instanceof Activity) {
+        mDialog.getWindow().getDecorView().setSystemUiVisibility(
+                ((Activity) context).getWindow().getDecorView().getSystemUiVisibility()
+        );
+      }
+      mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
   }
 
