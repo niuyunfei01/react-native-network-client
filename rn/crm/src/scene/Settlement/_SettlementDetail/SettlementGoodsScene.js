@@ -45,14 +45,7 @@ class SettlementGoodsScene extends PureComponent {
     });
     return this.state.goods_list.map((item, key) => {
       return (
-        <View style={{
-          flexDirection: 'row',
-          backgroundColor: '#fff',
-          justifyContent: 'space-between',
-          height: pxToDp(120),
-          alignItems: 'center',
-          paddingHorizontal: pxToDp(30)
-        }}>
+        <View key={key} style={title.goodsRow}>
           <Text numberOfLines={2} style={title.name}>{item.goods_name}</Text>
           <Text numberOfLines={2} style={title.comm}>{item.goods_num}</Text>
           <Text numberOfLines={2} style={title.comm}>{tool.toFixed(item.supply_price)}</Text>

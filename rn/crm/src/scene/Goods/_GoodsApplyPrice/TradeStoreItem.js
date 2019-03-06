@@ -26,7 +26,9 @@ export default class TradeStoreItem extends PureComponent {
           </If>
           <View style={[styles.item_right]}>
             <View style={styles.top}>
-              <Text style={[styles.goods_name]} numberOfLines={2}>{this.props.name}</Text>
+              <View style={{flex: 1}}>
+                <Text style={[styles.goods_name]} numberOfLines={2}>{this.props.name}</Text>
+              </View>
   
               <If condition={this.props.rank}>
                 <Text style={styles.rank}>
@@ -102,8 +104,8 @@ const styles = StyleSheet.create({
     color: '#4a4a4a'
   },
   goods_price: {
-    fontSize: pxToDp(30),
-    color: '#fd5b1b'
+    fontSize: pxToDp(24),
+    color: '#666666'
   },
   goods_month_sale: {
     fontSize: pxToDp(24),
@@ -129,11 +131,14 @@ const styles = StyleSheet.create({
   top: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    flex: 1
   },
   rank: {
     color: color.fontGray,
-    fontSize: pxToDp(24)
+    fontSize: pxToDp(24),
+    width: pxToDp(250),
+    textAlign: 'right'
   },
   rankTip: {
     color: color.red

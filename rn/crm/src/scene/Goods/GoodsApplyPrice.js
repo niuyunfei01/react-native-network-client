@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import GoodsBaseItem from '../../Components/Goods/BaseItem'
+import GoodsItem from './_GoodsApplyPrice/GoodsItem'
 import InputPrice from "./_GoodsApplyPrice/InputPrice";
 import TradeStoreItem from "./_GoodsApplyPrice/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
@@ -175,7 +175,12 @@ class GoodsApplyPrice extends Component {
     if (product.spec_mark === 'g' && product.spec && wmPrice) {
       unitPrices.push(wmPrice / product.spec * 500)
     }
-    unitPrices.sort()
+  
+    unitPrices = _.uniq(unitPrices)
+    unitPrices.sort(function (a, b) {
+      return a - b
+    })
+    console.log('sort ', unitPrices)
     this.setState({unitPrices})
   }
   
@@ -217,10 +222,11 @@ class GoodsApplyPrice extends Component {
   
   render () {
     let unitWmPrice = this.state.wmPrice / this.state.product.spec * 500
+    console.log(this.state.unitPrices)
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>
-          <GoodsBaseItem
+          <GoodsItem
             wmText={'当前外卖价'}
             name={this.state.product.name}
             wmPrice={this.state.product.waimai_product.price}

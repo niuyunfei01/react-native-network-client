@@ -103,7 +103,7 @@ class SettlementOrderScene extends PureComponent {
     if (this.state.order_list.length > 0) {
       return (this.state.order_list.map((item, key) => {
         let {orderTime, dayId, total_goods_num, total_supply_price, id} = item
-        if (this.state.dayId && this.state.dayId === item.dayId && !this.state.pageMounted) {
+        if (!this.state.pageMounted) {
           this.state.order_list[key].down = true
           this.setState({pageMounted: true})
         }
@@ -133,11 +133,10 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.state.refund_list}
-        ItemSeparatorComponent={<View style={styles.listSeparator}/>}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           let {orderTime, dayId, id} = item
-          if (this.state.dayId && this.state.dayId === item.dayId && !this.state.pageMounted) {
+          if (!this.state.pageMounted) {
             this.state.order_list[index].down = true
             this.setState({pageMounted: true})
           }
@@ -165,7 +164,6 @@ class SettlementOrderScene extends PureComponent {
     return (
       <FlatList
         data={this.state.other_list}
-        ItemSeparatorComponent={<View style={styles.listSeparator}/>}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           return (
@@ -246,10 +244,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: pxToDp(1),
     borderColor: '#f2f2f2'
-  },
-  listSeparator: {
-    borderColor: '#E2E2E2',
-    borderBottomWidth: pxToDp(1)
   },
   dropdown: {
     height: pxToDp(1),
