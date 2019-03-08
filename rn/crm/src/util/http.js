@@ -54,8 +54,6 @@ class HttpUtils {
   }
   
   static apiBase (method, url, params, navigation) {
-    this.logout(navigation)
-    
     Toast.loading('请求中', 0)
     return new Promise((resolve, reject) => {
       fetch(method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {}), this.getOptions(method, params))
