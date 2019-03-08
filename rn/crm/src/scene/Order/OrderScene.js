@@ -2059,7 +2059,7 @@ class ItemRow extends PureComponent {
   
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             {/*管理员看到的*/}
-            <If condition={isServiceMgr}>
+            <If condition={isServiceMgr || fnShowWmPrice}>
               <Text style={styles.priceMode}>保</Text>
               <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
               <View style={{marginLeft: 30}}/>
@@ -2067,7 +2067,7 @@ class ItemRow extends PureComponent {
               <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
             </If>
             {/*商户看到的*/}
-            <If condition={!isServiceMgr}>
+            <If condition={!isServiceMgr && !fnShowWmPrice}>
               {/*保底模式*/}
               <If condition={fnPriceControlled}>
                 <Text style={styles.priceMode}>保</Text>
