@@ -6,6 +6,7 @@ import color from "../../widget/color";
 import Config from "../../config";
 import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
+import BaseComponent from "../BaseComponent";
 
 const Item = List.Item;
 
@@ -14,7 +15,7 @@ function mapStateToProps (state) {
   return {global: global};
 }
 
-class Operation extends React.Component {
+class Operation extends BaseComponent {
   static navigationOptions = {title: "Operation", header: null};
   
   constructor (props) {
@@ -51,7 +52,7 @@ class Operation extends React.Component {
     const {accessToken, currStoreId} = this.props.global
     const self = this
     self.setState({isRefreshing: true})
-    HttpUtils.get(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
       self.setState({competition: res, isRefreshing: false})
     })
   }

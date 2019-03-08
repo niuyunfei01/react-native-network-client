@@ -35,7 +35,7 @@ class AreaGoodsPrice extends React.Component {
   fetchData () {
     const self = this
     const {access_token, store_id} = this.state
-    HttpUtils.get(`/api/get_store_prod_chgs/${store_id}?access_token=${access_token}`).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/get_store_prod_chgs/${store_id}?access_token=${access_token}`).then(res => {
       self.setState({lists: res})
     })
   }

@@ -267,7 +267,7 @@ class MineScene extends PureComponent {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    HttpUtils.get(api).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
       self.setState({storeStatus: res})
     })
   }

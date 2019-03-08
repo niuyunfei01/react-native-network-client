@@ -2,6 +2,7 @@ import DeviceInfo from 'react-native-device-info';
 import {Toast} from 'antd-mobile-rn'
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
+import {NavigationActions} from 'react-navigation'
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -52,7 +53,9 @@ class HttpUtils {
     }
   }
   
-  static apiBase (method, url, params) {
+  static apiBase (method, url, params, navigation) {
+    this.logout(navigation)
+    
     Toast.loading('请求中', 0)
     return new Promise((resolve, reject) => {
       fetch(method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {}), this.getOptions(method, params))
@@ -85,12 +88,12 @@ class HttpUtils {
     })
   }
   
-  static error (response) {
+  static error (response, navigation) {
     if (response.error_code === 10001) {
       ToastShort('权限错误')
     } else if (response.error_code === 21327) {
       ToastShort('登录信息过期,请退出重新登录')
-      native.logout()
+      this.logout(navigation)
     } else if (response.error_code === 30001) {
       ToastShort('客户端版本过低')
     } else {
@@ -98,20 +101,35 @@ class HttpUtils {
     }
   }
   
+  static logout (navigation) {
+    native.logout()
+    if (navigation !== HttpUtils) {
+      const resetAction = NavigationActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
+      });
+      navigation.dispatch(resetAction);
+    }
+  }
+  
   static get (url, params) {
-    return this.apiBase('GET', url, params)
+    const navigation = this
+    return HttpUtils.apiBase('GET', url, params, navigation)
   }
   
   static post (url, params) {
-    return this.apiBase('POST', url, params)
+    const navigation = this
+    return HttpUtils.apiBase('POST', url, params, navigation)
   }
   
   static put (url, params) {
-    return this.apiBase('PUT', url, params)
+    const navigation = this
+    return HttpUtils.apiBase('PUT', url, params, navigation)
   }
   
   static delete (url, params) {
-    return this.apiBase('DELETE', url, params)
+    const navigation = this
+    return HttpUtils.apiBase('DELETE', url, params, navigation)
   }
 }
 
