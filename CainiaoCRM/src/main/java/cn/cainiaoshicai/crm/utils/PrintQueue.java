@@ -95,7 +95,6 @@ public class PrintQueue {
     }
 
     /**
-     *
      * @param order
      */
     public synchronized void addManual(Order order) {
@@ -143,7 +142,7 @@ public class PrintQueue {
         return result;
     }
 
-    public synchronized void printManual(){
+    public synchronized void printManual() {
         doPrint(manualPrintQueue, false);
     }
 
@@ -238,7 +237,8 @@ public class PrintQueue {
     public void disconnect() {
         try {
             BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-            printer.closeSocket();
+            if (printer != null)
+                printer.closeSocket();
         } catch (Exception e) {
             CrashReportHelper.handleUncaughtException(null, e);
         }
