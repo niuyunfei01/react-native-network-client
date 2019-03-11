@@ -68,7 +68,7 @@ import OrderCancelShip from "../scene/Order/OrderCancelShip";
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
 import SettlementDetailsScene from "../scene/Settlement/SettlementDetailsScene";
-import SettlementOrderScene from "../scene/Settlement/settlementOrderScene";
+import SettlementOrderScene from "../scene/Settlement/_SettlementDetail/SettlementOrderScene";
 import SettlementGatherScene from "../scene/Settlement/SettlementGatherScene";
 
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
@@ -133,7 +133,7 @@ const tabDef = function (store_) {
         )
       })
     },
-
+    
     Orders: {
       screen: OrderScene,
       navigationOptions: ({navigation}) => ({
@@ -152,7 +152,7 @@ const tabDef = function (store_) {
         }
       })
     },
-
+    
     Goods: {
       screen: GoodsScene,
       navigationOptions: ({navigation}) => ({
@@ -177,7 +177,7 @@ const tabDef = function (store_) {
       })
     }
   }
-
+  
   if (isBlx) {
     tab.Operation = {
       screen: TabOperation,
@@ -194,7 +194,7 @@ const tabDef = function (store_) {
       })
     }
   }
-
+  
   tab.Mine = {
     screen: MineScene,
     navigationOptions: ({navigation}) => ({
@@ -209,7 +209,7 @@ const tabDef = function (store_) {
       )
     })
   }
-
+  
   return tab
 };
 
@@ -228,13 +228,13 @@ const tabInit = {
 };
 
 class Navigator extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
   }
-
-  render() {
+  
+  render () {
     const {initialRouteName, screenProps, initialRouteParams, store_} = this.props;
-
+    
     let stackNavigatorConfigs = {
       navigationOptions: {
         headerStyle: {
@@ -256,7 +256,7 @@ class Navigator extends Component {
         showIcon: true
       }
     };
-
+    
     if (initialRouteName) {
       stackNavigatorConfigs = {
         ...stackNavigatorConfigs,
@@ -264,7 +264,7 @@ class Navigator extends Component {
         initialRouteParams: initialRouteParams || {}
       };
     }
-
+    
     let tabInitN;
     if (initialRouteName === "Tab" && (initialRouteParams || {}).initTab) {
       tabInitN = {
@@ -274,9 +274,9 @@ class Navigator extends Component {
     } else {
       tabInitN = tabInit;
     }
-
+    
     // console.log(tabInitN);
-
+    
     const CustomNavigator = StackNavigator(
       {
         Tab: {screen: TabNavigator(tabDef(store_), tabInitN)},
@@ -334,10 +334,9 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
         [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
-
+        
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
-        [Config.ROUTE_SETTLEMENT_ORDER]: {screen: SettlementOrderScene},
         [Config.ROUTE_SELECT_WORKER]: {screen: SelectWorkerScene},
         [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
         [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},

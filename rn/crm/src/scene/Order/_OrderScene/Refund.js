@@ -57,7 +57,7 @@ class Refund extends React.Component {
               <Text>{tool.toFixed(product.supply_price)}</Text>
             </If>
             <If condition={this.props.isServiceMgr}>
-              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.refund_price)}</Text>
+              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)}</Text>
             </If>
           </View>
         </View>

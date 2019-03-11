@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import Config from "../../config";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
+import Dialog from "../component/Dialog";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -52,14 +53,17 @@ class GoodsPriceIndex extends Component {
       bigImageUri: [],
       bigImageVisible: false,
       storeScore: {
-        excellent_range: {}
+        excellent_range: {},
+        tips: [],
+        dialogTips: []
       },
       tabActiveValue: '0',
       page: 1,
       pageSize: 10,
       isLastPage: false,
       isLoading: false,
-      list: []
+      list: [],
+      visible: false
     }
   }
   
@@ -80,9 +84,9 @@ class GoodsPriceIndex extends Component {
     const self = this
     const {access_token, store_id, tabActiveValue, page, pageSize} = this.state
     this.setState({isLoading: true})
-    HttpUtils.get(`/api/get_store_should_adjust_prods/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
+    HttpUtils.get(`/api/get_store_should_adjust_prods_new/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
       const list = (this.state.page === 1 ? [] : this.state.list).concat(res.list)
-      self.setState({isLastPage: !res.has_more, list: list, isLoading: false})
+      self.setState({isLastPage: !res.has_more, list: list, isLoading: false, page: res.page})
     })
   }
   
@@ -124,7 +128,7 @@ class GoodsPriceIndex extends Component {
         supplyPrice: product.supply_price,
         onBack: () => {
           let list = self.state.list
-          product.hasApply = true
+          product.isAuditing = true
           list.splice(idx, 1, product)
           self.setState({
             list: list
@@ -132,6 +136,41 @@ class GoodsPriceIndex extends Component {
         }
       });
     })
+  }
+  
+  onPressText (config) {
+    if (config.linkType === 'dialog') {
+      this.setState({visible: true})
+    } else if (config.linkType === 'native') {
+      this.props.navigation.navigate(config.href)
+    }
+  }
+  
+  renderDialog () {
+    const {storeScore, visible} = this.state
+    return (
+      <Dialog
+        visible={visible}
+        onRequestClose={() => this.setState({visible: false})}
+      >
+        <For each="item" index="idx" of={storeScore.dialogTips}>
+          {this.renderText(idx, item)}
+        </For>
+      </Dialog>
+    )
+  }
+  
+  renderText (index, tipConfig) {
+    return (
+      <View key={index} style={{flexDirection: 'row'}}>
+        <Text>{tipConfig.text}</Text>
+        <If condition={tipConfig.linkType}>
+          <TouchableOpacity onPress={() => this.onPressText(tipConfig)}>
+            <Text style={styles.link}>{tipConfig.linkTitle}</Text>
+          </TouchableOpacity>
+        </If>
+      </View>
+    )
   }
   
   renderMessage () {
@@ -142,10 +181,13 @@ class GoodsPriceIndex extends Component {
           <Text style={styles.message}>
             价格指数：
             <Text style={styles.striking}>{storeScore.score}</Text>
+            <Text style={styles.messageTip}>（{storeScore.range}）</Text>
           </Text>
         </View>
         <View>
-          <Text style={styles.message}>{storeScore.excellent_range.min}以上为优秀价格指数，调价系统自动通过</Text>
+          <For each='tip' index='index' of={storeScore.tips}>
+            {this.renderText(index, tip)}
+          </For>
         </View>
       </View>
     )
@@ -185,20 +227,14 @@ class GoodsPriceIndex extends Component {
           <Text style={styles.goodsPrice}>￥{product.supply_price}</Text>
         </View>
         <View style={styles.goodsRight}>
-          <If condition={!product.hasApply}>
-            <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
-              <View style={styles.opBtn}>
-                <Text style={styles.opText}>比价/调价</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-          <If condition={product.hasApply}>
-            <TouchableOpacity>
-              <View style={[styles.opBtn, styles.opBtnDisable]}>
-                <Text style={[styles.opText, styles.opTextDisable]}>已改价</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
+          <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
+            <View style={styles.opBtn}>
+              <Text style={styles.opText}>比价/调价</Text>
+              <If condition={product.isAuditing}>
+                <Text style={styles.auditing}>调价中</Text>
+              </If>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -212,15 +248,23 @@ class GoodsPriceIndex extends Component {
     )
   }
   
+  renderContent () {
+    return (
+      <View>
+        {this.renderMessage()}
+        {this.renderList()}
+      </View>
+    )
+  }
+  
   render () {
     return (
       <View style={styles.container}>
-        {this.renderMessage()}
         {this.renderTab()}
         
         <LoadMore
           loadMoreType={'scroll'}
-          renderList={this.renderList()}
+          renderList={this.renderContent()}
           onRefresh={() => this.onRefresh()}
           isLastPage={this.state.isLastPage}
           isLoading={this.state.isLoading}
@@ -232,6 +276,8 @@ class GoodsPriceIndex extends Component {
           urls={this.state.bigImageUri}
           onClickModal={() => this.closeBigImage()}
         />
+  
+        {this.renderDialog()}
       </View>
     )
   }
@@ -246,6 +292,9 @@ const styles = StyleSheet.create({
   message: {
     alignItems: 'flex-end',
     fontSize: pxToDp(30)
+  },
+  messageTip: {
+    fontSize: pxToDp(24)
   },
   striking: {
     fontSize: pxToDp(40),
@@ -321,12 +370,20 @@ const styles = StyleSheet.create({
     color: color.theme,
     fontSize: pxToDp(20)
   },
+  auditing: {
+    color: color.fontGray,
+    fontSize: pxToDp(18)
+  },
   opBtnDisable: {
     backgroundColor: color.fontGray,
     borderColor: color.fontGray
   },
   opTextDisable: {
     color: '#fff'
+  },
+  link: {
+    color: color.blue_link,
+    textDecorationLine: 'underline'
   }
 })
 

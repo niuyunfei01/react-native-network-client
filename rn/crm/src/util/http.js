@@ -89,7 +89,7 @@ class HttpUtils {
     if (response.error_code === 10001) {
       ToastShort('权限错误')
     } else if (response.error_code === 21327) {
-      ToastShort('登录信息过期')
+      ToastShort('登录信息过期,请退出重新登录')
       native.logout()
     } else if (response.error_code === 30001) {
       ToastShort('客户端版本过低')
