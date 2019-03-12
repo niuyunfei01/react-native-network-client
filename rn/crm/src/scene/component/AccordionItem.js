@@ -11,12 +11,14 @@ export default class AccordionItem extends React.Component {
     title: PropTypes.string.isRequired,
     expanded: PropTypes.bool,
     tips: PropTypes.string,
-    onPress: PropTypes.func
+    onPress: PropTypes.func,
+    style: View.propTypes.style
   }
   
   static defaultProps = {
     expanded: false,
-    tips: ''
+    tips: '',
+    style: {}
   }
   
   constructor (props) {
@@ -50,7 +52,7 @@ export default class AccordionItem extends React.Component {
         </View>
         <If condition={this.state.visible}>
           <View style={accordionStyles.content}>
-            <View style={accordionStyles.container}>
+            <View style={[accordionStyles.container, this.props.style]}>
               {this.props.children}
             </View>
           </View>
@@ -91,7 +93,6 @@ const accordionStyles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    flexDirection: "row",
     backgroundColor: '#fff',
     paddingLeft: pxToDp(30),
     paddingRight: pxToDp(30),

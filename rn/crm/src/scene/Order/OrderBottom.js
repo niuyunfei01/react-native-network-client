@@ -30,7 +30,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderBottom extends PureComponent {
-
+  
+  static propTypes = {
+    mobile: PropTypes.string,
+    label: PropTypes.string,
+    onPress: PropTypes.func,
+    style: View.propTypes.style,
+  }
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -515,12 +522,5 @@ class OrderBottom extends PureComponent {
 
   }
 }
-
-OrderBottom.PropTypes = {
-  mobile: PropTypes.string,
-  label: PropTypes.string,
-  onPress: PropTypes.func,
-  style: ViewPropTypes.style,
-};
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderBottom)

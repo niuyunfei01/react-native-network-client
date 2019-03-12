@@ -7,6 +7,12 @@ import {native} from "../../common"
 import PropTypes from 'prop-types'
 
 class CallBtn extends PureComponent {
+  static propTypes = {
+    mobile: PropTypes.string,
+    label: PropTypes.string,
+    onPress: PropTypes.func,
+    style: View.propTypes.style,
+  }
   
   constructor (props) {
     super(props)
@@ -35,13 +41,6 @@ class CallBtn extends PureComponent {
       </TouchableOpacity>
     );
   }
-}
-
-CallBtn.PropTypes = {
-  mobile: PropTypes.string,
-  label: PropTypes.string,
-  onPress: PropTypes.func,
-  style: ViewPropTypes.style,
 }
 
 export default CallBtn
