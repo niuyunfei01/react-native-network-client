@@ -190,7 +190,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.wmJingdong.setVisibility(View.INVISIBLE);
         holder.wmMeituan.setVisibility(View.INVISIBLE);
         holder.wmElema.setVisibility(View.INVISIBLE);
-        holder.wmMeituanSg.setVisibility(View.VISIBLE);
+        holder.wmMeituanSg.setVisibility(View.INVISIBLE);
 
         boolean allInvisible = true;
         for (Map.Entry<Integer, StorageStatusResults.WMPrice> en : item.getWm().entrySet()) {
