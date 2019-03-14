@@ -1,16 +1,11 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
-import {bindActionCreators} from "redux";
-import CommonStyle from '../../common/CommonStyles'
-
-import {orderCallShip} from '../../reducers/order/orderActions'
+import React, {Component} from 'react'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
+import {Checkbox, List, Toast, WhiteSpace} from 'antd-mobile-rn';
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
-import {Button, RadioCells, ButtonArea,Toast, Dialog, CellsTitle} from "../../weui/index";
-import S from '../../stylekit'
-import Cts from "../../Cts";
-import tool from "../../common/tool";
-import Moment from "moment/moment";
+import color from "../../widget/color";
+import pxToDp from "../../util/pxToDp";
+import JbbButton from "../component/JbbButton";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps(state) {
   return {
@@ -18,146 +13,126 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({orderCallShip}, dispatch)}
-}
+const CheckboxItem = Checkbox.CheckboxItem;
 
 class OrderCallShip extends Component {
 
   static navigationOptions = {
-    headerTitle: '发配送',
+    headerTitle: '发第三方配送',
   };
 
   constructor(props: Object) {
     super(props);
-
+    console.log('navigation params => ', this.props.navigation.state.params)
     this.state = {
-      option: -1,
-      doneSubmitting: false,
-      onSubmitting: false,
-      alert_msg: '',
+      selected: [],
+      newSelected: [],
+      orderId: this.props.navigation.state.params.orderId,
+      storeId: this.props.navigation.state.params.storeId,
+      accessToken: this.props.global.accessToken,
+      logistics: []
     };
-
-    this._onTypeSelected = this._onTypeSelected.bind(this);
-    this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
-    this._doReply = this._doReply.bind(this);
-    this._onClick = this._onClick.bind(this);
   }
-
-  _onTypeSelected(idx) {
-    this.setState({option: idx});
+  
+  componentWillMount (): void {
+    this.fetchThirdWays()
   }
-
-  _checkDisableSubmit() {
-    return !this.state.option;
+  
+  fetchThirdWays () {
+    const self = this
+    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`
+    HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+      self.setState({logistics: res})
+    })
   }
-
-  _onClick() {
-    if(this.state.option === Cts.SHIP_AUTO_FN){
-      const {order} = (this.props.navigation.state.params || {});
-      let {expectTime} = order;
-      const nowMoment = Moment(new Date()).unix();
-      const dSeconds = (Moment(expectTime).unix() - nowMoment);
-      let diffHours = 0;
-      if(dSeconds > 0){
-        diffHours = Math.floor(dSeconds / 3600);
-      }
-
-      if(diffHours > 1){
-        diffHours = diffHours - 1;
-        this.setState({alert_msg: `该订单是预订单, 配送员将在大约 ${diffHours}小时 后前来取单`});
-      } else {
-        this._doReply();
-      }
+  
+  onCallThirdShip () {
+    const self = this
+    const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`
+    const {orderId, storeId, newSelect} = this.state
+    HttpUtils.get.bind(self.props.navigation)(api, {
+      orderId: orderId,
+      storeId: storeId,
+      logisticCode: newSelect
+    }).then(res => {
+      Toast.success('正在呼叫第三方配送，请稍等')
+      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack()
+      self.props.navigation.goBack()
+    })
+  }
+  
+  onSelectLogistic (code) {
+    let selected = this.state.newSelected
+    let index = selected.indexOf(code)
+    if (index >= 0) {
+      selected.splice(index, 1)
     } else {
-      this._doReply();
+      selected.push(code)
     }
+    this.setState({newSelected: selected})
   }
-
-  _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
-    this.setState({onSubmitting: true});
-    dispatch(orderCallShip(global.accessToken, order.id, this.state.option, (ok, msg, data) => {
-      this.setState({onSubmitting: false});
-      if (ok) {
-        this.setState({doneSubmitting: true});
-        navigation.goBack();
-      } else {
-        this.setState({doneSubmitting: false});
-        this.setState({errorHints: msg});
-      }
-    }))
-  }
-
-  render() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
-    const wayOpts = order.callWays.map((way, idx) => {
-      const estimate = way.estimate ? `(${way.estimate})` : '';
-      return {label: `${way.name}${estimate}`, value: way.way}
-    });
-
-    return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
-
-      <Dialog onRequestClose={() => {}}
-              visible={!!this.state.errorHints}
-              buttons={[{
-                type: 'default',
-                label: '知道了',
-                onPress: () => {
-                  this.setState({errorHints: ''})
-                }
-              }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
-      <Dialog
-        onRequestClose={() => {
-        }}
-        visible={!!this.state.alert_msg}
-        buttons={[{
-          type: 'default',
-          label: '知道了',
-          onPress: () => {
-            this.setState({alert_msg: ''});
-            this._doReply();
-          }
-        }]}
-      >
-        <Text style={{color: 'red'}}>{this.state.alert_msg}</Text>
-      </Dialog>
-
-      <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
-        <Text style={{ fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>
+  
+  renderHeader () {
+    return (
+      <View style={styles.header}>
+        <Text style={{color: '#000'}}>发第三方配送并保留专送</Text>
+        <Text style={{color: color.fontGray}}>一方先接单后，另一方会被取消</Text>
       </View>
-
-      <CellsTitle style={CommonStyle.cellsTitle}>选择第三方配送</CellsTitle>
-       <RadioCells
-        style={{marginTop: 2}}
-        options={wayOpts}
-        onChange={this._onTypeSelected}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.option}
-      />
-
-      <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._onClick} style={[S.mlr15]}>发配送</Button>
-      </ButtonArea>
-
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
-
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >已发出</Toast>
-    </ScrollView>
+    )
+  }
+  
+  renderLogistics () {
+    const {logistics} = this.state
+    return (
+      <List renderHeader={() => '选择配送方式'}>
+        {logistics.map(i => (
+          <CheckboxItem key={i.logisticCode} onChange={() => this.onSelectLogistic(i.logisticCode)}>
+            {i.logisticName}
+            <List.Item.Brief>{i.logisticDesc}</List.Item.Brief>
+          </CheckboxItem>
+        ))}
+      </List>
+    )
+  }
+  
+  renderBtn () {
+    return (
+      <View style={styles.btnCell}>
+        <JbbButton
+          onPress={() => this.onCallThirdShip()}
+          text={'呼叫配送'}
+          backgroundColor={color.theme}
+          fontColor={'#fff'}
+          fontWeight={'bold'}
+          fontSize={pxToDp(30)}
+        />
+      </View>
+    )
+  }
+  
+  render() {
+    return (
+      <ScrollView>
+        {this.renderHeader()}
+      
+        {this.renderLogistics()}
+        <WhiteSpace/>
+        {this.renderBtn()}
+      </ScrollView>
+    )
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderCallShip)
+const styles = StyleSheet.create({
+  header: {
+    height: pxToDp(200),
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  btnCell: {
+    padding: pxToDp(30)
+  }
+})
+
+export default connect(mapStateToProps)(OrderCallShip)
+
