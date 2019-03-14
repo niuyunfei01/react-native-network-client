@@ -1601,6 +1601,17 @@ class OrderReminds extends PureComponent {
 }
 
 class ItemRow extends PureComponent {
+  static propTypes = {
+    item: PropTypes.object.isRequired,
+    idx: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    isEditing: PropTypes.bool,
+    isAdd: PropTypes.bool,
+    edits: PropTypes.object,
+    onInputNumberChange: PropTypes.func,
+    nav: PropTypes.object,
+    fnShowWmPrice: PropTypes.bool
+  }
+  
   constructor (props) {
     super(props);
   }
@@ -1735,17 +1746,6 @@ class ItemRow extends PureComponent {
     </View>
   }
 }
-
-ItemRow.PropTypes = {
-  item: PropTypes.object.isRequired,
-  idx: PropTypes.number.isRequired,
-  isEditing: PropTypes.bool,
-  isAdd: PropTypes.bool,
-  edits: PropTypes.object,
-  onInputNumberChange: PropTypes.func,
-  nav: PropTypes.object,
-  fnShowWmPrice: PropTypes.bool
-};
 
 class Remark
   extends PureComponent {

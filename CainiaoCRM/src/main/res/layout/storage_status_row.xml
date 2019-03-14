@@ -231,6 +231,22 @@
         android:drawableStart="@drawable/meituan_list"
         android:text=""/>
 
+        <Button
+            android:id="@+id/wm_mt_sg"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:drawableStart="@drawable/meituan_list"
+            android:text=""/>
+
     <Button
         android:id="@+id/wm_elema"
         android:layout_width="0dp"
