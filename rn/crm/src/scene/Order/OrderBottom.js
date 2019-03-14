@@ -35,7 +35,7 @@ class OrderBottom extends PureComponent {
     mobile: PropTypes.string,
     label: PropTypes.string,
     onPress: PropTypes.func,
-    style: View.propTypes.style,
+    style: PropTypes.object,
   }
   
   constructor(props) {

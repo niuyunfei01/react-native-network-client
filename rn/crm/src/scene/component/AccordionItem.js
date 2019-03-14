@@ -12,7 +12,7 @@ export default class AccordionItem extends React.Component {
     expanded: PropTypes.bool,
     tips: PropTypes.string,
     onPress: PropTypes.func,
-    style: View.propTypes.style
+    style: PropTypes.object
   }
   
   static defaultProps = {
