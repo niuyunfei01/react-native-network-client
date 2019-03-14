@@ -74,6 +74,7 @@ class HttpUtils {
               resolve(response.obj)
             } else {
               this.error(response)
+              reject && reject(response)
             }
           }
         })
