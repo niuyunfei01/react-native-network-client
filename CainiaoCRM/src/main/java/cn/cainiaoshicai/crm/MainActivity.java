@@ -49,8 +49,6 @@ import com.roughike.bottombar.OnTabSelectListener;
 import com.roughike.bottombar.TabSelectionInterceptor;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,8 +67,6 @@ import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
-import cn.cainiaoshicai.crm.print.PrintMsgEvent;
-import cn.cainiaoshicai.crm.print.PrinterMsgType;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.LocationHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -85,8 +81,6 @@ import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
-import cn.cainiaoshicai.crm.utils.PrintQueue;
-import cn.cainiaoshicai.crm.utils.ToastUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -218,8 +212,6 @@ public class MainActivity extends AbstractActionBarActivity {
         if (store != null && (store.getType() == Cts.STORE_VENDOR_BLX || store.getType() == Cts.STORE_VENDOR_CN) && store.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES) {
             bottomBar.setItems(R.xml.bottombar_with_op_tabs);
         }
-        //初始化
-        EventBus.getDefault().register(MainActivity.this);
     }
 
     private void resetPrinterStatusBar() {
@@ -828,15 +820,6 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                     AlertUtil.error(MainActivity.this, "授权ALERT_WINDOW限失败");
                 }
             }
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onMessage(PrintMsgEvent event) {
-        if (event.type == PrinterMsgType.MESSAGE_TOAST) {
-            ToastUtil.showToast(GlobalCtx.app(), event.msg);
-        }
-        if (event.type == PrinterMsgType.MESSAGE_STATE_CHANGE) {
         }
     }
 

@@ -83,6 +83,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.wmElema = row.findViewById(R.id.wm_elema);
             holder.wmJingdong = row.findViewById(R.id.wm_jd);
             holder.wmMeituan = row.findViewById(R.id.wm_mt);
+            holder.wmMeituanSg = row.findViewById(R.id.wm_mt_sg);
             holder.wmInfoBar = row.findViewById(R.id.wm_info_bar);
 
             holder.sold_5day_fen = row.findViewById(R.id.sold_5day_fen);
@@ -189,6 +190,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.wmJingdong.setVisibility(View.INVISIBLE);
         holder.wmMeituan.setVisibility(View.INVISIBLE);
         holder.wmElema.setVisibility(View.INVISIBLE);
+        holder.wmMeituanSg.setVisibility(View.VISIBLE);
 
         boolean allInvisible = true;
         for (Map.Entry<Integer, StorageStatusResults.WMPrice> en : item.getWm().entrySet()) {
@@ -201,6 +203,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 btn = holder.wmJingdong;
             } else if (en.getKey() == Cts.PLAT_MT.id) {
                 btn = holder.wmMeituan;
+            } else if (en.getKey() == Cts.PLAT_MTSG.id) {
+                btn = holder.wmMeituanSg;
             }
 
             if (btn != null) {
@@ -327,6 +331,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         Button wmElema;
         Button wmMeituan;
         Button wmJingdong;
+        Button wmMeituanSg;
 
         LinearLayout wmInfoBar;
     }

@@ -354,7 +354,7 @@ public class OrderPrinter {
     }
 
     public static byte[] printOrder(Order order) throws IOException {
-        if (order != null) {
+        if (order == null) {
             return new byte[]{};
         }
         String mobile = order.getMobile();

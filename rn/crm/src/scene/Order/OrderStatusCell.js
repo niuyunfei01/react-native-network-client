@@ -101,6 +101,13 @@ class OrderStatusCell extends PureComponent {
 
 
 class OrderStep extends PureComponent {
+  static propTypes = {
+    statusTxt: PropTypes.string.isRequired,
+    loggerName: PropTypes.string,
+    timeAtStr: PropTypes.string.isRequired,
+    invalid: PropTypes.bool,
+    workerNames: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  }
 
   constructor(props) {
     super(props)
@@ -122,14 +129,6 @@ class OrderStep extends PureComponent {
     </TouchableOpacity>;
   }
 }
-
-OrderStep.PropTypes = {
-  statusTxt: PropTypes.string.isRequired,
-  loggerName: PropTypes.string.isRequired,
-  timeAtStr: PropTypes.string.isRequired,
-  invalid: PropTypes.bool,
-  workerNames: PropTypes.string,
-};
 
 
 const styles = StyleSheet.create({
