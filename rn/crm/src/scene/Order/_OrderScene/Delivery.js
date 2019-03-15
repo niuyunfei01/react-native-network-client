@@ -45,8 +45,21 @@ class Delivery extends React.Component {
     })
   }
   
-  onAddTip () {
-    
+  onConfirmAddTip (logisticId, val) {
+    const self = this
+    const navigation = self.props.navigation
+    const api = `/api/order_add_tips/${this.props.order.id}?access_token=${this.state.accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      logisticId: logisticId,
+      tips: val
+    }).then(res => {
+      this.setState({order: res})
+    })
+  }
+  
+  onAddTip (ship) {
+    const self = this
+    Modal.prompt('订单加小费', '请输入小费金额', (val) => self.onConfirmAddTip(ship.id, val), 'default', ship.tip, '请输入小费金额')
   }
   
   onCallThirdShip () {
@@ -110,19 +123,19 @@ class Delivery extends React.Component {
               <Text style={styles.shipWay}>{ship.logistic_name}：{ship.status_name}</Text>
               <Text style={styles.shipFee}>距离{ship.distance}米，配送费{ship.fee}元，已加小费{ship.tip}元</Text>
             </View>
-            <If condition={ship.time_away}>
+            <If condition={ship.time_away && ship.can_add_tip}>
               <View style={styles.cellRight}>
                 <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
-                {/*<JbbButton*/}
-                {/*onPress={() => this.onAddTip()}*/}
-                {/*text={'加小费'}*/}
-                {/*type={'hollow'}*/}
-                {/*fontColor={'#000'}*/}
-                {/*borderColor={'#000'}*/}
-                {/*fontSize={pxToDp(24)}*/}
-                {/*width={pxToDp(120)}*/}
-                {/*height={pxToDp(40)}*/}
-                {/*/>*/}
+                <JbbButton
+                  onPress={() => this.onAddTip(ship)}
+                  text={'加小费'}
+                  type={'hollow'}
+                  fontColor={'#000'}
+                  borderColor={'#000'}
+                  fontSize={pxToDp(24)}
+                  width={pxToDp(120)}
+                  height={pxToDp(40)}
+                />
               </View>
             </If>
             <If condition={!ship.time_away && ship.delivery_phone}>

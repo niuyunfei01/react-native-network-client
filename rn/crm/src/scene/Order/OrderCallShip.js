@@ -49,11 +49,11 @@ class OrderCallShip extends Component {
   onCallThirdShip () {
     const self = this
     const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`
-    const {orderId, storeId, newSelect} = this.state
-    HttpUtils.get.bind(self.props.navigation)(api, {
+    const {orderId, storeId, newSelected} = this.state
+    HttpUtils.post.bind(self.props.navigation)(api, {
       orderId: orderId,
       storeId: storeId,
-      logisticCode: newSelect
+      logisticCode: newSelected
     }).then(res => {
       Toast.success('正在呼叫第三方配送，请稍等')
       self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack()
@@ -69,6 +69,7 @@ class OrderCallShip extends Component {
     } else {
       selected.push(code)
     }
+    console.log(selected)
     this.setState({newSelected: selected})
   }
   
