@@ -12,6 +12,7 @@ import NoFoundDataView from "../component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../component/BigImage";
+import Mapping from "../../Mapping";
 
 
 function mapStateToProps (state) {
@@ -41,6 +42,7 @@ class SearchGoods extends Component {
   
   constructor (props) {
     super(props);
+    console.log(this.store)
     this.state = {
       storeId: this.props.global.currStoreId,
       goods: [],
@@ -170,8 +172,15 @@ class SearchGoods extends Component {
               </If>
             </View>
             <If condition={product.is_exist}>
-              <View style={styles.isOnlineBtn}>
-                <Text style={styles.isOnlineBtnText}>已上架</Text>
+              <View>
+                <View>
+                  <Text></Text>
+                </View>
+                <View style={styles.isOnlineBtn}>
+                  <Text style={styles.isOnlineBtnText}>
+                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
+                  </Text>
+                </View>
               </View>
             </If>
             <If condition={!product.is_exist}>
