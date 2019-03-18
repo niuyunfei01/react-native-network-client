@@ -151,8 +151,13 @@ class SearchGoods extends Component {
     })
   }
   
+  showOnlineBtn (product) {
+    return !product.is_exist ||
+      Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.is_exist.status)
+  }
+  
   /**
-   * 保底模式并且是售卖中的商品可以改价
+   * 保底模式并且是售卖中的商品显示保底价
    */
   showSupplyPrice (product) {
     return this.state.fnPriceControlled == 1
@@ -182,7 +187,7 @@ class SearchGoods extends Component {
                 <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
               </If>
             </View>
-            <If condition={product.is_exist}>
+            <If condition={!this.showOnlineBtn(product)}>
               <View style={{flexDirection: 'row'}}>
                 <If condition={this.showSupplyPrice(product.is_exist)}>
                   <View style={{marginRight: pxToDp(10)}}>
@@ -196,7 +201,7 @@ class SearchGoods extends Component {
                 </View>
               </View>
             </If>
-            <If condition={!product.is_exist}>
+            <If condition={this.showOnlineBtn(product)}>
               <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
                 store_id: this.state.storeId,
                 product_id: product.id,
