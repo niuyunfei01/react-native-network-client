@@ -152,8 +152,8 @@ class SearchGoods extends Component {
   }
   
   showOnlineBtn (product) {
-    return !product.is_exist ||
-      Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.is_exist.status)
+    return !product.is_exist
+      || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
   }
   
   /**
@@ -161,7 +161,7 @@ class SearchGoods extends Component {
    */
   showSupplyPrice (product) {
     return this.state.fnPriceControlled == 1
-      && Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE, product.status)
+      && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
   }
   
   renderRow = (product, idx) => {

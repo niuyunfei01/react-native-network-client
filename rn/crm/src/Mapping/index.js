@@ -14,6 +14,9 @@ export default class Mapping {
       }
     },
     ValueEqMapping: function (mapping, val) {
+      if (typeof (mapping) === 'object') {
+        return String(mapping.value) === String(val)
+      }
       return String(mapping) === String(val)
     },
     TransferOptions: (object, opt = {}) => {
