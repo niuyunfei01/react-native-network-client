@@ -217,7 +217,7 @@ class Delivery extends React.Component {
   
   render (): React.ReactNode {
     return (
-      <View>
+      <View style={{marginTop: pxToDp(20)}}>
         {this.renderShips()}
         {this.renderBtn()}
       </View>

@@ -27,6 +27,7 @@ import OrderBottom from './OrderBottom'
 import CommonStyle from '../../common/CommonStyles'
 import {Button1} from '../component/All'
 import {
+  addTipMoney,
   clearLocalOrder,
   getOrder,
   getRemindForOrderPage,
@@ -79,6 +80,7 @@ function mapDispatchToProps (dispatch) {
       orderWayRecord,
       clearLocalOrder,
       orderCancelZsDelivery,
+      addTipMoney,
     }, dispatch)
   }
 }
@@ -185,6 +187,8 @@ class OrderScene extends Component {
       reminds: {},
       remindFetching: false,
       store_contacts: [],
+      addTipDialog: false,
+      addTipMoney: false,
       addMoneyNum: '',
       visible: false,
       reason: '饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
@@ -764,6 +768,40 @@ class OrderScene extends Component {
     }));
   }
   
+  renderAddTip () {
+    let {order} = this.props.order;
+    let dada = this.state.orderWayLogs.hasOwnProperty(Cts.SHIP_AUTO_NEW_DADA)
+    let {orderStatus, auto_ship_type} = order;
+    if ((orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) && dada && auto_ship_type == Cts.SHIP_AUTO_NEW_DADA && (!this.state.shipHided)) {
+      
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            this.setState({addTipDialog: true})
+          }}
+        >
+          <View style={{
+            height: pxToDp(40),
+            backgroundColor: '#59b26a',
+            borderRadius: pxToDp(20),
+            paddingHorizontal: pxToDp(10),
+            paddingVertical: pxToDp(4),
+            marginTop: pxToDp(20),
+            marginRight: pxToDp(30)
+          }}>
+            <Text style={{
+              height: pxToDp(24),
+              fontSize: pxToDp(24),
+              textAlign: 'center',
+              color: '#EEEEEE',
+              lineHeight: pxToDp(24)
+            }}>加小费</Text>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+  }
+  
   renderWayRecord () {
     let order = this.props.order.order
     let orderWayLogs = this.state.orderWayLogs
@@ -887,6 +925,28 @@ class OrderScene extends Component {
       }}>
         <Text style={{color: '#59B26A'}}>没有相应的记录</Text>
       </View>
+    }
+  }
+  
+  upAddTip () {
+    let {orderId} = this.props.navigation.state.params;
+    let {addMoneyNum} = this.state;
+    let {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    if (addMoneyNum > 0) {
+      this.setState({onSubmitting: true});
+      dispatch(addTipMoney(orderId, addMoneyNum, accessToken, async (resp) => {
+        if (resp.ok) {
+          ToastLong('加小费成功')
+        } else {
+          ToastLong(resp.desc)
+        }
+        await this.setState({onSubmitting: false, addMoneyNum: ''});
+        this._orderChangeLogQuery();
+      }));
+    } else {
+      this.setState({addMoneyNum: ''});
+      ToastLong('加小费的金额必须大于0')
     }
   }
   
@@ -1037,6 +1097,60 @@ class OrderScene extends Component {
           >
             <Text>{this.state.errorHints}</Text>
           </Dialog>
+  
+          <Dialog
+            onRequestClose={() => {
+            }}
+            visible={this.state.addTipMoney}
+            title={'加小费'}
+            buttons={[{
+              type: 'default',
+              label: '取消',
+              onPress: () => {
+                this.setState({addTipMoney: false, addMoneyNum: ''})
+              }
+            },
+              {
+                type: 'default',
+                label: '确定',
+                onPress: async () => {
+                  await this.setState({addTipMoney: false});
+                  this.upAddTip()
+                }
+              }
+            ]}
+          >
+            <Input
+              placeholder={'请输入金额，金额只能大于0'}
+              value={`${this.state.addMoneyNum}`}
+              keyboardType='numeric'
+              onChangeText={(text) => {
+                this.setState({addMoneyNum: text})
+              }}
+            />
+          </Dialog>
+  
+          <Dialog
+            onRequestClose={() => {
+            }}
+            visible={this.state.addTipDialog}
+            buttons={[{
+              type: 'default',
+              label: '知道了',
+              onPress: () => {
+                this.setState({addTipDialog: false, addTipMoney: true})
+              }
+            }]}
+          >
+            <View>
+              <Text style={{color: '#000'}}>
+                1.达达或美团快送加小费金额以
+                <Text style={{color: "red"}}>最新一次为准</Text>
+                ,新一次金额必须大于上次加小费的金额.
+              </Text>
+              <Text style={{color: '#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>
+            </View>
+          </Dialog>
           
           <Toast
             icon="loading"
@@ -1184,6 +1298,293 @@ class OrderScene extends Component {
     }
   }
   
+  renderShipStatus () {
+    let {shipCallHided} = this.state;
+    let {
+      ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
+      auto_ship_type, dada_status, dada_distance, dada_fee, dada_tips, dada_mobile = '', dada_dm_name
+    } = this.props.order.order;
+    let {zs_way, ship_site_mobile = '', ship_site_tel = ''} = ext_store;
+    auto_ship_type = parseInt(auto_ship_type);
+    dada_status = parseInt(dada_status);
+    zs_status = parseInt(zs_status);
+    zs_way = parseInt(zs_way);
+    orderStatus = parseInt(orderStatus);
+    
+    let auto_ship_view = null;
+    if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
+      auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
+      auto_ship_type === Cts.SHIP_AUTO_BD ||
+      auto_ship_type === Cts.SHIP_AUTO_SX ||
+      auto_ship_type == Cts.SHIP_AUTO_MT ||
+      auto_ship_type == Cts.SHIP_AUTO_MT_ZB) && (
+      dada_status !== Cts.DADA_STATUS_CANCEL &&
+      dada_status !== Cts.DADA_STATUS_TIMEOUT
+    )) {
+      let ship_name = tool.disWay()[auto_ship_type];
+      let dada_ship_status = tool.disWayStatic(Cts.SHIP_AUTO_NEW_DADA)[dada_status];
+      
+      auto_ship_view = (
+        <View>
+          <View style={[ship_style.ship_box, {flexDirection: 'column'}]}>
+            <View style={[ship_style.ship_box, {borderBottomWidth: 0}]}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  {dada_status === Cts.DADA_STATUS_TO_ACCEPT ?
+                    ship_name + ' - ' + dada_ship_status :
+                    (dada_status === Cts.DADA_STATUS_TO_FETCH ||
+                      dada_status === Cts.DADA_STATUS_SHIPPING ||
+                      dada_status === Cts.DADA_STATUS_ARRIVED) &&
+                    (tool.length(dada_mobile) > 0 ?
+                        `骑手 ${dada_dm_name} ${dada_ship_status}` : ship_name + dada_ship_status
+                    )}
+                </Text>
+                {tool.length(dada_mobile) > 0 &&
+                <Text style={ship_style.ship_diff_time}>
+                  {ship_name}({dada_mobile})
+                </Text>}
+              </View>
+              {dada_status === Cts.DADA_STATUS_TO_ACCEPT && (
+                <View style={ship_style.ship_btn_view}>
+                  {auto_ship_type === Cts.SHIP_AUTO_NEW_DADA && <ClickBtn
+                    btn_text={'加小费'}
+                    onPress={() => {
+                      this.setState({addTipDialog: true})
+                    }}
+                  />}
+                </View>
+              )}
+              {(dada_status === Cts.DADA_STATUS_TO_FETCH ||
+                dada_status === Cts.DADA_STATUS_SHIPPING ||
+                dada_status === Cts.DADA_STATUS_ARRIVED) && tool.length(dada_mobile) > 0 &&
+              (<View style={ship_style.ship_btn_view}>
+                {!(zs_way > 0) && (ship_site_mobile !== '' || ship_site_tel !== '') && (
+                  <ImageBtn
+                    source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                    onPress={() => {
+                      this.setState({shipCallHided: !shipCallHided});
+                    }}
+                    imageStyle={styles.pullImg}
+                  />
+                )}
+                <ClickBtn
+                  type={'full'}
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(dada_mobile)
+                  }}
+                />
+              </View>)}
+            </View>
+            <View style={{
+              marginHorizontal: pxToDp(30),
+              flexDirection: "row",
+              alignItems: 'center',
+              height: pxToDp(80),
+              borderTopWidth: pxToDp(1),
+              borderColor: colors.back_color,
+              borderStyle: 'dashed'
+            }}>
+              <Text style={[ship_style.ship_diff_time]}>
+                距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
+              </Text>
+            </View>
+          </View>
+          
+          {!shipCallHided && ship_site_mobile !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点/客服 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(ship_site_mobile)
+                  }}
+                />
+              </View>
+            </View>
+          )}
+          {!shipCallHided && ship_site_tel !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点备用电话 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(ship_site_tel)
+                  }}
+                />
+              </View>
+            </View>
+          )}
+        </View>
+      );
+    }
+    let zs_ship_view = null;
+    if ((zs_way === Cts.SHIP_ZS_JD ||
+      zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT ||
+      zs_way === Cts.SHIP_ZS_ELE || zs_way === Cts.SHIP_ZS_BD) || (
+      auto_ship_type === Cts.SHIP_ZS_JD ||
+      auto_ship_type === Cts.SHIP_KS_MT || auto_ship_type === Cts.SHIP_ZS_MT ||
+      auto_ship_type === Cts.SHIP_ZS_ELE || auto_ship_type === Cts.SHIP_ZS_BD ||
+      auto_ship_type == Cts.SHIP_KS_ELE
+    )) {//专送配送
+      let zs_ship = tool.autoPlat(zs_way, zs_status);
+      let zs_ship_status = tool.zs_status(zs_status);
+      let zs_name = tool.ship_name(zs_way);
+      
+      zs_ship_view = (
+        <View>
+          <View style={[ship_style.ship_box, {flexDirection: "column"}]}>
+            <View style={[ship_style.ship_box, {borderBottomWidth: 0}]}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
+                    zs_status === Cts.ZS_STATUS_ON_WAY ||
+                    zs_status === Cts.ZS_STATUS_ARRIVED) &&
+                  tool.length(jd_ship_worker_mobile) > 0 ?
+                    `骑手 ${jd_ship_worker_name} ${zs_ship_status}` : zs_ship
+                  }
+                </Text>
+                <Text style={ship_style.ship_diff_time}>
+                  {zs_status === Cts.ZS_STATUS_TO_ACCEPT ? '已等待: ' + tool.diffDesc(orderTime) : zs_name}
+                  {tool.length(jd_ship_worker_mobile) > 0 &&
+                  <Text style={ship_style.ship_diff_time}>
+                    ({jd_ship_worker_mobile})
+                  </Text>}
+                </Text>
+              </View>
+              
+              {(zs_status === Cts.ZS_STATUS_TO_ACCEPT ||
+                zs_status === Cts.ZS_STATUS_CANCEL ||
+                zs_status === Cts.ZS_STATUS_ABNORMAL
+              ) && (
+                <View style={ship_style.ship_btn_view}>
+                  {(zs_status === Cts.ZS_STATUS_TO_ACCEPT && (zs_way === Cts.SHIP_KS_MT || zs_way === Cts.SHIP_ZS_MT)) &&
+                  <ClickBtn
+                    btn_text={'加小费'}
+                    onPress={() => {
+                      this.setState({addTipDialog: true})
+                    }}
+                  />}
+                  {(zs_status !== Cts.ZS_STATUS_NEVER_START &&
+                    zs_status !== Cts.ZS_STATUS_CANCEL &&
+                    zs_status !== Cts.ZS_STATUS_ABNORMAL
+                  ) && <ClickBtn
+                    type={'full'}
+                    btn_text={'转自配送'}
+                    style={{marginLeft: pxToDp(30)}}
+                    onPress={() => {
+                      this.setState({cancel_zs_hint: true});
+                    }}
+                  />}
+                  {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                    <ClickBtn
+                      type={'full'}
+                      btn_text={'催单'}
+                      style={{marginLeft: pxToDp(30)}}
+                      onPress={() => {
+                        this.setState({shipCallHided: !shipCallHided});
+                      }}
+                    />
+                  )}
+                </View>
+              )}
+              {(zs_status === Cts.ZS_STATUS_TO_FETCH ||
+                zs_status === Cts.ZS_STATUS_ON_WAY ||
+                zs_status === Cts.ZS_STATUS_ARRIVED) && tool.length(jd_ship_worker_mobile) > 0 &&
+              (<View style={ship_style.ship_btn_view}>
+                {(ship_site_mobile !== '' || ship_site_tel !== '') && (
+                  <ImageBtn
+                    source={shipCallHided ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                    onPress={() => {
+                      this.setState({shipCallHided: !shipCallHided});
+                    }}
+                    imageStyle={styles.pullImg}
+                  />
+                )}
+                <ClickBtn
+                  type={'full'}
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(jd_ship_worker_mobile)
+                  }}
+                />
+              </View>)}
+            </View>
+            <View style={{
+              marginHorizontal: pxToDp(30),
+              flexDirection: "row",
+              alignItems: 'center',
+              height: pxToDp(80),
+              borderTopWidth: pxToDp(1),
+              borderColor: colors.back_color,
+              borderStyle: 'dashed'
+            }}>
+              <Text style={[ship_style.ship_diff_time]}>
+                距离:{dada_distance}米.配送费:{dada_fee}元.已加小费:{dada_tips}元
+              </Text>
+            </View>
+          </View>
+          
+          {!shipCallHided && ship_site_mobile !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点/客服 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(ship_site_mobile)
+                  }}
+                />
+              </View>
+            </View>
+          )}
+          {!shipCallHided && ship_site_tel !== '' && (
+            <View style={ship_style.ship_box}>
+              <View style={ship_style.ship_info}>
+                <Text style={ship_style.ship_info_text}>
+                  站点备用电话 <Text style={ship_style.ship_tel_text}>({ship_site_tel})</Text>
+                </Text>
+              </View>
+              <View style={ship_style.ship_btn_view}>
+                <ClickBtn
+                  btn_text={'呼叫'}
+                  onPress={() => {
+                    native.dialNumber(ship_site_tel)
+                  }}
+                />
+              </View>
+            </View>
+          )}
+        </View>
+      );
+    }
+    
+    if (zs_ship_view !== null || auto_ship_view !== null) {
+      return (
+        <View>
+          {zs_ship_view}
+          {auto_ship_view}
+        </View>
+      );
+    } else {
+      return null;
+    }
+  }
+  
   renderHeader () {
     const {order} = this.props.order;
     const {isServiceMgr} = this.state
@@ -1259,6 +1660,7 @@ class OrderScene extends Component {
         </View>
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
+        {this.renderShipStatus()}
         <Delivery order={order}/>
     
         <View style={[CommonStyle.topBottomLine, styles.block]}>
@@ -1490,7 +1892,14 @@ class OrderScene extends Component {
             borderTopColor: "#D3D3D3",
             position: 'relative'
           }}>
-            {this.renderWayRecord()}
+            {
+              this.renderWayRecord()
+            }
+            <View style={{position: 'absolute', right: pxToDp(0), top: pxToDp(0)}}>
+              {
+                this.renderAddTip()
+              }
+            </View>
           </View>
         </View>
         
