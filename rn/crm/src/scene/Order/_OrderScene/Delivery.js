@@ -41,7 +41,7 @@ class Delivery extends React.Component {
     const navigation = self.props.navigation
     const api = `/api/order_deliveries/${this.props.order.id}?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(navigation)(api).then(res => {
-      this.setState({order: res})
+      this.setState({logistics: res})
     })
   }
   
