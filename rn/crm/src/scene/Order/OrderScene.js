@@ -151,9 +151,9 @@ class OrderScene extends Component {
   
   constructor (props) {
     super(props);
-    
+    let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
-      
+      isJbbVendor: tool.isJbbVendor(currVendorId),
       isFetching: false,
       orderReloading: false,
       
@@ -1660,8 +1660,7 @@ class OrderScene extends Component {
         </View>
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
-        {this.renderShipStatus()}
-        <Delivery order={order}/>
+        {this.state.isJbbVendor ? <Delivery order={order}/> : this.renderShipStatus()}
     
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {

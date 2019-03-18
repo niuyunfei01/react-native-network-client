@@ -182,6 +182,10 @@ export function vendor (global) {
   };
 }
 
+function isJbbVendor (vendorId) {
+  return vendorId == Cts.STORE_TYPE_SELF || vendorId == Cts.STORE_TYPE_AFFILIATE || vendorId == Cts.STORE_TYPE_BLX
+}
+
 export function server_info ({global, user}) {
   if (user === undefined) {
     return {};
@@ -803,5 +807,6 @@ export default {
   getTimeStamp,
   simpleBarrier,
   isPreOrder,
-  priceOptimize
+  priceOptimize,
+  isJbbVendor
 };

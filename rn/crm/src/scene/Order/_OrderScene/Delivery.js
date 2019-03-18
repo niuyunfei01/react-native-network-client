@@ -11,6 +11,7 @@ import Cts from "../../../Cts";
 import {native} from "../../../common";
 import {Modal, Toast} from "antd-mobile-rn";
 import HttpUtils from "../../../util/http";
+import tool from "../../../common/tool";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -26,7 +27,9 @@ class Delivery extends React.Component {
   
   constructor (props) {
     super(props)
+    let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
+      isJbbVendor: tool.isJbbVendor(currVendorId),
       logistics: [],
       accessToken: this.props.global.accessToken
     }
@@ -217,10 +220,12 @@ class Delivery extends React.Component {
   
   render (): React.ReactNode {
     return (
-      <View style={{marginTop: pxToDp(20)}}>
-        {this.renderShips()}
-        {this.renderBtn()}
-      </View>
+      <If condition={this.state.isJbbVendor}>
+        <View>
+          {this.renderShips()}
+          {this.renderBtn()}
+        </View>
+      </If>
     )
   }
 }
