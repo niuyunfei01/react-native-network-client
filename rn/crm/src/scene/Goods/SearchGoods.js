@@ -151,6 +151,14 @@ class SearchGoods extends Component {
     })
   }
   
+  /**
+   * 保底模式并且是售卖中的商品可以改价
+   */
+  showSupplyPrice (product) {
+    return this.state.fnPriceControlled == 1
+      && Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE, product.status)
+  }
+  
   renderRow = (product, idx) => {
     const self = this
     return (
@@ -176,7 +184,7 @@ class SearchGoods extends Component {
             </View>
             <If condition={product.is_exist}>
               <View style={{flexDirection: 'row'}}>
-                <If condition={this.state.fnPriceControlled == 1}>
+                <If condition={this.showSupplyPrice(product.is_exist)}>
                   <View style={{marginRight: pxToDp(10)}}>
                     <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
                   </View>
