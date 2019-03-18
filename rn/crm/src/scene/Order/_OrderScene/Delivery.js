@@ -123,9 +123,11 @@ class Delivery extends React.Component {
               <Text style={styles.shipWay}>{ship.logistic_name}：{ship.status_name}</Text>
               <Text style={styles.shipFee}>距离{ship.distance}米，配送费{ship.fee}元，已加小费{ship.tip}元</Text>
             </View>
-            <If condition={ship.time_away && ship.can_add_tip}>
-              <View style={styles.cellRight}>
+            <View style={styles.cellRight}>
+              <If condition={ship.time_away}>
                 <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
+              </If>
+              <If condition={ship.can_add_tip}>
                 <JbbButton
                   onPress={() => this.onAddTip(ship)}
                   text={'加小费'}
@@ -136,10 +138,8 @@ class Delivery extends React.Component {
                   width={pxToDp(120)}
                   height={pxToDp(40)}
                 />
-              </View>
-            </If>
-            <If condition={!ship.time_away && ship.delivery_phone}>
-              <View style={styles.cellRightCall}>
+              </If>
+              <If condition={ship.driver_phone}>
                 <JbbButton
                   onPress={() => native.dialNumber(ship.delivery_phone)}
                   text={'呼叫骑手'}
@@ -149,8 +149,8 @@ class Delivery extends React.Component {
                   fontWeight={'bold'}
                   fontSize={pxToDp(30)}
                 />
-              </View>
-            </If>
+              </If>
+            </View>
           </View>
         </For>
       </View>
