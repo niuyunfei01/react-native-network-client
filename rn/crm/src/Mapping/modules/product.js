@@ -6,7 +6,7 @@ export default {
     },
     SOLD_OUT: {
       value: '2',
-      label: '已售罄'
+      label: '售罄'
     },
     OFF_SALE: {
       value: '3',

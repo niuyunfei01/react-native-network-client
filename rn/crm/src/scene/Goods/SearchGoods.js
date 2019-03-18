@@ -42,9 +42,12 @@ class SearchGoods extends Component {
   
   constructor (props) {
     super(props);
-    console.log(this.store)
+    const vendor = tool.vendor(this.props.global)
+    let {fnPriceControlled} = vendor
+    
     this.state = {
       storeId: this.props.global.currStoreId,
+      fnPriceControlled: fnPriceControlled,
       goods: [],
       page: 1,
       pageNum: 15,
@@ -172,10 +175,12 @@ class SearchGoods extends Component {
               </If>
             </View>
             <If condition={product.is_exist}>
-              <View>
-                <View>
-                  <Text></Text>
-                </View>
+              <View style={{flexDirection: 'row'}}>
+                <If condition={this.state.fnPriceControlled == 1}>
+                  <View style={{marginRight: pxToDp(10)}}>
+                    <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
+                  </View>
+                </If>
                 <View style={styles.isOnlineBtn}>
                   <Text style={styles.isOnlineBtnText}>
                     {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
