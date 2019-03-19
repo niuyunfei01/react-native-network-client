@@ -117,6 +117,12 @@ class Delivery extends React.Component {
     ])
   }
   
+  showCallDriverBtn (ship) {
+    return ship.driver_phone &&
+      this.props.order.orderStatus != Cts.ORDER_STATUS_ARRIVED &&
+      this.props.order.orderStatus != Cts.ORDER_STATUS_INVALID
+  }
+  
   renderShips () {
     return (
       <View>
@@ -142,7 +148,7 @@ class Delivery extends React.Component {
                   height={pxToDp(40)}
                 />
               </If>
-              <If condition={ship.driver_phone}>
+              <If condition={this.showCallDriverBtn(ship)}>
                 <JbbButton
                   onPress={() => native.dialNumber(ship.delivery_phone)}
                   text={'呼叫骑手'}

@@ -6,6 +6,7 @@ import color from "../../widget/color";
 import pxToDp from "../../util/pxToDp";
 import JbbButton from "../component/JbbButton";
 import HttpUtils from "../../util/http";
+import EmptyData from "../component/EmptyData";
 
 function mapStateToProps(state) {
   return {
@@ -106,6 +107,7 @@ class OrderCallShip extends Component {
           fontColor={'#fff'}
           fontWeight={'bold'}
           fontSize={pxToDp(30)}
+          disabled={!this.state.newSelected.length}
         />
       </View>
     )
@@ -115,10 +117,16 @@ class OrderCallShip extends Component {
     return (
       <ScrollView>
         {this.renderHeader()}
-      
-        {this.renderLogistics()}
-        <WhiteSpace/>
-        {this.renderBtn()}
+  
+        <If condition={this.state.logistics.length}>
+          {this.renderLogistics()}
+          <WhiteSpace/>
+          {this.renderBtn()}
+        </If>
+  
+        <If condition={!this.state.logistics.length}>
+          <EmptyData placeholder={'无可用配送方式'}/>
+        </If>
       </ScrollView>
     )
   }
