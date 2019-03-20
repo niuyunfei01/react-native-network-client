@@ -66,7 +66,7 @@ class Delivery extends React.Component {
   }
   
   onCallThirdShip () {
-    this.props.navigation.navigate(Config.ROUTE_ORDER_CALL_SHIP, {
+    this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
       onBack: () => this.fetchShipData()
