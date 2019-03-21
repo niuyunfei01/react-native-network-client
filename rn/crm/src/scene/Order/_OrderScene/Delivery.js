@@ -107,7 +107,7 @@ class Delivery extends React.Component {
   
   onCallSelf () {
     const self = this
-    Modal.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定取消呼叫吗？', [
+    Modal.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
       {
         text: '确定',
         onPress: () => self.onTransferSelf()
@@ -150,7 +150,7 @@ class Delivery extends React.Component {
               </If>
               <If condition={this.showCallDriverBtn(ship)}>
                 <JbbButton
-                  onPress={() => native.dialNumber(ship.delivery_phone)}
+                  onPress={() => native.dialNumber(ship.driver_phone)}
                   text={'呼叫骑手'}
                   borderColor={'#E84E2A'}
                   backgroundColor={'#E84E2A'}
