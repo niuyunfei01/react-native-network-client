@@ -1215,6 +1215,13 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>老的提醒</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_INVENTORY_PRODUCT_PUT_IN)}
+          activeOpacity={customerOpacity}
+        >
+          <Text style={[block_styles.block_name]}>商品店铺</Text>
+        </TouchableOpacity>
       </View>
     );
   }
