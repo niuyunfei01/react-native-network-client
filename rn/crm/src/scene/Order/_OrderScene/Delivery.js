@@ -79,6 +79,7 @@ class Delivery extends React.Component {
     HttpUtils.get.bind(self.props.navigation)(api, {
       orderId: this.props.order.id
     }).then(res => {
+      Toast.success('操作成功')
       self.fetchShipData()
     }).catch(e => {
       self.fetchShipData()
