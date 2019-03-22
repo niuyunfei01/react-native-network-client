@@ -905,6 +905,7 @@ public class GlobalCtx extends Application {
         params.putInt("pid", pid);
         params.putString("productName", productName);
         params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
 
