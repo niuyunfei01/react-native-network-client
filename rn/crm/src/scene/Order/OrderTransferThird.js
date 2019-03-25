@@ -26,7 +26,7 @@ class OrderTransferThird extends Component {
     super(props);
     console.log('navigation params => ', this.props.navigation.state.params)
     this.state = {
-      selected: [],
+      selected: this.props.navigation.state.params.selectedWay,
       newSelected: [],
       orderId: this.props.navigation.state.params.orderId,
       storeId: this.props.navigation.state.params.storeId,
@@ -57,7 +57,7 @@ class OrderTransferThird extends Component {
       logisticCode: newSelected
     }).then(res => {
       Toast.success('正在呼叫第三方配送，请稍等')
-      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack()
+      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack(res)
       self.props.navigation.goBack()
     })
   }
@@ -84,11 +84,17 @@ class OrderTransferThird extends Component {
   }
   
   renderLogistics () {
-    const {logistics} = this.state
+    const {logistics, selected} = this.state
+    console.log(logistics, selected)
     return (
       <List renderHeader={() => '选择配送方式'}>
         {logistics.map(i => (
-          <CheckboxItem key={i.logisticCode} onChange={() => this.onSelectLogistic(i.logisticCode)}>
+          <CheckboxItem
+            key={i.logisticCode}
+            onChange={() => this.onSelectLogistic(i.logisticCode)}
+            disabled={selected.includes(String(i.logisticCode))}
+            defaultChecked={selected.includes(String(i.logisticCode))}
+          >
             {i.logisticName}
             <List.Item.Brief>{i.logisticDesc}</List.Item.Brief>
           </CheckboxItem>

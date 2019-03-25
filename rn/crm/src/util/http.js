@@ -54,7 +54,7 @@ class HttpUtils {
   }
   
   static apiBase (method, url, params, navigation) {
-    Toast.loading('请求中', 0)
+    // Toast.loading('请求中', 0)
     return new Promise((resolve, reject) => {
       fetch(method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {}), this.getOptions(method, params))
         .then((response) => {
@@ -66,7 +66,7 @@ class HttpUtils {
           }
         })
         .then((response) => {
-          Toast.hide()
+          // Toast.hide()
           if (authUrl.includes(url)) {
             resolve(response)
           } else {
@@ -79,7 +79,7 @@ class HttpUtils {
           }
         })
         .catch((error) => {
-          Toast.hide()
+          // Toast.hide()
           ToastShort('服务器错误')
           console.log('http error => ', error.message)
           reject(error.message)

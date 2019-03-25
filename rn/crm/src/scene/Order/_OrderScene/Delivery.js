@@ -12,6 +12,7 @@ import {native} from "../../../common";
 import {Modal, Toast} from "antd-mobile-rn";
 import HttpUtils from "../../../util/http";
 import tool from "../../../common/tool";
+import _ from 'lodash'
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -31,20 +32,34 @@ class Delivery extends React.Component {
     this.state = {
       isJbbVendor: tool.isJbbVendor(currVendorId),
       logistics: [],
-      accessToken: this.props.global.accessToken
+      isLoading: false,
+      accessToken: this.props.global.accessToken,
+      timer: null
     }
   }
   
   componentWillMount (): void {
-    this.fetchShipData()
+    const self = this
+    self.fetchShipData()
+    let timer = setInterval(function () {
+      self.fetchShipData()
+    }, 10000)
+    self.setState({timer: timer})
+  }
+  
+  componentWillUnmount (): void {
+    this.setState({timer: null})
   }
   
   fetchShipData () {
     const self = this
     const navigation = self.props.navigation
+    if (!this.state.logistics.length) {
+      this.setState({isLoading: true})
+    }
     const api = `/api/order_deliveries/${this.props.order.id}?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(navigation)(api).then(res => {
-      this.setState({logistics: res})
+      this.setState({logistics: res, isLoading: false})
     })
   }
   
@@ -66,10 +81,21 @@ class Delivery extends React.Component {
   }
   
   onCallThirdShip () {
+    const logistics = this.state.logistics
+    let logisticsCodes = _.map(logistics, 'type')
+    
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
-      onBack: () => this.fetchShipData()
+      selectedWay: logisticsCodes,
+      onBack: (res) => {
+        if (res.count > 0) {
+          Toast.success('发配送成功')
+        } else {
+          Toast.fail('发配送失败，请联系运营人员')
+        }
+        this.fetchShipData()
+      }
     });
   }
   
@@ -137,7 +163,7 @@ class Delivery extends React.Component {
               <If condition={ship.time_away}>
                 <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
               </If>
-              <If condition={ship.can_add_tip}>
+              <If condition={ship.can_add_tip && !ship.driver_phone}>
                 <JbbButton
                   onPress={() => this.onAddTip(ship)}
                   text={'加小费'}
@@ -227,7 +253,7 @@ class Delivery extends React.Component {
   
   render (): React.ReactNode {
     return (
-      <If condition={this.state.isJbbVendor}>
+      <If condition={this.state.isJbbVendor && !this.state.isLoading}>
         <View>
           {this.renderShips()}
           {this.renderBtn()}
