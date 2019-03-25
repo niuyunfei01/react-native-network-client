@@ -1,6 +1,6 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {List, InputItem} from 'antd-mobile-rn'
+import {List, InputItem, Toast} from 'antd-mobile-rn'
 import pxToDp from "../../util/pxToDp";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
@@ -9,8 +9,8 @@ import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import moment from 'moment'
 import WorkerPopup from "../component/WorkerPopup";
-import color from '../../widget/color'
 import Config from "../../config";
+import HttpUtils from "../../util/http";
 
 const Item = List.Item;
 
@@ -26,9 +26,7 @@ class ProductPutIn extends React.Component {
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
-          onPress={() => {
-            native.nativeBack();
-          }}
+          onPress={() => native.nativeBack()}
         />
       ),
       headerRight: (
@@ -71,7 +69,13 @@ class ProductPutIn extends React.Component {
   }
   
   doSubmit () {
-  
+    const self = this
+    const navigation = this.props.navigation
+    const api = `/api/product_put_in`
+    HttpUtils.post.bind(navigation)(api).then(res => {
+      Toast.success('操作成功')
+      native.nativeBack()
+    })
   }
   
   onSetPayUser (worker) {
