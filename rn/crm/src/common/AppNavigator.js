@@ -104,6 +104,7 @@ import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProdu
 import Refund from "../scene/Order/Refund";
 import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
+import InventoryProductPutIn from '../scene/Inventory/ProductPutIn'
 import Cts from "../Cts";
 
 
@@ -386,7 +387,8 @@ class Navigator extends Component {
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
         [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
-        [Config.ROUTE_OPERATION]: {screen: TabOperation}
+        [Config.ROUTE_OPERATION]: {screen: TabOperation},
+        [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn}
       },
       stackNavigatorConfigs
     );

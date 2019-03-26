@@ -898,6 +898,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toAddBuyRecordView(Activity ctx, int pid, String productName, int storeId) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryProductPutIn");
+        Bundle params = new Bundle();
+        params.putInt("pid", pid);
+        params.putString("productName", productName);
+        params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     /**
      * 跳转到新的调价页面
      *

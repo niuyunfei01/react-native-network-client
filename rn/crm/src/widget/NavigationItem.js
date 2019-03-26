@@ -9,23 +9,34 @@
 //import liraries
 import React, {PureComponent} from 'react'
 import {View, Text, StyleSheet, TouchableOpacity, Image,Dimensions} from 'react-native'
-
+import PropType from 'prop-types'
+import pxToDp from "../util/pxToDp";
+import color from "./color";
 var {height,width}=Dimensions.get('window')
 // create a component
 class NavigationItem extends PureComponent {
+  static propTypes = {
+    iconPosition: PropType.oneOf(['left', 'right']),
+    title: PropType.string
+  }
+  
+  static defaultProps = {
+    iconPosition: 'left'
+  }
+  
   render() {
-
-    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others,} = this.props;
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, iconPosition, ...others} = this.props;
     let _icon = this.props.icon &&
-      <Image style={[styles.icon, iconStyle]} source={icon}/>
+      <Image style={[iconPosition === 'left' ? styles.leftIcon : styles.rightIcon, iconStyle]} source={icon}/>
 
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
      <View>
         <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
-        {_icon}
-        {_title}
+          {iconPosition === 'left' ? _icon : null}
+          {_title}
+          {iconPosition === 'right' ? _icon : null}
       </TouchableOpacity>
      </View>
     );
@@ -44,15 +55,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  icon: {
-    width: 27,
-    height: 27,
-    margin: 8,
+  leftIcon: {
+    width: pxToDp(48),
+    height: pxToDp(38),
+    marginLeft: pxToDp(31),
+  },
+  rightIcon: {
+    width: pxToDp(48),
+    height: pxToDp(38),
+    marginVertical: 10,
+    marginRight: pxToDp(31),
+    tintColor: color.fontGray,
   },
   title: {
     fontSize: 15,
     color: '#333333',
-    margin: 8,
   }
 });
 

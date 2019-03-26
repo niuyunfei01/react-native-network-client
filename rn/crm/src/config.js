@@ -163,6 +163,7 @@ const C = {
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',
+  ROUTE_INVENTORY_PRODUCT_PUT_IN: 'InventoryProductPutIn',  // 库存 - 商品入库
   serverUrl,
   apiUrl,
   staticUrl,

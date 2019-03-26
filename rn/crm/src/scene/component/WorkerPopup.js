@@ -142,7 +142,7 @@ class WorkerPopup extends React.Component {
     for (let item of workerList) {
       elements.push(
         <CheckboxItem
-          key={item.id}
+          key={`checkbox_${item.id}`}
           onChange={() => self.onSelectWorker(item)}
           defaultChecked={this.props.selectWorkerIds.includes(item.id)}
         >
@@ -159,7 +159,7 @@ class WorkerPopup extends React.Component {
     let elements = []
     for (let item of workerList) {
       elements.push(
-        <ListItem key={item.id} onClick={() => self.onClickWorker(item)}>
+        <ListItem key={`radio_${item.id}`} onClick={() => self.onClickWorker(item)}>
           {item.name}
         </ListItem>
       )
@@ -195,7 +195,12 @@ class WorkerPopup extends React.Component {
 
   render() {
     return (
-      <Modal transparent={true} presentationStyle={'fullScreen'} hardwareAccelerated={true} visible={this.props.visible} onRequestClose={() => this.props.onModalClose()}>
+      <Modal
+        presentationStyle={'fullScreen'}
+        hardwareAccelerated={true}
+        visible={this.props.visible}
+        onRequestClose={() => this.props.onModalClose()}
+      >
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
