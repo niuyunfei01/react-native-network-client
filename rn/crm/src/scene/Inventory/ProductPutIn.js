@@ -31,8 +31,7 @@ class ProductPutIn extends React.Component {
       ),
       headerRight: (
         <NavigationItem
-          icon={require("../../img/new/scan.png")}
-          iconPosition={'right'}
+          position={'right'}
           title={'对账单'}
           onPress={() => {
             console.log(navigation)
@@ -71,8 +70,15 @@ class ProductPutIn extends React.Component {
   doSubmit () {
     const self = this
     const navigation = this.props.navigation
-    const api = `/api/product_put_in`
-    HttpUtils.post.bind(navigation)(api).then(res => {
+    const api = `/api/product_put_in?access_token=${self.props.global.accessToken}`
+    const data = {
+      price: Number(this.state.totalPrice),
+      num: Number(this.state.number),
+      userId: this.state.userId,
+      productId: navigation.state.params.pid
+    }
+  
+    HttpUtils.post.bind(navigation)(api, data).then(res => {
       Toast.success('操作成功')
       native.nativeBack()
     })
@@ -104,8 +110,14 @@ class ProductPutIn extends React.Component {
   renderForm () {
     return (
       <List renderHeader={'表单信息'}>
-        <InputItem defaultValue={this.state.totalPrice}>成本总计</InputItem>
-        <InputItem defaultValue={this.state.number}>份数</InputItem>
+        <InputItem
+          defaultValue={this.state.totalPrice}
+          onChange={(value) => this.setState({totalPrice: value})}
+        >成本总计</InputItem>
+        <InputItem
+          defaultValue={this.state.number}
+          onChange={(value) => this.setState({number: value})}
+        >份数</InputItem>
         <Item extra={this.state.date}>入库日期</Item>
         <Item
           extra={this.state.userName}

@@ -16,27 +16,27 @@ var {height,width}=Dimensions.get('window')
 // create a component
 class NavigationItem extends PureComponent {
   static propTypes = {
-    iconPosition: PropType.oneOf(['left', 'right']),
+    position: PropType.oneOf(['left', 'right']),
     title: PropType.string
   }
   
   static defaultProps = {
-    iconPosition: 'left'
+    position: 'left'
   }
   
   render() {
-    const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, iconPosition, ...others} = this.props;
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, position, ...others} = this.props;
     let _icon = this.props.icon &&
-      <Image style={[iconPosition === 'left' ? styles.leftIcon : styles.rightIcon, iconStyle]} source={icon}/>
+      <Image style={[position === 'left' ? styles.leftIcon : styles.rightIcon, iconStyle]} source={icon}/>
 
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
      <View>
-        <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
-          {iconPosition === 'left' ? _icon : null}
+       <TouchableOpacity style={[styles.containerDefault, containerStyle]} onPress={onPress} {...others}>
+         {position === 'left' ? _icon : null}
           {_title}
-          {iconPosition === 'right' ? _icon : null}
+         {position === 'right' ? _icon : null}
       </TouchableOpacity>
      </View>
     );
@@ -49,6 +49,11 @@ class NavigationItem extends PureComponent {
 
 // define your styles
 const styles = StyleSheet.create({
+  containerDefault: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: pxToDp(15)
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
