@@ -1,4 +1,5 @@
 import ProductModule from './modules/product'
+import OrderModule from './modules/order'
 
 /**
  * 存放常量的对应关系
@@ -31,4 +32,5 @@ export default class Mapping {
   }
   
   static Product = ProductModule
+  static Order = OrderModule
 }
