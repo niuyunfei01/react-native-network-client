@@ -9,11 +9,13 @@ export default class Dialog extends React.Component {
     visible: PropTypes.bool.isRequired,
     transparent: PropTypes.bool,
     onClickModal: PropTypes.func,
-    onRequestClose: PropTypes.func.isRequired
+    onRequestClose: PropTypes.func.isRequired,
+    align: PropTypes.string
   }
   
   static defaultProps = {
-    transparent: true
+    transparent: true,
+    align: 'left'
   }
   
   onRequestClose () {
@@ -21,6 +23,13 @@ export default class Dialog extends React.Component {
   }
   
   render () {
+    let containerStyle = {}
+    if (this.props.align === 'center') {
+      containerStyle = {
+        alignItems: 'center'
+      }
+    }
+    
     return (
       <Modal
         visible={this.props.visible}
@@ -29,7 +38,7 @@ export default class Dialog extends React.Component {
         transparent={true}
       >
         <View style={styles.modalBackground}>
-          <View style={styles.container}>
+          <View style={[styles.container, containerStyle]}>
             {this.props.children}
           </View>
           <TouchableOpacity onPress={() => this.props.onRequestClose()} style={styles.modalCancel}>

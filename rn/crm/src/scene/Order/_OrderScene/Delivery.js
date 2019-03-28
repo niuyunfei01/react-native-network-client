@@ -13,7 +13,6 @@ import {Modal, Toast} from "antd-mobile-rn";
 import HttpUtils from "../../../util/http";
 import tool from "../../../common/tool";
 import _ from 'lodash'
-import Mapping from "../../../Mapping";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -44,12 +43,12 @@ class Delivery extends React.Component {
     let orderStatus = this.props.order.orderStatus
     self.fetchShipData()
     // 如果订单完成或者无效则不设置定时刷新任务
-    if (!Mapping.Tools.ValueEqMapping(Mapping.Order.ORDER_STATUS.ARRIVED, orderStatus) && !Mapping.Tools.ValueEqMapping(Mapping.Order.ORDER_STATUS.INVALID, orderStatus)) {
-      let timer = setInterval(function () {
-        self.fetchShipData()
-      }, 10000)
-      self.setState({timer: timer})
-    }
+    // if (!Mapping.Tools.ValueEqMapping(Mapping.Order.ORDER_STATUS.ARRIVED, orderStatus) && !Mapping.Tools.ValueEqMapping(Mapping.Order.ORDER_STATUS.INVALID, orderStatus)) {
+    //   let timer = setInterval(function () {
+    //     self.fetchShipData()
+    //   }, 10000)
+    //   self.setState({timer: timer})
+    // }
   }
   
   componentWillUnmount (): void {

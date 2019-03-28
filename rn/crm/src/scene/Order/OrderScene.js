@@ -53,10 +53,14 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-import {getWithTpl, getWithTpl2} from "../../util/common";
+import {getWithTpl} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
 import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
+import {Modal} from "antd-mobile-rn";
+import HttpUtils from "../../util/http";
+import JbbDialog from '../component/Dialog'
+import QRCode from 'react-native-qrcode';
 
 const numeral = require('numeral');
 
@@ -106,6 +110,7 @@ const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
+const MENU_RECEIVE_QR = 10;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -194,7 +199,9 @@ class OrderScene extends Component {
       reason: '饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
       phone: undefined,
       person: '联系客户',
-      isServiceMgr: false
+      isServiceMgr: false,
+      visibleReceiveQr: false,
+      receiveQrText: ''
     };
     
     this._onLogin = this._onLogin.bind(this);
@@ -313,7 +320,7 @@ class OrderScene extends Component {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-    
+    as.push({key: MENU_RECEIVE_QR, label: '收款码'});
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }
@@ -337,6 +344,27 @@ class OrderScene extends Component {
     
     this._navSetParams();
   };
+  
+  showReceiveQr (order) {
+    const self = this
+    const navigation = this.props.navigation
+    const accessToken = this.props.global.accessToken
+    const url = `/api/gen_wx_pay_qr?access_token=${accessToken}`
+    Modal.prompt('提示', '请输入收款金额', (amount) => {
+      const data = {
+        orderId: order.id,
+        storeId: order.store_id,
+        amount: amount
+      }
+      HttpUtils.get.bind(navigation)(url, data).then(res => {
+        self.setState({receiveQrText: res.result, visibleReceiveQr: true})
+      })
+    })
+  }
+  
+  closeReceiveQr () {
+    this.setState({visibleReceiveQr: false})
+  }
   
   onPrint () {
     const order = this.props.order.order
@@ -391,6 +419,8 @@ class OrderScene extends Component {
       native.toNativeOrder(order.order.id);
     } else if (option.key === MENU_PROVIDING) {
       this._onToProvide();
+    } else if (option.key === MENU_RECEIVE_QR) {
+      this.showReceiveQr(order.order)
     } else if (option.key === MENU_SEND_MONEY) {
       navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
     } else {
@@ -1000,6 +1030,23 @@ class OrderScene extends Component {
     )
   }
   
+  renderReceiveQr () {
+    return (
+      <JbbDialog
+        visible={this.state.visibleReceiveQr}
+        onRequestClose={() => this.closeReceiveQr()}
+        align={'center'}
+      >
+        <QRCode
+          value={this.state.receiveQrText}
+          size={200}
+          bgColor='black'
+          fgColor='white'
+        />
+      </JbbDialog>
+    )
+  }
+  
   render () {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
@@ -1251,6 +1298,8 @@ class OrderScene extends Component {
               </Cell>
             </Cells>
           </Dialog>
+  
+          {this.renderReceiveQr()}
         </View>
       );
   }
