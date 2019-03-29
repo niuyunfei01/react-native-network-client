@@ -57,10 +57,7 @@ import {getWithTpl} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
 import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
-import {Modal} from "antd-mobile-rn";
-import HttpUtils from "../../util/http";
-import JbbDialog from '../component/Dialog'
-import QRCode from 'react-native-qrcode';
+import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 
 const numeral = require('numeral');
 
@@ -200,8 +197,7 @@ class OrderScene extends Component {
       phone: undefined,
       person: '联系客户',
       isServiceMgr: false,
-      visibleReceiveQr: false,
-      receiveQrText: ''
+      visibleReceiveQr: false
     };
     
     this._onLogin = this._onLogin.bind(this);
@@ -345,27 +341,6 @@ class OrderScene extends Component {
     this._navSetParams();
   };
   
-  showReceiveQr (order) {
-    const self = this
-    const navigation = this.props.navigation
-    const accessToken = this.props.global.accessToken
-    const url = `/api/gen_wx_pay_qr?access_token=${accessToken}`
-    Modal.prompt('提示', '请输入收款金额', (amount) => {
-      const data = {
-        orderId: order.id,
-        storeId: order.store_id,
-        amount: amount
-      }
-      HttpUtils.get.bind(navigation)(url, data).then(res => {
-        self.setState({receiveQrText: res.result, visibleReceiveQr: true})
-      })
-    })
-  }
-  
-  closeReceiveQr () {
-    this.setState({visibleReceiveQr: false})
-  }
-  
   onPrint () {
     const order = this.props.order.order
     if (order) {
@@ -420,7 +395,7 @@ class OrderScene extends Component {
     } else if (option.key === MENU_PROVIDING) {
       this._onToProvide();
     } else if (option.key === MENU_RECEIVE_QR) {
-      this.showReceiveQr(order.order)
+      this.setState({visibleReceiveQr: true})
     } else if (option.key === MENU_SEND_MONEY) {
       navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
     } else {
@@ -1030,20 +1005,13 @@ class OrderScene extends Component {
     )
   }
   
-  renderReceiveQr () {
+  renderReceiveQr (order) {
     return (
-      <JbbDialog
-        visible={this.state.visibleReceiveQr}
-        onRequestClose={() => this.closeReceiveQr()}
-        align={'center'}
-      >
-        <QRCode
-          value={this.state.receiveQrText}
-          size={200}
-          bgColor='black'
-          fgColor='white'
-        />
-      </JbbDialog>
+      <ReceiveMoney
+        formVisible={this.state.visibleReceiveQr}
+        onCloseForm={() => this.setState({visibleReceiveQr: false})}
+        order={order}
+      />
     )
   }
   
@@ -1299,7 +1267,7 @@ class OrderScene extends Component {
             </Cells>
           </Dialog>
   
-          {this.renderReceiveQr()}
+          {this.renderReceiveQr(order)}
         </View>
       );
   }
