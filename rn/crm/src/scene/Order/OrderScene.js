@@ -344,7 +344,7 @@ class OrderScene extends Component {
   onPrint () {
     const order = this.props.order.order
     if (order) {
-      const store = tool.store(order.store_id, this.props.global)
+      const store = tool.store(this.props.global, order.store_id)
       if (store && store.cloudPrinter) {
         this.setState({showPrinterChooser: true})
       } else {

@@ -82,7 +82,7 @@ class OrderEditStoreScene extends Component {
     const {global} = this.props;
 
     const currStoreId = order.store_id;
-    const currVendorId = (tool.store(currStoreId, global) || {}).vendor_id;
+    const currVendorId = (tool.store( global,currStoreId) || {}).vendor_id;
 
     //菜鸟和菜鸟食材视作同一个品牌
     //以后要在服务器端实现

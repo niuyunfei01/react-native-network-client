@@ -195,9 +195,28 @@ export function server_info ({global, user}) {
   return !!user_info[service_uid] ? user_info[service_uid] : {};
 }
 
-export function store (store_id, global) {
-  const {canReadStores} = global;
+/**
+ * 当前店铺信息
+ * @param global
+ * @param store_id
+ * @returns {*}
+ */
+export function store (global, store_id = null) {
+  const {canReadStores, currStoreId} = global;
+  store_id = store_id ? store_id : currStoreId
   return canReadStores[store_id];
+}
+
+/**
+ * 当前店铺所有者信息
+ * @returns {*}
+ * @param reduxGlobal
+ * @param reduxMine
+ */
+export function owner (reduxGlobal, reduxMine) {
+  const store = this.store(reduxGlobal)
+  const {user_list} = reduxMine
+  return user_list[1][store.owner_id];
 }
 
 export function length (obj) {
@@ -778,6 +797,7 @@ export default {
   objectSum,
   objectFilter,
   store,
+  owner,
   intOf,
   disWayStatic,
   disWay,
