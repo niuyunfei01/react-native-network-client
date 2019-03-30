@@ -1088,6 +1088,7 @@ class OrderScene extends Component {
                 onPress: this._hideCallStore.bind(this),
               }
             ]}
+            style={{maxHeight: '50%'}}
           />
           
           
