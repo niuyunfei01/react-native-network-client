@@ -909,6 +909,15 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toWarehouseManage(Activity ctx, int pid) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryProductInfo");
+        Bundle params = new Bundle();
+        params.putInt("pid", pid);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     /**
      * 跳转到新的调价页面
      *
