@@ -164,6 +164,7 @@ const C = {
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',
   ROUTE_INVENTORY_PRODUCT_PUT_IN: 'InventoryProductPutIn',  // 库存 - 商品入库
+  ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',     // 库存 - 商品库管详情
   serverUrl,
   apiUrl,
   staticUrl,
