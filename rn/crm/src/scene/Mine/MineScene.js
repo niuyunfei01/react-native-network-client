@@ -1,14 +1,14 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
-  ScrollView,
+  InteractionManager,
   RefreshControl,
-  InteractionManager
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -24,20 +24,18 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
+import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../reducers/global/globalActions";
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {
-  fetchWorkers,
-  fetchUserCount,
+  fetchDutyUsers,
   fetchStoreTurnover,
-  userCanChangeStore,
-  fetchDutyUsers
+  fetchUserCount,
+  fetchWorkers,
+  userCanChangeStore
 } from "../../reducers/mine/mineActions";
-import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
-import {upCurrentProfile} from "../../reducers/global/globalActions";
-import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
@@ -1214,13 +1212,6 @@ class MineScene extends PureComponent {
             source={require("../../img/Mine/icon_mine_collection_2x.png")}
           />
           <Text style={[block_styles.block_name]}>老的提醒</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_INVENTORY_PRODUCT_PUT_IN)}
-          activeOpacity={customerOpacity}
-        >
-          <Text style={[block_styles.block_name]}>商品店铺</Text>
         </TouchableOpacity>
       </View>
     );

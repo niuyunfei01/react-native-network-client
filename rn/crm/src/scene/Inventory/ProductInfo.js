@@ -6,15 +6,14 @@ import {connect} from "react-redux";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import {List, WhiteSpace} from "antd-mobile-rn";
-import ConfirmDialog from "../component/ConfirmDialog";
-import JbbInput from "../component/JbbInput";
+import {List, Picker, WhiteSpace} from "antd-mobile-rn";
 import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {global} = state;
   return {global: global};
 }
+
 
 class ProductInfo extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -38,6 +37,8 @@ class ProductInfo extends React.Component {
       productInfo: {
         product: {}
       },
+      shelfNos: [[{label: '', value: ''}], [{label: '', value: ''}]],
+      selectShelfNo: [],
       storeId: store.id,
       storeName: store.name,
       positionDialog: false,
@@ -47,8 +48,25 @@ class ProductInfo extends React.Component {
     }
   }
   
+  componentWillMount (): void {
+    this.fetchShelfNos()
+  }
+  
   componentDidMount (): void {
     this.fetchData()
+  }
+  
+  fetchShelfNos () {
+    const self = this
+    const navigation = this.props.navigation
+    const api = `/api_products/inventory_shelf_nos?access_token=${this.props.global.accessToken}`
+    HttpUtils.get.bind(navigation)(api, {
+      productId: self.state.productId,
+      storeId: self.state.storeId
+    }).then(res => {
+      self.setState({shelfNos: res})
+      console.log(res)
+    })
   }
   
   fetchData () {
@@ -60,19 +78,18 @@ class ProductInfo extends React.Component {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
-      self.setState({productInfo: res, refreshing: false})
+      self.setState({productInfo: res, refreshing: false, selectShelfNo: res.shelf_no})
     })
   }
   
-  onModifyPosition () {
+  onModifyPosition (value) {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/modify_inventory_shelf_no?access_token=${this.props.global.accessToken}`
     HttpUtils.post.bind(navigation)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId,
-      shelfArea: self.state.shelfArea,
-      shelfNo: self.state.shelfNo
+      shelfNo: value
     }).then(res => {
       self.fetchData()
     })
@@ -97,40 +114,22 @@ class ProductInfo extends React.Component {
   }
   
   renderForm () {
+    console.log(this.state.shelfNos)
     return (
       <View>
         <JbbCellTitle>库管信息</JbbCellTitle>
         <List>
-          <List.Item
-            arrow="horizontal"
+          <Picker
+            data={this.state.shelfNos}
+            title="选择货架"
+            cascade={false}
             extra={this.state.productInfo.shelf_no}
-            children={'货架编号'}
-            onClick={() => this.setState({positionDialog: true})}
-          />
+            onOk={v => this.onModifyPosition(v.join(''))}
+          >
+            <List.Item arrow="horizontal">货架编号</List.Item>
+          </Picker>
         </List>
       </View>
-    )
-  }
-  
-  renderModifyPosition () {
-    return (
-      <ConfirmDialog
-        visible={this.state.positionDialog}
-        onClickCancel={() => this.setState({positionDialog: false})}
-        onClickConfirm={() => this.onModifyPosition()}
-      >
-        <JbbInput
-          onChange={(shelfArea) => this.setState({shelfArea})}
-          value={this.state.shelfArea}
-          placeholder={'请输入货架区号'}
-        />
-        <WhiteSpace/>
-        <JbbInput
-          onChange={(shelfNo) => this.setState({shelfNo})}
-          value={this.state.shelfNo}
-          placeholder={'请输入货架编号'}
-        />
-      </ConfirmDialog>
     )
   }
   
@@ -146,8 +145,6 @@ class ProductInfo extends React.Component {
         {this.renderHeader()}
         <WhiteSpace/>
         {this.renderForm()}
-        
-        {this.renderModifyPosition()}
       </ScrollView>
     );
   }
