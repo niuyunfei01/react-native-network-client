@@ -184,7 +184,7 @@ public class MainActivity extends AbstractActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 OrderListFragment frag = (OrderListFragment) adapter.instantiateItem(ordersViewPager, position);
-                frag.refresh();
+//                frag.refresh();
             }
 
             @Override
