@@ -68,7 +68,6 @@ import OrderCancelShip from "../scene/Order/OrderCancelShip";
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
 import SettlementDetailsScene from "../scene/Settlement/SettlementDetailsScene";
-import SettlementOrderScene from "../scene/Settlement/_SettlementDetail/SettlementOrderScene";
 import SettlementGatherScene from "../scene/Settlement/SettlementGatherScene";
 
 import SelectWorkerScene from "../scene/Store/SelectWorkerScene";
@@ -104,10 +103,13 @@ import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProdu
 import Refund from "../scene/Order/Refund";
 import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
+import InventoryProductPutIn from '../scene/Inventory/ProductPutIn'
+import InventoryProductInfo from '../scene/Inventory/ProductInfo'
 import Cts from "../Cts";
 
 
 import _ from "lodash"
+import OrderTransferThird from "../scene/Order/OrderTransferThird";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -298,6 +300,7 @@ class Navigator extends Component {
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
         [Config.ROUTE_ORDER_CALL_SHIP]: {screen: OrderCallShip},
+        [Config.ROUTE_ORDER_TRANSFER_THIRD]: {screen: OrderTransferThird},
         [Config.ROUTE_ORDER_PACK]: {screen: OrderSetPackDone},
         [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
         [Config.ROUTE_SETTING]: {screen: SettingScene},
@@ -384,7 +387,9 @@ class Navigator extends Component {
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
         [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
-        [Config.ROUTE_OPERATION]: {screen: TabOperation}
+        [Config.ROUTE_OPERATION]: {screen: TabOperation},
+        [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn},
+        [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo}
       },
       stackNavigatorConfigs
     );

@@ -92,6 +92,7 @@ public class Order implements Serializable {
 
     //外卖店铺标示
     private String es_mark_name;
+    private String pack_assign_name;
 
     public int getId() {
         return id;
@@ -724,6 +725,14 @@ public class Order implements Serializable {
 
     public void setSupplyMoney(double supplyMoney) {
         this.supplyMoney = supplyMoney;
+    }
+
+    public String getPack_assign_name() {
+        return pack_assign_name;
+    }
+
+    public void setPack_assign_name(String pack_assign_name) {
+        this.pack_assign_name = pack_assign_name;
     }
 }
 

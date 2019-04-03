@@ -34,7 +34,7 @@ class StoreRule extends React.Component {
     const self = this
     const access_token = this.props.global.accessToken
     this.setState({isLoading: true})
-    HttpUtils.get(`/api/store_rules_v2?access_token=${access_token}`).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/store_rules_v2?access_token=${access_token}`).then(res => {
       self.setState({rules: res.rules, isLoading: false})
     })
   }

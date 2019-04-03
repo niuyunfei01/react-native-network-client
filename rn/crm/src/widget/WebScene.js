@@ -1,9 +1,7 @@
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, WebView, InteractionManager, Platform, BackHandler} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, View, WebView} from 'react-native'
 import {native, tool} from '../common'
 import Config from "../config";
-import LoadingView from "./LoadingView";
-import {Toast} from "./../weui/index";
 import NavigationItem from "./NavigationItem";
 import pxToDp from "../util/pxToDp";
 import {bindActionCreators} from "redux";
@@ -66,9 +64,13 @@ class WebScene extends PureComponent {
           if (data && data['action'] && data['params']) {
             let action = data['action'];
             let params = data['params'];
-            InteractionManager.runAfterInteractions(() => {
-              _this.props.navigation.navigate(action, params);
-            });
+            if (action == 'nativeToGoods') {
+              native.toGoods()
+            } else {
+              InteractionManager.runAfterInteractions(() => {
+                _this.props.navigation.navigate(action, params);
+              });
+            }
           } else {
             this._do_go_back(msg);
           }

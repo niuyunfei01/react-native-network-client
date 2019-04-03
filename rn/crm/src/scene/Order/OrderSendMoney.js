@@ -1,16 +1,19 @@
 import React, {PureComponent} from 'react'
-import {View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {List, InputItem, WhiteSpace, TextareaItem, Button} from 'antd-mobile-rn';
+import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {tool} from "../../common";
+import JbbCellTitle from "../component/JbbCellTitle";
+import pxToDp from "../../util/pxToDp";
 
 function mapStateToProps (state) {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global}
+  const {mine, user, global, store} = state;
+  return {mine: mine, user: user, global: global, store}
 }
 
 function mapDispatchToProps (dispatch) {
@@ -30,7 +33,14 @@ class OrderSendMoney extends PureComponent {
   
   constructor (props: Object) {
     super(props);
+    const store = tool.store(this.props.global)
+    const owner = tool.owner(this.props.global, this.props.mine)
+    console.log(owner)
     this.state = {
+      storeName: store.name,
+      storeCity: store.city,
+      storeVendor: store.vendor,
+      storeOwnerName: owner.nickname,
       amount: '',
       remark: '',
       submitting: false
@@ -71,9 +81,33 @@ class OrderSendMoney extends PureComponent {
       });
   }
   
+  renderInfoItem (label, value) {
+    return (
+      <View style={styles.infoItem}>
+        <Text style={styles.infoLabel}>{label}：</Text>
+        <Text>{value}</Text>
+      </View>
+    )
+  }
+  
+  renderInfo () {
+    const {storeName, storeCity, storeVendor, storeOwnerName} = this.state
+    return (
+      <View>
+        <JbbCellTitle>收款信息</JbbCellTitle>
+        <View style={styles.infoContainer}>
+          {this.renderInfoItem('收款人', storeOwnerName)}
+          {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
+        </View>
+      </View>
+    )
+  }
+  
   render () {
     return (
       <View>
+        {this.renderInfo()}
+        <WhiteSpace/>
         <List renderHeader={() => '红包金额'}>
           <InputItem
             type='number'
@@ -102,3 +136,17 @@ class OrderSendMoney extends PureComponent {
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderSendMoney)
+
+const styles = StyleSheet.create({
+  infoContainer: {
+    paddingHorizontal: pxToDp(30),
+    backgroundColor: '#fff'
+  },
+  infoItem: {
+    marginVertical: pxToDp(10)
+  },
+  infoLabel: {
+    fontSize: pxToDp(26),
+    fontWeight: 'bold'
+  }
+})

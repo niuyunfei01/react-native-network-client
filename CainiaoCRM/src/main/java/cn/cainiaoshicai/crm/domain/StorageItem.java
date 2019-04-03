@@ -38,6 +38,8 @@ public class StorageItem {
     private int totalInReq;
     private String reqMark;
 
+    private String shelfNo;
+
     private int when_sale_again;
     private String tag_code;
     private int price;
@@ -321,5 +323,13 @@ public class StorageItem {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public String getShelfNo() {
+        return shelfNo;
+    }
+
+    public void setShelfNo(String shelfNo) {
+        this.shelfNo = shelfNo;
     }
 }

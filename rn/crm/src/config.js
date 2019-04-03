@@ -87,6 +87,7 @@ const C = {
   ROUTE_ORDER_EDIT: 'OrderEdit',
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
   ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
+  ROUTE_ORDER_TRANSFER_THIRD: 'OrderTransferThird',
   ROUTE_ORDER_PACK: 'OrderSetPack',
   ROUTE_ORDER_START_SHIP: 'OrderStartShip',
   ROUTE_ORDER_CANCEL_SHIP: 'OrderCancelShip',
@@ -162,6 +163,8 @@ const C = {
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',
+  ROUTE_INVENTORY_PRODUCT_PUT_IN: 'InventoryProductPutIn',  // 库存 - 商品入库
+  ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',     // 库存 - 商品库管详情
   serverUrl,
   apiUrl,
   staticUrl,

@@ -12,6 +12,7 @@ import NoFoundDataView from "../component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../component/BigImage";
+import Mapping from "../../Mapping";
 
 
 function mapStateToProps (state) {
@@ -41,8 +42,12 @@ class SearchGoods extends Component {
   
   constructor (props) {
     super(props);
+    const vendor = tool.vendor(this.props.global)
+    let {fnPriceControlled} = vendor
+    
     this.state = {
       storeId: this.props.global.currStoreId,
+      fnPriceControlled: fnPriceControlled,
       goods: [],
       page: 1,
       pageNum: 15,
@@ -69,7 +74,7 @@ class SearchGoods extends Component {
     const self = this
     let accessToken = this.props.global.accessToken;
     let storeId = this.state.storeId
-    HttpUtils.get(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`).then(res => {
       self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
@@ -100,7 +105,7 @@ class SearchGoods extends Component {
       storeId: storeId
     }
     console.log('find_prod_with_pagination => ', params)
-    HttpUtils.get(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage
       let goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
@@ -146,6 +151,19 @@ class SearchGoods extends Component {
     })
   }
   
+  showOnlineBtn (product) {
+    return !product.is_exist
+      || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
+  }
+  
+  /**
+   * 保底模式并且是售卖中的商品显示保底价
+   */
+  showSupplyPrice (product) {
+    return this.state.fnPriceControlled == 1
+      && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
+  }
+  
   renderRow = (product, idx) => {
     const self = this
     return (
@@ -169,12 +187,21 @@ class SearchGoods extends Component {
                 <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
               </If>
             </View>
-            <If condition={product.is_exist}>
-              <View style={styles.isOnlineBtn}>
-                <Text style={styles.isOnlineBtnText}>已上架</Text>
+            <If condition={!this.showOnlineBtn(product)}>
+              <View style={{flexDirection: 'row'}}>
+                <If condition={this.showSupplyPrice(product.is_exist)}>
+                  <View style={{marginRight: pxToDp(10)}}>
+                    <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
+                  </View>
+                </If>
+                <View style={styles.isOnlineBtn}>
+                  <Text style={styles.isOnlineBtnText}>
+                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
+                  </Text>
+                </View>
               </View>
             </If>
-            <If condition={!product.is_exist}>
+            <If condition={this.showOnlineBtn(product)}>
               <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
                 store_id: this.state.storeId,
                 product_id: product.id,

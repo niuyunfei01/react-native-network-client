@@ -75,7 +75,7 @@ class GoodsPriceIndex extends Component {
   fetchStoreScore () {
     const self = this
     const {access_token, store_id} = this.state
-    HttpUtils.get(`/api/store_price_score/${store_id}?access_token=${access_token}`).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/store_price_score/${store_id}?access_token=${access_token}`).then(res => {
       self.setState({storeScore: res})
     })
   }
@@ -84,7 +84,7 @@ class GoodsPriceIndex extends Component {
     const self = this
     const {access_token, store_id, tabActiveValue, page, pageSize} = this.state
     this.setState({isLoading: true})
-    HttpUtils.get(`/api/get_store_should_adjust_prods_new/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(`/api/get_store_should_adjust_prods_new/${tabActiveValue}/${store_id}/${page}/${pageSize}?access_token=${access_token}`).then(res => {
       const list = (this.state.page === 1 ? [] : this.state.list).concat(res.list)
       self.setState({isLastPage: !res.has_more, list: list, isLoading: false, page: res.page})
     })

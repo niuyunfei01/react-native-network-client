@@ -75,6 +75,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_TO_LOSS = 10997;
     private static final int MENU_CONTEXT_VIEW_DETAIL = 10998;
     private static final int MENU_CONTEXT_TO_CHG_SUPPLY_PRICE = 10999;
+    private static final int MENU_CONTEXT_ADD_BUY_RECORD = 11000;
+    private static final int MENU_CONTEXT_WAREHOUSE = 11001;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
     private ListView lv;
@@ -773,7 +775,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item.getStatus() != STORE_PROD_OFF_SALE) {
                     menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
                 }
+                menu.add(Menu.NONE, MENU_CONTEXT_ADD_BUY_RECORD, Menu.NONE, "入库");
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
+                menu.add(Menu.NONE, MENU_CONTEXT_WAREHOUSE, Menu.NONE, "库管");
             }
 
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
@@ -898,6 +902,20 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item != null) {
                     String url = URLHelper.getStoresPrefix() + "/store_product/" + item.getId();
                     GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, url);
+                }
+                return true;
+            case MENU_CONTEXT_ADD_BUY_RECORD:
+                if (item != null) {
+                    int productId = item.getProduct_id();
+                    String name = item.getName();
+                    int storeId = item.getStore_id();
+                    GlobalCtx.app().toAddBuyRecordView(StoreStorageActivity.this, productId, name, storeId);
+                }
+                return true;
+            case MENU_CONTEXT_WAREHOUSE:
+                if (item != null) {
+                    int productId = item.getProduct_id();
+                    GlobalCtx.app().toWarehouseManage(StoreStorageActivity.this, productId);
                 }
                 return true;
             default:

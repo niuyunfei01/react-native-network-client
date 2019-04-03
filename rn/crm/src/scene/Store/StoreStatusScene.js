@@ -46,7 +46,7 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    Http.get(api, {}, this.props.navigation).then(res => {
+    Http.get.bind(this.props.navigation)(api, {}, this.props.navigation).then(res => {
       self.setState({
         all_close: res.all_close,
         all_open: res.all_open,
@@ -61,7 +61,7 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
-    Http.get(api, {}, this.props.navigation).then(res => {
+    Http.get.bind(this.props.navigation)(api, {}, this.props.navigation).then(res => {
       self.fetchData()
     })
   }
@@ -71,7 +71,7 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-    Http.get(api, {}, this.props.navigation).then(res => {
+    Http.get.bind(this.props.navigation)(api, {}, this.props.navigation).then(res => {
       self.fetchData()
     })
   }

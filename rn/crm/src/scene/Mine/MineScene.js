@@ -1,14 +1,14 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
-  ScrollView,
+  InteractionManager,
   RefreshControl,
-  InteractionManager
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -24,20 +24,18 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
+import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../reducers/global/globalActions";
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {
-  fetchWorkers,
-  fetchUserCount,
+  fetchDutyUsers,
   fetchStoreTurnover,
-  userCanChangeStore,
-  fetchDutyUsers
+  fetchUserCount,
+  fetchWorkers,
+  userCanChangeStore
 } from "../../reducers/mine/mineActions";
-import {setCurrentStore} from "../../reducers/global/globalActions";
 import * as tool from "../../common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
-import {upCurrentProfile} from "../../reducers/global/globalActions";
-import {getCommonConfig} from "../../reducers/global/globalActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
@@ -267,7 +265,7 @@ class MineScene extends PureComponent {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    HttpUtils.get(api).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
       self.setState({storeStatus: res})
     })
   }
@@ -367,8 +365,6 @@ class MineScene extends PureComponent {
     this.setState({
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
-      order_num: fnPriceControlled > 0 ? 0 : order_num[currStoreId],
-      turnover: fnPriceControlled > 0 ? "计算中" : turnover[currStoreId],
       currentUser: currentUser,
       prefer_store: prefer_store,
       screen_name: screen_name,

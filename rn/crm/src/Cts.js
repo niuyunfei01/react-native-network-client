@@ -120,7 +120,9 @@ export default {
   SHIP_ZS_BD: 24, //百度专送
   SHIP_KS_MT: 25, //美团快送
   SHIP_KS_ELE: 26, //饿了么快送
-
+  SHIP_SELF: 30, //自配送
+  SHIP_THIRD: 40, // 三方配送
+  
   TAG_HIDE: '74911547', //列表中隐藏tag_id
   ORDER_CANCEL_SHIP_REASON: 10000,
   //运营结算的详情的类型  收入的类型

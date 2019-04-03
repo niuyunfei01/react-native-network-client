@@ -40,6 +40,7 @@ import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -95,6 +96,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView orderTimesTxt = vi.findViewById(R.id.user_order_times);
         TextView viewMoreTimes = vi.findViewById(R.id.view_more_details);
         TextView paidWayTxt = vi.findViewById(R.id.fb_status);
+        TextView packAssigned = vi.findViewById(R.id.pack_assigned);
         TextView labelExpectTxt = vi.findViewById(R.id.fb_from_user);
 
         TextView ship_schedule = vi.findViewById(R.id.ship_schedule);
@@ -132,6 +134,14 @@ public class OrderAdapter extends BaseAdapter {
                 expect_time.setTextColor(lightBlue);
             }
 
+            if (!TextUtils.isEmpty(order.getPack_assign_name()) &&
+                    (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() ==  Cts.WM_ORDER_STATUS_TO_SHIP)) {
+                packAssigned.setText(order.getPack_assign_name());
+                packAssigned.setVisibility(View.VISIBLE);
+            } else {
+                packAssigned.setVisibility(View.GONE);
+            }
+
             boolean paid_done = order.isPaidDone();
             if (!paid_done) {
                 paidWayTxt.setText("货到付款");
@@ -141,7 +151,7 @@ public class OrderAdapter extends BaseAdapter {
                 paidWayTxt.setText("在线支付");
                 paidWayTxt.setTextColor(defTextColor);
                 paidWayTxt.setBackground(null);
-                paidWayTxt.setVisibility(View.INVISIBLE);
+                paidWayTxt.setVisibility(View.GONE);
             }
 
             boolean isInvalid = order.getOrderStatus() == Cts.WM_ORDER_STATUS_INVALID;

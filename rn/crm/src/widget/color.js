@@ -1,5 +1,5 @@
 export default {
-  theme: '#58C587',
+  theme: '#59b26a',
   border: '#e0e0e0',
   background: '#f3f3f3',
   // 字体颜色

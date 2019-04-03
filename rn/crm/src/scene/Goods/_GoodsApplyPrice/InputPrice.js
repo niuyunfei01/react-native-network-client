@@ -44,6 +44,7 @@ export default class InputPrice extends PureComponent {
   }
   
   onUpdateWmPrice (val, ratio) {
+    console.log('ratio ?', ratio, 'priceRatio ?', this.props.priceRatio)
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = 100
     if (typeof (ratio.radd) === 'object') {
@@ -54,13 +55,17 @@ export default class InputPrice extends PureComponent {
         }
       }
     } else {
-      if (!isNaN(ratio.add)) {
-        radd = parseInt(ratio.add)
+      if (!isNaN(ratio.radd)) {
+        radd = parseInt(ratio.radd)
       }
     }
-    let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
-    wm_price = tool.priceOptimize(wm_price * 100) / 100
-    this.setState({wm_price})
+  
+    let r = 1 / (1 - ratio.rs - ratio.ri - ratio.rp)
+    let add = parseInt(radd) / 100
+    let wm_price = (val * r * add).toFixed(2)
+    let optimize_price = tool.priceOptimize(wm_price * 100) / 100
+    console.log(r, add, wm_price, optimize_price)
+    this.setState({wm_price: optimize_price})
     this.props.onInput && this.props.onInput(val, wm_price)
   }
   

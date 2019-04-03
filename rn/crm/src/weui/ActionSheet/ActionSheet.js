@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
+  Animated,
+  Dimensions,
+  Easing,
   Modal,
-  View,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableHighlight,
-  Animated,
-  Easing,
-  StyleSheet,
-  Dimensions,
+  View,
   ViewPropTypes
 } from 'react-native'
 import $V from '../variable'
@@ -185,17 +186,19 @@ class ActionSheet extends Component {
               }]
             }]}
           >
-            <View
-              ref="actionsheet"
-              onLayout={this.handleLayout}
-            >
-              <View style={[styles.actionsheetMenu]}>
-                {this._renderMenuItems()}
+            <ScrollView>
+              <View
+                ref="actionsheet"
+                onLayout={this.handleLayout}
+              >
+                <View style={[styles.actionsheetMenu]}>
+                  {this._renderMenuItems()}
+                </View>
+                <View style={[styles.actionsheetAction]}>
+                  {this._renderActions()}
+                </View>
               </View>
-              <View style={[styles.actionsheetAction]}>
-                {this._renderActions()}
-              </View>
-            </View>
+            </ScrollView>
           </Animated.View>
         </View>
       </Modal>

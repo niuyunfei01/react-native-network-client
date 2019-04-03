@@ -184,7 +184,7 @@ public class MainActivity extends AbstractActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 OrderListFragment frag = (OrderListFragment) adapter.instantiateItem(ordersViewPager, position);
-                frag.refresh();
+//                frag.refresh();
             }
 
             @Override
@@ -508,7 +508,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
     }
 
     private void initShipAccept(final GlobalCtx app) {
-        final TextView shipStatusText = (TextView) this.findViewById(R.id.head_ship_status);
+        final TextView shipStatusText = this.findViewById(R.id.head_ship_status);
         shipStatusText.setVisibility(View.GONE);
 
         long store_id = SettingUtility.getListenerStore();
@@ -552,12 +552,9 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
 
                     final long storeId = SettingUtility.getListenerStore();
                     if (storeId <= 0) {
-                        Utility.tellSelectStore("请先选择工作门店", new StoreSelectedListener() {
-                            @Override
-                            public void done(long selectedId) {
-                                SettingUtility.setListenerStores(selectedId);
-                                resetPrinterStatusBar();
-                            }
+                        Utility.tellSelectStore("请先选择工作门店", selectedId -> {
+                            SettingUtility.setListenerStores(selectedId);
+                            resetPrinterStatusBar();
                         }, MainActivity.this);
                         return;
                     }
@@ -573,61 +570,53 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                     final String msg = myStatus + "\n" + workStatus.getDesc();
 
                     AlertUtil.showAlert(MainActivity.this, R.string.ship_accept_status, msg,
-                            "刷新状态", new DialogInterface.OnClickListener() {
+                            "刷新状态", (dialog, which) -> app.dao.shippingAcceptStatus(storeId).enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    app.dao.shippingAcceptStatus(storeId).enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
-                                        @Override
-                                        public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
-                                                               Response<ResultBean<ShipAcceptStatus>> response) {
-                                            ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body != null && body.isOk()) {
-                                                app.getAccountBean().setShipAcceptStatus(body.getObj());
-                                                dlg(storeId);
-                                            } else {
-                                                AlertUtil.error(MainActivity.this, "刷新失败，请稍后重试：" + body.getDesc());
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
-                                            AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
-                                        }
-                                    });
+                                public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                                       Response<ResultBean<ShipAcceptStatus>> response) {
+                                    ResultBean<ShipAcceptStatus> body = response.body();
+                                    if (body != null && body.isOk()) {
+                                        app.getAccountBean().setShipAcceptStatus(body.getObj());
+                                        dlg(storeId);
+                                    } else {
+                                        AlertUtil.error(MainActivity.this, "刷新失败，请稍后重试：" + body.getDesc());
+                                    }
                                 }
-                            }
+
+                                @Override
+                                public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                                    AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+                                }
+                            })
                             ,
                             "关闭", null,
-                            labelBtn, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Call<ResultBean<ShipAcceptStatus>> resultBeanCall;
-                                    if (shipAcceptStatus == Cts.SHIP_ACCEPT_ON) {
-                                        resultBeanCall = app.dao.shippingStopAccept(storeId);
-                                    } else {
-                                        resultBeanCall = app.dao.shippingStartAccept(storeId);
+                            labelBtn, (dialog, which) -> {
+                                Call<ResultBean<ShipAcceptStatus>> resultBeanCall;
+                                if (shipAcceptStatus == Cts.SHIP_ACCEPT_ON) {
+                                    resultBeanCall = app.dao.shippingStopAccept(storeId);
+                                } else {
+                                    resultBeanCall = app.dao.shippingStartAccept(storeId);
+                                }
+
+                                resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
+                                    @Override
+                                    public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                                           Response<ResultBean<ShipAcceptStatus>> response) {
+                                        ResultBean<ShipAcceptStatus> body = response.body();
+                                        if (body != null && body.isOk()) {
+                                            app.getAccountBean().setShipAcceptStatus(body.getObj());
+                                            initShipAccept(app);
+                                            Utility.toast("操作成功", MainActivity.this);
+                                        } else {
+                                            AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + Objects.requireNonNull(body).getDesc());
+                                        }
                                     }
 
-                                    resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
-                                        @Override
-                                        public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
-                                                               Response<ResultBean<ShipAcceptStatus>> response) {
-                                            ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body != null && body.isOk()) {
-                                                app.getAccountBean().setShipAcceptStatus(body.getObj());
-                                                initShipAccept(app);
-                                                Utility.toast("操作成功", MainActivity.this);
-                                            } else {
-                                                AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + Objects.requireNonNull(body).getDesc());
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
-                                            AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
-                                        }
-                                    });
-                                }
+                                    @Override
+                                    public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                                        AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+                                    }
+                                });
                             }
                     );
                 }

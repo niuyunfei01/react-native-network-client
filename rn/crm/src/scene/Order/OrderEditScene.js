@@ -166,7 +166,7 @@ class OrderEditScene extends Component {
   _storeLoc() {
     const { order } = this.props.navigation.state.params || {};
     if(order){
-      const store = tool.store(order.store_id, this.props.global);
+      const store = tool.store( this.props.global,order.store_id);
       return store ? `${store.loc_lng},${store.loc_lat}` : "0,0";
     }
     return "0,0"

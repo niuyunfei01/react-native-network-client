@@ -53,9 +53,11 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
 import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
-import {getWithTpl, getWithTpl2} from "../../util/common";
+import {getWithTpl} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
 import Refund from "./_OrderScene/Refund";
+import Delivery from "./_OrderScene/Delivery";
+import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 
 const numeral = require('numeral');
 
@@ -78,8 +80,8 @@ function mapDispatchToProps (dispatch) {
       markTaskDone,
       orderWayRecord,
       clearLocalOrder,
-      addTipMoney,
       orderCancelZsDelivery,
+      addTipMoney,
     }, dispatch)
   }
 }
@@ -105,6 +107,7 @@ const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
+const MENU_RECEIVE_QR = 10;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -150,9 +153,9 @@ class OrderScene extends Component {
   
   constructor (props) {
     super(props);
-    
+    let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
-      
+      isJbbVendor: tool.isJbbVendor(currVendorId),
       isFetching: false,
       orderReloading: false,
       
@@ -193,7 +196,8 @@ class OrderScene extends Component {
       reason: '饿了呢暂不支持商家退款，请联系用户在客户端发起申请，收到申请后同意退款。',
       phone: undefined,
       person: '联系客户',
-      isServiceMgr: false
+      isServiceMgr: false,
+      visibleReceiveQr: false
     };
     
     this._onLogin = this._onLogin.bind(this);
@@ -312,7 +316,7 @@ class OrderScene extends Component {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
-    
+    as.push({key: MENU_RECEIVE_QR, label: '收款码'});
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }
@@ -340,7 +344,7 @@ class OrderScene extends Component {
   onPrint () {
     const order = this.props.order.order
     if (order) {
-      const store = tool.store(order.store_id, this.props.global)
+      const store = tool.store(this.props.global, order.store_id)
       if (store && store.cloudPrinter) {
         this.setState({showPrinterChooser: true})
       } else {
@@ -390,6 +394,8 @@ class OrderScene extends Component {
       native.toNativeOrder(order.order.id);
     } else if (option.key === MENU_PROVIDING) {
       this._onToProvide();
+    } else if (option.key === MENU_RECEIVE_QR) {
+      this.setState({visibleReceiveQr: true})
     } else if (option.key === MENU_SEND_MONEY) {
       navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
     } else {
@@ -999,6 +1005,16 @@ class OrderScene extends Component {
     )
   }
   
+  renderReceiveQr (order) {
+    return (
+      <ReceiveMoney
+        formVisible={this.state.visibleReceiveQr}
+        onCloseForm={() => this.setState({visibleReceiveQr: false})}
+        order={order}
+      />
+    )
+  }
+  
   render () {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
@@ -1072,6 +1088,7 @@ class OrderScene extends Component {
                 onPress: this._hideCallStore.bind(this),
               }
             ]}
+            style={{maxHeight: '50%'}}
           />
           
           
@@ -1096,8 +1113,7 @@ class OrderScene extends Component {
           >
             <Text>{this.state.errorHints}</Text>
           </Dialog>
-          
-          
+  
           <Dialog
             onRequestClose={() => {
             }}
@@ -1129,7 +1145,7 @@ class OrderScene extends Component {
               }}
             />
           </Dialog>
-          
+  
           <Dialog
             onRequestClose={() => {
             }}
@@ -1251,6 +1267,8 @@ class OrderScene extends Component {
               </Cell>
             </Cells>
           </Dialog>
+  
+          {this.renderReceiveQr(order)}
         </View>
       );
   }
@@ -1660,8 +1678,8 @@ class OrderScene extends Component {
         </View>
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
-        {this.renderShipStatus()}
-        
+        {this.state.isJbbVendor ? <Delivery order={order}/> : this.renderShipStatus()}
+    
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
             marginRight: 0,
@@ -2070,7 +2088,7 @@ class ItemRow extends PureComponent {
   
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             {/*管理员看到的*/}
-            <If condition={isServiceMgr}>
+            <If condition={isServiceMgr || fnShowWmPrice}>
               <Text style={styles.priceMode}>保</Text>
               <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
               <View style={{marginLeft: 30}}/>
@@ -2078,7 +2096,7 @@ class ItemRow extends PureComponent {
               <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
             </If>
             {/*商户看到的*/}
-            <If condition={!isServiceMgr}>
+            <If condition={!isServiceMgr && !fnShowWmPrice}>
               {/*保底模式*/}
               <If condition={fnPriceControlled}>
                 <Text style={styles.priceMode}>保</Text>

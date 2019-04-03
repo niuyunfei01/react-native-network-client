@@ -6,11 +6,7 @@ import {
 
 class MyBtn extends PureComponent {
   render() {
-    let {
-      text,
-      onPress,
-      style,
-    } = this.props;
+    let {text, onPress, style,} = this.props;
     return (
       <TouchableOpacity
         onPress={onPress}
