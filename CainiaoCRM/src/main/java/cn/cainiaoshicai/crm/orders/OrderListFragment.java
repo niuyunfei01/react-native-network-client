@@ -115,7 +115,7 @@ public class OrderListFragment extends Fragment {
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
             RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,
-                   0,  swipeRefreshLayout, new QueryDoneCallback(this), byPassCache);
+                   0,  swipeRefreshLayout, new QueryDoneCallback(this), true);
             task.executeOnNormal();
         }
     }
