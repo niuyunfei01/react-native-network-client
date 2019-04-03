@@ -78,7 +78,7 @@ class Delivery extends React.Component {
       logisticId: logisticId,
       tips: val
     }).then(res => {
-      this.setState({order: res})
+      self.fetchShipData()
     })
   }
   
