@@ -81,8 +81,9 @@ public class OrdersDao {
         map.put("status", String.valueOf(this.listType));
         map.put("max_past_day", String.valueOf(maxPastDays));
 
+        String store_id_str = TextUtil.join(",", storeIds);
         if (hasStores) {
-            map.put("search", "store:" + TextUtil.join(",", this.storeIds));
+            map.put("search", "store:" + store_id_str);
         }
 
         OrderContainer oc = convert(getJson(map));
@@ -137,11 +138,12 @@ public class OrdersDao {
         map.put("offset", String.valueOf(offset));
         map.put("max_past_day", String.valueOf(maxPastDays));
 
+        String store_id_str = TextUtil.join(",", storeIds);
         if (storeIds != null && storeIds.length > 0 ) {
             if (!TextUtils.isEmpty(searchTerm)) {
-                searchTerm += "|||store:" + TextUtil.join(",", storeIds);
+                searchTerm += "|||store:" + store_id_str;
             } else {
-                searchTerm = TextUtil.join(",", storeIds);
+                searchTerm = store_id_str;
             }
         }
 

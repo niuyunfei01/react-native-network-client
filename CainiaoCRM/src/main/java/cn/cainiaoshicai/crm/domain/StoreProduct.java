@@ -33,6 +33,8 @@ public class StoreProduct {
     private int req_total;
     private String req_mark;
 
+    private String shelf_no;
+
     private int supply_price;
 
     private int applying_price;
@@ -251,5 +253,13 @@ public class StoreProduct {
 
     public void setApplying_price(int applying_price) {
         this.applying_price = applying_price;
+    }
+
+    public String getShelf_no() {
+        return shelf_no;
+    }
+
+    public void setShelf_no(String shelf_no) {
+        this.shelf_no = shelf_no;
     }
 }

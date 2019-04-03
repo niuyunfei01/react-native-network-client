@@ -69,6 +69,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.sold_5day = row.findViewById(R.id.sold_5day);
             holder.sold_weekend = row.findViewById(R.id.sold_weekend);
 
+            holder.shelfNo = row.findViewById(R.id.shelf_no);
             holder.prodStatus = row.findViewById(R.id.store_prod_status);
             holder.req_total = row.findViewById(R.id.provide_total_req);
             holder.riskNum = row.findViewById(R.id.lowest_risk_num);
@@ -106,6 +107,13 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.prodStatus.setBackground(null);
         }
 
+        if (!TextUtils.isEmpty(item.getShelfNo())) {
+            holder.shelfNo.setText(item.getShelfNo());
+            holder.shelfNo.setVisibility(View.VISIBLE);
+        } else {
+            holder.shelfNo.setVisibility(View.GONE);
+        }
+
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
             if (GlobalCtx.app().isDirectVendor()) {
@@ -129,38 +137,29 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.salePrice.setVisibility(View.VISIBLE);
             holder.leftNumber.setText(item.leftNumberStr());
             holder.salePrice.setText(item.getPricePrecision());
-            holder.salePrice.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-                    AlertDialog dlg = StoreStorageHelper.createEditPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                    dlg.show();
-                }
+            holder.salePrice.setOnClickListener(v -> {
+                StoreStorageChanged ssc = (StoreStorageChanged) getContext();
+                AlertDialog dlg = StoreStorageHelper.createEditPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                dlg.show();
             });
         }
 
-        holder.leftNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-                AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                dlg.show();
-            }
+        holder.leftNumber.setOnClickListener(v -> {
+            StoreStorageChanged ssc = (StoreStorageChanged) getContext();
+            AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+            dlg.show();
         });
 
-        holder.supplyPrice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean auditPriceByCompetitor = store == null ? false : store.isAuditPriceByCompetitor();
-                if (auditPriceByCompetitor) {
-                    Gson gson = new Gson();
-                    String json = gson.toJson(item);
-                    GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPricePrecision(), json);
-                } else {
-                    StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-                    AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-                    dlg.show();
-                }
+        holder.supplyPrice.setOnClickListener(view -> {
+            boolean auditPriceByCompetitor = store != null && store.isAuditPriceByCompetitor();
+            if (auditPriceByCompetitor) {
+                Gson gson = new Gson();
+                String json = gson.toJson(item);
+                GlobalCtx.app().toSupplyPriceApplyView(context, 2, item.getStore_id(), item.getProduct_id(), item.getSupplyPricePrecision(), json);
+            } else {
+                StoreStorageChanged ssc = (StoreStorageChanged) getContext();
+                AlertDialog dlg = StoreStorageHelper.createApplyChangeSupplyPrice((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+                dlg.show();
             }
         });
 
@@ -318,6 +317,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView prodStatus;
         TextView req_total;
         TextView riskNum;
+        TextView shelfNo;
 
         TextView supplyPrice;
         TextView applyingPrice;
