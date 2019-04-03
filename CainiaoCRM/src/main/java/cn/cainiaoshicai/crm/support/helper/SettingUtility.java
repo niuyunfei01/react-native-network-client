@@ -20,6 +20,7 @@ import java.util.Set;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -353,10 +354,11 @@ public class SettingUtility {
 
     @NonNull
     public static String key_order_list(int listType, long[] storeIds) {
+        ShipAcceptStatus status = GlobalCtx.app().getAccountBean().shipAcceptStatus(SettingUtility.getListenerStore());
         String cacheKey;
         Arrays.sort(storeIds);
         cacheKey = listType + "_" + TextUtil.join(",", storeIds);
-        return cacheKey;
+        return (status != null && status.getStatus() == Cts.SHIP_ACCEPT_ON) ? cacheKey + "-on" : cacheKey;
     }
 
     static class OrderEntry {

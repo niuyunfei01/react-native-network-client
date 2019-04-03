@@ -56,25 +56,28 @@
             android:singleLine="true"
             android:text="立即"
             android:textColor="@color/light_blue" />
-        <TextView
-            android:id="@+id/pack_assigned"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toStartOf="@+id/fb_status"
-            android:layout_centerVertical="true"
-            android:visibility="gone"
-            android:layout_marginEnd="10dip"
-            android:text="张三丰"
-            android:textSize="@dimen/mini_text" />
-        <TextView
-            android:id="@+id/fb_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <LinearLayout
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="10dip"
-            android:text="货到付款"
-            android:textSize="@dimen/mini_text" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/pack_assigned"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_marginEnd="10dip"
+                android:text="张三丰"
+                android:textSize="@dimen/mini_text" />
+            <TextView
+                android:id="@+id/fb_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dip"
+                android:visibility="invisible"
+                android:text="货到付款"
+                android:textSize="@dimen/mini_text" />
+        </LinearLayout>
     </RelativeLayout>
 
     <TextView
