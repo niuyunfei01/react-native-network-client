@@ -184,7 +184,7 @@ public class MainActivity extends AbstractActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 OrderListFragment frag = (OrderListFragment) adapter.instantiateItem(ordersViewPager, position);
-//                frag.refresh();
+                frag.refresh();
             }
 
             @Override
@@ -212,6 +212,8 @@ public class MainActivity extends AbstractActionBarActivity {
         if (store != null && (store.getType() == Cts.STORE_VENDOR_BLX || store.getType() == Cts.STORE_VENDOR_CN) && store.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES) {
             bottomBar.setItems(R.xml.bottombar_with_op_tabs);
         }
+
+        resetPrinterStatusBar();
     }
 
     private void resetPrinterStatusBar() {
@@ -239,12 +241,7 @@ public class MainActivity extends AbstractActionBarActivity {
         TextView signInTxt = this.findViewById(R.id.head_orders_waiting);
 
         ImageButton searchBtn = this.findViewById(R.id.head_order_search);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.app().toSearchActivity(MainActivity.this, "");
-            }
-        });
+        searchBtn.setOnClickListener(v -> GlobalCtx.app().toSearchActivity(MainActivity.this, ""));
 
         TextView tmpBuy = this.findViewById(R.id.head_orders_schedule);
         RelativeLayout.LayoutParams params = null;
