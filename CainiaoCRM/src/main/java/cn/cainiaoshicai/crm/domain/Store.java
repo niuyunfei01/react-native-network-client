@@ -320,6 +320,7 @@ public class Store {
         b.putString("city", city);
         b.putString("city_code", city_code);
         b.putString("district", district);
+        b.putString("owner_name", owner_name);
         b.putInt("fn_show_quota", fn_show_quota);
         b.putBoolean("auditPriceByCompetitor", auditPriceByCompetitor);
         return b;
