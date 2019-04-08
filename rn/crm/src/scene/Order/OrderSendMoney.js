@@ -34,13 +34,11 @@ class OrderSendMoney extends PureComponent {
   constructor (props: Object) {
     super(props);
     const store = tool.store(this.props.global)
-    const owner = tool.owner(this.props.global, this.props.mine)
-    console.log(owner)
     this.state = {
       storeName: store.name,
       storeCity: store.city,
       storeVendor: store.vendor,
-      storeOwnerName: owner.nickname,
+      storeOwnerName: store.owner_name,
       amount: '',
       remark: '',
       submitting: false

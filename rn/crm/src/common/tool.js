@@ -207,18 +207,6 @@ export function store (global, store_id = null) {
   return canReadStores[store_id];
 }
 
-/**
- * 当前店铺所有者信息
- * @returns {*}
- * @param reduxGlobal
- * @param reduxMine
- */
-export function owner (reduxGlobal, reduxMine) {
-  const store = this.store(reduxGlobal)
-  const {user_list} = reduxMine
-  return user_list[1][store.owner_id];
-}
-
 export function length (obj) {
   if (obj === undefined || obj === null) {
     return 0;
@@ -797,7 +785,6 @@ export default {
   objectSum,
   objectFilter,
   store,
-  owner,
   intOf,
   disWayStatic,
   disWay,
