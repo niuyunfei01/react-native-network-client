@@ -1,6 +1,6 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {List, InputItem, Toast} from 'antd-mobile-rn'
+import {InputItem, List, Toast} from 'antd-mobile-rn'
 import pxToDp from "../../util/pxToDp";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
@@ -75,7 +75,8 @@ class ProductPutIn extends React.Component {
       price: Number(this.state.totalPrice),
       num: Number(this.state.number),
       userId: this.state.userId,
-      productId: navigation.state.params.pid
+      productId: navigation.state.params.pid,
+      storeId: this.state.storeId
     }
   
     HttpUtils.post.bind(navigation)(api, data).then(res => {
