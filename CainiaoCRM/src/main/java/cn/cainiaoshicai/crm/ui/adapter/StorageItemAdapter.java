@@ -204,6 +204,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                 btn = holder.wmMeituan;
             } else if (en.getKey() == Cts.PLAT_MTSG.id) {
                 btn = holder.wmMeituanSg;
+            } else if (en.getKey() == Cts.PLAT_SS.id) {
+                btn = holder.wmBaidu;
             }
 
             if (btn != null) {
