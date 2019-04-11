@@ -1,12 +1,17 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {View, StyleSheet, TextInput, TouchableOpacity, Image, Text} from "react-native";
+import {Image, StyleSheet, TextInput, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import color from "../../widget/color";
+
+const StyleSheetPropType = require('StyleSheetPropType');
+const ViewStylePropTypes = require('ViewStylePropTypes');
+const stylePropType = StyleSheetPropType(ViewStylePropTypes);
 
 export default class SearchInputBar extends React.Component {
   static propTypes = {
-    onSearch: PropType.func.isRequired
+    onSearch: PropType.func.isRequired,
+    containerStyle: stylePropType,
+    onFocus: PropType.func
   }
   
   static defaultProps = {}
@@ -20,7 +25,7 @@ export default class SearchInputBar extends React.Component {
   
   render () {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, this.props.containerStyle]}>
         <TextInput
           style={styles.textInput}
           value={this.state.text}
@@ -30,10 +35,12 @@ export default class SearchInputBar extends React.Component {
           placeholderTextColor={"#bfbfbf"}
           onChangeText={text => this.setState({text})}
           onBlur={() => this.props.onSearch(this.state.text)}
+          onFocus={() => this.props.onFocus && this.props.onFocus()}
         />
         <TouchableOpacity onPress={() => this.props.onSearch(this.state.text)}>
           <View style={styles.searchTextBtn}>
-            <Text style={styles.searchText}>搜索</Text>
+            {/*<Text style={styles.searchText}>搜索</Text>*/}
+            <Image source={require('../../img/new/searchG.png')} style={{width: 20}} resizeMode={'contain'}/>
           </View>
         </TouchableOpacity>
       </View>
@@ -55,7 +62,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
     paddingVertical: 5,
-    paddingLeft: 5
+    paddingHorizontal: 10
   },
   searchIcon: {
     width: 20,
@@ -65,8 +72,7 @@ const styles = StyleSheet.create({
   },
   searchTextBtn: {
     flex: 1,
-    width: 80,
-    backgroundColor: color.theme,
+    width: 40,
     borderBottomRightRadius: 30,
     borderTopRightRadius: 30,
     justifyContent: 'center',

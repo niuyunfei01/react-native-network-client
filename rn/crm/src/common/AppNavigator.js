@@ -105,6 +105,10 @@ import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
 import InventoryProductPutIn from '../scene/Inventory/ProductPutIn'
 import InventoryProductInfo from '../scene/Inventory/ProductInfo'
+import InventoryMaterialList from '../scene/Inventory/MaterialList'
+import InventoryMaterialPutIn from '../scene/Inventory/MaterialPutIn'
+import InventoryMaterialTask from '../scene/Inventory/MaterialTask'
+import InventoryMaterialTaskFinish from '../scene/Inventory/MaterialTaskFinish'
 import Cts from "../Cts";
 
 
@@ -282,16 +286,10 @@ class Navigator extends Component {
     const CustomNavigator = StackNavigator(
       {
         Tab: {screen: TabNavigator(tabDef(store_), tabInitN)},
-        Order: {
-          screen: OrderScene,
-          path: "order/:orderId"
-        },
+        Order: {screen: OrderScene, path: "order/:orderId"},
         Web: {screen: WebScene},
         Home: {screen: RemindScene},
-        Login: {
-          screen: LoginScene,
-          path: "Login/:next/:nextParams"
-        },
+        Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
         Worker: {screen: WorkerListScene},
@@ -346,31 +344,19 @@ class Navigator extends Component {
         [Config.ROUTE_HELP]: {screen: HelpScene},
         [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
         [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
-        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {
-          screen: OperateIncomeDetailScene
-        },
-        [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {
-          screen: OperateExpendDetailScene
-        },
-        [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {
-          screen: OperateOtherExpendDetailScene
-        },
+        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
+        [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
+        [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
         [Config.ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
         [Config.ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
         [Config.ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
         [Config.ROUTE_ACTIVITY_RULE]: {screen: ActivityRuleScene},
         [Config.ROUTE_ACTIVITY_EDIT_RULE]: {screen: ActivityEditRuleScene},
-        [Config.ROUTE_ACTIVITY_SELECT_STORE]: {
-          screen: ActivitySelectStoreScene
-        },
+        [Config.ROUTE_ACTIVITY_SELECT_STORE]: {screen: ActivitySelectStoreScene},
         [Config.ROUTE_ACTIVITY_MANAGE]: {screen: ActivityManageScene},
         [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
-        [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {
-          screen: ActivitySelectGoodScene
-        },
-        [Config.ROUTE_ACTIVITY_CLASSIFY]: {
-          screen: ActivitySelectClassifyScene
-        },
+        [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
+        [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
         [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
         [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
         [Config.ROUTE_CREATE_SCAN]: {screen: CreateScan},
@@ -388,8 +374,13 @@ class Navigator extends Component {
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
         [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
         [Config.ROUTE_OPERATION]: {screen: TabOperation},
+        // 库存相关
         [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn},
-        [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo}
+        [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
+        [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
+        [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
+        [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
+        [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
       },
       stackNavigatorConfigs
     );
