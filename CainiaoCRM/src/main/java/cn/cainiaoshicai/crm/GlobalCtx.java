@@ -1459,7 +1459,7 @@ public class GlobalCtx extends Application {
                         GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
                     } else if (plat.equals("4")) {
                         GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
-                    } else if (plat.equals("3")) {
+                    } else if (plat.equals("3") || plat.equals("7")) {
                         GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
                     } else if (plat.equals("1")) {
                         GlobalCtx.app().getSoundManager().play_new_eb_order_sound();
