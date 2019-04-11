@@ -131,14 +131,8 @@ class MaterialPutIn extends React.Component {
         
         <View style={styles.footerContainer}>
           <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit(false)}>
-            <View style={[styles.footerBtn, styles.errorBtn]}>
-              <Text style={styles.footerBtnText}>入库</Text>
-            </View>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit(true)}>
             <View style={[styles.footerBtn, styles.successBtn]}>
-              <Text style={styles.footerBtnText}>入库并扫码</Text>
+              <Text style={styles.footerBtnText}>入库</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -169,7 +163,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   footerItem: {
-    width: '50%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center'
   },
