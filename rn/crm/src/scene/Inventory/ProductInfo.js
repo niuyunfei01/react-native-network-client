@@ -65,7 +65,6 @@ class ProductInfo extends React.Component {
       storeId: self.state.storeId
     }).then(res => {
       self.setState({shelfNos: res})
-      console.log(res)
     })
   }
   

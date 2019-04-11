@@ -79,6 +79,8 @@ class Delivery extends React.Component {
       tips: val
     }).then(res => {
       self.fetchShipData()
+    }).catch(e => {
+      self.fetchShipData()
     })
   }
   
@@ -94,7 +96,7 @@ class Delivery extends React.Component {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
-      selectedWay: logisticsCodes,
+      selectedWay: [],
       onBack: (res) => {
         if (res.count > 0) {
           Toast.success('发配送成功')
