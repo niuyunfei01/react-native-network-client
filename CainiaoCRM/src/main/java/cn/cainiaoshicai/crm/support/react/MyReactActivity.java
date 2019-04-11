@@ -33,12 +33,14 @@ import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.util.Log;
+import cn.cainiaoshicai.crm.scan.BluetoothScanGunKeyEventHelper;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 
 
-public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
+public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity, BluetoothScanGunKeyEventHelper.OnScanSuccessListener {
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
@@ -48,6 +50,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     private @Nullable
     PermissionListener mPermissionListener;
 
+    private BluetoothScanGunKeyEventHelper mScanGunKeyEventHelper;
 
     private static final int OVERLAY_PERMISSION_REQUEST_CODE = 2;
 
@@ -157,6 +160,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         mReactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
         mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
         setContentView(mReactRootView);
+        mScanGunKeyEventHelper = new BluetoothScanGunKeyEventHelper(this);
     }
 
     @Override
@@ -211,6 +215,17 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         return super.onKeyUp(keyCode, event);
     }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (mScanGunKeyEventHelper.isScanGunEvent(event)) {
+            mScanGunKeyEventHelper.analysisKeyEvent(event);
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+//        mScanGunKeyEventHelper.analysisKeyEvent(event);
+//        return true;
+    }
+
     @TargetApi(20)
     private void setTranslucent() {
         final Activity activity = this;
@@ -240,6 +255,12 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             PermissionListener listener) {
         mPermissionListener = listener;
         this.requestPermissions(permissions, requestCode);
+    }
+
+
+    @Override
+    public void onScanSuccess(String barcode) {
+        System.out.println("gun get code " + barcode);
     }
 
     public void onRequestPermissionsResult(
