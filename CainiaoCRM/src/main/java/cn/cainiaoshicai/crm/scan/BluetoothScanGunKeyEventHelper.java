@@ -96,34 +96,7 @@ public class BluetoothScanGunKeyEventHelper {
 
     //获取扫描内容
     private char getInputCode(KeyEvent event) {
-        int keyCode = event.getKeyCode();
-        char aChar;
-        if (keyCode >= KeyEvent.KEYCODE_A && keyCode <= KeyEvent.KEYCODE_Z) {
-            //字母
-            aChar = (char) ((mCaps ? 'A' : 'a') + keyCode - KeyEvent.KEYCODE_A);
-        } else if (keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9) {
-            //数字
-            aChar = (char) ('0' + keyCode - KeyEvent.KEYCODE_0);
-        } else {
-            //其他符号
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_PERIOD:
-                    aChar = '.';
-                    break;
-                case KeyEvent.KEYCODE_MINUS:
-                    aChar = mCaps ? '_' : '-';
-                    break;
-                case KeyEvent.KEYCODE_SLASH:
-                    aChar = '/';
-                    break;
-                case KeyEvent.KEYCODE_BACKSLASH:
-                    aChar = mCaps ? '|' : '\\';
-                    break;
-                default:
-                    aChar = 0;
-                    break;
-            }
-        }
+        char aChar = (char) event.getUnicodeChar();
         return aChar;
     }
 
@@ -145,7 +118,7 @@ public class BluetoothScanGunKeyEventHelper {
      * @return
      */
     public boolean hasScanGun() {
-        if(mDeviceName!=null){
+        if (mDeviceName != null) {
             return true;
         }
         if (mBluetoothAdapter == null) {
@@ -186,7 +159,10 @@ public class BluetoothScanGunKeyEventHelper {
         deviceNameList.clear();
         int[] deviceIds = InputDevice.getDeviceIds();
         for (int id : deviceIds) {
-            deviceNameList.add(InputDevice.getDevice(id).getName());
+            InputDevice device = InputDevice.getDevice(id);
+            if (device != null && !device.isVirtual()) {
+                deviceNameList.add(InputDevice.getDevice(id).getName());
+            }
         }
     }
 

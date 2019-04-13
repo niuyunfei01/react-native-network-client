@@ -2,6 +2,9 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -24,6 +27,7 @@ import com.facebook.react.modules.core.PermissionListener;
 import org.devio.rn.splashscreen.SplashScreen;
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -38,6 +42,7 @@ import cn.cainiaoshicai.crm.scan.BluetoothScanGunKeyEventHelper;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
+import cn.cainiaoshicai.crm.utils.BarCodeUtil;
 
 
 public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity, BluetoothScanGunKeyEventHelper.OnScanSuccessListener {
@@ -261,6 +266,8 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     @Override
     public void onScanSuccess(String barcode) {
         System.out.println("gun get code " + barcode);
+        Map<String, String> result = BarCodeUtil.extractCode(barcode);
+        GlobalCtx.app().toRnView(this, result.get("action"), result);
     }
 
     public void onRequestPermissionsResult(

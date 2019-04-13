@@ -918,6 +918,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toRnView(Activity ctx, String action, Map<String, String> params) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", action);
+        Bundle bundle = new Bundle();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            bundle.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", bundle);
+        ctx.startActivity(i);
+    }
+
     /**
      * 跳转到新的调价页面
      *
