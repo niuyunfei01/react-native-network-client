@@ -21,11 +21,13 @@ public class BarCodeUtil {
         String type = codeInfo[0];
         if (type.equals(CODE_TYPE_RECEIVE)) {
             result.put("type", type);
+            String weightData = codeInfo[3];
+
             List<String> storeSupplierInfo = splitEqually(codeInfo[1], 2);
             result.put("storeId", Integer.parseInt(storeSupplierInfo.get(0)) + "");
             result.put("supplierId", Integer.parseInt(storeSupplierInfo.get(1)) + "");
             result.put("skuId", Integer.parseInt(codeInfo[2]) + "");
-            result.put("weight", insertString(codeInfo[3], ".", 2));
+            result.put("weight", insertString(weightData, ".", weightData.length() - 4));
             result.put("datetime", formatDate(codeInfo[4]));
             result.put("action", "InventoryMaterialPutIn");
             result.put("barCode", code);
