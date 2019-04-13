@@ -220,7 +220,7 @@ const tabDef = function (store_) {
 };
 
 const tabInit = {
-  initialRouteName: "Remind",
+  initialRouteName: "Mine",
   tabBarComponent: TabBarBottom,
   tabBarPosition: "bottom",
   swipeEnabled: false,
@@ -239,6 +239,7 @@ class Navigator extends Component {
   }
   
   render () {
+    console.log('app navigation', this.props)
     const {initialRouteName, screenProps, initialRouteParams, store_} = this.props;
     
     let stackNavigatorConfigs = {

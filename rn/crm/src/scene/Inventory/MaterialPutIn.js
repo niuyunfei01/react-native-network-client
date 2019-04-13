@@ -1,6 +1,6 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List} from "antd-mobile-rn";
+import {InputItem, List, Modal, Toast} from "antd-mobile-rn";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
@@ -8,6 +8,8 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
+import moment from 'moment'
+import {NavigationActions} from "react-navigation";
 
 const ListItem = List.Item
 
@@ -45,13 +47,64 @@ class MaterialPutIn extends React.Component {
       supplierId: 0,
       weight: '0',
       reduceWeight: '0',
-      price: '0'
+      price: '0',
+      datetime: moment().format('YYYY-MM-DD hh:mm:ss')
     }
   }
   
   componentDidMount (): void {
+    const navigation = this.props.navigation
+    const params = navigation.state.params
+    
     this.fetchSkus()
     this.fetchSuppliers()
+  
+    // 如果是扫码进入
+    if (params.barCode) {
+      // if (params.storeId != this.state.storeId) {
+      //   Modal.alert('错误', '货物编号和当前店铺不一致,无法验收,请确认客户端当前店铺')
+      //   return
+      // }
+      if (params.supplierId) {
+        this.setSupplier(params.supplierId)
+      }
+      if (params.skuId) {
+        this.setSku(params.skuId)
+      }
+      this.setState({
+        barCode: params.barCode,
+        weight: params.weight,
+        datetime: params.datetime
+      })
+    }
+  }
+  
+  setSupplier (supplierId) {
+    const self = this
+    const navigation = this.props.navigation
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_get_supplier/${supplierId}?access_token=${accessToken}`
+    HttpUtils.get.bind(navigation)(api).then(res => {
+      if (!res) {
+        Modal.alert('错误', '未知供应商')
+      } else {
+        self.setState({supplier: res.name, supplierId: supplierId})
+      }
+    })
+  }
+  
+  setSku (skuId) {
+    const self = this
+    const navigation = this.props.navigation
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_get_sku/${skuId}?access_token=${accessToken}`
+    HttpUtils.get.bind(navigation)(api).then(res => {
+      if (!res) {
+        Modal.alert('错误', '未知商品')
+      } else {
+        self.setState({sku: res.name, skuId: skuId})
+      }
+    })
   }
   
   fetchSkus () {
@@ -74,21 +127,35 @@ class MaterialPutIn extends React.Component {
     })
   }
   
-  doSubmit (isContinue = false) {
+  goToMine = () => {
+    tool.resetNavStack(this.props.navigation, 'Tab', {initTab: 'Mine'})
+  }
+  
+  doSubmit () {
     const self = this
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
-    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode} = this.state
+    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime} = this.state
     const api = `/api_products/material_put_in?access_token=${accessToken}`
     HttpUtils.post.bind(navigation)(api, {
-      skuId, storeId, supplierId, weight, price, reduceWeight, barCode
+      skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime
     }).then(res => {
-      if (isContinue) {
-      
+      Toast.success('录入成功')
+      if (self.state.barCode) {
+        self.goToMine()
       } else {
         navigation.goBack()
         navigation.state.params.onBack && navigation.state.params.onBack()
       }
+    }).catch(e => {
+      Modal.alert('错误', e.reason, [
+        {
+          text: '确定',
+          onPress: () => {
+            self.goToMine()
+          }
+        }
+      ])
     })
   }
   
@@ -127,10 +194,13 @@ class MaterialPutIn extends React.Component {
             defaultValue={this.state.price}
             onChange={(price) => this.setState({price})}
           >金额</InputItem>
+          <ListItem
+            extra={this.state.datetime}
+          >时间</ListItem>
         </List>
         
         <View style={styles.footerContainer}>
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit(false)}>
+          <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
             <View style={[styles.footerBtn, styles.successBtn]}>
               <Text style={styles.footerBtnText}>入库</Text>
             </View>
