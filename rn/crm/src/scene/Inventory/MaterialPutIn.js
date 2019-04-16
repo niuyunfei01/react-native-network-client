@@ -61,12 +61,8 @@ class MaterialPutIn extends React.Component {
   
     // 如果是扫码进入
     if (params.barCode) {
-      // if (params.storeId != this.state.storeId) {
-      //   Modal.alert('错误', '货物编号和当前店铺不一致,无法验收,请确认客户端当前店铺')
-      //   return
-      // }
-      if (params.supplierId) {
-        this.setSupplier(params.supplierId)
+      if (params.workerId) {
+        this.setSupplier(params.workerId)
       }
       if (params.skuId) {
         this.setSku(params.skuId)
@@ -79,16 +75,16 @@ class MaterialPutIn extends React.Component {
     }
   }
   
-  setSupplier (supplierId) {
+  setSupplier (supplierCode) {
     const self = this
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/material_get_supplier/${supplierId}?access_token=${accessToken}`
+    const api = `/api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
     HttpUtils.get.bind(navigation)(api).then(res => {
       if (!res) {
         Modal.alert('错误', '未知供应商')
       } else {
-        self.setState({supplier: res.name, supplierId: supplierId})
+        self.setState({supplier: res.name, supplierId: res.id})
       }
     })
   }
