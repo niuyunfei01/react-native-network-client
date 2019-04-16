@@ -17,14 +17,17 @@ public class BarCodeUtil {
     //IR-0000048-0019-00580-190416183857-0061
     public static Map<String, String> extractCode(String code) {
         Map<String, String> result = Maps.newHashMap();
+        code = code.replaceAll("\\s+", "");
         String[] codeInfo = code.split("-");
         String type = codeInfo[0];
         if (type.equals(CODE_TYPE_RECEIVE)) {
             result.put("type", type);
-            String weightData = codeInfo[3];
             result.put("workerId", Integer.parseInt(codeInfo[1]) + "");
             result.put("tagCode", Integer.parseInt(codeInfo[2]) + "");
             result.put("skuId", Integer.parseInt(codeInfo[5]) + "");
+
+            String weightData = codeInfo[3];
+
             result.put("weight", insertString(weightData, ".", weightData.length() - 4));
             result.put("datetime", formatDate(codeInfo[4]));
             result.put("action", "InventoryMaterialPutIn");

@@ -262,12 +262,13 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         this.requestPermissions(permissions, requestCode);
     }
 
-
     @Override
     public void onScanSuccess(String barcode) {
-        System.out.println("gun get code " + barcode);
-        Map<String, String> result = BarCodeUtil.extractCode(barcode);
-        GlobalCtx.app().toRnView(this, result.get("action"), result);
+        try {
+            Map<String, String> result = BarCodeUtil.extractCode(barcode);
+            GlobalCtx.app().toRnView(this, result.get("action"), result);
+        } catch (Exception e) {
+        }
     }
 
     public void onRequestPermissionsResult(
