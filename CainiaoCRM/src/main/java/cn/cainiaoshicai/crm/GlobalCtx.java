@@ -918,6 +918,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toRnView(Activity ctx, String action, Map<String, String> params) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", action);
+        Bundle bundle = new Bundle();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            bundle.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", bundle);
+        ctx.startActivity(i);
+    }
+
     /**
      * 跳转到新的调价页面
      *
@@ -1459,7 +1470,7 @@ public class GlobalCtx extends Application {
                         GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
                     } else if (plat.equals("4")) {
                         GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
-                    } else if (plat.equals("3")) {
+                    } else if (plat.equals("3") || plat.equals("7")) {
                         GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
                     } else if (plat.equals("1")) {
                         GlobalCtx.app().getSoundManager().play_new_eb_order_sound();

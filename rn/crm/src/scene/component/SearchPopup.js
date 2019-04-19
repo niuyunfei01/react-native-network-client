@@ -1,46 +1,40 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal} from "react-native";
+import {Modal, StyleSheet, Text, View} from "react-native";
 import SearchList, {HighlightableText} from "@unpourtous/react-native-search-list"
 import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable"
-import {connect} from "react-redux";
 
 const rowHeight = 40
 
-function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global};
-}
-
-class SearchStore extends React.Component {
+class SearchPopup extends React.Component {
   static propTypes = {
+    dataSource: PropType.array,
     visible: PropType.bool,
     onSelect: PropType.func,
-    onClose: PropType.func
+    onClose: PropType.func,
+    placeholder: PropType.string,
+    title: PropType.string
   }
-
+  
   static defaultProps = {}
-
-  constructor(props) {
+  
+  constructor (props) {
     super(props)
-    const {
-      canReadStores
-    } = this.props.global;
-    let dataSource = [];
-    for (let key in canReadStores) {
-      let item = canReadStores[key]
-      item['searchStr'] = item['city'] + '-' + item['vendor'] + '-' + item['name']
-      dataSource.push(item);
-    }
     this.state = {
-      dataSource: dataSource
+      dataSource: this.props.dataSource
     }
   }
-
+  
+  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+    this.setState({dataSource: nextProps.dataSource})
+  }
+  
   // custom render row
-  renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
+  renderRow (item, sectionID, rowID, highlightRowFunc, isSearching) {
     return (
-      <Touchable onPress={() => {this.props.onSelect&&this.props.onSelect(item)}}>
+      <Touchable onPress={() => {
+        this.props.onSelect && this.props.onSelect(item)
+      }}>
         <View key={rowID} style={{flex: 1, marginLeft: 20, height: rowHeight, justifyContent: 'center'}}>
           {/*use `HighlightableText` to highlight the search result*/}
           <HighlightableText
@@ -53,18 +47,18 @@ class SearchStore extends React.Component {
       </Touchable>
     )
   }
-
+  
   // render empty view when datasource is empty
-  renderEmpty() {
+  renderEmpty () {
     return (
       <View style={styles.emptyDataSource}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> No Content </Text>
       </View>
     )
   }
-
+  
   // render empty result view when search result is empty
-  renderEmptyResult(searchStr) {
+  renderEmptyResult (searchStr) {
     return (
       <View style={styles.emptySearchResult}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 <Text
@@ -73,32 +67,37 @@ class SearchStore extends React.Component {
       </View>
     )
   }
-
+  
   renderBackBtn () {
     return (
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
-        <View style={{width: 80, alignItems:'center'}}><Text style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
+      <Touchable onPress={() => this.props.onClose && this.props.onClose()}>
+        <View style={{width: 80, alignItems: 'center'}}><Text
+          style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
       </Touchable>
     )
   }
-
+  
   renderRightBtn () {
-    return (<View style={{width: 80}} />)
+    return (<View style={{width: 80}}/>)
   }
-
-  renderHeader() {
+  
+  renderHeader () {
     return (<View style={styles.header}>
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <Touchable onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
       </Touchable>
-      <View><Text style={styles.headerTitle}>搜索店铺</Text></View>
-      <View  style={{width: 40}}></View>
+      <View><Text style={styles.headerTitle}>{this.props.title}</Text></View>
+      <View style={{width: 40}}></View>
     </View>)
   }
-
-  render() {
+  
+  render () {
     return (
-      <Modal style={styles.container} visible={this.props.visible} onRequestClose={() => this.props.onClose&&this.props.onClose()}>
+      <Modal
+        style={styles.container}
+        visible={this.props.visible}
+        onRequestClose={() => this.props.onClose && this.props.onClose()}
+      >
         <SearchList
           data={this.state.dataSource}
           renderRow={this.renderRow.bind(this)}
@@ -108,7 +107,7 @@ class SearchStore extends React.Component {
           renderEmpty={this.renderEmpty.bind(this)}
           rowHeight={rowHeight}
           toolbarBackgroundColor={'#2196f3'}
-          title='搜索店铺'
+          title={this.props.placeholder}
           cancelTitle='取消'
           onClickBack={() => {
           }}
@@ -168,9 +167,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#0069c0'
   },
   headerTitle: {
-    fontSize:18,
+    fontSize: 18,
     color: '#fff',
   }
 })
 
-export default connect(mapStateToProps)(SearchStore);
+export default SearchPopup

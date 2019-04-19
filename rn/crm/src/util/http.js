@@ -1,8 +1,8 @@
 import DeviceInfo from 'react-native-device-info';
-import {Toast} from 'antd-mobile-rn'
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
 import {NavigationActions} from 'react-navigation'
+import AppConfig from "../config.js";
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -11,8 +11,6 @@ import {NavigationActions} from 'react-navigation'
  * resolve 成功时候返回
  * reject 失败时候返回
  */
-
-import AppConfig from "../config.js";
 // url 免反参校验名单
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
 
@@ -55,8 +53,9 @@ class HttpUtils {
   
   static apiBase (method, url, params, navigation) {
     // Toast.loading('请求中', 0)
+    const uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     return new Promise((resolve, reject) => {
-      fetch(method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {}), this.getOptions(method, params))
+      fetch(uri, this.getOptions(method, params))
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -80,8 +79,9 @@ class HttpUtils {
         })
         .catch((error) => {
           // Toast.hide()
-          ToastShort('服务器错误')
+          ToastShort(`服务器错误:${error.message}`)
           console.log('http error => ', error.message)
+          console.log('uri => ', uri)
           reject(error.message)
         })
     })

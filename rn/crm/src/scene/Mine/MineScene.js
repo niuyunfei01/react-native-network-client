@@ -1084,11 +1084,7 @@ class MineScene extends PureComponent {
       <View style={[block_styles.container]}>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => {
-            // let path = `/stores/provide_req_all.html${token}`;
-            // let url = Config.serverUrl(path, Config.https);
-            this.onPress(Config.ROUTE_INVOICING, {});
-          }}
+          onPress={() => this.onPress(Config.ROUTE_INVOICING, {})}
           activeOpacity={customerOpacity}
         >
           <Image
@@ -1126,6 +1122,28 @@ class MineScene extends PureComponent {
             source={require("../../img/My/caigou_.png")}
           />
           <Text style={[block_styles.block_name]}>门店采购</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_INVENTORY_MATERIAL_LIST, {})}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/caigou_.png")}
+          />
+          <Text style={[block_styles.block_name]}>原料入库</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_INVENTORY_MATERIAL_TASK, {})}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/caigou_.png")}
+          />
+          <Text style={[block_styles.block_name]}>任务中心</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}

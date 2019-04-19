@@ -8,16 +8,21 @@
 
 //import liraries
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Image,Dimensions} from 'react-native'
+import {Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import PropType from 'prop-types'
 import pxToDp from "../util/pxToDp";
 import color from "./color";
+
 var {height,width}=Dimensions.get('window')
 // create a component
 class NavigationItem extends PureComponent {
   static propTypes = {
     position: PropType.oneOf(['left', 'right']),
-    title: PropType.string
+    title: PropType.string,
+    icon: PropType.any,
+    onPress: PropType.func,
+    containerStyle: PropType.any,
+    iconStyle: PropType.any,
   }
   
   static defaultProps = {
@@ -52,7 +57,8 @@ const styles = StyleSheet.create({
   containerDefault: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: pxToDp(15)
+    marginHorizontal: pxToDp(15),
+    flex: 1,
   },
   container: {
     flex: 1,
