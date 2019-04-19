@@ -308,7 +308,7 @@ class OrderScene extends Component {
       {key: MENU_SET_INVALID, label: '置为无效'},
     ];
     
-    if (is_service_mgr) {
+    if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
     
@@ -736,6 +736,11 @@ class OrderScene extends Component {
     const {order, global} = this.props;
     const storeId = (order.order || {}).store_id;
     return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
+  }
+
+  _fnViewFullFin () {
+    const {order, global} = this.props;
+    return (order.order || {}).fn_full_fin;
   }
   
   _callShip () {
