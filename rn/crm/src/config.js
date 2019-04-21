@@ -108,6 +108,7 @@ const C = {
   ROUTE_ORDER_SEARCH: 'OrderSearch',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
+  ROUTE_ORDER_PEND_PAYMENT: 'OrderPendingPayment',
   ROUTE_VERSION: 'Version',
   ROUTE_GOODS: 'Goods',
   ROUTE_SELECT_STORE: 'SelectStore',
