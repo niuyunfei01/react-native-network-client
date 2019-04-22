@@ -208,7 +208,11 @@ class MaterialPutIn extends React.Component {
           dataSource={this.state.suppliers}
           title={'选择供应商'}
           onClose={() => this.setState({supplierPopup: false})}
-          onSelect={(item) => this.setState({supplier: item.name, supplierId: item.id, supplierPopup: false})}
+          onSelect={(item) => this.setState({
+            supplier: item.name,
+            supplierId: item.supplier_code,
+            supplierPopup: false
+          })}
         />
       </ScrollView>
     );
