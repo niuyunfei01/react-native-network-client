@@ -43,11 +43,10 @@ class MaterialList extends React.Component {
   
   constructor (props) {
     super(props)
-    const today = moment().format('YYYY-MM-DD')
     this.state = {
       headerMenu: false,
       filterStatus: '',
-      filterDate: today,
+      filterDate: '',
       filterName: '',
       materials: [],
       datePickerVisible: false,
@@ -188,7 +187,7 @@ class MaterialList extends React.Component {
           <Text style={styles.drawerItemLabel}>日期</Text>
           <TouchableOpacity onPress={() => this._showDateTimePicker()}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <Text>{this.state.filterDate}</Text>
+              <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'}</Text>
               <Image source={require('../../img/calendar.png')} style={{width: 15, height: 15}} resizeMode={'contain'}/>
             </View>
           </TouchableOpacity>
