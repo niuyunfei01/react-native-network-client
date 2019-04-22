@@ -97,7 +97,7 @@ class MaterialTask extends React.Component {
           </View>
           <For each="task" of={item.task} index="taskIdx">
             <View style={styles.taskItem} key={taskIdx}>
-              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}</Text>
+              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}(#{task.product_id})</Text>
               <View style={{flexDirection: 'row', alignItems: 'center', width: 100}}>
                 <JbbInput
                   ref={`taskInput_${task.product_id}`}
@@ -108,7 +108,7 @@ class MaterialTask extends React.Component {
                 />
                 <Text style={{textAlign: 'right'}}>份</Text>
               </View>
-              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>5工分</Text>
+              <Text style={{fontSize: 12, width: 30, textAlign: 'right'}}>0工分</Text>
             </View>
           </For>
           <View style={styles.taskBtn}>
