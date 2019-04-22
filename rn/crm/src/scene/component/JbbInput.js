@@ -10,7 +10,8 @@ export default class JbbInput extends React.Component {
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string.isRequired,
     initValue:PropTypes.string,
-    rows: PropTypes.number
+    rows: PropTypes.number,
+    styles: PropTypes.object
   }
   
   static defaultProps = {
@@ -18,6 +19,10 @@ export default class JbbInput extends React.Component {
     multiline: false,
     initValue:'',
     rows: 1
+  }
+  
+  rerender () {
+    this.forceUpdate()
   }
   
   render () {
@@ -28,7 +33,7 @@ export default class JbbInput extends React.Component {
         onChangeText={(value) => this.props.onChange(value)}
         value={this.props.value}
         placeholderTextColor={'#cad0d9'}
-        style={styles.formInput}
+        style={[styles.formInput, this.props.styles]}
         multiline={this.props.rows > 1}
         numberOfLines={this.props.rows}
         defaultValue={this.props.initValue}

@@ -6,8 +6,9 @@ import {connect} from "react-redux";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import {List, Picker, WhiteSpace} from "antd-mobile-rn";
+import {List, Picker, Toast, WhiteSpace} from "antd-mobile-rn";
 import HttpUtils from "../../util/http";
+import Swipeout from 'react-native-swipeout';
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -65,7 +66,6 @@ class ProductInfo extends React.Component {
       storeId: self.state.storeId
     }).then(res => {
       self.setState({shelfNos: res})
-      console.log(res)
     })
   }
   
@@ -91,10 +91,23 @@ class ProductInfo extends React.Component {
       storeId: self.state.storeId,
       shelfNo: value
     }).then(res => {
+      Toast.success('操作成功')
       self.fetchData()
     })
   }
   
+  onClearShelfNo () {
+    const self = this
+    const navigation = this.props.navigation
+    const api = `/api_products/clear_inventory_shelf_no?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      productId: self.state.productId,
+      storeId: self.state.storeId
+    }).then(res => {
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
   renderHeader () {
     return (
       <View>
@@ -113,21 +126,34 @@ class ProductInfo extends React.Component {
     )
   }
   
+  renderShelfNo () {
+    const swipeoutBtns = [
+      {
+        text: '清除',
+        type: 'delete',
+        onPress: () => this.onClearShelfNo()
+      }
+    ]
+    return (
+      <Swipeout right={swipeoutBtns} autoClose={true}>
+        <Picker
+          data={this.state.shelfNos}
+          title="选择货架"
+          cascade={false}
+          extra={this.state.productInfo.shelf_no}
+          onOk={v => this.onModifyPosition(v.join(''))}
+        >
+          <List.Item arrow="horizontal">货架编号</List.Item>
+        </Picker>
+      </Swipeout>
+    )
+  }
   renderForm () {
-    console.log(this.state.shelfNos)
     return (
       <View>
         <JbbCellTitle>库管信息</JbbCellTitle>
         <List>
-          <Picker
-            data={this.state.shelfNos}
-            title="选择货架"
-            cascade={false}
-            extra={this.state.productInfo.shelf_no}
-            onOk={v => this.onModifyPosition(v.join(''))}
-          >
-            <List.Item arrow="horizontal">货架编号</List.Item>
-          </Picker>
+          {this.renderShelfNo()}
         </List>
       </View>
     )

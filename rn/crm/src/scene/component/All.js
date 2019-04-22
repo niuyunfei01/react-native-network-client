@@ -1,19 +1,18 @@
-import React, {PureComponent, Component} from "react";
+import React, {Component, PureComponent} from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
+  Dimensions,
   Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
   PixelRatio,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Dimensions
+  View
 } from "react-native";
 
 import pxToDp from "../../util/pxToDp";
-import {Colors, Styles, Metrics} from "../../themes";
+import {Colors, Metrics, Styles} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const one = 1 / PixelRatio.get();
@@ -356,7 +355,7 @@ class NavigationItem1 extends PureComponent {
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
-     <View style={{flexDirection:'row',width:width,alignItems:'center'}}>
+      <View style={{flexDirection: 'row', width: width, alignItems: 'center', flex: 1}}>
         <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
         {_icon}
         {_title}

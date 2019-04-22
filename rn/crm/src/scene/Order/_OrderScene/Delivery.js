@@ -21,7 +21,9 @@ function mapStateToProps (state) {
 
 class Delivery extends React.Component {
   static propTypes = {
-    order: PropType.object
+    order: PropType.object,
+    logistics: PropType.array,
+    fetchData:PropType.func
   }
   
   static defaultProps = {}
@@ -31,8 +33,7 @@ class Delivery extends React.Component {
     let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
       isJbbVendor: tool.isJbbVendor(currVendorId),
-      logistics: [],
-      isLoading: false,
+      logistics: this.props.logistics,
       accessToken: this.props.global.accessToken,
       timer: null
     }
@@ -41,7 +42,7 @@ class Delivery extends React.Component {
   componentWillMount (): void {
     const self = this
     let orderStatus = this.props.order.orderStatus
-    self.fetchShipData()
+    self.props.fetchData()
     // 如果订单完成或者无效则不设置定时刷新任务
     // if (!Mapping.Tools.ValueEqMapping(Mapping.Order.ORDER_STATUS.ARRIVED, orderStatus) && !Mapping.Tools.ValueEqMapping(Mapping.Order.ORDER_STATUS.INVALID, orderStatus)) {
     //   let timer = setInterval(function () {
@@ -58,18 +59,6 @@ class Delivery extends React.Component {
     }
   }
   
-  fetchShipData () {
-    const self = this
-    const navigation = self.props.navigation
-    if (!this.state.logistics.length) {
-      this.setState({isLoading: true})
-    }
-    const api = `/api/order_deliveries/${this.props.order.id}?access_token=${this.state.accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
-      this.setState({logistics: res, isLoading: false})
-    })
-  }
-  
   onConfirmAddTip (logisticId, val) {
     const self = this
     const navigation = self.props.navigation
@@ -78,7 +67,9 @@ class Delivery extends React.Component {
       logisticId: logisticId,
       tips: val
     }).then(res => {
-      self.fetchShipData()
+      self.props.fetchData()
+    }).catch(e => {
+      self.props.fetchData()
     })
   }
   
@@ -94,14 +85,14 @@ class Delivery extends React.Component {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
-      selectedWay: logisticsCodes,
+      selectedWay: [],
       onBack: (res) => {
         if (res.count > 0) {
           Toast.success('发配送成功')
         } else {
           Toast.fail('发配送失败，请联系运营人员')
         }
-        this.fetchShipData()
+        this.props.fetchData()
       }
     });
   }
@@ -113,9 +104,9 @@ class Delivery extends React.Component {
       orderId: this.props.order.id
     }).then(res => {
       Toast.success('操作成功')
-      self.fetchShipData()
+      self.props.fetchData()
     }).catch(e => {
-      self.fetchShipData()
+      self.props.fetchData()
     })
   }
   
@@ -127,7 +118,7 @@ class Delivery extends React.Component {
     const self = this
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
-      self.fetchShipData()
+      self.props.fetchData()
     })
   }
   
@@ -135,7 +126,7 @@ class Delivery extends React.Component {
     const self = this
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
-      self.fetchShipData()
+      self.props.fetchData()
     })
   }
   
@@ -260,7 +251,7 @@ class Delivery extends React.Component {
   
   render (): React.ReactNode {
     return (
-      <If condition={this.state.isJbbVendor && !this.state.isLoading}>
+      <If condition={this.state.isJbbVendor}>
         <View>
           {this.renderShips()}
           {this.renderBtn()}

@@ -71,6 +71,8 @@ class OrderSearchScene extends PureComponent {
     } else if (route === Config.ROUTE_ORDER_SERIOUS_DELAY) {
       native.ordersSeriousDelay();
       return;
+    } else if (route === Config.ROUTE_ORDER_PEND_PAYMENT) {
+      this.onSearch("paid:offline");
     }
 
     InteractionManager.runAfterInteractions(() => {
@@ -100,17 +102,14 @@ class OrderSearchScene extends PureComponent {
             点击标签直接搜索
           </Text>
           <View style={styles.label_view}>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}
-            >
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}>
               <Text style={styles.label_style}>无效订单</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}
-            >
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}>
               <Text style={styles.label_style}>严重延误</Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_PEND_PAYMENT)}>
+              <Text style={styles.label_style}>需收款</Text>
             </TouchableOpacity>
           </View>
         </View>

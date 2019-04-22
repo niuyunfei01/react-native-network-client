@@ -2,6 +2,9 @@ package cn.cainiaoshicai.crm.support.react;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -24,6 +27,7 @@ import com.facebook.react.modules.core.PermissionListener;
 import org.devio.rn.splashscreen.SplashScreen;
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -33,12 +37,15 @@ import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.util.Log;
+import cn.cainiaoshicai.crm.scan.BluetoothScanGunKeyEventHelper;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
+import cn.cainiaoshicai.crm.utils.BarCodeUtil;
 
 
-public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
+public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity, BluetoothScanGunKeyEventHelper.OnScanSuccessListener {
 
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
@@ -48,6 +55,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     private @Nullable
     PermissionListener mPermissionListener;
 
+    private BluetoothScanGunKeyEventHelper mScanGunKeyEventHelper;
 
     private static final int OVERLAY_PERMISSION_REQUEST_CODE = 2;
 
@@ -157,6 +165,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         mReactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
         mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
         setContentView(mReactRootView);
+        mScanGunKeyEventHelper = new BluetoothScanGunKeyEventHelper(this);
     }
 
     @Override
@@ -211,6 +220,17 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         return super.onKeyUp(keyCode, event);
     }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (mScanGunKeyEventHelper.isScanGunEvent(event)) {
+            mScanGunKeyEventHelper.analysisKeyEvent(event);
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+//        mScanGunKeyEventHelper.analysisKeyEvent(event);
+//        return true;
+    }
+
     @TargetApi(20)
     private void setTranslucent() {
         final Activity activity = this;
@@ -240,6 +260,16 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             PermissionListener listener) {
         mPermissionListener = listener;
         this.requestPermissions(permissions, requestCode);
+    }
+
+    @Override
+    public void onScanSuccess(String barcode) {
+        try {
+            Map<String, String> result = BarCodeUtil.extractCode(barcode);
+            GlobalCtx.app().toRnView(this, result.get("action"), result);
+        } catch (Exception e) {
+            System.out.println("scan code exception " + e.getMessage());
+        }
     }
 
     public void onRequestPermissionsResult(

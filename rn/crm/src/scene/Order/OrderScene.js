@@ -58,6 +58,7 @@ import {Colors, Metrics, Styles} from "../../themes";
 import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
+import HttpUtils from "../../util/http";
 
 const numeral = require('numeral');
 
@@ -197,7 +198,8 @@ class OrderScene extends Component {
       phone: undefined,
       person: '联系客户',
       isServiceMgr: false,
-      visibleReceiveQr: false
+      visibleReceiveQr: false,
+      logistics: []
     };
     
     this._onLogin = this._onLogin.bind(this);
@@ -277,6 +279,7 @@ class OrderScene extends Component {
                   this._orderChangeLogQuery();
                   this.wayRecordQuery();
                   this.logOrderViewed();
+                  this.fetchShipData()
                 } else {
                   this.setState({errorHints: desc, remindFetching: false})
                 }
@@ -287,6 +290,16 @@ class OrderScene extends Component {
       }
     }
   };
+  
+  fetchShipData () {
+    const self = this
+    const navigation = self.props.navigation
+    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const api = `/api/order_deliveries/${orderId}?access_token=${this.props.global.accessToken}`
+    HttpUtils.get.bind(navigation)(api).then(res => {
+      this.setState({logistics: res})
+    })
+  }
   
   static _extract_edited_items (items) {
     const edits = {};
@@ -308,7 +321,7 @@ class OrderScene extends Component {
       {key: MENU_SET_INVALID, label: '置为无效'},
     ];
     
-    if (is_service_mgr) {
+    if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
     
@@ -481,6 +494,7 @@ class OrderScene extends Component {
     dispatch(clearLocalOrder(order.order.id));
     this.wayRecordQuery();
     this._orderChangeLogQuery();
+    this.fetchShipData()
   }
   
   _hidePrinterChooser () {
@@ -736,6 +750,11 @@ class OrderScene extends Component {
     const {order, global} = this.props;
     const storeId = (order.order || {}).store_id;
     return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
+  }
+
+  _fnViewFullFin () {
+    const {order, global} = this.props;
+    return (order.order || {}).fn_full_fin;
   }
   
   _callShip () {
@@ -1678,7 +1697,10 @@ class OrderScene extends Component {
         </View>
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
-        {this.state.isJbbVendor ? <Delivery order={order}/> : this.renderShipStatus()}
+        {this.state.isJbbVendor ? <Delivery
+          order={order}
+          logistics={this.state.logistics}
+          fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
     
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
