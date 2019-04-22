@@ -144,14 +144,7 @@ class MaterialPutIn extends React.Component {
         navigation.state.params.onBack && navigation.state.params.onBack()
       }
     }).catch(e => {
-      Modal.alert('错误', e.reason, [
-        {
-          text: '确定',
-          onPress: () => {
-            self.goToMine()
-          }
-        }
-      ])
+      Modal.alert('错误', e.reason, [{text: '确定'}])
     })
   }
   
