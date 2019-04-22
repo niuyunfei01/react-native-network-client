@@ -264,7 +264,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
 
     @Override
     public void onScanSuccess(String barcode) {
-        System.out.println("scan code result " + barcode);
         try {
             Map<String, String> result = BarCodeUtil.extractCode(barcode);
             GlobalCtx.app().toRnView(this, result.get("action"), result);
