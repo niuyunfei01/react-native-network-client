@@ -1142,7 +1142,7 @@ public class GlobalCtx extends Application {
     static  public class ScanStatus {
         private AtomicLong lastTalking = new AtomicLong(0);
         private CopyOnWriteArrayList<Map<String, String>> ls = Lists.newCopyOnWriteArrayList();
-        private long getLastTalking() {
+        public long getLastTalking() {
             return  lastTalking.longValue();
         }
 
