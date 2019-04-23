@@ -266,6 +266,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     public void onScanSuccess(String barcode) {
         try {
             Map<String, String> result = BarCodeUtil.extractCode(barcode);
+            GlobalCtx.app().scanInfo().add(result);
             GlobalCtx.app().toRnView(this, result.get("action"), result);
         } catch (Exception e) {
             System.out.println("scan code exception " + e.getMessage());

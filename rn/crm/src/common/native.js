@@ -134,6 +134,16 @@ export default {
       NativeModules.ActivityStarter.dialNumber(phone))
   },
 
+  clearScan: async function(code, callback = function (){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.clearScan(code, callback))
+  },
+
+  listenScan: async function(callback = function (){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.listenScan(callback))
+  },
+
   reportException: async function (msg, stack, currentExceptionID, isFatal) {
     console.log("error:", msg)
     console.log("stack:", stack)
