@@ -272,6 +272,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void listenScan(@Nonnull final Callback callback) {
         GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
         List<Map<String, String>> results = ss.notConsumed();
+        ss.markTalking();
         callback.invoke(true, DaoHelper.gson().toJson(results));
     }
 

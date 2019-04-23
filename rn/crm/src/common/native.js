@@ -139,7 +139,7 @@ export default {
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
 
-  listenScan: async function(callback = function (){}) {
+  listenScan: async function(callback = function (scan_items){}) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.listenScan(callback))
   },

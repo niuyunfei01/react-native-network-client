@@ -1164,6 +1164,10 @@ public class GlobalCtx extends Application {
                 }
             }
         }
+
+        public void markTalking() {
+            lastTalking.set(System.currentTimeMillis());
+        }
     }
 
     public interface TaskCountUpdated {
