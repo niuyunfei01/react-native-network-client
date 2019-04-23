@@ -92,7 +92,9 @@ class MaterialTask extends React.Component {
       <For each='item' of={this.state.packingTask} index='idx'>
         <View style={styles.item} key={idx}>
           <View style={styles.taskTitle}>
-            <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>{item.sku.name}</Text>
+            <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>
+              {item.sku.name}({item.sku.material_code})
+            </Text>
             <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`}</Text>
           </View>
           <For each="task" of={item.task} index="taskIdx">
@@ -108,7 +110,7 @@ class MaterialTask extends React.Component {
                 />
                 <Text style={{textAlign: 'right'}}>份</Text>
               </View>
-              <Text style={{fontSize: 12, width: 30, textAlign: 'right'}}>0工分</Text>
+              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>0工分</Text>
             </View>
           </For>
           <View style={styles.taskBtn}>
