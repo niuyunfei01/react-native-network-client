@@ -66,7 +66,7 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
             if(lastTalking - System.currentTimeMillis() > 1000){
                 GlobalCtx.app().toRnView(this, result.get("action"), result);
             } else {
-                System.out.println("lastTalking = " + lastTalking + ", now=" + System.currentTimeMillis());
+                System.out.println("lastTalking = " + (lastTalking/1000) + ", now=" + (System.currentTimeMillis()/1000));
             }
         } catch (Exception e) {
             System.out.println("scan code exception " + e.getMessage());

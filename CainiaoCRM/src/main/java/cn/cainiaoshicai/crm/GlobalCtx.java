@@ -1140,7 +1140,7 @@ public class GlobalCtx extends Application {
     private AtomicReference<ScanStatus> ssRef = new AtomicReference<>();
 
     static  public class ScanStatus {
-        private AtomicLong lastTalking = new AtomicLong(0);
+        private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
         private CopyOnWriteArrayList<Map<String, String>> ls = Lists.newCopyOnWriteArrayList();
         public long getLastTalking() {
             return  lastTalking.longValue();
@@ -1152,7 +1152,6 @@ public class GlobalCtx extends Application {
 
         public void add(Map<String, String> result) {
             ls.add(result);
-            this.lastTalking.set(System.currentTimeMillis());
         }
 
         public void clearCode(String code) {
