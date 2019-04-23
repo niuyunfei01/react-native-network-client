@@ -6,9 +6,10 @@ import {connect} from "react-redux";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import {List, Picker, Toast, WhiteSpace} from "antd-mobile-rn";
+import {List, Picker, Switch, Toast, WhiteSpace} from "antd-mobile-rn";
 import HttpUtils from "../../util/http";
 import Swipeout from 'react-native-swipeout';
+import JbbPrompt from "../component/JbbPrompt";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -23,7 +24,7 @@ class ProductInfo extends React.Component {
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
+          onPress={() => native.toGoods()}
         />
       )
     }
@@ -36,7 +37,8 @@ class ProductInfo extends React.Component {
     this.state = {
       productId: pid,
       productInfo: {
-        product: {}
+        product: {},
+        sku: {}
       },
       shelfNos: [[{label: '', value: ''}], [{label: '', value: ''}]],
       selectShelfNo: [],
@@ -45,7 +47,8 @@ class ProductInfo extends React.Component {
       positionDialog: false,
       shelfArea: '',
       shelfNo: '',
-      refreshing: false
+      refreshing: false,
+      tagCodePrompt: false
     }
   }
   
@@ -108,6 +111,34 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
+  
+  onChgTagCode (val) {
+    const self = this
+    const navigation = this.props.navigation
+    const api = `/api_products/chg_sku_tag_code?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      skuId: self.state.productInfo.sku.id,
+      tagCode: val
+    }).then(res => {
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onChangeNeedPack (checked) {
+    console.log('on switch changed => ', checked)
+    const self = this
+    const navigation = this.props.navigation
+    const api = `/api_products/chg_sku_need_pack?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      skuId: self.state.productInfo.sku.id,
+      need_pack: checked ? 1 : 0
+    }).then(res => {
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
   renderHeader () {
     return (
       <View>
@@ -126,34 +157,46 @@ class ProductInfo extends React.Component {
     )
   }
   
-  renderShelfNo () {
-    const swipeoutBtns = [
+  renderForm () {
+    const shelfNoSwipeOutBtns = [
       {
         text: '清除',
         type: 'delete',
         onPress: () => this.onClearShelfNo()
       }
     ]
-    return (
-      <Swipeout right={swipeoutBtns} autoClose={true}>
-        <Picker
-          data={this.state.shelfNos}
-          title="选择货架"
-          cascade={false}
-          extra={this.state.productInfo.shelf_no}
-          onOk={v => this.onModifyPosition(v.join(''))}
-        >
-          <List.Item arrow="horizontal">货架编号</List.Item>
-        </Picker>
-      </Swipeout>
-    )
-  }
-  renderForm () {
+    
     return (
       <View>
         <JbbCellTitle>库管信息</JbbCellTitle>
         <List>
-          {this.renderShelfNo()}
+          <Swipeout right={shelfNoSwipeOutBtns} autoClose={true}>
+            <Picker
+              data={this.state.shelfNos}
+              title="选择货架"
+              cascade={false}
+              extra={this.state.productInfo.shelf_no}
+              onOk={v => this.onModifyPosition(v.join(''))}
+            >
+              <List.Item arrow="horizontal">货架编号</List.Item>
+            </Picker>
+          </Swipeout>
+          <List.Item
+            arrow={"horizontal"}
+            extra={this.state.productInfo.sku.name}
+          >秤签名称</List.Item>
+          <List.Item
+            onClick={() => this.setState({tagCodePrompt: true})}
+            arrow={"horizontal"}
+            extra={this.state.productInfo.sku.material_code}
+          >秤签编号</List.Item>
+          <List.Item
+            extra={<Switch
+              disabled={!this.state.productInfo.sku.material_code}
+              checked={this.state.productInfo.sku.need_pack == 1}
+              onChange={(checked) => this.onChangeNeedPack(checked)}
+            />}
+          >需要打包</List.Item>
         </List>
       </View>
     )
@@ -171,6 +214,13 @@ class ProductInfo extends React.Component {
         {this.renderHeader()}
         <WhiteSpace/>
         {this.renderForm()}
+  
+        <JbbPrompt
+          onConfirm={(value) => this.onChgTagCode(value)}
+          onCancel={() => this.setState({tagCodePrompt: false})}
+          initValue={this.state.productInfo.sku.material_code}
+          visible={this.state.tagCodePrompt}
+        />
       </ScrollView>
     );
   }

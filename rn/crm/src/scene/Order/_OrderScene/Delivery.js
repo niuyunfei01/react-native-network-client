@@ -13,6 +13,7 @@ import {Modal, Toast} from "antd-mobile-rn";
 import HttpUtils from "../../../util/http";
 import tool from "../../../common/tool";
 import _ from 'lodash'
+import JbbPrompt from "../../component/JbbPrompt";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -59,6 +60,10 @@ class Delivery extends React.Component {
     }
   }
   
+  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+    this.setState({logistics: nextProps.logistics})
+  }
+  
   onConfirmAddTip (logisticId, val) {
     const self = this
     const navigation = self.props.navigation
@@ -71,11 +76,6 @@ class Delivery extends React.Component {
     }).catch(e => {
       self.props.fetchData()
     })
-  }
-  
-  onAddTip (ship) {
-    const self = this
-    Modal.prompt('订单加小费', '请输入小费金额', (val) => self.onConfirmAddTip(ship.id, val), 'default', ship.tip, '请输入小费金额')
   }
   
   onCallThirdShip () {
@@ -162,16 +162,21 @@ class Delivery extends React.Component {
                 <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
               </If>
               <If condition={ship.can_add_tip && !ship.driver_phone}>
-                <JbbButton
-                  onPress={() => this.onAddTip(ship)}
-                  text={'加小费'}
-                  type={'hollow'}
-                  fontColor={'#000'}
-                  borderColor={'#000'}
-                  fontSize={pxToDp(24)}
-                  width={pxToDp(120)}
-                  height={pxToDp(40)}
-                />
+                <JbbPrompt
+                  title={'输入小费'}
+                  onConfirm={(value) => this.onConfirmAddTip(ship.id, value)}
+                  initValue={ship.tip}
+                >
+                  <JbbButton
+                    text={'加小费'}
+                    type={'hollow'}
+                    fontColor={'#000'}
+                    borderColor={'#000'}
+                    fontSize={pxToDp(24)}
+                    width={pxToDp(120)}
+                    height={pxToDp(40)}
+                  />
+                </JbbPrompt>
               </If>
               <If condition={this.showCallDriverBtn(ship)}>
                 <JbbButton

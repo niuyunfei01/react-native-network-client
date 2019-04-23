@@ -1,7 +1,7 @@
 import React from "react";
 import {Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {NavigationItem} from "../../widget";
-import {Modal as AntModal} from 'antd-mobile-rn';
+import {Modal as AntModal, Toast} from 'antd-mobile-rn';
 import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'
@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../config";
 import HttpUtils from "../../util/http";
+import WorkerPopup from "../component/WorkerPopup";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -50,7 +51,9 @@ class MaterialList extends React.Component {
       filterName: '',
       materials: [],
       datePickerVisible: false,
-      loading: false
+      loading: false,
+      workerPopup: false,
+      selectedItem: {}
     }
   }
   
@@ -116,6 +119,22 @@ class MaterialList extends React.Component {
     this.setState({headerMenu: false})
     this.refs._drawer.open()
   };
+  
+  onAssignWorker (worker) {
+    console.log(worker)
+    const self = this
+    const navigation = this.props.navigation
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_assign_task?access_token=${accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      receiptId: this.state.selectedItem.id,
+      userId: worker.id
+    }).then(res => {
+      Toast.success('操作成功')
+      self.setState({selectedItem: {}, workerPopup: false})
+      self.fetchData()
+    })
+  }
   
   toMaterialPutIn () {
     this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {onBack: () => this.fetchData()})
@@ -198,7 +217,7 @@ class MaterialList extends React.Component {
   
   renderItem (item) {
     return (
-      <View style={[styles.itemWrap]} key={item.key}>
+      <View style={[styles.itemWrap]} key={item.id}>
         <View style={[styles.itemLine]}>
           <Text style={[styles.itemTitle]}>{item.sku.name}</Text>
           <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
@@ -211,7 +230,7 @@ class MaterialList extends React.Component {
         </View>
         <View style={[styles.itemLine]}>
           <Text style={[styles.itemDate]}>{item.create_user}：{item.date}</Text>
-          <TouchableOpacity onPress={() => console.log(1)}>
+          <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
             <View>
               <Text style={[styles.itemStatus]}>
                 {item.assign_user ? item.assign_user + ':' : null}{item.status_label}
@@ -269,6 +288,13 @@ class MaterialList extends React.Component {
           isVisible={this.state.datePickerVisible}
           onConfirm={this._handleDatePicked}
           onCancel={this._hideDateTimePicker}
+        />
+  
+        <WorkerPopup
+          visible={this.state.workerPopup}
+          multiple={false}
+          onClickWorker={(worker) => this.onAssignWorker(worker)}
+          onCancel={() => this.setState({workerPopup: false})}
         />
       </View>
     );
