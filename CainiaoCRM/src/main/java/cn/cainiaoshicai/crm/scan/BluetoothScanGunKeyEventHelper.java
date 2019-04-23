@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class BluetoothScanGunKeyEventHelper {
 
-    private final static long MESSAGE_DELAY = 300;             //延迟300ms，判断扫码是否完成。
+    private final static long MESSAGE_DELAY = 1000;             //延迟300ms，判断扫码是否完成。
     private StringBuffer mStringBufferResult;                  //扫码内容
     private boolean mCaps;                                     //大小写区分
     private final Handler mHandler;
@@ -72,8 +72,8 @@ public class BluetoothScanGunKeyEventHelper {
                 mHandler.post(mScanningFishedRunnable);
             } else {
                 //延迟post，若500ms内，有其他事件
-                mHandler.removeCallbacks(mScanningFishedRunnable);
-                mHandler.postDelayed(mScanningFishedRunnable, MESSAGE_DELAY);
+//                mHandler.removeCallbacks(mScanningFishedRunnable);
+//                mHandler.postDelayed(mScanningFishedRunnable, MESSAGE_DELAY);
             }
 
         }
