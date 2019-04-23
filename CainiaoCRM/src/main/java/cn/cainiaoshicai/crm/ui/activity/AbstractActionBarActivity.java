@@ -40,6 +40,12 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
     }
 
     @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mScanGunKeyEventHelper = new BluetoothScanGunKeyEventHelper(this);
+    }
+
+    @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (mScanGunKeyEventHelper.isScanGunEvent(event)) {
             mScanGunKeyEventHelper.analysisKeyEvent(event);
@@ -56,8 +62,11 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
         try {
             Map<String, String> result = BarCodeUtil.extractCode(barcode);
             GlobalCtx.app().scanInfo().add(result);
-            if(GlobalCtx.app().scanInfo().getLastTalking() - System.currentTimeMillis() > 1000){
+            long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
+            if(lastTalking - System.currentTimeMillis() > 1000){
                 GlobalCtx.app().toRnView(this, result.get("action"), result);
+            } else {
+                System.out.println("lastTalking = " + lastTalking + ", now=" + System.currentTimeMillis());
             }
         } catch (Exception e) {
             System.out.println("scan code exception " + e.getMessage());
