@@ -179,7 +179,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        final GlobalCtx app = GlobalCtx.app();
+        final GlobalCtx app = GlobalCtx.app();
 //        if (!app.appEnabledGoodMgr()) {
 //            app.toGoodsMgrRN(StoreStorageActivity.this);
 //            return;
