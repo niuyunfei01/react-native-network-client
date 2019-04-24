@@ -38,6 +38,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.i18n.reactnativei18n.ReactNativeI18n;
 import com.iflytek.cloud.SpeechConstant;
@@ -1139,29 +1140,24 @@ public class GlobalCtx extends Application {
 
     private AtomicReference<ScanStatus> ssRef = new AtomicReference<>();
 
-    static  public class ScanStatus {
+    static public class ScanStatus {
         private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
-        private CopyOnWriteArrayList<Map<String, String>> ls = Lists.newCopyOnWriteArrayList();
+        private Map<String, Map<String, String>> ls = Maps.newConcurrentMap();
+
         public long getLastTalking() {
-            return  lastTalking.longValue();
+            return lastTalking.longValue();
         }
 
         public List<Map<String, String>> notConsumed() {
-            return ls;
+            return new ArrayList<>(ls.values());
         }
 
         public void add(Map<String, String> result) {
-            ls.add(result);
+            ls.put(result.get("barCode"), result);
         }
 
         public void clearCode(String code) {
-            ListIterator<Map<String, String>> it = ls.listIterator();
-            while(it.hasNext()) {
-                Map<String, String> n = it.next();
-                if (code.equals(n.get("barCode"))) {
-                    it.remove();
-                }
-            }
+            ls.remove(code);
         }
 
         public void markTalking() {

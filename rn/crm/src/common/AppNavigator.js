@@ -220,7 +220,7 @@ const tabDef = function (store_) {
 };
 
 const tabInit = {
-  initialRouteName: "Mine",
+  initialRouteName: "Remind",
   tabBarComponent: TabBarBottom,
   tabBarPosition: "bottom",
   swipeEnabled: false,

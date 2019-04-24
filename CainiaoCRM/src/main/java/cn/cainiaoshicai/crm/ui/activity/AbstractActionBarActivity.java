@@ -60,6 +60,7 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
     @Override
     public void onScanSuccess(String barcode) {
         try {
+            System.out.println("barcode => " + barcode);
             Map<String, String> result = BarCodeUtil.extractCode(barcode);
             GlobalCtx.app().scanInfo().add(result);
             long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
