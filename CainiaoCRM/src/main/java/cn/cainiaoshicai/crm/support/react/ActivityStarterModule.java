@@ -264,8 +264,13 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     void clearScan(@Nonnull String code, @Nonnull final Callback callback) {
         GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
-        ss.clearCode(code);
-        callback.invoke(true);
+
+        try {
+            ss.clearCode(code);
+            callback.invoke(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @ReactMethod
