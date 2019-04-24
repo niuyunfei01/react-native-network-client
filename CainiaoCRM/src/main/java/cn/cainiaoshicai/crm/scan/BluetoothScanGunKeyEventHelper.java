@@ -173,6 +173,11 @@ public class BluetoothScanGunKeyEventHelper {
      * @return
      */
     public boolean isScanGunEvent(KeyEvent event) {
+
+        if (event.getKeyCode() <= 6) {
+            return false;
+        }
+
         if (deviceNameList.isEmpty()) {
             setDeviceNameList();
         }
