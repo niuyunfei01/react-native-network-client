@@ -1158,7 +1158,7 @@ public class GlobalCtx extends Application {
             ListIterator<Map<String, String>> it = ls.listIterator();
             while(it.hasNext()) {
                 Map<String, String> n = it.next();
-                if (code.equals(n.get("code"))) {
+                if (code.equals(n.get("barCode"))) {
                     it.remove();
                 }
             }
