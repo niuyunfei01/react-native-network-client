@@ -144,6 +144,11 @@ export default {
       NativeModules.ActivityStarter.listenScan(callback))
   },
 
+  speakText: async function(text, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.speakText(text, callback))
+  },
+
   reportException: async function (msg, stack, currentExceptionID, isFatal) {
     console.log("error:", msg)
     console.log("stack:", stack)
