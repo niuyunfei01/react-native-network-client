@@ -116,11 +116,7 @@ public class MainActivity extends AbstractActionBarActivity {
 
     private void setViewPagerCurrentItem(Bundle savedInstanceState) {
         if (ordersViewPager != null && savedInstanceState != null) {
-            try {
-                ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
-            } catch (Exception e) {
-                ordersViewPager.setCurrentItem(1);
-            }
+            ordersViewPager.setCurrentItem(1);
         }
     }
 
