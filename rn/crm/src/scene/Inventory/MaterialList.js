@@ -72,7 +72,8 @@ class MaterialList extends React.Component {
   componentDidMount (): void {
     this.props.navigation.setParams({
       showMenu: () => this.showMenu(),
-      onFocusSearchInput: () => this.onFocusSearchInput()
+      onFocusSearchInput: () => this.onFocusSearchInput(),
+      onSearch: (text) => this.onSearch(text)
     })
     this.fetchData()
     this.getCodeFromAndroid()
