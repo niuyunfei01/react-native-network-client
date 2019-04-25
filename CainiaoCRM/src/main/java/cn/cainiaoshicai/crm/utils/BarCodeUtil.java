@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class BarCodeUtil {
 
-    public static String CODE_TYPE_RECEIVE = "IR";
+    private static String CODE_TYPE_RECEIVE = "IR";
 
     //类型 操作人 tag_code 重量 年月日时分秒 sku
     //IR-0000048-0019-00580-190416183857-0061
@@ -21,7 +21,6 @@ public class BarCodeUtil {
         String[] codeInfo = code.split("-");
         String type = codeInfo[0];
         if (type.equals(CODE_TYPE_RECEIVE)) {
-            result.put("type", type);
             result.put("workerId", Integer.parseInt(codeInfo[1]) + "");
             result.put("tagCode", Integer.parseInt(codeInfo[2]) + "");
             result.put("skuId", Integer.parseInt(codeInfo[5]) + "");
@@ -31,8 +30,9 @@ public class BarCodeUtil {
             result.put("weight", insertString(weightData, ".", weightData.length() - 4));
             result.put("datetime", formatDate(codeInfo[4]));
             result.put("action", "InventoryMaterialPutIn");
-            result.put("barCode", code);
         }
+        result.put("type", type);
+        result.put("barCode", code);
         return result;
     }
 

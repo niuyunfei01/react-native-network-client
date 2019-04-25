@@ -34,44 +34,40 @@ class MaterialPutIn extends React.Component {
   constructor (props) {
     super(props)
     const store = tool.store(this.props.global)
+    const navigation = this.props.navigation
+    const {params = {}} = navigation.state
+    console.log('navigation params =>', params)
     this.state = {
+      receiptId: params.receiptId ? params.receiptId : null,
       skus: [],
       skuPopup: false,
       suppliers: [],
       supplierPopup: false,
       storeId: store.id,
-      barCode: '',
+      barCode: params.barCode ? params.barCode : null,
       sku: '',
       skuId: 0,
       supplier: '',
       supplierId: 0,
-      weight: '0',
+      weight: params.weight ? params.weight : '0',
       reduceWeight: '0',
       price: '0',
-      datetime: moment().format('YYYY-MM-DD hh:mm:ss')
+      datetime: params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
     }
   }
   
   componentDidMount (): void {
     const navigation = this.props.navigation
-    const params = navigation.state.params
+    const {params = {}} = navigation.state
     
     this.fetchSkus()
     this.fetchSuppliers()
   
-    // 如果是扫码进入
-    if (params.barCode) {
-      if (params.workerId) {
-        this.setSupplier(params.workerId)
-      }
-      if (params.skuId) {
-        this.setSku(params.skuId)
-      }
-      this.setState({
-        barCode: params.barCode,
-        weight: params.weight,
-        datetime: params.datetime
-      })
+    if (params.workerId) {
+      this.setSupplier(params.workerId)
+    }
+    if (params.skuId) {
+      this.setSku(params.skuId)
     }
   }
   
@@ -123,35 +119,21 @@ class MaterialPutIn extends React.Component {
     })
   }
   
-  goToMine = () => {
-    tool.resetNavStack(this.props.navigation, 'Tab', {initTab: 'Mine'})
-  }
-  
   doSubmit () {
     const self = this
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
-    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime} = this.state
+    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId} = this.state
     const api = `/api_products/material_put_in?access_token=${accessToken}`
     HttpUtils.post.bind(navigation)(api, {
+      id: receiptId,
       skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime
     }).then(res => {
       Toast.success('录入成功')
-      if (self.state.barCode) {
-        self.goToMine()
-      } else {
         navigation.goBack()
         navigation.state.params.onBack && navigation.state.params.onBack()
-      }
     }).catch(e => {
-      Modal.alert('错误', e.reason, [
-        {
-          text: '确定',
-          onPress: () => {
-            self.goToMine()
-          }
-        }
-      ])
+      Modal.alert('错误', e.reason, [{text: '确定'}])
     })
   }
   
@@ -215,7 +197,11 @@ class MaterialPutIn extends React.Component {
           dataSource={this.state.suppliers}
           title={'选择供应商'}
           onClose={() => this.setState({supplierPopup: false})}
-          onSelect={(item) => this.setState({supplier: item.name, supplierId: item.id, supplierPopup: false})}
+          onSelect={(item) => this.setState({
+            supplier: item.name,
+            supplierId: item.supplier_code,
+            supplierPopup: false
+          })}
         />
       </ScrollView>
     );

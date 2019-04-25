@@ -1,7 +1,7 @@
 import React from "react";
-import {Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {NavigationItem} from "../../widget";
-import {Modal as AntModal} from 'antd-mobile-rn';
+import {Modal as AntModal, Toast} from 'antd-mobile-rn';
 import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'
@@ -11,6 +11,10 @@ import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../config";
 import HttpUtils from "../../util/http";
+import WorkerPopup from "../component/WorkerPopup";
+import {native, tool} from "../../common";
+import Swipeout from 'react-native-swipeout';
+import LoadMore from "react-native-loadmore";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -43,27 +47,40 @@ class MaterialList extends React.Component {
   
   constructor (props) {
     super(props)
+    const store = tool.store(this.props.global)
     this.state = {
+      store: store,
       headerMenu: false,
       filterStatus: '',
       filterDate: '',
       filterName: '',
       materials: [],
       datePickerVisible: false,
-      loading: false
+      workerPopup: false,
+      selectedItem: {},
+      codeFromAndroidTimer: null,
+      page: 1,
+      isLastPage: false,
+      isLoading: false
     }
   }
   
   setFilterStatus (value) {
-    this.setState({filterStatus: value}, () => this.fetchData())
+    this.setState({filterStatus: value}, () => this.onRefresh())
   }
   
   componentDidMount (): void {
     this.props.navigation.setParams({
       showMenu: () => this.showMenu(),
-      onFocusSearchInput: () => this.onFocusSearchInput()
+      onFocusSearchInput: () => this.onFocusSearchInput(),
+      onSearch: (text) => this.onSearch(text)
     })
     this.fetchData()
+    this.getCodeFromAndroid()
+  }
+  
+  componentWillUnmount (): void {
+    clearInterval(this.codeFromAndroidTimer)
   }
   
   fetchData () {
@@ -71,14 +88,75 @@ class MaterialList extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_list?access_token=${accessToken}`
-    this.setState({loading: true})
+    this.setState({isLoading: true})
     HttpUtils.get.bind(navigation)(api, {
+      page: this.state.page,
       status: this.state.filterStatus,
       date: this.state.filterDate,
       name: this.state.filterName
     }).then(res => {
-      self.setState({materials: res, loading: false})
+      let totalPage = res.count / res.pageSize
+      let isLastPage = res.page >= totalPage
+      let lists = res.page == 1 ? res.lists : this.state.materials.concat(res.lists)
+      self.setState({materials: lists, isLoading: false, page: res.page + 1, isLastPage})
     })
+  }
+  
+  onRefresh () {
+    this.setState({page: 1}, () => this.fetchData())
+  }
+  
+  // 获取Android
+  getCodeFromAndroid () {
+    const self = this
+    let dealArr = []
+    const navigation = self.props.navigation
+    const accessToken = self.props.global.accessToken
+    const api = `/api_products/material_put_in?access_token=${accessToken}`
+    if (this.codeFromAndroidTimer) {
+      clearInterval(this.codeFromAndroidTimer)
+    }
+    
+    
+    this.codeFromAndroidTimer = setInterval(function () {
+      native.listenScan(function (ok, items) {
+        if (ok) {
+          const lists = JSON.parse(items)
+          for (let obj of lists) {
+            if (obj.barCode) {
+              console.log('scan item => ', obj)
+              if (obj.type === 'IR' && !dealArr.includes(obj.barCode)) {
+                dealArr.push(barCode)
+                const {skuId, workerId, weight, barCode, datetime} = obj
+                HttpUtils.post.bind(navigation)(api, {
+                  skuId, weight, barCode, datetime,
+                  storeId: self.state.store.id,
+                  supplierId: workerId,
+                  price: 0,
+                  reduceWeight: 0
+                }).then(res => {
+                  let name = res.name ? res.name : '未知商品'
+                  native.clearScan(barCode)
+                  native.speakText(`收货${name}${res.weight}公斤`)
+                  Toast.success(`收货${name}${res.weight}公斤成功`)
+                  self.onRefresh()
+                }).catch(e => {
+                  if (e.reason === 'BARCODE_EXIST') {
+                    native.clearScan(barCode)
+                  } else {
+                    let idx = dealArr.indexOf(barCode)
+                    dealArr.splice(idx, 1)
+                  }
+                  Toast.offline('录入失败：' + e.reason)
+                })
+              }
+            } else {
+              native.clearScan(obj.barCode)
+            }
+          }
+        }
+      })
+    }, 500)
   }
   
   showMenu () {
@@ -94,7 +172,7 @@ class MaterialList extends React.Component {
     console.log('A date has been picked: ', date);
     this._hideDateTimePicker();
     this.setState({filterDate: moment(date).format('YYYY-MM-DD')}, () => {
-      this.fetchData()
+      this.onRefresh()
     })
   };
   
@@ -104,7 +182,7 @@ class MaterialList extends React.Component {
   
   onSearch (value) {
     this.setState({name: value}, () => {
-      this.fetchData()
+      this.onRefresh()
     })
   }
   
@@ -117,8 +195,24 @@ class MaterialList extends React.Component {
     this.refs._drawer.open()
   };
   
+  onAssignWorker (worker) {
+    console.log(worker)
+    const self = this
+    const navigation = this.props.navigation
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_assign_task?access_token=${accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      receiptId: this.state.selectedItem.id,
+      userId: worker.id
+    }).then(res => {
+      Toast.success('操作成功')
+      self.setState({selectedItem: {}, workerPopup: false})
+      self.fetchData()
+    })
+  }
+  
   toMaterialPutIn () {
-    this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {onBack: () => this.fetchData()})
+    this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {onBack: () => this.onRefresh()})
     this.setState({headerMenu: false})
   }
   
@@ -197,8 +291,25 @@ class MaterialList extends React.Component {
   }
   
   renderItem (item) {
+    const swipeOutBtns = [
+      {
+        text: '编辑',
+        type: 'primary',
+        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {
+          receiptId: item.id,
+          barCode: item.bar_code,
+          datetime: item.created,
+          weight: item.weight,
+          workerId: item.supplier ? item.supplier.supplier_code : null,
+          skuId: item.sku_id,
+          onBack: () => this.onRefresh()
+        })
+      }
+    ]
+    
     return (
-      <View style={[styles.itemWrap]} key={item.key}>
+      <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
+        <View style={[styles.itemWrap]}>
         <View style={[styles.itemLine]}>
           <Text style={[styles.itemTitle]}>{item.sku.name}</Text>
           <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
@@ -210,16 +321,25 @@ class MaterialList extends React.Component {
           <Text>{item.weight}公斤 {item.price}元</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text style={[styles.itemDate]}>{item.create_user}：{item.date}</Text>
-          <TouchableOpacity onPress={() => console.log(1)}>
+          <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date}</Text>
+          <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
             <View>
               <Text style={[styles.itemStatus]}>
-                {item.assign_user ? item.assign_user + ':' : null}{item.status_label}
+                {item.assign_user ? item.assign_user.nickname + ':' : null}{item.status_label}
               </Text>
             </View>
           </TouchableOpacity>
         </View>
       </View>
+      </Swipeout>
+    )
+  }
+  
+  renderList () {
+    return (
+      <For of={this.state.materials} each='item' index='idx'>
+        {this.renderItem(item)}
+      </For>
     )
   }
   
@@ -250,17 +370,14 @@ class MaterialList extends React.Component {
           })}
           ref={'_drawer'}
         >
-          <ScrollView
-            style={{flex: 1}}
-            contentContainerStyle={{alignItems: 'center'}}
-            refreshControl={
-              <RefreshControl onRefresh={() => this.fetchData()} refreshing={this.state.loading}/>
-            }
-          >
-            <For of={this.state.materials} each='item' index='idx'>
-              {this.renderItem(item)}
-            </For>
-          </ScrollView>
+          <LoadMore
+            renderList={this.renderList()}
+            onRefresh={() => this.onRefresh()}
+            isLastPage={this.state.isLastPage}
+            isLoading={this.state.isLoading}
+            loadMoreType={'scroll'}
+            onLoadMore={() => this.fetchData()}
+          />
         </Drawer>
         {this.renderHeaderMenu()}
         
@@ -269,6 +386,13 @@ class MaterialList extends React.Component {
           isVisible={this.state.datePickerVisible}
           onConfirm={this._handleDatePicked}
           onCancel={this._hideDateTimePicker}
+        />
+  
+        <WorkerPopup
+          visible={this.state.workerPopup}
+          multiple={false}
+          onClickWorker={(worker) => this.onAssignWorker(worker)}
+          onCancel={() => this.setState({workerPopup: false})}
         />
       </View>
     );
@@ -326,11 +450,11 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   itemWrap: {
-    borderRadius: 20,
     padding: 20,
     backgroundColor: '#fff',
-    margin: 5,
-    width: '95%'
+    borderBottomWidth: 1,
+    borderBottomColor: '#bbb',
+    width: '100%'
   },
   itemLine: {
     height: 25,

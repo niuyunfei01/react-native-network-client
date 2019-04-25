@@ -7,7 +7,7 @@ import pxToDp from "../../util/pxToDp";
 class JbbButton extends React.Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
-    onPress: PropTypes.func.isRequired,
+    onPress: PropTypes.func,
     type: PropTypes.oneOf(['default', 'hollow', 'text']), // 默认 空心 文字
     backgroundColor: PropTypes.string,
     borderWidth: PropTypes.number,
@@ -81,9 +81,9 @@ class JbbButton extends React.Component {
   
   render (): React.ReactNode {
   
-    return this.props.disabled ? this.renderBtn() : (
+    return this.props.disabled || !this.props.onPress ? this.renderBtn() : (
       <TouchableOpacity
-        onPress={() => this.props.onPress()}
+        onPress={() => this.props.onPress && this.props.onPress()}
         style={this.props.touchStyle}
       >
         {this.renderBtn()}

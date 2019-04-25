@@ -28,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -258,6 +259,32 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             callback.invoke(activity.getClass().getSimpleName());
         }
+    }
+
+    @ReactMethod
+    void clearScan(@Nonnull String code, @Nonnull final Callback callback) {
+        GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
+
+        try {
+            ss.clearCode(code);
+            callback.invoke(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @ReactMethod
+    void listenScan(@Nonnull final Callback callback) {
+        GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
+        List<Map<String, String>> results = ss.notConsumed();
+        ss.markTalking();
+        callback.invoke(true, DaoHelper.gson().toJson(results));
+    }
+
+    @ReactMethod
+    void speakText(@Nonnull final String text, @Nonnull  final Callback clb) {
+        GlobalCtx.app().getSoundManager().play_by_xunfei(text);
+        clb.invoke(true, "");
     }
 
     @ReactMethod

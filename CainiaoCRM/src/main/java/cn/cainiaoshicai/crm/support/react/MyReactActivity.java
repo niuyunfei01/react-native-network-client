@@ -55,7 +55,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     private @Nullable
     PermissionListener mPermissionListener;
 
-    private BluetoothScanGunKeyEventHelper mScanGunKeyEventHelper;
 
     private static final int OVERLAY_PERMISSION_REQUEST_CODE = 2;
 
@@ -165,7 +164,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         mReactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
         mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
         setContentView(mReactRootView);
-        mScanGunKeyEventHelper = new BluetoothScanGunKeyEventHelper(this);
     }
 
     @Override
@@ -220,17 +218,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         return super.onKeyUp(keyCode, event);
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mScanGunKeyEventHelper.isScanGunEvent(event)) {
-            mScanGunKeyEventHelper.analysisKeyEvent(event);
-            return true;
-        }
-        return super.dispatchKeyEvent(event);
-//        mScanGunKeyEventHelper.analysisKeyEvent(event);
-//        return true;
-    }
-
     @TargetApi(20)
     private void setTranslucent() {
         final Activity activity = this;
@@ -260,16 +247,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             PermissionListener listener) {
         mPermissionListener = listener;
         this.requestPermissions(permissions, requestCode);
-    }
-
-    @Override
-    public void onScanSuccess(String barcode) {
-        try {
-            Map<String, String> result = BarCodeUtil.extractCode(barcode);
-            GlobalCtx.app().toRnView(this, result.get("action"), result);
-        } catch (Exception e) {
-            System.out.println("scan code exception " + e.getMessage());
-        }
     }
 
     public void onRequestPermissionsResult(
