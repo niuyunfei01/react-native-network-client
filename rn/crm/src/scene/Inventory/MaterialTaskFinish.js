@@ -27,7 +27,10 @@ class MaterialTaskFinish extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      tasks: []
+      tasks: [],
+      page: 1,
+      isLastPage: false,
+      isLoading: false
     }
   }
   
@@ -40,14 +43,23 @@ class MaterialTaskFinish extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task_finished?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
-      self.setState({tasks: res})
+    self.setState({isLoading: true})
+    HttpUtils.get.bind(navigation)(api, {
+      page: this.state.page
+    }).then(res => {
+      let lists = res.page == 1 ? res.lists : this.state.tasks.concat(res.lists)
+      self.setState({tasks: lists, isLoading: false, isLastPage: res.isLastPage, page: res.page + 1})
     })
   }
   
-  renderItem () {
+  onRefresh () {
+    this.setState({page: 1}, () => {
+      this.fetchData()
+    })
+  }
+  
+  renderItem (item, idx) {
     return (
-      <For each='item' of={this.state.tasks} index='idx'>
         <View style={styles.item} key={idx}>
           <View style={{height: 20}}>
             <Text style={{color: '#000', fontWeight: 'bold'}}>{item.date}</Text>
@@ -63,6 +75,13 @@ class MaterialTaskFinish extends React.Component {
             </View>
           </For>
         </View>
+    )
+  }
+  
+  renderList () {
+    return (
+      <For each='item' of={this.state.tasks} index='idx'>
+        {this.renderItem(item, idx)}
       </For>
     )
   }
@@ -70,10 +89,10 @@ class MaterialTaskFinish extends React.Component {
   render () {
     return (
       <LoadMore
-        onRefresh={() => this.fetchData}
-        isLastPage={true}
+        onRefresh={() => this.onRefresh()}
+        isLastPage={this.state.isLastPage}
         renderList={this.renderItem()}
-        isLoading={false}
+        isLoading={this.state.isLoading}
         loadMoreType={'scroll'}
       />
     );
