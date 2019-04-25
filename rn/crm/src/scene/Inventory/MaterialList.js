@@ -66,7 +66,7 @@ class MaterialList extends React.Component {
   }
   
   setFilterStatus (value) {
-    this.setState({filterStatus: value}, () => this.fetchData())
+    this.setState({filterStatus: value}, () => this.onRefresh())
   }
   
   componentDidMount (): void {

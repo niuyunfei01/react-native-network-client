@@ -99,7 +99,7 @@ class MaterialTask extends React.Component {
           </View>
           <For each="task" of={item.task} index="taskIdx">
             <View style={styles.taskItem} key={taskIdx}>
-              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}(#{task.product_id})</Text>
+              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}</Text>
               <View style={{flexDirection: 'row', alignItems: 'center', width: 100}}>
                 <JbbInput
                   ref={`taskInput_${task.product_id}`}
