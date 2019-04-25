@@ -1,6 +1,6 @@
 //import liraries
 import React, {Component} from "react";
-import {Clipboard, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Clipboard, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import * as tool from "../../common/tool";
@@ -33,7 +33,6 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
-import {Modal} from 'antd-mobile-rn'
 //组件
 import {Yuan} from "../component/All";
 import {Colors, Metrics} from "../../themes";
@@ -582,7 +581,7 @@ class StoreAddScene extends Component {
   }
   
   showWorkerPopup (multi) {
-    Modal.alert('提示', '请选择方式', [
+    Alert.alert('提示', '请选择方式', [
       {'text': '取消'},
       {
         'text': '搜索员工',
@@ -595,7 +594,6 @@ class StoreAddScene extends Component {
         onPress: () => this.onAddUser()
       }
     ])
-    
   }
   
   renderRemark () {

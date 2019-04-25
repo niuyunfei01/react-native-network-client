@@ -1,7 +1,7 @@
 import React from "react";
-import {Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {NavigationItem} from "../../widget";
-import {Modal as AntModal, Toast} from 'antd-mobile-rn';
+import {Toast} from 'antd-mobile-rn';
 import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'
@@ -230,7 +230,7 @@ class MaterialList extends React.Component {
               <View style={styles.headerMenuItems}>
                 <TouchableOpacity onPress={() => {
                   this.setState({headerMenu: false})
-                  AntModal.alert('温馨提示', '手机连扫码枪，即可扫码入库')
+                  Alert.alert('温馨提示', '手机连扫码枪，即可扫码入库')
                 }}>
                   <View style={styles.headerMenuItem}>
                     <Text style={styles.headerMenuItemText}>扫码入库</Text>

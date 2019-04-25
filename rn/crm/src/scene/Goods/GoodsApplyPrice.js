@@ -121,15 +121,6 @@ class GoodsApplyPrice extends Component {
   
   onSave () {
     if (this.state.supply_price) {
-      // Modal.prompt('原因', '请输入调价原因', [
-      //   {
-      //     text: '关闭',
-      //   },
-      //   {
-      //     text: '确认',
-      //     onPress: (val) => this.onApplyStorePrice(val)
-      //   }
-      // ])
       this.onApplyStorePrice("自助调价")
     } else {
       Toast.info('请输入保底价！')

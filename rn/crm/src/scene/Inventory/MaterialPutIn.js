@@ -1,5 +1,5 @@
 import React from "react";
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert,ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {InputItem, List, Modal, Toast} from "antd-mobile-rn";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
@@ -78,7 +78,7 @@ class MaterialPutIn extends React.Component {
     const api = `/api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
     HttpUtils.get.bind(navigation)(api).then(res => {
       if (!res) {
-        Modal.alert('错误', '未知供应商')
+        Alert.alert('错误', '未知供应商')
       } else {
         self.setState({supplier: res.name, supplierId: res.id})
       }
@@ -92,7 +92,7 @@ class MaterialPutIn extends React.Component {
     const api = `/api_products/material_get_sku/${skuId}?access_token=${accessToken}`
     HttpUtils.get.bind(navigation)(api).then(res => {
       if (!res) {
-        Modal.alert('错误', '未知商品')
+        Alert.alert('错误', '未知商品')
       } else {
         self.setState({sku: res.name, skuId: skuId})
       }
@@ -133,7 +133,7 @@ class MaterialPutIn extends React.Component {
         navigation.goBack()
         navigation.state.params.onBack && navigation.state.params.onBack()
     }).catch(e => {
-      Modal.alert('错误', e.reason, [{text: '确定'}])
+      Alert.alert('错误', e.reason)
     })
   }
   
