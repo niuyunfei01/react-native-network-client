@@ -43,7 +43,7 @@ public class KeepAliveService extends AbsWorkService {
     public void startWork(Intent intent, int flags, int startId) {
         Log.d("检查磁盘中是否有上次销毁时保存的数据");
         sDisposable = Observable
-                .interval(3, TimeUnit.SECONDS)
+                .interval(30, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
                 .doOnDispose(() -> {
                     Log.d("保存数据到磁盘。");
@@ -51,14 +51,15 @@ public class KeepAliveService extends AbsWorkService {
                 })
                 .subscribe(count -> {
                     Log.d("每 3 秒采集一次数据... count = " + count);
-                    if (count > 0 && count % 18 == 0)
+                    if (count > 0 && count % 18 == 0) {
                         Log.d("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
-                    if (JPushInterface.isPushStopped(GlobalCtx.app())) {
-                        String uid = GlobalCtx.app().getCurrentAccountId();
-                        if (!TextUtils.isEmpty(uid)) {
-                            JPushInterface.setAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+                        if (JPushInterface.isPushStopped(GlobalCtx.app())) {
+                            String uid = GlobalCtx.app().getCurrentAccountId();
+                            if (!TextUtils.isEmpty(uid)) {
+                                JPushInterface.setAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+                                JPushInterface.resumePush(GlobalCtx.app());
+                            }
                         }
-                        JPushInterface.resumePush(GlobalCtx.app());
                     }
                 });
     }
