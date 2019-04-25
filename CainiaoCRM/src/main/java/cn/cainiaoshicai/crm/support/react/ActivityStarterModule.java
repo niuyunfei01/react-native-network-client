@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.clj.fastble.BleManager;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.CatalystInstance;
@@ -37,7 +36,6 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.Log;
@@ -95,7 +93,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
-        Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+        //Bootstrap.stopAlwaysOnService(GlobalCtx.app());
         JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
     }
 
@@ -134,7 +132,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 callback.invoke(false, "Account is null", null);
             }
 
-            Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+            //Bootstrap.stopAlwaysOnService(GlobalCtx.app());
 
             long store_id = SettingUtility.getListenerStore();
             Map<String, String> serviceExtras = Maps.newHashMap();
@@ -146,7 +144,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             serviceExtras.put("storeId", store_id + "");
             SettingHelper.setEditor(GlobalCtx.app(), "accessToken", accessToken);
             SettingHelper.setEditor(GlobalCtx.app(), "storeId", store_id + "");
-            Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
+            //Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
             String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
