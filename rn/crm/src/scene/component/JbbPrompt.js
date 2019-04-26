@@ -29,7 +29,10 @@ export default class JbbPrompt extends React.Component {
   }
   
   componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
-    this.setState({visible: nextProps.visible, text: nextProps.initValue})
+    this.setState({
+      visible: nextProps.visible,
+      text: nextProps.initValue ? nextProps.initValue : ''
+    })
   }
   
   onCancel () {

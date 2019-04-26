@@ -62,6 +62,9 @@ class ProductInfo extends React.Component {
     this.fetchData()
   }
   
+  componentWillUnmount (): void {
+  }
+  
   fetchShelfNos () {
     const self = this
     const navigation = this.props.navigation
@@ -138,6 +141,7 @@ class ProductInfo extends React.Component {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/chg_prod_upc?access_token=${this.props.global.accessToken}`
+    native.clearUpcScan(upc)
     HttpUtils.post.bind(navigation)(api, {
       productId: self.state.productId,
       upc: upc
@@ -145,6 +149,7 @@ class ProductInfo extends React.Component {
       this.setState({upcPrompt: false})
       Toast.success('操作成功')
       self.fetchData()
+  
     })
   }
   
