@@ -61,6 +61,7 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
     public void onScanSuccess(String barcode) {
         try {
             System.out.println("barcode => " + barcode);
+            barcode = barcode.replaceAll("\\s+", "");
             if (barcode.startsWith("IR") || barcode.startsWith("WO")) {
                 Map<String, String> result = BarCodeUtil.extractCode(barcode);
                 GlobalCtx.app().scanInfo().add(result);

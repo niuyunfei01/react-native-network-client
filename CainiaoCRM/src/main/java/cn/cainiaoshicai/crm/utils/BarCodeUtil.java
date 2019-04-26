@@ -17,7 +17,6 @@ public class BarCodeUtil {
     //IR-0000048-0019-00580-190416183857-0061
     public static Map<String, String> extractCode(String code) {
         Map<String, String> result = Maps.newHashMap();
-        code = code.replaceAll("\\s+", "");
         String[] codeInfo = code.split("-");
         String type = codeInfo[0];
         if (type.equals(CODE_TYPE_RECEIVE)) {
@@ -89,5 +88,17 @@ public class BarCodeUtil {
         c = (a + b * 3) % 10;
         d = (10 - c) % 10;
         return (code.charAt(12) - '0') == d;
+    }
+
+    public static void main(String[] args) {
+        String[] codes = {"6921204802204", "6942032700760"};
+        for (String s : codes) {
+            boolean r = checkEAN13(s);
+            if (r) {
+                System.out.println(s + " : 检查成功");
+            } else {
+                System.out.println(s + " : 检查失败");
+            }
+        }
     }
 }
