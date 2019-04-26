@@ -77,6 +77,24 @@ public class BarCodeUtil {
         return newString;
     }
 
+    public static boolean checkGTIN(String value, boolean createWithChecksum) {
+        int l = value.length() - 1;
+        int checksum = 0;
+        int weight;
+        int val;
+        for (int i = 0; i < l; i++) {
+            val = value.charAt(i) - '0';
+            weight = i % 2 == 0 ? 1 : 3;
+            checksum += val * weight;
+        }
+        int chk = 10 - checksum % 10;
+        if (createWithChecksum) {
+            char ch = (char) ('0' + chk);
+            value = value.substring(0, l) + ch;
+        }
+        return chk == (value.charAt(l) - '0');
+    }
+
     public static boolean checkEAN13(String code) {
         if (code == null || code.length() != 13)
             return false;
@@ -89,4 +107,11 @@ public class BarCodeUtil {
         d = (10 - c) % 10;
         return (code.charAt(12) - '0') == d;
     }
+
+//    public static void main(String[] args) {
+//        boolean check = checkGTIN("6924513908032", true);
+//        if(check){
+//            System.out.println("check success!");
+//        }
+//    }
 }

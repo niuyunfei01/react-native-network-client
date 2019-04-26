@@ -72,7 +72,7 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
                     System.out.println("lastTalking = " + (lastTalking / 1000) + ", now=" + (System.currentTimeMillis() / 1000));
                 }
             } else {
-                if (BarCodeUtil.checkEAN13(barcode)) {
+                if (BarCodeUtil.checkGTIN(barcode)) {
                     GlobalCtx.app().scanInfo().addUpc(barcode);
                 }
             }
