@@ -301,7 +301,7 @@ class MaterialList extends React.Component {
   }
   
   renderItem (item) {
-    const swipeOutBtns = [
+    const swipeOutBtns = item.type == 1 ? [
       {
         text: '编辑',
         type: 'primary',
@@ -315,20 +315,22 @@ class MaterialList extends React.Component {
           onBack: () => this.onRefresh()
         })
       }
-    ]
+    ] : []
     
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
         <View style={[styles.itemWrap]}>
         <View style={[styles.itemLine]}>
-          <Text style={[styles.itemTitle]}>{item.sku.name}</Text>
+          <View style={{flex: 1}}>
+            <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
+          </View>
           <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text>{item.bar_code}</Text>
+          <Text>{item.type == 1 ? '收获码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text>{item.weight}公斤 {item.price}元</Text>
+          <Text>{item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤' : '件'} {item.price}元</Text>
         </View>
         <View style={[styles.itemLine]}>
           <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
