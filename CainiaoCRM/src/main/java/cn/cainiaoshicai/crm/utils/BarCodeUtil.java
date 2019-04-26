@@ -89,16 +89,4 @@ public class BarCodeUtil {
         d = (10 - c) % 10;
         return (code.charAt(12) - '0') == d;
     }
-
-    public static void main(String[] args) {
-        String[] codes = {"6921204802204", "6942032700760"};
-        for (String s : codes) {
-            boolean r = checkEAN13(s);
-            if (r) {
-                System.out.println(s + " : 检查成功");
-            } else {
-                System.out.println(s + " : 检查失败");
-            }
-        }
-    }
 }
