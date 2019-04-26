@@ -61,13 +61,19 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
     public void onScanSuccess(String barcode) {
         try {
             System.out.println("barcode => " + barcode);
-            Map<String, String> result = BarCodeUtil.extractCode(barcode);
-            GlobalCtx.app().scanInfo().add(result);
-            long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
-            if(lastTalking - System.currentTimeMillis() > 1000){
-                GlobalCtx.app().toRnView(this, result.get("action"), result);
+            if (barcode.startsWith("IR") || barcode.startsWith("WO")) {
+                Map<String, String> result = BarCodeUtil.extractCode(barcode);
+                GlobalCtx.app().scanInfo().add(result);
+                long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
+                if (lastTalking - System.currentTimeMillis() > 1000) {
+                    GlobalCtx.app().toRnView(this, result.get("action"), result);
+                } else {
+                    System.out.println("lastTalking = " + (lastTalking / 1000) + ", now=" + (System.currentTimeMillis() / 1000));
+                }
             } else {
-                System.out.println("lastTalking = " + (lastTalking/1000) + ", now=" + (System.currentTimeMillis()/1000));
+                if (BarCodeUtil.checkEAN13(barcode)) {
+                    GlobalCtx.app().scanInfo().addUpc(barcode);
+                }
             }
         } catch (Exception e) {
             System.out.println("scan code exception " + e.getMessage());

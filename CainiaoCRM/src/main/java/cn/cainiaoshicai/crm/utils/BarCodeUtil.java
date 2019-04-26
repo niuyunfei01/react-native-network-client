@@ -77,4 +77,17 @@ public class BarCodeUtil {
         // return the modified String
         return newString;
     }
+
+    public static boolean checkEAN13(String code) {
+        if (code == null || code.length() != 13)
+            return false;
+        int a = 0, b = 0, c = 0, d = 0;
+        for (int i = 0; i < 12; i += 2) {
+            a += (code.charAt(i) - '0');
+            b += (code.charAt(i + 1) - '0');
+        }
+        c = (a + b * 3) % 10;
+        d = (10 - c) % 10;
+        return (code.charAt(12) - '0') == d;
+    }
 }

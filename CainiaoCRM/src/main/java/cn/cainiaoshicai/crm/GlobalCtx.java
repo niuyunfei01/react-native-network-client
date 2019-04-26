@@ -1143,6 +1143,7 @@ public class GlobalCtx extends Application {
     static public class ScanStatus {
         private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
         private Map<String, Map<String, String>> ls = Maps.newConcurrentMap();
+        private Map<String, String> upcList = Maps.newConcurrentMap();
 
         public long getLastTalking() {
             return lastTalking.longValue();
@@ -1152,8 +1153,20 @@ public class GlobalCtx extends Application {
             return new ArrayList<>(ls.values());
         }
 
+        public List<String> notConsumedUpc() {
+            return new ArrayList<>(upcList.values());
+        }
+
         public void add(Map<String, String> result) {
             ls.put(result.get("barCode"), result);
+        }
+
+        public void addUpc(String upc) {
+            upcList.put(upc, upc);
+        }
+
+        public void clearUpc(String code) {
+            upcList.remove(code);
         }
 
         public void clearCode(String code) {

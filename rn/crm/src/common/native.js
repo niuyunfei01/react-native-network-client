@@ -139,9 +139,19 @@ export default {
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
 
+  clearUpcScan: async function(code, callback = function (){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.clearScanUpc(code, callback))
+  },
+
   listenScan: async function(callback = function (scan_items){}) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.listenScan(callback))
+  },
+
+  listenScanUpc: async function(callback = function (scan_items){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.listScanUpc(callback))
   },
 
   speakText: async function(text, callback = function (ok, msg){}) {
