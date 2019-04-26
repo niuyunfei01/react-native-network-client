@@ -168,6 +168,7 @@ const C = {
   ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',                         // 库存 - 商品库管详情
   ROUTE_INVENTORY_MATERIAL_LIST: 'InventoryMaterialList',                       // 库存 - 原材料列表
   ROUTE_INVENTORY_MATERIAL_PUT_IN: 'InventoryMaterialPutIn',                    // 库存 - 原材料手动入库
+  ROUTE_INVENTORY_STANDARD_PUT_IN: 'InventoryStandardPutIn',                    // 库存 - 标品入库
   ROUTE_INVENTORY_MATERIAL_TASK: 'InventoryMaterialTask',                       // 库存 - 原材料任务
   ROUTE_INVENTORY_MATERIAL_TASK_FINISH: 'InventoryMaterialTaskFinish',          // 库存 - 原材料我完成的任务
   serverUrl,

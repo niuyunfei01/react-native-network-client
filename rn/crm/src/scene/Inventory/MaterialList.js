@@ -216,6 +216,11 @@ class MaterialList extends React.Component {
     this.setState({headerMenu: false})
   }
   
+  toStandardPutIn () {
+    this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {onBack: () => this.onRefresh()})
+    this.setState({headerMenu: false})
+  }
+  
   renderHeaderMenu () {
     return (
       <Modal
@@ -239,6 +244,11 @@ class MaterialList extends React.Component {
                 <TouchableOpacity onPress={() => this.toMaterialPutIn()}>
                   <View style={styles.headerMenuItem}>
                     <Text style={styles.headerMenuItemText}>手动入库</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.toStandardPutIn()}>
+                  <View style={styles.headerMenuItem}>
+                    <Text style={styles.headerMenuItemText}>标品入库</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.openControlPanel()}>
@@ -321,7 +331,7 @@ class MaterialList extends React.Component {
           <Text>{item.weight}公斤 {item.price}元</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date}</Text>
+          <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
           <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
             <View>
               <Text style={[styles.itemStatus]}>

@@ -48,7 +48,9 @@ class ProductInfo extends React.Component {
       shelfArea: '',
       shelfNo: '',
       refreshing: false,
-      tagCodePrompt: false
+      tagCodePrompt: false,
+      isStandard: false, // 是否是标品
+      upcPrompt: false
     }
   }
   
@@ -81,7 +83,12 @@ class ProductInfo extends React.Component {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
-      self.setState({productInfo: res, refreshing: false, selectShelfNo: res.shelf_no})
+      self.setState({
+        productInfo: res,
+        refreshing: false,
+        selectShelfNo: res.shelf_no,
+        isStandard: !!res.product.upc
+      })
     })
   }
   
@@ -120,6 +127,22 @@ class ProductInfo extends React.Component {
       skuId: self.state.productInfo.sku.id,
       tagCode: val
     }).then(res => {
+      this.setState({tagCodePrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onConfirmUpc (upc) {
+    console.log('upc => ', upc)
+    const self = this
+    const navigation = this.props.navigation
+    const api = `/api_products/chg_prod_upc?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      productId: self.state.productId,
+      upc: upc
+    }).then(res => {
+      this.setState({upcPrompt: false})
       Toast.success('操作成功')
       self.fetchData()
     })
@@ -168,7 +191,16 @@ class ProductInfo extends React.Component {
     
     return (
       <View>
-        <JbbCellTitle>库管信息</JbbCellTitle>
+        <View style={styles.formHeader}>
+          <Text>库管信息</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text>标品</Text>
+            <Switch
+              checked={this.state.isStandard}
+              onChange={(checked) => this.setState({isStandard: checked})}
+            />
+          </View>
+        </View>
         <List>
           <Swipeout right={shelfNoSwipeOutBtns} autoClose={true}>
             <Picker
@@ -181,22 +213,33 @@ class ProductInfo extends React.Component {
               <List.Item arrow="horizontal">货架编号</List.Item>
             </Picker>
           </Swipeout>
-          <List.Item
-            arrow={"horizontal"}
-            extra={this.state.productInfo.sku.name}
-          >秤签名称</List.Item>
-          <List.Item
-            onClick={() => this.setState({tagCodePrompt: true})}
-            arrow={"horizontal"}
-            extra={this.state.productInfo.sku.material_code}
-          >秤签编号</List.Item>
-          <List.Item
-            extra={<Switch
-              disabled={!this.state.productInfo.sku.material_code}
-              checked={this.state.productInfo.sku.need_pack == 1}
-              onChange={(checked) => this.onChangeNeedPack(checked)}
-            />}
-          >需要打包</List.Item>
+  
+          <If condition={!this.state.isStandard}>
+            <List.Item
+              arrow={"horizontal"}
+              extra={this.state.productInfo.sku.name}
+            >秤签名称</List.Item>
+            <List.Item
+              onClick={() => this.setState({tagCodePrompt: true})}
+              arrow={"horizontal"}
+              extra={this.state.productInfo.sku.material_code}
+            >秤签编号</List.Item>
+            <List.Item
+              extra={<Switch
+                disabled={!this.state.productInfo.sku.material_code}
+                checked={this.state.productInfo.sku.need_pack == 1}
+                onChange={(checked) => this.onChangeNeedPack(checked)}
+              />}
+            >需要打包</List.Item>
+          </If>
+  
+          <If condition={this.state.isStandard}>
+            <List.Item
+              onClick={() => this.setState({upcPrompt: true})}
+              extra={this.state.productInfo.product.upc}
+              arrow="horizontal"
+            >商品码</List.Item>
+          </If>
         </List>
       </View>
     )
@@ -221,6 +264,15 @@ class ProductInfo extends React.Component {
           initValue={this.state.productInfo.sku.material_code}
           visible={this.state.tagCodePrompt}
         />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入标品商品码'}
+          onConfirm={(value) => this.onConfirmUpc(value)}
+          onCancel={() => this.setState({upcPrompt: false})}
+          initValue={''}
+          visible={this.state.upcPrompt}
+        />
       </ScrollView>
     );
   }
@@ -238,6 +290,13 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(26),
     fontWeight: 'bold'
   },
+  formHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: pxToDp(20),
+    height: pxToDp(50)
+  }
 })
 
 export default connect(mapStateToProps)(ProductInfo)

@@ -11,14 +11,16 @@ export default class JbbInput extends React.Component {
     value: PropTypes.string.isRequired,
     initValue:PropTypes.string,
     rows: PropTypes.number,
-    styles: PropTypes.object
+    styles: PropTypes.object,
+    autoFocus: PropTypes.bool
   }
   
   static defaultProps = {
     placeholder: '',
     multiline: false,
     initValue:'',
-    rows: 1
+    rows: 1,
+    autoFocus: false
   }
   
   rerender () {
@@ -28,6 +30,7 @@ export default class JbbInput extends React.Component {
   render () {
     return (
       <TextInput
+        autoFocus={this.props.autoFocus}
         underlineColorAndroid='transparent'
         placeholder={this.props.placeholder}
         onChangeText={(value) => this.props.onChange(value)}

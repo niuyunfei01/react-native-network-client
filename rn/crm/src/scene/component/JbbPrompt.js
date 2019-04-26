@@ -9,20 +9,22 @@ export default class JbbPrompt extends React.Component {
     onConfirm: PropTypes.func,
     initValue: PropTypes.string,
     title: PropTypes.string,
+    autoFocus: PropTypes.bool,
     visible: PropTypes.bool
   }
   
   static defaultProps = {
     initValue: '',
     title: '输入',
-    visible: false
+    visible: false,
+    autoFocus: false
   }
   
   constructor (props) {
     super(props)
     this.state = {
       visible: this.props.visible,
-      text: this.props.initValue
+      text: this.props.initValue ? this.props.initValue : ''
     }
   }
   
@@ -48,6 +50,7 @@ export default class JbbPrompt extends React.Component {
         
         <View>
           <JbbInput
+            autoFocus={this.props.autoFocus}
             onChange={(text) => this.setState({text})}
             value={this.state.text}
             styles={{height: 35}}

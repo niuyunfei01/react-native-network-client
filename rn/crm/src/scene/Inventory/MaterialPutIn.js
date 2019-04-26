@@ -1,6 +1,6 @@
 import React from "react";
-import {Alert,ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Modal, Toast} from "antd-mobile-rn";
+import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {InputItem, List, Toast} from "antd-mobile-rn";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
@@ -34,25 +34,22 @@ class MaterialPutIn extends React.Component {
   constructor (props) {
     super(props)
     const store = tool.store(this.props.global)
-    const navigation = this.props.navigation
-    const {params = {}} = navigation.state
-    console.log('navigation params =>', params)
     this.state = {
-      receiptId: params.receiptId ? params.receiptId : null,
+      receiptId: null,
       skus: [],
       skuPopup: false,
       suppliers: [],
       supplierPopup: false,
       storeId: store.id,
-      barCode: params.barCode ? params.barCode : null,
+      barCode: null,
       sku: '',
       skuId: 0,
       supplier: '',
       supplierId: 0,
-      weight: params.weight ? params.weight : '0',
+      weight: '0',
       reduceWeight: '0',
       price: '0',
-      datetime: params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
+      datetime: null
     }
   }
   
@@ -63,6 +60,13 @@ class MaterialPutIn extends React.Component {
     this.fetchSkus()
     this.fetchSuppliers()
   
+    let state = {}
+    state.receiptId = params.receiptId ? params.receiptId : null
+    state.barCode = params.barCode ? params.barCode : null
+    state.weight = params.weight ? params.weight : '0'
+    state.datetime = params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
+    this.setState(state)
+    
     if (params.workerId) {
       this.setSupplier(params.workerId)
     }
