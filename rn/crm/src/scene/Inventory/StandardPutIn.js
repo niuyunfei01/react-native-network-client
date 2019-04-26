@@ -34,6 +34,7 @@ class StandardPutIn extends BaseComponent {
     const store = tool.store(this.props.global)
     this.state = {
       store: store,
+      upc: '',
       product: {},
       supplierPopup: false,
       suppliers: [],
@@ -103,7 +104,7 @@ class StandardPutIn extends BaseComponent {
       {
         text: '确定',
         onPress: () => {
-          native.clearUpcScan(this.state.product.upc)
+          native.clearUpcScan(this.state.upc)
           self.setState({product: {}})
           self.listenUpcInterval()
         }
@@ -118,6 +119,7 @@ class StandardPutIn extends BaseComponent {
         console.log('listen scan upc => ', items)
         if (items.length > 0) {
           clearInterval(self.timer)
+          self.setState({upc: items[0]})
           self.fetchProductByUpc(items[0])
         }
       })
