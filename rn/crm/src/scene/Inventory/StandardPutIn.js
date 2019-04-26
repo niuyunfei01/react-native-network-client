@@ -1,6 +1,6 @@
 import BaseComponent from "../BaseComponent";
 import React from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {InputItem, List, WhiteSpace} from "antd-mobile-rn";
 import SearchPopup from "../component/SearchPopup";
@@ -8,6 +8,8 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
+import {ToastShort} from "../../util/ToastUtils";
+import * as tool from "../../common/tool";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -29,13 +31,28 @@ class StandardPutIn extends BaseComponent {
   
   constructor (props) {
     super(props)
+    const store = tool.store(this.props.global)
     this.state = {
+      store: store,
       product: {},
       supplierPopup: false,
       suppliers: [],
       supplier: {},
-      number: '0'
+      number: '0',
+      price: '0'
     }
+  }
+  
+  componentDidMount (): void {
+    const navigation = this.props.navigation
+    const {params = {}} = navigation.state
+    
+    this.fetchSuppliers()
+    this.listenUpcInterval()
+  }
+  
+  componentWillUnmount () {
+    clearInterval(this.timer)
   }
   
   fetchSuppliers () {
@@ -48,24 +65,63 @@ class StandardPutIn extends BaseComponent {
     })
   }
   
-  componentDidMount (): void {
+  fetchProductByUpc (upc) {
+    const self = this
     const navigation = this.props.navigation
-    const {params = {}} = navigation.state
-    
-    this.fetchSuppliers()
-    this.listenUpcInterval()
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
+    HttpUtils.get.bind(navigation)(api).then(res => {
+      self.setState({product: res})
+    })
   }
   
   doSubmit () {
-  
+    const self = this
+    if (!this.state.product.upc) {
+      ToastShort('未知商品')
+    }
+    const navigation = this.props.navigation
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/standard_prod_put_in?access_token=${accessToken}`
+    HttpUtils.post.bind(navigation)(api, {
+      upc: self.state.product.upc,
+      storeId: self.state.store.id,
+      supplierId: self.state.supplier.id,
+      price: self.state.price,
+      number: self.state.number
+    }).then(res => {
+      native.clearUpcScan(this.state.product.upc)
+      self.setState({product: {}, number: '0', price: '0', supplier: {}})
+      self.listenUpcInterval()
+    })
   }
   
+  doNext () {
+    const self = this
+    Alert.alert('警告', '确定当过当前商品？', [
+      {text: '取消'},
+      {
+        text: '确定',
+        onPress: () => {
+          native.clearUpcScan(this.state.product.upc)
+          self.setState({product: {}})
+          self.listenUpcInterval()
+        }
+      }
+    ])
+  }
   setUpcListener () {
+    const self = this
     return setInterval(function () {
-      native.listenScanUpc(function (item) {
-        console.log('listen scan upc => ', item)
+      native.listenScanUpc(function (ok, items) {
+        items = JSON.parse(items)
+        console.log('listen scan upc => ', items)
+        if (items.length > 0) {
+          clearInterval(self.timer)
+          self.fetchProductByUpc(items[0])
+        }
       })
-    }, 500)
+    }, 1000)
   }
   
   listenUpcInterval () {
@@ -78,20 +134,26 @@ class StandardPutIn extends BaseComponent {
       <View>
         <View style={[styles.cell_box]}>
           <View style={styles.cell}>
-            <If condition={this.props.image}>
-              <Image style={[styles.goods_image]} source={{uri: this.state.product.image}}/>
-            </If>
+            <View style={[styles.goods_image]}>
+              <Image
+                style={[styles.goods_image]}
+                source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../img/Order/zanwutupian_.png')}
+              />
+            </View>
             <View style={[styles.item_right]}>
-              <Text style={[styles.goods_name]}>{this.state.product.name}</Text>
-              <View style={styles.sku}>
-              
+              <Text style={[styles.goods_name]}>
+                {this.state.product.name ? this.state.product.name : '未知商品'}
+              </Text>
+              <View>
+                <Text style={styles.sku}>商品ID：{this.state.product.id}</Text>
+                <Text style={styles.sku}>商品码：{this.state.product.upc}</Text>
               </View>
             </View>
-            <TouchableOpacity>
-              <View style={styles.arrow}>
-                <Image source={require('../../assets/back_arrow.png')}/>
-              </View>
-            </TouchableOpacity>
+            {/*<TouchableOpacity>*/}
+            {/*<View style={styles.arrow}>*/}
+            {/*<Image source={require('../../assets/back_arrow.png')}/>*/}
+            {/*</View>*/}
+            {/*</TouchableOpacity>*/}
           </View>
         </View>
       </View>
@@ -112,6 +174,12 @@ class StandardPutIn extends BaseComponent {
           defaultValue={this.state.number}
           onChange={(number) => this.setState({number})}
         >数量</InputItem>
+        <InputItem
+          extra={'元'}
+          value={this.state.price}
+          defaultValue={this.state.price}
+          onChange={(price) => this.setState({price})}
+        >总价</InputItem>
       </List>
     )
   }
@@ -119,6 +187,11 @@ class StandardPutIn extends BaseComponent {
   renderBtn () {
     return (
       <View style={styles.footerContainer}>
+        <TouchableOpacity style={styles.footerItem} onPress={() => this.doNext()}>
+          <View style={[styles.footerBtn, styles.errorBtn]}>
+            <Text style={styles.footerBtnText}>下一个</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
           <View style={[styles.footerBtn, styles.successBtn]}>
             <Text style={styles.footerBtnText}>入库</Text>
@@ -181,8 +254,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   sku: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    fontSize: pxToDp(20)
   },
   arrow: {
     width: pxToDp(40),
@@ -195,7 +267,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   footerItem: {
-    width: '100%',
+    width: '50%',
     alignItems: 'center',
     justifyContent: 'center'
   },
