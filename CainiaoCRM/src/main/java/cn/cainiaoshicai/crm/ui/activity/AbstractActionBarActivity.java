@@ -76,6 +76,14 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
                 } else {
                     System.out.println("lastTalking = " + (lastTalking / 1000) + ", now=" + (System.currentTimeMillis() / 1000));
                 }
+            } else if (barcode.startsWith("PROD")) {
+                Map<String, String> result = BarCodeUtil.extractCode(barcode);
+                WritableMap params = Arguments.createMap();
+                for (Map.Entry<String, String> entry : result.entrySet()) {
+                    params.putString(entry.getKey(), entry.getValue());
+                }
+                ReactContext reactContext = GlobalCtx.app().getReactContext();
+                GlobalCtx.app().sendRNEvent(reactContext, "listenScanProductCode", params);
             } else if (barcode.startsWith("WO")) {
                 ReactContext reactContext = GlobalCtx.app().getReactContext();
                 WritableMap params = Arguments.createMap();
