@@ -66,7 +66,7 @@ export default {
   },
 
   gotoRNActivity: async function (action, json = '{}') {
-    if (NativeModules.ActivityStarter && activityName) {
+    if (NativeModules.ActivityStarter && action) {
       await NativeModules.ActivityStarter.navigateToRnView(action, json);
     }
   },

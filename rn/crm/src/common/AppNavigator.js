@@ -115,6 +115,7 @@ import Cts from "../Cts";
 
 import _ from "lodash"
 import OrderTransferThird from "../scene/Order/OrderTransferThird";
+import OrderScan from "../scene/Order/OrderScan";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -299,22 +300,27 @@ class Navigator extends Component {
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
-        [Config.ROUTE_ORDER_CALL_SHIP]: {screen: OrderCallShip},
-        [Config.ROUTE_ORDER_TRANSFER_THIRD]: {screen: OrderTransferThird},
-        [Config.ROUTE_ORDER_PACK]: {screen: OrderSetPackDone},
-        [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
+  
         [Config.ROUTE_SETTING]: {screen: SettingScene},
         [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
-        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
+        // 订单相关
+        [Config.ROUTE_ORDER_CALL_SHIP]: {screen: OrderCallShip},
         [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
-        [Config.ROUTE_ORDER_TO_INVALID]: {screen: OrderToInvalidScene},
+        [Config.ROUTE_ORDER_PACK]: {screen: OrderSetPackDone},
+        [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
+        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
         [Config.ROUTE_ORDER_TODO]: {screen: OrderTodoScene},
+        [Config.ROUTE_ORDER_TO_INVALID]: {screen: OrderToInvalidScene},
+        [Config.ROUTE_ORDER_TRANSFER_THIRD]: {screen: OrderTransferThird},
         [Config.ROUTE_ORDER_STORE]: {screen: OrderEditStoreScene},
         [Config.ROUTE_ORDER_SHIP_DETAIL]: {screen: OrderShipDetail},
         [Config.ROUTE_ORDER_CANCEL_SHIP]: {screen: OrderCancelShip},
         [Config.ROUTE_ORDER_SEND_MONEY]: {screen: OrderSendMoney},
         [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
+        [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
+        [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
+        
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
@@ -323,7 +329,6 @@ class Navigator extends Component {
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
-        [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},
         [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
         [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},

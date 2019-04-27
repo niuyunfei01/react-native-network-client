@@ -109,6 +109,7 @@ const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
+const MENU_ORDER_SCAN = 11;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -333,6 +334,7 @@ class OrderScene extends Component {
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }
+    as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
     
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
@@ -411,6 +413,8 @@ class OrderScene extends Component {
       this.setState({visibleReceiveQr: true})
     } else if (option.key === MENU_SEND_MONEY) {
       navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
+    } else if (option.key === MENU_ORDER_SCAN) {
+      native.gotoRNActivity(Config.ROUTE_ORDER_SCAN)
     } else {
       ToastShort('未知的操作');
     }
