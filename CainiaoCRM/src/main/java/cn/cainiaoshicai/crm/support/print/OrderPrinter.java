@@ -39,7 +39,9 @@ public class OrderPrinter {
     private static final int MAX_TITLE_PART = 16;
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid) {
-        printWhenNeverPrinted(platform, platformOid, null);
+        if (SettingUtility.getAutoPrintSetting()) {
+            printWhenNeverPrinted(platform, platformOid, null);
+        }
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
