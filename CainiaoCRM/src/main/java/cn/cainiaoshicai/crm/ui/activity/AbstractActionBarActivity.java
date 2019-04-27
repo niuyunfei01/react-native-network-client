@@ -6,6 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -62,7 +67,7 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
         try {
             System.out.println("barcode => " + barcode);
             barcode = barcode.replaceAll("\\s+", "");
-            if (barcode.startsWith("IR") || barcode.startsWith("WO")) {
+            if (barcode.startsWith("IR")) {
                 Map<String, String> result = BarCodeUtil.extractCode(barcode);
                 GlobalCtx.app().scanInfo().add(result);
                 long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
@@ -71,6 +76,11 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
                 } else {
                     System.out.println("lastTalking = " + (lastTalking / 1000) + ", now=" + (System.currentTimeMillis() / 1000));
                 }
+            } else if (barcode.startsWith("WO")) {
+                ReactContext reactContext = GlobalCtx.app().getReactContext();
+                WritableMap params = Arguments.createMap();
+                params.putString("orderId", barcode.replace("WO", ""));
+                GlobalCtx.app().sendRNEvent(reactContext, "listenScanBarCode", params);
             } else {
                 if (BarCodeUtil.checkGTIN(barcode, true)) {
                     GlobalCtx.app().scanInfo().addUpc(barcode);

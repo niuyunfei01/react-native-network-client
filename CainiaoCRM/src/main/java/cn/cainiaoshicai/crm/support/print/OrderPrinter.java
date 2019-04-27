@@ -256,9 +256,9 @@ public class OrderPrinter {
     }
 
     public static void smPrintOrder(Order order) {
+        AidlUtil.getInstance().printBarCode("WO" + order.getId(), 7, 80, 2, 2);
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
-
         try {
             ByteArrayOutputStream btos = new ByteArrayOutputStream();
             BasePrinter printer = new BasePrinter(btos);
