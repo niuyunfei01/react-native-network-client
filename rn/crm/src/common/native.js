@@ -65,6 +65,12 @@ export default {
     }
   },
 
+  gotoRNActivity: async function (action, json = '{}') {
+    if (NativeModules.ActivityStarter && activityName) {
+      await NativeModules.ActivityStarter.navigateToRnView(action, json);
+    }
+  },
+
   nativeBack: async function(){
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.nativeBack();

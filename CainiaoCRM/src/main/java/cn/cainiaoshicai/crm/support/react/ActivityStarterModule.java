@@ -446,6 +446,16 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    void navigateToRnView(String action, String params) {
+        final Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Gson gson = new Gson();
+            Map<String, String> p = gson.fromJson(params, Map.class);
+            GlobalCtx.app().toRnView(activity, action, p);
+        }
+    }
+
     /**
      * To pass an object instead of a simple string, create a {@link WritableNativeMap} and populate it.
      */
