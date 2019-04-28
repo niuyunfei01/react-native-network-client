@@ -304,8 +304,12 @@ public class OrderPrinter {
                 for (CartItem item : order.getItems()) {
                     String name = item.getProduct_name();
                     String tagCode = item.getTag_code();
+                    String shelfNo= item.getShelf_no();
                     if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
                         name = name + "#" + tagCode;
+                    }
+                    if (shelfNo != null && !"".equals(shelfNo) && !"0".equals(shelfNo)) {
+                        name = shelfNo + " " + name;
                     }
                     if (item.getPrice() >= 0) {
                         for (int idx = 0; idx < name.length(); ) {
