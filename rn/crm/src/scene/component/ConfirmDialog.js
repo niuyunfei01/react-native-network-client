@@ -11,12 +11,13 @@ export default class ConfirmDialog extends React.Component {
     onClickModal: PropTypes.func,
     onClickCancel: PropTypes.func.isRequired,
     onClickConfirm: PropTypes.func.isRequired,
-    onRequestClose: PropTypes.func
+    onRequestClose: PropTypes.func,
+    containerStyle: PropTypes.object
   }
   
   static defaultProps = {
     transparent: true,
-    
+    containerStyle: {}
   }
   
   constructor (props) {
@@ -35,7 +36,7 @@ export default class ConfirmDialog extends React.Component {
         transparent={true}
       >
         <View style={styles.modalBackground}>
-          <View style={styles.container}>
+          <View style={[styles.container, this.props.containerStyle]}>
             {this.props.children}
           </View>
           <View style={styles.modalCancel}>
