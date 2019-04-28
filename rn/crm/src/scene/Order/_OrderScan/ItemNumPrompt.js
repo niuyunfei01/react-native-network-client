@@ -1,22 +1,23 @@
 import React from "react";
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import ConfirmDialog from "./ConfirmDialog";
-import JbbInput from "./JbbInput";
+import ConfirmDialog from "../../component/ConfirmDialog";
 import PropTypes from 'prop-types'
+import inputNumberStyles from "../inputNumberStyles";
+import InputNumber from "rc-input-number";
 
-export default class JbbPrompt extends React.Component {
+export default class ItemNumPrompt extends React.Component {
   static propTypes = {
     onConfirm: PropTypes.func,
     onCancel: PropTypes.func,
-    initValue: PropTypes.string,
+    initValue: PropTypes.any,
     title: PropTypes.string,
-    autoFocus: PropTypes.bool,
-    visible: PropTypes.bool
+    visible: PropTypes.bool,
+    maxNumber: PropTypes.any
   }
   
   static defaultProps = {
     initValue: '',
-    title: '输入',
+    title: '选择数量',
     visible: false,
     autoFocus: false
   }
@@ -25,14 +26,14 @@ export default class JbbPrompt extends React.Component {
     super(props)
     this.state = {
       visible: this.props.visible,
-      text: this.props.initValue ? this.props.initValue : ''
+      number: this.props.initValue ? this.props.initValue : 0
     }
   }
   
   componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
     this.setState({
       visible: nextProps.visible,
-      text: nextProps.initValue ? nextProps.initValue : ''
+      number: nextProps.initValue ? nextProps.initValue : 0
     })
   }
   
@@ -46,18 +47,21 @@ export default class JbbPrompt extends React.Component {
       <ConfirmDialog
         visible={this.state.visible}
         onClickCancel={() => this.onCancel()}
-        onClickConfirm={() => this.props.onConfirm && this.props.onConfirm(this.state.text)}
+        onClickConfirm={() => this.props.onConfirm && this.props.onConfirm(this.state.number)}
       >
         <View style={styles.titleWrap}>
           <Text style={styles.titleText}>{this.props.title}</Text>
         </View>
         
-        <View>
-          <JbbInput
-            autoFocus={this.props.autoFocus}
-            onChange={(text) => this.setState({text})}
-            value={this.state.text}
-            styles={{height: 35}}
+        <View style={{height: 60, width: '100%', justifyContent: 'center'}}>
+          <InputNumber
+            styles={inputNumberStyles}
+            min={0}
+            max={parseInt(this.props.maxNumber)}
+            value={parseInt(this.state.number)}
+            style={{backgroundColor: 'white', width: '100%', height: 40}}
+            onChange={(number) => this.setState({number})}
+            keyboardType={'numeric'}
           />
         </View>
       </ConfirmDialog>

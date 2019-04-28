@@ -1,6 +1,6 @@
 import BaseComponent from "../BaseComponent";
 import React from "react";
-import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {InputItem, List, WhiteSpace} from "antd-mobile-rn";
 import SearchPopup from "../component/SearchPopup";
@@ -10,6 +10,7 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import {ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
+import C from '../../config'
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -53,7 +54,9 @@ class StandardPutIn extends BaseComponent {
   }
   
   componentWillUnmount () {
-    clearInterval(this.timer)
+    if (this.listenScanUpc) {
+      this.listenScanUpc.remove()
+    }
   }
   
   fetchSuppliers () {
@@ -72,7 +75,13 @@ class StandardPutIn extends BaseComponent {
     const accessToken = this.props.global.accessToken
     const api = `/api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
     HttpUtils.get.bind(navigation)(api).then(res => {
-      self.setState({product: res})
+      if (!res.id) {
+        native.speakText('未知标准品')
+        ToastShort('未知标准品！')
+        self.setState({upc: ''})
+      } else {
+        self.setState({product: res})
+      }
     })
   }
   
@@ -91,7 +100,6 @@ class StandardPutIn extends BaseComponent {
       price: self.state.price,
       number: self.state.number
     }).then(res => {
-      native.clearUpcScan(this.state.product.upc)
       self.setState({product: {}, number: '0', price: '0', supplier: {}})
       self.listenUpcInterval()
     })
@@ -104,31 +112,27 @@ class StandardPutIn extends BaseComponent {
       {
         text: '确定',
         onPress: () => {
-          native.clearUpcScan(this.state.upc)
-          self.setState({product: {}})
-          self.listenUpcInterval()
+          self.setState({product: {}, upc: ''})
         }
       }
     ])
   }
-  setUpcListener () {
-    const self = this
-    return setInterval(function () {
-      native.listenScanUpc(function (ok, items) {
-        items = JSON.parse(items)
-        console.log('listen scan upc => ', items)
-        if (items.length > 0) {
-          clearInterval(self.timer)
-          self.setState({upc: items[0]})
-          self.fetchProductByUpc(items[0])
-        }
-      })
-    }, 1000)
-  }
   
   listenUpcInterval () {
     const self = this
-    this.timer = this.setUpcListener()
+    if (this.listenScanUpc) {
+      this.listenScanUpc.remove()
+    }
+    this.listenScanUpc = DeviceEventEmitter.addListener(C.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
+      console.log('listen scan upc => barCode :', barCode)
+      if (self.state.upc) {
+        native.speakText('当前有未处理的标准品入库')
+        ToastShort('当前有未处理的标准品入库！')
+        return
+      }
+      self.setState({upc: barCode})
+      self.fetchProductByUpc(barCode)
+    })
   }
   
   renderProdInfo () {

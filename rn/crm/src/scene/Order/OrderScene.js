@@ -414,7 +414,7 @@ class OrderScene extends Component {
     } else if (option.key === MENU_SEND_MONEY) {
       navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
     } else if (option.key === MENU_ORDER_SCAN) {
-      native.gotoRNActivity(Config.ROUTE_ORDER_SCAN)
+      navigation.navigate(Config.ROUTE_ORDER_SCAN)
     } else {
       ToastShort('未知的操作');
     }
