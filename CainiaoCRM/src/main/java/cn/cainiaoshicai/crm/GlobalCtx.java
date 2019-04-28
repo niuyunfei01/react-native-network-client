@@ -1168,20 +1168,8 @@ public class GlobalCtx extends Application {
             return new ArrayList<>(ls.values());
         }
 
-        public List<String> notConsumedUpc() {
-            return new ArrayList<>(upcList.values());
-        }
-
         public void add(Map<String, String> result) {
             ls.put(result.get("barCode"), result);
-        }
-
-        public void addUpc(String upc) {
-            upcList.put(upc, upc);
-        }
-
-        public void clearUpc(String code) {
-            upcList.remove(code);
         }
 
         public void clearCode(String code) {

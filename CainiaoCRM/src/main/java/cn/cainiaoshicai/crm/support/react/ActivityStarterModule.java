@@ -272,30 +272,11 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void clearScanUpc(@Nonnull String code, @Nonnull final Callback callback) {
-        GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
-        try {
-            ss.clearUpc(code);
-            callback.invoke(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @ReactMethod
     void listenScan(@Nonnull final Callback callback) {
         GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
         List<Map<String, String>> results = ss.notConsumed();
         ss.markTalking();
         callback.invoke(true, DaoHelper.gson().toJson(results));
-    }
-
-    @ReactMethod
-    void listScanUpc(@Nonnull final Callback callback) {
-        GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
-        List<String> result = ss.notConsumedUpc();
-        callback.invoke(true, DaoHelper.gson().toJson(result));
     }
 
     @ReactMethod

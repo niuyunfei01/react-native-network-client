@@ -91,7 +91,10 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
                 GlobalCtx.app().sendRNEvent(reactContext, "listenScanBarCode", params);
             } else {
                 if (BarCodeUtil.checkGTIN(barcode, true)) {
-                    GlobalCtx.app().scanInfo().addUpc(barcode);
+                    ReactContext reactContext = GlobalCtx.app().getReactContext();
+                    WritableMap params = Arguments.createMap();
+                    params.putString("barCode", barcode);
+                    GlobalCtx.app().sendRNEvent(reactContext, "listenScanStandardProdBarCode", params);
                 }
             }
         } catch (Exception e) {
