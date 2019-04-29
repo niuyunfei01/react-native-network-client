@@ -62,12 +62,10 @@ class OrderList extends BaseComponent {
                   </TouchableOpacity>
                   <View style={{flex: 1}}>
                     <Text
-                      style={[styles.product_name, {
-                        textDecorationLine: prod.scan_num >= prod.num ? 'line-through' : 'none'
-                      }]}
+                      style={[styles.product_name]}
                     >{prod.name}</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                      <Text style={{textDecorationLine: prod.scan_num >= prod.num ? 'line-through' : 'none'}}>
+                      <Text>
                         {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
                         &nbsp;
                         {!prod.product.upc && prod.sku.material_code ? `秤签：${prod.sku.material_code}` : ''}
@@ -80,6 +78,12 @@ class OrderList extends BaseComponent {
                 <View style={{marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
                   <JbbButton text={prod.scan_num ? String(prod.scan_num) : '0'}/>
                 </View>
+  
+                <If condition={prod.scan_num >= prod.num}>
+                  <View style={styles.mask}>
+                    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
+                  </View>
+                </If>
               </View>
             </For>
           </ScrollView>
@@ -107,6 +111,7 @@ class OrderList extends BaseComponent {
   }
 }
 
+const rowHeight = pxToDp(120)
 const styles = StyleSheet.create({
   container: {
     width: screenWidth
@@ -158,6 +163,16 @@ const styles = StyleSheet.create({
     paddingBottom: pxToDp(14),
     borderBottomColor: colors.color999,
     borderBottomWidth: screen.onePixel,
+    height: rowHeight
+  },
+  mask: {
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    width: '100%',
+    height: rowHeight,
+    paddingVertical: pxToDp(14)
   },
   product_img: {
     height: pxToDp(90),

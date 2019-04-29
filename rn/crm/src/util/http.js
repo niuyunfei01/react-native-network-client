@@ -62,7 +62,6 @@ class HttpUtils {
       store = tool.store(props.global)
       vendor = tool.vendor(props.global)
     }
-    console.log(store, vendor)
     let options = this.getOptions(method, params)
     options.headers.store_id = store.id
     options.headers.vendor_id = vendor.currVendorId

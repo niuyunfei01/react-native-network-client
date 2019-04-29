@@ -137,7 +137,8 @@ class OrderScan extends BaseComponent {
     const {tagCode, weight = 0, barCode = ''} = prodCode
     const idx = orderIds.indexOf(id)
     const {id, items, scan_count} = currentOrder
-    for (let item of items) {
+    for (let i in items) {
+      let item = items[i]
       if (
         (!isStandard && item.sku && item.sku.material_code > 0 && item.sku.material_code == tagCode) ||
         (isStandard && item.product.upc && item.product.upc == tagCode)
@@ -148,12 +149,17 @@ class OrderScan extends BaseComponent {
           return
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
+          // 如果拣货数量够，就置底
+          if (item.scan_num >= item.num) {
+            items.splice(i, 1)
+            items.push(item)
+          }
+          currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
           dataSource = dataSource.splice(idx, 1, currentOrder)
           self.setState({dataSource})
-          self.addScanProdLog(id, item.id, num, tagCode, barCode,
-          isStandard ? 2 : 1, parseFloat(weight)
-        )
+          self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
+          
           ToastShort(`商品减${num}！`)
           native.speakText(`商品减${num}`)
           if (currentOrder.scan_count >= currentOrder.items_count) {
