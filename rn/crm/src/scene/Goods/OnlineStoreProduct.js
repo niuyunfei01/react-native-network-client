@@ -61,7 +61,7 @@ class OnlineStoreProduct extends Component {
     const {store_id, product_id, access_token} = self.state
     const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
-    HttpUtils.post.bind(this.props.navigation)(url, {}, navigation).then(res => {
+    HttpUtils.post.bind(this.props)(url, {}, navigation).then(res => {
       self.setState({
         product: res.product,
         trade_products: res.trade_products,
@@ -74,7 +74,7 @@ class OnlineStoreProduct extends Component {
   onApplyStorePrice () {
     const self = this
     const {store_id, product_id, access_token, supply_price} = self.state
-    HttpUtils.post.bind(this.props.navigation)(`api/online_store_product?access_token=${access_token}`, {
+    HttpUtils.post.bind(this.props)(`api/online_store_product?access_token=${access_token}`, {
       store_id: store_id,
       product_id: product_id,
       price: supply_price * 100,

@@ -57,7 +57,7 @@ class MaterialTask extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api, {storeId: this.state.storeId}).then(res => {
+    HttpUtils.get.bind(self.props)(api, {storeId: this.state.storeId}).then(res => {
       self.setState({packingTask: res.packing, pendingTask: res.pending}, () => self.forceUpdate())
     })
   }
@@ -67,7 +67,7 @@ class MaterialTask extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_task?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.fetchData()
     })
   }
@@ -77,7 +77,7 @@ class MaterialTask extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
     }).then(res => {
@@ -91,7 +91,7 @@ class MaterialTask extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       receiptId: this.state.selectRow.id,
       userId: user.id,
       storeId: this.state.storeId

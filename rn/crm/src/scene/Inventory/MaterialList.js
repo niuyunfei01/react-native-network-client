@@ -89,7 +89,7 @@ class MaterialList extends React.Component {
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_list?access_token=${accessToken}`
     this.setState({isLoading: true})
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       page: this.state.page,
       status: this.state.filterStatus,
       date: this.state.filterDate,
@@ -128,7 +128,7 @@ class MaterialList extends React.Component {
               if (obj.type === 'IR' && !dealArr.includes(obj.barCode)) {
                 dealArr.push(barCode)
                 const {skuId, workerId, weight, barCode, datetime} = obj
-                HttpUtils.post.bind(navigation)(api, {
+                HttpUtils.post.bind(self.props)(api, {
                   skuId, weight, barCode, datetime,
                   storeId: self.state.store.id,
                   supplierId: workerId,
@@ -201,7 +201,7 @@ class MaterialList extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       receiptId: this.state.selectedItem.id,
       userId: worker.id
     }).then(res => {

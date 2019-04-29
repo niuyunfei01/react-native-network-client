@@ -80,7 +80,7 @@ class MaterialPutIn extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res) {
         Alert.alert('错误', '未知供应商')
       } else {
@@ -94,7 +94,7 @@ class MaterialPutIn extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_sku/${skuId}?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res) {
         Alert.alert('错误', '未知商品')
       } else {
@@ -108,7 +108,7 @@ class MaterialPutIn extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_skus?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({skus: res})
     })
   }
@@ -118,7 +118,7 @@ class MaterialPutIn extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_suppliers?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({suppliers: res})
     })
   }
@@ -129,7 +129,7 @@ class MaterialPutIn extends React.Component {
     const accessToken = self.props.global.accessToken
     const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId} = this.state
     const api = `/api_products/material_put_in?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       id: receiptId,
       skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime
     }).then(res => {

@@ -42,7 +42,7 @@ class StoreRate extends React.Component {
   componentWillMount () {
     const self = this
     const access_token = this.props.global.accessToken
-    HttpUtils.get.bind(this.props.navigation)(`/api/store_rate?access_token=${access_token}`).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/store_rate?access_token=${access_token}`).then(res => {
       self.setState({info: res})
     })
   }

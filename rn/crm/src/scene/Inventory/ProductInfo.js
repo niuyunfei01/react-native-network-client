@@ -69,7 +69,7 @@ class ProductInfo extends React.Component {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/inventory_shelf_nos?access_token=${this.props.global.accessToken}`
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
@@ -82,7 +82,7 @@ class ProductInfo extends React.Component {
     const navigation = this.props.navigation
     const api = `/api_products/inventory_info?access_token=${this.props.global.accessToken}`
     self.setState({refreshing: true})
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
@@ -99,7 +99,7 @@ class ProductInfo extends React.Component {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/modify_inventory_shelf_no?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId,
       shelfNo: value
@@ -113,7 +113,7 @@ class ProductInfo extends React.Component {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/clear_inventory_shelf_no?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
@@ -126,7 +126,7 @@ class ProductInfo extends React.Component {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/chg_sku_tag_code?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       skuId: self.state.productInfo.sku.id,
       tagCode: val
     }).then(res => {
@@ -142,7 +142,7 @@ class ProductInfo extends React.Component {
     const navigation = this.props.navigation
     const api = `/api_products/chg_prod_upc?access_token=${this.props.global.accessToken}`
     native.clearUpcScan(upc)
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
       upc: upc
     }).then(res => {
@@ -158,8 +158,9 @@ class ProductInfo extends React.Component {
     const self = this
     const navigation = this.props.navigation
     const api = `/api_products/chg_sku_need_pack?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       skuId: self.state.productInfo.sku.id,
+      storeId: self.state.storeId,
       need_pack: checked ? 1 : 0
     }).then(res => {
       Toast.success('操作成功')

@@ -103,7 +103,7 @@ class OrderScan extends BaseComponent {
     const navigation = self.props.navigation;
     const accessToken = self.props.global.accessToken;
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       let {dataSource = [], orderIds = []} = self.state;
       dataSource.push(res);
       orderIds.push(orderId);
@@ -151,7 +151,7 @@ class OrderScan extends BaseComponent {
           currentOrder.scan_count = scan_count ? scan_count + num : num
           dataSource = dataSource.splice(idx, 1, currentOrder)
           self.setState({dataSource})
-          self.addScanProdLog(id, item.id, num, tagCode, barCode
+          self.addScanProdLog(id, item.id, num, tagCode, barCode,
           isStandard ? 2 : 1, parseFloat(weight)
         )
           ToastShort(`商品减${num}！`)
@@ -203,7 +203,7 @@ class OrderScan extends BaseComponent {
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/add_inventory_exit_log?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       order_id, item_id, num, code, type, weight, bar_code
     }).then(res => {
     
@@ -215,7 +215,7 @@ class OrderScan extends BaseComponent {
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/update_inventory_exit_log?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       order_id, item_id, num, code, type: 2
     }).then(res => {
     
@@ -232,7 +232,7 @@ class OrderScan extends BaseComponent {
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(() => {
+    HttpUtils.get.bind(self.props)(api).then(() => {
       dataSource = dataSource.splice(idx + 1, 1)
       orderIds = orderIds.splice(idx + 1, 1)
       currentOrder = dataSource.length ? dataSource[0] : {}

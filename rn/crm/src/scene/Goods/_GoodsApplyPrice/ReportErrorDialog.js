@@ -43,7 +43,7 @@ class ReportErrorDialog extends React.Component {
       ToastShort('请输入市场单价')
       return
     }
-    HttpUtils.post.bind(this.props.navigation)(`/api/report_track_product_err/${storeId}/${productId}?access_token=${access_token}`, {
+    HttpUtils.post.bind(this.props)(`/api/report_track_product_err/${storeId}/${productId}?access_token=${access_token}`, {
       price, remark
     }).then(res => {
       Toast.success('提交成功')

@@ -49,7 +49,7 @@ class GoodsAnalysis extends Component {
     const {access_token, store_id, page, pageSize} = this.state
     uri = `/api/area_hot_new_sku/${store_id}?access_token=${access_token}`
     this.setState({isLoading: true})
-    HttpUtils.get.bind(this.props.navigation)(uri, {page, pageSize}).then(res => {
+    HttpUtils.get.bind(this.props)(uri, {page, pageSize}).then(res => {
       if (page !== 1) {
         lists = this.state.list.concat(res.lists)
       } else {
@@ -107,7 +107,7 @@ class GoodsAnalysis extends Component {
     if (skuId) {
       const self = this
       const {access_token, store_id} = this.state
-      HttpUtils.get.bind(this.props.navigation)(`/api/area_hot_new_prod/${store_id}/${skuId}?access_token=${access_token}`).then(res => {
+      HttpUtils.get.bind(this.props)(`/api/area_hot_new_prod/${store_id}/${skuId}?access_token=${access_token}`).then(res => {
         self.setState({skuProdList: res, productListModal: true})
       })
     }

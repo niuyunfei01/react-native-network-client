@@ -64,7 +64,7 @@ class StandardPutIn extends BaseComponent {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_suppliers?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({suppliers: res})
     })
   }
@@ -74,7 +74,7 @@ class StandardPutIn extends BaseComponent {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res.id) {
         native.speakText('未知标准品')
         ToastShort('未知标准品！')
@@ -93,7 +93,7 @@ class StandardPutIn extends BaseComponent {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/standard_prod_put_in?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       upc: self.state.product.upc,
       storeId: self.state.store.id,
       supplierId: self.state.supplier.id,

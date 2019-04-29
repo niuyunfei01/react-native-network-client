@@ -44,7 +44,7 @@ class MaterialTaskFinish extends React.Component {
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task_finished?access_token=${accessToken}`
     self.setState({isLoading: true})
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       page: this.state.page
     }).then(res => {
       let lists = res.page == 1 ? res.lists : this.state.tasks.concat(res.lists)
