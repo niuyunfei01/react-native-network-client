@@ -91,7 +91,7 @@ class MaterialTaskFinish extends React.Component {
       <LoadMore
         onRefresh={() => this.onRefresh()}
         isLastPage={this.state.isLastPage}
-        renderList={this.renderItem()}
+        renderList={this.renderList()}
         isLoading={this.state.isLoading}
         loadMoreType={'scroll'}
       />
