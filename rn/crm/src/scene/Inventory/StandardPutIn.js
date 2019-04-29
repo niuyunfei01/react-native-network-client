@@ -11,6 +11,8 @@ import native from "../../common/native";
 import {ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
 import C from '../../config'
+import InputNumber from "rc-input-number";
+import inputNumberStyles from "../Order/inputNumberStyles";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -175,12 +177,6 @@ class StandardPutIn extends BaseComponent {
           extra={this.state.supplier.name}
         >供货商</List.Item>
         <InputItem
-          extra={'件'}
-          value={this.state.number}
-          defaultValue={this.state.number}
-          onChange={(number) => this.setState({number})}
-        >数量</InputItem>
-        <InputItem
           extra={'元'}
           value={this.state.price}
           defaultValue={this.state.price}
@@ -207,6 +203,20 @@ class StandardPutIn extends BaseComponent {
     )
   }
   
+  renderStepper () {
+    return (
+      <View style={styles.stepperRow}>
+        <InputNumber
+          styles={inputNumberStyles}
+          min={0}
+          value={parseInt(this.state.number)}
+          style={{backgroundColor: 'white', width: '100%', height: 40}}
+          onChange={(number) => this.setState({number})}
+          keyboardType={'numeric'}
+        />
+      </View>
+    )
+  }
   render () {
     return (
       <ScrollView
@@ -217,6 +227,7 @@ class StandardPutIn extends BaseComponent {
           {this.renderProdInfo()}
           <WhiteSpace/>
           {this.renderInput()}
+          {this.renderStepper()}
         </View>
         
         {this.renderBtn()}
@@ -266,6 +277,13 @@ const styles = StyleSheet.create({
     width: pxToDp(40),
     flex: 1,
     justifyContent: 'center'
+  },
+  stepperRow: {
+    width: '100%',
+    height: 70,
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(15),
+    backgroundColor: '#fff'
   },
   footerContainer: {
     flexDirection: 'row',
