@@ -187,7 +187,7 @@ public class OrderPrinter {
             testData = printer.concatenate(testData, printer.startLineBytes());
             testData = printer.concatenate(testData, printer.normalTextBytes("外送帮，好生意！"));
             testData = printer.concatenate(testData, printer.newLineBytes());
-            testData = printer.concatenate(testData, new byte[]{0x0D,0x0D,0x0D});
+            testData = printer.concatenate(testData, new byte[]{0x0D, 0x0D, 0x0D});
             testData = printer.concatenate(testData, GPrinterCommand.walkPaper((byte) 4));
             PrintQueue.getQueue(GlobalCtx.app()).write(testData);
         } catch (Exception e) {
@@ -304,7 +304,7 @@ public class OrderPrinter {
                 for (CartItem item : order.getItems()) {
                     String name = item.getProduct_name();
                     String tagCode = item.getTag_code();
-                    String shelfNo= item.getShelf_no();
+                    String shelfNo = item.getShelf_no();
                     if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
                         name = name + "#" + tagCode;
                     }
@@ -528,7 +528,7 @@ public class OrderPrinter {
     }
 
     /**
-     * @param order     Must contain items!!!!
+     * @param order           Must contain items!!!!
      * @param isAutoPrint
      * @param printedCallback
      */
