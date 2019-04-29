@@ -47,6 +47,7 @@ class OrderList extends BaseComponent {
         <View style={styles.itemTitleRow}>
           <Text style={styles.itemTitle}>商品明细</Text>
           <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
+          <Text style={styles.itemTitleScanTip}>已扫{item.scan_count}件商品</Text>
         </View>
         <View style={{marginBottom: this.props.footerHeight * 2}}>
           <ScrollView>
@@ -141,6 +142,11 @@ const styles = StyleSheet.create({
   },
   itemTitleTip: {
     color: colors.color999,
+    fontSize: pxToDp(24),
+    marginLeft: pxToDp(20)
+  },
+  itemTitleScanTip: {
+    color: colors.editStatusAdd,
     fontSize: pxToDp(24),
     marginLeft: pxToDp(20)
   },

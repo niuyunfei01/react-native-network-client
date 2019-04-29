@@ -134,9 +134,9 @@ class OrderScan extends BaseComponent {
       native.speakText('无订单数据！')
       return
     }
-    const {tagCode, weight = 0} = prodCode
+    const {tagCode, weight = 0, barCode = ''} = prodCode
     const idx = orderIds.indexOf(id)
-    const {id, items} = currentOrder
+    const {id, items, scan_count} = currentOrder
     for (let item of items) {
       if (
         (!isStandard && item.sku && item.sku.material_code > 0 && item.sku.material_code == tagCode) ||
@@ -148,11 +148,17 @@ class OrderScan extends BaseComponent {
           return
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
+          currentOrder.scan_count = scan_count ? scan_count + num : num
           dataSource = dataSource.splice(idx, 1, currentOrder)
           self.setState({dataSource})
-          self.addScanProdLog(id, item.id, num, tagCode, isStandard ? 2 : 1, parseFloat(weight))
+          self.addScanProdLog(id, item.id, num, tagCode, barCode
+          isStandard ? 2 : 1, parseFloat(weight)
+        )
           ToastShort(`商品减${num}！`)
           native.speakText(`商品减${num}`)
+          if (currentOrder.scan_count >= currentOrder.items_count) {
+            self.onForcePickUp()
+          }
           return
         }
       }
@@ -192,13 +198,13 @@ class OrderScan extends BaseComponent {
     native.speakText('该订单不存在此商品！')
   }
   
-  addScanProdLog (order_id, item_id, num, code, type, weight) {
+  addScanProdLog (order_id, item_id, num, code, bar_code, type, weight) {
     const self = this
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/add_inventory_exit_log?access_token=${accessToken}`
     HttpUtils.post.bind(navigation)(api, {
-      order_id, item_id, num, code, type, weight
+      order_id, item_id, num, code, type, weight, bar_code
     }).then(res => {
     
     })
@@ -225,7 +231,7 @@ class OrderScan extends BaseComponent {
   
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
-    const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}&worker_id=${this.state.global.currentUser}`
+    const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
     HttpUtils.get.bind(navigation)(api).then(() => {
       dataSource = dataSource.splice(idx + 1, 1)
       orderIds = orderIds.splice(idx + 1, 1)

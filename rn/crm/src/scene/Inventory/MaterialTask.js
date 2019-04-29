@@ -93,7 +93,8 @@ class MaterialTask extends React.Component {
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
     HttpUtils.post.bind(navigation)(api, {
       receiptId: this.state.selectRow.id,
-      userId: user.id
+      userId: user.id,
+      storeId: this.state.storeId
     }).then(res => {
       Toast.success('操作成功')
       self.setState({selectRow: {}, workerPopup: false})
