@@ -39,34 +39,34 @@ public class OrderPrinter {
     private static final int MAX_TITLE_PART = 16;
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid) {
-        if (SettingUtility.getAutoPrintSetting()) {
-            printWhenNeverPrinted(platform, platformOid, null);
-        }
+        printWhenNeverPrinted(platform, platformOid, null);
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    final boolean supportSunMiPrinter = supportSunMiPrinter();
-                    final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
-                    final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                    if (supportSunMiPrinter) {
-                        smPrintOrder(order);
-                    } else {
-                        if (order != null && order.getPrint_times() == 0) {
-                            PrintQueue.getQueue(GlobalCtx.app()).add(order);
+        if (SettingUtility.getAutoPrintSetting()) {
+            new MyAsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        final boolean supportSunMiPrinter = supportSunMiPrinter();
+                        final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+                        final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                        if (supportSunMiPrinter) {
+                            smPrintOrder(order);
                         } else {
-                            AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                            if (order != null && order.getPrint_times() == 0) {
+                                PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                            } else {
+                                AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                            }
                         }
+                    } catch (Exception e) {
+                        Log.e("auto print order error", e);
                     }
-                } catch (Exception e) {
-                    Log.e("auto print order error", e);
+                    return null;
                 }
-                return null;
-            }
-        }.executeOnNormal();
+            }.executeOnNormal();
+        }
     }
 
     public static BluetoothPrinters.DeviceStatus resetDeviceStatus(BluetoothPrinters.DeviceStatus ds) {
