@@ -327,7 +327,7 @@ class MaterialList extends React.Component {
           <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text>{item.type == 1 ? '收获码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
+          <Text>{item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
         </View>
         <View style={[styles.itemLine]}>
           <Text>{item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤' : '件'} {item.price}元</Text>
