@@ -2108,8 +2108,8 @@ class ItemRow extends PureComponent {
             color: colors.color333,
             marginBottom: pxToDp(14),
           }}>
-            {item.name}
-            <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id})</Text>
+            <If condition={item.shelf_no}>{item.shelf_no} </If>{item.name}
+            <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id}<If condition={item.tag_code}>[{item.tag_code}]</If>)</Text>
           </Text>
   
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
