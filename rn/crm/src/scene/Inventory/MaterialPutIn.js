@@ -108,7 +108,7 @@ class MaterialPutIn extends React.Component {
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const currStoreId = this.props.global.currStoreId
-    const api = `api_products/material_skus?access_token=${accessToken}&_sid=${currStoreId}`
+    const api = `api_products/material_skus?access_token=${accessToken}&_sid=${currStoreId}&with_code=1`
     HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({skus: res})
     })
