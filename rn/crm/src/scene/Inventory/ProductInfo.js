@@ -166,6 +166,7 @@ class ProductInfo extends React.Component {
       productId: self.state.productId,
       prePackScore: value
     }).then(res => {
+      this.setState({packScorePrompt: false})
       Toast.success('操作成功')
       self.fetchData()
     })
