@@ -47,7 +47,9 @@ class MaterialList extends React.Component {
   
   constructor (props) {
     super(props)
+    console.log(this.props.global)
     const store = tool.store(this.props.global)
+    console.log(store)
     this.state = {
       store: store,
       headerMenu: false,
@@ -109,7 +111,6 @@ class MaterialList extends React.Component {
   getCodeFromAndroid () {
     const self = this
     let dealArr = []
-    const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/material_put_in?access_token=${accessToken}`
     if (this.codeFromAndroidTimer) {
@@ -197,7 +198,6 @@ class MaterialList extends React.Component {
   onAssignWorker (worker) {
     console.log(worker)
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {

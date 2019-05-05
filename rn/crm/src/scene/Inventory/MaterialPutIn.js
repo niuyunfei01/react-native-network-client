@@ -91,7 +91,6 @@ class MaterialPutIn extends React.Component {
   
   setSku (skuId) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_get_sku/${skuId}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -116,7 +115,6 @@ class MaterialPutIn extends React.Component {
   
   fetchSuppliers () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_suppliers?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {

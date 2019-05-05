@@ -44,9 +44,9 @@ class HttpUtils {
     } : {
       method: method,
       headers: {
-        requestTime: new Date().toISOString(),
+        request_time: new Date().toISOString(),
         version: DeviceInfo.getVersion(),
-        buildNumber: DeviceInfo.getBuildNumber(),
+        build_number: DeviceInfo.getBuildNumber(),
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
