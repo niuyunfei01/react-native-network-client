@@ -173,8 +173,10 @@ public class BluetoothScanGunKeyEventHelper {
      * @return
      */
     public boolean isScanGunEvent(KeyEvent event) {
-
         if(event.isSystem()){
+            return false;
+        }
+        if (event.getDevice() == null) {
             return false;
         }
         if (deviceNameList.isEmpty()) {
