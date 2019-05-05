@@ -90,7 +90,8 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
                 params.putString("orderId", barcode.replace("WO", ""));
                 GlobalCtx.app().sendRNEvent(reactContext, "listenScanBarCode", params);
             } else {
-                if (BarCodeUtil.checkGTIN(barcode, true)) {
+                //标品处理
+                if (barcode.startsWith("JBBUPC") || BarCodeUtil.checkGTIN(barcode, true)) {
                     ReactContext reactContext = GlobalCtx.app().getReactContext();
                     WritableMap params = Arguments.createMap();
                     params.putString("barCode", barcode);
