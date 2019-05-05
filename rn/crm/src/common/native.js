@@ -155,6 +155,11 @@ export default {
       NativeModules.ActivityStarter.speakText(text, callback))
   },
 
+  showInputKeyboard: async function () {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.showInputMethod())
+  },
+
   reportException: async function (msg, stack, currentExceptionID, isFatal) {
     console.log("error:", msg)
     console.log("stack:", stack)
