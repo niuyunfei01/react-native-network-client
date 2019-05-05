@@ -221,13 +221,13 @@ class OrderScan extends BaseComponent {
     })
   }
   
-  updateScanProdLogNum (order_id, item_id, num, code) {
+  updateScanProdLogNum (order_id, item_id, num) {
     const self = this
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/update_inventory_exit_log?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      order_id, item_id, num, code, type: 2
+      order_id, item_id, num
     }).then(res => {
     
     })

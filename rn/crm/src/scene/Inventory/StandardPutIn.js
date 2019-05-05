@@ -43,7 +43,9 @@ class StandardPutIn extends BaseComponent {
       suppliers: [],
       supplier: {},
       number: '0',
-      price: '0'
+      price: '0',
+      standardProducts: [],
+      standardProdPrompt: false
     }
   }
   
@@ -53,6 +55,7 @@ class StandardPutIn extends BaseComponent {
     
     this.fetchSuppliers()
     this.listenUpcInterval()
+    this.fetchStandardProducts()
   }
   
   componentWillUnmount () {
@@ -63,7 +66,6 @@ class StandardPutIn extends BaseComponent {
   
   fetchSuppliers () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_suppliers?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -73,7 +75,6 @@ class StandardPutIn extends BaseComponent {
   
   fetchProductByUpc (upc) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -92,7 +93,6 @@ class StandardPutIn extends BaseComponent {
     if (!this.state.product.upc) {
       ToastShort('未知商品')
     }
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/standard_prod_put_in?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
@@ -120,6 +120,16 @@ class StandardPutIn extends BaseComponent {
     ])
   }
   
+  fetchStandardProducts () {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const currStoreId = this.props.global.currStoreId
+    const api = `api_products/standard_products?access_token=${accessToken}&_sid=${currStoreId}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      self.setState({standardProducts: res})
+    })
+  }
+  
   listenUpcInterval () {
     const self = this
     if (this.listenScanUpc) {
@@ -141,28 +151,25 @@ class StandardPutIn extends BaseComponent {
     return (
       <View>
         <View style={[styles.cell_box]}>
-          <View style={styles.cell}>
-            <View style={[styles.goods_image]}>
-              <Image
-                style={[styles.goods_image]}
-                source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../img/Order/zanwutupian_.png')}
-              />
-            </View>
-            <View style={[styles.item_right]}>
-              <Text style={[styles.goods_name]}>
-                {this.state.product.name ? this.state.product.name : '未知商品'}
-              </Text>
-              <View>
-                <Text style={styles.sku}>商品ID：{this.state.product.id}</Text>
-                <Text style={styles.sku}>商品码：{this.state.product.upc}</Text>
+          <TouchableOpacity onPress={() => this.setState({standardProdPrompt: true})}>
+            <View style={styles.cell}>
+              <View style={[styles.goods_image]}>
+                <Image
+                  style={[styles.goods_image]}
+                  source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../img/Order/zanwutupian_.png')}
+                />
+              </View>
+              <View style={[styles.item_right]}>
+                <Text style={[styles.goods_name]}>
+                  {this.state.product.name ? this.state.product.name : '未知商品'}
+                </Text>
+                <View>
+                  <Text style={styles.sku}>商品ID：{this.state.product.id}</Text>
+                  <Text style={styles.sku}>商品码：{this.state.product.upc}</Text>
+                </View>
               </View>
             </View>
-            {/*<TouchableOpacity>*/}
-            {/*<View style={styles.arrow}>*/}
-            {/*<Image source={require('../../assets/back_arrow.png')}/>*/}
-            {/*</View>*/}
-            {/*</TouchableOpacity>*/}
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -240,6 +247,17 @@ class StandardPutIn extends BaseComponent {
           onSelect={(item) => this.setState({
             supplier: item,
             supplierPopup: false
+          })}
+        />
+  
+        <SearchPopup
+          visible={this.state.standardProdPrompt}
+          dataSource={this.state.standardProducts}
+          title={'选择供应商'}
+          onClose={() => this.setState({standardProdPrompt: false})}
+          onSelect={(item) => this.setState({
+            product: item,
+            standardProdPrompt: false
           })}
         />
       </ScrollView>
