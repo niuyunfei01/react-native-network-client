@@ -85,7 +85,6 @@ class MaterialList extends React.Component {
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_list?access_token=${accessToken}`
     this.setState({isLoading: true})
@@ -181,7 +180,7 @@ class MaterialList extends React.Component {
   }
   
   onSearch (value) {
-    this.setState({name: value}, () => {
+    this.setState({filterName: value}, () => {
       this.onRefresh()
     })
   }
