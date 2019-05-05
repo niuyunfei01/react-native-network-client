@@ -60,11 +60,14 @@ class OrderScan extends BaseComponent {
     }
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
       console.log('scan bar code listener => order id :', orderId);
-      let {orderIds = []} = self.state;
+      let {orderIds = [], dataSource = []} = self.state;
       console.log('scan bar code listener => state order ids :', orderIds);
+      console.log('fetch order => state data sources :', dataSource)
       const idx = orderIds.indexOf(orderId);
       if (idx >= 0) {
-        self.swipeToOrder(idx)
+        self.setState({currentOrder: dataSource[idx]}, () => {
+          self.swipeToOrder(idx)
+        })
       } else {
         self.fetchOrder(orderId)
       }
@@ -100,7 +103,6 @@ class OrderScan extends BaseComponent {
   
   fetchOrder (orderId) {
     const self = this;
-    const navigation = self.props.navigation;
     const accessToken = self.props.global.accessToken;
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -135,8 +137,8 @@ class OrderScan extends BaseComponent {
       return
     }
     const {tagCode, weight = 0, barCode = ''} = prodCode
-    const idx = orderIds.indexOf(id)
     const {id, items, scan_count} = currentOrder
+    const idx = orderIds.indexOf(id)
     for (let i in items) {
       let item = items[i]
       if (
@@ -156,7 +158,10 @@ class OrderScan extends BaseComponent {
           }
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
-          dataSource = dataSource.splice(idx, 1, currentOrder)
+          console.log('handle scan product current order : ', currentOrder)
+          console.log('handle scan product data source  before : ', dataSource)
+          dataSource.splice(idx, 1, currentOrder)
+          console.log('handle scan product data source after : ', dataSource)
           self.setState({dataSource})
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
           
@@ -239,8 +244,8 @@ class OrderScan extends BaseComponent {
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(() => {
-      dataSource = dataSource.splice(idx + 1, 1)
-      orderIds = orderIds.splice(idx + 1, 1)
+      dataSource.splice(idx + 1, 1)
+      orderIds.splice(idx + 1, 1)
       currentOrder = dataSource.length ? dataSource[0] : {}
       self.setState({dataSource, currentOrder, orderIds}, () => self.swipeToOrder(0))
     })
