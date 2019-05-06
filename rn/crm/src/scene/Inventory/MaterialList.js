@@ -300,8 +300,9 @@ class MaterialList extends React.Component {
   }
   
   renderItem (item) {
-    const swipeOutBtns = item.type == 1 ? [
-      {
+    let swipeOutBtns = []
+    if (item.type == 1) {
+      swipeOutBtns.push({
         text: '编辑',
         type: 'primary',
         onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {
@@ -311,10 +312,25 @@ class MaterialList extends React.Component {
           weight: item.weight,
           workerId: item.supplier ? item.supplier.supplier_code : null,
           skuId: item.sku_id,
+          price: item.price,
           onBack: () => this.onRefresh()
         })
-      }
-    ] : []
+      })
+    } else if (item.type == 2) {
+      swipeOutBtns.push({
+        text: '编辑',
+        type: 'primary',
+        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {
+          receiptId: item.id,
+          upc: item.bar_code,
+          datetime: item.created,
+          number: item.weight,
+          price: item.price,
+          workerId: item.supplier ? item.supplier.supplier_code : null,
+          onBack: () => this.onRefresh()
+        })
+      })
+    }
     
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
