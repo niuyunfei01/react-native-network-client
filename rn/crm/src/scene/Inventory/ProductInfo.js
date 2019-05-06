@@ -48,7 +48,10 @@ class ProductInfo extends React.Component {
       shelfArea: '',
       shelfNo: '',
       refreshing: false,
-      tagCodePrompt: false
+      tagCodePrompt: false,
+      isStandard: false, // 是否是标品
+      upcPrompt: false,
+      packScorePrompt: false
     }
   }
   
@@ -60,11 +63,13 @@ class ProductInfo extends React.Component {
     this.fetchData()
   }
   
+  componentWillUnmount (): void {
+  }
+  
   fetchShelfNos () {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/inventory_shelf_nos?access_token=${this.props.global.accessToken}`
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
@@ -74,22 +79,25 @@ class ProductInfo extends React.Component {
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/inventory_info?access_token=${this.props.global.accessToken}`
     self.setState({refreshing: true})
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
-      self.setState({productInfo: res, refreshing: false, selectShelfNo: res.shelf_no})
+      self.setState({
+        productInfo: res,
+        refreshing: false,
+        selectShelfNo: res.shelf_no,
+        isStandard: !!res.product.upc
+      })
     })
   }
   
   onModifyPosition (value) {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/modify_inventory_shelf_no?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId,
       shelfNo: value
@@ -101,9 +109,8 @@ class ProductInfo extends React.Component {
   
   onClearShelfNo () {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/clear_inventory_shelf_no?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
@@ -114,26 +121,52 @@ class ProductInfo extends React.Component {
   
   onChgTagCode (val) {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/chg_sku_tag_code?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       skuId: self.state.productInfo.sku.id,
       tagCode: val
+    }).then(res => {
+      this.setState({tagCodePrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onConfirmUpc (upc) {
+    const self = this
+    const api = `/api_products/chg_prod_upc?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      productId: self.state.productId,
+      upc: upc
+    }).then(res => {
+      this.setState({upcPrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+  
+    })
+  }
+  
+  onChangeNeedPack (checked) {
+    const self = this
+    const api = `/api_products/chg_sku_need_pack?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      skuId: self.state.productInfo.sku.id,
+      storeId: self.state.storeId,
+      need_pack: checked ? 1 : 0
     }).then(res => {
       Toast.success('操作成功')
       self.fetchData()
     })
   }
   
-  onChangeNeedPack (checked) {
-    console.log('on switch changed => ', checked)
+  onChgPrePackScore (value) {
     const self = this
-    const navigation = this.props.navigation
-    const api = `/api_products/chg_sku_need_pack?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
-      skuId: self.state.productInfo.sku.id,
-      need_pack: checked ? 1 : 0
+    const api = `/api_products/chg_prod_pre_pack_score?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      productId: self.state.productId,
+      prePackScore: value
     }).then(res => {
+      this.setState({packScorePrompt: false})
       Toast.success('操作成功')
       self.fetchData()
     })
@@ -168,7 +201,16 @@ class ProductInfo extends React.Component {
     
     return (
       <View>
-        <JbbCellTitle>库管信息</JbbCellTitle>
+        <View style={styles.formHeader}>
+          <Text>库管信息</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text>标品</Text>
+            <Switch
+              checked={this.state.isStandard}
+              onChange={(checked) => this.setState({isStandard: checked})}
+            />
+          </View>
+        </View>
         <List>
           <Swipeout right={shelfNoSwipeOutBtns} autoClose={true}>
             <Picker
@@ -181,22 +223,40 @@ class ProductInfo extends React.Component {
               <List.Item arrow="horizontal">货架编号</List.Item>
             </Picker>
           </Swipeout>
-          <List.Item
-            arrow={"horizontal"}
-            extra={this.state.productInfo.sku.name}
-          >秤签名称</List.Item>
-          <List.Item
-            onClick={() => this.setState({tagCodePrompt: true})}
-            arrow={"horizontal"}
-            extra={this.state.productInfo.sku.material_code}
-          >秤签编号</List.Item>
-          <List.Item
-            extra={<Switch
-              disabled={!this.state.productInfo.sku.material_code}
-              checked={this.state.productInfo.sku.need_pack == 1}
-              onChange={(checked) => this.onChangeNeedPack(checked)}
-            />}
-          >需要打包</List.Item>
+  
+          <If condition={!this.state.isStandard}>
+            <List.Item
+              arrow={"horizontal"}
+              extra={this.state.productInfo.sku.name}
+            >秤签名称</List.Item>
+            <List.Item
+              onClick={() => this.setState({tagCodePrompt: true})}
+              arrow={"horizontal"}
+              extra={this.state.productInfo.sku.material_code}
+            >秤签编号</List.Item>
+            <List.Item
+              extra={<Switch
+                disabled={!this.state.productInfo.sku.material_code}
+                checked={this.state.productInfo.sku.need_pack == 1}
+                onChange={(checked) => this.onChangeNeedPack(checked)}
+              />}
+            >需要打包</List.Item>
+            <If condition={this.state.productInfo.sku.need_pack == 1}>
+              <List.Item
+                arrow={"horizontal"}
+                extra={this.state.productInfo.product.pre_pack_score}
+                onClick={() => this.setState({packScorePrompt: true})}
+              >打包工分</List.Item>
+            </If>
+          </If>
+  
+          <If condition={this.state.isStandard}>
+            <List.Item
+              onClick={() => this.setState({upcPrompt: true})}
+              extra={this.state.productInfo.product.upc}
+              arrow="horizontal"
+            >商品码</List.Item>
+          </If>
         </List>
       </View>
     )
@@ -221,6 +281,24 @@ class ProductInfo extends React.Component {
           initValue={this.state.productInfo.sku.material_code}
           visible={this.state.tagCodePrompt}
         />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入标品商品码'}
+          onConfirm={(value) => this.onConfirmUpc(value)}
+          onCancel={() => this.setState({upcPrompt: false})}
+          initValue={''}
+          visible={this.state.upcPrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入打包工分'}
+          onConfirm={(value) => this.onChgPrePackScore(value)}
+          onCancel={() => this.setState({packScorePrompt: false})}
+          initValue={this.state.productInfo.product.pre_pack_score}
+          visible={this.state.packScorePrompt}
+        />
       </ScrollView>
     );
   }
@@ -238,6 +316,13 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(26),
     fontWeight: 'bold'
   },
+  formHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: pxToDp(20),
+    height: pxToDp(50)
+  }
 })
 
 export default connect(mapStateToProps)(ProductInfo)

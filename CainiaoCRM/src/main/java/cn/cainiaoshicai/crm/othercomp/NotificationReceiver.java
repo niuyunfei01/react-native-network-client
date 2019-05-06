@@ -92,7 +92,9 @@ public class NotificationReceiver extends BroadcastReceiver {
                         if (!SettingUtility.isDisableNewOrderSoundNotify()) {
                             notifyOrder(notify);
                         }
-                        OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
+                        if(SettingUtility.getAutoPrintSetting()){
+                            OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
+                        }
                     }
                 }
 

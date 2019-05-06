@@ -12,12 +12,12 @@ import java.util.Map;
 public class BarCodeUtil {
 
     private static String CODE_TYPE_RECEIVE = "IR";
+    private static String CODE_TYPE_PROD = "PROD";
 
     //类型 操作人 tag_code 重量 年月日时分秒 sku
     //IR-0000048-0019-00580-190416183857-0061
     public static Map<String, String> extractCode(String code) {
         Map<String, String> result = Maps.newHashMap();
-        code = code.replaceAll("\\s+", "");
         String[] codeInfo = code.split("-");
         String type = codeInfo[0];
         if (type.equals(CODE_TYPE_RECEIVE)) {
@@ -31,6 +31,18 @@ public class BarCodeUtil {
             result.put("datetime", formatDate(codeInfo[4]));
             result.put("action", "InventoryMaterialPutIn");
         }
+        if (type.equals(CODE_TYPE_PROD)) {
+
+            String weightData = codeInfo[3];
+
+            //     营业员 plu  重量   日期
+            //PROD-0020-0007-01670-190427173030
+            result.put("workerId", Integer.parseInt(codeInfo[1]) + "");
+            result.put("tagCode", Integer.parseInt(codeInfo[2]) + "");
+            result.put("weight", insertString(weightData, ".", weightData.length() - 4));
+            result.put("datetime", formatDate(codeInfo[4]));
+        }
+
         result.put("type", type);
         result.put("barCode", code);
         return result;
@@ -77,4 +89,42 @@ public class BarCodeUtil {
         // return the modified String
         return newString;
     }
+
+    public static boolean checkGTIN(String value, boolean createWithChecksum) {
+        int l = value.length() - 1;
+        int checksum = 0;
+        int weight;
+        int val;
+        for (int i = 0; i < l; i++) {
+            val = value.charAt(i) - '0';
+            weight = i % 2 == 0 ? 1 : 3;
+            checksum += val * weight;
+        }
+        int chk = 10 - checksum % 10;
+        if (createWithChecksum) {
+            char ch = (char) ('0' + chk);
+            value = value.substring(0, l) + ch;
+        }
+        return chk == (value.charAt(l) - '0');
+    }
+
+    public static boolean checkEAN13(String code) {
+        if (code == null || code.length() != 13)
+            return false;
+        int a = 0, b = 0, c = 0, d = 0;
+        for (int i = 0; i < 12; i += 2) {
+            a += (code.charAt(i) - '0');
+            b += (code.charAt(i + 1) - '0');
+        }
+        c = (a + b * 3) % 10;
+        d = (10 - c) % 10;
+        return (code.charAt(12) - '0') == d;
+    }
+
+//    public static void main(String[] args) {
+//        boolean check = checkGTIN("6924513908032", true);
+//        if(check){
+//            System.out.println("check success!");
+//        }
+//    }
 }

@@ -43,7 +43,7 @@ class ReceiveMoney extends React.Component {
       amount: this.state.amount,
       remark: this.state.remark
     }
-    HttpUtils.get.bind(navigation)(url, data).then(res => {
+    HttpUtils.get.bind(self.props)(url, data).then(res => {
       self.setState({receiveQrText: res.result, visibleReceiveQr: true})
       self.props.onCloseForm()
     })

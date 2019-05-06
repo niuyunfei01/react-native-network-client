@@ -38,7 +38,7 @@ class Refund extends React.Component {
   fetchRefundData () {
     const {accessToken, orderId, platform} = this.state
     const self = this
-    HttpUtils.get.bind(this.props.navigation)(`/api/order_refund/${orderId}?access_token=${accessToken}`, {platform}).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/order_refund/${orderId}?access_token=${accessToken}`, {platform}).then(res => {
       self.setState({refunds: res})
     })
   }

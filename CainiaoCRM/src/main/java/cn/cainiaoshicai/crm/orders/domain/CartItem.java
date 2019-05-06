@@ -9,6 +9,7 @@ public class CartItem {
     private int product_id;
     private double price;
     private String tag_code;
+    private String shelf_no;
 
     public String getProduct_name() {
         return product_name;
@@ -48,5 +49,13 @@ public class CartItem {
 
     public void setTag_code(String tag_code) {
         this.tag_code = tag_code;
+    }
+
+    public String getShelf_no() {
+        return shelf_no;
+    }
+
+    public void setShelf_no(String shelf_no) {
+        this.shelf_no = shelf_no;
     }
 }

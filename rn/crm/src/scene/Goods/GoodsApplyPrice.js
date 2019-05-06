@@ -96,7 +96,7 @@ class GoodsApplyPrice extends Component {
     const {store_id, product_id, access_token, type} = self.state
     const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
-    HttpUtils.get.bind(this.props.navigation)(url, {sortType: type}).then(res => {
+    HttpUtils.get.bind(this.props)(url, {sortType: type}).then(res => {
       self.setState({
         product: res.product,
         trade_products: res.trade_products,
@@ -121,15 +121,6 @@ class GoodsApplyPrice extends Component {
   
   onSave () {
     if (this.state.supply_price) {
-      // Modal.prompt('原因', '请输入调价原因', [
-      //   {
-      //     text: '关闭',
-      //   },
-      //   {
-      //     text: '确认',
-      //     onPress: (val) => this.onApplyStorePrice(val)
-      //   }
-      // ])
       this.onApplyStorePrice("自助调价")
     } else {
       Toast.info('请输入保底价！')

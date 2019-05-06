@@ -1,7 +1,7 @@
 import React from "react";
-import {Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {NavigationItem} from "../../widget";
-import {Modal as AntModal, Toast} from 'antd-mobile-rn';
+import {Toast} from 'antd-mobile-rn';
 import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'
@@ -47,7 +47,9 @@ class MaterialList extends React.Component {
   
   constructor (props) {
     super(props)
+    console.log(this.props.global)
     const store = tool.store(this.props.global)
+    console.log(store)
     this.state = {
       store: store,
       headerMenu: false,
@@ -85,11 +87,10 @@ class MaterialList extends React.Component {
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_list?access_token=${accessToken}`
     this.setState({isLoading: true})
-    HttpUtils.get.bind(navigation)(api, {
+    HttpUtils.get.bind(self.props)(api, {
       page: this.state.page,
       status: this.state.filterStatus,
       date: this.state.filterDate,
@@ -110,7 +111,6 @@ class MaterialList extends React.Component {
   getCodeFromAndroid () {
     const self = this
     let dealArr = []
-    const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/material_put_in?access_token=${accessToken}`
     if (this.codeFromAndroidTimer) {
@@ -128,7 +128,7 @@ class MaterialList extends React.Component {
               if (obj.type === 'IR' && !dealArr.includes(obj.barCode)) {
                 dealArr.push(barCode)
                 const {skuId, workerId, weight, barCode, datetime} = obj
-                HttpUtils.post.bind(navigation)(api, {
+                HttpUtils.post.bind(self.props)(api, {
                   skuId, weight, barCode, datetime,
                   storeId: self.state.store.id,
                   supplierId: workerId,
@@ -181,7 +181,7 @@ class MaterialList extends React.Component {
   }
   
   onSearch (value) {
-    this.setState({name: value}, () => {
+    this.setState({filterName: value}, () => {
       this.onRefresh()
     })
   }
@@ -198,10 +198,9 @@ class MaterialList extends React.Component {
   onAssignWorker (worker) {
     console.log(worker)
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       receiptId: this.state.selectedItem.id,
       userId: worker.id
     }).then(res => {
@@ -213,6 +212,11 @@ class MaterialList extends React.Component {
   
   toMaterialPutIn () {
     this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {onBack: () => this.onRefresh()})
+    this.setState({headerMenu: false})
+  }
+  
+  toStandardPutIn () {
+    this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {onBack: () => this.onRefresh()})
     this.setState({headerMenu: false})
   }
   
@@ -230,7 +234,7 @@ class MaterialList extends React.Component {
               <View style={styles.headerMenuItems}>
                 <TouchableOpacity onPress={() => {
                   this.setState({headerMenu: false})
-                  AntModal.alert('温馨提示', '手机连扫码枪，即可扫码入库')
+                  Alert.alert('温馨提示', '手机连扫码枪，即可扫码入库')
                 }}>
                   <View style={styles.headerMenuItem}>
                     <Text style={styles.headerMenuItemText}>扫码入库</Text>
@@ -239,6 +243,11 @@ class MaterialList extends React.Component {
                 <TouchableOpacity onPress={() => this.toMaterialPutIn()}>
                   <View style={styles.headerMenuItem}>
                     <Text style={styles.headerMenuItemText}>手动入库</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.toStandardPutIn()}>
+                  <View style={styles.headerMenuItem}>
+                    <Text style={styles.headerMenuItemText}>标品入库</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.openControlPanel()}>
@@ -291,8 +300,9 @@ class MaterialList extends React.Component {
   }
   
   renderItem (item) {
-    const swipeOutBtns = [
-      {
+    let swipeOutBtns = []
+    if (item.type == 1) {
+      swipeOutBtns.push({
         text: '编辑',
         type: 'primary',
         onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {
@@ -302,26 +312,43 @@ class MaterialList extends React.Component {
           weight: item.weight,
           workerId: item.supplier ? item.supplier.supplier_code : null,
           skuId: item.sku_id,
+          price: item.price,
           onBack: () => this.onRefresh()
         })
-      }
-    ]
+      })
+    } else if (item.type == 2) {
+      swipeOutBtns.push({
+        text: '编辑',
+        type: 'primary',
+        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {
+          receiptId: item.id,
+          upc: item.bar_code,
+          datetime: item.created,
+          number: item.weight,
+          price: item.price,
+          workerId: item.supplier ? item.supplier.supplier_code : null,
+          onBack: () => this.onRefresh()
+        })
+      })
+    }
     
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
         <View style={[styles.itemWrap]}>
         <View style={[styles.itemLine]}>
-          <Text style={[styles.itemTitle]}>{item.sku.name}</Text>
+          <View style={{flex: 1}}>
+            <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
+          </View>
           <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text>{item.bar_code}</Text>
+          <Text>{item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text>{item.weight}公斤 {item.price}元</Text>
+          <Text>{item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤' : '件'} {item.price}元</Text>
         </View>
         <View style={[styles.itemLine]}>
-          <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date}</Text>
+          <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
           <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
             <View>
               <Text style={[styles.itemStatus]}>

@@ -62,7 +62,6 @@ import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -201,7 +200,7 @@ public class MainActivity extends AbstractActionBarActivity {
         Map<String, String> serviceExtras = Maps.newHashMap();
         serviceExtras.put("accessToken", accountBean.getAccess_token());
         serviceExtras.put("storeId", store_id + "");
-        Bootstrap.startAlwaysOnService(this, "Crm", serviceExtras);
+        //Bootstrap.startAlwaysOnService(this, "Crm", serviceExtras);
 
         Store store = GlobalCtx.app().findStore(store_id);
         BottomBar bottomBar = findViewById(R.id.toolbar_bottom);

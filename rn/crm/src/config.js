@@ -96,6 +96,7 @@ const C = {
   ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_ORDER_SEND_MONEY: 'OrderSendMoney',
   ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
+  ROUTE_ORDER_SCAN: 'OrderScan', // 订单扫码过机
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
@@ -168,6 +169,7 @@ const C = {
   ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',                         // 库存 - 商品库管详情
   ROUTE_INVENTORY_MATERIAL_LIST: 'InventoryMaterialList',                       // 库存 - 原材料列表
   ROUTE_INVENTORY_MATERIAL_PUT_IN: 'InventoryMaterialPutIn',                    // 库存 - 原材料手动入库
+  ROUTE_INVENTORY_STANDARD_PUT_IN: 'InventoryStandardPutIn',                    // 库存 - 标品入库
   ROUTE_INVENTORY_MATERIAL_TASK: 'InventoryMaterialTask',                       // 库存 - 原材料任务
   ROUTE_INVENTORY_MATERIAL_TASK_FINISH: 'InventoryMaterialTaskFinish',          // 库存 - 原材料我完成的任务
   serverUrl,
@@ -178,5 +180,12 @@ const C = {
    */
   host
 };
+
+C.Listener = {
+  KEY_SCAN_ORDER_BAR_CODE: 'listenScanBarCode',                                 // 扫描订单条形码
+  KEY_SCAN_PROD_QR_CODE: 'listenScanProductCode',                               // 扫描商品打包二维码
+  KEY_SCAN_STANDARD_PROD_BAR_CODE: 'listenScanStandardProdBarCode',             // 扫描标准品条形码
+}
+
 
 export default C;

@@ -31,13 +31,13 @@ public class RebootBroadcastReceiver extends BroadcastReceiver {
 			}
 			serviceExtras.put("accessToken", accessToken);
 			serviceExtras.put("storeId", store_id + "");
-			Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
+			//Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
 			if (JPushInterface.isPushStopped(GlobalCtx.app())) {
 				String uid = GlobalCtx.app().getCurrentAccountId();
 				if (!TextUtils.isEmpty(uid)) {
 					JPushInterface.setAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+					JPushInterface.resumePush(GlobalCtx.app());
 				}
-				JPushInterface.resumePush(GlobalCtx.app());
 			}
 		}
 	}

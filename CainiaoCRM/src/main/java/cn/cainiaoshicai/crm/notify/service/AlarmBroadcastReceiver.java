@@ -33,7 +33,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
 			}
 			serviceExtras.put("accessToken", accessToken);
 			serviceExtras.put("storeId", store_id + "");
-			Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
+			//Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
 		}
 	}
 }

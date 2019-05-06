@@ -6,6 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -61,13 +66,37 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
     public void onScanSuccess(String barcode) {
         try {
             System.out.println("barcode => " + barcode);
-            Map<String, String> result = BarCodeUtil.extractCode(barcode);
-            GlobalCtx.app().scanInfo().add(result);
-            long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
-            if(lastTalking - System.currentTimeMillis() > 1000){
-                GlobalCtx.app().toRnView(this, result.get("action"), result);
+            barcode = barcode.replaceAll("\\s+", "");
+            if (barcode.startsWith("IR")) {
+                Map<String, String> result = BarCodeUtil.extractCode(barcode);
+                GlobalCtx.app().scanInfo().add(result);
+                long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
+                if (lastTalking - System.currentTimeMillis() > 1000) {
+                    GlobalCtx.app().toRnView(this, result.get("action"), result);
+                } else {
+                    System.out.println("lastTalking = " + (lastTalking / 1000) + ", now=" + (System.currentTimeMillis() / 1000));
+                }
+            } else if (barcode.startsWith("PROD")) {
+                Map<String, String> result = BarCodeUtil.extractCode(barcode);
+                WritableMap params = Arguments.createMap();
+                for (Map.Entry<String, String> entry : result.entrySet()) {
+                    params.putString(entry.getKey(), entry.getValue());
+                }
+                ReactContext reactContext = GlobalCtx.app().getReactContext();
+                GlobalCtx.app().sendRNEvent(reactContext, "listenScanProductCode", params);
+            } else if (barcode.startsWith("WO")) {
+                ReactContext reactContext = GlobalCtx.app().getReactContext();
+                WritableMap params = Arguments.createMap();
+                params.putString("orderId", barcode.replace("WO", ""));
+                GlobalCtx.app().sendRNEvent(reactContext, "listenScanBarCode", params);
             } else {
-                System.out.println("lastTalking = " + (lastTalking/1000) + ", now=" + (System.currentTimeMillis()/1000));
+                //标品处理
+                if (barcode.startsWith("JBBUPC") || BarCodeUtil.checkGTIN(barcode, true)) {
+                    ReactContext reactContext = GlobalCtx.app().getReactContext();
+                    WritableMap params = Arguments.createMap();
+                    params.putString("barCode", barcode);
+                    GlobalCtx.app().sendRNEvent(reactContext, "listenScanStandardProdBarCode", params);
+                }
             }
         } catch (Exception e) {
             System.out.println("scan code exception " + e.getMessage());

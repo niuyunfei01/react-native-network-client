@@ -74,7 +74,7 @@ class SearchGoods extends Component {
     const self = this
     let accessToken = this.props.global.accessToken;
     let storeId = this.state.storeId
-    HttpUtils.get.bind(this.props.navigation)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`).then(res => {
       self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
@@ -105,7 +105,7 @@ class SearchGoods extends Component {
       storeId: storeId
     }
     console.log('find_prod_with_pagination => ', params)
-    HttpUtils.get.bind(this.props.navigation)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage
       let goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)

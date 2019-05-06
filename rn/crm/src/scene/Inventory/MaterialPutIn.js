@@ -1,6 +1,6 @@
 import React from "react";
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Modal, Toast} from "antd-mobile-rn";
+import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {InputItem, List, Toast} from "antd-mobile-rn";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
@@ -34,25 +34,22 @@ class MaterialPutIn extends React.Component {
   constructor (props) {
     super(props)
     const store = tool.store(this.props.global)
-    const navigation = this.props.navigation
-    const {params = {}} = navigation.state
-    console.log('navigation params =>', params)
     this.state = {
-      receiptId: params.receiptId ? params.receiptId : null,
+      receiptId: null,
       skus: [],
       skuPopup: false,
       suppliers: [],
       supplierPopup: false,
       storeId: store.id,
-      barCode: params.barCode ? params.barCode : null,
+      barCode: null,
       sku: '',
       skuId: 0,
       supplier: '',
       supplierId: 0,
-      weight: params.weight ? params.weight : '0',
+      weight: '0',
       reduceWeight: '0',
       price: '0',
-      datetime: params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
+      datetime: null
     }
   }
   
@@ -63,6 +60,14 @@ class MaterialPutIn extends React.Component {
     this.fetchSkus()
     this.fetchSuppliers()
   
+    let state = {}
+    state.receiptId = params.receiptId ? params.receiptId : null
+    state.barCode = params.barCode ? params.barCode : null
+    state.weight = params.weight ? params.weight : '0'
+    state.price = params.price ? params.price : '0'
+    state.datetime = params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
+    this.setState(state)
+    
     if (params.workerId) {
       this.setSupplier(params.workerId)
     }
@@ -73,12 +78,11 @@ class MaterialPutIn extends React.Component {
   
   setSupplier (supplierCode) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    const api = `api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res) {
-        Modal.alert('错误', '未知供应商')
+        Alert.alert('错误', '未知供应商')
       } else {
         self.setState({supplier: res.name, supplierId: res.id})
       }
@@ -87,12 +91,11 @@ class MaterialPutIn extends React.Component {
   
   setSku (skuId) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/material_get_sku/${skuId}?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    const api = `api_products/material_get_sku/${skuId}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res) {
-        Modal.alert('错误', '未知商品')
+        Alert.alert('错误', '未知商品')
       } else {
         self.setState({sku: res.name, skuId: skuId})
       }
@@ -101,20 +104,19 @@ class MaterialPutIn extends React.Component {
   
   fetchSkus () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/material_skus?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    const currStoreId = this.props.global.currStoreId
+    const api = `api_products/material_skus?access_token=${accessToken}&_sid=${currStoreId}&with_code=1`
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({skus: res})
     })
   }
   
   fetchSuppliers () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/material_suppliers?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    const api = `api_products/material_suppliers?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({suppliers: res})
     })
   }
@@ -124,8 +126,8 @@ class MaterialPutIn extends React.Component {
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId} = this.state
-    const api = `/api_products/material_put_in?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    const api = `api_products/material_put_in?access_token=${accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
       id: receiptId,
       skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime
     }).then(res => {
@@ -133,7 +135,7 @@ class MaterialPutIn extends React.Component {
         navigation.goBack()
         navigation.state.params.onBack && navigation.state.params.onBack()
     }).catch(e => {
-      Modal.alert('错误', e.reason, [{text: '确定'}])
+      Alert.alert('错误', e.reason)
     })
   }
   

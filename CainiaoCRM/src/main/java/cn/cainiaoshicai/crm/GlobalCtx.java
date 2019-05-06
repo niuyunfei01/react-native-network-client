@@ -28,7 +28,10 @@ import android.widget.Toast;
 
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.ForegroundNotification;
@@ -159,6 +162,7 @@ public class GlobalCtx extends Application {
     //private SpeechSynthesizer mTts;
 
     private ReactInstanceManager mReactInstanceManager;
+    private ReactContext reactContext;
     private Config configByServer;
 
     public GlobalCtx() {
@@ -934,6 +938,17 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void sendRNEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
+        if (reactContext == null) {
+            return;
+        }
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
+    }
+
+    public ReactContext getReactContext() {
+        return reactContext != null ? reactContext : mReactInstanceManager != null ? mReactInstanceManager.getCurrentReactContext() : null;
+    }
+
     /**
      * 跳转到新的调价页面
      *
@@ -1143,6 +1158,7 @@ public class GlobalCtx extends Application {
     static public class ScanStatus {
         private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
         private Map<String, Map<String, String>> ls = Maps.newConcurrentMap();
+        private Map<String, String> upcList = Maps.newConcurrentMap();
 
         public long getLastTalking() {
             return lastTalking.longValue();

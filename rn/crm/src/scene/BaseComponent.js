@@ -15,8 +15,6 @@ export default class BaseComponent extends React.Component {
   }
   
   componentWillUnmount () {
-    this.setState = (state, callback) => {
-      return;
-    };
+  
   }
 }

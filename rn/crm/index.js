@@ -4,16 +4,12 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-
-
+import React, {Component} from 'react';
+import {AppRegistry, StyleSheet, UIManager} from 'react-native';
 import RootScene from "./src/RootScene";
+
+// 启用Android Layout动画
+UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
 export default class crm extends Component {
     render() {

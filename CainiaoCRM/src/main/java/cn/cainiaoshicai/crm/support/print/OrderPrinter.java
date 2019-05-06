@@ -43,28 +43,30 @@ public class OrderPrinter {
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    final boolean supportSunMiPrinter = supportSunMiPrinter();
-                    final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
-                    final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                    if (supportSunMiPrinter) {
-                        smPrintOrder(order);
-                    } else {
-                        if (order != null && order.getPrint_times() == 0) {
-                            PrintQueue.getQueue(GlobalCtx.app()).add(order);
+        if (SettingUtility.getAutoPrintSetting()) {
+            new MyAsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        final boolean supportSunMiPrinter = supportSunMiPrinter();
+                        final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+                        final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                        if (supportSunMiPrinter) {
+                            smPrintOrder(order);
                         } else {
-                            AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                            if (order != null && order.getPrint_times() == 0) {
+                                PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                            } else {
+                                AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                            }
                         }
+                    } catch (Exception e) {
+                        Log.e("auto print order error", e);
                     }
-                } catch (Exception e) {
-                    Log.e("auto print order error", e);
+                    return null;
                 }
-                return null;
-            }
-        }.executeOnNormal();
+            }.executeOnNormal();
+        }
     }
 
     public static BluetoothPrinters.DeviceStatus resetDeviceStatus(BluetoothPrinters.DeviceStatus ds) {
@@ -185,7 +187,7 @@ public class OrderPrinter {
             testData = printer.concatenate(testData, printer.startLineBytes());
             testData = printer.concatenate(testData, printer.normalTextBytes("外送帮，好生意！"));
             testData = printer.concatenate(testData, printer.newLineBytes());
-            testData = printer.concatenate(testData, new byte[]{0x0D,0x0D,0x0D});
+            testData = printer.concatenate(testData, new byte[]{0x0D, 0x0D, 0x0D});
             testData = printer.concatenate(testData, GPrinterCommand.walkPaper((byte) 4));
             PrintQueue.getQueue(GlobalCtx.app()).write(testData);
         } catch (Exception e) {
@@ -254,102 +256,109 @@ public class OrderPrinter {
     }
 
     public static void smPrintOrder(Order order) {
-        String mobile = order.getMobile();
-        mobile = mobile.replace("_", "转").replace(",", "转");
-
-        try {
-            ByteArrayOutputStream btos = new ByteArrayOutputStream();
-            BasePrinter printer = new BasePrinter(btos);
-            btos.write(new byte[]{0x1B, 0x21, 0});
-            btos.write(GPrinterCommand.left);
-
-            printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
-                    .newLine().highBigText("  #" + order.getDayId());
-
-            printer.normalText(order.platformWithId()).newLine();
-
-            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
-
-            printer.starLine()
-                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + mobile)
-                    .newLine()
-                    .highText(TextUtil.replaceWhiteStr(order.getAddress()));
-            if (!TextUtils.isEmpty(order.getDirection())) {
-                printer.highText("[" + order.getDirection() + "]");
-            }
-            printer.newLine();
-
-            String expectedStr = order.getExpectTimeStr();
-            if (expectedStr == null) {
-                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
-            }
-            printer.starLine().highText("期望送达：" + expectedStr).newLine();
-            if (!TextUtils.isEmpty(order.getRemark())) {
-                printer.highText("用户备注：" + order.getRemark())
-                        .newLine();
-            }
-
-            printer.starLine()
-                    .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
-                    .newLine()
-                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
-                    .newLine();
-
-            printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
-
-            int total = 0;
-            for (CartItem item : order.getItems()) {
-                String name = item.getProduct_name();
-                String tagCode = item.getTag_code();
-                if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
-                    name = name + "#" + tagCode;
-                }
-                if (item.getPrice() >= 0) {
-                    for (int idx = 0; idx < name.length(); ) {
-
-                        String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
-
-                        boolean isEnd = idx + MAX_TITLE_PART >= name.length();
-                        if (isEnd) {
-                            String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
-                            text = String.format(format, text, "x" + item.getNum());
-                        }
-                        printer.highText(text).newLine();
-                        if (isEnd) {
-                            printer.spaceLine();
-                        }
-
-                        idx += MAX_TITLE_PART;
-                    }
-                    total += item.getNum();
-                }
-            }
-            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
-            if (!TextUtils.isEmpty(order.getLine_additional())) {
-                printer.starLine().normalText(order.getLine_additional());
-            }
-            printer.starLine().highText(order.getLine_money_total()).newLine();
-
-            printer.starLine().normalText(order.getPrintFooter1())
-                    .newLine().normalText(order.getPrintFooter2());
-
-            String printFooter3 = order.getPrintFooter3();
-            if (!TextUtils.isEmpty(printFooter3)) {
-                printer.newLine().normalText(printFooter3);
-            }
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(GPrinterCommand.walkPaper((byte) 4));
-            AidlUtil.getInstance().sendRawData(btos.toByteArray());
+        int state = AidlUtil.getInstance().printerState();
+        if (state == 1) {
+            String mobile = order.getMobile();
+            mobile = mobile.replace("_", "转").replace(",", "转");
             try {
-                final String access_token = GlobalCtx.app().token();
-                new OrderActionDao(access_token).logOrderPrinted(order.getId());
-            } catch (ServiceException e) {
-                AppLogger.e("error Service Exception:" + e.getMessage());
+                ByteArrayOutputStream btos = new ByteArrayOutputStream();
+                BasePrinter printer = new BasePrinter(btos);
+                btos.write(new byte[]{0x1B, 0x21, 0});
+                btos.write(GPrinterCommand.left);
+
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText("  #" + order.getDayId());
+
+                printer.normalText(order.platformWithId()).newLine();
+
+                printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
+
+                printer.starLine()
+                        .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + mobile)
+                        .newLine()
+                        .highText(TextUtil.replaceWhiteStr(order.getAddress()));
+                if (!TextUtils.isEmpty(order.getDirection())) {
+                    printer.highText("[" + order.getDirection() + "]");
+                }
+                printer.newLine();
+
+                String expectedStr = order.getExpectTimeStr();
+                if (expectedStr == null) {
+                    expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+                }
+                printer.starLine().highText("期望送达：" + expectedStr).newLine();
+                if (!TextUtils.isEmpty(order.getRemark())) {
+                    printer.highText("用户备注：" + order.getRemark())
+                            .newLine();
+                }
+
+                printer.starLine()
+                        .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
+                        .newLine()
+                        .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+                        .newLine();
+
+                printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
+
+                int total = 0;
+                for (CartItem item : order.getItems()) {
+                    String name = item.getProduct_name();
+                    String tagCode = item.getTag_code();
+                    String shelfNo = item.getShelf_no();
+                    if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
+                        name = name + "#" + tagCode;
+                    }
+                    if (shelfNo != null && !"".equals(shelfNo) && !"0".equals(shelfNo)) {
+                        name = shelfNo + " " + name;
+                    }
+                    if (item.getPrice() >= 0) {
+                        for (int idx = 0; idx < name.length(); ) {
+
+                            String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
+                            boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                            if (isEnd) {
+                                String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                                text = String.format(format, text, "x" + item.getNum());
+                            }
+                            printer.highText(text).newLine();
+                            if (isEnd) {
+                                printer.spaceLine();
+                            }
+
+                            idx += MAX_TITLE_PART;
+                        }
+                        total += item.getNum();
+                    }
+                }
+                printer.highText(String.format("合计 %27s", "x" + total)).newLine();
+                if (!TextUtils.isEmpty(order.getLine_additional())) {
+                    printer.starLine().normalText(order.getLine_additional());
+                }
+                printer.starLine().highText(order.getLine_money_total()).newLine();
+
+                printer.starLine().normalText(order.getPrintFooter1())
+                        .newLine().normalText(order.getPrintFooter2());
+
+                String printFooter3 = order.getPrintFooter3();
+                if (!TextUtils.isEmpty(printFooter3)) {
+                    printer.newLine().normalText(printFooter3);
+                }
+                btos.write(0x0D);
+                btos.write(0x0D);
+                btos.write(0x0D);
+                AidlUtil.getInstance().sendRawData(btos.toByteArray());
+                AidlUtil.getInstance().printBarCode("WO" + order.getId(), 8, 81, 2, 2);
+                AidlUtil.getInstance().print3Line();
+                try {
+                    final String access_token = GlobalCtx.app().token();
+                    new OrderActionDao(access_token).logOrderPrinted(order.getId());
+                } catch (ServiceException e) {
+                    AppLogger.e("error Service Exception:" + e.getMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -519,7 +528,7 @@ public class OrderPrinter {
     }
 
     /**
-     * @param order     Must contain items!!!!
+     * @param order           Must contain items!!!!
      * @param isAutoPrint
      * @param printedCallback
      */

@@ -11,14 +11,18 @@ export default class JbbInput extends React.Component {
     value: PropTypes.string.isRequired,
     initValue:PropTypes.string,
     rows: PropTypes.number,
-    styles: PropTypes.object
+    styles: PropTypes.object,
+    autoFocus: PropTypes.bool,
+    keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad'])
   }
   
   static defaultProps = {
     placeholder: '',
     multiline: false,
     initValue:'',
-    rows: 1
+    rows: 1,
+    autoFocus: false,
+    keyboardType: 'default'
   }
   
   rerender () {
@@ -28,6 +32,8 @@ export default class JbbInput extends React.Component {
   render () {
     return (
       <TextInput
+        keyboardType={this.props.keyboardType}
+        autoFocus={this.props.autoFocus}
         underlineColorAndroid='transparent'
         placeholder={this.props.placeholder}
         onChangeText={(value) => this.props.onChange(value)}

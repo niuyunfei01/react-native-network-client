@@ -3,6 +3,8 @@ import {ToastShort} from './ToastUtils';
 import native from '../common/native'
 import {NavigationActions} from 'react-navigation'
 import AppConfig from "../config.js";
+import {tool} from "../common";
+
 /**
  * React-Native Fatch网络请求工具类
  * Fengtianhe create
@@ -42,20 +44,30 @@ class HttpUtils {
     } : {
       method: method,
       headers: {
-        requestTime: new Date().toISOString(),
+        request_time: new Date().toISOString(),
         version: DeviceInfo.getVersion(),
-        buildNumber: DeviceInfo.getBuildNumber(),
+        build_number: DeviceInfo.getBuildNumber(),
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     }
   }
   
-  static apiBase (method, url, params, navigation) {
+  static apiBase (method, url, params, props) {
     // Toast.loading('请求中', 0)
     const uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
+    
+    let store = {}, vendor = {}
+    if (props && props.global) {
+      store = tool.store(props.global)
+      vendor = tool.vendor(props.global)
+    }
+    let options = this.getOptions(method, params)
+    options.headers.store_id = store.id
+    options.headers.vendor_id = vendor.currVendorId
+    
     return new Promise((resolve, reject) => {
-      fetch(uri, this.getOptions(method, params))
+      fetch(uri, options)
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -72,7 +84,7 @@ class HttpUtils {
             if (response.ok) {
               resolve(response.obj)
             } else {
-              this.error(response)
+              this.error(response, props.navigation)
               reject && reject(response)
             }
           }
@@ -112,23 +124,23 @@ class HttpUtils {
   }
   
   static get (url, params) {
-    const navigation = this
-    return HttpUtils.apiBase('GET', url, params, navigation)
+    const props = this
+    return HttpUtils.apiBase('GET', url, params, props)
   }
   
   static post (url, params) {
-    const navigation = this
-    return HttpUtils.apiBase('POST', url, params, navigation)
+    const props = this
+    return HttpUtils.apiBase('POST', url, params, props)
   }
   
   static put (url, params) {
-    const navigation = this
-    return HttpUtils.apiBase('PUT', url, params, navigation)
+    const props = this
+    return HttpUtils.apiBase('PUT', url, params, props)
   }
   
   static delete (url, params) {
-    const navigation = this
-    return HttpUtils.apiBase('DELETE', url, params, navigation)
+    const props = this
+    return HttpUtils.apiBase('DELETE', url, params, props)
   }
 }
 

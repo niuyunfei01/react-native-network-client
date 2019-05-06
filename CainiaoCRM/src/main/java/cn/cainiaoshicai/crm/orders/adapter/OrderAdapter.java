@@ -51,7 +51,7 @@ import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 public class OrderAdapter extends BaseAdapter {
 
     private final Activity activity;
-    private ArrayList<Order> orders = new ArrayList<>();
+    private ArrayList<Order> orders;
     private static LayoutInflater inflater = null;
     private final int listType;
 
@@ -134,9 +134,13 @@ public class OrderAdapter extends BaseAdapter {
                 expect_time.setTextColor(lightBlue);
             }
 
-            if (!TextUtils.isEmpty(order.getPack_assign_name()) &&
+            if ( (!TextUtils.isEmpty(order.getPack_assign_name()) || !TextUtils.isEmpty(order.getPack_1st_worker())) &&
                     (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() ==  Cts.WM_ORDER_STATUS_TO_SHIP)) {
-                packAssigned.setText(order.getPack_assign_name());
+                if (!TextUtils.isEmpty(order.getPack_assign_name())) {
+                    packAssigned.setText("派:"+order.getPack_assign_name());
+                } else {
+                    packAssigned.setText("领:"+order.getPack_1st_worker());
+                }
                 packAssigned.setVisibility(View.VISIBLE);
             } else {
                 packAssigned.setVisibility(View.GONE);

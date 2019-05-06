@@ -233,11 +233,12 @@ export function curr_vendor (vendor_data, currVendorId) {
 }
 
 export function user_info (mine, currVendorId, currentUser) {
+  console.log('tool user => ', mine, currVendorId, currentUser)
   let user_info = {};
   if (
-    this.length(mine.user_list) > 0 &&
-    this.length(mine.user_list[currVendorId]) > 0 &&
-    this.length(mine.user_list[currVendorId][currentUser]) > 0
+    Object.keys(mine.user_list).length > 0 &&
+    Object.keys(mine.user_list[currVendorId]).length > 0 &&
+    Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
   ) {
     // let {
     //   id, nickname, nameRemark, mobilephone, image, //user 表数据
@@ -247,6 +248,13 @@ export function user_info (mine, currVendorId, currentUser) {
   }
   
   return user_info;
+}
+
+export function user (reduxGlobal, reduxMine) {
+  console.log('tool user => ', reduxGlobal, reduxMine)
+  const {currentUser} = reduxGlobal
+  const vendor = this.vendor(reduxGlobal)
+  return user_info(reduxMine, vendor.currVendorId, currentUser)
 }
 
 export function shortTimestampDesc (timestamp) {
@@ -789,6 +797,7 @@ export default {
   disWayStatic,
   disWay,
   vendor,
+  user,
   vendorOfStoreId,
   length,
   parameterByName,

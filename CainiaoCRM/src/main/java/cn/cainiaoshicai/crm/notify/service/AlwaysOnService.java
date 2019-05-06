@@ -6,16 +6,12 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.common.base.Strings;
-
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +22,6 @@ import cn.cainiaoshicai.crm.dao.StoreDao;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.jpush.android.api.JPushInterface;
 
 public class AlwaysOnService extends BaseService {

@@ -52,7 +52,7 @@ class Operation extends BaseComponent {
     const {accessToken, currStoreId} = this.props.global
     const self = this
     self.setState({isRefreshing: true})
-    HttpUtils.get.bind(this.props.navigation)(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
       self.setState({competition: res, isRefreshing: false})
     })
   }

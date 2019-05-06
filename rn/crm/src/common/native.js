@@ -65,6 +65,12 @@ export default {
     }
   },
 
+  gotoRNActivity: async function (action, json = '{}') {
+    if (NativeModules.ActivityStarter && action) {
+      await NativeModules.ActivityStarter.navigateToRnView(action, json);
+    }
+  },
+
   nativeBack: async function(){
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.nativeBack();
@@ -147,6 +153,11 @@ export default {
   speakText: async function(text, callback = function (ok, msg){}) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.speakText(text, callback))
+  },
+
+  showInputKeyboard: async function () {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.showInputMethod())
   },
 
   reportException: async function (msg, stack, currentExceptionID, isFatal) {

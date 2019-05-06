@@ -9,6 +9,8 @@ import HttpUtils from "../../util/http";
 import JbbButton from "../component/JbbButton";
 import JbbInput from "../component/JbbInput";
 import {tool} from "../../common";
+import Swipeout from 'react-native-swipeout';
+import WorkerPopup from "../component/WorkerPopup";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
@@ -33,11 +35,16 @@ class MaterialTask extends React.Component {
   
   constructor (props) {
     super(props)
+    const vendor = tool.vendor(this.props.global);
     const store = tool.store(this.props.global)
+    const {is_service_mgr = false} = vendor
     this.state = {
+      is_service_mgr: is_service_mgr,
       storeId: store.id,
       packingTask: [],
-      pendingTask: []
+      pendingTask: [],
+      selectRow: {},
+      workerPopup: false
     }
   }
   
@@ -47,34 +54,46 @@ class MaterialTask extends React.Component {
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api, {storeId: this.state.storeId}).then(res => {
+    HttpUtils.get.bind(self.props)(api, {storeId: this.state.storeId}).then(res => {
       self.setState({packingTask: res.packing, pendingTask: res.pending}, () => self.forceUpdate())
     })
   }
   
   getTask () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_task?access_token=${accessToken}`
-    HttpUtils.get.bind(navigation)(api).then(res => {
+    HttpUtils.get.bind(self.props)(api).then(res => {
       self.fetchData()
     })
   }
   
   onPickUp (item, isFinish) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
     }).then(res => {
       Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onAssignTask (user) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_assign_task?access_token=${accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      receiptId: this.state.selectRow.id,
+      userId: user.id,
+      storeId: this.state.storeId
+    }).then(res => {
+      Toast.success('操作成功')
+      self.setState({selectRow: {}, workerPopup: false})
       self.fetchData()
     })
   }
@@ -110,7 +129,7 @@ class MaterialTask extends React.Component {
                 />
                 <Text style={{textAlign: 'right'}}>份</Text>
               </View>
-              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>0工分</Text>
+              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>{task.pre_pack_score}工分</Text>
             </View>
           </For>
           <View style={styles.taskBtn}>
@@ -132,19 +151,35 @@ class MaterialTask extends React.Component {
     )
   }
   
+  renderItem (item, idx) {
+    const swipeOutBtns = [
+      {
+        text: '指派',
+        type: 'primary',
+        onPress: () => this.setState({selectRow: item, workerPopup: true})
+      }
+    ]
+    
+    return (
+      <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
+        <ListItem
+          key={idx}
+          extra={item.date}
+        >
+          {item.sku.name}
+          <ListItemBrief>
+            <Text style={{fontSize: 10}}>{`货重：${item.weight}公斤 扣重：${item.reduce_weight}公斤`}</Text>
+          </ListItemBrief>
+        </ListItem>
+      </Swipeout>
+    )
+  }
+  
   renderPendingTask () {
     return (
       <List renderHeader={`剩余待打包任务(${this.state.pendingTask.length}件)`}>
         <For of={this.state.pendingTask} each="item" index="idx">
-          <ListItem
-            key={idx}
-            extra={item.date}
-          >
-            {item.sku.name}
-            <ListItemBrief>
-              <Text style={{fontSize: 10}}>{`货重：${item.weight}公斤 扣重：${item.reduce_weight}公斤`}</Text>
-            </ListItemBrief>
-          </ListItem>
+          {this.renderItem(item, idx)}
         </For>
       </List>
     )
@@ -173,6 +208,14 @@ class MaterialTask extends React.Component {
             <Text>我完成的任务</Text>
           </View>
         </TouchableOpacity>
+  
+        <WorkerPopup
+          multiple={false}
+          visible={this.state.workerPopup}
+          onCancel={() => this.setState({workerPopup: false})}
+          onModalClose={() => this.setState({workerPopup: false})}
+          onClickWorker={(user) => this.onAssignTask(user)}
+        />
       </View>
     );
   }

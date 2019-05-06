@@ -1,6 +1,6 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View} from 'react-native'
+import {Alert,StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import color from '../../../widget/color'
 import JbbButton from "../../component/JbbButton";
@@ -68,7 +68,7 @@ class Delivery extends React.Component {
     const self = this
     const navigation = self.props.navigation
     const api = `/api/order_add_tips/${this.props.order.id}?access_token=${this.state.accessToken}`
-    HttpUtils.post.bind(navigation)(api, {
+    HttpUtils.post.bind(self.props)(api, {
       logisticId: logisticId,
       tips: val
     }).then(res => {
@@ -132,7 +132,7 @@ class Delivery extends React.Component {
   
   onCallSelf () {
     const self = this
-    Modal.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
+    Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
       {
         text: '确定',
         onPress: () => self.onTransferSelf()

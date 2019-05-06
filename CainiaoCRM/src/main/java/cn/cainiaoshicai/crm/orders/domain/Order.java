@@ -48,6 +48,7 @@ public class Order implements Serializable {
     private int ship_worker_id;
     private int pack_operator;
     private String pack_workers;
+    private String pack_1st_worker;
     private int order_times;
     private int paid_done;
     private int readyLeftMin;
@@ -559,6 +560,9 @@ public class Order implements Serializable {
         ship_worker_name = updatedO.ship_worker_name;
         ship_worker_id = updatedO.ship_worker_id;
         pack_operator = updatedO.pack_operator;
+        pack_1st_worker = updatedO.pack_1st_worker;
+        pack_assign_name = updatedO.pack_assign_name;
+
         pack_workers = updatedO.pack_workers;
         order_times = updatedO.order_times;
         paid_done = updatedO.paid_done;
@@ -733,6 +737,14 @@ public class Order implements Serializable {
 
     public void setPack_assign_name(String pack_assign_name) {
         this.pack_assign_name = pack_assign_name;
+    }
+
+    public String getPack_1st_worker() {
+        return pack_1st_worker;
+    }
+
+    public void setPack_1st_worker(String pack_1st_worker) {
+        this.pack_1st_worker = pack_1st_worker;
     }
 }
 
