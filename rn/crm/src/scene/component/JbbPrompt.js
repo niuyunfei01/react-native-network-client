@@ -6,19 +6,22 @@ import PropTypes from 'prop-types'
 
 export default class JbbPrompt extends React.Component {
   static propTypes = {
+    beforeVisible: PropTypes.func,
     onConfirm: PropTypes.func,
     onCancel: PropTypes.func,
-    initValue: PropTypes.string,
+    initValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     title: PropTypes.string,
     autoFocus: PropTypes.bool,
-    visible: PropTypes.bool
+    visible: PropTypes.bool,
+    keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad'])
   }
   
   static defaultProps = {
     initValue: '',
     title: '输入',
     visible: false,
-    autoFocus: false
+    autoFocus: false,
+    keyboardType: 'default'
   }
   
   constructor (props) {
@@ -41,12 +44,17 @@ export default class JbbPrompt extends React.Component {
     this.props.onCancel && this.props.onCancel()
   }
   
+  onConfirm () {
+    this.props.onConfirm && this.props.onConfirm(this.state.text)
+    this.setState({visible: false})
+  }
+  
   renderConfirm () {
     return (
       <ConfirmDialog
         visible={this.state.visible}
         onClickCancel={() => this.onCancel()}
-        onClickConfirm={() => this.props.onConfirm && this.props.onConfirm(this.state.text)}
+        onClickConfirm={() => this.onConfirm()}
       >
         <View style={styles.titleWrap}>
           <Text style={styles.titleText}>{this.props.title}</Text>
@@ -56,24 +64,32 @@ export default class JbbPrompt extends React.Component {
           <JbbInput
             autoFocus={this.props.autoFocus}
             onChange={(text) => this.setState({text})}
-            value={this.state.text}
+            value={String(this.state.text)}
             styles={{height: 35}}
+            keyboardType={this.props.keyboardType}
           />
         </View>
       </ConfirmDialog>
     )
   }
   
+  handlePressChild = () => {
+    if (this.props.beforeVisible) {
+      if (!this.props.beforeVisible()) {
+        return
+      }
+    }
+    this.setState({visible: true})
+  }
+  
   render () {
     return this.props.children ? (
       <View>
         {this.renderConfirm()}
-        
-        <If condition={this.props.children}>
-          <TouchableOpacity onPress={() => this.setState({visible: true})}>
-            {this.props.children}
-          </TouchableOpacity>
-        </If>
+  
+        <TouchableOpacity onPress={this.handlePressChild.bind(this)}>
+          {this.props.children}
+        </TouchableOpacity>
       </View>
     ) : this.renderConfirm()
   }

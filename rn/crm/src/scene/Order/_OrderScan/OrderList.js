@@ -1,26 +1,43 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import swipeable from "../../../widget/react-native-gesture-recognizers/swipeable";
+// import swipeable from "../../../widget/react-native-gesture-recognizers/swipeable";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
+import color from '../../../widget/color'
 import {screen} from "../../../common";
-import JbbButton from "../../component/JbbButton";
+import PropTypes from 'prop-types'
+import {ToastShort} from "../../../util/ToastUtils";
+import JbbPrompt from "../../component/JbbPrompt";
 
 var Dimensions = require('Dimensions');
 var screenWidth = Dimensions.get('window').width;
 var screenHeight = Dimensions.get('window').height;
 
-@swipeable({
-  horizontal: true,
-  vertical: false,
-  continuous: false,
-  initialVelocityThreshold: 0.7
-})
+// @swipeable({
+//   horizontal: true,
+//   vertical: false,
+//   continuous: false,
+//   initialVelocityThreshold: 0.7
+// })
 class OrderList extends BaseComponent {
+  static propTypes = {
+    onChgProdNum: PropTypes.func,
+    styles: PropTypes.object
+  }
+  
   constructor (props) {
     super(props)
   }
+  
+  beforeProdNumVisible (product) {
+    if (!product.scan_num || product.scan_num == 0) {
+      ToastShort('请先扫入一个商品')
+      return false
+    }
+    return true
+  }
+  
   
   renderOrderInfo (item) {
     return (
@@ -41,51 +58,65 @@ class OrderList extends BaseComponent {
     )
   }
   
+  renderProduct (prod, goodsItemIdx) {
+    console.log(prod)
+    return (
+      <View key={`goodsItemIdx_${goodsItemIdx}`} style={[styles.row]}>
+        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity onPress={() => console.log('click product image')}>
+            <Image
+              style={styles.product_img}
+              source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
+            />
+          </TouchableOpacity>
+          <View style={{flex: 1}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={[styles.product_name]}>{prod.name}</Text>
+              <JbbPrompt
+                beforeVisible={() => this.beforeProdNumVisible(prod)}
+                onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}
+                initValue={prod.scan_num ? prod.scan_num : 0}
+                keyboardType={'numeric'}
+              >
+                <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
+              </JbbPrompt>
+            </View>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text>
+                {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
+                &nbsp;
+                {!prod.product.upc && prod.sku.material_code ? `秤签：${prod.sku.material_code}` : ''}
+              </Text>
+              <Text style={styles.product_num}>X{prod.num}</Text>
+            </View>
+          </View>
+        </View>
+        
+        <If condition={Number(prod.scan_num) >= Number(prod.num)}>
+          <View style={styles.mask}>
+            <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
+          </View>
+        </If>
+      </View>
+    )
+  }
+  
   renderOrderItem (item) {
+    const self = this
     return (
       <View style={styles.itemContainer}>
         <View style={styles.itemTitleRow}>
           <Text style={styles.itemTitle}>商品明细</Text>
           <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
-          <Text style={styles.itemTitleScanTip}>已扫{item.scan_count}件商品</Text>
+          <Text style={styles.itemTitleScanTip} onPress={() => console.log('click scan num')}>
+            已扫{item.scan_count}件商品
+          </Text>
         </View>
         <View style={{marginBottom: this.props.footerHeight * 2}}>
           <ScrollView>
-            <For of={item.items} each="prod" index="goodsItemIdx">
-              <View key={`goodsItemIdx_${goodsItemIdx}`} style={[styles.row]}>
-                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-                  <TouchableOpacity>
-                    <Image
-                      style={styles.product_img}
-                      source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
-                    />
-                  </TouchableOpacity>
-                  <View style={{flex: 1}}>
-                    <Text
-                      style={[styles.product_name]}
-                    >{prod.name}</Text>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                      <Text>
-                        {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
-                        &nbsp;
-                        {!prod.product.upc && prod.sku.material_code ? `秤签：${prod.sku.material_code}` : ''}
-                      </Text>
-                      <Text style={styles.product_num}>X{prod.num}</Text>
-                    </View>
-                  </View>
-                </View>
-                
-                <View style={{marginLeft: 10, justifyContent: 'center', alignItems: 'center'}}>
-                  <JbbButton text={prod.scan_num ? String(prod.scan_num) : '0'}/>
-                </View>
-  
-                <If condition={prod.scan_num >= prod.num}>
-                  <View style={styles.mask}>
-                    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
-                  </View>
-                </If>
-              </View>
-            </For>
+            {item.items.map((prod, index) => {
+              return self.renderProduct.bind(self)(prod, index)
+            })}
           </ScrollView>
         </View>
       </View>
@@ -93,15 +124,13 @@ class OrderList extends BaseComponent {
   }
   
   render () {
+    const containerStyle = {
+      height: screenHeight - this.props.footerHeight
+    }
     return (
-      <View style={{flexDirection: 'row'}}>
+      <View style={[{flexDirection: 'row'}, this.props.style]}>
         <For of={this.props.dataSource} each="item" index="idx">
-          <View
-            style={[styles.container, {
-              height: screenHeight - this.props.footerHeight
-            }]}
-            key={idx}
-          >
+          <View style={[styles.container, containerStyle]} key={idx}>
             {this.renderOrderInfo(item)}
             {this.renderOrderItem(item)}
           </View>
@@ -191,6 +220,15 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     fontSize: pxToDp(26),
     color: '#f44140'
+  },
+  scanNum: {
+    marginLeft: pxToDp(10),
+    borderColor: color.theme,
+    borderWidth: pxToDp(1),
+    paddingVertical: pxToDp(10),
+    paddingHorizontal: pxToDp(15),
+    color: color.theme,
+    fontSize: pxToDp(26)
   }
 })
 
