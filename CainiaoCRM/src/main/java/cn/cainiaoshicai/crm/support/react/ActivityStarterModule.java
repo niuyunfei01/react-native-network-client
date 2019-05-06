@@ -442,7 +442,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     public void showInputMethod() {
         final Activity activity = getCurrentActivity();
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     /**
