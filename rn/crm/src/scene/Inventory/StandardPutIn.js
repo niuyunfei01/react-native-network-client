@@ -56,6 +56,8 @@ class StandardPutIn extends BaseComponent {
     this.fetchSuppliers()
     this.listenUpcInterval()
     this.fetchStandardProducts()
+
+    native.showInputKeyboard();
   }
   
   componentWillUnmount () {
