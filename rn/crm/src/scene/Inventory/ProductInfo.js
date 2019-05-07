@@ -227,7 +227,7 @@ class ProductInfo extends React.Component {
           <If condition={!this.state.isStandard}>
             <List.Item
               arrow={"horizontal"}
-              extra={this.state.productInfo.sku.name}
+              extra={`${this.state.productInfo.sku.name}(${this.state.productInfo.sku.id})`}
             >秤签名称</List.Item>
             <List.Item
               onClick={() => this.setState({tagCodePrompt: true})}

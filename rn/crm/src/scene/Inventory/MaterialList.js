@@ -15,6 +15,8 @@ import WorkerPopup from "../component/WorkerPopup";
 import {native, tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
 import LoadMore from "react-native-loadmore";
+import Mapping from '../../Mapping'
+import PackDetail from "./_MaterialList/PackDetail";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -63,7 +65,8 @@ class MaterialList extends React.Component {
       codeFromAndroidTimer: null,
       page: 1,
       isLastPage: false,
-      isLoading: false
+      isLoading: false,
+      packDetailDialog: false
     }
   }
   
@@ -220,6 +223,14 @@ class MaterialList extends React.Component {
     this.setState({headerMenu: false})
   }
   
+  onClickStatus (item) {
+    if (Mapping.Tools.ValueEqMapping(Mapping.Product.RECEIPT_STATUS.ENTRY.value, item.status)) {
+      this.setState({packDetailDialog: true, selectedItem: item})
+    } else {
+      this.setState({workerPopup: true, selectedItem: item})
+    }
+  }
+  
   renderHeaderMenu () {
     return (
       <Modal
@@ -282,8 +293,8 @@ class MaterialList extends React.Component {
           {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
           <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
             {this.renderStatusFilterBtn('待分配', 0, filterStatus === 0)}
-            {this.renderStatusFilterBtn('已完成', 1, filterStatus === 1)}
-            {this.renderStatusFilterBtn('进行中', 2, filterStatus === 2)}
+            {this.renderStatusFilterBtn('进行中', 1, filterStatus === 1)}
+            {this.renderStatusFilterBtn('已完成', 2, filterStatus === 2)}
           </View>
         </View>
         <View style={styles.drawerItem}>
@@ -349,7 +360,7 @@ class MaterialList extends React.Component {
         </View>
         <View style={[styles.itemLine]}>
           <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
-          <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
+          <TouchableOpacity onPress={() => this.onClickStatus(item)}>
             <View>
               <Text style={[styles.itemStatus]}>
                 {item.assign_user ? item.assign_user.nickname + ':' : null}{item.status_label}
@@ -420,6 +431,12 @@ class MaterialList extends React.Component {
           multiple={false}
           onClickWorker={(worker) => this.onAssignWorker(worker)}
           onCancel={() => this.setState({workerPopup: false})}
+        />
+  
+        <PackDetail
+          receiptId={this.state.selectedItem.id}
+          visible={this.state.packDetailDialog}
+          onClickClose={() => this.setState({packDetailDialog: false})}
         />
       </View>
     );
