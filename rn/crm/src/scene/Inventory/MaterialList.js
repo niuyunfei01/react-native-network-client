@@ -333,7 +333,7 @@ class MaterialList extends React.Component {
     )
   }
   
-  renderItem (item) {
+  renderItem (item, idx) {
     let swipeOutBtns = []
     if (item.type == 1) {
       swipeOutBtns.push({
