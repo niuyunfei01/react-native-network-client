@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, DeviceEventEmitter, Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {NavigationItem} from "../../widget";
 import {Toast} from 'antd-mobile-rn';
 import SearchInputBar from "../component/SearchInput";
@@ -10,6 +10,7 @@ import moment from 'moment'
 import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../config";
+import C from "../../config";
 import HttpUtils from "../../util/http";
 import WorkerPopup from "../component/WorkerPopup";
 import {native, tool} from "../../common";
@@ -17,6 +18,7 @@ import Swipeout from 'react-native-swipeout';
 import LoadMore from "react-native-loadmore";
 import Mapping from '../../Mapping'
 import PackDetail from "./_MaterialList/PackDetail";
+import {ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -62,6 +64,7 @@ class MaterialList extends React.Component {
       datePickerVisible: false,
       workerPopup: false,
       selectedItem: {},
+      detailItems: {},
       codeFromAndroidTimer: null,
       page: 1,
       isLastPage: false,
@@ -85,7 +88,7 @@ class MaterialList extends React.Component {
   }
   
   componentWillUnmount (): void {
-    clearInterval(this.codeFromAndroidTimer)
+    this.listenScanPackProd.remove()
   }
   
   fetchData () {
@@ -106,6 +109,21 @@ class MaterialList extends React.Component {
     })
   }
   
+  onFetchDetail (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/inventory_entry_detail/${item.id}?access_token=${accessToken}`
+    this.setState({isLoading: true})
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      if (res && Object.keys(res).length > 0) {
+        this.setState({packDetailDialog: true, detailItems: res, selectedItem: item})
+      } else {
+        ToastShort('无打包详情')
+        self.props.onClickClose()
+      }
+    })
+  }
+  
   onRefresh () {
     this.setState({page: 1}, () => this.fetchData())
   }
@@ -113,53 +131,38 @@ class MaterialList extends React.Component {
   // 获取Android
   getCodeFromAndroid () {
     const self = this
+    if (this.listenScanPackProd) {
+      this.listenScanPackProd.remove()
+    }
     let dealArr = []
     const accessToken = self.props.global.accessToken
     const api = `/api_products/material_put_in?access_token=${accessToken}`
-    if (this.codeFromAndroidTimer) {
-      clearInterval(this.codeFromAndroidTimer)
-    }
-    
-    
-    this.codeFromAndroidTimer = setInterval(function () {
-      native.listenScan(function (ok, items) {
-        if (ok) {
-          const lists = JSON.parse(items)
-          for (let obj of lists) {
-            if (obj.barCode) {
-              console.log('scan item => ', obj)
-              if (obj.type === 'IR' && !dealArr.includes(obj.barCode)) {
-                dealArr.push(barCode)
-                const {skuId, workerId, weight, barCode, datetime} = obj
-                HttpUtils.post.bind(self.props)(api, {
-                  skuId, weight, barCode, datetime,
-                  storeId: self.state.store.id,
-                  supplierId: workerId,
-                  price: 0,
-                  reduceWeight: 0
-                }).then(res => {
-                  let name = res.name ? res.name : '未知商品'
-                  native.clearScan(barCode)
-                  native.speakText(`收货${name}${res.weight}公斤`)
-                  Toast.success(`收货${name}${res.weight}公斤成功`)
-                  self.onRefresh()
-                }).catch(e => {
-                  if (e.reason === 'BARCODE_EXIST') {
-                    native.clearScan(barCode)
-                  } else {
-                    let idx = dealArr.indexOf(barCode)
-                    dealArr.splice(idx, 1)
-                  }
-                  Toast.offline('录入失败：' + e.reason)
-                })
-              }
-            } else {
-              native.clearScan(obj.barCode)
-            }
+    this.listenScanPackProd = DeviceEventEmitter.addListener(C.Listener.KEY_SCAN_PACK_PROD_BAR_CODE, function (obj) {
+      if (obj.type === 'IR' && !dealArr.includes(obj.barCode)) {
+        const {skuId, workerId, weight, barCode, datetime} = obj
+        dealArr.push(barCode)
+        HttpUtils.post.bind(self.props)(api, {
+          skuId, weight, barCode, datetime,
+          storeId: self.state.store.id,
+          supplierId: workerId,
+          price: 0,
+          reduceWeight: 0
+        }).then(res => {
+          let name = res.name ? res.name : '未知商品'
+          native.speakText(`收货${name}${res.weight}公斤`)
+          Toast.success(`收货${name}${res.weight}公斤成功`)
+          self.onRefresh()
+        }).catch(e => {
+          if (e.reason === 'BARCODE_EXIST') {
+            native.clearScan(barCode)
+          } else {
+            let idx = dealArr.indexOf(barCode)
+            dealArr.splice(idx, 1)
           }
-        }
-      })
-    }, 500)
+          Toast.offline('录入失败：' + e.reason)
+        })
+      }
+    })
   }
   
   showMenu () {
@@ -225,10 +228,30 @@ class MaterialList extends React.Component {
   
   onClickStatus (item) {
     if (Mapping.Tools.ValueEqMapping(Mapping.Product.RECEIPT_STATUS.ENTRY.value, item.status)) {
-      this.setState({packDetailDialog: true, selectedItem: item})
+      this.onFetchDetail(item)
     } else {
       this.setState({workerPopup: true, selectedItem: item})
     }
+  }
+  
+  onDisabledReceipt (item, idx) {
+    const self = this
+    Alert.alert('警告', `确定将此条记录置为无效么\n【${item.sku.name}】${item.weight}${item.type == 1 ? '公斤' : '件'} \n 置为无效后，如果是标品需要减去相应库存`, [
+      {text: '取消'},
+      {
+        text: '确定',
+        onPress: () => {
+          const accessToken = this.props.global.accessToken
+          const api = `/api_products/material_disabled/${item.id}?access_token=${accessToken}`
+          HttpUtils.post.bind(self.props)(api).then(res => {
+            Toast.success('操作成功')
+            const {materials} = self.state
+            materials.splice(idx, 1)
+            self.setState({materials})
+          })
+        }
+      }
+    ])
   }
   
   renderHeaderMenu () {
@@ -342,6 +365,11 @@ class MaterialList extends React.Component {
         })
       })
     }
+    swipeOutBtns.push({
+      text: '无效',
+      type: 'delete',
+      onPress: () => this.onDisabledReceipt(item, idx)
+    })
     
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
@@ -376,7 +404,7 @@ class MaterialList extends React.Component {
   renderList () {
     return (
       <For of={this.state.materials} each='item' index='idx'>
-        {this.renderItem(item)}
+        {this.renderItem(item, idx)}
       </For>
     )
   }
@@ -434,7 +462,8 @@ class MaterialList extends React.Component {
         />
   
         <PackDetail
-          receiptId={this.state.selectedItem.id}
+          details={this.state.detailItems}
+          item={this.state.selectedItem}
           visible={this.state.packDetailDialog}
           onClickClose={() => this.setState({packDetailDialog: false})}
         />
