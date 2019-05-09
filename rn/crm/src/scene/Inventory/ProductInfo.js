@@ -24,7 +24,7 @@ class ProductInfo extends React.Component {
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
-          onPress={() => native.toGoods()}
+          onPress={() => native.nativeBack()}
         />
       )
     }
@@ -51,7 +51,8 @@ class ProductInfo extends React.Component {
       tagCodePrompt: false,
       isStandard: false, // 是否是标品
       upcPrompt: false,
-      packScorePrompt: false
+      packScorePrompt: false,
+      stockCheckCyclePrompt: false
     }
   }
   
@@ -172,6 +173,19 @@ class ProductInfo extends React.Component {
     })
   }
   
+  onChgStockCheckCycle (value) {
+    const self = this
+    const api = `/api_products/chg_sku_stock_check_cycle?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      skuId: self.state.productInfo.sku.id,
+      cycle: value
+    }).then(res => {
+      this.setState({stockCheckCyclePrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
   renderHeader () {
     return (
       <View>
@@ -223,6 +237,11 @@ class ProductInfo extends React.Component {
               <List.Item arrow="horizontal">货架编号</List.Item>
             </Picker>
           </Swipeout>
+          <List.Item
+            arrow={"horizontal"}
+            extra={`${this.state.productInfo.sku.stock_check_cycle}天`}
+            onClick={() => this.setState({stockCheckCyclePrompt: true})}
+          >盘点周期</List.Item>
   
           <If condition={!this.state.isStandard}>
             <List.Item
@@ -298,6 +317,15 @@ class ProductInfo extends React.Component {
           onCancel={() => this.setState({packScorePrompt: false})}
           initValue={this.state.productInfo.product.pre_pack_score}
           visible={this.state.packScorePrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入盘点周期'}
+          onConfirm={(value) => this.onChgStockCheckCycle(value)}
+          onCancel={() => this.setState({stockCheckCyclePrompt: false})}
+          initValue={this.state.productInfo.sku.stock_check_cycle}
+          visible={this.state.stockCheckCyclePrompt}
         />
       </ScrollView>
     );

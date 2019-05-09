@@ -94,7 +94,6 @@ class GoodsApplyPrice extends Component {
   fetchData () {
     const self = this
     const {store_id, product_id, access_token, type} = self.state
-    const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
     HttpUtils.get.bind(this.props)(url, {sortType: type}).then(res => {
       self.setState({

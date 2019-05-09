@@ -374,29 +374,41 @@ class MaterialList extends React.Component {
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
         <View style={[styles.itemWrap]}>
-        <View style={[styles.itemLine]}>
-          <View style={{flex: 1}}>
-            <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
-          </View>
-          <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
-        </View>
-        <View style={[styles.itemLine]}>
-          <Text>{item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
-        </View>
-        <View style={[styles.itemLine]}>
-          <Text>{item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤' : '件'} {item.price}元</Text>
-        </View>
-        <View style={[styles.itemLine]}>
-          <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
-          <TouchableOpacity onPress={() => this.onClickStatus(item)}>
-            <View>
-              <Text style={[styles.itemStatus]}>
-                {item.assign_user ? item.assign_user.nickname + ':' : null}{item.status_label}
-              </Text>
+          <View style={[styles.itemLine]}>
+            <View style={{flex: 1}}>
+              <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
             </View>
-          </TouchableOpacity>
+            <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
+          </View>
+          <If condition={item.bar_code}>
+            <View style={[styles.itemLine]}>
+              <Text>{item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
+            </View>
+          </If>
+          <View style={[styles.itemLine]}>
+            <Text>
+              {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
+              {item.price}元
+            </Text>
+          </View>
+          <View style={[styles.itemLine]}>
+            <If condition={item.type == 1 && item.status == 2}>
+              <Text>
+                {`打包重量：${item.pack_weight}公斤 | `}
+              </Text>
+            </If>
+          </View>
+          <View style={[styles.itemLine]}>
+            <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
+            <TouchableOpacity onPress={() => this.onClickStatus(item)}>
+              <View>
+                <Text style={[styles.itemStatus]}>
+                  {item.assign_user ? item.assign_user.nickname + ':' : null}{item.status_label}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
       </Swipeout>
     )
   }

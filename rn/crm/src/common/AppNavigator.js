@@ -110,6 +110,7 @@ import InventoryMaterialPutIn from '../scene/Inventory/MaterialPutIn'
 import InventoryStandardPutIn from '../scene/Inventory/StandardPutIn'
 import InventoryMaterialTask from '../scene/Inventory/MaterialTask'
 import InventoryMaterialTaskFinish from '../scene/Inventory/MaterialTaskFinish'
+import InventoryStockCheck from '../scene/Inventory/StockCheck'
 import Cts from "../Cts";
 
 
@@ -389,6 +390,7 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
+        [Config.ROUTE_INVENTORY_STOCK_CHECK]: {screen: InventoryStockCheck},
       },
       stackNavigatorConfigs
     );

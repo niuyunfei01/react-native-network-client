@@ -132,8 +132,7 @@ class StandardPutIn extends BaseComponent {
       price: self.state.price,
       number: self.state.number
     }).then(res => {
-      self.setState({product: {}, number: '0', price: '0', supplier: {}})
-      self.listenUpcInterval()
+      self.setState({product: {}, number: '0', price: '0', upc: ''})
     })
   }
   

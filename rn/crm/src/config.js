@@ -172,6 +172,7 @@ const C = {
   ROUTE_INVENTORY_STANDARD_PUT_IN: 'InventoryStandardPutIn',                    // 库存 - 标品入库
   ROUTE_INVENTORY_MATERIAL_TASK: 'InventoryMaterialTask',                       // 库存 - 原材料任务
   ROUTE_INVENTORY_MATERIAL_TASK_FINISH: 'InventoryMaterialTaskFinish',          // 库存 - 原材料我完成的任务
+  ROUTE_INVENTORY_STOCK_CHECK: 'InventoryStockCheck',                           // 库存 - 库存盘点
   serverUrl,
   apiUrl,
   staticUrl,
