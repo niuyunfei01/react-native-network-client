@@ -54,7 +54,6 @@ class MaterialTask extends React.Component {
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api, {storeId: this.state.storeId}).then(res => {
@@ -64,7 +63,6 @@ class MaterialTask extends React.Component {
   
   getTask () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_task?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -74,7 +72,6 @@ class MaterialTask extends React.Component {
   
   onPickUp (item, isFinish) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
@@ -88,7 +85,6 @@ class MaterialTask extends React.Component {
   
   onAssignTask (user) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
@@ -133,7 +129,7 @@ class MaterialTask extends React.Component {
                 />
                 <Text style={{textAlign: 'right'}}>份</Text>
               </View>
-              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>0工分</Text>
+              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>{task.pre_pack_score}工分</Text>
             </View>
           </For>
           <View style={styles.taskBtn}>

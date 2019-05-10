@@ -64,6 +64,7 @@ class MaterialPutIn extends React.Component {
     state.receiptId = params.receiptId ? params.receiptId : null
     state.barCode = params.barCode ? params.barCode : null
     state.weight = params.weight ? params.weight : '0'
+    state.price = params.price ? params.price : '0'
     state.datetime = params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
     this.setState(state)
     
@@ -77,7 +78,6 @@ class MaterialPutIn extends React.Component {
   
   setSupplier (supplierCode) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -91,7 +91,6 @@ class MaterialPutIn extends React.Component {
   
   setSku (skuId) {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_get_sku/${skuId}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -105,7 +104,6 @@ class MaterialPutIn extends React.Component {
   
   fetchSkus () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const currStoreId = this.props.global.currStoreId
     const api = `api_products/material_skus?access_token=${accessToken}&_sid=${currStoreId}&with_code=1`
@@ -116,7 +114,6 @@ class MaterialPutIn extends React.Component {
   
   fetchSuppliers () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_suppliers?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {

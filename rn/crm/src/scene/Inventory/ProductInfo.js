@@ -24,7 +24,7 @@ class ProductInfo extends React.Component {
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
-          onPress={() => native.toGoods()}
+          onPress={() => native.nativeBack()}
         />
       )
     }
@@ -50,7 +50,9 @@ class ProductInfo extends React.Component {
       refreshing: false,
       tagCodePrompt: false,
       isStandard: false, // 是否是标品
-      upcPrompt: false
+      upcPrompt: false,
+      packScorePrompt: false,
+      stockCheckCyclePrompt: false
     }
   }
   
@@ -67,7 +69,6 @@ class ProductInfo extends React.Component {
   
   fetchShelfNos () {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/inventory_shelf_nos?access_token=${this.props.global.accessToken}`
     HttpUtils.get.bind(self.props)(api, {
       productId: self.state.productId,
@@ -79,7 +80,6 @@ class ProductInfo extends React.Component {
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/inventory_info?access_token=${this.props.global.accessToken}`
     self.setState({refreshing: true})
     HttpUtils.get.bind(self.props)(api, {
@@ -97,7 +97,6 @@ class ProductInfo extends React.Component {
   
   onModifyPosition (value) {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/modify_inventory_shelf_no?access_token=${this.props.global.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
@@ -111,7 +110,6 @@ class ProductInfo extends React.Component {
   
   onClearShelfNo () {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/clear_inventory_shelf_no?access_token=${this.props.global.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
@@ -124,7 +122,6 @@ class ProductInfo extends React.Component {
   
   onChgTagCode (val) {
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/chg_sku_tag_code?access_token=${this.props.global.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       skuId: self.state.productInfo.sku.id,
@@ -137,11 +134,8 @@ class ProductInfo extends React.Component {
   }
   
   onConfirmUpc (upc) {
-    console.log('upc => ', upc)
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/chg_prod_upc?access_token=${this.props.global.accessToken}`
-    native.clearUpcScan(upc)
     HttpUtils.post.bind(self.props)(api, {
       productId: self.state.productId,
       upc: upc
@@ -154,15 +148,39 @@ class ProductInfo extends React.Component {
   }
   
   onChangeNeedPack (checked) {
-    console.log('on switch changed => ', checked)
     const self = this
-    const navigation = this.props.navigation
     const api = `/api_products/chg_sku_need_pack?access_token=${this.props.global.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       skuId: self.state.productInfo.sku.id,
       storeId: self.state.storeId,
       need_pack: checked ? 1 : 0
     }).then(res => {
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onChgPrePackScore (value) {
+    const self = this
+    const api = `/api_products/chg_prod_pre_pack_score?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      productId: self.state.productId,
+      prePackScore: value
+    }).then(res => {
+      this.setState({packScorePrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onChgStockCheckCycle (value) {
+    const self = this
+    const api = `/api_products/chg_sku_stock_check_cycle?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      skuId: self.state.productInfo.sku.id,
+      cycle: value
+    }).then(res => {
+      this.setState({stockCheckCyclePrompt: false})
       Toast.success('操作成功')
       self.fetchData()
     })
@@ -219,11 +237,16 @@ class ProductInfo extends React.Component {
               <List.Item arrow="horizontal">货架编号</List.Item>
             </Picker>
           </Swipeout>
+          <List.Item
+            arrow={"horizontal"}
+            extra={`${this.state.productInfo.sku.stock_check_cycle}天`}
+            onClick={() => this.setState({stockCheckCyclePrompt: true})}
+          >盘点周期</List.Item>
   
           <If condition={!this.state.isStandard}>
             <List.Item
               arrow={"horizontal"}
-              extra={this.state.productInfo.sku.name}
+              extra={`${this.state.productInfo.sku.name}(${this.state.productInfo.sku.id})`}
             >秤签名称</List.Item>
             <List.Item
               onClick={() => this.setState({tagCodePrompt: true})}
@@ -237,6 +260,13 @@ class ProductInfo extends React.Component {
                 onChange={(checked) => this.onChangeNeedPack(checked)}
               />}
             >需要打包</List.Item>
+            <If condition={this.state.productInfo.sku.need_pack == 1}>
+              <List.Item
+                arrow={"horizontal"}
+                extra={this.state.productInfo.product.pre_pack_score}
+                onClick={() => this.setState({packScorePrompt: true})}
+              >打包工分</List.Item>
+            </If>
           </If>
   
           <If condition={this.state.isStandard}>
@@ -278,6 +308,24 @@ class ProductInfo extends React.Component {
           onCancel={() => this.setState({upcPrompt: false})}
           initValue={''}
           visible={this.state.upcPrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入打包工分'}
+          onConfirm={(value) => this.onChgPrePackScore(value)}
+          onCancel={() => this.setState({packScorePrompt: false})}
+          initValue={this.state.productInfo.product.pre_pack_score}
+          visible={this.state.packScorePrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入盘点周期'}
+          onConfirm={(value) => this.onChgStockCheckCycle(value)}
+          onCancel={() => this.setState({stockCheckCyclePrompt: false})}
+          initValue={this.state.productInfo.sku.stock_check_cycle}
+          visible={this.state.stockCheckCyclePrompt}
         />
       </ScrollView>
     );

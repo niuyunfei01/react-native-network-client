@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
@@ -435,6 +436,13 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             Map<String, String> p = gson.fromJson(params, Map.class);
             GlobalCtx.app().toRnView(activity, action, p);
         }
+    }
+
+    @ReactMethod
+    public void showInputMethod() {
+        final Activity activity = getCurrentActivity();
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     /**

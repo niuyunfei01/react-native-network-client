@@ -927,6 +927,16 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toStockCheck(Activity ctx, int pid, int storeId) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryStockCheck");
+        Bundle params = new Bundle();
+        params.putInt("productId", pid);
+        params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     public void toRnView(Activity ctx, String action, Map<String, String> params) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", action);

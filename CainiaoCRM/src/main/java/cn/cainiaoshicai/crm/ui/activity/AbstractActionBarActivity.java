@@ -65,33 +65,31 @@ public class AbstractActionBarActivity extends AppCompatActivity implements Blue
     @Override
     public void onScanSuccess(String barcode) {
         try {
+            ReactContext reactContext = GlobalCtx.app().getReactContext();
             System.out.println("barcode => " + barcode);
+
             barcode = barcode.replaceAll("\\s+", "");
             if (barcode.startsWith("IR")) {
                 Map<String, String> result = BarCodeUtil.extractCode(barcode);
-                GlobalCtx.app().scanInfo().add(result);
-                long lastTalking = GlobalCtx.app().scanInfo().getLastTalking();
-                if (lastTalking - System.currentTimeMillis() > 1000) {
-                    GlobalCtx.app().toRnView(this, result.get("action"), result);
-                } else {
-                    System.out.println("lastTalking = " + (lastTalking / 1000) + ", now=" + (System.currentTimeMillis() / 1000));
+                WritableMap params = Arguments.createMap();
+                for (Map.Entry<String, String> entry : result.entrySet()) {
+                    params.putString(entry.getKey(), entry.getValue());
                 }
+                GlobalCtx.app().sendRNEvent(reactContext, "listenScanIrCode", params);
             } else if (barcode.startsWith("PROD")) {
                 Map<String, String> result = BarCodeUtil.extractCode(barcode);
                 WritableMap params = Arguments.createMap();
                 for (Map.Entry<String, String> entry : result.entrySet()) {
                     params.putString(entry.getKey(), entry.getValue());
                 }
-                ReactContext reactContext = GlobalCtx.app().getReactContext();
                 GlobalCtx.app().sendRNEvent(reactContext, "listenScanProductCode", params);
             } else if (barcode.startsWith("WO")) {
-                ReactContext reactContext = GlobalCtx.app().getReactContext();
                 WritableMap params = Arguments.createMap();
                 params.putString("orderId", barcode.replace("WO", ""));
                 GlobalCtx.app().sendRNEvent(reactContext, "listenScanBarCode", params);
             } else {
-                if (BarCodeUtil.checkGTIN(barcode, true)) {
-                    ReactContext reactContext = GlobalCtx.app().getReactContext();
+                //标品处理
+                if (barcode.startsWith("JBBUPC") || BarCodeUtil.checkGTIN(barcode, true)) {
                     WritableMap params = Arguments.createMap();
                     params.putString("barCode", barcode);
                     GlobalCtx.app().sendRNEvent(reactContext, "listenScanStandardProdBarCode", params);

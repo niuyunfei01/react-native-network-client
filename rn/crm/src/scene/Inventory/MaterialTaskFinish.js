@@ -70,8 +70,10 @@ class MaterialTaskFinish extends React.Component {
           <For each='entry' of={item.entries} index='entryIdx'>
             <View style={styles.entryItem} key={entryIdx}>
               <Text style={{fontSize: 12, flex: 1}}>{entry.product.name}</Text>
-              <Text style={{fontSize: 12, width: 40, textAlign: 'left'}}>{entry.num}份</Text>
-              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>{entry.score}工分</Text>
+              <Text style={{fontSize: 12, width: 80, textAlign: 'left'}}>
+                {entry.pack_user.nickname} {entry.num > 0 ? `+${entry.num}` : entry.num}份
+              </Text>
+              <Text style={{fontSize: 12, width: 60, textAlign: 'right'}}>{entry.score}工分</Text>
             </View>
           </For>
         </View>

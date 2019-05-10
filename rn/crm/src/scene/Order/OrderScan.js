@@ -10,7 +10,6 @@ import {ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import config from '../../config'
-import ItemNumPrompt from "./_OrderScan/ItemNumPrompt";
 import EmptyData from "../component/EmptyData";
 
 const {directions: {SWIPE_LEFT, SWIPE_RIGHT}} = swipeable;
@@ -46,9 +45,7 @@ class OrderScan extends BaseComponent {
       idx: 0,
       orderIds: [],
       dataSource: [],
-      currentOrder: {},
-      scanProd: {},
-      prodNumPrompt: false
+      currentOrder: {}
     }
   }
   
@@ -60,11 +57,14 @@ class OrderScan extends BaseComponent {
     }
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
       console.log('scan bar code listener => order id :', orderId);
-      let {orderIds = []} = self.state;
+      let {orderIds = [], dataSource = []} = self.state;
       console.log('scan bar code listener => state order ids :', orderIds);
+      console.log('fetch order => state data sources :', dataSource)
       const idx = orderIds.indexOf(orderId);
       if (idx >= 0) {
-        self.swipeToOrder(idx)
+        self.setState({currentOrder: dataSource[idx]}, () => {
+          self.swipeToOrder(idx)
+        })
       } else {
         self.fetchOrder(orderId)
       }
@@ -100,7 +100,6 @@ class OrderScan extends BaseComponent {
   
   fetchOrder (orderId) {
     const self = this;
-    const navigation = self.props.navigation;
     const accessToken = self.props.global.accessToken;
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
@@ -117,11 +116,11 @@ class OrderScan extends BaseComponent {
   
   swipeToOrder (toIdx) {
     let {x, y, idx, dataSource} = this.state;
+    console.log(`auto swipe to idx ${idx} toIdx ${toIdx}`)
     if (toIdx != idx) {
       let viewHeight = screenHeight - footerHeight
       x = 0 - toIdx * screenWidth
       LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
-      console.log(`auto swipe to x ${x} y ${y} idx ${idx} toIdx ${toIdx}`)
       this.setState({x, y, idx: toIdx});
     }
   }
@@ -135,8 +134,8 @@ class OrderScan extends BaseComponent {
       return
     }
     const {tagCode, weight = 0, barCode = ''} = prodCode
-    const idx = orderIds.indexOf(id)
     const {id, items, scan_count} = currentOrder
+    const idx = orderIds.indexOf(id)
     for (let i in items) {
       let item = items[i]
       if (
@@ -150,13 +149,16 @@ class OrderScan extends BaseComponent {
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
           // 如果拣货数量够，就置底
-          if (item.scan_num >= item.num) {
+          if (Number(item.scan_num) >= Number(item.num)) {
             items.splice(i, 1)
             items.push(item)
           }
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
-          dataSource = dataSource.splice(idx, 1, currentOrder)
+          console.log('handle scan product current order : ', currentOrder)
+          console.log('handle scan product data source  before : ', dataSource)
+          dataSource.splice(idx, 1, currentOrder)
+          console.log('handle scan product data source after : ', dataSource)
           self.setState({dataSource})
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
           
@@ -190,13 +192,8 @@ class OrderScan extends BaseComponent {
           native.speakText('该商品已经拣够了！')
           return
         } else {
-          if (item.num || item.scan_num - item.num == 1) {
-            self.handleScanProduct({tagCode: barCode}, true, 1)
-            return
-          } else {
-            self.setState({scanProd: item, prodNumPrompt: true})
-            return
-          }
+          self.handleScanProduct({tagCode: barCode}, true, 1)
+          return
         }
       }
     }
@@ -206,7 +203,6 @@ class OrderScan extends BaseComponent {
   
   addScanProdLog (order_id, item_id, num, code, bar_code, type, weight) {
     const self = this
-    const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/add_inventory_exit_log?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
@@ -216,13 +212,12 @@ class OrderScan extends BaseComponent {
     })
   }
   
-  updateScanProdLogNum (order_id, item_id, num, code) {
+  updateScanProdLogNum (order_id, item_id, num) {
     const self = this
-    const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `/api_products/update_inventory_exit_log?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      order_id, item_id, num, code, type: 2
+      order_id, item_id, num
     }).then(res => {
     
     })
@@ -235,12 +230,11 @@ class OrderScan extends BaseComponent {
     const idx = orderIds.indexOf(id)
     console.log('force pick up dataSource before', dataSource, 'orderIds', orderIds, ' currentOrder', currentOrder, 'idx', idx)
   
-    const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(() => {
-      dataSource = dataSource.splice(idx + 1, 1)
-      orderIds = orderIds.splice(idx + 1, 1)
+      dataSource.splice(idx + 1, 1)
+      orderIds.splice(idx + 1, 1)
       currentOrder = dataSource.length ? dataSource[0] : {}
       self.setState({dataSource, currentOrder, orderIds}, () => self.swipeToOrder(0))
     })
@@ -284,6 +278,25 @@ class OrderScan extends BaseComponent {
     });
   };
   
+  onChgProdNum (prodIdx, number) {
+    let {currentOrder, orderIds, dataSource} = this.state
+    const {id} = currentOrder
+    const idx = orderIds.indexOf(id)
+    const oldNumber = currentOrder.items[prodIdx].scan_num
+    currentOrder.items[prodIdx].scan_num = number
+    const item = currentOrder.items[prodIdx]
+    // 如果拣货数量够，就置底
+    if (Number(currentOrder.items[prodIdx].scan_num) >= Number(currentOrder.items[prodIdx].num)) {
+      currentOrder.items.splice(prodIdx, 1)
+      currentOrder.items.push(item)
+    }
+    currentOrder.scan_count = currentOrder.scan_count - oldNumber + Number(number)
+    dataSource[idx] = currentOrder
+    this.setState({currentOrder, dataSource})
+    
+    this.updateScanProdLogNum(currentOrder.id, item.id, number)
+  }
+  
   renderBtn () {
     return (
       <View style={styles.footerContainer}>
@@ -303,11 +316,16 @@ class OrderScan extends BaseComponent {
   
   render () {
     const {x, y, dataSource} = this.state;
-    
+    const OrderListStyle = {
+      left: x,
+      top: y,
+      position: 'absolute',
+    }
     return dataSource.length ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
           <OrderList
+            style={OrderListStyle}
             footerHeight={footerHeight}
             dataSource={this.state.dataSource}
             onSwipeBegin={this.onSwipeBegin}
@@ -316,22 +334,11 @@ class OrderScan extends BaseComponent {
               top: y,
               position: 'absolute',
             }}
+            onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
           />
         </View>
         
         {this.renderBtn()}
-  
-        <ItemNumPrompt
-          visible={this.state.prodNumPrompt}
-          title={`请输入商品【${this.state.scanProd.name}】的数量`}
-          onConfirm={(number) => {
-            this.handleScanProduct({tagCode: this.state.scanProd.product.upc}, true, number);
-            this.setState({scanProd: {}, prodNumPrompt: false})
-          }}
-          onCancel={() => this.setState({scanProd: {}, prodNumPrompt: false})}
-          initValue={0}
-          maxNumber={this.state.scanProd.num - (this.state.scanProd.scan_num ? this.state.scanProd.scan_num : 0)}
-        />
       </View>
     ) : <EmptyData/>
   }
