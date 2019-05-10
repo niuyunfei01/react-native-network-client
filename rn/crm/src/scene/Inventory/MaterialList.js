@@ -382,22 +382,28 @@ class MaterialList extends React.Component {
           </View>
           <If condition={item.bar_code}>
             <View style={[styles.itemLine]}>
-              <Text>{item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}</Text>
+              <Text style={styles.itemText}>
+                {item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}
+              </Text>
             </View>
           </If>
           <View style={[styles.itemLine]}>
-            <Text>
+            <Text style={styles.itemText}>
               {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
               {item.price}元
             </Text>
           </View>
-          <View style={[styles.itemLine]}>
-            <If condition={item.type == 1 && item.status == 2}>
-              <Text>
+          <If condition={item.type == 1 && item.status == 2 && item.sku && item.sku.need_pack == 1}>
+            <View style={[styles.itemLine]}>
+              <Text style={styles.itemText}>
                 {`打包重量：${item.pack_weight}公斤 | `}
+                {`损耗：${item.pack_loss}公斤 | `}
+                <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
+                  {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
+                </Text>
               </Text>
-            </If>
-          </View>
+            </View>
+          </If>
           <View style={[styles.itemLine]}>
             <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
             <TouchableOpacity onPress={() => this.onClickStatus(item)}>
@@ -546,6 +552,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  itemText: {
+    fontSize: 12,
   },
   itemTitle: {
     fontSize: 16,
