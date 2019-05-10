@@ -13,7 +13,8 @@ export default class JbbInput extends React.Component {
     rows: PropTypes.number,
     styles: PropTypes.object,
     autoFocus: PropTypes.bool,
-    keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad'])
+    keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad']),
+    onBlur: PropTypes.func,
   }
   
   static defaultProps = {
@@ -43,6 +44,7 @@ export default class JbbInput extends React.Component {
         multiline={this.props.rows > 1}
         numberOfLines={this.props.rows}
         defaultValue={this.props.initValue}
+        onBlur={() => this.props.onBlur && this.props.onBlur()}
       />
     );
   }

@@ -19,6 +19,7 @@ import LoadMore from "react-native-loadmore";
 import Mapping from '../../Mapping'
 import PackDetail from "./_MaterialList/PackDetail";
 import {ToastShort} from "../../util/ToastUtils";
+import JbbInput from "../component/JbbInput";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -60,6 +61,7 @@ class MaterialList extends React.Component {
       filterStatus: '',
       filterDate: '',
       filterName: '',
+      filterLossPercent: '',
       materials: [],
       datePickerVisible: false,
       workerPopup: false,
@@ -100,7 +102,8 @@ class MaterialList extends React.Component {
       page: this.state.page,
       status: this.state.filterStatus,
       date: this.state.filterDate,
-      name: this.state.filterName
+      name: this.state.filterName,
+      lossPercent: this.state.filterLossPercent / 100
     }).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage
@@ -329,6 +332,19 @@ class MaterialList extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
+        <View style={styles.drawerItem}>
+          <Text style={styles.drawerItemLabel}>损耗</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Text>高于百分比(%)</Text>
+            <JbbInput
+              styles={styles.filterInput}
+              onChange={(value) => this.setState({filterLossPercent: value})}
+              value={this.state.filterLossPercent}
+              keyboardType={'numeric'}
+              onBlur={() => this.onRefresh()}
+            />
+          </View>
+        </View>
       </View>
     )
   }
@@ -539,6 +555,13 @@ const styles = StyleSheet.create({
   drawerItemTagLight: {
     backgroundColor: color.theme,
     color: '#fff',
+  },
+  filterInput: {
+    height: 18,
+    fontSize: 12,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    marginHorizontal: 0
   },
   itemWrap: {
     padding: 20,
