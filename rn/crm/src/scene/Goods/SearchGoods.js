@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Image, Text, TouchableOpacity, View, StyleSheet, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
@@ -131,9 +131,9 @@ class SearchGoods extends Component {
     }, () => this.search())
   }
   
-  changeRowExist (idx) {
+  changeRowExist (idx, supplyPrice) {
     const products = this.state.goods
-    products[idx].is_exist = true
+    products[idx].is_exist = {supply_price: supplyPrice}
     this.setState({goods: products})
   }
   
@@ -207,7 +207,7 @@ class SearchGoods extends Component {
                 product_id: product.id,
                 mode: 2,
                 onlineType: this.state.onlineType,
-                onBack: () => this.changeRowExist(idx)
+                onBack: (supplyPrice) => this.changeRowExist(idx,supplyPrice)
               })}>
                 <View style={styles.toOnlineBtn}>
                   <Text style={styles.toOnlineBtnText}>上架</Text>

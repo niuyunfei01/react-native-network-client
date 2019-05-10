@@ -81,7 +81,7 @@ class OnlineStoreProduct extends Component {
       onlineType: this.state.onlineType
     }).then(res => {
       self.props.navigation.state.params.onBack()
-      self.props.navigation.goBack()
+      self.props.navigation.goBack(supply_price * 100)
     })
   }
   
