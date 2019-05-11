@@ -223,7 +223,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day() / 5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend() / 2.0));
-        if (!GlobalCtx.app().getVendor().isFnProviding()) {
+        if (GlobalCtx.app().getVendor() != null && !GlobalCtx.app().getVendor().isFnProviding()) {
             holder.sold_5day.setVisibility(View.GONE);
             holder.sold_weekend.setVisibility(View.GONE);
             holder.sold_weekend_fen.setVisibility(View.GONE);
