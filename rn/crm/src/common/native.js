@@ -130,6 +130,11 @@ export default {
       NativeModules.ActivityStarter.printSmPrinter(JSON.stringify(order), callback));
   },
 
+  printInventoryOrder: async function (supplierOrder, callback = function () {}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.printInventoryOrder(JSON.stringify(supplierOrder), callback));
+  },
+
   ordersByMobileTimes: async function(phone, times) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))

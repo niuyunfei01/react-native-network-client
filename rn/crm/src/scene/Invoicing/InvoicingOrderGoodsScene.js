@@ -48,6 +48,7 @@ import moment from "moment"
 import {ToastLong} from "../../util/ToastUtils";
 
 import numeral from "numeral";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -440,6 +441,26 @@ class InvoicingOrderGoodsScene extends Component {
     );
   }
 
+  printOrder(order){
+    const {invoicing} = this.props;
+    let {suppliers} = invoicing;
+    let suppliersMap = {};
+    _.forEach(suppliers, function (val) {
+      let id = val['id'];
+      suppliersMap[id] = val;
+    });
+
+    let data = {
+      'id': order.id,
+      'supplierId': order.supplier_id,
+      'supplierName': suppliersMap[order.supplier_id]['name'],
+      'date': order.consignee_date,
+      'createName': order.create_name,
+      'items': order.req_items
+    };
+    native.printInventoryOrder(data)
+  }
+
   commonHandleProxy(id, storeId, handle) {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
@@ -576,11 +597,11 @@ class InvoicingOrderGoodsScene extends Component {
 
   renderItems() {
     let {invoicing} = this.props;
-    let {suppliers} = invoicing;
-    let suppliersMap = {};
     const orderCtrlStatus = this.state.orderCtrlStatus;
     const storeCtrlStatus = this.state.storeCtrlStatus;
     const listData = this.getListDataByStatus();
+    let {suppliers} = invoicing;
+    let suppliersMap = {};
     _.forEach(suppliers, function (val) {
       let id = val['id'];
       suppliersMap[id] = val;
@@ -652,6 +673,9 @@ class InvoicingOrderGoodsScene extends Component {
           <MyBtn key={3} text='确认结算' style={list.blue_btn}
                  onPress={() => self.balanceOrder(val['id'], val['consignee_store_id'])}/>];
       }
+
+      opBtns.push(<MyBtn key={1} text='打印' style={list.warn_btn} onPress={() => self.printOrder(val)}/>);
+
       ordersView.push(
         <View key={val['id']}>
           <Cell customStyle={list.init_cell} first>
@@ -921,22 +945,6 @@ class InvoicingOrderGoodsScene extends Component {
         },
       ]}>
       <Cell style={customStyles.formCellStyle}>
-        <CellHeader><Label style={font.font24}>份数</Label></CellHeader>
-        <CellBody>
-          <Input
-            style={font.font24}
-            keyboardType={'numeric'}
-            placeholder="采购份数"
-            value={currentEditItem['total_req']}
-            onChangeText={(val) => {
-              let currentEditItem = self.state.currentEditItem;
-              currentEditItem['total_req'] = val;
-              this.setState({currentEditItem: currentEditItem});
-            }}
-          />
-        </CellBody>
-      </Cell>
-      <Cell style={customStyles.formCellStyle}>
         <CellHeader><Label style={font.font24}>总量</Label></CellHeader>
         <CellBody>
           <Input
@@ -963,6 +971,22 @@ class InvoicingOrderGoodsScene extends Component {
             onChangeText={(val) => {
               let currentEditItem = self.state.currentEditItem;
               currentEditItem['unit_price'] = val;
+              this.setState({currentEditItem: currentEditItem});
+            }}
+          />
+        </CellBody>
+      </Cell>
+      <Cell style={customStyles.formCellStyle}>
+        <CellHeader><Label style={font.font24}>总价</Label></CellHeader>
+        <CellBody>
+          <Input
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="采购总价"
+            value={currentEditItem['total_cost']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['total_cost'] = val;
               this.setState({currentEditItem: currentEditItem});
             }}
           />
@@ -1091,6 +1115,18 @@ const list = {
     color: colors.fontBlue,
     borderWidth: 0.5,
     borderColor: colors.fontBlue,
+    fontSize: 13,
+  },
+  warn_btn: {
+    width: pxToDp(130),
+    height: pxToDp(70),
+    marginLeft: pxToDp(5),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderRadius: pxToDp(5),
+    color: colors.orange,
+    borderWidth: 0.5,
+    borderColor: colors.orange,
     fontSize: 13,
   },
   danger_btn: {

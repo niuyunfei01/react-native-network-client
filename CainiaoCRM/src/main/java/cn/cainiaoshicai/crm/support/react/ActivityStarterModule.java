@@ -24,6 +24,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
+import cn.cainiaoshicai.crm.domain.SupplierOrder;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.Log;
@@ -332,6 +334,32 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
         if (!success) {
             callback.invoke(false, "不支持该设备");
+        }
+    }
+
+    @ReactMethod
+    void printInventoryOrder(@Nonnull String orderJson, @Nonnull final Callback callback) {
+        System.out.println(" get inventory order json  " + orderJson);
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        final SupplierOrder order = gson.fromJson(orderJson, new TypeToken<SupplierOrder>() {
+        }.getType());
+        int tryTimes = 3;
+        boolean success = false;
+
+        while (tryTimes > 0) {
+            AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
+            AidlUtil.getInstance().initPrinter();
+            boolean isEnable = GlobalCtx.smPrintIsEnable();
+            if (isEnable) {
+                AidlUtil.getInstance().initPrinter();
+                OrderPrinter.smPrintSupplierOrder(order);
+                success = true;
+                break;
+            }
+            tryTimes--;
+        }
+        if (!success) {
+            callback.invoke(false, "打印失败！");
         }
     }
 

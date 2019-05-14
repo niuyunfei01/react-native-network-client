@@ -8,6 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import cn.cainiaoshicai.crm.AppInfo;
@@ -17,12 +19,16 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
+import cn.cainiaoshicai.crm.domain.SupplierOrder;
+import cn.cainiaoshicai.crm.domain.SupplierOrderItem;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
 import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.print.PrinterWriter;
+import cn.cainiaoshicai.crm.print.PrinterWriter58mm;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -252,6 +258,86 @@ public class OrderPrinter {
         } catch (Exception e) {
             AppLogger.e("error in printing list lists", e);
             throw e;
+        }
+    }
+
+    static String getUnitTypeName(int type) {
+        switch (type) {
+            case 0:
+                return "斤";
+            case 1:
+                return "份";
+            case 2:
+                return "克";
+            case 3:
+                return "千克";
+            default:
+                return "";
+        }
+    }
+
+    public static void smPrintSupplierOrder(SupplierOrder order) {
+        int state = AidlUtil.getInstance().printerState();
+        if (state == 1) {
+            try {
+                ArrayList<byte[]> data = new ArrayList<>();
+                PrinterWriter printer = new PrinterWriter58mm();
+                printer.setAlignCenter();
+                data.add(printer.getDataAndReset());
+
+                printer.printLineFeed();
+                printer.setFontSize(0);
+                printer.setAlignCenter();
+                printer.print("订货单：" + order.getId());
+                printer.printLineFeed();
+
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.print("送达时间: " + order.getDate());
+                printer.printLineFeed();
+                printer.print("订货员姓名: " + order.getCreateName());
+                printer.printLineFeed();
+                printer.print("供应商姓名: " + order.getSupplierName());
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+                printer.printInOneLine("货名", "数量", "单价", 0);
+                printer.printLine();
+                printer.printLineFeed();
+                double total = 0;
+                for (SupplierOrderItem item : order.getItems()) {
+                    printer.printInOneLine(item.getName(), item.getReq_amount() + getUnitTypeName(item.getUnit_type()), item.getUnit_price() + "", 0);
+                    printer.printLineFeed();
+                    printer.printLineFeed();
+                    total += item.getUnit_price() * item.getReq_amount();
+                }
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.printInOneLine("总额：", total + "", 0);
+
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+
+                data.add(printer.getDataAndClose());
+
+                for (byte[] bs : data) {
+                    AidlUtil.getInstance().sendRawData(bs);
+                }
+
+            } catch (Exception e) {
+
+            }
         }
     }
 
