@@ -615,7 +615,7 @@ class InvoicingOrderGoodsScene extends Component {
           <Text style={editAble ? {width: pxToDp(150), ...font.fontBlue} : {width: pxToDp(150)}}>{item['name']}</Text>
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>
+          {/*<Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>*/}
           <Text
             style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
           <Text style={getGoodItemTextStyle()}>{item['unit_price']}</Text>
@@ -698,7 +698,7 @@ class InvoicingOrderGoodsScene extends Component {
                 <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名</Text>
               </CellHeader>
               <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={getGoodItemTextStyle()}>份数</Text>
+                {/*<Text style={getGoodItemTextStyle()}>份数</Text>*/}
                 <Text style={getGoodItemTextStyle()}>总量</Text>
                 <Text style={getGoodItemTextStyle()}>单价</Text>
                 <Text style={getGoodItemTextStyle()}>总价</Text>
