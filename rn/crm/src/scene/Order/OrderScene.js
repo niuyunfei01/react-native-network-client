@@ -2187,7 +2187,7 @@ class ItemRow extends PureComponent {
         <InputNumber
           styles={inputNumberStyles}
           min={0}
-          value={parseInt((edited || item).num)}
+          value={(edited || item).num}
           style={{backgroundColor: 'white', width: 96}}
           onChange={(v) => {
             onInputNumberChange(item, v)

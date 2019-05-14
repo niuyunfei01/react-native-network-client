@@ -927,12 +927,14 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public void toStockCheck(Activity ctx, int pid, int storeId) {
+    public void toStockCheck(Activity ctx, int pid, int storeId, String productName, String shelfNo) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "InventoryStockCheck");
         Bundle params = new Bundle();
         params.putInt("productId", pid);
         params.putInt("storeId", storeId);
+        params.putString("shelfNo", shelfNo);
+        params.putString("productName", productName);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }

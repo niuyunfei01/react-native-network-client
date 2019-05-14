@@ -27,5 +27,15 @@ export default {
       value: '2',
       label: '已入库'
     }
+  },
+  RECEIPT_TYPE: {
+    NONSTANDARD: {
+      value: '1',
+      label: '非标品'
+    },
+    STANDARD: {
+      value: '2',
+      label: '标品'
+    }
   }
 }

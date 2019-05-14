@@ -20,6 +20,7 @@ import Mapping from '../../Mapping'
 import PackDetail from "./_MaterialList/PackDetail";
 import {ToastShort} from "../../util/ToastUtils";
 import JbbInput from "../component/JbbInput";
+import ReceiptDetail from "./_MaterialList/ReceiptDetail";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -71,7 +72,8 @@ class MaterialList extends React.Component {
       page: 1,
       isLastPage: false,
       isLoading: false,
-      packDetailDialog: false
+      packDetailDialog: false,
+      receiptDetailDialog: false
     }
   }
   
@@ -153,17 +155,17 @@ class MaterialList extends React.Component {
         }).then(res => {
           let name = res.name ? res.name : '未知商品'
           native.speakText(`收货${name}${res.weight}公斤`)
-          Toast.success(`收货${name}${res.weight}公斤成功`)
+          ToastShort(`成功收货${name}${res.weight}公斤`)
           self.onRefresh()
         }).catch(e => {
-          if (e.reason === 'BARCODE_EXIST') {
-            native.clearScan(barCode)
-          } else {
+          if (e.reason !== 'BARCODE_EXIST') {
             let idx = dealArr.indexOf(barCode)
             dealArr.splice(idx, 1)
           }
           Toast.offline('录入失败：' + e.reason)
         })
+      } else {
+        Toast.offline('录入失败：该条码以录入')
       }
     })
   }
@@ -351,36 +353,6 @@ class MaterialList extends React.Component {
   
   renderItem (item, idx) {
     let swipeOutBtns = []
-    if (item.type == 1) {
-      swipeOutBtns.push({
-        text: '编辑',
-        type: 'primary',
-        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {
-          receiptId: item.id,
-          barCode: item.bar_code,
-          datetime: item.created,
-          weight: item.weight,
-          workerId: item.supplier ? item.supplier.supplier_code : null,
-          skuId: item.sku_id,
-          price: item.price,
-          onBack: () => this.onRefresh()
-        })
-      })
-    } else if (item.type == 2) {
-      swipeOutBtns.push({
-        text: '编辑',
-        type: 'primary',
-        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {
-          receiptId: item.id,
-          upc: item.bar_code,
-          datetime: item.created,
-          number: item.weight,
-          price: item.price,
-          workerId: item.supplier ? item.supplier.supplier_code : null,
-          onBack: () => this.onRefresh()
-        })
-      })
-    }
     swipeOutBtns.push({
       text: '无效',
       type: 'delete',
@@ -394,7 +366,11 @@ class MaterialList extends React.Component {
             <View style={{flex: 1}}>
               <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
             </View>
-            <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
+            <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptDetailDialog: true})}>
+              <View>
+                <Text style={[styles.itemSupplier]}>明细</Text>
+              </View>
+            </TouchableOpacity>
           </View>
           <If condition={item.bar_code}>
             <View style={[styles.itemLine]}>
@@ -421,7 +397,7 @@ class MaterialList extends React.Component {
             </View>
           </If>
           <View style={[styles.itemLine]}>
-            <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
+            <Text style={[styles.itemDate]}>日期：{item.date} </Text>
             <TouchableOpacity onPress={() => this.onClickStatus(item)}>
               <View>
                 <Text style={[styles.itemStatus]}>
@@ -500,6 +476,12 @@ class MaterialList extends React.Component {
           item={this.state.selectedItem}
           visible={this.state.packDetailDialog}
           onClickClose={() => this.setState({packDetailDialog: false})}
+        />
+  
+        <ReceiptDetail
+          item={this.state.selectedItem}
+          visible={this.state.receiptDetailDialog}
+          onClickClose={() => this.setState({receiptDetailDialog: false})}
         />
       </View>
     );

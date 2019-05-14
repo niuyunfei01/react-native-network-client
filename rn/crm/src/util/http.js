@@ -19,6 +19,7 @@ const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
 class HttpUtils {
   static urlFormat (url, params = {}) {
     let paramsArray = [];
+    url = url[0] == '/' ? url.substring(1) : url
     url = AppConfig.apiUrl(url)
     //拼接参数
     Object.keys(params).forEach(key => paramsArray.push(key + '=' + params[key]))
@@ -31,37 +32,35 @@ class HttpUtils {
   }
   
   static getOptions (method, params) {
-    return method === 'POST' || method === 'PUT' ? {
-      method: method,
-      headers: {
-        requestTime: new Date().toISOString(),
-        version: DeviceInfo.getVersion(),
-        buildNumber: DeviceInfo.getBuildNumber(),
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(params)
-    } : {
+    const options = {
       method: method,
       headers: {
         request_time: new Date().toISOString(),
         version: DeviceInfo.getVersion(),
         build_number: DeviceInfo.getBuildNumber(),
+        store_id: 0,
+        vendor_id: 0,
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     }
+    method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
+    return options
   }
   
   static apiBase (method, url, params, props) {
-    // Toast.loading('请求中', 0)
-    const uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
-    
     let store = {}, vendor = {}
     if (props && props.global) {
       store = tool.store(props.global)
       vendor = tool.vendor(props.global)
     }
+  
+    let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
+    if (uri.substr(uri.length - 1) != '&') {
+      uri += '&'
+    }
+    uri += `store_id=${store.id}&vendor_id=${vendor.currVendorId}`
+    
     let options = this.getOptions(method, params)
     options.headers.store_id = store.id
     options.headers.vendor_id = vendor.currVendorId
@@ -90,7 +89,6 @@ class HttpUtils {
           }
         })
         .catch((error) => {
-          // Toast.hide()
           ToastShort(`服务器错误:${error.message}`)
           console.log('http error => ', error.message)
           console.log('uri => ', uri)
