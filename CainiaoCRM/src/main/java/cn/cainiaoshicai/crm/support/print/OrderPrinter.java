@@ -293,6 +293,8 @@ public class OrderPrinter {
 
                 printer.printLineFeed();
                 printer.setAlignLeft();
+                printer.print("店铺名: " + order.getStoreName());
+                printer.printLineFeed();
                 printer.print("送达时间: " + order.getDate());
                 printer.printLineFeed();
                 printer.print("订货员姓名: " + order.getCreateName());

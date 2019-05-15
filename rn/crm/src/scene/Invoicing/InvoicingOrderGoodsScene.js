@@ -441,7 +441,7 @@ class InvoicingOrderGoodsScene extends Component {
     );
   }
 
-  printOrder(order){
+  printOrder(order, storeName, storeId){
     const {invoicing} = this.props;
     let {suppliers} = invoicing;
     let suppliersMap = {};
@@ -452,6 +452,8 @@ class InvoicingOrderGoodsScene extends Component {
 
     let data = {
       'id': order.id,
+      'storeName': storeName,
+      'storeId': storeId,
       'supplierId': order.supplier_id,
       'supplierName': suppliersMap[order.supplier_id]['name'],
       'date': order.consignee_date,
@@ -648,7 +650,7 @@ class InvoicingOrderGoodsScene extends Component {
     return goodsView;
   }
 
-  renderSupplyOrder(listData, suppliers, status, orderCtrlStatus) {
+  renderSupplyOrder(listData, suppliers, status, orderCtrlStatus, storeName = '', storeId = 0) {
     let ordersView = [];
     let self = this;
     _.forEach(listData, function (val, idx) {
@@ -674,7 +676,7 @@ class InvoicingOrderGoodsScene extends Component {
                  onPress={() => self.balanceOrder(val['id'], val['consignee_store_id'])}/>];
       }
 
-      opBtns.push(<MyBtn key={1} text='打印' style={list.warn_btn} onPress={() => self.printOrder(val)}/>);
+      opBtns.push(<MyBtn key={1} text='打印' style={list.warn_btn} onPress={() => self.printOrder(val, storeName, storeId)}/>);
 
       ordersView.push(
         <View key={val['id']}>
@@ -792,7 +794,7 @@ class InvoicingOrderGoodsScene extends Component {
         </View>
       </View>
       {/*展开详情*/}
-      {storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] && this.renderSupplyOrder(data['data'], suppliers, status, orderCtrlStatus)}
+      {storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] && this.renderSupplyOrder(data['data'], suppliers, status, orderCtrlStatus, data['store_name'], data['store_id'])}
     </View>
   }
 

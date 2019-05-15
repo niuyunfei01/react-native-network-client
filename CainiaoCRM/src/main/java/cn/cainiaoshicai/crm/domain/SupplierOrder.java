@@ -8,6 +8,10 @@ public class SupplierOrder {
 
     private int supplierId;
 
+    private int storeId;
+
+    private String storeName;
+
     private String supplierName;
 
     private String date;
@@ -63,5 +67,21 @@ public class SupplierOrder {
 
     public void setCreateName(String createName) {
         this.createName = createName;
+    }
+
+    public int getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(int storeId) {
+        this.storeId = storeId;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }
