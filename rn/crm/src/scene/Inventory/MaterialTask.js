@@ -123,7 +123,7 @@ class MaterialTask extends React.Component {
                 <JbbInput
                   ref={`taskInput_${task.product_id}`}
                   onChange={(value) => this.setProductNum(task, idx, taskIdx, value)}
-                  value={task.num}
+                  value={task.num ? task.num : ''}
                   initValue={''}
                   styles={styles.taskInput}
                 />
