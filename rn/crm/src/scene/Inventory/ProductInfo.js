@@ -196,7 +196,7 @@ class ProductInfo extends React.Component {
             <Text>{this.state.storeName}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>商品：</Text>
+            <Text style={styles.infoLabel}>商品：(ID:#{this.state.productId})</Text>
             <Text>{this.state.productInfo.product.name}</Text>
           </View>
         </View>

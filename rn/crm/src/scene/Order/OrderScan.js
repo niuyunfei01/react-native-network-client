@@ -186,7 +186,10 @@ class OrderScan extends BaseComponent {
     }
     const {items} = currentOrder
     for (let item of items) {
-      if (item.product.upc && item.product.upc == barCode) {
+      if (
+        (item.product.upc && item.product.upc == barCode) ||
+        (barCode.indexOf('JBBUPC') && item.product.upc && item.product.upc.substring(0, 8) == barCode.substring(0, 8))
+      ) {
         if (item.scan_num && item.scan_num >= item.num) {
           ToastShort('该商品已经拣够了！')
           native.speakText('该商品已经拣够了！')
