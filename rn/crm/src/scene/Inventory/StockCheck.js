@@ -59,7 +59,6 @@ class StockCheck extends BaseComponent {
   fetchData () {
     const self = this
     const api = `api_products/inventory_info?access_token=${this.props.global.accessToken}`
-    self.setState({refreshing: true})
     HttpUtils.get.bind(self.props)(api, {
       productId: this.props.navigation.state.params.productId,
       storeId: self.state.storeId
@@ -75,7 +74,6 @@ class StockCheck extends BaseComponent {
   fetchStockCheckType () {
     const self = this
     const api = `api_products/inventory_check_types?access_token=${this.props.global.accessToken}`
-    self.setState({refreshing: true})
     HttpUtils.get.bind(self.props)(api, {}).then(res => {
       self.setState({checkTypes: res})
     })
@@ -84,10 +82,17 @@ class StockCheck extends BaseComponent {
   handleSubmit () {
     const self = this
     const {global, navigation} = self.props;
-  }
-  
-  setCheckType (type) {
-    console.log(type)
+    const api = `api_products/inventory_check?access_token=${global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      storeId: this.state.storeId,
+      productId: this.state.productId,
+      theoreticalNum: this.state.originStock,
+      actualNum: this.state.actualStock,
+      differenceType: this.state.checkType.value,
+      remark: this.state.remark
+    }).then(res => {
+      native.nativeBack()
+    })
   }
   
   renderInfoItem (label, value, extra = '') {

@@ -54,7 +54,7 @@ class MaterialTaskFinish extends React.Component {
       userId: params.uid ? params.uid : null,
       username: params.name ? params.name : null,
       start: params.start ? params.start : moment().format('YYYY-MM-DD'),
-      end: params.end ? params.end : moment().add(1, 'days').format('YYYY-MM-DD'),
+      end: params.end ? params.end : moment().format('YYYY-MM-DD'),
     }
     
     if (!data.userId) {
