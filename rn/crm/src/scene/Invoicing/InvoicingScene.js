@@ -11,6 +11,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 
 
+
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
@@ -30,13 +31,14 @@ class InvoicingScene extends PureComponent {
     headerStyle: {
       backgroundColor: colors.fontBlue,
     },
-    headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+    headerRight: (
       <NavigationItem
-        iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
-        icon={require('../../img/Order/print_.png')}
-        onPress={() => {}}
-      />
-    </View>),
+        iconStyle={{tintColor: colors.white,}}
+        icon={require('../../img/Order/print_white.png')}
+        position={'right'}
+        onPress={() => {
+        }}
+      />),
   });
 
   constructor(props) {
