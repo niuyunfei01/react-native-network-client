@@ -9,6 +9,7 @@ import {NavigationItem} from '../../widget'
 import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import native from "../../common/native";
 
 
 
@@ -37,6 +38,7 @@ class InvoicingScene extends PureComponent {
         icon={require('../../img/Order/print_white.png')}
         position={'right'}
         onPress={() => {
+          native.printSupplierSummaryOrder()
         }}
       />),
   });

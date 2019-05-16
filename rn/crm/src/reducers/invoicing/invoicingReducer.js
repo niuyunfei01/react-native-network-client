@@ -120,11 +120,9 @@ function updateListData(state, action, handler) {
       break;
     case Constant.INVOICING.STATUS_CONFIRMED:
       return {receivedSupplyOrder: handler(state.confirmedSupplyOrder, data, storeId)};
-      return state;
       break;
     case Constant.INVOICING.STATUS_ARRIVED:
       return {confirmedSupplyOrder: handler(state.receivedSupplyOrder, data, storeId)};
-      return state;
       break;
   }
   return {};
@@ -202,6 +200,7 @@ function doMergeSupplyOrderItem(list, data, storeId) {
       let dataList = item['data'];
       let dataListCopy = [];
       dataList.forEach(function (orderItem) {
+        //更新后的数据
         if (orderItem['id'] == data['supply_order_id']) {
           let copyItems = [];
           let itemsData = orderItem['req_items'];
