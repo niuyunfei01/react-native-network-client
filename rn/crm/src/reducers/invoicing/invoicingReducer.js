@@ -141,9 +141,7 @@ function doRemoveSupplyOrder(list, data, storeId) {
       });
       item['data'] = dataListCopy;
     }
-    if (item['data'].length > 0) {
-      copy.push(item);
-    }
+    copy.push(item);
   });
   return copy;
 }

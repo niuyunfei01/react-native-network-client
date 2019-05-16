@@ -357,7 +357,7 @@ export function createCheckHistory(token, productId, supplierId, storeId) {
 }
 
 function commonRespHandle(dispatch, resp, storeId, status, callback) {
-  let {ok, reason, obj, error_code} = resp;
+  let {ok, reason, obj} = resp;
   dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})
   callback(ok, reason)
 }
