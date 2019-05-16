@@ -50,20 +50,23 @@ class HttpUtils {
   
   static apiBase (method, url, params, props) {
     let store = {}, vendor = {}
+    let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
+    let options = this.getOptions(method, params)
+    
     if (props && props.global) {
       store = tool.store(props.global)
       vendor = tool.vendor(props.global)
-    }
   
-    let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
-    if (uri.substr(uri.length - 1) != '&') {
-      uri += '&'
-    }
-    uri += `store_id=${store.id}&vendor_id=${vendor.currVendorId}`
+      if (store && vendor) {
+        options.headers.store_id = store.id
+        options.headers.vendor_id = vendor.currVendorId
     
-    let options = this.getOptions(method, params)
-    options.headers.store_id = store.id
-    options.headers.vendor_id = vendor.currVendorId
+        if (uri.substr(uri.length - 1) != '&') {
+          uri += '&'
+        }
+        uri += `store_id=${store.id}&vendor_id=${vendor.currVendorId}`
+      }
+    }
     
     return new Promise((resolve, reject) => {
       fetch(uri, options)

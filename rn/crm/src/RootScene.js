@@ -34,7 +34,6 @@ import {
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
-import * as _g from "./global";
 
 import Config from "./config";
 
@@ -42,6 +41,7 @@ import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
 import _ from "lodash"
+import GlobalUtil from "./util/GlobalUtil";
 
 const lightContentScenes = ["Home", "Mine", "Operation"];
 
@@ -118,7 +118,7 @@ class RootScene extends PureComponent {
             }))
           }
         }
-        _g.setHostPortNoDef(store.getState().global, native, () => {
+        GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
           this.setState({rehydrated: true});
         });
       }.bind(this)
