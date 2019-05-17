@@ -884,6 +884,18 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toInventoryMaterialTaskFinish(Activity ctx, String uid, String startTime, String endTime) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryMaterialTaskFinish");
+        Bundle params = new Bundle();
+        Gson gson = new Gson();
+        params.putString("uid", uid);
+        params.putString("start_time", startTime);
+        params.putString("end_time", endTime);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     //跳转到reactnative web页面
     public void toRNWebView(Activity ctx, Map<String, String> data) {
         Intent i = new Intent(ctx, MyReactActivity.class);
