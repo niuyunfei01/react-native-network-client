@@ -12,15 +12,14 @@ import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../config";
 import C from "../../config";
 import HttpUtils from "../../util/http";
-import WorkerPopup from "../component/WorkerPopup";
 import {native, tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
 import LoadMore from "react-native-loadmore";
-import Mapping from '../../Mapping'
 import PackDetail from "./_MaterialList/PackDetail";
 import {ToastShort} from "../../util/ToastUtils";
 import JbbInput from "../component/JbbInput";
 import ReceiptDetail from "./_MaterialList/ReceiptDetail";
+import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -231,14 +230,6 @@ class MaterialList extends React.Component {
     this.setState({headerMenu: false})
   }
   
-  onClickStatus (item) {
-    if (Mapping.Tools.ValueEqMapping(Mapping.Product.RECEIPT_STATUS.ENTRY.value, item.status)) {
-      this.onFetchDetail(item)
-    } else {
-      this.setState({workerPopup: true, selectedItem: item})
-    }
-  }
-  
   onDisabledReceipt (item, idx) {
     const self = this
     Alert.alert('警告', `确定将此条记录置为无效么\n【${item.sku.name}】${item.weight}${item.type == 1 ? '公斤' : '件'} \n 置为无效后，如果是标品需要减去相应库存`, [
@@ -396,12 +387,21 @@ class MaterialList extends React.Component {
               </Text>
             </View>
           </If>
+          <If condition={item.packers.length}>
+            <TouchableOpacity onPress={() => this.onFetchDetail(item)}>
+              <View style={[styles.itemLine]}>
+                <Text style={styles.itemText}>
+                  打包员：{item.packers.map((value, idx, arr) => value.nickname + ',')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           <View style={[styles.itemLine]}>
-            <Text style={[styles.itemDate]}>日期：{item.date} </Text>
-            <TouchableOpacity onPress={() => this.onClickStatus(item)}>
+            <Text style={[styles.itemDate]}>收货日期：{item.date} </Text>
+            <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
               <View>
                 <Text style={[styles.itemStatus]}>
-                  {item.assign_user ? item.assign_user.nickname + ':' : null}{item.status_label}
+                  {item.status_label}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -464,7 +464,7 @@ class MaterialList extends React.Component {
           onCancel={this._hideDateTimePicker}
         />
   
-        <WorkerPopup
+        <ActiveWorkerPopup
           visible={this.state.workerPopup}
           multiple={false}
           onClickWorker={(worker) => this.onAssignWorker(worker)}

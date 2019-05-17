@@ -95,7 +95,7 @@ class HttpUtils {
           ToastShort(`服务器错误:${error.message}`)
           console.log('http error => ', error.message)
           console.log('uri => ', uri)
-          reject(error.message)
+          reject && reject(error.message)
         })
     })
   }

@@ -11,6 +11,7 @@ import GlobalUtil from "../../util/GlobalUtil";
 import moment from "moment";
 import JbbDateRangeDialog from "../component/JbbDateRangeDialog";
 import {tool} from "../../common";
+import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -41,7 +42,8 @@ class MaterialTaskFinish extends React.Component {
       username: '',
       isLastPage: false,
       isLoading: false,
-      workerPopup: false
+      workerPopup: false,
+      summary: {}
     }
   }
   
@@ -61,16 +63,15 @@ class MaterialTaskFinish extends React.Component {
       GlobalUtil.getUser().then(user => {
         data.userId = user.id
         data.username = user.screen_name
-        self.setState(data, () => this.fetchData())
+        self.setState(data, () => this.onRefresh())
       })
     } else {
-      self.setState(data, () => this.fetchData())
+      self.setState(data, () => this.onRefresh())
     }
   }
   
   fetchData () {
     const self = this
-    const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task_finished?access_token=${accessToken}`
     self.setState({isLoading: true})
@@ -85,6 +86,20 @@ class MaterialTaskFinish extends React.Component {
     })
   }
   
+  fetchSummaryData () {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_task_finished_summary?access_token=${accessToken}`
+    self.setState({isLoading: true})
+    HttpUtils.get.bind(self.props)(api, {
+      userId: this.state.userId,
+      start: this.state.start,
+      end: this.state.end
+    }).then(res => {
+      self.setState({summary: res})
+    })
+  }
+  
   onSwitchUser (user) {
     this.setState({page: 1, userId: user.id, username: user.name, workerPopup: false}, () => {
       this.onRefresh()
@@ -94,6 +109,7 @@ class MaterialTaskFinish extends React.Component {
   onRefresh () {
     this.setState({page: 1}, () => {
       this.fetchData()
+      this.fetchSummaryData()
     })
   }
   
@@ -122,6 +138,15 @@ class MaterialTaskFinish extends React.Component {
             style={[styles.filterImage, {marginLeft: pxToDp(10)}]}
           />
         </JbbDateRangeDialog>
+      </View>
+    )
+  }
+  
+  renderSummary () {
+    const {summary} = this.state
+    return (
+      <View style={styles.summary}>
+        <Text>总损耗：{summary.loss_price}元  总工分：{summary.total_score}</Text>
       </View>
     )
   }
@@ -172,7 +197,7 @@ class MaterialTaskFinish extends React.Component {
     return (
       <View style={{flex: 1}}>
         {this.renderFilterRow()}
-    
+        {this.renderSummary()}
         <LoadMore
           style={{marginBottom: pxToDp(60)}}
           scrollViewStyle={{flex: 1}}
@@ -185,7 +210,7 @@ class MaterialTaskFinish extends React.Component {
           bottomLoadDistance={pxToDp(60)}
         />
     
-        <WorkerPopup
+        <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}
           onClickWorker={(user) => this.onSwitchUser(user)}
@@ -205,6 +230,14 @@ const styles = StyleSheet.create({
     height: pxToDp(60),
     borderBottomWidth: pxToDp(1),
     borderColor: '#333'
+  },
+  summary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: pxToDp(15),
+    height: pxToDp(60),
+    borderBottomWidth: pxToDp(1),
+    borderColor: '#666'
   },
   filterImage: {
     width: pxToDp(40),
