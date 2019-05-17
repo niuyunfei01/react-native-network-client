@@ -1,38 +1,33 @@
 import React, {PureComponent} from 'react'
 import {
-  TouchableOpacity,
-  StyleSheet,
-  View,
-  ScrollView,
-  Text,
-  ImageBackground,
   Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
   ToastAndroid,
-  NativeModules,
-  ActivityIndicator,
-  TextInput
+  TouchableOpacity,
+  View
 } from 'react-native'
-import {FormInput} from 'react-native-elements'
 import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
-import {
-  getCommonConfig, logout, requestSmsCode, setCurrentStore, setUserProfile,
-  signIn
-} from '../../reducers/global/globalActions'
+import {getCommonConfig, logout, requestSmsCode, setCurrentStore, signIn} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
-
-const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
-
 import Config from '../../config'
 import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
 import {Button} from "../../weui";
 import {ToastLong} from "../../util/ToastUtils";
+import HttpUtils from "../../util/http";
+import GlobalUtil from "../../util/GlobalUtil";
+
+const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -194,6 +189,7 @@ class LoginScene extends PureComponent {
   }
 
   _signIn(mobile, password, name) {
+    const self = this
     this.setState({doingSign: true});
 
     const {dispatch, navigation} = this.props;
@@ -260,6 +256,8 @@ class LoginScene extends PureComponent {
             ToastAndroid.show(err_msg, ToastAndroid.LONG);
           }
         }));
+  
+        self.doSaveUserInfo(token)
       } else {
         this.doneReqSign();
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
@@ -271,7 +269,13 @@ class LoginScene extends PureComponent {
   doneReqSign() {
     this.setState({doingSign: false})
   }
-
+  
+  doSaveUserInfo (token) {
+    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
+      GlobalUtil.setUser(res)
+    })
+  }
+  
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7',width:width,height:height}}>

@@ -11,7 +11,6 @@ export default class JbbInput extends React.Component {
     value: PropTypes.string.isRequired,
     initValue:PropTypes.string,
     rows: PropTypes.number,
-    styles: PropTypes.object,
     autoFocus: PropTypes.bool,
     keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad']),
     onBlur: PropTypes.func,

@@ -133,7 +133,7 @@ class SearchGoods extends Component {
   
   changeRowExist (idx, supplyPrice) {
     const products = this.state.goods
-    products[idx].is_exist = {supply_price: supplyPrice}
+    products[idx].is_exist = {supply_price: supplyPrice, status: 1}
     this.setState({goods: products})
   }
   

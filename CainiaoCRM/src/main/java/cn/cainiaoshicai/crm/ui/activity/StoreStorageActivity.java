@@ -924,7 +924,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item != null) {
                     int productId = item.getProduct_id();
                     int storeId = item.getStore_id();
-                    GlobalCtx.app().toStockCheck(StoreStorageActivity.this, productId, storeId);
+                    String productName = item.getName();
+                    String shelfNo = item.getShelfNo();
+
+                    GlobalCtx.app().toStockCheck(StoreStorageActivity.this, productId, storeId,productName,shelfNo);
                 }
                 return true;
             default:

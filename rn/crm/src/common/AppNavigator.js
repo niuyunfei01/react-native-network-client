@@ -107,7 +107,9 @@ import InventoryProductPutIn from '../scene/Inventory/ProductPutIn'
 import InventoryProductInfo from '../scene/Inventory/ProductInfo'
 import InventoryMaterialList from '../scene/Inventory/MaterialList'
 import InventoryMaterialPutIn from '../scene/Inventory/MaterialPutIn'
+import InventoryMaterialDetailUpdate from '../scene/Inventory/MaterialDetailUpdate'
 import InventoryStandardPutIn from '../scene/Inventory/StandardPutIn'
+import InventoryStandardDetailUpdate from '../scene/Inventory/StandardDetailUpdate'
 import InventoryMaterialTask from '../scene/Inventory/MaterialTask'
 import InventoryMaterialTaskFinish from '../scene/Inventory/MaterialTaskFinish'
 import InventoryStockCheck from '../scene/Inventory/StockCheck'
@@ -387,7 +389,9 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
         [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
         [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
+        [Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE]: {screen: InventoryMaterialDetailUpdate},
         [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},
+        [Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE]: {screen: InventoryStandardDetailUpdate},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
         [Config.ROUTE_INVENTORY_STOCK_CHECK]: {screen: InventoryStockCheck},

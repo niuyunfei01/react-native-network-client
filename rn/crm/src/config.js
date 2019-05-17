@@ -169,7 +169,9 @@ const C = {
   ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',                         // 库存 - 商品库管详情
   ROUTE_INVENTORY_MATERIAL_LIST: 'InventoryMaterialList',                       // 库存 - 原材料列表
   ROUTE_INVENTORY_MATERIAL_PUT_IN: 'InventoryMaterialPutIn',                    // 库存 - 原材料手动入库
+  ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE: 'InventoryMaterialDetailUpdate',      // 库存 - 原材料详情修改
   ROUTE_INVENTORY_STANDARD_PUT_IN: 'InventoryStandardPutIn',                    // 库存 - 标品入库
+  ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE: 'InventoryStandardDetailUpdate',      // 库存 - 标品详情修改
   ROUTE_INVENTORY_MATERIAL_TASK: 'InventoryMaterialTask',                       // 库存 - 原材料任务
   ROUTE_INVENTORY_MATERIAL_TASK_FINISH: 'InventoryMaterialTaskFinish',          // 库存 - 原材料我完成的任务
   ROUTE_INVENTORY_STOCK_CHECK: 'InventoryStockCheck',                           // 库存 - 库存盘点

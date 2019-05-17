@@ -10,7 +10,7 @@ import JbbButton from "../component/JbbButton";
 import JbbInput from "../component/JbbInput";
 import {tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
-import WorkerPopup from "../component/WorkerPopup";
+import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
@@ -123,7 +123,7 @@ class MaterialTask extends React.Component {
                 <JbbInput
                   ref={`taskInput_${task.product_id}`}
                   onChange={(value) => this.setProductNum(task, idx, taskIdx, value)}
-                  value={task.num}
+                  value={task.num ? task.num : ''}
                   initValue={''}
                   styles={styles.taskInput}
                 />
@@ -209,7 +209,7 @@ class MaterialTask extends React.Component {
           </View>
         </TouchableOpacity>
   
-        <WorkerPopup
+        <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}
           onCancel={() => this.setState({workerPopup: false})}

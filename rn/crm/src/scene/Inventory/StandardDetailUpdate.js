@@ -1,8 +1,8 @@
 import BaseComponent from "../BaseComponent";
 import React from "react";
-import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {InputItem, List, WhiteSpace} from "antd-mobile-rn";
+import {InputItem, List, Toast, WhiteSpace} from "antd-mobile-rn";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
@@ -10,7 +10,6 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import {ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
-import C from '../../config'
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../Order/inputNumberStyles";
 
@@ -37,47 +36,39 @@ class StandardPutIn extends BaseComponent {
     const store = tool.store(this.props.global)
     this.state = {
       store: store,
-      receiptId: null,
       upc: '',
       product: {},
       supplierPopup: false,
       suppliers: [],
       supplier: {},
       number: '0',
-      price: '0',
-      standardProducts: [],
-      standardProdPrompt: false
+      price: '0'
     }
   }
   
   componentDidMount (): void {
-    const navigation = this.props.navigation
-    const {params = {}} = navigation.state
-    
     this.fetchSuppliers()
-    this.listenUpcInterval()
-    this.fetchStandardProducts()
-  
-    let state = {}
-    state.receiptId = params.receiptId ? params.receiptId : null
-    state.number = params.number ? params.number : '0'
-    state.price = params.price ? params.price : '0'
-    if (params.upc) {
-      state.upc = params.upc
-      this.fetchProductByUpc(params.upc)
-    }
-    if (params.workerId) {
-      this.setSupplier(params.workerId)
-    }
-    this.setState(state)
-
-    native.showInputKeyboard();
+    this.fetchDetail()
   }
   
   componentWillUnmount () {
-    if (this.listenScanUpc) {
-      this.listenScanUpc.remove()
-    }
+  }
+  
+  fetchDetail () {
+    const self = this
+    const navigation = this.props.navigation
+    const {params = {}} = navigation.state
+    const accessToken = this.props.global.accessToken
+    const api = `api_products/inventory_material_detail_info/${params.receiptDetailId}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      self.setState({
+        upc: res.bar_code,
+        product: res.sku,
+        supplier: res.supplier,
+        number: res.weight,
+        price: res.price
+      })
+    })
   }
   
   fetchSuppliers () {
@@ -89,116 +80,66 @@ class StandardPutIn extends BaseComponent {
     })
   }
   
-  fetchProductByUpc (upc) {
-    const self = this
-    const accessToken = this.props.global.accessToken
-    const api = `api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api).then(res => {
-      if (!res.id) {
-        native.speakText('未知标准品')
-        ToastShort('未知标准品！')
-        self.setState({upc: ''})
-      } else {
-        self.setState({product: res})
-      }
-    })
-  }
-  
-  setSupplier (supplierCode) {
-    const self = this
-    const accessToken = this.props.global.accessToken
-    const api = `api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api).then(res => {
-      if (!res) {
-        Alert.alert('错误', '未知供应商')
-      } else {
-        self.setState({supplier: res})
-      }
-    })
-  }
-  
   doSubmit () {
     const self = this
+    const navigation = this.props.navigation
+    const {params = {}} = navigation.state
     if (!this.state.product.upc) {
       ToastShort('未知商品')
     }
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/standard_prod_put_in?access_token=${accessToken}`
+    const api = `/api_products/material_detail_update/${params.receiptDetailId}?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      receiptId: self.state.receiptId,
-      upc: self.state.product.upc,
-      storeId: self.state.store.id,
       supplierId: self.state.supplier.id,
       price: self.state.price,
-      number: self.state.number
+      weight: self.state.number
     }).then(res => {
-      self.setState({product: {}, number: '0', price: '0', upc: ''})
+      navigation.goBack()
     })
   }
   
-  doNext () {
+  setInvalid () {
     const self = this
-    Alert.alert('警告', '确定当过当前商品？', [
+    const navigation = this.props.navigation
+    const {params = {}} = navigation.state
+    const {detail} = self.state
+    Alert.alert('警告', `确定将此条记录置为无效么\n【${detail.sku.name}】${detail.weight}${detail.type == 1 ? '公斤' : '件'}`, [
       {text: '取消'},
       {
         text: '确定',
         onPress: () => {
-          self.setState({product: {}, upc: ''})
+          const accessToken = this.props.global.accessToken
+          const api = `/api_products/material_detail_disabled/${params.receiptDetailId}?access_token=${accessToken}`
+          HttpUtils.post.bind(self.props)(api).then(res => {
+            Toast.success('操作成功')
+            navigation.goBack()
+          })
         }
       }
     ])
-  }
-  
-  fetchStandardProducts () {
-    const self = this
-    const accessToken = this.props.global.accessToken
-    const currStoreId = this.props.global.currStoreId
-    const api = `api_products/standard_products?access_token=${accessToken}&_sid=${currStoreId}`
-    HttpUtils.get.bind(self.props)(api).then(res => {
-      self.setState({standardProducts: res})
-    })
-  }
-  
-  listenUpcInterval () {
-    const self = this
-    if (this.listenScanUpc) {
-      this.listenScanUpc.remove()
-    }
-    this.listenScanUpc = DeviceEventEmitter.addListener(C.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
-      console.log('listen scan upc => barCode :', barCode)
-      if (self.state.upc) {
-        native.speakText('当前有未处理的标准品入库')
-        ToastShort('当前有未处理的标准品入库！')
-        return
-      }
-      self.setState({upc: barCode})
-      self.fetchProductByUpc(barCode)
-    })
   }
   
   renderProdInfo () {
     return (
       <View>
         <View style={[styles.cell_box]}>
-          <TouchableOpacity onPress={() => this.setState({standardProdPrompt: true})}>
-            <View style={styles.cell}>
-              <View style={[styles.goods_image]}>
-                <Image
-                  style={[styles.goods_image]}
-                  source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../img/Order/zanwutupian_.png')}
-                />
-              </View>
-              <View style={[styles.item_right]}>
-                <Text style={[styles.goods_name]}>
-                  {this.state.product.name ? this.state.product.name : '未知商品'}
-                </Text>
-                <View>
-                  <Text style={styles.sku}>商品ID：{this.state.product.id}</Text>
-                  <Text style={styles.sku}>商品码：{this.state.product.upc}</Text>
-                </View>
+          <View style={styles.cell}>
+            <View style={[styles.goods_image]}>
+              <Image
+                style={[styles.goods_image]}
+                source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../img/Order/zanwutupian_.png')}
+              />
+            </View>
+            <View style={[styles.item_right]}>
+              <Text style={[styles.goods_name]}>
+                {this.state.product.name ? this.state.product.name : '未知商品'}
+              </Text>
+              <View>
+                <Text style={styles.sku}>商品ID：{this.state.product.id}</Text>
+                <Text style={styles.sku}>商品码：{this.state.product.upc}</Text>
               </View>
             </View>
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
     )
@@ -225,14 +166,14 @@ class StandardPutIn extends BaseComponent {
   renderBtn () {
     return (
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.footerItem} onPress={() => this.doNext()}>
+        <TouchableOpacity style={styles.footerItem} onPress={() => this.setInvalid()}>
           <View style={[styles.footerBtn, styles.errorBtn]}>
-            <Text style={styles.footerBtnText}>下一个</Text>
+            <Text style={styles.footerBtnText}>置为无效</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
           <View style={[styles.footerBtn, styles.successBtn]}>
-            <Text style={styles.footerBtnText}>入库</Text>
+            <Text style={styles.footerBtnText}>更新数据</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -253,6 +194,7 @@ class StandardPutIn extends BaseComponent {
       </View>
     )
   }
+  
   render () {
     return (
       <ScrollView
@@ -276,17 +218,6 @@ class StandardPutIn extends BaseComponent {
           onSelect={(item) => this.setState({
             supplier: item,
             supplierPopup: false
-          })}
-        />
-  
-        <SearchPopup
-          visible={this.state.standardProdPrompt}
-          dataSource={this.state.standardProducts}
-          title={'选择供应商'}
-          onClose={() => this.setState({standardProdPrompt: false})}
-          onSelect={(item) => this.setState({
-            product: item,
-            standardProdPrompt: false
           })}
         />
       </ScrollView>

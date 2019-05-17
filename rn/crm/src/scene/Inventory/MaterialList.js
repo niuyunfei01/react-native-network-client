@@ -12,14 +12,14 @@ import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../config";
 import C from "../../config";
 import HttpUtils from "../../util/http";
-import WorkerPopup from "../component/WorkerPopup";
 import {native, tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
 import LoadMore from "react-native-loadmore";
-import Mapping from '../../Mapping'
 import PackDetail from "./_MaterialList/PackDetail";
 import {ToastShort} from "../../util/ToastUtils";
 import JbbInput from "../component/JbbInput";
+import ReceiptDetail from "./_MaterialList/ReceiptDetail";
+import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -71,7 +71,8 @@ class MaterialList extends React.Component {
       page: 1,
       isLastPage: false,
       isLoading: false,
-      packDetailDialog: false
+      packDetailDialog: false,
+      receiptDetailDialog: false
     }
   }
   
@@ -153,17 +154,17 @@ class MaterialList extends React.Component {
         }).then(res => {
           let name = res.name ? res.name : '未知商品'
           native.speakText(`收货${name}${res.weight}公斤`)
-          Toast.success(`收货${name}${res.weight}公斤成功`)
+          ToastShort(`成功收货${name}${res.weight}公斤`)
           self.onRefresh()
         }).catch(e => {
-          if (e.reason === 'BARCODE_EXIST') {
-            native.clearScan(barCode)
-          } else {
+          if (e.reason !== 'BARCODE_EXIST') {
             let idx = dealArr.indexOf(barCode)
             dealArr.splice(idx, 1)
           }
           Toast.offline('录入失败：' + e.reason)
         })
+      } else {
+        Toast.offline('录入失败：该条码以录入')
       }
     })
   }
@@ -227,14 +228,6 @@ class MaterialList extends React.Component {
   toStandardPutIn () {
     this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {onBack: () => this.onRefresh()})
     this.setState({headerMenu: false})
-  }
-  
-  onClickStatus (item) {
-    if (Mapping.Tools.ValueEqMapping(Mapping.Product.RECEIPT_STATUS.ENTRY.value, item.status)) {
-      this.onFetchDetail(item)
-    } else {
-      this.setState({workerPopup: true, selectedItem: item})
-    }
   }
   
   onDisabledReceipt (item, idx) {
@@ -351,36 +344,6 @@ class MaterialList extends React.Component {
   
   renderItem (item, idx) {
     let swipeOutBtns = []
-    if (item.type == 1) {
-      swipeOutBtns.push({
-        text: '编辑',
-        type: 'primary',
-        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {
-          receiptId: item.id,
-          barCode: item.bar_code,
-          datetime: item.created,
-          weight: item.weight,
-          workerId: item.supplier ? item.supplier.supplier_code : null,
-          skuId: item.sku_id,
-          price: item.price,
-          onBack: () => this.onRefresh()
-        })
-      })
-    } else if (item.type == 2) {
-      swipeOutBtns.push({
-        text: '编辑',
-        type: 'primary',
-        onPress: () => this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {
-          receiptId: item.id,
-          upc: item.bar_code,
-          datetime: item.created,
-          number: item.weight,
-          price: item.price,
-          workerId: item.supplier ? item.supplier.supplier_code : null,
-          onBack: () => this.onRefresh()
-        })
-      })
-    }
     swipeOutBtns.push({
       text: '无效',
       type: 'delete',
@@ -394,7 +357,11 @@ class MaterialList extends React.Component {
             <View style={{flex: 1}}>
               <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
             </View>
-            <Text style={[styles.itemSupplier]}>{item.supplier.name}</Text>
+            <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptDetailDialog: true})}>
+              <View>
+                <Text style={[styles.itemSupplier]}>明细</Text>
+              </View>
+            </TouchableOpacity>
           </View>
           <If condition={item.bar_code}>
             <View style={[styles.itemLine]}>
@@ -420,12 +387,21 @@ class MaterialList extends React.Component {
               </Text>
             </View>
           </If>
+          <If condition={item.packers.length}>
+            <TouchableOpacity onPress={() => this.onFetchDetail(item)}>
+              <View style={[styles.itemLine]}>
+                <Text style={styles.itemText}>
+                  打包员：{item.packers.map((value, idx, arr) => value.nickname + ',')}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           <View style={[styles.itemLine]}>
-            <Text style={[styles.itemDate]}>{item.create_user.nickname}：{item.date} 收货</Text>
-            <TouchableOpacity onPress={() => this.onClickStatus(item)}>
+            <Text style={[styles.itemDate]}>收货日期：{item.date} </Text>
+            <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
               <View>
                 <Text style={[styles.itemStatus]}>
-                  {item.assign_user ? item.assign_user.nickname + ':' : null}{item.status_label}
+                  {item.status_label}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -488,7 +464,7 @@ class MaterialList extends React.Component {
           onCancel={this._hideDateTimePicker}
         />
   
-        <WorkerPopup
+        <ActiveWorkerPopup
           visible={this.state.workerPopup}
           multiple={false}
           onClickWorker={(worker) => this.onAssignWorker(worker)}
@@ -500,6 +476,12 @@ class MaterialList extends React.Component {
           item={this.state.selectedItem}
           visible={this.state.packDetailDialog}
           onClickClose={() => this.setState({packDetailDialog: false})}
+        />
+  
+        <ReceiptDetail
+          item={this.state.selectedItem}
+          visible={this.state.receiptDetailDialog}
+          onClickClose={() => this.setState({receiptDetailDialog: false})}
         />
       </View>
     );

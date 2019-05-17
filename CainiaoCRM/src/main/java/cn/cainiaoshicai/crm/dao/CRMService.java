@@ -9,6 +9,7 @@ import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ProductTpl;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -91,7 +92,8 @@ public interface CRMService {
     @GET("/api/query_store_prod_quota/{storeId}")
     Call<ResultBean<Map<String, String>>> getStoreQuota(@Path("storeId") long storeId);
 
-
+    @GET("/InventoryApi/list_summary_order_by_supplier")
+    Call<ResultBean<List<SupplierSummaryOrder>>> getSupplierOrderSummary();
 
     class UploadRes {
         private FileBean file;
