@@ -21,6 +21,7 @@ import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.SupplierOrder;
 import cn.cainiaoshicai.crm.domain.SupplierOrderItem;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -273,6 +274,65 @@ public class OrderPrinter {
                 return "千克";
             default:
                 return "";
+        }
+    }
+
+    public static void smPrintSupplierSummaryOrder(SupplierSummaryOrder order) {
+        int state = AidlUtil.getInstance().printerState();
+        if (state == 1) {
+            try {
+                ArrayList<byte[]> data = new ArrayList<>();
+                PrinterWriter printer = new PrinterWriter58mm();
+                printer.setAlignCenter();
+                data.add(printer.getDataAndReset());
+
+                printer.printLineFeed();
+                printer.setFontSize(0);
+                printer.setAlignCenter();
+                printer.print("供应商采货单：" + order.getName());
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.print("供应商联系方式: " + order.getMobile());
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+                printer.printInOneLine("货名", "数量", 0);
+                printer.printLine();
+                printer.printLineFeed();
+
+                double total = 0;
+
+                for (SupplierOrderItem item : order.getItems()) {
+                    printer.printInOneLine(item.getName(), item.getReq_amount() + getUnitTypeName(item.getUnit_type()), 0);
+                    printer.printLineFeed();
+                    printer.printLineFeed();
+                    total += 1;
+                }
+
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.printInOneLine("合计：", total + "", 0);
+
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+                data.add(printer.getDataAndClose());
+                for (byte[] bs : data) {
+                    AidlUtil.getInstance().sendRawData(bs);
+                }
+            } catch (Exception e) {
+
+            }
         }
     }
 

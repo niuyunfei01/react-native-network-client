@@ -676,7 +676,8 @@ class InvoicingOrderGoodsScene extends Component {
                  onPress={() => self.balanceOrder(val['id'], val['consignee_store_id'])}/>];
       }
 
-      opBtns.push(<MyBtn key={1} text='打印' style={list.warn_btn} onPress={() => self.printOrder(val, storeName, storeId)}/>);
+      opBtns.push(<MyBtn key={1} text='打印' style={list.warn_btn}
+                         onPress={() => self.printOrder(val, storeName, storeId)}/>);
 
       ordersView.push(
         <View key={val['id']}>

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
@@ -24,7 +25,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -39,8 +39,10 @@ import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.SupplierOrder;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -59,6 +61,8 @@ import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
 import cn.jpush.android.api.JPushInterface;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -69,6 +73,10 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     private static DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter = null;
+
+
+    private long mLastClickTime = 0;
+    public static final long TIME_INTERVAL = 5000L;
 
     ActivityStarterModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -283,7 +291,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void speakText(@Nonnull final String text, @Nonnull  final Callback clb) {
+    void speakText(@Nonnull final String text, @Nonnull final Callback clb) {
         GlobalCtx.app().getSoundManager().play_by_xunfei(text);
         clb.invoke(true, "");
     }
@@ -339,7 +347,6 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void printInventoryOrder(@Nonnull String orderJson, @Nonnull final Callback callback) {
-        System.out.println(" get inventory order json  " + orderJson);
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         final SupplierOrder order = gson.fromJson(orderJson, new TypeToken<SupplierOrder>() {
         }.getType());
@@ -360,6 +367,48 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
         if (!success) {
             callback.invoke(false, "打印失败！");
+        }
+    }
+
+    @ReactMethod
+    void printSupplierSummaryOrder(@Nonnull final Callback callback) {
+        long nowTime = System.currentTimeMillis();
+        if (nowTime - mLastClickTime > TIME_INTERVAL) {
+            mLastClickTime = nowTime;
+            try {
+                int tryTimes = 3;
+                while (tryTimes > 0) {
+                    AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
+                    AidlUtil.getInstance().initPrinter();
+                    boolean isEnable = GlobalCtx.smPrintIsEnable();
+                    if (isEnable) {
+                        AidlUtil.getInstance().initPrinter();
+                    }
+                    tryTimes--;
+                }
+                Call<ResultBean<List<SupplierSummaryOrder>>> rbCall = GlobalCtx.app().dao.getSupplierOrderSummary();
+                rbCall.enqueue(new retrofit2.Callback<ResultBean<List<SupplierSummaryOrder>>>() {
+                    @Override
+                    public void onResponse(Call<ResultBean<List<SupplierSummaryOrder>>> call, Response<ResultBean<List<SupplierSummaryOrder>>> response) {
+                        ResultBean<List<SupplierSummaryOrder>> data = response.body();
+                        List<SupplierSummaryOrder> orders = data.getObj();
+                        for (SupplierSummaryOrder order : orders) {
+                            OrderPrinter.smPrintSupplierSummaryOrder(order);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResultBean<List<SupplierSummaryOrder>>> call, Throwable t) {
+                    }
+                });
+            } catch (Exception e) {
+                android.util.Log.e("Error", e.getMessage());
+            }
+        } else {
+            try {
+                Toast.makeText(getReactApplicationContext(), "稍后重试", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+            }
         }
     }
 
