@@ -116,13 +116,13 @@ class MaterialList extends React.Component {
   onFetchDetail (item) {
     const self = this
     const accessToken = this.props.global.accessToken
-    const api = `/api_products/inventory_entry_detail/${item.id}?access_token=${accessToken}`
+    const api = `/api_products/inventory_entry_detail_v2/${item.id}?access_token=${accessToken}`
     this.setState({isLoading: true})
     HttpUtils.get.bind(self.props)(api).then(res => {
       if (res && Object.keys(res).length > 0) {
         this.setState({packDetailDialog: true, detailItems: res, selectedItem: item})
       } else {
-        ToastShort('无打包详情')
+        ToastShort('无打包任务详情')
         self.props.onClickClose()
       }
     })

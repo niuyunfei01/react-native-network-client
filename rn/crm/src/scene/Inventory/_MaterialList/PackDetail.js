@@ -61,11 +61,11 @@ class PackDetail extends React.Component {
         <View key={idx} style={styles.item}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text numberOfLines={2} style={{width: 250}}>
-              {item[0].product.name}
+              {item.product_name}
             </Text>
             <JbbPrompt
               title={'请输入数量'}
-              onConfirm={(value) => this.onAddPackNumber(value, item[0].product_id, idx)}
+              onConfirm={(value) => this.onAddPackNumber(value, item.product_id, idx)}
               keyboardType={'numeric'}
             >
               <Text style={styles.add}>
@@ -73,8 +73,8 @@ class PackDetail extends React.Component {
               </Text>
             </JbbPrompt>
           </View>
-          
-          <For of={item} each="record" index="i">
+  
+          <For of={item.entries} each="record" index="i">
             <View key={i} style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text>{record.pack_user.nickname} </Text>
               <Text>{record.num > 0 ? `+${record.num}` : record.num}</Text>
