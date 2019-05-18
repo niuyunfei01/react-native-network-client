@@ -5,7 +5,6 @@ import LoadMore from "react-native-loadmore";
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
-import WorkerPopup from "../component/WorkerPopup";
 import pxToDp from "../../util/pxToDp";
 import GlobalUtil from "../../util/GlobalUtil";
 import moment from "moment";
@@ -146,7 +145,10 @@ class MaterialTaskFinish extends React.Component {
     const {summary} = this.state
     return (
       <View style={styles.summary}>
-        <Text>总损耗：{summary.loss_price}元  总工分：{summary.total_score}</Text>
+        <Text>
+          总损耗：{summary.loss_price}元({tool.toFixed(summary.loss_price_percent, 'percent')})
+          总工分：{summary.total_score}
+        </Text>
       </View>
     )
   }
@@ -159,7 +161,9 @@ class MaterialTaskFinish extends React.Component {
           </View>
           <View style={{height: 30, flexDirection: 'row', alignItems: 'flex-end'}}>
             <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>{item.sku.name}</Text>
-            <Text style={{fontSize: 12}}>(秤签：#{item.sku.material_code}；总货重{item.weight}公斤)</Text>
+            <Text style={{fontSize: 12}}>
+              (秤签：#{item.sku.material_code}；总货重{item.weight}公斤)
+            </Text>
           </View>
           <For each='entry' of={item.entries} index='entryIdx'>
             <View style={styles.entryItem} key={entryIdx}>
@@ -264,6 +268,7 @@ const styles = StyleSheet.create({
   },
   entryItem: {
     flexDirection: 'row',
+    alignItems: 'flex-end',
     width: '100%',
     height: 20
   }
