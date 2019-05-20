@@ -386,7 +386,7 @@ class MaterialList extends React.Component {
             <View style={[styles.itemLine]}>
               <Text style={styles.itemText}>
                 {`打包重量：${item.pack_weight}公斤 | `}
-                {`损耗：${item.pack_loss}公斤 | `}
+                {`损耗：${tool.toFixed(item.pack_loss, 2)}公斤 | `}
                 <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
                   {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
                 </Text>

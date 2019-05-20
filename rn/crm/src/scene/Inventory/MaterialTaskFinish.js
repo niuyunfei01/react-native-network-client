@@ -49,20 +49,26 @@ class MaterialTaskFinish extends React.Component {
   componentDidMount (): void {
     const self = this
     const {params = {}} = self.props.navigation.state
-    console.log(params)
-    
+    const accessToken = this.props.global.accessToken
+    const api = `/api/is_sign_worker?access_token=${accessToken}`
     const data = {
-      userId: params.uid ? params.uid : null,
-      username: params.name ? params.name : null,
+      userId: params.uid ? params.uid : 0,
+      username: params.name ? params.name : '全部',
       start: params.start ? params.start : moment().format('YYYY-MM-DD'),
       end: params.end ? params.end : moment().format('YYYY-MM-DD'),
     }
-    
     if (!data.userId) {
-      GlobalUtil.getUser().then(user => {
-        data.userId = user.id
-        data.username = user.screen_name
-        self.setState(data, () => this.onRefresh())
+      HttpUtils.get.bind(self.props)(api, {}).then(res => {
+        //本店签到人员且非(店长、助理店长、运营人员)
+        if (res) {
+          GlobalUtil.getUser().then(user => {
+            data.userId = user.id
+            data.username = user.screen_name
+            self.setState(data, () => this.onRefresh())
+          })
+        } else {
+          self.setState(data, () => this.onRefresh())
+        }
       })
     } else {
       self.setState(data, () => this.onRefresh())

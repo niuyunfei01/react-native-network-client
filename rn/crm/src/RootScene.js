@@ -7,22 +7,14 @@
  */
 
 import React, {PureComponent} from "react";
-import {
-  StatusBar,
-  Platform,
-  StyleSheet,
-  View,
-  Text,
-  ToastAndroid
-} from "react-native";
+import {Platform, StatusBar, StyleSheet, ToastAndroid, View, YellowBox} from "react-native";
 
 import {Provider} from "react-redux";
-
 /**
  * ## Actions
  *  The necessary actions for dispatching our bootstrap values
  */
-import {setPlatform, setVersion} from "./reducers/device/deviceActions";
+import {setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,
@@ -47,7 +39,7 @@ const lightContentScenes = ["Home", "Mine", "Operation"];
 
 //global exception handlers
 const caught = new Caught();
-
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
 function getCurrentRouteName (navigationState) {
   if (!navigationState) {
     return null;
