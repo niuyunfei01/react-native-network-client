@@ -64,15 +64,6 @@ class ReceiptDetail extends React.Component {
             <Text numberOfLines={1}>
               {item.supplier.name}
             </Text>
-            <Text>
-              {item.created}
-            </Text>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text>
-              {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
-              {item.price}元
-            </Text>
             <View>
               <If condition={item.deleted == 1}>
                 <Text style={{color: '#e94f4f'}}>(已置为无效)</Text>
@@ -83,7 +74,18 @@ class ReceiptDetail extends React.Component {
                 </TouchableOpacity>
               </If>
             </View>
+          
           </View>
+          <Text>
+            {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
+            {item.price}元
+          </Text>
+          <Text>
+            收货人：{item.creator.nickname}
+          </Text>
+          <Text>
+            收货时间：{item.created}
+          </Text>
         </View>
       )
     }

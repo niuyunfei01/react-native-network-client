@@ -20,6 +20,8 @@ import {ToastShort} from "../../util/ToastUtils";
 import JbbInput from "../component/JbbInput";
 import ReceiptDetail from "./_MaterialList/ReceiptDetail";
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
+import _ from 'lodash'
+import ReceiptOpLog from "./_MaterialList/ReceiptOpLog";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -72,7 +74,8 @@ class MaterialList extends React.Component {
       isLastPage: false,
       isLoading: false,
       packDetailDialog: false,
-      receiptDetailDialog: false
+      receiptDetailDialog: false,
+      receiptOpLogDialog: false
     }
   }
   
@@ -357,11 +360,14 @@ class MaterialList extends React.Component {
             <View style={{flex: 1}}>
               <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
             </View>
-            <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptDetailDialog: true})}>
-              <View>
-                <Text style={[styles.itemSupplier]}>明细</Text>
-              </View>
-            </TouchableOpacity>
+            {item.logs.length ? (
+              <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptOpLogDialog: true})}>
+                <View>
+                  <Text style={[styles.itemSupplier]}>修改记录</Text>
+                </View>
+              </TouchableOpacity>) : (
+              <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>修改记录</Text>
+            )}
           </View>
           <If condition={item.bar_code}>
             <View style={[styles.itemLine]}>
@@ -391,11 +397,18 @@ class MaterialList extends React.Component {
             <TouchableOpacity onPress={() => this.onFetchDetail(item)}>
               <View style={[styles.itemLine]}>
                 <Text style={styles.itemText}>
-                  打包员：{item.packers.map((value, idx, arr) => value.nickname + ',')}
+                  打包员：{_.map(item.packers, 'nickname').join(',')}
                 </Text>
               </View>
             </TouchableOpacity>
           </If>
+          <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptDetailDialog: true})}>
+            <View style={[styles.itemLine]}>
+              <Text style={[styles.itemText]}>
+                收货人：{_.map(item.detail, row => row.creator.nickname).join(',')}
+              </Text>
+            </View>
+          </TouchableOpacity>
           <View style={[styles.itemLine]}>
             <Text style={[styles.itemDate]}>收货日期：{item.date} </Text>
             <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
@@ -456,32 +469,38 @@ class MaterialList extends React.Component {
           />
         </Drawer>
         {this.renderHeaderMenu()}
-        
+        {/*日期弹窗*/}
         <DatePicker
           date={new Date(this.state.filterDate)}
           isVisible={this.state.datePickerVisible}
           onConfirm={this._handleDatePicked}
           onCancel={this._hideDateTimePicker}
         />
-  
+        {/*打卡的员工*/}
         <ActiveWorkerPopup
           visible={this.state.workerPopup}
           multiple={false}
           onClickWorker={(worker) => this.onAssignWorker(worker)}
           onCancel={() => this.setState({workerPopup: false})}
         />
-  
+        {/*打包记录*/}
         <PackDetail
           details={this.state.detailItems}
           item={this.state.selectedItem}
           visible={this.state.packDetailDialog}
           onClickClose={() => this.setState({packDetailDialog: false})}
         />
-  
+        {/*收货详情*/}
         <ReceiptDetail
           item={this.state.selectedItem}
           visible={this.state.receiptDetailDialog}
           onClickClose={() => this.setState({receiptDetailDialog: false})}
+        />
+        {/*操作明细*/}
+        <ReceiptOpLog
+          item={this.state.selectedItem}
+          visible={this.state.receiptOpLogDialog}
+          onClickClose={() => this.setState({receiptOpLogDialog: false})}
         />
       </View>
     );
