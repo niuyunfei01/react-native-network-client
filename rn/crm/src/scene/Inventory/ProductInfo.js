@@ -52,7 +52,8 @@ class ProductInfo extends React.Component {
       isStandard: false, // 是否是标品
       upcPrompt: false,
       packScorePrompt: false,
-      stockCheckCyclePrompt: false
+      stockCheckCyclePrompt: false,
+      packLossWarnPrompt: false
     }
   }
   
@@ -186,6 +187,19 @@ class ProductInfo extends React.Component {
     })
   }
   
+  onChgSkuPackLossWarn (value) {
+    const self = this
+    const api = `/api_products/chg_sku_pack_loss_warn?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      skuId: self.state.productInfo.sku.id,
+      value: value
+    }).then(res => {
+      this.setState({packLossWarnPrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
   renderHeader () {
     return (
       <View>
@@ -266,6 +280,11 @@ class ProductInfo extends React.Component {
                 extra={this.state.productInfo.product.pre_pack_score}
                 onClick={() => this.setState({packScorePrompt: true})}
               >打包工分</List.Item>
+              <List.Item
+                arrow={"horizontal"}
+                extra={tool.toFixed(this.state.productInfo.sku.pack_loss_warn, 'percent')}
+                onClick={() => this.setState({packLossWarnPrompt: true})}
+              >打包损耗预警</List.Item>
             </If>
           </If>
   
@@ -326,6 +345,15 @@ class ProductInfo extends React.Component {
           onCancel={() => this.setState({stockCheckCyclePrompt: false})}
           initValue={this.state.productInfo.sku.stock_check_cycle}
           visible={this.state.stockCheckCyclePrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入打包损耗阈值(%)'}
+          onConfirm={(value) => this.onChgSkuPackLossWarn(value)}
+          onCancel={() => this.setState({packLossWarnPrompt: false})}
+          initValue={(this.state.productInfo.sku.pack_loss_warn * 100).toFixed(2)}
+          visible={this.state.packLossWarnPrompt}
         />
       </ScrollView>
     );

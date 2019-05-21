@@ -116,6 +116,7 @@ class MaterialTask extends React.Component {
             </Text>
             <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`}</Text>
           </View>
+          <Text style={{fontSize: 12}}>收货时间：{tool.shortTimeDesc(item.receipt_time)}</Text>
           <For each="task" of={item.task} index="taskIdx">
             <View style={styles.taskItem} key={taskIdx}>
               <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}</Text>
@@ -248,7 +249,8 @@ const styles = StyleSheet.create({
     height: 30,
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'flex-end'
   },
   taskItem: {
     flexDirection: 'row',

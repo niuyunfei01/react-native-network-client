@@ -11,6 +11,8 @@ import moment from "moment";
 import JbbDateRangeDialog from "../component/JbbDateRangeDialog";
 import {tool} from "../../common";
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
+import ModalSelector from "react-native-modal-selector";
+import color from '../../widget/color'
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -42,7 +44,8 @@ class MaterialTaskFinish extends React.Component {
       isLastPage: false,
       isLoading: false,
       workerPopup: false,
-      summary: {}
+      summary: {},
+      explainTypes: []
     }
   }
   
@@ -73,6 +76,8 @@ class MaterialTaskFinish extends React.Component {
     } else {
       self.setState(data, () => this.onRefresh())
     }
+  
+    this.fetchExplainType()
   }
   
   fetchData () {
@@ -105,6 +110,16 @@ class MaterialTaskFinish extends React.Component {
     })
   }
   
+  fetchExplainType () {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/pack_loss_explain_types?access_token=${accessToken}`
+    self.setState({isLoading: true})
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      self.setState({explainTypes: res})
+    })
+  }
+  
   onSwitchUser (user) {
     this.setState({page: 1, userId: user.id, username: user.name, workerPopup: false}, () => {
       this.onRefresh()
@@ -115,6 +130,18 @@ class MaterialTaskFinish extends React.Component {
     this.setState({page: 1}, () => {
       this.fetchData()
       this.fetchSummaryData()
+    })
+  }
+  
+  addExplain (receipt, explain) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/add_loss_explain?access_token=${accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      receiptId: receipt.id,
+      type: explain.value
+    }).then(res => {
+    
     })
   }
   
@@ -161,37 +188,67 @@ class MaterialTaskFinish extends React.Component {
   
   renderItem (item, idx) {
     return (
-        <View style={styles.item} key={idx}>
-          <View style={{height: 20}}>
-            <Text style={{color: '#000', fontWeight: 'bold'}}>{item.date}</Text>
-          </View>
-          <View style={{height: 30, flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>{item.sku.name}</Text>
-            <Text style={{fontSize: 12}}>
-              (秤签：#{item.sku.material_code}；总货重{item.weight}公斤)
+      <View style={styles.item} key={idx}>
+        <View style={{height: 20}}>
+          <Text style={{color: '#000', fontWeight: 'bold'}}>{item.date}</Text>
+        </View>
+        <View style={{height: 30, flexDirection: 'row', alignItems: 'flex-end'}}>
+          <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>{item.sku.name}</Text>
+          <Text style={{fontSize: 12}}>
+            (秤签：#{item.sku.material_code})
+          </Text>
+        </View>
+        <For each='entry' of={item.entries} index='entryIdx'>
+          <View style={styles.entryItem} key={entryIdx}>
+            <Text style={{fontSize: 12, flex: 1}}>{entry.product.name}</Text>
+            <Text style={{fontSize: 12, width: 80, textAlign: 'left'}}>
+              {entry.pack_user.nickname} {entry.num > 0 ? `+${entry.num}` : entry.num}份
             </Text>
+            <Text style={[{
+              fontSize: 12,
+              width: 60,
+              textAlign: 'right'
+            }, item.pack_loss_warning ? {
+              textDecorationLine: 'line-through',
+              textDecorationColor: '#e94f4f'
+            } : null]}>{entry.score}工分</Text>
           </View>
-          <For each='entry' of={item.entries} index='entryIdx'>
-            <View style={styles.entryItem} key={entryIdx}>
-              <Text style={{fontSize: 12, flex: 1}}>{entry.product.name}</Text>
-              <Text style={{fontSize: 12, width: 80, textAlign: 'left'}}>
-                {entry.pack_user.nickname} {entry.num > 0 ? `+${entry.num}` : entry.num}份
-              </Text>
-              <Text style={{fontSize: 12, width: 60, textAlign: 'right'}}>{entry.score}工分</Text>
+        </For>
+        <View style={[styles.itemLine]}>
+          <Text style={styles.itemText}>
+            总货重{item.weight}公斤 | 打包重量：{item.pack_weight}公斤
+          </Text>
+        </View>
+        <View style={[styles.itemLine]}>
+          <Text style={styles.itemText}>
+            {`损耗：${item.pack_loss_weight}公斤 | ${item.pack_loss_price}元 | `}
+            <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
+              {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
+            </Text>
+          </Text>
+        </View>
+        <If condition={item.pack_loss_warning}>
+          <View style={styles.explainWrap}>
+            <Text style={styles.itemText}>损耗原因：</Text>
+            <ModalSelector
+              style={[{flex: 1}]}
+              touchableStyle={[{width: '100%', flex: 1}]}
+              childrenContainerStyle={[{width: '100%', flex: 1}]}
+              onChange={(option) => this.addExplain(item, option)}
+              cancelText={'取消'}
+              data={this.state.explainTypes}
+            >
+              <Text style={[styles.itemText, {color: color.theme}]}>添加解释</Text>
+            </ModalSelector>
+          </View>
+          <For each='explain' index='explainIdx' of={item.explains}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+              <Text style={{fontSize: 12}}>{explain.user.nickname}：{explain.label}</Text>
+              <Text style={{fontSize: 12}}>{explain.created}</Text>
             </View>
           </For>
-          <If condition={item.type == 1 && item.status == 2 && item.sku && item.sku.need_pack == 1}>
-            <View style={[styles.itemLine]}>
-              <Text style={styles.itemText}>
-                {`打包重量：${item.pack_weight}公斤 | `}
-                {`损耗：${item.pack_loss}公斤 | `}
-                <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
-                  {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
-                </Text>
-              </Text>
-            </View>
-          </If>
-        </View>
+        </If>
+      </View>
     )
   }
   
@@ -219,7 +276,7 @@ class MaterialTaskFinish extends React.Component {
           loadMoreType={'scroll'}
           bottomLoadDistance={pxToDp(60)}
         />
-    
+  
         <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}
@@ -277,6 +334,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     width: '100%',
     height: 20
+  },
+  explainWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#efefef'
   }
 })
 export default connect(mapStateToProps)(MaterialTaskFinish)
