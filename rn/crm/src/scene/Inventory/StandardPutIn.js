@@ -149,6 +149,19 @@ class StandardPutIn extends BaseComponent {
     ])
   }
   
+  onSelectProduct (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `api_products/get_supplier_by_last_time/${item.upc}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      this.setState({
+        supplier: res,
+        product: item,
+        standardProdPrompt: false
+      })
+    })
+  }
+  
   fetchStandardProducts () {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -282,12 +295,9 @@ class StandardPutIn extends BaseComponent {
         <SearchPopup
           visible={this.state.standardProdPrompt}
           dataSource={this.state.standardProducts}
-          title={'选择供应商'}
+          title={'选择商品'}
           onClose={() => this.setState({standardProdPrompt: false})}
-          onSelect={(item) => this.setState({
-            product: item,
-            standardProdPrompt: false
-          })}
+          onSelect={(item) => this.onSelectProduct(item)}
         />
       </ScrollView>
     )

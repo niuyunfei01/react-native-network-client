@@ -107,7 +107,7 @@ class SearchPopup extends React.Component {
           renderEmpty={this.renderEmpty.bind(this)}
           rowHeight={rowHeight}
           toolbarBackgroundColor={'#2196f3'}
-          title={this.props.placeholder}
+          title={this.props.title}
           cancelTitle='取消'
           onClickBack={() => {
           }}

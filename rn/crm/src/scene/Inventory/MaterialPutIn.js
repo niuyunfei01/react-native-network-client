@@ -142,6 +142,21 @@ class MaterialPutIn extends React.Component {
     })
   }
   
+  onSelectMaterial (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `api_products/get_supplier_by_last_time/${item.id}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      this.setState({
+        sku: item.name,
+        skuId: item.id,
+        skuPopup: false,
+        supplier: res.name,
+        supplierId: res.id,
+      })
+    })
+  }
+  
   render () {
     return (
       <ScrollView
@@ -201,7 +216,7 @@ class MaterialPutIn extends React.Component {
           dataSource={this.state.skus}
           title={'选择原料名称'}
           onClose={() => this.setState({skuPopup: false})}
-          onSelect={(item) => this.setState({sku: item.name, skuId: item.id, skuPopup: false})}
+          onSelect={(item) => this.onSelectMaterial(item)}
         />
         <SearchPopup
           visible={this.state.supplierPopup}
