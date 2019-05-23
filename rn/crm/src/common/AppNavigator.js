@@ -113,6 +113,7 @@ import InventoryStandardDetailUpdate from '../scene/Inventory/StandardDetailUpda
 import InventoryMaterialTask from '../scene/Inventory/MaterialTask'
 import InventoryMaterialTaskFinish from '../scene/Inventory/MaterialTaskFinish'
 import InventoryStockCheck from '../scene/Inventory/StockCheck'
+import InventoryReportLoss from '../scene/Inventory/ReportLoss'
 import Cts from "../Cts";
 
 
@@ -395,6 +396,7 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
         [Config.ROUTE_INVENTORY_STOCK_CHECK]: {screen: InventoryStockCheck},
+        [Config.ROUTE_INVENTORY_REPORT_LOSS]: {screen: InventoryReportLoss},
       },
       stackNavigatorConfigs
     );

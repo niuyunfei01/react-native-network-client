@@ -21,7 +21,7 @@ function mapStateToProps (state) {
 class MaterialDetailUpdate extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '原料入库',
+      headerTitle: '原料收货详情',
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
@@ -77,6 +77,7 @@ class MaterialDetailUpdate extends React.Component {
         supplierId: res.supplier_id,
         weight: res.weight,
         reduceWeight: res.reduce_weight,
+        packageWeight: res.package_weight,
         price: res.price,
         datetime: res.receipt_time,
         detail: res
@@ -108,10 +109,10 @@ class MaterialDetailUpdate extends React.Component {
     const navigation = self.props.navigation
     const {params = {}} = navigation.state
     const accessToken = self.props.global.accessToken
-    const {skuId, supplierId, weight, price, reduceWeight} = this.state
+    const {skuId, supplierId, weight, price, reduceWeight, packageWeight} = this.state
     const api = `api_products/material_detail_update/${params.receiptDetailId}?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      skuId, supplierId, weight, reduceWeight, price
+      skuId, supplierId, weight, reduceWeight, price, packageWeight
     }).then(res => {
       ToastShort('修改成功')
       navigation.goBack()
@@ -170,7 +171,13 @@ class MaterialDetailUpdate extends React.Component {
             value={this.state.reduceWeight}
             defaultValue={this.state.reduceWeight}
             onChange={(reduceWeight) => this.setState({reduceWeight})}
-          >扣重</InputItem>
+          >货损</InputItem>
+          <InputItem
+            extra={'公斤'}
+            value={this.state.packageWeight}
+            defaultValue={this.state.packageWeight}
+            onChange={(packageWeight) => this.setState({packageWeight})}
+          >皮重</InputItem>
           <InputItem
             extra={'元'}
             value={this.state.price}

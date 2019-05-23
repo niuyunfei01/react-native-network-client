@@ -777,7 +777,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
                 }
                 menu.add(Menu.NONE, MENU_CONTEXT_ADD_BUY_RECORD, Menu.NONE, "入库");
-//                menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
+                menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
                 menu.add(Menu.NONE, MENU_CONTEXT_STOCK_CHECK, Menu.NONE, "盘点");
                 menu.add(Menu.NONE, MENU_CONTEXT_WAREHOUSE, Menu.NONE, "库管");
             }
@@ -895,8 +895,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     AlertUtil.error(this, "您使用的版本还没有开启报损模块");
                 } else {
                     if (item != null) {
-                        int itemId = item.getId();
-                        GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, URLHelper.WEB_URL_ROOT + "/stores/prod_loss/" + itemId);
+//                        int itemId = item.getId();
+//                        GeneralWebViewActivity.gotoWeb(StoreStorageActivity.this, URLHelper.WEB_URL_ROOT + "/stores/prod_loss/" + itemId);
+
+                        int productId = item.getProduct_id();
+                        int storeId = item.getStore_id();
+                        String productName = item.getName();
+
+                        GlobalCtx.app().toReportLoss(StoreStorageActivity.this, productId, storeId,productName);
                     }
                 }
                 return true;

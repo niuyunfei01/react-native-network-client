@@ -107,6 +107,7 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -1178,6 +1179,17 @@ public class GlobalCtx extends Application {
     }
 
     private AtomicReference<ScanStatus> ssRef = new AtomicReference<>();
+
+    public void toReportLoss(Activity ctx, int productId, int storeId, String productName) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryReportLoss");
+        Bundle params = new Bundle();
+        params.putInt("productId", productId);
+        params.putInt("storeId", storeId);
+        params.putString("productName", productName);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
 
     static public class ScanStatus {
         private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
