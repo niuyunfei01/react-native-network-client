@@ -85,7 +85,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private Spinner tagFilterSpinner;
     private Spinner currStatusSpinner;
     private Button btnReqList;
-    private Button btnEmptyList;
+    private Button btnRefillList;
     private Button btnApplyPriceList;
     private LayoutInflater inflater;
     private int lastCategoryPos = 0;
@@ -98,6 +98,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_TO_SET_PRICE = 6;
     public static final int FILTER_SET_PROVIDE_PRICE = 7;
     public static final int FILTER_FREQ_PRODUCT = 8;
+    public static final int FILTER_ = 8;
 
     public static final String SORT_BY_SOLD = "sold";
     public static final String SORT_BY_DEF = "defined";
@@ -113,18 +114,32 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         static final StatusItem[] STATUS = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
-                new StatusItem(FILTER_RISK, "待订货"),
-                new StatusItem(FILTER_SOLD_EMPTY, "零库待订"),
                 new StatusItem(FILTER_SOLD_OUT, "缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
-                new StatusItem(FILTER_FREQ_PRODUCT, "平价品"),
+        };
+
+        static final StatusItem[] STATUS_PROVIDING = new StatusItem[]{
+                new StatusItem(FILTER_ON_SALE, "在售"),
+                new StatusItem(FILTER_SOLD_OUT, "缺货"),
+                new StatusItem(FILTER_OFF_SALE, "已下架"),
+                new StatusItem(FILTER_RISK, "待补货"),
+                new StatusItem(FILTER_SOLD_EMPTY, "零库存"),
+                new StatusItem(FILTER_FREQ_PRODUCT, "待盘点"),
         };
 
         static final StatusItem[] STATUS_PRICE_CONTROLLED = new StatusItem[]{
                 new StatusItem(FILTER_ON_SALE, "在售"),
                 new StatusItem(FILTER_SOLD_OUT, "缺货"),
                 new StatusItem(FILTER_OFF_SALE, "已下架"),
-                new StatusItem(FILTER_FREQ_PRODUCT, "平价品"),
+        };
+
+        static final StatusItem[] STATUS_PRICE_CTRL_PROVIDING = new StatusItem[]{
+                new StatusItem(FILTER_ON_SALE, "在售"),
+                new StatusItem(FILTER_SOLD_OUT, "缺货"),
+                new StatusItem(FILTER_OFF_SALE, "已下架"),
+                new StatusItem(FILTER_RISK, "待补货"),
+                new StatusItem(FILTER_SOLD_EMPTY, "零库存"),
+                new StatusItem(FILTER_FREQ_PRODUCT, "待盘点"),
         };
 
         public final int status;
@@ -150,17 +165,19 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
 
         public static StatusItem find(int filter, boolean isPriceControlled) {
-            for (StatusItem item : isPriceControlled ? STATUS_PRICE_CONTROLLED : STATUS) {
+            boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+            for (StatusItem item : getSs(isPriceControlled, fnProviding)) {
                 if (item.status == filter) {
                     return item;
                 }
             }
 
-            return null;
+            return new StatusItem(0, "-");
         }
 
         static int findIdx(int filter, boolean isPriceControlled) {
-            StatusItem[] ss = isPriceControlled ? STATUS_PRICE_CONTROLLED : STATUS;
+            boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+            StatusItem[] ss = getSs(isPriceControlled, fnProviding);
             for (int i = 0; i < ss.length; i++) {
                 if (ss[i].status == filter) {
                     return i;
@@ -168,6 +185,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
 
             return -1;
+        }
+
+        private static StatusItem[] getSs(boolean isPriceControlled, boolean fnProviding) {
+            return isPriceControlled ? (fnProviding ? STATUS_PRICE_CTRL_PROVIDING : STATUS_PRICE_CONTROLLED)
+                    : (fnProviding ? STATUS_PROVIDING : STATUS);
         }
     }
 
@@ -250,44 +272,35 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        this.btnEmptyList = titleBar.findViewById(R.id.btn_empty_list);
-        this.btnEmptyList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Store cs = StoreStorageActivity.this.currStore;
-                //boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
-                boolean isDirect = !filterBtnControlled();
-                if (isDirect) {
-                    filter = StatusItem.find(FILTER_SOLD_EMPTY, !isDirect).status;
-                    currStatusSpinner.setSelection(StatusItem.findIdx(filter, false));
-                    searchTerm = "";
-                    Tag tag = new Tag();
-                    tag.setId(0);
-                    currTag = tag;
-                    AppLogger.d("start refresh data:");
-                    refreshData();
-                }
+        this.btnRefillList = titleBar.findViewById(R.id.btn_refill_list);
+        this.btnRefillList.setOnClickListener(v -> {
+            //Store cs = StoreStorageActivity.this.currStore;
+            //boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
+            final boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+            if (fnProviding) {
+                filter = StatusItem.find(FILTER_RISK, false).status;
+                currStatusSpinner.setSelection(StatusItem.findIdx(filter, false));
+                searchTerm = "";
+                Tag tag = new Tag();
+                tag.setId(0);
+                currTag = tag;
+                AppLogger.d("start refresh data:");
+                refreshData();
             }
         });
 
         ctv = findViewById(R.id.title_product_name);
         this.btnApplyPriceList = titleBar.findViewById(R.id.btn_apply_price_list);
-        this.btnApplyPriceList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO redirect
-                long storeId = StoreStorageActivity.this.currStore != null ? StoreStorageActivity.this.currStore.getId() : -1;
-                GlobalCtx.app().toApplyChangePriceList(StoreStorageActivity.this, storeId);
-            }
+        this.btnApplyPriceList.setOnClickListener(view -> {
+            //TODO redirect
+            long storeId1 = StoreStorageActivity.this.currStore != null ? StoreStorageActivity.this.currStore.getId() : -1;
+            GlobalCtx.app().toApplyChangePriceList(StoreStorageActivity.this, storeId1);
         });
         ImageButton searchBtn = findViewById(R.id.goods_search);
         addNewBtn = findViewById(R.id.add_new_prod);
-        addNewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
-                app.toGoodsNew(StoreStorageActivity.this, filterBtnControlled(), currStore != null ? currStore.getId() : 0L);
-            }
+        addNewBtn.setOnClickListener(v -> {
+            //boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
+            app.toGoodsNew(StoreStorageActivity.this, filterBtnControlled(), currStore != null ? currStore.getId() : 0L);
         });
 
 
@@ -310,26 +323,18 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                _do_search();
-            }
-        });
+        searchBtn.setOnClickListener(v -> _do_search());
 
-        ctv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object selected = parent.getAdapter().getItem(position);
-                if (selected instanceof StorageItem) {
-                    listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
-                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (in != null) {
-                        in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                    }
-                } else {
-                    Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
+        ctv.setOnItemClickListener((parent1, view, position, id) -> {
+            Object selected = parent1.getAdapter().getItem(position);
+            if (selected instanceof StorageItem) {
+                listAdapter.filter(String.valueOf(((StorageItem) selected).getProduct_id()));
+                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (in != null) {
+                    in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 }
+            } else {
+                Toast.makeText(StoreStorageActivity.this, "not a text item:" + selected, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -338,9 +343,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         currStatusSpinner = titleBar.findViewById(R.id.spinner_curr_status);
         statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
-        //boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
 
-        statusAdapter.addAll(filterBtnControlled() ? StatusItem.STATUS_PRICE_CONTROLLED : StatusItem.STATUS);
+        final boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+        statusAdapter.addAll(StatusItem.getSs(filterBtnControlled(), fnProviding));
 
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
         currStatusSpinner.setAdapter(statusAdapter);
@@ -366,22 +371,19 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         ArrayList<Tag> allTags = GlobalCtx.app().listTags(this.currStore != null ? this.currStore.getId() : 0);
         tagAdapter.addAll(allTags);
         categoryLv.setAdapter(tagAdapter);
-        categoryLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Tag tag = tagAdapter.getItem(position);
-                if (tag != null) {
-                    currTag = tag;
-                    AppLogger.d("start refresh data:");
-                    refreshData();
-                    view.setBackgroundColor(getResources().getColor(R.color.white));
+        categoryLv.setOnItemClickListener((parent12, view, position, id) -> {
+            Tag tag = tagAdapter.getItem(position);
+            if (tag != null) {
+                currTag = tag;
+                AppLogger.d("start refresh data:");
+                refreshData();
+                view.setBackgroundColor(getResources().getColor(R.color.white));
 
-                    int lastPos = StoreStorageActivity.this.lastCategoryPos;
-                    StoreStorageActivity.this.lastCategoryPos = position;
+                int lastPos = StoreStorageActivity.this.lastCategoryPos;
+                StoreStorageActivity.this.lastCategoryPos = position;
 
-                    View lastView = getViewByPosition(lastPos, categoryLv);
-                    lastView.setBackgroundColor(ContextCompat.getColor(StoreStorageActivity.this, R.color.lightgray));
-                }
+                View lastView = getViewByPosition(lastPos, categoryLv);
+                lastView.setBackgroundColor(ContextCompat.getColor(StoreStorageActivity.this, R.color.lightgray));
             }
         });
 
@@ -515,33 +517,23 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private void setHeadToolBar() {
 //        boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
 //        boolean isDirect = currStore != null &&  currStore.getType() == Cts.STORE_VENDOR_CN;
+        boolean fnEnabledReqProvide = GlobalCtx.app().getVendor().isFnProviding();
         if (filterBtnControlled()) {
-            this.btnReqList.setVisibility(View.INVISIBLE);
-            this.btnEmptyList.setVisibility(View.INVISIBLE);
-            this.btnApplyPriceList.setVisibility(View.VISIBLE);
-            if (statusAdapter != null) {
-                statusAdapter.clear();
-                statusAdapter.addAll(StatusItem.STATUS_PRICE_CONTROLLED);
-                statusAdapter.notifyDataSetChanged();
-            }
 
+            this.btnReqList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
+            this.btnRefillList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
+
+            this.btnApplyPriceList.setVisibility(View.VISIBLE);
             if (this.addNewBtn != null) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.addNewBtn.getLayoutParams();
                 params.removeRule(RelativeLayout.ALIGN_PARENT_END);
                 this.addNewBtn.setLayoutParams(params);
             }
         } else {
-            boolean fnEnabledReqProvide = GlobalCtx.app().fnEnabledReqProvide();
             this.btnReqList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
-            this.btnEmptyList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
+            this.btnRefillList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
 
             this.btnApplyPriceList.setVisibility(View.INVISIBLE);
-
-            if (statusAdapter != null) {
-                statusAdapter.clear();
-                statusAdapter.addAll(StatusItem.STATUS);
-                statusAdapter.notifyDataSetChanged();
-            }
 
             if (this.addNewBtn != null) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.addNewBtn.getLayoutParams();
@@ -549,6 +541,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 this.addNewBtn.setLayoutParams(params);
             }
         }
+
+        if (statusAdapter != null) {
+            statusAdapter.clear();
+            statusAdapter.addAll(StatusItem.getSs(filterBtnControlled(), fnEnabledReqProvide));
+            statusAdapter.notifyDataSetChanged();
+        }
+
     }
 
     public void initCurrStore(long storeId) {
@@ -644,13 +643,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
 
         updateReqListBtn(total_in_req);
-        updateEmptyListBtn(totalSoldEmpty);
+        updateRefillListBtn(totalRisk);
     }
 
     boolean filterBtnControlled() {
-        boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
-        boolean isDirect = currStore != null && currStore.getType() == Cts.STORE_VENDOR_CN;
-        return isPriceControlled && !isDirect;
+        return currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
     }
 
     void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, boolean isPriceControlled) {
@@ -669,9 +666,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
     }
 
-    void updateEmptyListBtn(int total) {
-        if (this.btnEmptyList != null) {
-            this.btnEmptyList.setText("零库存(" +  total + ")");
+    void updateRefillListBtn(int total) {
+        if (this.btnRefillList != null) {
+            this.btnRefillList.setText("待补货(" +  total + ")");
         }
     }
 

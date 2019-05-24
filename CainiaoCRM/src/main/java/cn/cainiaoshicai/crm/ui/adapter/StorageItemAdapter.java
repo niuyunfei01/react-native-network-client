@@ -30,6 +30,7 @@ import cn.cainiaoshicai.crm.domain.StorageStatusResults;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
@@ -116,7 +117,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
-            if (GlobalCtx.app().isDirectVendor()) {
+            if (GlobalCtx.app().getVendor().isFnProviding()) {
                 holder.leftNumber.setVisibility(View.VISIBLE);
                 holder.leftNumber.setText(item.leftNumberStr());
             } else {
@@ -146,8 +147,14 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.leftNumber.setOnClickListener(v -> {
             StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-            AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-            dlg.show();
+//            AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+//            dlg.show();
+            int productId = item.getProduct_id();
+            int storeId = item.getStore_id();
+            String productName = item.getName();
+            String shelfNo = item.getShelfNo();
+
+            GlobalCtx.app().toStockCheck(context, productId, storeId,productName,shelfNo);
         });
 
         holder.supplyPrice.setOnClickListener(view -> {

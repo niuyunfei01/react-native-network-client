@@ -54,10 +54,10 @@
     </LinearLayout>
 
 
-    <Button android:id="@+id/btn_empty_list"
+    <Button android:id="@+id/btn_refill_list"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@id/btn_req_list"
-        android:text="零库存(0)"
+        android:text="待补货(0)"
         android:textSize="@dimen/tiny_text"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
