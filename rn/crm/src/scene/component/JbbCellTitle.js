@@ -1,21 +1,31 @@
 import React from "react";
-import {StyleSheet} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import {CellsTitle} from "../../weui/Cell";
+import $V from "../../weui/variable";
 
 export default class JbbCellTitle extends React.Component {
   render () {
     return (
-      <CellsTitle style={[styles.cell_title]}>{this.props.children}</CellsTitle>
+      <View style={styles.cellTitle}>
+        <Text style={styles.cellsTitle}>{this.props.children}</Text>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   cellTitle: {
-    marginBottom: pxToDp(10),
-    fontSize: pxToDp(26),
-    color: colors.color999
+    paddingBottom: pxToDp(10),
+    backgroundColor: '#f5f5f9',
+    borderBottomColor: '#ddd',
+    borderBottomWidth: pxToDp(1),
+    flex: 1
+  },
+  cellsTitle: {
+    marginTop: $V.weuiCellTipsFontSize * 0.77 + (14 * $V.baseLineHeight - 14) * 0.5,
+    paddingLeft: $V.weuiCellGapH,
+    paddingRight: $V.weuiCellGapH,
+    fontSize: $V.weuiCellTipsFontSize,
+    color: $V.globalTextColor,
   }
 })

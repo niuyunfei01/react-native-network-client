@@ -48,7 +48,7 @@ class PackDetail extends React.Component {
       num: value
     }).then(res => {
       const {details} = this.state
-      details[prodIdx].push(res)
+      details[prodIdx].entries.push(res)
       this.setState({details})
     })
   }

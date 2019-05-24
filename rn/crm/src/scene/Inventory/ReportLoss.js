@@ -1,5 +1,5 @@
 import React from 'react'
-import {ScollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, WhiteSpace} from 'antd-mobile-rn';
 import {tool} from "../../common";
@@ -18,7 +18,7 @@ function mapStateToProps (state) {
 class ReportLoss extends BaseComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '库存盘点',
+      headerTitle: '商品报损',
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
@@ -42,11 +42,24 @@ class ReportLoss extends BaseComponent {
       num: '',
       remark: '',
       submitting: false,
+      history: {
+        lists: []
+      }
     }
   }
   
   componentDidMount () {
+    this.fetchHistory()
+  }
   
+  fetchHistory () {
+    const self = this
+    const {global} = self.props;
+    const {productId, storeId} = this.state
+    const api = `api_products/inventory_loss_history?access_token=${global.accessToken}`
+    HttpUtils.get.bind(self.props)(api, {page: 1, pageSize: 5, productId, storeId}).then(res => {
+      self.setState({history: res})
+    })
   }
   
   handleSubmit () {
@@ -84,9 +97,26 @@ class ReportLoss extends BaseComponent {
     )
   }
   
+  renderHistory () {
+    return (
+      <View>
+        <JbbCellTitle>报损历史</JbbCellTitle>
+        <View style={{backgroundColor: '#fff', padding: pxToDp(20)}}>
+          <For of={this.state.history.lists} each="item" index="index">
+            <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(40)}}>
+              <Text>{item.created}</Text>
+              <Text>{item.create_user.nickname}</Text>
+              <Text>-{item.num}份</Text>
+            </View>
+          </For>
+        </View>
+      </View>
+    )
+  }
+  
   render () {
     return (
-      <ScollView>
+      <ScrollView>
         {this.renderInfo()}
         <WhiteSpace/>
         <List renderHeader={() => '商品库存'}>
@@ -100,7 +130,9 @@ class ReportLoss extends BaseComponent {
         </List>
         <WhiteSpace/>
         <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
-      </ScollView>
+        <WhiteSpace/>
+        {this.renderHistory()}
+      </ScrollView>
     )
   }
 }

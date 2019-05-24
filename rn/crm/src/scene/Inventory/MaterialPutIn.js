@@ -152,7 +152,7 @@ class MaterialPutIn extends React.Component {
         skuId: item.id,
         skuPopup: false,
         supplier: res.name,
-        supplierId: res.id,
+        supplierId: res.supplier_code,
       })
     })
   }
