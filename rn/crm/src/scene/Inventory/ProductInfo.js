@@ -53,7 +53,9 @@ class ProductInfo extends React.Component {
       upcPrompt: false,
       packScorePrompt: false,
       stockCheckCyclePrompt: false,
-      packLossWarnPrompt: false
+      packLossWarnPrompt: false,
+      riskMinStatVocPrompt: false,
+      riskMinStatPrompt: false
     }
   }
   
@@ -200,6 +202,32 @@ class ProductInfo extends React.Component {
     })
   }
   
+  onChgStoreProdRiskMinStat (value) {
+    const self = this
+    const api = `/api_products/chg_store_prod_risk_min_stat?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      storeProdId: self.state.productInfo.id,
+      value: value
+    }).then(res => {
+      this.setState({riskMinStatPrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
+  onChgStoreProdRiskMinStatVoc (value) {
+    const self = this
+    const api = `/api_products/chg_store_prod_risk_min_stat_voc?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      storeProdId: self.state.productInfo.id,
+      value: value
+    }).then(res => {
+      this.setState({riskMinStatVocPrompt: false})
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
   renderHeader () {
     return (
       <View>
@@ -256,6 +284,16 @@ class ProductInfo extends React.Component {
             extra={`${this.state.productInfo.sku.stock_check_cycle}天`}
             onClick={() => this.setState({stockCheckCyclePrompt: true})}
           >盘点周期</List.Item>
+          <List.Item
+            arrow={"horizontal"}
+            extra={`${this.state.productInfo.risk_min_stat_voc}`}
+            onClick={() => this.setState({riskMinStatVocPrompt: true})}
+          >忙日最低库存</List.Item>
+          <List.Item
+            arrow={"horizontal"}
+            extra={`${this.state.productInfo.risk_min_stat}`}
+            onClick={() => this.setState({riskMinStatPrompt: true})}
+          >闲日最低库存</List.Item>
   
           <If condition={!this.state.isStandard}>
             <List.Item
@@ -354,6 +392,24 @@ class ProductInfo extends React.Component {
           onCancel={() => this.setState({packLossWarnPrompt: false})}
           initValue={(this.state.productInfo.sku.pack_loss_warn * 100).toFixed(2)}
           visible={this.state.packLossWarnPrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入忙日风险库存'}
+          onConfirm={(value) => this.onChgStoreProdRiskMinStatVoc(value)}
+          onCancel={() => this.setState({riskMinStatVocPrompt: false})}
+          initValue={this.state.productInfo.risk_min_stat_voc}
+          visible={this.state.riskMinStatVocPrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入闲日风险库存'}
+          onConfirm={(value) => this.onChgStoreProdRiskMinStat(value)}
+          onCancel={() => this.setState({riskMinStatPrompt: false})}
+          initValue={this.state.productInfo.risk_min_stat}
+          visible={this.state.riskMinStatPrompt}
         />
       </ScrollView>
     );
