@@ -1,18 +1,10 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-
-} from 'react-native';
+import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native';
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchVendorProduct, batchPriceSave} from "../../reducers/product/productActions";
+import {batchPriceSave, fetchVendorProduct} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "../../widget/ModalSelector/index";
 import tool from '../../common/tool';
@@ -21,14 +13,12 @@ import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {Toast} from "../../weui/index";
 import {NavigationActions} from "react-navigation";
+import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;
   return {product: product, global: global}
 }
-
-import {ToastLong} from "../../util/ToastUtils";
-import colors from "../../styles/colors";
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -277,23 +267,6 @@ class GoodsBatchPriceScene extends PureComponent {
                 <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)}</Text>
               </View>
             </ModalSelector>
-
-            <View style={[styles.title_item]}>
-              <TextInput
-                  underlineColorAndroid='transparent'
-                  style={[
-                    styles.item_font_style, {
-                      width: '100%'
-                    },
-                    styles.title_item
-                  ]}
-                  keyboardType='numeric'
-                  value={`${s_product.left_since_last_stat}`}
-                  onChangeText={(text) => {
-                    s_product.left_since_last_stat = text;
-                    _this.forceUpdate()
-                  }}/>
-            </View>
             <View style={[styles.price]}>
               <TextInput
                   underlineColorAndroid='transparent'
@@ -369,9 +342,6 @@ class GoodsBatchPriceScene extends PureComponent {
             </View>
             <View style={styles.title_item}>
               <Text>状态</Text>
-            </View>
-            <View style={[styles.title_item]}>
-              <Text>库存</Text>
             </View>
             <View style={styles.title_item}>
               <Text>价格</Text>
