@@ -1,45 +1,35 @@
-import React, { Component } from "react";
-import { bindActionCreators } from "redux";
-import {
-  Platform,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ListView,
-  Image,
-  InteractionManager,
-  RefreshControl
-} from "react-native";
+import React, {Component} from "react";
+import {bindActionCreators} from "redux";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Config from "../../config";
 import CommonStyle from "../../common/CommonStyles";
 
-import { saveOrderBasic, getOrder } from "../../reducers/order/orderActions";
-import { createTaskByOrder } from "../../reducers/remind/remindActions";
-import { connect } from "react-redux";
-import { tool } from "../../common";
+import {getOrder, saveOrderBasic, saveUserTag} from "../../reducers/order/orderActions";
+import {createTaskByOrder} from "../../reducers/remind/remindActions";
+import {connect} from "react-redux";
+import {tool} from "../../common";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
+import UserTagPopup from "../component/UserTagPopup";
+import FetchEx from "../../util/fetchEx";
+import AppConfig from "../../config";
+import {WhiteSpace} from "antd-mobile-rn"
+
 import {
-  Button,
+  Cell,
+  CellBody,
+  CellFooter,
+  CellHeader,
+  Cells,
+  CellsTitle,
+  Dialog,
+  Input,
+  Label,
   Switch,
   TextArea,
-  ButtonArea,
-  Toast,
-  Label,
-  Dialog,
-  Cells,
-  Input,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellFooter,
-  CellBody,
-  CellsTips
+  Toast
 } from "../../weui/index";
 import IconEvilIcons from "react-native-vector-icons/EvilIcons";
-import NavigationItem from "../../widget/NavigationItem";
 import Cts from "../../Cts";
 import _ from "underscore";
 
@@ -53,16 +43,15 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      { saveOrderBaisc: saveOrderBasic, getOrder, createTaskByOrder },
+      {saveOrderBaisc: saveOrderBasic, getOrder, createTaskByOrder},
       dispatch
     )
   };
 }
 
 class OrderEditScene extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
-    // disabled={this._shouldDisabledSaveBtn()}
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
       headerTitle: "修改订单信息",
       headerRight: (
@@ -79,7 +68,7 @@ class OrderEditScene extends Component {
             }}
           >
             <Text
-              style={{ color: colors.white, fontSize: 14, fontWeight: "bold" }}
+              style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}
             >
               保存
             </Text>
@@ -105,7 +94,11 @@ class OrderEditScene extends Component {
       onSendingConfirm: false,
       onSubmittingConfirm: false,
       confirmSent: false,
-      errorHints: ""
+      errorHints: "",
+      userTagPopupVisible: false,
+      userTagPopupMulti: false,
+      userTags: [],
+      selectTagIds: []
     };
 
     this.editFields = [
@@ -114,14 +107,14 @@ class OrderEditScene extends Component {
         val: order => order.phone_backup,
         label: "备用电话"
       },
-      { key: "detailAddr", val: order => order.address, label: "送货地址" },
+      {key: "detailAddr", val: order => order.address, label: "送货地址"},
       {
         key: "storeRemark",
         val: order => order.store_remark,
         label: "商家备注"
       },
-      { key: "taxInvoice", val: order => order.invoice, label: "发票抬头" },
-      { key: "taxId", val: order => order.taxer_id, label: "纳税人识别号" },
+      {key: "taxInvoice", val: order => order.invoice, label: "发票抬头"},
+      {key: "taxId", val: order => order.taxer_id, label: "纳税人识别号"},
       {
         key: "loc_data",
         val: order => `${order.loc_lng},${order.loc_lat}`,
@@ -151,7 +144,7 @@ class OrderEditScene extends Component {
   }
 
   componentWillMount() {
-    const { order } = this.props.navigation.state.params || {};
+    const {order} = this.props.navigation.state.params || {};
     const init = {
       autoSaveUserBackup: true,
       loc_name: order.street_block
@@ -161,32 +154,76 @@ class OrderEditScene extends Component {
     });
 
     this.setState(init);
+    this.getUserTags();
+  }
+
+  getUserTagNames() {
+    console.log("getUserTagNames ", this.state.userTags)
+    let names = _.pluck(this.state.userTags, 'name');
+    if (_.isEmpty(names)) {
+      return '点击选择标签'
+    } else {
+      return names.join(',')
+    }
+  }
+
+  getUserTagIds() {
+    console.log("getUserTagIds ", this.state.userTags)
+    let ids = _.pluck(this.state.userTags, 'id');
+    if (_.isEmpty(ids)) {
+      return []
+    } else {
+      return ids
+    }
+  }
+
+  getUserTags() {
+    const self = this
+    const {accessToken} = this.props.global;
+    const url = `api/get_user_tags?access_token=${accessToken}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url)).then(resp => resp.json()).then(resp => {
+      let {ok, reason, obj} = resp;
+      if (ok) {
+        self.setState({userTags: obj})
+      }
+    })
+  }
+
+  saveUserTags(tags) {
+    console.log("saveUserTags ", tags)
+    let ids = _.pluck(tags, 'id')
+    if (!_.isEmpty(ids)) {
+      const {dispatch, global} = this.props;
+      const token = global.accessToken;
+      dispatch(saveUserTag(token, ids, (ok, msg, respData) => {
+      }))
+    }
   }
 
   _storeLoc() {
-    const { order } = this.props.navigation.state.params || {};
-    if(order){
-      const store = tool.store( this.props.global,order.store_id);
+    const {order} = this.props.navigation.state.params || {};
+    if (order) {
+      const store = tool.store(this.props.global, order.store_id);
       return store ? `${store.loc_lng},${store.loc_lat}` : "0,0";
     }
     return "0,0"
   }
 
   _onChangeBackupPhone(backupPhone) {
-    const { order } = this.props.navigation.state.params;
+    const {order} = this.props.navigation.state.params;
     if (order.mobile === backupPhone) {
-      this.setState({ errorHints: "备用电话不能与订单电话相同" });
+      this.setState({errorHints: "备用电话不能与订单电话相同"});
       return;
     }
-    this.setState({ backupPhone });
+    this.setState({backupPhone});
   }
 
   _onChangeAutoSaveBackup(autoSaveUserBackup) {
-    this.setState({ autoSaveUserBackup });
+    this.setState({autoSaveUserBackup});
   }
 
   _toSetLocation() {
-    const { state, navigate } = this.props.navigation;
+    const {state, navigate} = this.props.navigation;
     const params = {
       action: Config.LOC_PICKER,
       center:
@@ -205,19 +242,19 @@ class OrderEditScene extends Component {
   }
 
   _onChangeDetailAddr(detailAddr) {
-    this.setState({ detailAddr });
+    this.setState({detailAddr});
   }
 
   _onChangeTaxId(taxId) {
-    this.setState({ taxId });
+    this.setState({taxId});
   }
 
   _onChangeTaxInvoice(taxInvoice) {
-    this.setState({ taxInvoice });
+    this.setState({taxInvoice});
   }
 
   _buildNotifyRemark() {
-    const { order } = this.props.navigation.state.params;
+    const {order} = this.props.navigation.state.params;
 
     const changes = this.editFields
       .filter(edit => this.state[edit.key] !== edit.val(order))
@@ -229,8 +266,8 @@ class OrderEditScene extends Component {
   }
 
   _doSaveEdit() {
-    const { dispatch, global } = this.props;
-    const { order } = this.props.navigation.state.params;
+    const {dispatch, global} = this.props;
+    const {order} = this.props.navigation.state.params;
 
     const changes = this.editFields
       .filter(edit => this.state[edit.key] !== edit.val(order))
@@ -242,7 +279,7 @@ class OrderEditScene extends Component {
     console.log("changes", changes);
 
     if (!_.isEmpty(changes)) {
-      this.setState({ onSubmitting: true });
+      this.setState({onSubmitting: true});
       const token = global.accessToken;
       dispatch(
         saveOrderBasic(token, order.id, changes, (ok, msg, respData) => {
@@ -267,20 +304,20 @@ class OrderEditScene extends Component {
         })
       );
     } else {
-      this.setState({ errorHints: "没有修改需要保存" });
+      this.setState({errorHints: "没有修改需要保存"});
     }
   }
 
   _back() {
-    this.setState({ onSendingConfirm: false });
-    const { navigation } = this.props;
+    this.setState({onSendingConfirm: false});
+    const {navigation} = this.props;
     navigation.goBack();
   }
 
   _doSendRemind() {
-    const { dispatch, global } = this.props;
-    const { order } = this.props.navigation.state.params;
-    this.setState({ onSendingConfirm: false, onSubmittingConfirm: true });
+    const {dispatch, global} = this.props;
+    const {order} = this.props.navigation.state.params;
+    this.setState({onSendingConfirm: false, onSubmittingConfirm: true});
 
     const remark = this._buildNotifyRemark();
 
@@ -300,13 +337,13 @@ class OrderEditScene extends Component {
               confirmSent: true
             });
             setTimeout(() => {
-              this.setState({ confirmSent: false });
+              this.setState({confirmSent: false});
               this._back();
             }, 2000);
           } else {
             this.setState({
               errorHints:
-                "发送通知时发生错误：" + msg + ", 请使用其他方式通知门店",
+              "发送通知时发生错误：" + msg + ", 请使用其他方式通知门店",
               onSubmittingConfirm: false
             });
             this._errorHintsCallback = () => {
@@ -319,7 +356,7 @@ class OrderEditScene extends Component {
   }
 
   _shouldDisabledSaveBtn() {
-    const { order } = this.props.navigation.state.params;
+    const {order} = this.props.navigation.state.params;
 
     const ts = this.editFields.filter(
       edit => this.state[edit.key] !== edit.val(order)
@@ -327,9 +364,13 @@ class OrderEditScene extends Component {
     return ts.length === 0;
   }
 
+  showTagPopup (multi) {
+    this.setState({userTagPopupVisible: true, userTagPopupMulti: true})
+  }
+
   render() {
     return (
-      <ScrollView style={[styles.container, { flex: 1 }]}>
+      <ScrollView style={[styles.container, {flex: 1}]}>
         <Dialog
           onRequestClose={() => {
             if (this._errorHintsCallback) this._errorHintsCallback();
@@ -340,7 +381,7 @@ class OrderEditScene extends Component {
               type: "default",
               label: "知道了",
               onPress: () => {
-                this.setState({ errorHints: "" });
+                this.setState({errorHints: ""});
               }
             }
           ]}
@@ -349,7 +390,8 @@ class OrderEditScene extends Component {
         </Dialog>
 
         <Dialog
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
           visible={this.state.onSendingConfirm}
           buttons={[
             {
@@ -386,7 +428,7 @@ class OrderEditScene extends Component {
           </Cell>
           <Cell>
             <CellHeader>
-              <Label style={[CommonStyle.cellTextH35W70, { fontSize: 12 }]}>
+              <Label style={[CommonStyle.cellTextH35W70, {fontSize: 12}]}>
                 保存到客户
               </Label>
             </CellHeader>
@@ -403,13 +445,13 @@ class OrderEditScene extends Component {
             <CellHeader>
               <Label style={CommonStyle.cellTextH35W70}>导航座标</Label>
             </CellHeader>
-            <CellBody style={{ flexDirection: "row", flex: 1 }}>
-              <IconEvilIcons name="location" size={26} />
-              <Text style={{ fontSize: 15 }}>
+            <CellBody style={{flexDirection: "row", flex: 1}}>
+              <IconEvilIcons name="location" size={26}/>
+              <Text style={{fontSize: 15}}>
                 {this.state.loc_name || this.state.loc_data}
               </Text>
             </CellBody>
-            <CellFooter access />
+            <CellFooter access/>
           </Cell>
           <Cell>
             <CellHeader>
@@ -421,7 +463,7 @@ class OrderEditScene extends Component {
                 value={this.state.detailAddr}
                 onChangeText={this._onChangeDetailAddr}
                 underlineColorAndroid={"transparent"}
-                style={[CommonStyle.inputH35, { fontSize: 12 }]}
+                style={[CommonStyle.inputH35, {fontSize: 12}]}
               />
             </CellBody>
           </Cell>
@@ -435,7 +477,7 @@ class OrderEditScene extends Component {
                 maxLength={60}
                 placeholder=""
                 onChange={v => {
-                  this.setState({ storeRemark: v });
+                  this.setState({storeRemark: v});
                 }}
                 value={this.state.storeRemark}
                 underlineColorAndroid={"transparent"}
@@ -476,10 +518,29 @@ class OrderEditScene extends Component {
           </Cell>
         </Cells>
 
+        <CellsTitle style={CommonStyle.cellsTitle35}>标签</CellsTitle>
+        <Cells style={CommonStyle.cells35}>
+          <Cell>
+            <CellHeader>
+              <Label style={CommonStyle.cellTextH35W70}>选择标签</Label>
+            </CellHeader>
+            <CellBody>
+              <TouchableOpacity onPress={() => this.showTagPopup()}>
+                <Text style={styles.body_text}>
+                  {this.getUserTagNames()}
+                </Text>
+              </TouchableOpacity>
+            </CellBody>
+          </Cell>
+        </Cells>
+
+        <WhiteSpace/>
+
         <Toast
           icon="loading"
           show={this.state.onSubmitting}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           提交中
         </Toast>
@@ -487,7 +548,8 @@ class OrderEditScene extends Component {
         <Toast
           icon="loading"
           show={this.state.onSubmittingConfirm}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           正在发送订单修改通知
         </Toast>
@@ -495,23 +557,47 @@ class OrderEditScene extends Component {
         <Toast
           icon="success"
           show={this.state.confirmSent}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >
           发送成功
         </Toast>
+        {/*标签列表*/}
+        <UserTagPopup
+          multiple={this.state.userTagPopupMulti}
+          visible={this.state.userTagPopupVisible}
+          selectTagIds={this.getUserTagIds()}
+          onClickWorker={(tag) => {
+            this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
+          }}
+          onComplete={(tags) => {
+            console.log('order edit get tags ', tags)
+            this.setState({userTags: tags})
+            this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
+            this.saveUserTags(tags)
+          }}
+          onCancel={() => this.setState({userTagPopupMulti: false, userTagPopupVisible: false})}
+        />
       </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: "#f2f2f2" },
+  container: {backgroundColor: "#f2f2f2"},
   border_top: {
     borderTopWidth: pxToDp(1),
     borderTopColor: colors.color999
   },
   cells: {
     marginTop: 0
+  },
+  body_text: {
+    paddingLeft: pxToDp(8),
+    fontSize: pxToDp(30),
+    color: colors.color333,
+    height: pxToDp(60),
+    textAlignVertical: "center"
   }
 });
 
