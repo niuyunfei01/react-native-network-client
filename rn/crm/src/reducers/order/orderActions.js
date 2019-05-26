@@ -1,9 +1,9 @@
 'use strict';
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {getWithTpl, getWithTpl2, jsonWithTpl, jsonWithTpl2} from '../../util/common'
+import {getWithTpl, getWithTpl2, jsonWithTpl2} from '../../util/common'
 import Cts from "../../Cts";
-import { ToastShort } from "../../util/ToastUtils";
+import {ToastShort} from "../../util/ToastUtils";
 
 /**
  * ## Imports
@@ -118,6 +118,16 @@ export function getOrder(sessionToken, orderId, callback) {
       }
     )
   }
+}
+
+export function saveUserTag(token, tagIds, callback) {
+  const url = `api/save_user_tags.json?access_token=${token}`;
+  return jsonWithTpl2(url, tagIds
+    , (json, dispatch) => {
+      callback(json.ok, json.reason, json.obj)
+    }
+    , (error) => callback(false, "网络错误, 请稍后重试")
+  )
 }
 
 export function saveOrderBasic(token, orderId, changes, callback) {

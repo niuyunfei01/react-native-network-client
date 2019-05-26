@@ -850,9 +850,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         switch (mi.getItemId()) {
             case MENU_CONTEXT_DELETE_ID:
                 if (item != null) {
-                    AlertDialog dlg = StoreStorageHelper.createEditLeftNum(this, item, inflater, notifyDataSetChanged());
-                    dlg.show();
-                    return true;
+                    //alertDialog dlg = StoreStorageHelper.createEditLeftNum(this, item, inflater, notifyDataSetChanged());
+                    //dlg.show();
+                    int productId = item.getProduct_id();
+                    int storeId = item.getStore_id();
+                    String productName = item.getName();
+
+                    GlobalCtx.app().toReportLoss(StoreStorageActivity.this, productId, storeId,productName);
+                    return  true;
                 } else {
                     return false;
                 }
