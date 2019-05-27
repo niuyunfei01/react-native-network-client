@@ -89,6 +89,13 @@ class OrderScan extends BaseComponent {
     })
   }
   
+  componentDidMount () {
+    super.componentDidMount();
+    if (this.props.navigation.state.params.orderId) {
+      this.fetchOrder(this.props.navigation.state.params.orderId)
+    }
+  }
+  
   componentWillUnmount () {
     if (this.listenScanBarCode) {
       this.listenScanBarCode.remove()
