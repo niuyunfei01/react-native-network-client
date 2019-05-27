@@ -7,7 +7,7 @@ import font from './fontStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchLocked, loadAllSuppliers} from "../../reducers/invoicing/invoicingActions";
+import {fetchLocked, loadAllSuppliers, loadEnableSuppliers} from "../../reducers/invoicing/invoicingActions";
 import Conf from '../../config';
 import EmptyListView from "./EmptyListView";
 
@@ -54,6 +54,7 @@ class InvoicingShippingScene extends PureComponent {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
     dispatch(loadAllSuppliers(token));
+    dispatch(loadEnableSuppliers(token));
   }
 
   reloadData() {
@@ -78,8 +79,8 @@ class InvoicingShippingScene extends PureComponent {
         });
       }, 3000);
       let {invoicing} = this.props;
-      let {suppliers} = invoicing;
-      this.props.navigate(Conf.ROUTE_INVOICING_SHIPPING_DETAIL, {req: data, suppliers: suppliers});
+      let {suppliers, enableSuppliers} = invoicing;
+      this.props.navigate(Conf.ROUTE_INVOICING_SHIPPING_DETAIL, {req: data, suppliers: suppliers, enableSuppliers: enableSuppliers});
     }
   }
 
