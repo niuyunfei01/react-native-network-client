@@ -241,6 +241,9 @@ class ProductInfo extends React.Component {
             <Text style={styles.infoLabel}>商品：(ID:#{this.state.productId})</Text>
             <Text>{this.state.productInfo.product.name}</Text>
           </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>店铺成本：{this.state.productInfo.store_cost}元</Text>
+          </View>
         </View>
       </View>
     )
