@@ -98,7 +98,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_SOLD_EMPTY = 5;
     public static final int FILTER_TO_SET_PRICE = 6;
     public static final int FILTER_SET_PROVIDE_PRICE = 7;
-    public static final int FILTER_FREQ_PRODUCT = 8;
+    public static final int FILTER_FREQ_PRODUCT = 20;
     public static final int FILTER_ = 8;
 
     public static final String SORT_BY_SOLD = "sold";
@@ -451,7 +451,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         initStoreProdQuota();
         //Must after buttons initialized
         setHeadToolBar();
-        updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+        updateFilterBtnLabels(0, 0, 0, 0, 0, 0, 0);
     }
 
     private String getSortType(String label) {
@@ -630,11 +630,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
-                                       int total_in_req, int totalSoldEmpty) {
+                                       int total_in_req, int totalSoldEmpty, int totalNeedCheck) {
 
         //boolean isPriceControlled = this.currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
 
-        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, filterBtnControlled());
+        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, totalNeedCheck, filterBtnControlled());
         StatusItem riskItem = StatusItem.find(FILTER_RISK, filterBtnControlled());
         if (riskItem != null) {
             riskItem.setNum(totalRisk);
@@ -656,12 +656,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         return currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
     }
 
-    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, boolean isPriceControlled) {
+    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, int totalNeedCheck, boolean isPriceControlled) {
         StatusItem.find(FILTER_ON_SALE, isPriceControlled).setNum(totalOnSale);
         StatusItem.find(FILTER_SOLD_OUT, isPriceControlled).setNum(totalSoldOut);
         StatusItem.find(FILTER_OFF_SALE, isPriceControlled).setNum(totalOffSale);
-        if(this.currStatusSpinner != null) {
-            ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
+        StatusItem.find(FILTER_FREQ_PRODUCT, isPriceControlled).setNum(totalNeedCheck);
+        if (this.currStatusSpinner != null) {
+            ((ArrayAdapter) this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
         }
     }
 
@@ -740,7 +741,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                                 StoreStorageActivity.this.stats = sec;
                                 updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
                                         sec.getTotal_sold_out(), sec.getTotal_off_sale(),
-                                        sec.getTotal_req_cnt(), sec.getTotal_sold_empty());
+                                        sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check());
                             }
                         }
                     });
@@ -824,7 +825,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                         break;
                 }
                 //boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
-                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale(), filterBtnControlled());
+                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale(), st.getTotal_need_check(), filterBtnControlled());
             }
             if (additional != null) {
                 additional.run();
