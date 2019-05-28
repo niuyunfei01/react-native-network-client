@@ -555,6 +555,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 }
 
                 void dlg(final long storeId) {
+                    final ShipAcceptStatus workStatus =  app.getWorkerStatus(store_id);
                     final int shipAcceptStatus = workStatus.getStatus();
                     final String labelBtn = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "开始接单" : "停止接单";
 
