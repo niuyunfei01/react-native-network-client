@@ -11,6 +11,7 @@ public class StoreStatusStat {
     private int total_off_sale;
     private int total_req_cnt;
     private int total_sold_empty;
+    private int total_need_check;
 
     public int getTotal_on_sale() {
         return total_on_sale;
@@ -58,5 +59,13 @@ public class StoreStatusStat {
 
     public void setTotal_sold_empty(int total_sold_empty) {
         this.total_sold_empty = total_sold_empty;
+    }
+
+    public int getTotal_need_check() {
+        return total_need_check;
+    }
+
+    public void setTotal_need_check(int total_need_check) {
+        this.total_need_check = total_need_check;
     }
 }

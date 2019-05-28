@@ -53,7 +53,8 @@ class InvoicingShippingDetailScene extends Component {
       remark: {},
       productSupplierMap : {},
       checkSuppliers: {},
-      checkCount: {}
+      checkCount: {},
+      enableSuppliers: []
     }
     this.handleCheckSupplier = this.handleCheckSupplier.bind(this);
     this.handleCheckItem = this.handleCheckItem.bind(this);
@@ -82,12 +83,12 @@ class InvoicingShippingDetailScene extends Component {
   }
 
   initViewData(lastChecked = {}) {
-    const {req, suppliers} = (this.props.navigation.state.params || {});
-    this.setState({req: req, suppliers: suppliers});
+    const {req, suppliers, enableSuppliers} = (this.props.navigation.state.params || {});
+    this.setState({req: req, suppliers: suppliers, enableSuppliers: enableSuppliers});
     let reqItems = req['req_items'];
     let checkCount = {};
     let orderRemark = {};
-    _.forEach(suppliers, function (item) {
+    _.forEach(enableSuppliers, function (item) {
       let supplyId = item['id'];
       checkCount[supplyId] = 0;
       orderRemark[supplyId] = '';
@@ -106,7 +107,7 @@ class InvoicingShippingDetailScene extends Component {
       }
       return {label: item['name'], id: item['id'], sId: supplierId, pid: pid}
     });
-    let checkSuppliers = suppliers.map(function (item, idx) {
+    let checkSuppliers = enableSuppliers.map(function (item, idx) {
       return {id: item['id'], name: item['name']}
     });
     this.setState({

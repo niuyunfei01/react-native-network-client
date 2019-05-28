@@ -74,10 +74,12 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
+    Toast.loading('请求中', 0)
     HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
     }).then(res => {
+      Toast.hide()
       Toast.success('操作成功')
       self.fetchData()
     })

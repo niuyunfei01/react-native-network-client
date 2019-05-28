@@ -48,6 +48,7 @@ import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -97,7 +98,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_SOLD_EMPTY = 5;
     public static final int FILTER_TO_SET_PRICE = 6;
     public static final int FILTER_SET_PROVIDE_PRICE = 7;
-    public static final int FILTER_FREQ_PRODUCT = 8;
+    public static final int FILTER_FREQ_PRODUCT = 20;
     public static final int FILTER_ = 8;
 
     public static final String SORT_BY_SOLD = "sold";
@@ -165,7 +166,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
 
         public static StatusItem find(int filter, boolean isPriceControlled) {
-            boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+            Vendor v = GlobalCtx.app().getVendor();
+            boolean fnProviding = v == null ? false : v.isFnProviding();
             for (StatusItem item : getSs(isPriceControlled, fnProviding)) {
                 if (item.status == filter) {
                     return item;
@@ -176,7 +178,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
 
         static int findIdx(int filter, boolean isPriceControlled) {
-            boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+            Vendor v = GlobalCtx.app().getVendor();
+            boolean fnProviding = v == null ? false : v.isFnProviding();
             StatusItem[] ss = getSs(isPriceControlled, fnProviding);
             for (int i = 0; i < ss.length; i++) {
                 if (ss[i].status == filter) {
@@ -276,7 +279,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         this.btnRefillList.setOnClickListener(v -> {
             //Store cs = StoreStorageActivity.this.currStore;
             //boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
-            final boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+            final Vendor vendor = GlobalCtx.app().getVendor();
+            final boolean fnProviding = v == null ? false : vendor.isFnProviding();
             if (fnProviding) {
                 filter = StatusItem.find(FILTER_RISK, false).status;
                 currStatusSpinner.setSelection(StatusItem.findIdx(filter, false));
@@ -344,7 +348,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         currStatusSpinner = titleBar.findViewById(R.id.spinner_curr_status);
         statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
 
-        final boolean fnProviding = GlobalCtx.app().getVendor().isFnProviding();
+        Vendor v = GlobalCtx.app().getVendor();
+        boolean fnProviding = v == null ? false : v.isFnProviding();
         statusAdapter.addAll(StatusItem.getSs(filterBtnControlled(), fnProviding));
 
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
@@ -446,7 +451,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         initStoreProdQuota();
         //Must after buttons initialized
         setHeadToolBar();
-        updateFilterBtnLabels(0, 0, 0, 0, 0, 0);
+        updateFilterBtnLabels(0, 0, 0, 0, 0, 0, 0);
     }
 
     private String getSortType(String label) {
@@ -517,7 +522,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private void setHeadToolBar() {
 //        boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
 //        boolean isDirect = currStore != null &&  currStore.getType() == Cts.STORE_VENDOR_CN;
-        boolean fnEnabledReqProvide = GlobalCtx.app().getVendor().isFnProviding();
+        Vendor v = GlobalCtx.app().getVendor();
+        boolean fnEnabledReqProvide = v == null ? false : v.isFnProviding();
         if (filterBtnControlled()) {
 
             this.btnReqList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
@@ -624,11 +630,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
-                                       int total_in_req, int totalSoldEmpty) {
+                                       int total_in_req, int totalSoldEmpty, int totalNeedCheck) {
 
         //boolean isPriceControlled = this.currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
 
-        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, filterBtnControlled());
+        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, totalNeedCheck, filterBtnControlled());
         StatusItem riskItem = StatusItem.find(FILTER_RISK, filterBtnControlled());
         if (riskItem != null) {
             riskItem.setNum(totalRisk);
@@ -650,12 +656,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         return currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
     }
 
-    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, boolean isPriceControlled) {
+    void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, int totalNeedCheck, boolean isPriceControlled) {
         StatusItem.find(FILTER_ON_SALE, isPriceControlled).setNum(totalOnSale);
         StatusItem.find(FILTER_SOLD_OUT, isPriceControlled).setNum(totalSoldOut);
         StatusItem.find(FILTER_OFF_SALE, isPriceControlled).setNum(totalOffSale);
-        if(this.currStatusSpinner != null) {
-            ((ArrayAdapter)this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
+        StatusItem.find(FILTER_FREQ_PRODUCT, isPriceControlled).setNum(totalNeedCheck);
+        if (this.currStatusSpinner != null) {
+            ((ArrayAdapter) this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
         }
     }
 
@@ -734,7 +741,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                                 StoreStorageActivity.this.stats = sec;
                                 updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
                                         sec.getTotal_sold_out(), sec.getTotal_off_sale(),
-                                        sec.getTotal_req_cnt(), sec.getTotal_sold_empty());
+                                        sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check());
                             }
                         }
                     });
@@ -818,7 +825,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                         break;
                 }
                 //boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
-                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale(), filterBtnControlled());
+                updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale(), st.getTotal_need_check(), filterBtnControlled());
             }
             if (additional != null) {
                 additional.run();

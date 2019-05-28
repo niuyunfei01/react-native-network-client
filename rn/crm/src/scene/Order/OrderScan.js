@@ -89,6 +89,13 @@ class OrderScan extends BaseComponent {
     })
   }
   
+  componentDidMount () {
+    super.componentDidMount();
+    if (this.props.navigation.state.params.orderId) {
+      this.fetchOrder(this.props.navigation.state.params.orderId)
+    }
+  }
+  
   componentWillUnmount () {
     if (this.listenScanBarCode) {
       this.listenScanBarCode.remove()
@@ -235,11 +242,13 @@ class OrderScan extends BaseComponent {
   
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api).then(() => {
-      dataSource.splice(idx + 1, 1)
-      orderIds.splice(idx + 1, 1)
+    HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then(() => {
+      dataSource.splice(idx, 1)
+      orderIds.splice(idx, 1)
       currentOrder = dataSource.length ? dataSource[0] : {}
+      console.log('datasource', dataSource, 'current order ', currentOrder, 'order ids ', orderIds)
       self.setState({dataSource, currentOrder, orderIds}, () => self.swipeToOrder(0))
+      ToastShort('打包完成操作成功')
     })
   }
   

@@ -21,7 +21,8 @@ const {
   AFTER_TRANSFER_ORDER_ITEM,
   AFTER_APPEND_SUPPLY_ORDER,
   REMOVE_SUPPLY_ORDER,
-  LIST_ALL_STORES
+  LIST_ALL_STORES,
+  LIST_ALL_ENABLE_SUPPLIERS
 } = require('./ActionTypes.js').default;
 
 const initialState = {
@@ -33,6 +34,7 @@ const initialState = {
   receivedSupplyOrder: [],
   confirmedSupplyOrder: [],
   balancedSupplyOrder: [],
+  enableSuppliers: []
 };
 
 export default function invoicing(state = initialState, action) {
@@ -58,6 +60,10 @@ export default function invoicing(state = initialState, action) {
     case LIST_ALL_SUPPLIERS:
       return {
         ...state, suppliers: extractSuppliers(state, action)
+      };
+    case LIST_ALL_ENABLE_SUPPLIERS:
+      return {
+        ...state, enableSuppliers: extractSuppliers(state, action)
       };
     case LIST_ALL_STORES:
       return {
