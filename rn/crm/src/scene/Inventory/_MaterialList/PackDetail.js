@@ -8,6 +8,8 @@ import JbbPrompt from "../../component/JbbPrompt";
 import HttpUtils from "../../../util/http";
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
+import {List} from "antd-mobile-rn/lib/list/index.native";
+import ModalSelector from "react-native-modal-selector";
 
 function mapStateToProps (state) {
   const {global, mine} = state;
@@ -26,30 +28,52 @@ class PackDetail extends React.Component {
   constructor (props) {
     super(props)
     const user = tool.user(this.props.global, this.props.mine)
+    const store = tool.store(this.props.global)
     console.log(user)
     this.state = {
       user: user,
+      store: store,
       visible: false,
-      details: []
+      details: [],
+      activeUsers: [],
+      appendVisible: false,
+      appendUser: {},
+      appendProductId: 0,
+      appendIdx: 0
     }
+  }
+  
+  componentDidMount (): void {
+    this.fetchActiveWorker()
   }
   
   componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
     this.setState({visible: nextProps.visible, details: nextProps.details})
   }
   
-  onAddPackNumber (value, productId, prodIdx) {
+  onAddPackNumber (value) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry_append?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       receiptId: this.props.item.id,
-      productId: productId,
-      num: value
+      productId: this.state.appendProductId,
+      num: value,
+      appendUId: this.state.appendUser.id
     }).then(res => {
       const {details} = this.state
-      details[prodIdx].entries.push(res)
+      details[this.state.appendIdx].entries.push(res)
       this.setState({details})
+    })
+  }
+  
+  fetchActiveWorker () {
+    const self = this
+    const {accessToken} = this.props.global;
+    let {store} = this.state;
+    const url = `api/store_contacts/${store.id}.json?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      self.setState({activeUsers: res})
     })
   }
   
@@ -63,15 +87,20 @@ class PackDetail extends React.Component {
             <Text numberOfLines={2} style={{width: 250}}>
               {item.product_name}
             </Text>
-            <JbbPrompt
-              title={'请输入数量'}
-              onConfirm={(value) => this.onAddPackNumber(value, item.product_id, idx)}
-              keyboardType={'numeric'}
+            <ModalSelector
+              onChange={(option) => this.setState({
+                appendUser: option,
+                appendVisible: true,
+                appendProductId: item.product_id,
+                appendIdx: idx
+              })}
+              cancelText={'取消'}
+              data={this.state.activeUsers}
             >
               <Text style={styles.add}>
                 添加
               </Text>
-            </JbbPrompt>
+            </ModalSelector>
           </View>
   
           <For of={item.entries} each="record" index="i">
@@ -93,6 +122,13 @@ class PackDetail extends React.Component {
         <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
           {this.renderContent()}
         </Dialog>
+  
+        <JbbPrompt
+          visible={this.state.appendVisible}
+          title={`追加${this.state.appendUser.desc}打包数量`}
+          onConfirm={(value) => this.onAddPackNumber(value)}
+          keyboardType={'numeric'}
+        />
       </View>
     )
   }
