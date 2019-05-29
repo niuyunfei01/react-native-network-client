@@ -1676,7 +1676,7 @@ class OrderScene extends Component {
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
-            <CallBtn mobile={order.mobile} label={mobile_label}/>
+            <CallBtn mobile={order.mobile} label={mobile_label} phoneList={order.contacts}/>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
               <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>

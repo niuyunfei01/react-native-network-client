@@ -495,7 +495,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             double score = Double.parseDouble(obj.get("score"));
                             String color = obj.get("color");
                             storeProdQuota.setBackgroundColor(Color.parseColor(color));
-                            storeProdPriceScore.setText("价格: " + score + " 分");
+                            storeProdPriceScore.setText(new StringBuilder().append("价格: ").append(score).append(" 分").toString());
                             storeProdScoreDetail.setText(obj.get("highRate") + " 高于同行");
                             storeProdQuota.setVisibility(View.VISIBLE);
                             storeProdQuota.setOnClickListener(new View.OnClickListener() {
@@ -523,7 +523,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 //        boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == PRICE_CONTROLLER_YES;
 //        boolean isDirect = currStore != null &&  currStore.getType() == Cts.STORE_VENDOR_CN;
         Vendor v = GlobalCtx.app().getVendor();
-        boolean fnEnabledReqProvide = v == null ? false : v.isFnProviding();
+        boolean fnEnabledReqProvide = v != null && v.isFnProviding();
         if (filterBtnControlled()) {
 
             this.btnReqList.setVisibility(fnEnabledReqProvide ? View.VISIBLE : View.GONE);
