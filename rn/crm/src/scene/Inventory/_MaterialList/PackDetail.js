@@ -59,7 +59,7 @@ class PackDetail extends React.Component {
       receiptId: this.props.item.id,
       productId: this.state.appendProductId,
       num: value,
-      appendUId: this.state.appendUser.id
+      appendUid: this.state.appendUser.id
     }).then(res => {
       const {details} = this.state
       details[this.state.appendIdx].entries.push(res)

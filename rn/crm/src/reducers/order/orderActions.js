@@ -120,8 +120,8 @@ export function getOrder(sessionToken, orderId, callback) {
   }
 }
 
-export function saveUserTag(token, tagIds, callback) {
-  const url = `api/save_user_tags.json?access_token=${token}`;
+export function saveUserTag(token, userId ,tagIds, callback) {
+  const url = `api/save_user_tags/${userId}.json?access_token=${token}`;
   return jsonWithTpl2(url, tagIds
     , (json, dispatch) => {
       callback(json.ok, json.reason, json.obj)

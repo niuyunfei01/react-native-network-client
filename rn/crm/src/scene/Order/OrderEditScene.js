@@ -180,7 +180,8 @@ class OrderEditScene extends Component {
   getUserTags() {
     const self = this
     const {accessToken} = this.props.global;
-    const url = `api/get_user_tags?access_token=${accessToken}`;
+    const {order} = this.props.navigation.state.params;
+    const url = `api/get_user_tags/${order.user_id}?access_token=${accessToken}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url)).then(resp => resp.json()).then(resp => {
       let {ok, reason, obj} = resp;
       if (ok) {
@@ -195,7 +196,8 @@ class OrderEditScene extends Component {
     if (!_.isEmpty(ids)) {
       const {dispatch, global} = this.props;
       const token = global.accessToken;
-      dispatch(saveUserTag(token, ids, (ok, msg, respData) => {
+      const {order} = this.props.navigation.state.params;
+      dispatch(saveUserTag(token, order.user_id, ids, (ok, msg, respData) => {
       }))
     }
   }
@@ -364,7 +366,7 @@ class OrderEditScene extends Component {
     return ts.length === 0;
   }
 
-  showTagPopup (multi) {
+  showTagPopup(multi) {
     this.setState({userTagPopupVisible: true, userTagPopupMulti: true})
   }
 

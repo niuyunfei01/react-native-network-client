@@ -10,6 +10,7 @@ import {List, Picker, Switch, Toast, WhiteSpace} from "antd-mobile-rn";
 import HttpUtils from "../../util/http";
 import Swipeout from 'react-native-swipeout';
 import JbbPrompt from "../component/JbbPrompt";
+import ModalSelector from "react-native-modal-selector";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -55,15 +56,14 @@ class ProductInfo extends React.Component {
       stockCheckCyclePrompt: false,
       packLossWarnPrompt: false,
       riskMinStatVocPrompt: false,
-      riskMinStatPrompt: false
+      riskMinStatPrompt: false,
+      skuRefineLevels: []
     }
   }
   
-  componentWillMount (): void {
-    this.fetchShelfNos()
-  }
-  
   componentDidMount (): void {
+    this.fetchShelfNos()
+    this.fetchSkuRefineLevel()
     this.fetchData()
   }
   
@@ -78,6 +78,14 @@ class ProductInfo extends React.Component {
       storeId: self.state.storeId
     }).then(res => {
       self.setState({shelfNos: res})
+    })
+  }
+  
+  fetchSkuRefineLevel () {
+    const self = this
+    const api = `/api_products/sku_refine_level_options?access_token=${this.props.global.accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      self.setState({skuRefineLevels: res})
     })
   }
   
@@ -228,6 +236,18 @@ class ProductInfo extends React.Component {
     })
   }
   
+  onChgSkuRefineLevel (value) {
+    const self = this
+    const api = `/api_products/chg_sku_refine_level?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      skuId: self.state.productInfo.sku.id,
+      value: value
+    }).then(res => {
+      Toast.success('操作成功')
+      self.fetchData()
+    })
+  }
+  
   renderHeader () {
     return (
       <View>
@@ -326,6 +346,16 @@ class ProductInfo extends React.Component {
                 extra={tool.toFixed(this.state.productInfo.sku.pack_loss_warn, 'percent')}
                 onClick={() => this.setState({packLossWarnPrompt: true})}
               >打包损耗预警</List.Item>
+              <ModalSelector
+                onChange={(option) => this.onChgSkuRefineLevel(option.value)}
+                cancelText={'取消'}
+                data={this.state.skuRefineLevels}
+              >
+                <List.Item
+                  arrow="horizontal"
+                  extra={this.state.productInfo.sku.refine_level_label}
+                >打包级别</List.Item>
+              </ModalSelector>
             </If>
           </If>
   
