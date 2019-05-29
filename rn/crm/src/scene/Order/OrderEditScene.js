@@ -193,13 +193,14 @@ class OrderEditScene extends Component {
   saveUserTags(tags) {
     console.log("saveUserTags ", tags)
     let ids = _.pluck(tags, 'id')
-    if (!_.isEmpty(ids)) {
-      const {dispatch, global} = this.props;
-      const token = global.accessToken;
-      const {order} = this.props.navigation.state.params;
-      dispatch(saveUserTag(token, order.user_id, ids, (ok, msg, respData) => {
-      }))
+    if (_.isEmpty(ids)) {
+      ids = [];
     }
+    const {dispatch, global} = this.props;
+    const token = global.accessToken;
+    const {order} = this.props.navigation.state.params;
+    dispatch(saveUserTag(token, order.user_id, ids, (ok, msg, respData) => {
+    }))
   }
 
   _storeLoc() {
