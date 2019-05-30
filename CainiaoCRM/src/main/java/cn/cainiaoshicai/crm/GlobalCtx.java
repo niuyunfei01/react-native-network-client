@@ -1203,6 +1203,8 @@ public class GlobalCtx extends Application {
         if (adapter != null) {
             adapter.updateItemStorage(pid, storage);
         }
+
+        AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, (adapter == null) ? " null Adapter" : "done"));
     }
 
     public void updatePidApplyPrice(int pid, int applyPrice) {
@@ -1212,6 +1214,8 @@ public class GlobalCtx extends Application {
         if (adapter != null) {
             adapter.updateItemApplyPrice(pid, applyPrice);
         }
+
+        AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, (adapter == null) ? " null Adapter" : "done"));
     }
 
     static public class ScanStatus {

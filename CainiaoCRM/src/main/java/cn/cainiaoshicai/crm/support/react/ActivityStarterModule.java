@@ -321,11 +321,13 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
-    void updatePidApplyPrice(@Nonnull int pid, @Nonnull int applyPrice)  {
+    @ReactMethod
+    void updatePidApplyPrice(int pid, int applyPrice)  {
         GlobalCtx.app().updatePidApplyPrice(pid, applyPrice);
     }
 
-    void updatePidStorage(@Nonnull int pid, @Nonnull int storage) {
+    @ReactMethod
+    void updatePidStorage(int pid, int storage) {
         GlobalCtx.app().updatePidStorage(pid, storage);
     }
 

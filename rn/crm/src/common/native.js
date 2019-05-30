@@ -155,6 +155,16 @@ export default {
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
 
+  updatePidApplyPrice: async function(pid, applyPrice)  {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice))
+  },
+
+  updatePidStorage: async function(pid, storage) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.updatePidStorage(pid, storage))
+  },
+
   listenScan: async function(callback = function (scan_items){}) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.listenScan(callback))
