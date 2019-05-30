@@ -1198,6 +1198,10 @@ public class GlobalCtx extends Application {
         boolean updated = false;
         if (adapter != null) {
             adapter.updateItemStorage(pid, storage);
+            updated = true;
+            if (currentRunningActivity != null) {
+                currentRunningActivity.runOnUiThread(adapter::notifyDataSetChanged);
+            }
         }
 
         AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, updated ? " null Adapter" : "done"));
@@ -1212,6 +1216,9 @@ public class GlobalCtx extends Application {
         if (adapter != null) {
             adapter.updateItemApplyPrice(pid, applyPrice);
             updated = true;
+            if (currentRunningActivity != null) {
+                currentRunningActivity.runOnUiThread(adapter::notifyDataSetChanged);
+            }
         }
 
         AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, updated ? " null Adapter" : "done"));

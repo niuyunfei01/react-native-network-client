@@ -30,7 +30,6 @@ import cn.cainiaoshicai.crm.domain.StorageStatusResults;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
-import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 
@@ -271,22 +270,25 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         return (convertView);
     }
 
-    public void updateItemStorage(int pid, int newStorage) {
+    public boolean updateItemStorage(int pid, int newStorage) {
         for (StorageItem item : this.backendData) {
             if (pid > 0 && item.getProduct_id() == pid) {
                 item.setLeft_since_last_stat(newStorage);
-                break;
+                return true;
             }
         }
+        return false;
     }
 
-    public void updateItemApplyPrice(int pid, int applyPrice) {
+    public boolean updateItemApplyPrice(int pid, int applyPrice) {
         for (StorageItem item : this.backendData) {
             if (pid > 0 && item.getProduct_id() == pid) {
                 item.setApplyingPrice(applyPrice);
-                break;
+                return true;
             }
         }
+
+        return false;
     }
 
     public void filter(String text) {
