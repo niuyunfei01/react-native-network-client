@@ -322,13 +322,15 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void updatePidApplyPrice(int pid, int applyPrice)  {
-        GlobalCtx.app().updatePidApplyPrice(pid, applyPrice);
+    void updatePidApplyPrice(int pid, int applyPrice, @Nonnull final Callback callback)  {
+        boolean updated = GlobalCtx.app().updatePidApplyPrice(pid, applyPrice);
+        callback.invoke(updated, "");
     }
 
     @ReactMethod
-    void updatePidStorage(int pid, int storage) {
-        GlobalCtx.app().updatePidStorage(pid, storage);
+    void updatePidStorage(int pid, int storage, @Nonnull final Callback callback) {
+        boolean updated = GlobalCtx.app().updatePidStorage(pid, storage);
+        callback.invoke(updated, "");
     }
 
     @ReactMethod
@@ -496,12 +498,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             final FragmentManager fm = activity.getFragmentManager();
             if (fm.getBackStackEntryCount() > 0) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.i("MainActivity popping backstack");
-                        fm.popBackStack();
-                    }
+                activity.runOnUiThread(() -> {
+                    Log.i("MainActivity popping backstack");
+                    fm.popBackStack();
                 });
             } else {
                 activity.runOnUiThread(new Runnable() {

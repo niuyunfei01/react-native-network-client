@@ -91,8 +91,9 @@ class StockCheck extends BaseComponent {
       differenceType: this.state.checkType.value,
       remark: this.state.remark
     }).then(res => {
-      native.updatePidStorage(self.state.productId, self.state.actualStock)
-      native.nativeBack()
+      native.updatePidStorage(self.state.productId, self.state.actualStock, function(ok, msg){
+        native.nativeBack()
+      })
     })
   }
   

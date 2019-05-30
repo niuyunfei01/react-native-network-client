@@ -160,9 +160,9 @@ export default {
       NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice))
   },
 
-  updatePidStorage: async function(pid, storage) {
+  updatePidStorage: async function(pid, storage, clb = function(){}) {
     await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.updatePidStorage(pid, storage))
+      NativeModules.ActivityStarter.updatePidStorage(pid, storage, clb))
   },
 
   listenScan: async function(callback = function (scan_items){}) {

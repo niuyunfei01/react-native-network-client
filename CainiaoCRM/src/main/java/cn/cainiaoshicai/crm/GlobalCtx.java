@@ -40,7 +40,6 @@ import com.fanjun.keeplive.config.KeepLiveService;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.i18n.reactnativei18n.ReactNativeI18n;
@@ -61,7 +60,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -72,7 +70,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.dao.CRMService;
@@ -83,7 +80,6 @@ import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
-import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
@@ -109,7 +105,6 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
@@ -1196,26 +1191,31 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public void updatePidStorage(int pid, int storage) {
+    public boolean updatePidStorage(int pid, int storage) {
         WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
         StorageItemAdapter adapter = ref.get();
 
+        boolean updated = false;
         if (adapter != null) {
             adapter.updateItemStorage(pid, storage);
         }
 
-        AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, (adapter == null) ? " null Adapter" : "done"));
+        AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, updated ? " null Adapter" : "done"));
+        return updated;
     }
 
-    public void updatePidApplyPrice(int pid, int applyPrice) {
+    public boolean updatePidApplyPrice(int pid, int applyPrice) {
         WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
         StorageItemAdapter adapter = ref.get();
 
+        boolean updated = false;
         if (adapter != null) {
             adapter.updateItemApplyPrice(pid, applyPrice);
+            updated = true;
         }
 
-        AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, (adapter == null) ? " null Adapter" : "done"));
+        AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, updated ? " null Adapter" : "done"));
+        return updated;
     }
 
     static public class ScanStatus {
