@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.common.collect.Maps;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -607,6 +608,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             lv.setOnScrollListener(new PicassoScrollListener(StoreStorageActivity.this));
             listAdapter.filter(this.searchTerm);
             listAdapter.notifyDataSetChanged();
+            GlobalCtx.app().storageItemAdapterRef.set(new WeakReference<>(listAdapter));
         }
 
 

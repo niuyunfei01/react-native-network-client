@@ -271,6 +271,24 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         return (convertView);
     }
 
+    public void updateItemStorage(int pid, int newStorage) {
+        for (StorageItem item : this.backendData) {
+            if (pid > 0 && item.getProduct_id() == pid) {
+                item.setLeft_since_last_stat(newStorage);
+                break;
+            }
+        }
+    }
+
+    public void updateItemApplyPrice(int pid, int applyPrice) {
+        for (StorageItem item : this.backendData) {
+            if (pid > 0 && item.getProduct_id() == pid) {
+                item.setApplyingPrice(applyPrice);
+                break;
+            }
+        }
+    }
+
     public void filter(String text) {
         this.clear();
 

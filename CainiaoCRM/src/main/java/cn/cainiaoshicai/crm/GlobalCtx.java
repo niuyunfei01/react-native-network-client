@@ -55,6 +55,7 @@ import com.xdandroid.hellodaemon.DaemonEnv;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -82,6 +83,7 @@ import cn.cainiaoshicai.crm.dao.UserTalkDao;
 import cn.cainiaoshicai.crm.domain.Config;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
+import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
@@ -108,6 +110,7 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -165,6 +168,8 @@ public class GlobalCtx extends Application {
     private ReactInstanceManager mReactInstanceManager;
     private ReactContext reactContext;
     private Config configByServer;
+
+    public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -1189,6 +1194,24 @@ public class GlobalCtx extends Application {
         params.putString("productName", productName);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
+    }
+
+    public void updatePidStorage(int pid, int storage) {
+        WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
+        StorageItemAdapter adapter = ref.get();
+
+        if (adapter != null) {
+            adapter.updateItemStorage(pid, storage);
+        }
+    }
+
+    public void updatePidApplyPrice(int pid, int applyPrice) {
+        WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
+        StorageItemAdapter adapter = ref.get();
+
+        if (adapter != null) {
+            adapter.updateItemApplyPrice(pid, applyPrice);
+        }
     }
 
     static public class ScanStatus {

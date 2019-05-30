@@ -321,6 +321,14 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    void updatePidApplyPrice(@Nonnull int pid, @Nonnull int applyPrice)  {
+        GlobalCtx.app().updatePidApplyPrice(pid, applyPrice);
+    }
+
+    void updatePidStorage(@Nonnull int pid, @Nonnull int storage) {
+        GlobalCtx.app().updatePidStorage(pid, storage);
+    }
+
     @ReactMethod
     void printSmPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
