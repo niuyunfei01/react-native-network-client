@@ -734,17 +734,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                     e.printStackTrace();
                 }
                 if (result != null) {
-                    StoreStorageActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateAdapterData(result.first);
-                            StoreStatusStat sec = result.second;
-                            if (sec != null) {
-                                StoreStorageActivity.this.stats = sec;
-                                updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
-                                        sec.getTotal_sold_out(), sec.getTotal_off_sale(),
-                                        sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check());
-                            }
+                    StoreStorageActivity.this.runOnUiThread(() -> {
+                        updateAdapterData(result.first);
+                        StoreStatusStat sec = result.second;
+                        if (sec != null) {
+                            StoreStorageActivity.this.stats = sec;
+                            updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
+                                    sec.getTotal_sold_out(), sec.getTotal_off_sale(),
+                                    sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check());
                         }
                     });
                 }
