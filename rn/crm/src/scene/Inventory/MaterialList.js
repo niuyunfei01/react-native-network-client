@@ -22,12 +22,17 @@ import ReceiptDetail from "./_MaterialList/ReceiptDetail";
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 import _ from 'lodash'
 import ReceiptOpLog from "./_MaterialList/ReceiptOpLog";
+import ModalSelector from "react-native-modal-selector";
 
 function mapStateToProps (state) {
   const {global} = state;
   return {global: global};
 }
 
+const MENU_KEY_REBUILD_TASK = 1
+const MORE_MENU = [
+  {'label': '重新生成打包任务', 'key': MENU_KEY_REBUILD_TASK}
+]
 class MaterialList extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
@@ -253,6 +258,25 @@ class MaterialList extends React.Component {
     ])
   }
   
+  _handleMoreOperation (option, item) {
+    switch (option.key) {
+      case MENU_KEY_REBUILD_TASK:
+        this._doRebuildReceiptTask(item)
+        return
+      default:
+        break
+    }
+  }
+  
+  _doRebuildReceiptTask (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_rebuild_task/${item.id}?access_token=${accessToken}`
+    HttpUtils.post.bind(self.props)(api).then(res => {
+      ToastShort('操作成功')
+    })
+  }
+  
   renderHeaderMenu () {
     return (
       <Modal
@@ -418,6 +442,15 @@ class MaterialList extends React.Component {
                 </Text>
               </View>
             </TouchableOpacity>
+          </View>
+          <View style={[styles.itemLine, styles.itemFooter]}>
+            <ModalSelector
+              onChange={(option) => this._handleMoreOperation(option, item)}
+              cancelText={'取消'}
+              data={MORE_MENU}
+            >
+              <Text style={[styles.itemMoreOperation]}>更多操作</Text>
+            </ModalSelector>
           </View>
         </View>
       </Swipeout>
@@ -598,6 +631,14 @@ const styles = StyleSheet.create({
   },
   itemStatus: {
     fontSize: 12
+  },
+  itemFooter: {
+    borderTopWidth: pxToDp(1),
+    borderTopColor: '#d9d9d9'
+  },
+  itemMoreOperation: {
+    fontSize: 12,
+    color: color.theme
   }
 })
 export default connect(mapStateToProps)(MaterialList)
