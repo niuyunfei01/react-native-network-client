@@ -30,8 +30,10 @@ function mapStateToProps (state) {
 }
 
 const MENU_KEY_REBUILD_TASK = 1
+const MENU_KEY_RESET_LOSS = 2
 const MORE_MENU = [
-  {'label': '重新生成打包任务', 'key': MENU_KEY_REBUILD_TASK}
+  {'label': '重新生成打包任务', 'key': MENU_KEY_REBUILD_TASK},
+  {'label': '重新计算损耗', 'key': MENU_KEY_RESET_LOSS}
 ]
 class MaterialList extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -263,6 +265,9 @@ class MaterialList extends React.Component {
       case MENU_KEY_REBUILD_TASK:
         this._doRebuildReceiptTask(item)
         return
+      case MENU_KEY_RESET_LOSS:
+        this._doResetReceiptLoss(item)
+        return
       default:
         break
     }
@@ -274,6 +279,16 @@ class MaterialList extends React.Component {
     const api = `/api_products/material_rebuild_task/${item.id}?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api).then(res => {
       ToastShort('操作成功')
+    })
+  }
+  
+  _doResetReceiptLoss (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/material_reset_loss/${item.id}?access_token=${accessToken}`
+    HttpUtils.post.bind(self.props)(api).then(res => {
+      ToastShort('操作成功')
+      self.onRefresh()
     })
   }
   
@@ -410,7 +425,13 @@ class MaterialList extends React.Component {
             <View style={[styles.itemLine]}>
               <Text style={styles.itemText}>
                 {`打包重量：${item.pack_weight}公斤 | `}
-                {`损耗：${tool.toFixed(item.pack_loss_weight, 'yuan')}公斤 | ${item.pack_loss_price}元 | `}
+                {`调货：${item.transfer_weight}公斤 | `}
+                {`损耗：${tool.toFixed(item.pack_loss_weight, 'yuan')}公斤`}
+              </Text>
+            </View>
+            <View style={[styles.itemLine]}>
+              <Text style={styles.itemText}>
+                {`损耗金额：${item.pack_loss_price}元 | `}
                 <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
                   {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
                 </Text>
