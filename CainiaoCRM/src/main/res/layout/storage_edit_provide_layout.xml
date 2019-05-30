@@ -6,28 +6,28 @@
     android:paddingEnd="10dp"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/label_now_stat"
-        android:layout_width="wrap_content"
-        android:layout_height="36dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
-        android:text="现有库存:"
-        android:textColor="@color/light_blue" />
+    <!--<TextView-->
+        <!--android:id="@+id/label_now_stat"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="36dp"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:text="现有库存:"-->
+        <!--android:textColor="@color/light_blue" />-->
 
 
-    <EditText
-        android:id="@+id/now_stat"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
-        android:layout_toEndOf="@id/label_now_stat"
-        android:background="@drawable/edittext_style"
-        android:inputType="number"
-        android:textCursorDrawable="@drawable/edit_cursor_color"
-        android:textColor="@color/light_blue" />
+    <!--<EditText-->
+        <!--android:id="@+id/now_stat"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="36dp"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_toEndOf="@id/label_now_stat"-->
+        <!--android:background="@drawable/edittext_style"-->
+        <!--android:inputType="number"-->
+        <!--android:textCursorDrawable="@drawable/edit_cursor_color"-->
+        <!--android:textColor="@color/light_blue" />-->
 
 
     <TextView
@@ -35,7 +35,6 @@
         android:layout_width="wrap_content"
         android:layout_height="36dp"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/label_now_stat"
         android:layout_marginTop="10dp"
         android:text="订货份数:"
         android:textColor="@color/light_blue" />
@@ -44,7 +43,6 @@
         android:id="@+id/total_req"
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:layout_below="@id/now_stat"
         android:layout_marginTop="10dp"
         android:layout_toEndOf="@id/label_least_amount"
         android:background="@drawable/edittext_style"

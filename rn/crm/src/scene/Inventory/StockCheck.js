@@ -1,5 +1,5 @@
 import React from 'react'
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
 import {tool} from "../../common";
@@ -10,6 +10,9 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import HttpUtils from "../../util/http";
 import ModalSelector from "react-native-modal-selector";
+import $V from "../../weui/variable";
+import color from '../../widget/color'
+import C from '../../config'
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -123,13 +126,26 @@ class StockCheck extends BaseComponent {
     )
   }
   
+  renderFormHeader () {
+    return (
+      <View style={cellStyles.cellTitle}>
+        <Text style={cellStyles.cellsTitle}>商品库存</Text>
+        <TouchableOpacity onPress={() => this.props.navigation.navigate(C.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+          productId: this.state.productId,
+          storeId: this.state.storeId
+        })}>
+          <Text style={[cellStyles.cellsTitle, styles.historyBtn]}>盘点历史</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+  
   render () {
-    console.log(this.state.checkTypes)
     return (
       <View>
         {this.renderInfo()}
         <WhiteSpace/>
-        <List renderHeader={() => '商品库存'}>
+        <List renderHeader={this.renderFormHeader()}>
           <InputItem
             value={String(this.state.originStock)}
             defaultValue={String(this.state.originStock)}
@@ -187,5 +203,30 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: pxToDp(26),
     fontWeight: 'bold'
+  },
+  historyBtn: {
+    fontSize: 12,
+    color: color.theme
+  }
+})
+
+const cellStyles = StyleSheet.create({
+  cellTitle: {
+    paddingBottom: pxToDp(10),
+    backgroundColor: '#f5f5f9',
+    borderBottomColor: '#ddd',
+    borderBottomWidth: pxToDp(1),
+    // flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: pxToDp(80),
+    width: '100%'
+  },
+  cellsTitle: {
+    marginTop: $V.weuiCellTipsFontSize * 0.77 + (14 * $V.baseLineHeight - 14) * 0.5,
+    paddingLeft: $V.weuiCellGapH,
+    paddingRight: $V.weuiCellGapH,
+    fontSize: $V.weuiCellTipsFontSize,
+    color: $V.globalTextColor,
   }
 })
