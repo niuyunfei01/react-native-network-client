@@ -10,6 +10,7 @@ import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
 import {List} from "antd-mobile-rn/lib/list/index.native";
 import ModalSelector from "react-native-modal-selector";
+import {Toast} from "antd-mobile-rn";
 
 function mapStateToProps (state) {
   const {global, mine} = state;
@@ -55,6 +56,7 @@ class PackDetail extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry_append?access_token=${accessToken}`
+    Toast.loading('提交中。。', 3)
     HttpUtils.post.bind(self.props)(api, {
       receiptId: this.props.item.id,
       productId: this.state.appendProductId,

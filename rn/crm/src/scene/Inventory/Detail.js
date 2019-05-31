@@ -6,6 +6,9 @@ import LoadMore from "react-native-loadmore";
 import HttpUtils from "../../util/http";
 import pxToDp from "../../util/pxToDp";
 import color from '../../widget/color'
+import NavigationItem from "../../widget/NavigationItem";
+import native from "../../common/native";
+import EmptyListView from "../Invoicing/EmptyListView";
 import EmptyData from "../component/EmptyData";
 
 function mapStateToProps (state) {
@@ -13,10 +16,16 @@ function mapStateToProps (state) {
   return {global: global}
 }
 
-class StockCheckHistory extends BaseComponent {
+class Detail extends BaseComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: '商品盘点历史'
+      headerTitle: '商品出入库明细',
+      headerLeft: (
+        <NavigationItem
+          icon={require("../../img/Register/back_.png")}
+          onPress={() => native.nativeBack()}
+        />
+      )
     }
   }
   
@@ -37,7 +46,7 @@ class StockCheckHistory extends BaseComponent {
   fetchData () {
     const self = this
     const {productId, storeId} = self.props.navigation.state.params
-    const uri = `/api_products/inventory_check_history?access_token=${this.props.global.accessToken}`
+    const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
     self.setState({isLoading: true})
     HttpUtils.get.bind(self.props)(uri, {productId, storeId}).then(res => {
       const lists = (this.state.page === 1 ? [] : this.state.lists).concat(res.lists)
@@ -54,16 +63,20 @@ class StockCheckHistory extends BaseComponent {
       <For of={this.state.lists} each="item" index="idx">
         <View key={idx} style={styles.item}>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>盘点时间：{item.check_time}</Text>
-            <Text style={styles.itemRowText}>盘点人：{item.check_user.nickname}</Text>
+            <Text style={styles.itemRowText}>操作时间：{item.created}</Text>
+            <If condition={item.operator_user}>
+              <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname}</Text>
+            </If>
           </View>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>理论库存：{item.theoretical_num}</Text>
-            <Text style={styles.itemRowText}>实际库存：{item.actual_num}</Text>
+            <Text style={styles.itemRowText}>操作类型：{item.operate_type}</Text>
+            <Text style={styles.itemRowText}>{item.num > 0 ? `+${item.num}` : item.num}</Text>
           </View>
-          <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>备注信息：{item.remark}</Text>
-          </View>
+          <If condition={item.remark}>
+            <View style={styles.itemRow}>
+              <Text style={styles.itemRowText}>备注信息：{item.remark}</Text>
+            </View>
+          </If>
         </View>
       </For>
     )
@@ -86,7 +99,7 @@ class StockCheckHistory extends BaseComponent {
   }
 }
 
-export default connect(mapStateToProps)(StockCheckHistory)
+export default connect(mapStateToProps)(Detail)
 
 const styles = StyleSheet.create({
   item: {

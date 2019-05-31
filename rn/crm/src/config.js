@@ -178,6 +178,7 @@ const C = {
   ROUTE_INVENTORY_STOCK_CHECK: 'InventoryStockCheck',                           // 库存 - 库存盘点
   ROUTE_INVENTORY_STOCK_CHECK_HISTORY: 'InventoryStockCheckHistory',            // 库存 - 库存盘点历史
   ROUTE_INVENTORY_REPORT_LOSS: 'InventoryReportLoss',                           // 库存 - 库存报损
+  ROUTE_INVENTORY_DETAIL: 'InventoryDetail',                                    // 库存 - 商品出入库明细
   serverUrl,
   apiUrl,
   staticUrl,

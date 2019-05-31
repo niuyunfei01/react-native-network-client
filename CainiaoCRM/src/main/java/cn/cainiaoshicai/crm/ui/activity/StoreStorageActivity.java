@@ -79,6 +79,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private static final int MENU_CONTEXT_TO_CHG_SUPPLY_PRICE = 10999;
     private static final int MENU_CONTEXT_ADD_BUY_RECORD = 11000;
     private static final int MENU_CONTEXT_WAREHOUSE = 11001;
+    private static final int MENU_CONTEXT_INVENTORY_DETAIL = 11003;
     private static final int MENU_CONTEXT_STOCK_CHECK = 11002;
     private StorageItemAdapter<StorageItem> listAdapter;
     private final StorageActionDao sad = new StorageActionDao(GlobalCtx.app().token());
@@ -783,6 +784,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
                 menu.add(Menu.NONE, MENU_CONTEXT_STOCK_CHECK, Menu.NONE, "盘点");
                 menu.add(Menu.NONE, MENU_CONTEXT_WAREHOUSE, Menu.NONE, "库管");
+                menu.add(Menu.NONE, MENU_CONTEXT_INVENTORY_DETAIL, Menu.NONE, "商品出入库明细");
             }
 
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
@@ -932,6 +934,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item != null) {
                     int productId = item.getProduct_id();
                     GlobalCtx.app().toWarehouseManage(StoreStorageActivity.this, productId);
+                }
+                return true;
+            case MENU_CONTEXT_INVENTORY_DETAIL:
+                if (item != null) {
+                    int productId = item.getProduct_id();
+                    int storeId = item.getStore_id();
+                    GlobalCtx.app().toInventoryDetail(StoreStorageActivity.this, productId,storeId);
                 }
                 return true;
             case MENU_CONTEXT_STOCK_CHECK:

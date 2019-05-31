@@ -11,6 +11,7 @@ import JbbInput from "../component/JbbInput";
 import {tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
+import {ToastShort} from "../../util/ToastUtils";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
@@ -80,7 +81,7 @@ class MaterialTask extends React.Component {
       task: item.task,
       isFinish: isFinish
     }).then(res => {
-      Toast.success('操作成功')
+      ToastShort('提交成功')
       self.fetchData()
     })
   }

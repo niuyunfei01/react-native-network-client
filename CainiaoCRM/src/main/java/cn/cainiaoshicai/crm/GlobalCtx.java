@@ -105,6 +105,7 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
@@ -1223,6 +1224,16 @@ public class GlobalCtx extends Application {
 
         AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, updated ? " null Adapter" : "done"));
         return updated;
+    }
+
+    public void toInventoryDetail(StoreStorageActivity storeStorageActivity, int productId, int storeId) {
+        Intent i = new Intent(storeStorageActivity, MyReactActivity.class);
+        i.putExtra("_action", "InventoryDetail");
+        Bundle params = new Bundle();
+        params.putInt("productId", productId);
+        params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
+        storeStorageActivity.startActivity(i);
     }
 
     static public class ScanStatus {

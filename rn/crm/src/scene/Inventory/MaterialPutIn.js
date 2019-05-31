@@ -130,6 +130,7 @@ class MaterialPutIn extends React.Component {
     const accessToken = self.props.global.accessToken
     const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId, packageWeight} = this.state
     const api = `api_products/material_put_in?access_token=${accessToken}`
+    Toast.loading('提交中。。', 3)
     HttpUtils.post.bind(self.props)(api, {
       id: receiptId,
       skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, packageWeight
