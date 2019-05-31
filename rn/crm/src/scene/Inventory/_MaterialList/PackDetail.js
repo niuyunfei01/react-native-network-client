@@ -63,7 +63,7 @@ class PackDetail extends React.Component {
     }).then(res => {
       const {details} = this.state
       details[this.state.appendIdx].entries.push(res)
-      this.setState({details})
+      this.setState({details, appendVisible: false})
     })
   }
   
@@ -124,6 +124,7 @@ class PackDetail extends React.Component {
         </Dialog>
   
         <JbbPrompt
+          onCancel={() => this.setState({appendVisible: false})}
           visible={this.state.appendVisible}
           title={`追加${this.state.appendUser.desc}打包数量`}
           onConfirm={(value) => this.onAddPackNumber(value)}
