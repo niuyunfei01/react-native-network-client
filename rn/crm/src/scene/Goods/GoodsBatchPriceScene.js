@@ -235,9 +235,10 @@ class GoodsBatchPriceScene extends PureComponent {
       return alert(false, '请重新选择状态！')
     } else if (!((provided == Cts.STORE_COMMON_PROVIDED) || (provided == Cts.STORE_SELF_PROVIDED))) {
       return alert(false, '请重新选择订货方式！')
-    } else if (stock < 0 || isNaN(stock) ) {
-      return alert(false,'库存不能小于0')
     }
+    // else if (stock < 0 || isNaN(stock) ) {
+    //   return alert(false,'库存不能小于0')
+    // }
     function alert(flag, msg) {
       ToastLong(msg);
       return flag
