@@ -271,7 +271,7 @@ public class MainActivity extends AbstractActionBarActivity {
                         }
 
                         String token = app.token();
-                        intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token=" + token,
+                        intent.putExtra("url", String.format("%s/orders_to_buy/%s.html?access_token=" + token,
                                 URLHelper.getStoresPrefix(), storeId));
                         startActivity(intent);
                     }
