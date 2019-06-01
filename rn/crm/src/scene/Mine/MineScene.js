@@ -40,6 +40,7 @@ import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
+import NextSchedule from "./_Mine/NextSchedule";
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
@@ -686,6 +687,7 @@ class MineScene extends PureComponent {
         >
           {this.renderHeader()}
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
+          {currVersion === Cts.VERSION_DIRECT ? <NextSchedule/> : null}
           {this.renderStoreBlock()}
           {this.renderVersionBlock()}
           {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}

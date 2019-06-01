@@ -763,6 +763,7 @@ function getTimeStamp (str) {
  * @return float|int
  */
 function priceOptimize ($spPrice) {
+  var $jiao;
   $jiao = Math.floor($spPrice / 10);
   if ($spPrice >= 200) { //超过此价才处理尾数
     $jiao_mod = $jiao % 10;

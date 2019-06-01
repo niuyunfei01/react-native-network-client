@@ -122,6 +122,7 @@ import Cts from "../Cts";
 import _ from "lodash"
 import OrderTransferThird from "../scene/Order/OrderTransferThird";
 import OrderScan from "../scene/Order/OrderScan";
+import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -301,7 +302,6 @@ class Navigator extends Component {
         Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
-        Worker: {screen: WorkerListScene},
         User: {screen: UserScene},
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
@@ -401,6 +401,9 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY]: {screen: InventoryStockCheckHistory},
         [Config.ROUTE_INVENTORY_REPORT_LOSS]: {screen: InventoryReportLoss},
         [Config.ROUTE_INVENTORY_DETAIL]: {screen: InventoryDetail},
+        // 员工相关
+        [Config.ROUTE_WORKER]: {screen: WorkerListScene},
+        [Config.ROUTE_WORKER_SCHEDULE]: {screen: WorkerSchedule},
       },
       stackNavigatorConfigs
     );

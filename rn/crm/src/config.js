@@ -74,7 +74,6 @@ const C = {
   ROUTE_ORDER: 'Order',
   ROUTE_ALERT: 'Tab', //Home for reminds
   ROUTE_ORDERS: 'Orders',
-  ROUTE_WORKER: 'Worker',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_USER_CHOOSE: 'UserChoose',
@@ -165,6 +164,9 @@ const C = {
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',
+  // 员工相关
+  ROUTE_WORKER: 'Worker',
+  ROUTE_WORKER_SCHEDULE: 'WorkerSchedule',
   // 库存相关
   ROUTE_INVENTORY_PRODUCT_PUT_IN: 'InventoryProductPutIn',                      // 库存 - 商品入库
   ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',                         // 库存 - 商品库管详情
