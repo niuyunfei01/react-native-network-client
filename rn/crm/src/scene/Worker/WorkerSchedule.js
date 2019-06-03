@@ -9,6 +9,7 @@ import TimeUtil from "../../util/TimeUtil";
 import pxToDp from "../../util/pxToDp";
 import Mapping from "../../Mapping";
 import color from "../../widget/color";
+import _ from 'lodash'
 
 moment.locale('zh');
 
@@ -70,11 +71,15 @@ class WorkerSchedule extends React.Component {
     return (
       <View style={[styles.item]}>
         <View style={{flex: 1}}>
-          <If condition={item.morning_uid}>
-            <Text>早班：{item.morning_user}</Text>
+          <If condition={item.work_day && item.work_day.is_voc == 1}>
+            <Text style={{color: color.red, fontSize: 13}}>高峰日</Text>
           </If>
-          <If condition={item.night_uid}>
-            <Text>晚班：{item.night_user}</Text>
+          <If condition={item.schedules && item.schedules.length}>
+            <For of={item.schedules} each="schedule" index="idx">
+              <Text>{schedule.slot_label}: {_.map(schedule.users, function (user) {
+                return user.username + (user.is_leader ? '(负责人)' : '') + '，'
+              })}</Text>
+            </For>
           </If>
         </View>
         <View style={{width: 40}}>
@@ -114,7 +119,7 @@ class WorkerSchedule extends React.Component {
   }
   
   renderDay (day, item) {
-    let isVoc = item && item.work_day.is_voc
+    let isVoc = item && item.work_day.is_voc == 1
     return (
       <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>
         <If condition={day}>
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
     width: 80,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginTop: 32
+    marginTop: 18
   },
   dayNum: {
     fontSize: 28,
