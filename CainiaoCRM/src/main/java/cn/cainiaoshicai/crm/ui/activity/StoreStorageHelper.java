@@ -367,6 +367,7 @@ public class StoreStorageHelper {
         selectUnitType.setAdapter(adapter);
 
         int defaultSelect = 0;
+        //不是斤就按份调货
         if(!"斤".equals(item.getSkuUnit())){
             defaultSelect = 1;
         }
