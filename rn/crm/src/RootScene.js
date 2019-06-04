@@ -40,8 +40,7 @@ const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
 const caught = new Caught();
 YellowBox.ignoreWarnings([
-  'Warning: isMounted(...) is deprecated',
-  'Warning: Each child in an array'
+  'Warning: isMounted(...) is deprecated'
 ])
 function getCurrentRouteName (navigationState) {
   if (!navigationState) {

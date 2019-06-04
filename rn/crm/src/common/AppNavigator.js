@@ -53,7 +53,7 @@ import GoodsPriceIndex from '../scene/Goods/GoodsPriceIndex'
 import GoodsPriceArea from "../scene/Goods/AreaGoodsPrice";
 import GoodsList from '../scene/Goods/GoodsList'
 import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
-
+// 订单相关
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 import OrderTodoScene from "../scene/Order/OrderTodoScene";
@@ -64,6 +64,10 @@ import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
 import OrderCancelShip from "../scene/Order/OrderCancelShip";
+import Refund from "../scene/Order/Refund";
+import OrderRefundByWeight from "../scene/Order/RefundByWeight";
+import OrderTransferThird from "../scene/Order/OrderTransferThird";
+import OrderScan from "../scene/Order/OrderScan";
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -99,10 +103,9 @@ import OnlineStoreProduct from "../scene/Goods/OnlineStoreProduct";
 //新产品详情
 import NewProductDetail from "../scene/Goods/NewProductDetail";
 import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProductRemindScene"
-//退款详情
-import Refund from "../scene/Order/Refund";
 import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
+// 库存相关
 import InventoryProductPutIn from '../scene/Inventory/ProductPutIn'
 import InventoryProductInfo from '../scene/Inventory/ProductInfo'
 import InventoryMaterialList from '../scene/Inventory/MaterialList'
@@ -120,8 +123,6 @@ import Cts from "../Cts";
 
 
 import _ from "lodash"
-import OrderTransferThird from "../scene/Order/OrderTransferThird";
-import OrderScan from "../scene/Order/OrderScan";
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 
 const tabDef = function (store_) {
@@ -326,6 +327,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
+        [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
         
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
