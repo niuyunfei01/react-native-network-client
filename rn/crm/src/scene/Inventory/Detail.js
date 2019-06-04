@@ -63,7 +63,7 @@ class Detail extends BaseComponent {
       <For of={this.state.lists} each="item" index="idx">
         <View key={idx} style={styles.item}>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>操作时间：{item.created}</Text>
+            <Text style={styles.itemRowText}>操作时间：{item.updated}</Text>
             <If condition={item.operator_user}>
               <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname}</Text>
             </If>
