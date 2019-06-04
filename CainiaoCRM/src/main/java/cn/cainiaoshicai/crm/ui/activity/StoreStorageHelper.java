@@ -470,7 +470,7 @@ public class StoreStorageHelper {
                                             @Override
                                             public void run() {
                                                 if (finalRb.isOk()) {
-                                                    item.setLeft_since_last_stat(nowStat);
+                                                    //item.setLeft_since_last_stat(nowStat);
                                                     item.setTotalInReq(total_req_no);
                                                     item.setReqMark(remarkTxt);
                                                     activity.updateReqListBtn(total_req_cnt);
