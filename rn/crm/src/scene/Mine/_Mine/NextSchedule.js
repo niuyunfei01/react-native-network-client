@@ -56,10 +56,6 @@ class NextSchedule extends React.Component {
   }
   
   render () {
-    if (!this.state.schedule.schedules.length) {
-      return null
-    }
-    
     return (
       <View style={styles.container}>
         <View style={styles.title}>
@@ -71,11 +67,18 @@ class NextSchedule extends React.Component {
           </TouchableOpacity>
         </View>
         <View style={styles.scheduleContainer}>
-          <View>
-            <For of={this.state.schedule.schedules} each='item' index='idx'>
-              <Text key={idx}>{item}</Text>
-            </For>
-          </View>
+          {this.state.schedule.schedules.length ? (
+            <View>
+              <For of={this.state.schedule.schedules} each='item' index='idx'>
+                <Text key={idx}>{item}</Text>
+              </For>
+            </View>
+          ) : (
+            <View>
+              <Text>未知今日安排</Text>
+            </View>
+          )}
+          
           {this.renderWeather()}
         </View>
       </View>

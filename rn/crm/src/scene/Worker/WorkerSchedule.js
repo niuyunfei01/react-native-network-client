@@ -82,8 +82,11 @@ class WorkerSchedule extends React.Component {
             </For>
           </If>
         </View>
-        <View style={{width: 40}}>
+        <View style={{width: 60, justifyContent: 'space-between', alignItems: 'flex-end'}}>
           {this.renderWeather(item)}
+          <If condition={item.work_day && item.work_day.expect_orders}>
+            <Text style={{fontSize: 12}}>预计{item.work_day.expect_orders}单</Text>
+          </If>
         </View>
       </View>
     );
@@ -104,7 +107,7 @@ class WorkerSchedule extends React.Component {
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SNOW, weather)) {
       return <Image source={require('../../img/weather_sun.png')} style={styles.weatherImg}/>
     } else {
-      return
+      return <View/>
     }
   }
   
