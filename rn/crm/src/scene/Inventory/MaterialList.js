@@ -421,23 +421,21 @@ class MaterialList extends React.Component {
               {item.price}元
             </Text>
           </View>
-          <If condition={item.type == 1 && item.status == 2 && item.sku && item.sku.need_pack == 1}>
-            <View style={[styles.itemLine]}>
-              <Text style={styles.itemText}>
-                {`打包重量：${item.pack_weight}公斤 | `}
-                {`调货：${item.transfer_weight}公斤 | `}
-                {`损耗：${tool.toFixed(item.pack_loss_weight, 'yuan')}公斤`}
+          <View style={[styles.itemLine]}>
+            <Text style={styles.itemText}>
+              {`打包重量：${item.pack_weight}公斤 | `}
+              {`调货：${item.transfer_weight}公斤 | `}
+              {`损耗：${tool.toFixed(item.pack_loss_weight, 'yuan')}公斤`}
+            </Text>
+          </View>
+          <View style={[styles.itemLine]}>
+            <Text style={styles.itemText}>
+              {`损耗金额：${item.pack_loss_price}元 | `}
+              <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
+                {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
               </Text>
-            </View>
-            <View style={[styles.itemLine]}>
-              <Text style={styles.itemText}>
-                {`损耗金额：${item.pack_loss_price}元 | `}
-                <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
-                  {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
-                </Text>
-              </Text>
-            </View>
-          </If>
+            </Text>
+          </View>
           <If condition={item.packers.length}>
             <TouchableOpacity onPress={() => this.onFetchDetail(item)}>
               <View style={[styles.itemLine]}>
