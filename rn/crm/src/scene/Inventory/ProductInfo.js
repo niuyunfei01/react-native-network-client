@@ -11,6 +11,7 @@ import HttpUtils from "../../util/http";
 import Swipeout from 'react-native-swipeout';
 import JbbPrompt from "../component/JbbPrompt";
 import ModalSelector from "react-native-modal-selector";
+import SearchProduct from "../component/SearchProduct";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -57,7 +58,9 @@ class ProductInfo extends React.Component {
       packLossWarnPrompt: false,
       riskMinStatVocPrompt: false,
       riskMinStatPrompt: false,
-      skuRefineLevels: []
+      skuRefineLevels: [],
+      unitNumPrompt: false, // 商品份含量
+      refProdPrompt: false, // 关联商品
     }
   }
   
@@ -106,56 +109,43 @@ class ProductInfo extends React.Component {
     })
   }
   
-  onModifyPosition (value) {
+  _baseRequest (api, params, ok) {
     const self = this
-    const api = `/api_products/modify_inventory_shelf_no?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      productId: self.state.productId,
-      storeId: self.state.storeId,
-      shelfNo: value
-    }).then(res => {
+    let uri = `${api}?access_token=${this.props.global.accessToken}`
+    HttpUtils.post.bind(self.props)(uri, params).then(res => {
       Toast.success('操作成功')
       self.fetchData()
+      ok && ok()
+    })
+  }
+  
+  onModifyPosition (value) {
+    this._baseRequest('/api_products/modify_inventory_shelf_no', {
+      productId: this.state.productId,
+      storeId: this.state.storeId,
+      shelfNo: value
     })
   }
   
   onClearShelfNo () {
-    const self = this
-    const api = `/api_products/clear_inventory_shelf_no?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      productId: self.state.productId,
-      storeId: self.state.storeId
-    }).then(res => {
-      Toast.success('操作成功')
-      self.fetchData()
+    this._baseRequest('/api_products/clear_inventory_shelf_no', {
+      productId: this.state.productId,
+      storeId: this.state.storeId
     })
   }
   
   onChgTagCode (val) {
-    const self = this
-    const api = `/api_products/chg_sku_tag_code?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      skuId: self.state.productInfo.sku.id,
+    this._baseRequest('/api_products/chg_sku_tag_code', {
+      skuId: this.state.productInfo.sku.id,
       tagCode: val
-    }).then(res => {
-      this.setState({tagCodePrompt: false})
-      Toast.success('操作成功')
-      self.fetchData()
-    })
+    }, () => this.setState({tagCodePrompt: false}))
   }
   
   onConfirmUpc (upc) {
-    const self = this
-    const api = `/api_products/chg_prod_upc?access_token=${this.props.global.accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      productId: self.state.productId,
+    this._baseRequest('/api_products/chg_prod_upc', {
+      productId: this.state.productId,
       upc: upc
-    }).then(res => {
-      this.setState({upcPrompt: false})
-      Toast.success('操作成功')
-      self.fetchData()
-  
-    })
+    }, () => this.setState({upcPrompt: false}))
   }
   
   onChangeNeedPack (checked) {
@@ -246,6 +236,14 @@ class ProductInfo extends React.Component {
       Toast.success('操作成功')
       self.fetchData()
     })
+  }
+  
+  onChgStoreProdUnitNum (productId, unitNum) {
+    this._baseRequest('/api_products/chg_sp_refer_prod', {
+      product_id: this.state.productInfo.product_id,
+      refer_product_id: productId,
+      unit_num: unitNum
+    }, () => this.setState({unitNumPrompt: false, refProdPrompt: false}))
   }
   
   renderHeader () {
@@ -366,6 +364,17 @@ class ProductInfo extends React.Component {
               arrow="horizontal"
             >商品码</List.Item>
           </If>
+  
+          <List.Item
+            onClick={() => this.setState({unitNumPrompt: true})}
+            extra={this.state.productInfo.unit_num}
+            arrow="horizontal"
+          >商品份含量</List.Item>
+          <List.Item
+            onClick={() => this.setState({refProdPrompt: true})}
+            extra={this.state.productInfo.refer_prod_name}
+            arrow="horizontal"
+          >关联单份商品</List.Item>
         </List>
       </View>
     )
@@ -443,6 +452,21 @@ class ProductInfo extends React.Component {
           onCancel={() => this.setState({riskMinStatPrompt: false})}
           initValue={this.state.productInfo.risk_min_stat}
           visible={this.state.riskMinStatPrompt}
+        />
+  
+        <JbbPrompt
+          autoFocus={true}
+          title={'输入商品单份含量'}
+          onConfirm={(value) => this.onChgStoreProdUnitNum(this.state.productInfo.refer_prod_id, value)}
+          onCancel={() => this.setState({unitNumPrompt: false})}
+          initValue={this.state.productInfo.unit_num}
+          visible={this.state.unitNumPrompt}
+        />
+  
+        <SearchProduct
+          visible={this.state.refProdPrompt}
+          onCancel={() => this.setState({refProdPrompt: false})}
+          onSelect={product => this.onChgStoreProdUnitNum(product.id, this.state.productInfo.unit_num)}
         />
       </ScrollView>
     );
