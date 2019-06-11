@@ -446,7 +446,7 @@ public class OrderPrinter {
                         .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
                         .newLine();
 
-                printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
+                printer.starLine().normalText(String.format("食材名称%22s", "数量")).newLine().splitLine();
 
                 int total = 0;
                 for (CartItem item : order.getItems()) {
@@ -469,7 +469,7 @@ public class OrderPrinter {
                                 String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
                                 text = String.format(format, text, "x" + item.getNum());
                             }
-                            printer.highText(text).newLine();
+                            printer.normalText(text).newLine();
                             if (isEnd) {
                                 printer.spaceLine();
                             }
@@ -492,6 +492,8 @@ public class OrderPrinter {
                 if (!TextUtils.isEmpty(printFooter3)) {
                     printer.newLine().normalText(printFooter3);
                 }
+                printer.newLine();
+                printer.starLine();
                 btos.write(0x0D);
                 btos.write(0x0D);
                 btos.write(0x0D);

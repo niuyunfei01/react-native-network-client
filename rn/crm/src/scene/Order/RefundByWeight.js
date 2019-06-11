@@ -56,9 +56,9 @@ class RefundByWeight extends BaseComponent {
     if (!this.state.remark) return ToastLong("请输入退款原因！")
     
     let refundgoodsList = [];
-    this.state.goodsList.map(element => {
-      if (element.active && element.num !== 0) {
-        refundgoodsList.push({id: element.id, count: element.num});
+    this.state.goodsItems.map(element => {
+      if (element.active && element.refund_weight > 0) {
+        refundgoodsList.push({id: element.id, refund_weight: element.refund_weight});
       }
     });
     
@@ -66,12 +66,12 @@ class RefundByWeight extends BaseComponent {
     
     let params = {
       order_id: this.state.order.id,
-      items: this.refundgoodsList,
+      items: refundgoodsList,
       reason: this.state.remark,
       refund_type: 'weight'
     };
-    
-    HttpUtils.get(`api/manual_refund?access_token=${this.props.global.accessToken}`, params).then(res => {
+
+    HttpUtils.post.bind(this.props)(`api/manual_refund?access_token=${this.props.global.accessToken}`, params).then(res => {
       ToastLong("退款成功！");
       self.props.navigation.goBack()
       self.props.navigation.state.params.onSuccess()
