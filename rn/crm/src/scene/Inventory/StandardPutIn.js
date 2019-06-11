@@ -8,7 +8,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
 import C from '../../config'
 import InputNumber from "rc-input-number";
@@ -43,7 +43,7 @@ class StandardPutIn extends BaseComponent {
       supplierPopup: false,
       suppliers: [],
       supplier: {},
-      number: '0',
+      number: 0,
       price: '0',
       standardProducts: [],
       standardProdPrompt: false
@@ -132,7 +132,7 @@ class StandardPutIn extends BaseComponent {
       price: self.state.price,
       number: self.state.number
     }).then(res => {
-      self.setState({product: {}, number: '0', price: '0', upc: ''})
+      self.setState({product: {}, number: 0, price: '0', upc: ''})
     })
   }
   
@@ -149,13 +149,21 @@ class StandardPutIn extends BaseComponent {
     ])
   }
   
+  /**
+   * 获取最近一次标品入库信息
+   * @param item
+   */
   onSelectProduct (item) {
     const self = this
     const accessToken = this.props.global.accessToken
-    const api = `api_products/get_supplier_by_last_time/${item.upc}?access_token=${accessToken}`
+    const api = `api_products/get_last_receipt_info/${item.upc}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
+      if (!res || !res.supplier || !res.weight) {
+        ToastLong('暂无最近收货信息，请手动录入')
+      }
       this.setState({
-        supplier: res,
+        supplier: res.supplier,
+        number: res.weight ? res.weight : 0,
         product: item,
         standardProdPrompt: false
       })
