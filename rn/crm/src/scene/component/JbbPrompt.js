@@ -88,7 +88,9 @@ export default class JbbPrompt extends React.Component {
         {this.renderConfirm()}
   
         <TouchableOpacity onPress={this.handlePressChild.bind(this)}>
-          {this.props.children}
+          <View pointerEvents="none">
+            {this.props.children}
+          </View>
         </TouchableOpacity>
       </View>
     ) : this.renderConfirm()

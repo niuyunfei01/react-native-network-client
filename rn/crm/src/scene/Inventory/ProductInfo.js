@@ -59,7 +59,7 @@ class ProductInfo extends React.Component {
       riskMinStatVocPrompt: false,
       riskMinStatPrompt: false,
       skuRefineLevels: [],
-      unitNumPrompt: false, // 商品份含量
+      skuFreshDegrees: [],
       refProdPrompt: false, // 关联商品
     }
   }
@@ -68,6 +68,7 @@ class ProductInfo extends React.Component {
     this.fetchShelfNos()
     this.fetchSkuRefineLevel()
     this.fetchData()
+    this.fetchSkuFreshDegree()
   }
   
   componentWillUnmount (): void {
@@ -89,6 +90,14 @@ class ProductInfo extends React.Component {
     const api = `/api_products/sku_refine_level_options?access_token=${this.props.global.accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
       self.setState({skuRefineLevels: res})
+    })
+  }
+  
+  fetchSkuFreshDegree () {
+    const self = this
+    const api = `/api_products/sku_fresh_degree_options?access_token=${this.props.global.accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      self.setState({skuFreshDegrees: res})
     })
   }
   
@@ -246,6 +255,10 @@ class ProductInfo extends React.Component {
     }, () => this.setState({unitNumPrompt: false, refProdPrompt: false}))
   }
   
+  onChgSkuFreshDegree (value) {
+    this._baseRequest('/api_products/chg_sku_fresh_degree', {skuId: this.state.productInfo.sku.id, value})
+  }
+  
   renderHeader () {
     return (
       <View>
@@ -365,16 +378,36 @@ class ProductInfo extends React.Component {
             >商品码</List.Item>
           </If>
   
-          <List.Item
-            onClick={() => this.setState({unitNumPrompt: true})}
-            extra={this.state.productInfo.unit_num}
-            arrow="horizontal"
-          >商品份含量</List.Item>
+          <JbbPrompt
+            autoFocus={true}
+            title={'输入商品单份含量'}
+            onConfirm={(value) => this.onChgStoreProdUnitNum(this.state.productInfo.refer_prod_id, value)}
+            onCancel={() => this.setState({unitNumPrompt: false})}
+            initValue={this.state.productInfo.unit_num}
+          >
+            <List.Item
+              extra={this.state.productInfo.unit_num}
+              arrow="horizontal"
+            >商品份含量</List.Item>
+          </JbbPrompt>
+          
           <List.Item
             onClick={() => this.setState({refProdPrompt: true})}
             extra={this.state.productInfo.refer_prod_name}
             arrow="horizontal"
           >关联单份商品</List.Item>
+  
+          <ModalSelector
+            onChange={(option) => this.onChgSkuFreshDegree(option.value)}
+            cancelText={'取消'}
+            data={this.state.skuFreshDegrees}
+          >
+            <List.Item
+              onClick={() => this.setState({refProdPrompt: true})}
+              extra={this.state.productInfo.sku.fresh_degree_label}
+              arrow="horizontal"
+            >保鲜程度</List.Item>
+          </ModalSelector>
         </List>
       </View>
     )
@@ -454,14 +487,6 @@ class ProductInfo extends React.Component {
           visible={this.state.riskMinStatPrompt}
         />
   
-        <JbbPrompt
-          autoFocus={true}
-          title={'输入商品单份含量'}
-          onConfirm={(value) => this.onChgStoreProdUnitNum(this.state.productInfo.refer_prod_id, value)}
-          onCancel={() => this.setState({unitNumPrompt: false})}
-          initValue={this.state.productInfo.unit_num}
-          visible={this.state.unitNumPrompt}
-        />
   
         <SearchProduct
           visible={this.state.refProdPrompt}
