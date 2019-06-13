@@ -117,7 +117,9 @@ class StockCheck extends BaseComponent {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
       <View>
+        <WhiteSpace/>
         <JbbCellTitle>商品信息</JbbCellTitle>
+        <WhiteSpace/>
         <View style={styles.infoContainer}>
           {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
           {this.renderInfoItem(`商品(ID:${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
@@ -143,6 +145,7 @@ class StockCheck extends BaseComponent {
   render () {
     return (
       <View>
+        <WhiteSpace/>
         {this.renderInfo()}
         <WhiteSpace/>
         <List renderHeader={this.renderFormHeader()}>
