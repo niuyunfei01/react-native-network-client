@@ -1,5 +1,5 @@
 import React from 'react'
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
 import {tool} from "../../common";
@@ -117,9 +117,7 @@ class StockCheck extends BaseComponent {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
       <View>
-        <WhiteSpace/>
         <JbbCellTitle>商品信息</JbbCellTitle>
-        <WhiteSpace/>
         <View style={styles.infoContainer}>
           {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
           {this.renderInfoItem(`商品(ID:${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
@@ -144,8 +142,7 @@ class StockCheck extends BaseComponent {
   
   render () {
     return (
-      <View>
-        <WhiteSpace/>
+      <ScrollView>
         {this.renderInfo()}
         <WhiteSpace/>
         <List renderHeader={this.renderFormHeader()}>
@@ -187,7 +184,7 @@ class StockCheck extends BaseComponent {
         </If>
         <WhiteSpace/>
         <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
-      </View>
+      </ScrollView>
     )
   }
 }

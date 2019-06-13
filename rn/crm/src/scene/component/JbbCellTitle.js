@@ -20,10 +20,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f9',
     borderBottomColor: '#ddd',
     borderBottomWidth: pxToDp(1),
-    flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
+    width: '100%'
   },
   cellsTitle: {
     fontSize: 15,
