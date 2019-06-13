@@ -66,6 +66,7 @@ class Detail extends BaseComponent {
             <If condition={item.operator_user}>
               <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname}</Text>
             </If>
+            <Text style={styles.itemRowText}>库存：{item.stock}</Text>
           </View>
           <View style={styles.itemRow}>
             <Text style={styles.itemRowText}>操作类型：{item.operate_type}</Text>
