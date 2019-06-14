@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.domain;
 
+import java.util.List;
+
 import cn.cainiaoshicai.crm.Cts;
 
 /**
@@ -11,6 +13,8 @@ public class ShipAcceptStatus {
     private int expireTs;
     private int storeId;
     private String desc;
+    private String[] printers;
+    private String checkedPrinter;
 
     public int getStatus() {
         return status;
@@ -42,5 +46,30 @@ public class ShipAcceptStatus {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String[] getPrinters() {
+        return printers;
+    }
+
+    public void setPrinters(String[] printers) {
+        this.printers = printers;
+    }
+
+    public String getCheckedPrinter() {
+        return checkedPrinter;
+    }
+
+    public void setCheckedPrinter(String checkedPrinter) {
+        this.checkedPrinter = checkedPrinter;
+    }
+
+    public int getCheckedIdx() {
+        for (int i = 0; i < printers.length; i++) {
+            if (printers[i].equals(checkedPrinter)) {
+                return i;
+            }
+        }
+        return 0;
     }
 }

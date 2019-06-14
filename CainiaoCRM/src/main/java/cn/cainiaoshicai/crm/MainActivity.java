@@ -77,6 +77,7 @@ import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
+import cn.cainiaoshicai.crm.ui.activity.SingleChoiceDialogFragment;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
@@ -526,7 +527,6 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                             initShipAccept(app);
                         } else {
                             AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());
-                            ;
                         }
                     }
 
@@ -555,7 +555,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 }
 
                 void dlg(final long storeId) {
-                    final ShipAcceptStatus workStatus =  app.getWorkerStatus(store_id);
+                    final ShipAcceptStatus workStatus = app.getWorkerStatus(store_id);
                     final int shipAcceptStatus = workStatus.getStatus();
                     final String labelBtn = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "开始接单" : "停止接单";
 
@@ -584,37 +584,61 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                             ,
                             "关闭", null,
                             labelBtn, (dialog, which) -> {
-                                Call<ResultBean<ShipAcceptStatus>> resultBeanCall;
                                 if (shipAcceptStatus == Cts.SHIP_ACCEPT_ON) {
-                                    resultBeanCall = app.dao.shippingStopAccept(storeId);
+                                    Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStopAccept(storeId);
+                                    handleChangeShipAcceptStatus(resultBeanCall);
                                 } else {
-                                    resultBeanCall = app.dao.shippingStartAccept(storeId);
+                                    showChoosePrinterDialog(storeId);
                                 }
-
-                                resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
-                                    @Override
-                                    public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
-                                                           Response<ResultBean<ShipAcceptStatus>> response) {
-                                        ResultBean<ShipAcceptStatus> body = response.body();
-                                        if (body != null && body.isOk()) {
-                                            app.getAccountBean().setShipAcceptStatus(body.getObj());
-                                            initShipAccept(app);
-                                            Utility.toast("操作成功", MainActivity.this);
-                                        } else {
-                                            AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + Objects.requireNonNull(body).getDesc());
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
-                                        AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
-                                    }
-                                });
                             }
                     );
                 }
             });
         }
+    }
+
+    private void showChoosePrinterDialog(long storeId) {
+        GlobalCtx app = GlobalCtx.app();
+        ShipAcceptStatus shipAcceptStatus = app.getAccountBean().shipAcceptStatus(storeId);
+        String[] items = shipAcceptStatus.getPrinters();
+        int checkedIdx = shipAcceptStatus.getCheckedIdx();
+        SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
+        singleChoiceDialogFragment.show("请选择接单打印机", items, checkedIdx, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId);
+                handleChangeShipAcceptStatus(resultBeanCall);
+            }
+        }, getFragmentManager());
+    }
+
+    private void handleChangeShipAcceptStatus(Call<ResultBean<ShipAcceptStatus>> resultBeanCall){
+        resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
+            @Override
+            public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                   Response<ResultBean<ShipAcceptStatus>> response) {
+                ResultBean<ShipAcceptStatus> body = response.body();
+                if (body != null && body.isOk()) {
+                    GlobalCtx app = GlobalCtx.app();
+                    app.getAccountBean().setShipAcceptStatus(body.getObj());
+                    initShipAccept(app);
+                    Utility.toast("操作成功", MainActivity.this);
+                } else {
+                    AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + Objects.requireNonNull(body).getDesc());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+            }
+        });
     }
 
     private void requestUpdateBadges() {
