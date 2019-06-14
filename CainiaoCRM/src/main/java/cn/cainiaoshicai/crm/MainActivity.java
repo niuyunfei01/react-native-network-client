@@ -611,7 +611,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
         }, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                String sn = items[which];
                 Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId);
                 handleChangeShipAcceptStatus(resultBeanCall);
             }
