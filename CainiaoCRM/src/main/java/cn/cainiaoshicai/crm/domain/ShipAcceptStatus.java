@@ -65,9 +65,11 @@ public class ShipAcceptStatus {
     }
 
     public int getCheckedIdx() {
-        for (int i = 0; i < printers.length; i++) {
-            if (printers[i].equals(checkedPrinter)) {
-                return i;
+        if (printers != null && printers.length > 0) {
+            for (int i = 0; i < printers.length; i++) {
+                if (printers[i].equals(checkedPrinter)) {
+                    return i;
+                }
             }
         }
         return 0;
