@@ -68,6 +68,7 @@ import Refund from "../scene/Order/Refund";
 import OrderRefundByWeight from "../scene/Order/RefundByWeight";
 import OrderTransferThird from "../scene/Order/OrderTransferThird";
 import OrderScan from "../scene/Order/OrderScan";
+import OrderScan from "../scene/Order/OrderSetReady";
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -124,6 +125,7 @@ import Cts from "../Cts";
 
 import _ from "lodash"
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
+import OrderSetReady from "../scene/Order/OrderSetReady";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -327,6 +329,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
+        [Config.ROUTE_ORDER_SCAN_REDAY]: {screen: OrderSetReady},
         [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
         
         [Config.ROUTE_STORE]: {screen: StoreScene},

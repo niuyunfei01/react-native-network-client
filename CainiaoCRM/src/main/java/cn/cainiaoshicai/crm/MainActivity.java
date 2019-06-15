@@ -597,7 +597,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
         }
     }
 
-    private void showChoosePrinterDialog(long storeId) {
+    private void showChoosePrinterDialog(final long storeId) {
         GlobalCtx app = GlobalCtx.app();
         ShipAcceptStatus shipAcceptStatus = app.getAccountBean().shipAcceptStatus(storeId);
         String[] items = shipAcceptStatus.getPrinters();
@@ -612,7 +612,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String sn = items[which];
-                Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId);
+                Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId, sn);
                 handleChangeShipAcceptStatus(resultBeanCall);
             }
         }, getFragmentManager());
