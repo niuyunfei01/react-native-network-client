@@ -97,6 +97,7 @@ const C = {
   ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
   ROUTE_ORDER_SCAN: 'OrderScan', // 订单扫码过机
   ROUTE_ORDER_REFUND_BY_WEIGHT: 'OrderRefundByWeight', // 订单按重退款
+  ROUTE_ORDER_SCAN_REDAY: 'OrderSetReady',
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
