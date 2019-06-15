@@ -12,6 +12,7 @@ import Swipeout from 'react-native-swipeout';
 import JbbPrompt from "../component/JbbPrompt";
 import ModalSelector from "react-native-modal-selector";
 import SearchProduct from "../component/SearchProduct";
+import JbbTimeRange from "../component/JbbTimeRange";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -42,6 +43,7 @@ class ProductInfo extends React.Component {
         product: {},
         sku: {}
       },
+      saleTimes: [],
       shelfNos: [[{label: '', value: ''}], [{label: '', value: ''}]],
       selectShelfNo: [],
       storeId: store.id,
@@ -109,7 +111,17 @@ class ProductInfo extends React.Component {
       productId: self.state.productId,
       storeId: self.state.storeId
     }).then(res => {
+      let saleTimes = []
+      let timeStrings = res.availableTimes.split(',')
+      if (timeStrings.length) {
+        timeStrings.map(item => {
+          let t = item.split('-')
+          saleTimes.push({start: t[0], end: t[1]})
+        })
+      }
+      
       self.setState({
+        saleTimes,
         productInfo: res,
         refreshing: false,
         selectShelfNo: res.shelf_no,
@@ -257,6 +269,16 @@ class ProductInfo extends React.Component {
   
   onChgSkuFreshDegree (value) {
     this._baseRequest('/api_products/chg_sku_fresh_degree', {skuId: this.state.productInfo.sku.id, value})
+  }
+  
+  onSaveProductSaleTime (value) {
+    let times = []
+    value.map((item) => item.start && item.end ? times.push(`${item.start}-${item.end}`) : null)
+    this._baseRequest('/api_products/save_product_sale_time', {
+      product_id: this.state.productId,
+      store_id: this.state.storeId,
+      available_times: times.join(',')
+    })
   }
   
   renderHeader () {
@@ -408,6 +430,16 @@ class ProductInfo extends React.Component {
               arrow="horizontal"
             >保鲜程度</List.Item>
           </ModalSelector>
+  
+          <JbbTimeRange
+            onConfirm={(ranges) => this.onSaveProductSaleTime(ranges)}
+            value={this.state.saleTimes}
+          >
+            <List.Item
+              extra={'设置可售时间'}
+              arrow="horizontal"
+            >可售时间</List.Item>
+          </JbbTimeRange>
         </List>
       </View>
     )
