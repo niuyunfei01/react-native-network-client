@@ -68,7 +68,6 @@ import Refund from "../scene/Order/Refund";
 import OrderRefundByWeight from "../scene/Order/RefundByWeight";
 import OrderTransferThird from "../scene/Order/OrderTransferThird";
 import OrderScan from "../scene/Order/OrderScan";
-import OrderScan from "../scene/Order/OrderSetReady";
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";

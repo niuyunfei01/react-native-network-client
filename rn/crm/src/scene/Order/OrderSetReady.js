@@ -7,7 +7,7 @@ import native from "../../common/native";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
 import HttpUtils from "../../util/http";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global, user, mine} = state;
@@ -46,7 +46,13 @@ class OrderSetReady extends BaseComponent {
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
       const api = `api/order_set_ready_by_id/${orderId}.json?access_token=${accessToken}`
       HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then(() => {
-        ToastShort(`${orderId}打包完成操作成功!`)
+        let text = `${orderId} : 打包完成操作成功!`
+        ToastLong(text)
+        native.speakText(text)
+      }).catch((resp) => {
+        let text = `打包失败, ${reason.reason}`
+        ToastLong(text)
+        native.speakText(text)
       })
     });
   }
