@@ -112,14 +112,15 @@ class ProductInfo extends React.Component {
       storeId: self.state.storeId
     }).then(res => {
       let saleTimes = []
-      let timeStrings = res.availableTimes.split(',')
-      if (timeStrings.length) {
-        timeStrings.map(item => {
-          let t = item.split('-')
-          saleTimes.push({start: t[0], end: t[1]})
-        })
+      if (res.availableTimes && res.availableTimes != '') {
+        let timeStrings = res.availableTimes.split(',')
+        if (timeStrings.length) {
+          timeStrings.map(item => {
+            let t = item.split('-')
+            saleTimes.push({start: t[0], end: t[1]})
+          })
+        }
       }
-      
       self.setState({
         saleTimes,
         productInfo: res,
