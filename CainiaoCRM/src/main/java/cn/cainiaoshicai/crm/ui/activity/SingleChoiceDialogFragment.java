@@ -33,7 +33,7 @@ public class SingleChoiceDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title).setSingleChoiceItems(items, checkedIdx, onClickListener)
-                .setPositiveButton("确定", positiveCallback);
+                .setPositiveButton("关闭", positiveCallback);
         return builder.create();
     }
 
