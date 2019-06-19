@@ -11,6 +11,7 @@ import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
+import Moment from 'moment'
 
 const {directions: {SWIPE_LEFT, SWIPE_RIGHT}} = swipeable;
 let screenWidth = Dimensions.get('window').width;
@@ -168,9 +169,15 @@ class OrderScan extends BaseComponent {
           console.log('handle scan product data source after : ', dataSource)
           self.setState({dataSource})
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
-          
-          ToastShort(`商品减${num}！`)
-          native.speakText(`商品减${num}`)
+  
+          let msg = `商品减${num}！`
+          if (!isStandard) {
+            const {datetime} = prodCode
+            let shortTime = Moment(new Date(datetime)).format('MM月DD日')
+            msg = `${msg}${shortTime}打包`
+          }
+          ToastShort(msg)
+          native.speakText(msg)
           if (currentOrder.scan_count >= currentOrder.items_count) {
             self.onForcePickUp()
           }
