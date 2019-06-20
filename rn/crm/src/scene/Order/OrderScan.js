@@ -151,8 +151,8 @@ class OrderScan extends BaseComponent {
         (isStandard && item.product.upc && item.product.upc == tagCode)
       ) {
         if (item.scan_num && item.scan_num >= item.num) {
-          ToastShort('该商品已经拣够了！')
-          native.speakText('该商品已经拣够了！')
+          // ToastShort('该商品已经拣够了！')
+          // native.speakText('该商品已经拣够了！')
           return
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
@@ -250,13 +250,22 @@ class OrderScan extends BaseComponent {
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then(() => {
-      dataSource.splice(idx, 1)
-      orderIds.splice(idx, 1)
-      currentOrder = dataSource.length ? dataSource[0] : {}
-      console.log('datasource', dataSource, 'current order ', currentOrder, 'order ids ', orderIds)
-      self.setState({dataSource, currentOrder, orderIds}, () => self.swipeToOrder(0))
-      ToastShort('打包完成操作成功')
+      self.afterPackUp(dataSource, orderIds, idx, currentOrder, self)
+    }).catch(e => {
+      if (e.obj == 'ALREADY_PACK_UP') {
+        self.afterPackUp(dataSource, orderIds, idx, currentOrder, self)
+      }
     })
+  }
+  
+  afterPackUp (dataSource, orderIds, idx, currentOrder, self) {
+    dataSource.splice(idx, 1)
+    orderIds.splice(idx, 1)
+    currentOrder = dataSource.length ? dataSource[0] : {}
+    console.log('datasource', dataSource, 'current order ', currentOrder, 'order ids ', orderIds)
+    self.setState({dataSource, currentOrder, orderIds}, () => self.swipeToOrder(0))
+    ToastShort('打包完成操作成功')
+    native.speakText('打包完成操作成功')
   }
   
   onSwipeBegin = ({direction, distance, velocity}) => {
