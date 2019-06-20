@@ -1,7 +1,6 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-// import swipeable from "../../../widget/react-native-gesture-recognizers/swipeable";
+import {Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import color from '../../../widget/color'
@@ -14,12 +13,6 @@ var Dimensions = require('Dimensions');
 var screenWidth = Dimensions.get('window').width;
 var screenHeight = Dimensions.get('window').height;
 
-// @swipeable({
-//   horizontal: true,
-//   vertical: false,
-//   continuous: false,
-//   initialVelocityThreshold: 0.7
-// })
 class OrderList extends BaseComponent {
   static propTypes = {
     onChgProdNum: PropTypes.func,
@@ -113,7 +106,12 @@ class OrderList extends BaseComponent {
           </Text>
         </View>
         <View style={{marginBottom: this.props.footerHeight * 2}}>
-          <ScrollView>
+          <ScrollView refreshControl={
+            <RefreshControl
+              refreshing={this.props.isLoading}
+              onRefresh={() => this.props.onRefresh()}
+            />
+          }>
             {item.items.map((prod, index) => {
               return self.renderProduct.bind(self)(prod, index)
             })}
@@ -127,14 +125,13 @@ class OrderList extends BaseComponent {
     const containerStyle = {
       height: screenHeight - this.props.footerHeight
     }
+    const {dataSource} = this.props
     return (
       <View style={[{flexDirection: 'row'}, this.props.style]}>
-        <For of={this.props.dataSource} each="item" index="idx">
-          <View style={[styles.container, containerStyle]} key={idx}>
-            {this.renderOrderInfo(item)}
-            {this.renderOrderItem(item)}
+        <View style={[styles.container, containerStyle]}>
+          {this.renderOrderInfo(dataSource)}
+          {this.renderOrderItem(dataSource)}
           </View>
-        </For>
       </View>
     )
   }
