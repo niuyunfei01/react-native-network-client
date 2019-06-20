@@ -173,7 +173,7 @@ class OrderScan extends BaseComponent {
           let msg = `商品减${num}！`
           if (!isStandard) {
             const {datetime} = prodCode
-            let shortTime = Moment(new Date(datetime)).format('MM月DD日')
+            let shortTime = Moment(new Date(datetime).getTime()).format('MM月DD日')
             msg = `${msg}${shortTime}打包`
           }
           ToastShort(msg)
