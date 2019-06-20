@@ -298,7 +298,11 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void playWarningSound() {
-        GlobalCtx.app().getSoundManager().play_warning_order();
+        try{
+            GlobalCtx.app().getSoundManager().play_warning_order();
+        }catch (Exception e){
+
+        }
     }
 
     @ReactMethod
