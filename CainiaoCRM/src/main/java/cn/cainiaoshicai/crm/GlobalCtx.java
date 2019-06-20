@@ -1339,6 +1339,7 @@ public class GlobalCtx extends Application {
         private int new_ele_order_sound;
         private int new_eb_order_sound;
         private int todo_complain_sound;
+        private int warn_sound;
 
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
@@ -1368,6 +1369,7 @@ public class GlobalCtx extends Application {
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
             new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
+            warn_sound = soundPool.load(ctx, R.raw.warning, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1465,6 +1467,9 @@ public class GlobalCtx extends Application {
             }
         }
 
+        public boolean play_warning_order() {
+            return this.play_single_sound(warn_sound);
+        }
 
         public boolean play_new_simple_order_sound() {
             return this.play_single_sound(simpleNewOrderSound);

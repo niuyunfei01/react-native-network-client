@@ -297,6 +297,11 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void playWarningSound() {
+        GlobalCtx.app().getSoundManager().play_warning_order();
+    }
+
+    @ReactMethod
     void printBtPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         final Order o = gson.fromJson(orderJson, new TypeToken<Order>() {
