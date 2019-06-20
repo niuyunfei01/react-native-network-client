@@ -599,9 +599,12 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
 
     private void showChoosePrinterDialog(final long storeId) {
         GlobalCtx app = GlobalCtx.app();
-        ShipAcceptStatus shipAcceptStatus = app.getAccountBean().shipAcceptStatus(storeId);
-        String[] items = shipAcceptStatus.getPrinters();
-        int checkedIdx = shipAcceptStatus.getCheckedIdx();
+        ShipAcceptStatus shipAcceptStatus = null;
+        if (app.getAccountBean() != null) {
+            shipAcceptStatus = app.getAccountBean().shipAcceptStatus(storeId);
+        }
+        String[] items = shipAcceptStatus == null ? new String[]{} : shipAcceptStatus.getPrinters();
+        int checkedIdx = shipAcceptStatus == null ? 0 : shipAcceptStatus.getCheckedIdx();
         SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
         singleChoiceDialogFragment.show("请选择接单打印机", items, checkedIdx, new DialogInterface.OnClickListener() {
             @Override

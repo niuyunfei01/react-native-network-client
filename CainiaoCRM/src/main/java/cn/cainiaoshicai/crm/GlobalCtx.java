@@ -1080,7 +1080,11 @@ public class GlobalCtx extends Application {
     }
 
     public ShipAcceptStatus getWorkerStatus(long storeId) {
-        return this.getAccountBean().shipAcceptStatus(storeId);
+        AccountBean accountBean = this.getAccountBean();
+        if (accountBean != null) {
+            return accountBean.shipAcceptStatus(storeId);
+        }
+        return null;
     }
 
     public void handleUncaughtException(Thread t, Throwable e) {
