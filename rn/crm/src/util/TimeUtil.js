@@ -8,10 +8,14 @@ export default class TimeUtil {
   /**
    * yyyy-MM-dd hh:mm:ss q S
    * @param format
-   * @param time
+   * @param time [string|Date()]
    * @returns {*}
    */
   static format (format, time = new Date()) {
+    if (typeof (time) == 'string') {
+      time = new Date(time.replace(/\-/g, '/'))
+    }
+    
     const o = {
       'M+': time.getMonth() + 1, // month
       'd+': time.getDate(), // day
