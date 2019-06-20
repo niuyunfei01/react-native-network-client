@@ -11,7 +11,7 @@ import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
-import Moment from 'moment'
+import TimeUtil from "../../util/TimeUtil";
 
 const {directions: {SWIPE_LEFT, SWIPE_RIGHT}} = swipeable;
 let screenWidth = Dimensions.get('window').width;
@@ -173,7 +173,7 @@ class OrderScan extends BaseComponent {
           let msg = `商品减${num}！`
           if (!isStandard) {
             const {datetime} = prodCode
-            let shortTime = Moment(new Date(datetime).getTime()).format('MM月DD日')
+            let shortTime = TimeUtil.format('MM月dd日', new Date(datetime))
             msg = `${msg}${shortTime}打包`
           }
           ToastShort(msg)
