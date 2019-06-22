@@ -352,45 +352,43 @@ class ProductInfo extends React.Component {
             onClick={() => this.setState({riskMinStatPrompt: true})}
           >闲日最低库存</List.Item>
   
-          <If condition={!this.state.isStandard}>
+          <List.Item
+            arrow={"horizontal"}
+            extra={`${this.state.productInfo.sku.name}(${this.state.productInfo.sku.id})`}
+          >秤签名称</List.Item>
+          <List.Item
+            onClick={() => this.setState({tagCodePrompt: true})}
+            arrow={"horizontal"}
+            extra={this.state.productInfo.sku.material_code}
+          >秤签编号</List.Item>
+          <List.Item
+            extra={<Switch
+              disabled={!this.state.productInfo.sku.material_code}
+              checked={this.state.productInfo.sku.need_pack == 1}
+              onChange={(checked) => this.onChangeNeedPack(checked)}
+            />}
+          >需要打包</List.Item>
+          <If condition={this.state.productInfo.sku.need_pack == 1}>
             <List.Item
               arrow={"horizontal"}
-              extra={`${this.state.productInfo.sku.name}(${this.state.productInfo.sku.id})`}
-            >秤签名称</List.Item>
+              extra={this.state.productInfo.product.pre_pack_score}
+              onClick={() => this.setState({packScorePrompt: true})}
+            >打包工分</List.Item>
             <List.Item
-              onClick={() => this.setState({tagCodePrompt: true})}
               arrow={"horizontal"}
-              extra={this.state.productInfo.sku.material_code}
-            >秤签编号</List.Item>
-            <List.Item
-              extra={<Switch
-                disabled={!this.state.productInfo.sku.material_code}
-                checked={this.state.productInfo.sku.need_pack == 1}
-                onChange={(checked) => this.onChangeNeedPack(checked)}
-              />}
-            >需要打包</List.Item>
-            <If condition={this.state.productInfo.sku.need_pack == 1}>
+              extra={tool.toFixed(this.state.productInfo.sku.pack_loss_warn, 'percent')}
+              onClick={() => this.setState({packLossWarnPrompt: true})}
+            >打包损耗预警</List.Item>
+            <ModalSelector
+              onChange={(option) => this.onChgSkuRefineLevel(option.value)}
+              cancelText={'取消'}
+              data={this.state.skuRefineLevels}
+            >
               <List.Item
-                arrow={"horizontal"}
-                extra={this.state.productInfo.product.pre_pack_score}
-                onClick={() => this.setState({packScorePrompt: true})}
-              >打包工分</List.Item>
-              <List.Item
-                arrow={"horizontal"}
-                extra={tool.toFixed(this.state.productInfo.sku.pack_loss_warn, 'percent')}
-                onClick={() => this.setState({packLossWarnPrompt: true})}
-              >打包损耗预警</List.Item>
-              <ModalSelector
-                onChange={(option) => this.onChgSkuRefineLevel(option.value)}
-                cancelText={'取消'}
-                data={this.state.skuRefineLevels}
-              >
-                <List.Item
-                  arrow="horizontal"
-                  extra={this.state.productInfo.sku.refine_level_label}
-                >打包级别</List.Item>
-              </ModalSelector>
-            </If>
+                arrow="horizontal"
+                extra={this.state.productInfo.sku.refine_level_label}
+              >打包级别</List.Item>
+            </ModalSelector>
           </If>
   
           <If condition={this.state.isStandard}>

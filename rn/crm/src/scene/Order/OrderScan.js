@@ -139,6 +139,7 @@ class OrderScan extends BaseComponent {
           }
           ToastShort(msg)
           native.speakText(msg)
+          // native.playWarningSound()
           if (currentOrder.scan_count >= currentOrder.items_count) {
             self.onForcePickUp()
           }

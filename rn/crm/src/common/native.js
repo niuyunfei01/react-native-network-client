@@ -174,6 +174,11 @@ export default {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.speakText(text, callback))
   },
+  
+  playWarningSound: async function () {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.playWarningSound())
+  },
 
   showInputKeyboard: async function () {
     await (NativeModules.ActivityStarter &&
