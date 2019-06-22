@@ -194,6 +194,7 @@ public class StorageActionDao {
                     si.setSupplyPrice(sp.getSupply_price());
                     si.setShelfNo(sp.getShelf_no());
                     si.setApplyingPrice(sp.getApplying_price());
+                    si.setSold_latest(sp.getSold_latest());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {

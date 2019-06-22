@@ -30,6 +30,7 @@ public class StoreProduct {
     private int auto_off_sale;
     private int sold_7day;
     private int sold_weekend;
+    private int sold_latest;
     private int req_total;
     private String req_mark;
 
@@ -261,5 +262,13 @@ public class StoreProduct {
 
     public void setShelf_no(String shelf_no) {
         this.shelf_no = shelf_no;
+    }
+
+    public int getSold_latest() {
+        return sold_latest;
+    }
+
+    public void setSold_latest(int sold_latest) {
+        this.sold_latest = sold_latest;
     }
 }

@@ -68,6 +68,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.leftNumber = row.findViewById(R.id.total_last_stat);
             holder.sold_5day = row.findViewById(R.id.sold_5day);
             holder.sold_weekend = row.findViewById(R.id.sold_weekend);
+            holder.sold_latest = row.findViewById(R.id.sold_latest);
 
             holder.shelfNo = row.findViewById(R.id.shelf_no);
             holder.prodStatus = row.findViewById(R.id.store_prod_status);
@@ -89,6 +90,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
             holder.sold_5day_fen = row.findViewById(R.id.sold_5day_fen);
             holder.sold_weekend_fen = row.findViewById(R.id.sold_weekend_fen);
+            holder.sold_latest_fen = row.findViewById(R.id.sold_latest_fen);
 
             convertView = row;
             convertView.setTag(holder);
@@ -226,14 +228,17 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             }
         }
         holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
-
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day() / 5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend() / 2.0));
+        holder.sold_latest.setText("今日:" + item.getSold_latest());
         if (GlobalCtx.app().getVendor() != null && !GlobalCtx.app().getVendor().isFnProviding()) {
             holder.sold_5day.setVisibility(View.GONE);
             holder.sold_weekend.setVisibility(View.GONE);
+            holder.sold_latest.setVisibility(View.GONE);
+
             holder.sold_weekend_fen.setVisibility(View.GONE);
             holder.sold_5day_fen.setVisibility(View.GONE);
+            holder.sold_latest_fen.setVisibility(View.GONE);
         }
 
         holder.goodIcon.setOnClickListener(new View.OnClickListener() {
@@ -342,6 +347,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         TextView sold_5day_fen;
         TextView sold_weekend;
         TextView sold_weekend_fen;
+        TextView sold_latest;
+        TextView sold_latest_fen;
 
         TextView prodStatus;
         TextView req_total;

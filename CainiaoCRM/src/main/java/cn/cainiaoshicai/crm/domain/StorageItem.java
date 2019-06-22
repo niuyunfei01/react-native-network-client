@@ -31,8 +31,9 @@ public class StorageItem {
     private int status;
     private int self_provided;
     private int risk_min_stat;
-    private int sold_5day;
-    private int sold_weekend;
+    private int sold_5day = 0;
+    private int sold_weekend = 0;
+    private int sold_latest = 0;
     private int store_id;
 
     private int totalInReq;
@@ -212,6 +213,14 @@ public class StorageItem {
 
     public void setReqMark(String reqMark) {
         this.reqMark = reqMark;
+    }
+
+    public int getSold_latest() {
+        return sold_latest;
+    }
+
+    public void setSold_latest(int sold_latest) {
+        this.sold_latest = sold_latest;
     }
 
     public static String getDesc(int when_sale_again) {
