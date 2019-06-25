@@ -52,6 +52,7 @@ import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
+import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -480,7 +481,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         String text = ctv.getText().toString();
         String term = !TextUtils.isEmpty(text) ? text : null;
         StoreStorageActivity.this.searchTerm = term != null ? term : "";
-        listAdapter.filter(term);
+
+        if (!TextUtils.isEmpty(term) && term.startsWith("@@")) {
+            refreshData();
+        } else {
+            listAdapter.filter(term);
+        }
+
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (in != null) {
             in.hideSoftInputFromWindow(ctv.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -713,7 +720,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, currTag, sortBy);
+                    result = sad.getStorageItems(currStore, filter, currTag, sortBy, searchTerm);
                     return null;
                 } catch (final ServiceException e) {
                     AppLogger.e("error to refresh storage items:" + currStore, e);
@@ -902,12 +909,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 return true;
 
             case MENU_CONTEXT_TO_SOLD_OUT_ID:
-                changed.setAdditional(new Runnable() {
-                    @Override
-                    public void run() {
-                        listAdapterRefresh();
-                        refreshData();
-                    }
+                changed.setAdditional(() -> {
+                    listAdapterRefresh();
+                    refreshData();
                 });
                 StoreStorageHelper.createSetOnSaleDlg(StoreStorageActivity.this, item, changed).show();
                 return true;

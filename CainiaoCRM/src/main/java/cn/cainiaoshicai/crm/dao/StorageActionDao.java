@@ -143,7 +143,7 @@ public class StorageActionDao {
     }
 
     public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter,
-                                                                         Tag tag, String sortBy) throws ServiceException {
+                                                                         Tag tag, String sortBy, String term) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
         try {
@@ -155,7 +155,7 @@ public class StorageActionDao {
             }
 
             params.put("sale_price", "1");
-            String json = getJson("/list_store_storage_status/0/" + store.getId() + "/" + filter, params);
+            String json = getJson(String.format("/list_store_storage_status/0/%d/%d/%s", store.getId(), filter, term), params);
             AppLogger.i("list_store_storage_status json result " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
