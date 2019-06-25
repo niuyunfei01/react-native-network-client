@@ -14,6 +14,7 @@ public class StoreStatusStat {
     private int total_need_check;
     private int total_no_code;
     private int total_no_shelf;
+    private int total_sales_time;
 
     public int getTotal_on_sale() {
         return total_on_sale;
@@ -85,5 +86,13 @@ public class StoreStatusStat {
 
     public void setTotal_no_shelf(int total_no_shelf) {
         this.total_no_shelf = total_no_shelf;
+    }
+
+    public int getTotal_sales_time() {
+        return total_sales_time;
+    }
+
+    public void setTotal_sales_time(int total_sales_time) {
+        this.total_sales_time = total_sales_time;
     }
 }

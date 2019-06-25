@@ -103,6 +103,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_FREQ_PRODUCT = 20;
     public static final int FILTER_NO_CODE = 21;
     public static final int FILTER_NO_SHELF = 22;
+    public static final int FILTER_SALES_TIME = 23;
     public static final int FILTER_ = 8;
 
     public static final String SORT_BY_SOLD = "sold";
@@ -147,6 +148,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_FREQ_PRODUCT, "待盘点"),
                 new StatusItem(FILTER_NO_CODE, "无编号"),
                 new StatusItem(FILTER_NO_SHELF, "无货架"),
+                new StatusItem(FILTER_SALES_TIME, "有限时"),
         };
 
         public final int status;
@@ -457,7 +459,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         initStoreProdQuota();
         //Must after buttons initialized
         setHeadToolBar();
-        updateFilterBtnLabels(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        updateFilterBtnLabels(0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0);
     }
 
     private String getSortType(String label) {
@@ -637,11 +640,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
-                                       int total_in_req, int totalSoldEmpty, int totalNeedCheck, int total_no_code, int total_no_shelf) {
+                                       int total_in_req, int totalSoldEmpty, int totalNeedCheck,
+                                       int total_no_code, int total_no_shelf, int total_sales_time) {
 
         //boolean isPriceControlled = this.currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
 
-        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, totalNeedCheck, filterBtnControlled(), total_no_code, total_no_shelf);
+        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, totalNeedCheck, filterBtnControlled(),
+                total_no_code, total_no_shelf, total_sales_time);
         StatusItem riskItem = StatusItem.find(FILTER_RISK, filterBtnControlled());
         if (riskItem != null) {
             riskItem.setNum(totalRisk);
@@ -664,13 +669,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     void updateFilterStatusNum(int totalOnSale, int totalSoldOut, int totalOffSale, int totalNeedCheck,
-                               boolean isPriceControlled, int totalNoCode, int totalNoShelf) {
+                               boolean isPriceControlled, int totalNoCode, int totalNoShelf, int totalSalesTime) {
         StatusItem.find(FILTER_ON_SALE, isPriceControlled).setNum(totalOnSale);
         StatusItem.find(FILTER_SOLD_OUT, isPriceControlled).setNum(totalSoldOut);
         StatusItem.find(FILTER_OFF_SALE, isPriceControlled).setNum(totalOffSale);
         StatusItem.find(FILTER_FREQ_PRODUCT, isPriceControlled).setNum(totalNeedCheck);
         StatusItem.find(FILTER_NO_CODE, isPriceControlled).setNum(totalNoCode);
         StatusItem.find(FILTER_NO_SHELF, isPriceControlled).setNum(totalNoShelf);
+        StatusItem.find(FILTER_SALES_TIME, isPriceControlled).setNum(totalSalesTime);
         if (this.currStatusSpinner != null) {
             ((ArrayAdapter) this.currStatusSpinner.getAdapter()).notifyDataSetChanged();
         }
@@ -750,7 +756,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
                                     sec.getTotal_sold_out(), sec.getTotal_off_sale(),
                                     sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check(),
-                                    sec.getTotal_no_code(), sec.getTotal_no_shelf());
+                                    sec.getTotal_no_code(), sec.getTotal_no_shelf(), sec.getTotal_sales_time());
                         }
                     });
                 }
@@ -835,7 +841,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 }
                 //boolean isPriceControlled = currStore != null && currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
                 updateFilterStatusNum(st.getTotal_on_sale(), st.getTotal_sold_out(), st.getTotal_off_sale(),
-                        st.getTotal_need_check(), filterBtnControlled(), st.getTotal_no_code(), st.getTotal_no_shelf());
+                        st.getTotal_need_check(), filterBtnControlled(), st.getTotal_no_code(), st.getTotal_no_shelf(), st.getTotal_sales_time());
             }
             if (additional != null) {
                 additional.run();
