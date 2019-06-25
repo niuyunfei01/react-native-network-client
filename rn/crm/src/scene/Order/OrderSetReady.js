@@ -37,11 +37,11 @@ class OrderSetReady extends BaseComponent {
   }
 
   componentWillMount() {
+    const self = this
     // 监听扫描订单条码
     if (this.listenScanBarCode) {
       this.listenScanBarCode.remove()
     }
-    const self = this
     const accessToken = self.props.global.accessToken
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
       const api = `api/order_set_ready_by_id/${orderId}.json?access_token=${accessToken}`

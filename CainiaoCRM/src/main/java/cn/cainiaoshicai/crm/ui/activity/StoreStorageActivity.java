@@ -130,8 +130,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_RISK, "待补货"),
                 new StatusItem(FILTER_SOLD_EMPTY, "零库存"),
                 new StatusItem(FILTER_FREQ_PRODUCT, "待盘点"),
-                new StatusItem(FILTER_NO_CODE, "无编号"),
-                new StatusItem(FILTER_NO_SHELF, "无货架"),
         };
 
         static final StatusItem[] STATUS_PRICE_CONTROLLED = new StatusItem[]{
@@ -147,6 +145,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_RISK, "待补货"),
                 new StatusItem(FILTER_SOLD_EMPTY, "零库存"),
                 new StatusItem(FILTER_FREQ_PRODUCT, "待盘点"),
+                new StatusItem(FILTER_NO_CODE, "无编号"),
+                new StatusItem(FILTER_NO_SHELF, "无货架"),
         };
 
         public final int status;
