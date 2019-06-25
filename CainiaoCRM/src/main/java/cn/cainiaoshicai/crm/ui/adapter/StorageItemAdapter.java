@@ -37,6 +37,7 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
+    public static final String PREFIX_NOT_FILTER = "@@";
     private List<StorageItem> backendData = new ArrayList<>();
     private Activity context;
     private Store store;
@@ -307,7 +308,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         AppLogger.d("items count after clear:" + this.getCount());
 
-        if (!TextUtils.isEmpty(text)) {
+        if (!TextUtils.isEmpty(text) && !text.startsWith(PREFIX_NOT_FILTER)) {
 
             int id = 0;
             if (text.indexOf("#") > 0) {

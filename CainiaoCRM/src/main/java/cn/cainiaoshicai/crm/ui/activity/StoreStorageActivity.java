@@ -482,7 +482,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         String term = !TextUtils.isEmpty(text) ? text : null;
         StoreStorageActivity.this.searchTerm = term != null ? term : "";
 
-        if (!TextUtils.isEmpty(term) && term.startsWith("@@")) {
+        if (!TextUtils.isEmpty(term) && term.startsWith(StorageItemAdapter.PREFIX_NOT_FILTER)) {
             refreshData();
         } else {
             listAdapter.filter(term);
