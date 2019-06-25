@@ -28,6 +28,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.StorageStatusResults;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
@@ -118,7 +119,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
-            if (GlobalCtx.app().getVendor().isFnProviding()) {
+            Vendor v = GlobalCtx.app().getVendor();
+            if (v != null && v.isFnProviding()) {
                 holder.leftNumber.setVisibility(View.VISIBLE);
                 holder.leftNumber.setText(item.leftNumberStr());
             } else {
