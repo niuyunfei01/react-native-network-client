@@ -230,7 +230,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day() / 5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend() / 2.0));
-        holder.sold_latest.setText("今日:" + item.getSold_latest());
+        holder.sold_latest.setText("最近:" + item.getSold_latest());
         if (GlobalCtx.app().getVendor() != null && !GlobalCtx.app().getVendor().isFnProviding()) {
             holder.sold_5day.setVisibility(View.GONE);
             holder.sold_weekend.setVisibility(View.GONE);

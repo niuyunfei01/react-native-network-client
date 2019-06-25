@@ -18,7 +18,7 @@ function mapStateToProps (state) {
   return {global: global};
 }
 
-class StandardPutIn extends BaseComponent {
+class StandardDetailUpdate extends BaseComponent {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: '标品入库',
@@ -290,4 +290,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default connect(mapStateToProps)(StandardPutIn)
+export default connect(mapStateToProps)(StandardDetailUpdate)
