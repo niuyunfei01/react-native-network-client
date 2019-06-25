@@ -457,7 +457,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         initStoreProdQuota();
         //Must after buttons initialized
         setHeadToolBar();
-        updateFilterBtnLabels(0, 0, 0, 0, 0, 0, 0);
+        updateFilterBtnLabels(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     private String getSortType(String label) {
@@ -637,11 +637,11 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
-                                       int total_in_req, int totalSoldEmpty, int totalNeedCheck) {
+                                       int total_in_req, int totalSoldEmpty, int totalNeedCheck, int total_no_code, int total_no_shelf) {
 
         //boolean isPriceControlled = this.currStore.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
 
-        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, totalNeedCheck, filterBtnControlled());
+        updateFilterStatusNum(totalOnSale, totalSoldOut, totalOffSale, totalNeedCheck, filterBtnControlled(), total_no_code, total_no_shelf);
         StatusItem riskItem = StatusItem.find(FILTER_RISK, filterBtnControlled());
         if (riskItem != null) {
             riskItem.setNum(totalRisk);
@@ -749,7 +749,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                             StoreStorageActivity.this.stats = sec;
                             updateFilterBtnLabels(sec.getTotal_on_sale(), sec.getTotal_risk(),
                                     sec.getTotal_sold_out(), sec.getTotal_off_sale(),
-                                    sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check());
+                                    sec.getTotal_req_cnt(), sec.getTotal_sold_empty(), sec.getTotal_need_check(),
+                                    sec.getTotal_no_code(), sec.getTotal_no_shelf());
                         }
                     });
                 }
