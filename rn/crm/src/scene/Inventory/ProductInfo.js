@@ -311,6 +311,13 @@ class ProductInfo extends React.Component {
         onPress: () => this.onClearShelfNo()
       }
     ]
+  
+    const refProductSwipeOutBtns = [
+      {
+        text: '取消关联',
+        onPress: () => this.onChgStoreProdUnitNum(0, 1)
+      }
+    ]
     
     return (
       <View>
@@ -411,13 +418,13 @@ class ProductInfo extends React.Component {
               arrow="horizontal"
             >商品份含量</List.Item>
           </JbbPrompt>
-          
+          <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
           <List.Item
             onClick={() => this.setState({refProdPrompt: true})}
             extra={this.state.productInfo.refer_prod_name}
             arrow="horizontal"
           >关联单份商品</List.Item>
-  
+          </Swipeout>
           <ModalSelector
             onChange={(option) => this.onChgSkuFreshDegree(option.value)}
             cancelText={'取消'}
