@@ -46,7 +46,7 @@ class OrderSetReady extends BaseComponent {
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
       const api = `api/order_set_ready_by_id/${orderId}.json?access_token=${accessToken}`
       HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then((res) => {
-        let text = res.desc
+        let text = res.msg
         ToastLong(text)
         native.speakText(text)
       }).catch((resp) => {
