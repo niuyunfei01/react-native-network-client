@@ -359,7 +359,7 @@ class ProductInfo extends React.Component {
             extra={`${productInfo.risk_min_stat}`}
             onClick={() => this.setState({riskMinStatPrompt: true})}
           >闲日最低库存</List.Item>
-          <If condition={productInfo.is_standard_code}>
+          <If condition={!productInfo.is_standard_code}>
             <List.Item
               arrow={"horizontal"}
               extra={`${productInfo.sku.name}(${this.state.productInfo.sku.id})`}
