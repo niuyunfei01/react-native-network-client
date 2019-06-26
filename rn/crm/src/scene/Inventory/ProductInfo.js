@@ -304,6 +304,7 @@ class ProductInfo extends React.Component {
   }
   
   renderForm () {
+    const {productInfo} = this.state
     const shelfNoSwipeOutBtns = [
       {
         text: '清除',
@@ -337,7 +338,7 @@ class ProductInfo extends React.Component {
               data={this.state.shelfNos}
               title="选择货架"
               cascade={false}
-              extra={this.state.productInfo.shelf_no}
+              extra={productInfo.shelf_no}
               onOk={v => this.onModifyPosition(v.join(''))}
             >
               <List.Item arrow="horizontal">货架编号</List.Item>
@@ -345,45 +346,46 @@ class ProductInfo extends React.Component {
           </Swipeout>
           <List.Item
             arrow={"horizontal"}
-            extra={`${this.state.productInfo.sku.stock_check_cycle}天`}
+            extra={`${productInfo.sku.stock_check_cycle}天`}
             onClick={() => this.setState({stockCheckCyclePrompt: true})}
           >盘点周期</List.Item>
           <List.Item
             arrow={"horizontal"}
-            extra={`${this.state.productInfo.risk_min_stat_voc}`}
+            extra={`${productInfo.risk_min_stat_voc}`}
             onClick={() => this.setState({riskMinStatVocPrompt: true})}
           >忙日最低库存</List.Item>
           <List.Item
             arrow={"horizontal"}
-            extra={`${this.state.productInfo.risk_min_stat}`}
+            extra={`${productInfo.risk_min_stat}`}
             onClick={() => this.setState({riskMinStatPrompt: true})}
           >闲日最低库存</List.Item>
-  
-          <List.Item
-            arrow={"horizontal"}
-            extra={`${this.state.productInfo.sku.name}(${this.state.productInfo.sku.id})`}
-          >秤签名称</List.Item>
-          <List.Item
-            onClick={() => this.setState({tagCodePrompt: true})}
-            arrow={"horizontal"}
-            extra={this.state.productInfo.sku.material_code}
-          >秤签编号</List.Item>
-          <List.Item
-            extra={<Switch
-              disabled={!this.state.productInfo.sku.material_code}
-              checked={this.state.productInfo.sku.need_pack == 1}
-              onChange={(checked) => this.onChangeNeedPack(checked)}
-            />}
-          >需要打包</List.Item>
-          <If condition={this.state.productInfo.sku.need_pack == 1}>
+          <If condition={productInfo.is_standard_code}>
             <List.Item
               arrow={"horizontal"}
-              extra={this.state.productInfo.product.pre_pack_score}
+              extra={`${productInfo.sku.name}(${this.state.productInfo.sku.id})`}
+            >秤签名称</List.Item>
+            <List.Item
+              onClick={() => this.setState({tagCodePrompt: true})}
+              arrow={"horizontal"}
+              extra={productInfo.sku.material_code}
+            >秤签编号</List.Item>
+            <List.Item
+              extra={<Switch
+                disabled={!productInfo.sku.material_code}
+                checked={this.state.productInfo.sku.need_pack == 1}
+                onChange={(checked) => this.onChangeNeedPack(checked)}
+              />}
+            >需要打包</List.Item>
+          </If>
+          <If condition={productInfo.sku.need_pack == 1}>
+            <List.Item
+              arrow={"horizontal"}
+              extra={productInfo.product.pre_pack_score}
               onClick={() => this.setState({packScorePrompt: true})}
             >打包工分</List.Item>
             <List.Item
               arrow={"horizontal"}
-              extra={tool.toFixed(this.state.productInfo.sku.pack_loss_warn, 'percent')}
+              extra={tool.toFixed(productInfo.sku.pack_loss_warn, 'percent')}
               onClick={() => this.setState({packLossWarnPrompt: true})}
             >打包损耗预警</List.Item>
             <ModalSelector
@@ -393,7 +395,7 @@ class ProductInfo extends React.Component {
             >
               <List.Item
                 arrow="horizontal"
-                extra={this.state.productInfo.sku.refine_level_label}
+                extra={productInfo.sku.refine_level_label}
               >打包级别</List.Item>
             </ModalSelector>
           </If>
@@ -401,7 +403,7 @@ class ProductInfo extends React.Component {
           <If condition={this.state.isStandard}>
             <List.Item
               onClick={() => this.setState({upcPrompt: true})}
-              extra={this.state.productInfo.product.upc}
+              extra={productInfo.product.upc}
               arrow="horizontal"
             >商品码</List.Item>
           </If>
@@ -411,17 +413,17 @@ class ProductInfo extends React.Component {
             title={'输入商品单份含量'}
             onConfirm={(value) => this.onChgStoreProdUnitNum(this.state.productInfo.refer_prod_id, value)}
             onCancel={() => this.setState({unitNumPrompt: false})}
-            initValue={this.state.productInfo.unit_num}
+            initValue={productInfo.unit_num}
           >
             <List.Item
-              extra={this.state.productInfo.unit_num}
+              extra={productInfo.unit_num}
               arrow="horizontal"
             >商品份含量</List.Item>
           </JbbPrompt>
           <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
           <List.Item
             onClick={() => this.setState({refProdPrompt: true})}
-            extra={this.state.productInfo.refer_prod_name}
+            extra={productInfo.refer_prod_name}
             arrow="horizontal"
           >关联单份商品</List.Item>
           </Swipeout>
@@ -432,7 +434,7 @@ class ProductInfo extends React.Component {
           >
             <List.Item
               onClick={() => this.setState({refProdPrompt: true})}
-              extra={this.state.productInfo.sku.fresh_degree_label}
+              extra={productInfo.sku.fresh_degree_label}
               arrow="horizontal"
             >保鲜程度</List.Item>
           </ModalSelector>
