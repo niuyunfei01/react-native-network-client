@@ -102,8 +102,8 @@ class StandardDetailUpdate extends BaseComponent {
     const self = this
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
-    const {detail} = self.state
-    Alert.alert('警告', `确定将此条记录置为无效么\n【${detail.sku.name}】${detail.weight}${detail.type == 1 ? '公斤' : '件'}`, [
+    const {product, number} = self.state
+    Alert.alert('警告', `确定将此条记录置为无效么\n【${product.name}】${number}件`, [
       {text: '取消'},
       {
         text: '确定',
