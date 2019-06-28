@@ -62,7 +62,7 @@ class StockCheck extends BaseComponent {
   
   fetchData () {
     const self = this
-    const api = `api_products/inventory_info?access_token=${this.props.global.accessToken}`
+    const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
     HttpUtils.get.bind(self.props)(api, {
       productId: this.props.navigation.state.params.productId,
       storeId: self.state.storeId
@@ -153,6 +153,13 @@ class StockCheck extends BaseComponent {
             editable={false}
             extra={'件'}
           >理论库存</InputItem>
+          <InputItem
+            value={String(this.state.productInfo.expectUseNum)}
+            defaultValue={String(this.state.productInfo.expectUseNum)}
+            type='number'
+            editable={false}
+            extra={'件'}
+          >订单预计使用</InputItem>
           <InputItem
             value={String(this.state.actualStock)}
             defaultValue={String(this.state.actualStock)}
