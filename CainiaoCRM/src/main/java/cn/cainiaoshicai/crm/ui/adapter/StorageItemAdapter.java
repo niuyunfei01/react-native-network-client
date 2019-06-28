@@ -309,7 +309,6 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         AppLogger.d("items count after clear:" + this.getCount());
 
         if (!TextUtils.isEmpty(text) && !text.startsWith(PREFIX_NOT_FILTER)) {
-
             int id = 0;
             if (text.indexOf("#") > 0) {
                 id = Integer.parseInt(text.substring(0, text.indexOf("#")));
@@ -331,7 +330,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                     }
                 }
             }
-        } else {
+        }  else {
             ((StorageItemAdapter<StorageItem>) this).addAll(this.backendData);
         }
 

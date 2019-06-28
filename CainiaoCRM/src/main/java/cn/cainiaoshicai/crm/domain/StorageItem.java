@@ -63,6 +63,11 @@ public class StorageItem {
     public StorageItem() {
     }
 
+    public StorageItem(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public StorageItem(int id, String name, int total_last_stat, int total_sold) {
         this.id = id;
         this.name = name;

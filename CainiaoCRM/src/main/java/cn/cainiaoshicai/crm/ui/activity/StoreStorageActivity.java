@@ -629,10 +629,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         if (ctv != null) {
             ArrayAdapter<StorageItem> ctvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+            //ctvAdapter.addAll(getShelfItems());
             ctvAdapter.addAll(storageItems);
             ctv.setAdapter(ctvAdapter);
         }
     }
+
 
     public View getViewByPosition(int pos, ListView listView) {
         final int firstListItemPosition = listView.getFirstVisiblePosition();
@@ -644,6 +646,16 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             final int childIndex = pos - firstListItemPosition;
             return listView.getChildAt(childIndex);
         }
+    }
+
+    private ArrayList<StorageItem> getShelfItems() {
+        String[] shelfList = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Z"};
+        ArrayList<StorageItem> items = new ArrayList<>();
+        int idx = 999999;
+        for (String prefix : shelfList) {
+            items.add(new StorageItem(++idx, "@@" + prefix));
+        }
+        return items;
     }
 
     private void updateFilterBtnLabels(int totalOnSale, int totalRisk, int totalSoldOut, int totalOffSale,
