@@ -119,10 +119,16 @@ class RootScene extends PureComponent {
         });
       }.bind(this)
     );
-
-    DeviceEventEmitter.removeAllListeners();
+    this.removeListener();
   }
-  
+
+  removeListener() {
+    DeviceEventEmitter.removeListener(Config.Listener.KEY_SCAN_ORDER_BAR_CODE);
+    DeviceEventEmitter.removeListener(Config.Listener.KEY_SCAN_PROD_QR_CODE);
+    DeviceEventEmitter.removeListener(Config.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE);
+    DeviceEventEmitter.removeListener(Config.Listener.KEY_SCAN_PACK_PROD_BAR_CODE);
+  }
+
   render () {
     const launchProps = this.props.launchProps;
     const orderId = launchProps["order_id"];

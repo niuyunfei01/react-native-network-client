@@ -1,25 +1,14 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from 'react-native';
+import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackHandler} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
 import SearchBar from "../../weui/SearchBar/SearchBar";
 import {native} from '../../common';
-import NavigationItem from "../../widget/NavigationItem";
 import Config from "../../config";
 
 
@@ -50,6 +39,19 @@ class OrderSearchScene extends PureComponent {
 
   componentDidMount() {
   }
+
+  componentWillMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+
+  onBackAndroid = () => {
+    native.toOrders()
+    return true;
+  };
 
 
   onHeaderRefresh() {
