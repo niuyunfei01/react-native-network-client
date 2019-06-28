@@ -13,6 +13,7 @@ import ModalSelector from "react-native-modal-selector";
 import $V from "../../weui/variable";
 import color from '../../widget/color'
 import C from '../../config'
+import {ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -94,10 +95,9 @@ class StockCheck extends BaseComponent {
       differenceType: this.state.checkType.value,
       remark: this.state.remark
     }).then(res => {
-      console.log(`product id ${self.state.productId} 实际库存 ${self.state.actualStock}`)
-      native.updatePidStorage(parseInt(self.state.productId), parseInt(self.state.actualStock), () => {
-        native.nativeBack()
-      })
+      ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualStock}`)
+      native.updatePidStorage(parseInt(self.state.productId), parseInt(self.state.actualStock), () => {})
+      native.nativeBack()
     })
   }
   

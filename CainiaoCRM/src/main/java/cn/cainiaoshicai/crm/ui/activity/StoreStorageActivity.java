@@ -302,7 +302,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         });
 
-        ctv = findViewById(R.id.title_product_name);
         this.btnApplyPriceList = titleBar.findViewById(R.id.btn_apply_price_list);
         this.btnApplyPriceList.setOnClickListener(view -> {
             //TODO redirect
@@ -626,11 +625,10 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             GlobalCtx.app().storageItemAdapterRef.set(new WeakReference<>(listAdapter));
         }
 
-
         if (ctv != null) {
             ArrayAdapter<StorageItem> ctvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-            //ctvAdapter.addAll(getShelfItems());
             ctvAdapter.addAll(storageItems);
+            ctvAdapter.addAll(getShelfItems());
             ctv.setAdapter(ctvAdapter);
         }
     }
@@ -651,9 +649,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     private ArrayList<StorageItem> getShelfItems() {
         String[] shelfList = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Z"};
         ArrayList<StorageItem> items = new ArrayList<>();
-        int idx = 999999;
         for (String prefix : shelfList) {
-            items.add(new StorageItem(++idx, "@@" + prefix));
+            items.add(new StorageItem(0, "@@" + prefix));
         }
         return items;
     }

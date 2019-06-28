@@ -63,8 +63,8 @@ public class StorageItem {
     public StorageItem() {
     }
 
-    public StorageItem(int id, String name) {
-        this.id = id;
+    public StorageItem(int product_id, String name) {
+        this.product_id = product_id;
         this.name = name;
     }
 
@@ -126,13 +126,13 @@ public class StorageItem {
             AppLogger.e("name is null, pid=" + this.getProduct_id() + ", store_id=" + this.getStore_id());
         }
 
-        if (name != null && limit){
+        if (name != null && limit) {
             int maxLen = 12;
             if (name.length() > maxLen) {
                 name = name.substring(0, maxLen);
             }
         }
-        return String.format("%s#%s", product_id, name);
+        return product_id == 0 ? name : String.format("%s#%s", product_id, name);
     }
 
     public String nameAndPidStr() {
