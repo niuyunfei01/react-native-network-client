@@ -31,9 +31,11 @@ function mapStateToProps (state) {
 
 const MENU_KEY_REBUILD_TASK = 1
 const MENU_KEY_RESET_LOSS = 2
+const MENU_KEY_ENTRY_FINISH = 3
 const MORE_MENU = [
   {'label': '重新生成打包任务', 'key': MENU_KEY_REBUILD_TASK},
-  {'label': '重新计算损耗', 'key': MENU_KEY_RESET_LOSS}
+  {'label': '重新计算损耗', 'key': MENU_KEY_RESET_LOSS},
+  {'label': '置为入库完成', 'key': MENU_KEY_ENTRY_FINISH}
 ]
 class MaterialList extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -268,6 +270,9 @@ class MaterialList extends React.Component {
       case MENU_KEY_RESET_LOSS:
         this._doResetReceiptLoss(item)
         return
+      case MENU_KEY_ENTRY_FINISH:
+        this._doFinishEntry(item)
+        return
       default:
         break
     }
@@ -279,6 +284,7 @@ class MaterialList extends React.Component {
     const api = `/api_products/material_rebuild_task/${item.id}?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api).then(res => {
       ToastShort('操作成功')
+      self.onRefresh()
     })
   }
   
@@ -286,6 +292,16 @@ class MaterialList extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_reset_loss/${item.id}?access_token=${accessToken}`
+    HttpUtils.post.bind(self.props)(api).then(res => {
+      ToastShort('操作成功')
+      self.onRefresh()
+    })
+  }
+  
+  _doFinishEntry (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api_products/inventory_entry_finish/${item.id}?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api).then(res => {
       ToastShort('操作成功')
       self.onRefresh()
