@@ -1,5 +1,5 @@
 import React from 'react'
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
 import {tool} from "../../common";
@@ -45,13 +45,16 @@ class StockCheck extends BaseComponent {
       storeVendor: store.vendor,
       productName: this.props.navigation.state.params.productName,
       shelfNo: this.props.navigation.state.params.shelfNo,
-      originStock: 0,
-      actualStock: 0,
+      remainNum: 0,
+      orderUse: 0,
+      totalRemain: 0,
+      actualNum: 0,
       remark: '',
       submitting: false,
       productInfo: {},
       checkTypes: [],
-      checkType: {}
+      checkType: {},
+      loading: false
     }
   }
   
@@ -63,14 +66,18 @@ class StockCheck extends BaseComponent {
   fetchData () {
     const self = this
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
+    self.setState({loading: true})
     HttpUtils.get.bind(self.props)(api, {
       productId: this.props.navigation.state.params.productId,
       storeId: self.state.storeId
     }).then(res => {
       self.setState({
         productInfo: res,
-        originStock: res.left_since_last_stat,
-        actualStock: res.left_since_last_stat
+        remainNum: res.left_since_last_stat,
+        orderUse: res.orderUse,
+        totalRemain: res.totalRemain,
+        actualNum: res.totalRemain,
+        loading: false
       })
     })
   }
@@ -90,14 +97,21 @@ class StockCheck extends BaseComponent {
     HttpUtils.post.bind(self.props)(api, {
       storeId: this.state.storeId,
       productId: this.state.productId,
-      theoreticalNum: this.state.originStock,
-      actualNum: this.state.actualStock,
+      remainNum: this.state.remainNum,
+      orderUse: this.state.orderUse,
+      totalRemain: this.state.totalRemain,
+      actualNum: this.state.actualNum,
       differenceType: this.state.checkType.value,
       remark: this.state.remark
     }).then(res => {
-      ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualStock}`)
-      native.updatePidStorage(parseInt(self.state.productId), parseInt(self.state.actualStock), () => {})
+      ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualNum}`)
+      native.updatePidStorage(parseInt(self.state.productId), parseInt(self.state.actualNum), () => {
+      })
       native.nativeBack()
+    }).catch(e => {
+      if (e.obj == 'THEORY_NUM_CHANGED') {
+        self.fetchData()
+      }
     })
   }
   
@@ -141,39 +155,59 @@ class StockCheck extends BaseComponent {
   }
   
   render () {
+    const {
+      remainNum = 0,
+      orderUse = 0,
+      totalRemain = 0,
+      actualNum = 0,
+      loading = false,
+      productInfo = {}
+    } = this.state
     return (
-      <ScrollView>
+      <ScrollView refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
+      }>
         {this.renderInfo()}
         <WhiteSpace/>
         <List renderHeader={this.renderFormHeader()}>
           <InputItem
-            value={String(this.state.originStock)}
-            defaultValue={String(this.state.originStock)}
+            value={String(remainNum)}
+            defaultValue={String(remainNum)}
+            type='number'
+            editable={false}
+            extra={'件'}
+          >剩余库存</InputItem>
+          <InputItem
+            value={String(orderUse)}
+            defaultValue={String(orderUse)}
+            type='number'
+            editable={false}
+            extra={'件'}
+          >订单占用</InputItem>
+          <InputItem
+            value={String(totalRemain)}
+            defaultValue={String(totalRemain)}
             type='number'
             editable={false}
             extra={'件'}
           >理论库存</InputItem>
+        </List>
+        <WhiteSpace/>
+        <List>
           <InputItem
-            value={String(this.state.productInfo.expectUseNum)}
-            defaultValue={String(this.state.productInfo.expectUseNum)}
-            type='number'
-            editable={false}
-            extra={'件'}
-          >订单预计使用</InputItem>
-          <InputItem
-            value={String(this.state.actualStock)}
-            defaultValue={String(this.state.actualStock)}
+            value={String(actualNum)}
+            defaultValue={String(actualNum)}
             type='number'
             placeholder="请输入实际库存"
             onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
             clear
             extra={'件'}
-            onChange={(actualStock) => this.setState({actualStock})}
+            onChange={(actualNum) => this.setState({actualNum})}
           >实际库存</InputItem>
         </List>
         <WhiteSpace/>
-  
-        <If condition={this.state.actualStock != this.state.originStock}>
+    
+        <If condition={actualNum != totalRemain}>
           <List renderHeader={() => '备注'}>
             <ModalSelector
               onChange={(option) => this.setState({checkType: option})}
