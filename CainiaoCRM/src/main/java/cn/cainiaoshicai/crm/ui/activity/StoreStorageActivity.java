@@ -2,6 +2,7 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -52,7 +53,6 @@ import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
-import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
@@ -105,6 +105,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final int FILTER_NO_CODE = 21;
     public static final int FILTER_NO_SHELF = 22;
     public static final int FILTER_SALES_TIME = 23;
+    public static final int FILTER_BY_SHELF = 24;
     public static final int FILTER_ = 8;
 
     public static final String SORT_BY_SOLD = "sold";
@@ -150,6 +151,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 new StatusItem(FILTER_NO_CODE, "无编号"),
                 new StatusItem(FILTER_NO_SHELF, "无货架"),
                 new StatusItem(FILTER_SALES_TIME, "有限时"),
+                new StatusItem(FILTER_BY_SHELF, "按货架"),
         };
 
         public final int status;
@@ -289,7 +291,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             //Store cs = StoreStorageActivity.this.currStore;
             //boolean priceControlled = cs != null && cs.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES;
             final Vendor vendor = GlobalCtx.app().getVendor();
-            final boolean fnProviding = v == null ? false : vendor.isFnProviding();
+            final boolean fnProviding = v != null && vendor.isFnProviding();
             if (fnProviding) {
                 filter = StatusItem.find(FILTER_RISK, false).status;
                 currStatusSpinner.setSelection(StatusItem.findIdx(filter, false));
@@ -357,19 +359,47 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         statusAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_small);
 
         Vendor v = GlobalCtx.app().getVendor();
-        boolean fnProviding = v == null ? false : v.isFnProviding();
+        boolean fnProviding = v != null && v.isFnProviding();
         statusAdapter.addAll(StatusItem.getSs(filterBtnControlled(), fnProviding));
 
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
         currStatusSpinner.setAdapter(statusAdapter);
         currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            private void cancel(DialogInterface dialogInterface, int i) {
+                filter = FILTER_ON_SALE;
+                currStatusSpinner.setSelection(StatusItem.findIdx(filter, filterBtnControlled()));
+            }
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 StatusItem status = statusAdapter.getItem(position);
                 if (status != null) {
-                    filter = status.status;
-                    AppLogger.d("start refresh data:");
-                    refreshData();
+
+                    if (status.status == FILTER_BY_SHELF) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(StoreStorageActivity.this);
+                        CharSequence[] items = new String[getShelfItems().size()];
+                        for(int i = 0; i < items.length; i++) {
+                            items[i] = getShelfItems().get(i).getName();
+                        }
+                        adb.setSingleChoiceItems(items, items.length - 1, (dialogInterface, i) -> {
+                            cancel(null, 0);
+                            searchTerm = items[i].toString();
+                            AppLogger.d("start refresh data:");
+                            refreshData();
+                        }).setNegativeButton("取消", this::cancel);
+                        adb.setCancelable(true).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                cancel(dialogInterface, 0);
+                            }
+                        });
+
+                        AlertUtil.showDlg(adb);
+                    } else {
+                        filter = status.status;
+                        AppLogger.d("start refresh data:");
+                        refreshData();
+                    }
                 }
             }
             @Override
