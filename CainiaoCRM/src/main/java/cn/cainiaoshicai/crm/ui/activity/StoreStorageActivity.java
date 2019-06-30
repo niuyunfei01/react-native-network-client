@@ -365,9 +365,12 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         statusAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_small);
         currStatusSpinner.setAdapter(statusAdapter);
         currStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            private void cancel(DialogInterface dialogInterface, int i) {
+            private void cancel(DialogInterface dlg) {
                 filter = FILTER_ON_SALE;
                 currStatusSpinner.setSelection(StatusItem.findIdx(filter, filterBtnControlled()));
+                if (dlg != null) {
+                    dlg.dismiss();
+                }
             }
 
             @Override
@@ -377,22 +380,17 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
                     if (status.status == FILTER_BY_SHELF) {
                         AlertDialog.Builder adb = new AlertDialog.Builder(StoreStorageActivity.this);
-                        CharSequence[] items = new String[getShelfItems().size()];
+                        ArrayList<StorageItem> shelfItems = getShelfItems();
+                        CharSequence[] items = new String[shelfItems.size()];
                         for(int i = 0; i < items.length; i++) {
-                            items[i] = getShelfItems().get(i).getName();
+                            items[i] = shelfItems.get(i).getName();
                         }
-                        adb.setSingleChoiceItems(items, items.length - 1, (dialogInterface, i) -> {
-                            cancel(null, 0);
+                        adb.setSingleChoiceItems(items, items.length - 1, (dlg, i) -> {
                             searchTerm = items[i].toString();
+                            cancel(dlg);
                             AppLogger.d("start refresh data:");
                             refreshData();
-                        }).setNegativeButton("取消", this::cancel);
-                        adb.setCancelable(true).setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialogInterface) {
-                                cancel(dialogInterface, 0);
-                            }
-                        });
+                        }).setCancelable(true).setOnCancelListener(this::cancel);
 
                         AlertUtil.showDlg(adb);
                     } else {

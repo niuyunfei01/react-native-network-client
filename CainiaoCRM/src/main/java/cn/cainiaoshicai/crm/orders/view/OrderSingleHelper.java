@@ -98,7 +98,7 @@ public class OrderSingleHelper {
             }
         }
 
-        final boolean checked[] = new boolean[workerList.size()];
+        final boolean[] checked = new boolean[workerList.size()];
         int checkedIdx = 0;
         List<String> items = new ArrayList<>();
         for (int i = 0; i < workerList.size(); i++) {
@@ -133,29 +133,26 @@ public class OrderSingleHelper {
         }
 
         adb.setTitle(!is_choosing_ship ? "谁打包的？" : "选择快递小哥")
-                .setPositiveButton(activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ArrayList<Integer> selected = new ArrayList<Integer>();
-                        for(int i = 0 ; i < checked.length; i++) {
-                            if (checked[i]) selected.add(workerList.get(i).getId());
-                        }
+                .setPositiveButton(activity.getString(R.string.ok), (dialog, which) -> {
+                    ArrayList<Integer> selected = new ArrayList<Integer>();
+                    for(int i = 0 ; i < checked.length; i++) {
+                        if (checked[i]) selected.add(workerList.get(i).getId());
+                    }
 
-                        if (selected.isEmpty()) {
-                            AlertUtil.showAlert(OrderSingleHelper.this.activity, "错误提示", "请至少操作人员");
-                            return;
-                        }
+                    if (selected.isEmpty()) {
+                        AlertUtil.showAlert(OrderSingleHelper.this.activity, "错误提示", "请至少操作人员");
+                        return;
+                    }
 
-                        if (action == OrderSingleActivity.ACTION_EDIT_SHIP_WORKER) {
-                            new EditShipWorkerTask(selected).executeOnIO();
-                        } else if (action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) {
-                            new EditPackWorkerTask(selected).executeOnIO();
-                        } else {
-                            OrderSingleActivity.OrderActionOp orderActionOp = new OrderSingleActivity.OrderActionOp(orderId,
-                                    activity, orderListTypeToJump);
-                            orderActionOp.setWorkerId(selected);
-                            orderActionOp.executeOnNormal(fromStatus);
-                        }
+                    if (action == OrderSingleActivity.ACTION_EDIT_SHIP_WORKER) {
+                        new EditShipWorkerTask(selected).executeOnIO();
+                    } else if (action == OrderSingleActivity.ACTION_EDIT_PACK_WORKER) {
+                        new EditPackWorkerTask(selected).executeOnIO();
+                    } else {
+                        OrderSingleActivity.OrderActionOp orderActionOp = new OrderSingleActivity.OrderActionOp(orderId,
+                                activity, orderListTypeToJump);
+                        orderActionOp.setWorkerId(selected);
+                        orderActionOp.executeOnNormal(fromStatus);
                     }
                 });
         adb.setNegativeButton(activity.getString(R.string.cancel), null);

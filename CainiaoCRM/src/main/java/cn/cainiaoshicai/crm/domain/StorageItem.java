@@ -51,6 +51,7 @@ public class StorageItem {
 
     private String skuUnit;
     private int weight;
+    private String expect_check_time;
 
     public int getProduct_id() {
         return product_id;
@@ -345,5 +346,13 @@ public class StorageItem {
 
     public void setShelfNo(String shelfNo) {
         this.shelfNo = shelfNo;
+    }
+
+    public String getExpect_check_time() {
+        return expect_check_time;
+    }
+
+    public void setExpect_check_time(String expect_check_time) {
+        this.expect_check_time = expect_check_time;
     }
 }

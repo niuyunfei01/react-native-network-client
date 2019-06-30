@@ -20,7 +20,7 @@
             android:src="@drawable/placeholder" />
 
         <TextView
-            android:id="@+id/sold_5day"
+            android:id="@+id/expect_check_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/good_icon"
@@ -28,6 +28,19 @@
             android:layout_marginTop="@dimen/list_good_sold_margin_top"
             android:layout_marginEnd="2dp"
             android:layout_toEndOf="@id/good_icon"
+            android:visibility="gone"
+            android:gravity="start"
+            android:textSize="@dimen/tiny_text" />
+
+        <TextView
+            android:id="@+id/sold_5day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/good_icon"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="@dimen/list_good_sold_margin_top"
+            android:layout_marginEnd="2dp"
+            android:layout_toEndOf="@id/expect_check_time"
             android:gravity="start"
             android:textSize="@dimen/tiny_text" />
 

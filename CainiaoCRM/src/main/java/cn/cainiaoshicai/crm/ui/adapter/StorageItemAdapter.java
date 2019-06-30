@@ -68,6 +68,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
             holder.label = row.findViewById(R.id.product_name);
             holder.leftNumber = row.findViewById(R.id.total_last_stat);
+            holder.expect_check_time = row.findViewById(R.id.expect_check_time);
             holder.sold_5day = row.findViewById(R.id.sold_5day);
             holder.sold_weekend = row.findViewById(R.id.sold_weekend);
             holder.sold_latest = row.findViewById(R.id.sold_latest);
@@ -244,6 +245,27 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.sold_latest_fen.setVisibility(View.GONE);
         }
 
+        if (!TextUtils.isEmpty(item.getExpect_check_time())) {
+            holder.sold_5day.setVisibility(View.GONE);
+            holder.sold_5day_fen.setVisibility(View.GONE);
+            holder.sold_latest.setVisibility(View.GONE);
+            holder.sold_latest_fen.setVisibility(View.GONE);
+            holder.sold_weekend.setVisibility(View.GONE);
+            holder.sold_weekend_fen.setVisibility(View.GONE);
+
+            holder.expect_check_time.setText(item.getExpect_check_time()+"前盘点");
+            holder.expect_check_time.setVisibility(View.VISIBLE);
+        } else {
+            holder.sold_5day.setVisibility(View.VISIBLE);
+            holder.sold_5day_fen.setVisibility(View.VISIBLE);
+            holder.sold_latest.setVisibility(View.VISIBLE);
+            holder.sold_latest_fen.setVisibility(View.VISIBLE);
+            holder.sold_weekend.setVisibility(View.VISIBLE);
+            holder.sold_weekend_fen.setVisibility(View.VISIBLE);
+
+            holder.expect_check_time.setVisibility(View.GONE);
+        }
+
         holder.goodIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -345,6 +367,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private class ViewHolder {
         TextView label;
         TextView leftNumber;
+        TextView expect_check_time;
         TextView sold_5day;
         TextView sold_5day_fen;
         TextView sold_weekend;
