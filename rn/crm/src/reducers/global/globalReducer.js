@@ -35,7 +35,8 @@ const initialState = {
   host: '',
   cfgOfKey: {},
   last_get_cfg_ts: 0,
-  currentNewProductStoreId: 0
+  currentNewProductStoreId: 0,
+  listeners: []
 };
 
 /**
