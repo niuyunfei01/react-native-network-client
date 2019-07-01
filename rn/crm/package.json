@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@ercpereda/react-native-accordion": "^2.0.6",
-    "@react-native-community/async-storage": "^1.4.0",
     "@unpourtous/react-native-search-list": "^2.1.0",
     "antd-mobile-rn": "^2.3.3",
     "babel-plugin-jsx-control-statements": "^3.2.8",
