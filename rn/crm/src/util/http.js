@@ -109,7 +109,9 @@ class HttpUtils {
     } else if (response.error_code === 30001) {
       ToastShort('客户端版本过低')
     } else {
-      ToastShort(response.reason.toString())
+      let text = response.reason.toString()
+      native.speakText(text)
+      ToastShort(text)
     }
   }
   
