@@ -183,7 +183,7 @@ class StockCheck extends BaseComponent {
             type='number'
             editable={false}
             extra={'件'}
-          >订单占用</InputItem>
+          >待打包</InputItem>
           <InputItem
             value={String(totalRemain)}
             defaultValue={String(totalRemain)}
