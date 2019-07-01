@@ -83,6 +83,8 @@ class MaterialTask extends React.Component {
     }).then(res => {
       ToastShort('提交成功')
       self.fetchData()
+    }).catch(e => {
+      native.speakText(e.reason)
     })
   }
   

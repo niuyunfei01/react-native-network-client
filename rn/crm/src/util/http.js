@@ -110,7 +110,7 @@ class HttpUtils {
       ToastShort('客户端版本过低')
     } else {
       let text = response.reason.toString()
-      native.speakText(text)
+      // native.speakText(text)
       ToastShort(text)
     }
   }
