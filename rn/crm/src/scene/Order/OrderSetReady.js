@@ -23,7 +23,7 @@ class OrderSetReady extends BaseComponent {
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
-          onPress={() => native.toOrders()}
+          onPress={() => native.nativeBack()}
         />
       )
     }
