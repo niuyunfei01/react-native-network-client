@@ -371,7 +371,6 @@ class ProductInfo extends React.Component {
             >秤签编号</List.Item>
             <List.Item
               extra={<Switch
-                disabled={!productInfo.sku.material_code}
                 checked={this.state.productInfo.sku.need_pack == 1}
                 onChange={(checked) => this.onChangeNeedPack(checked)}
               />}

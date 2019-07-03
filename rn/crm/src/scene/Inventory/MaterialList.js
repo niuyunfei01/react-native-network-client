@@ -1,5 +1,15 @@
 import React from "react";
-import {Alert, DeviceEventEmitter, Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  DeviceEventEmitter,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {NavigationItem} from "../../widget";
 import {Toast} from 'antd-mobile-rn';
 import SearchInputBar from "../component/SearchInput";
@@ -23,6 +33,7 @@ import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 import _ from 'lodash'
 import ReceiptOpLog from "./_MaterialList/ReceiptOpLog";
 import ModalSelector from "react-native-modal-selector";
+import JbbButton from "../component/JbbButton";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -73,6 +84,7 @@ class MaterialList extends React.Component {
       filterDate: '',
       filterName: '',
       filterLossPercent: '',
+      filterSupplyPriceHigh: false,
       materials: [],
       datePickerVisible: false,
       workerPopup: false,
@@ -116,7 +128,8 @@ class MaterialList extends React.Component {
       status: this.state.filterStatus,
       date: this.state.filterDate,
       name: this.state.filterName,
-      lossPercent: this.state.filterLossPercent / 100
+      lossPercent: this.state.filterLossPercent / 100,
+      supplyPriceHigh: this.state.filterSupplyPriceHigh
     }).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage
@@ -362,40 +375,64 @@ class MaterialList extends React.Component {
   }
   
   renderDrawerContent () {
-    const {filterStatus} = this.state
+    const {filterStatus, filterSupplyPriceHigh} = this.state
     return (
       <View style={{flex: 1, backgroundColor: '#fff'}}>
-        <View style={styles.drawerItem}>
-          <Text style={styles.drawerItemLabel}>状态</Text>
-          {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
-            {this.renderStatusFilterBtn('待分配', 0, filterStatus === 0)}
-            {this.renderStatusFilterBtn('进行中', 1, filterStatus === 1)}
-            {this.renderStatusFilterBtn('已完成', 2, filterStatus === 2)}
-          </View>
-        </View>
-        <View style={styles.drawerItem}>
-          <Text style={styles.drawerItemLabel}>日期</Text>
-          <TouchableOpacity onPress={() => this._showDateTimePicker()}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'}</Text>
-              <Image source={require('../../img/calendar.png')} style={{width: 15, height: 15}} resizeMode={'contain'}/>
+        <ScrollView>
+          <View style={styles.drawerItem}>
+            <Text style={styles.drawerItemLabel}>状态</Text>
+            {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
+              {this.renderStatusFilterBtn('待分配', 0, filterStatus === 0)}
+              {this.renderStatusFilterBtn('进行中', 1, filterStatus === 1)}
+              {this.renderStatusFilterBtn('已完成', 2, filterStatus === 2)}
             </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.drawerItem}>
-          <Text style={styles.drawerItemLabel}>损耗</Text>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Text>高于百分比(%)</Text>
-            <JbbInput
-              styles={styles.filterInput}
-              onChange={(value) => this.setState({filterLossPercent: value})}
-              value={this.state.filterLossPercent}
-              keyboardType={'numeric'}
-              onBlur={() => this.onRefresh()}
-            />
           </View>
-        </View>
+          <View style={styles.drawerItem}>
+            <Text style={styles.drawerItemLabel}>日期</Text>
+            <TouchableOpacity onPress={() => this._showDateTimePicker()}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'}</Text>
+                <Image source={require('../../img/calendar.png')} style={{width: 15, height: 15}}
+                       resizeMode={'contain'}/>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.drawerItem}>
+            <Text style={styles.drawerItemLabel}>损耗</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+              <Text>高于百分比(%)</Text>
+              <JbbInput
+                styles={styles.filterInput}
+                onChange={(value) => this.setState({filterLossPercent: value})}
+                value={this.state.filterLossPercent}
+                keyboardType={'numeric'}
+                onBlur={() => this.onRefresh()}
+              />
+            </View>
+          </View>
+          <View style={styles.drawerItem}>
+            <TouchableOpacity onPress={() => this.setState({filterSupplyPriceHigh: !filterSupplyPriceHigh})}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Image
+                  style={{width: 20, height: 20}}
+                  source={filterSupplyPriceHigh ? require('../../img/checked.png') : require('../../img/checked_disable.png')}
+                />
+                <Text>成本高于保底价</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+        <JbbButton
+          text={'筛选'}
+          onPress={() => {
+            this.onRefresh();
+            this.closeControlPanel()
+          }}
+          backgroundColor={color.theme}
+          fontColor={'#fff'}
+          fontWeight={'bold'}
+        />
       </View>
     )
   }
