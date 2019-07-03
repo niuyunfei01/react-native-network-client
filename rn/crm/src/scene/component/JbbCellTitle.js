@@ -1,8 +1,12 @@
 import React from "react";
 import {StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
+import PropTypes from 'prop-types'
 
 export default class JbbCellTitle extends React.Component {
+  static propTypes = {
+    right: PropTypes.any
+  }
   render () {
     return (
       <View style={styles.cellTitle}>
