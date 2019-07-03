@@ -1,6 +1,6 @@
 package cn.cainiaoshicai.crm.domain;
 
-import java.util.List;
+import java.util.Map;
 
 import cn.cainiaoshicai.crm.Cts;
 
@@ -15,6 +15,8 @@ public class ShipAcceptStatus {
     private String desc;
     private String[] printers;
     private String checkedPrinter;
+    private Map<String, String> users;
+
 
     public int getStatus() {
         return status;
@@ -73,5 +75,13 @@ public class ShipAcceptStatus {
             }
         }
         return 0;
+    }
+
+    public Map<String, String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Map<String, String> users) {
+        this.users = users;
     }
 }

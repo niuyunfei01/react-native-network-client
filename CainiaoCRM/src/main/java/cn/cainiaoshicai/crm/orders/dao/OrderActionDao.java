@@ -256,4 +256,9 @@ public class OrderActionDao<T extends Order> {
         return wrapUpdateOrder(actionWithResult("/order_edit_group/" + orderId + "/" + shipSch, params), orderId);
     }
 
+    public ResultBean order_re_assign(String orderId, String userId, String storeId) throws ServiceException {
+        String path = String.format("/order_re_assign/%s/%s/%s", orderId, userId, storeId);
+        return actionWithResult(path);
+    }
+
 }
