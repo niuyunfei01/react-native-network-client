@@ -435,7 +435,7 @@ class ProductInfo extends React.Component {
               onClick={() => this.setState({refProdPrompt: true})}
               extra={productInfo.sku.fresh_degree_label}
               arrow="horizontal"
-            >保鲜程度</List.Item>
+            >温区</List.Item>
           </ModalSelector>
   
           <JbbTimeRange
