@@ -792,7 +792,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => {
               if (is_mgr || is_helper) {
-                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+                let path = `/stores/worker_stats_v2.html${token}&&_v_id=${currVendorId}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
               } else {
@@ -831,7 +831,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_box]}
             onPress={() => {
               if (is_service_mgr) {
-                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+                let path = `/stores/worker_stats_v2.html${token}&&_v_id=${currVendorId}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
               } else {

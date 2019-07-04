@@ -197,15 +197,13 @@ class MaterialTask extends React.Component {
         <ScrollView style={{flex: 1}}>
           {this.renderPackingTask()}
           
-          <If condition={this.state.packingTask.length < 2}>
-            <View style={styles.getTaskBtnWrap}>
-              <TouchableOpacity onPress={() => this.getTask()}>
-                <View>
-                  <Text style={styles.getTaskBtn}>领取任务</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </If>
+          <View style={styles.getTaskBtnWrap}>
+            <TouchableOpacity onPress={() => this.getTask()}>
+              <View>
+                <Text style={styles.getTaskBtn}>领取任务</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
           
           {this.renderPendingTask()}
         </ScrollView>
@@ -214,7 +212,7 @@ class MaterialTask extends React.Component {
             <Text>我完成的任务</Text>
           </View>
         </TouchableOpacity>
-  
+        
         <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}
