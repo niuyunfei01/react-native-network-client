@@ -269,7 +269,11 @@ class ProductInfo extends React.Component {
   }
   
   onChgSkuFreshDegree (value) {
-    this._baseRequest('/api_products/chg_sku_fresh_degree', {skuId: this.state.productInfo.sku.id, value})
+    this._baseRequest('/api_products/chg_sku_fresh_degree', {
+      skuId: this.state.productInfo.sku.id,
+      value,
+      product_id: this.state.productInfo.product_id
+    })
   }
   
   onSaveProductSaleTime (value) {
