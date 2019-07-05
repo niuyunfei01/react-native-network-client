@@ -616,7 +616,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         if (this.currStore == null) {
             storeId = SettingUtility.getListenerStore();
-            Collection<Store> listStores = GlobalCtx.app().listStores();
+            Collection<Store> listStores = GlobalCtx.app().listStores(true);
             if (listStores == null || listStores.isEmpty()) {
                 Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
             } else {
