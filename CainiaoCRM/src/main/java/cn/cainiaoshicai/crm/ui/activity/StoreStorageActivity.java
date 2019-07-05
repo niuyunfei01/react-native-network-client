@@ -64,6 +64,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
+import static cn.cainiaoshicai.crm.Cts.STORE_UNKNOWN;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_OFF_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_ON_SALE;
 import static cn.cainiaoshicai.crm.domain.StorageItem.STORE_PROD_SOLD_OUT;
@@ -228,7 +229,13 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         this.setContentView(R.layout.storage_status);
 
         this.filter = this.getIntent().getIntExtra("filter", filter);
-        final int storeId = this.getIntent().getIntExtra("store_id", -1);
+        int storeId = this.getIntent().getIntExtra("store_id", 0);
+        if (storeId == 0) {
+            storeId = (int) SettingUtility.getListenerStore();
+        }
+        if (storeId == 0) {
+            storeId = STORE_UNKNOWN;
+        }
         this.searchTerm = this.getIntent().getStringExtra("search");
         initCurrStore(storeId);
 
