@@ -142,7 +142,8 @@ class GoodsApplyPrice extends Component {
       .then(resp => resp.json())
       .then(resp => {
         if (resp.ok) {
-          native.updatePidApplyPrice(product_id, supply_price)
+          native.updatePidApplyPrice(product_id, supply_price * 100, () => {
+          })
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
           if (this.props.navigation.state.params.onBack) {
             this.props.navigation.state.params.onBack()

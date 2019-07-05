@@ -154,10 +154,11 @@ export default {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
-
-  updatePidApplyPrice: async function(pid, applyPrice)  {
+  
+  updatePidApplyPrice: async function (pid, applyPrice, cb = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice))
+      NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
   },
 
   updatePidStorage: async function(pid, storage, clb = function(){}) {
