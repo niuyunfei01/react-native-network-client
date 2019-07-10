@@ -84,6 +84,7 @@ class OrderSearchScene extends PureComponent {
 
   onSearch = (search) => {
     console.log('search -> ', search);
+    search = this.state.selectPrefix.value + search
     native.ordersSearch(search)
   };
 
