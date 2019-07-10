@@ -1,6 +1,15 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackHandler} from 'react-native';
+import {
+  BackHandler,
+  Image,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
@@ -10,6 +19,8 @@ import Toast from "../../weui/Toast/Toast";
 import SearchBar from "../../weui/SearchBar/SearchBar";
 import {native} from '../../common';
 import Config from "../../config";
+import ModalSelector from "react-native-modal-selector";
+import HttpUtils from "../../util/http";
 
 
 function mapStateToProps(state) {
@@ -34,6 +45,8 @@ class OrderSearchScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       isSearching: false,
+      prefix: [],
+      selectPrefix: {}
     };
   }
 
@@ -41,11 +54,21 @@ class OrderSearchScene extends PureComponent {
   }
 
   componentWillMount() {
+    this.fetchOrderSearchPrefix()
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
 
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+  
+  fetchOrderSearchPrefix () {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api/order_search_prefix?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then(res => {
+      self.setState({prefix: res, selectPrefix: res[0]})
+    })
   }
 
   onBackAndroid = () => {
@@ -83,7 +106,27 @@ class OrderSearchScene extends PureComponent {
       _this.props.navigation.navigate(route, params);
     });
   }
-
+  
+  renderSearchBarPrefix () {
+    return (
+      <ModalSelector
+        data={this.state.prefix}
+        onChange={(item) => this.setState({selectPrefix: item})}
+        cancelText={'取消'}
+      >
+        <View style={styles.searchBarPrefix}>
+          <Text style={{fontSize: 12, fontWeight: 'bold'}}>
+            {this.state.selectPrefix.label}
+          </Text>
+          <Image
+            source={require('../../img/triangle_down.png')}
+            style={{width: 15, height: 15, marginTop: 2}}
+          />
+        </View>
+      </ModalSelector>
+    )
+  }
+  
   render() {
     return (
       <ScrollView
@@ -100,6 +143,7 @@ class OrderSearchScene extends PureComponent {
           placeholder="序号/编号/收货手机姓名/地址/备注/发票/商品"
           onBlurSearch={this.onSearch.bind(this)}
           lang={{cancel: '搜索'}}
+          prefix={this.renderSearchBarPrefix()}
         />
         <View style={styles.label_box}>
           <Text style={styles.alert_msg}>
@@ -160,6 +204,13 @@ const styles = StyleSheet.create({
     paddingVertical: pxToDp(8),
     paddingHorizontal: pxToDp(20),
   },
+  searchBarPrefix: {
+    flexDirection: 'row',
+    width: pxToDp(140),
+    flex: 1,
+    position: 'relative',
+    alignItems: 'center'
+  }
 });
 
 

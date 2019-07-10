@@ -1,13 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, Text, TextInput, View, ViewPropTypes} from 'react-native'
 import {Icon} from '../Icon'
 
 const styles = StyleSheet.create({
@@ -150,6 +143,7 @@ class SearchBar extends Component {
       <View style={[styles.searchBar, style]}>
         <View style={styles.searchOuter}>
           <View style={styles.searchInner}>
+            {this.props.prefix}
             <Icon name="search"/>
             <TextInput
               ref="searchInput"
@@ -170,12 +164,12 @@ class SearchBar extends Component {
               </Text>
             ) : null}
           </View>
-          {(focus || text) ? null :
-            <TouchableOpacity style={styles.searchCover} onPress={this.focus}>
-              <Icon name="search"/>
-              <Text style={styles.searchCoverText}>{placeholder}</Text>
-            </TouchableOpacity>
-          }
+          {/*{(focus || text) ? null :*/}
+          {/*    <TouchableOpacity style={styles.searchCover} onPress={this.focus}>*/}
+          {/*      <Icon name="search"/>*/}
+          {/*      <Text style={styles.searchCoverText}>{placeholder}</Text>*/}
+          {/*    </TouchableOpacity>*/}
+          {/*}*/}
         </View>
         {!focus ? null :
           <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel}</Text>}
@@ -192,6 +186,7 @@ SearchBar.propTypes = {
   lang: PropTypes.object,
   style: ViewPropTypes.style,
   placeholder: PropTypes.string,
+  prefix: PropTypes.any
 }
 
 export default SearchBar
