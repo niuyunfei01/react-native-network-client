@@ -141,7 +141,7 @@ class UserScene extends PureComponent {
 	}
 	
 	componentWillMount() {
-		this.getExceptSupplement()
+//		this.getExceptSupplement()
 	}
 	
 	onGetUserCount() {
@@ -166,19 +166,19 @@ class UserScene extends PureComponent {
 		});
 	}
 	
-	getExceptSupplement() {
-		const self = this
-		const {accessToken} = this.props.global;
-		const {dispatch} = this.props;
-		InteractionManager.runAfterInteractions(() => {
-			dispatch(getUserWageData(accessToken, 0, (ok, obj) => {
-				self.setState({onGetWage: false})
-				if (ok) {
-					self.setState({exceptSupplement: obj.expect_total_supplement})
-				}
-			}))
-		})
-	}
+	// getExceptSupplement() {
+	// 	const self = this
+	// 	const {accessToken} = this.props.global;
+	// 	const {dispatch} = this.props;
+	// 	InteractionManager.runAfterInteractions(() => {
+	// 		dispatch(getUserWageData(accessToken, 0, (ok, obj) => {
+	// 			self.setState({onGetWage: false})
+	// 			if (ok) {
+	// 				self.setState({exceptSupplement: obj.expect_total_supplement})
+	// 			}
+	// 		}))
+	// 	})
+	// }
 	
 	onHeaderRefresh() {
 		this.setState({isRefreshing: true});
