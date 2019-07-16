@@ -115,7 +115,7 @@ class UserScene extends PureComponent {
 			sign_count: mine.sign_count[currentUser] === undefined ? 0 : mine.sign_count[currentUser],
 			bad_cases_of: mine.bad_cases_of[currentUser] === undefined ? 0 : mine.bad_cases_of[currentUser],
 			exceptSupplement: 0,
-			onGetWage: true,
+			onGetWage: false,
 			mobile: mobilephone,
 			cover_image: image,
 			screen_name: name,
