@@ -301,9 +301,9 @@ public class StorageItem {
     }
 
     public String leftNumberStr() {
-        String txt = "库存: " + this.getLeft_since_last_stat();
+        String txt = "库:" + this.getLeft_since_last_stat();
         if (this.getOccupy() > 0) {
-            txt = txt + " 占: " + this.getOccupy();
+            txt = txt + "\n占:" + this.getOccupy();
         }
         return txt;
     }
