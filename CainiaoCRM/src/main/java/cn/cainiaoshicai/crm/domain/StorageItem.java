@@ -34,6 +34,7 @@ public class StorageItem {
     private int sold_5day = 0;
     private int sold_weekend = 0;
     private int sold_latest = 0;
+    private int occupy = 0;
     private int store_id;
 
     private int totalInReq;
@@ -173,15 +174,15 @@ public class StorageItem {
         this.risk_min_stat = risk_min_stat;
     }
 
-    public  String getStatusText(boolean enableReq) {
+    public String getStatusText(boolean enableReq) {
         if (this.status == STORE_PROD_ON_SALE) {
-            return (this.getLeft_since_last_stat() >= this.risk_min_stat || !enableReq)? "正常" : "告急";
+            return (this.getLeft_since_last_stat() >= this.risk_min_stat || !enableReq) ? "正常" : "告急";
         }
-        return this.status == STORE_PROD_OFF_SALE? "下架" : (this.status == STORE_PROD_SOLD_OUT? "缺货" : "不明");
+        return this.status == STORE_PROD_OFF_SALE ? "下架" : (this.status == STORE_PROD_SOLD_OUT ? "缺货" : "不明");
     }
 
     public String getProvideTypeText() {
-        return (self_provided>0 ? "自采" : "直供");
+        return (self_provided > 0 ? "自采" : "直供");
     }
 
     @Override
@@ -259,24 +260,27 @@ public class StorageItem {
     }
 
     public String getPricePrecision() {
-        return String.format("￥%.2f", (double)this.price/100);
+        return String.format("￥%.2f", (double) this.price / 100);
     }
+
     public String getPricePrecisionNoSymbol() {
-        return String.format("%.2f", (double)this.price/100);
+        return String.format("%.2f", (double) this.price / 100);
     }
 
-    public String getSupplyPricePrecision(){
-        return String.format("￥%.2f", (double)this.supplyPrice/100);
+    public String getSupplyPricePrecision() {
+        return String.format("￥%.2f", (double) this.supplyPrice / 100);
     }
+
     public String getSupplyPricePrecisionNoSymbol() {
-        return String.format("%.2f", (double)this.supplyPrice/100);
+        return String.format("%.2f", (double) this.supplyPrice / 100);
     }
 
-    public String getApplyingPricePrecision(){
-        return String.format("￥%.2f", (double)this.applyingPrice/100);
+    public String getApplyingPricePrecision() {
+        return String.format("￥%.2f", (double) this.applyingPrice / 100);
     }
+
     public String getApplyingPricePrecisionNoSymbol() {
-        return String.format("%.2f", (double)this.applyingPrice/100);
+        return String.format("%.2f", (double) this.applyingPrice / 100);
     }
 
 
@@ -297,7 +301,11 @@ public class StorageItem {
     }
 
     public String leftNumberStr() {
-        return "库存 " + this.getLeft_since_last_stat();
+        String txt = "库存: " + this.getLeft_since_last_stat();
+        if (this.getOccupy() > 0) {
+            txt = txt + " 占: " + this.getOccupy();
+        }
+        return txt;
     }
 
     public int getSupplyPrice() {
@@ -354,5 +362,13 @@ public class StorageItem {
 
     public void setExpect_check_time(String expect_check_time) {
         this.expect_check_time = expect_check_time;
+    }
+
+    public int getOccupy() {
+        return occupy;
+    }
+
+    public void setOccupy(int occupy) {
+        this.occupy = occupy;
     }
 }

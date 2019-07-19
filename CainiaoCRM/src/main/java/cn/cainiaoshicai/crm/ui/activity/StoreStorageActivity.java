@@ -686,7 +686,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     }
 
     private ArrayList<StorageItem> getShelfItems() {
-        String[] shelfList = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Z"};
+        String[] shelfList = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "I", "S", "T", "U", "V", "W", "X", "Y", "Z"};
         ArrayList<StorageItem> items = new ArrayList<>();
         for (String prefix : shelfList) {
             items.add(new StorageItem(0, "@@" + prefix));
