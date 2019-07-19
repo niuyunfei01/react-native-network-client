@@ -112,6 +112,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
     public static final String SORT_BY_SOLD = "sold";
     public static final String SORT_BY_DEF = "defined";
     public static final String SORT_BY_UPDATE = "update";
+    public static final String SORT_BY_STORAGE = "storage";
 
     private int total_in_req;
     private StoreStatusStat stats;
@@ -475,7 +476,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         final Spinner sortBy = findViewById(R.id.prods_sort_spinner);
 
-        final List<String> sortList = new ArrayList<>(Arrays.asList("按:默认", "按:销量", "按:更新"));
+        final List<String> sortList = new ArrayList<>(Arrays.asList("按:默认", "按:销量", "按:更新", "按:库存"));
         final ArrayAdapter<String> sortArrayAdapter = new ArrayAdapter<String>(
                 this, R.layout.spinner_item_small, sortList);
         sortBy.setAdapter(sortArrayAdapter);
@@ -507,6 +508,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         }
         if (label.equals("按:更新")) {
             return SORT_BY_UPDATE;
+        }
+        if (label.equals("按:库存")) {
+            return SORT_BY_STORAGE;
         }
         return SORT_BY_DEF;
     }
