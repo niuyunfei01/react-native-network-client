@@ -60,7 +60,7 @@
         android:id="@+id/label_add_app_to_white_list"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_below="@+id/toggleUsePreview"
+        android:layout_below="@+id/label_use_preview"
         android:layout_marginStart="10dp"
         android:text="设置应用后台运行" />
 
@@ -73,11 +73,28 @@
         android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/label_add_app_to_white_list" />
 
+    <TextView
+        android:id="@+id/label_open_ziti"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_add_app_to_white_list"
+        android:layout_marginStart="10dp"
+        android:text="自提模式" />
+
+    <Switch
+        android:id="@+id/toggleSetZitiMode"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/toggleSetAppWhiteList"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_open_ziti" />
+
     <RelativeLayout
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:id="@+id/settings_order_filter"
-        android:layout_below="@+id/toggleUsePreview"
+        android:layout_below="@+id/toggleSetZitiMode"
         android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">

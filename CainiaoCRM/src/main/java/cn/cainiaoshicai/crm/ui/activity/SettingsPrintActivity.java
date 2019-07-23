@@ -109,6 +109,15 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
             }
         });
 
+        final Switch toggleSetZiti = findViewById(R.id.toggleSetZitiMode);
+        toggleSetZiti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SettingUtility.setZitiMode(isChecked);
+            }
+        });
+        toggleSetZiti.setChecked(SettingHelper.useZitiMode());
+        
         GlobalCtx app = GlobalCtx.app();
         boolean isDirect = app.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(app.getVendor().getVersion());
 
@@ -192,7 +201,6 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
                 }
             }
         });
-
 
         btn_scan = findViewById(R.id.btn_scan);
         btn_scan.setOnClickListener(this);

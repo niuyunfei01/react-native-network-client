@@ -517,6 +517,10 @@ public class SettingUtility {
         SettingHelper.setEditor(getContext(), "disable_new_order_sound_notify", isChecked);
     }
 
+    public static void setZitiMode(boolean isChecked) {
+        SettingHelper.setEditor(getContext(), "store_is_ziti_mode", isChecked);
+    }
+
 
     public static void setListenerStores(long selectedStoreId) {
         Set<Long> currSelectedStores = new HashSet<>();
