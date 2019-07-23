@@ -24,6 +24,7 @@ import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
@@ -114,8 +115,9 @@ public class OrderListFragment extends Fragment {
         AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter + ", listTYpe:" + listType);
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
+            boolean zitiMode = SettingHelper.useZitiMode();
             RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,
-                   0,  swipeRefreshLayout, new QueryDoneCallback(this), true);
+                   0,  swipeRefreshLayout, new QueryDoneCallback(this), true, zitiMode);
             task.executeOnNormal();
         }
     }

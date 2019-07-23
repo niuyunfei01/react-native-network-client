@@ -117,7 +117,7 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
             }
         });
         toggleSetZiti.setChecked(SettingHelper.useZitiMode());
-        
+
         GlobalCtx app = GlobalCtx.app();
         boolean isDirect = app.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(app.getVendor().getVersion());
 
