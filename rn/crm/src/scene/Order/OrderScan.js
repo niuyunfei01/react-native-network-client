@@ -38,7 +38,8 @@ class OrderScan extends BaseComponent {
     super(props);
     this.state = {
       currentOrder: {},
-      isLoading: false
+      isLoading: false,
+      scanEnough: false,
     }
   }
   
@@ -94,7 +95,7 @@ class OrderScan extends BaseComponent {
     this.setState({isLoading: true})
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
-      self.setState({currentOrder: res, isLoading: false})
+      self.setState({currentOrder: res, isLoading: false}, () => self.checkScanNum())
     })
   }
   
@@ -121,10 +122,10 @@ class OrderScan extends BaseComponent {
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
           // 如果拣货数量够，就置底
-          if (Number(item.scan_num) >= Number(item.num)) {
-            items.splice(i, 1)
-            items.push(item)
-          }
+          // if (Number(item.scan_num) >= Number(item.num)) {
+          //   items.splice(i, 1)
+          //   items.push(item)
+          // }
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
           console.log('handle scan product current order : ', currentOrder)
@@ -187,18 +188,7 @@ class OrderScan extends BaseComponent {
     HttpUtils.post.bind(self.props)(api, {
       order_id, item_id, num, code, type, weight, bar_code
     }).then(res => {
-    
-    })
-  }
-  
-  updateScanProdLogNum (order_id, item_id, num) {
-    const self = this
-    const accessToken = self.props.global.accessToken
-    const api = `/api_products/update_inventory_exit_log?access_token=${accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      order_id, item_id, num
-    }).then(res => {
-    
+      self.checkScanNum()
     })
   }
   
@@ -231,27 +221,36 @@ class OrderScan extends BaseComponent {
     currentOrder.items[prodIdx].scan_num = number
     const item = currentOrder.items[prodIdx]
     // 如果拣货数量够，就置底
-    if (Number(currentOrder.items[prodIdx].scan_num) >= Number(currentOrder.items[prodIdx].num)) {
-      currentOrder.items.splice(prodIdx, 1)
-      currentOrder.items.push(item)
-    }
+    // if (Number(currentOrder.items[prodIdx].scan_num) >= Number(currentOrder.items[prodIdx].num)) {
+    //   currentOrder.items.splice(prodIdx, 1)
+    //   currentOrder.items.push(item)
+    // }
     currentOrder.scan_count = currentOrder.scan_count - oldNumber + Number(number)
     this.setState({currentOrder})
-    
-    this.updateScanProdLogNum(currentOrder.id, item.id, number)
+  
+    this.addScanProdLog(currentOrder.id, item.id, number)
+  }
+  
+  checkScanNum () {
+    let {currentOrder} = this.state
+    if (currentOrder.items_need_scan_num <= currentOrder.scan_count) {
+      this.setState({scanEnough: true})
+    } else {
+      this.setState({scanEnough: false})
+    }
   }
   
   renderBtn () {
+    const {scanEnough, currentOrder} = this.state
     return (
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.footerItem} onPress={() => console.log(1)}>
-          <View style={[styles.footerBtn, styles.successBtn]}>
-            <Text style={styles.footerBtnText}>联系用户</Text>
-          </View>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
-          <View style={[styles.footerBtn, styles.errorBtn]}>
-            <Text style={styles.footerBtnText}>强制打包完成</Text>
+          <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
+            <Text style={styles.footerBtnText}>
+              应扫{currentOrder.items_need_scan_num}件 |
+              已扫{currentOrder.scan_count}件 =>
+              {scanEnough ? '' : '强制'}打包完成
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -285,7 +284,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   footerItem: {
-    width: '50%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center'
   },

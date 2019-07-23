@@ -90,7 +90,8 @@ class WebScene extends PureComponent {
       this.webview.goBack();
       return true;
     } else {
-      native.nativeBack()
+      // native.nativeBack()
+      this.props.navigation.goBack()
     }
   };
   

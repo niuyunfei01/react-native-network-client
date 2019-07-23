@@ -71,7 +71,6 @@ class OrderList extends BaseComponent {
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={[styles.product_name]}>{prod.name}</Text>
               <JbbPrompt
-                beforeVisible={() => this.beforeProdNumVisible(prod)}
                 onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}
                 initValue={prod.scan_num ? prod.scan_num : 0}
                 keyboardType={'numeric'}
@@ -83,7 +82,7 @@ class OrderList extends BaseComponent {
               <Text>
                 {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
                 &nbsp;
-                {!prod.product.upc && prod.sku.material_code ? `秤签：${prod.sku.material_code}` : ''}
+                {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
               </Text>
               <Text style={styles.product_num}>X{prod.num}</Text>
             </View>
@@ -106,6 +105,7 @@ class OrderList extends BaseComponent {
         <View style={styles.itemTitleRow}>
           <Text style={styles.itemTitle}>商品明细</Text>
           <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
+          <Text style={styles.itemTitleTip}>应扫{item.items_need_scan_num}件商品</Text>
           <Text style={styles.itemTitleScanTip} onPress={() => console.log('click scan num')}>
             已扫{item.scan_count}件商品
           </Text>
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     height: rowHeight
   },
   mask: {
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    // backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
