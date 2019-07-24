@@ -64,6 +64,7 @@ public class Cts {
     public static final Platform PLAT_JDDJ  = new Platform("JD到家", 6);
     public static final Platform PLAT_MTSG  = new Platform("美团", 7);
     public static final Platform PLAT_SS  = new Platform("嗖嗖", 8);
+    public static final Platform PLAT_CM  = new Platform("小程序", 9);
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", -1);
 
     public static final String ERR_INVALID_GRANT = "invalid_grant";
