@@ -149,7 +149,7 @@ public class Cts {
         }
 
         static public Platform find(int id) {
-            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP, PLAT_JDDJ, PLAT_MTSG, PLAT_SS)) {
+            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP, PLAT_JDDJ, PLAT_MTSG, PLAT_SS, PLAT_CM)) {
                 if (next.id == id) {
                     return next;
                 }
