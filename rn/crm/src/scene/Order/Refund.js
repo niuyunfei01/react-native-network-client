@@ -1,33 +1,19 @@
 import React, {Component} from "react";
-import {
-  Platform,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ListView,
-  Image,
-  InteractionManager,
-  RefreshControl,
-  Alert,
-  Clipboard,
-  ToastAndroid,
-  PixelRatio,
-  TextInput
-} from "react-native";
+import {Image, PixelRatio, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
-import {Styles, Metrics, Colors} from "../../themes";
+import {Colors, Metrics, Styles} from "../../themes";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import Config from '../../config'
+import color from '../../widget/color'
 //组件
-import {Button, Line, Yuan, Button1} from "../component/All";
+import {Button, Button1, Line, Yuan} from "../component/All";
 import LoadingView from "../../widget/LoadingView";
 //请求
 import {getWithTpl, jsonWithTpl} from "../../util/common";
 import {tool} from "../../common";
 import {ToastLong} from "../../util/ToastUtils";
+import JbbCellTitle from "../component/JbbCellTitle";
 
 const one = 1 / PixelRatio.get(); //屏幕密度
 
@@ -119,7 +105,9 @@ class Refund extends Component {
       <View
         style={{
           height: 40,
-          justifyContent: "center",
+          flexDirection: 'row',
+          justifyContent: "space-between",
+          alignItems: 'center',
           paddingHorizontal: pxToDp(31),
           backgroundColor: "#f2f2f2"
         }}
@@ -197,6 +185,10 @@ class Refund extends Component {
   
   render () {
     console.disableYellowBox = true;
+    const self = this
+    const navigation = self.props.navigation
+    const order = self.state.orderDetail
+    
     return this.state.isLoading ? (
       <LoadingView/>
     ) : (
@@ -269,7 +261,19 @@ class Refund extends Component {
               提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
             </Text>
           </View>
-          {this.title("选择要退的商品")}
+  
+          <JbbCellTitle
+            right={(<TouchableOpacity
+                onPress={() => navigation.navigate(Config.ROUTE_ORDER_REFUND_BY_WEIGHT, {
+                  order, onSuccess: () => navigation.goBack()
+                })}>
+                <Text style={{color: color.theme, fontSize: 13}}>
+                  按重退款>>
+                </Text>
+              </TouchableOpacity>
+            )}
+            children={'选择要退的商品'}
+          />
           {/*商品明细列表*/}
           <View style={{paddingHorizontal: pxToDp(31)}}>
             {this.state.goodsList.map((element, index) => {

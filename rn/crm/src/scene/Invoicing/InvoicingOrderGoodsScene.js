@@ -48,6 +48,7 @@ import moment from "moment"
 import {ToastLong} from "../../util/ToastUtils";
 
 import numeral from "numeral";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -440,6 +441,28 @@ class InvoicingOrderGoodsScene extends Component {
     );
   }
 
+  printOrder(order, storeName, storeId){
+    const {invoicing} = this.props;
+    let {suppliers} = invoicing;
+    let suppliersMap = {};
+    _.forEach(suppliers, function (val) {
+      let id = val['id'];
+      suppliersMap[id] = val;
+    });
+
+    let data = {
+      'id': order.id,
+      'storeName': storeName,
+      'storeId': storeId,
+      'supplierId': order.supplier_id,
+      'supplierName': suppliersMap[order.supplier_id]['name'],
+      'date': order.consignee_date,
+      'createName': order.create_name,
+      'items': order.req_items
+    };
+    native.printInventoryOrder(data)
+  }
+
   commonHandleProxy(id, storeId, handle) {
     const {dispatch, global} = this.props;
     let token = global['accessToken'];
@@ -576,11 +599,11 @@ class InvoicingOrderGoodsScene extends Component {
 
   renderItems() {
     let {invoicing} = this.props;
-    let {suppliers} = invoicing;
-    let suppliersMap = {};
     const orderCtrlStatus = this.state.orderCtrlStatus;
     const storeCtrlStatus = this.state.storeCtrlStatus;
     const listData = this.getListDataByStatus();
+    let {suppliers} = invoicing;
+    let suppliersMap = {};
     _.forEach(suppliers, function (val) {
       let id = val['id'];
       suppliersMap[id] = val;
@@ -615,7 +638,7 @@ class InvoicingOrderGoodsScene extends Component {
           <Text style={editAble ? {width: pxToDp(150), ...font.fontBlue} : {width: pxToDp(150)}}>{item['name']}</Text>
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>
+          {/*<Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>*/}
           <Text
             style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
           <Text style={getGoodItemTextStyle()}>{item['unit_price']}</Text>
@@ -627,7 +650,7 @@ class InvoicingOrderGoodsScene extends Component {
     return goodsView;
   }
 
-  renderSupplyOrder(listData, suppliers, status, orderCtrlStatus) {
+  renderSupplyOrder(listData, suppliers, status, orderCtrlStatus, storeName = '', storeId = 0) {
     let ordersView = [];
     let self = this;
     _.forEach(listData, function (val, idx) {
@@ -652,6 +675,10 @@ class InvoicingOrderGoodsScene extends Component {
           <MyBtn key={3} text='确认结算' style={list.blue_btn}
                  onPress={() => self.balanceOrder(val['id'], val['consignee_store_id'])}/>];
       }
+
+      opBtns.push(<MyBtn key={1} text='打印' style={list.warn_btn}
+                         onPress={() => self.printOrder(val, storeName, storeId)}/>);
+
       ordersView.push(
         <View key={val['id']}>
           <Cell customStyle={list.init_cell} first>
@@ -698,7 +725,7 @@ class InvoicingOrderGoodsScene extends Component {
                 <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名</Text>
               </CellHeader>
               <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={getGoodItemTextStyle()}>份数</Text>
+                {/*<Text style={getGoodItemTextStyle()}>份数</Text>*/}
                 <Text style={getGoodItemTextStyle()}>总量</Text>
                 <Text style={getGoodItemTextStyle()}>单价</Text>
                 <Text style={getGoodItemTextStyle()}>总价</Text>
@@ -768,7 +795,7 @@ class InvoicingOrderGoodsScene extends Component {
         </View>
       </View>
       {/*展开详情*/}
-      {storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] && this.renderSupplyOrder(data['data'], suppliers, status, orderCtrlStatus)}
+      {storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] && this.renderSupplyOrder(data['data'], suppliers, status, orderCtrlStatus, data['store_name'], data['store_id'])}
     </View>
   }
 
@@ -921,22 +948,6 @@ class InvoicingOrderGoodsScene extends Component {
         },
       ]}>
       <Cell style={customStyles.formCellStyle}>
-        <CellHeader><Label style={font.font24}>份数</Label></CellHeader>
-        <CellBody>
-          <Input
-            style={font.font24}
-            keyboardType={'numeric'}
-            placeholder="采购份数"
-            value={currentEditItem['total_req']}
-            onChangeText={(val) => {
-              let currentEditItem = self.state.currentEditItem;
-              currentEditItem['total_req'] = val;
-              this.setState({currentEditItem: currentEditItem});
-            }}
-          />
-        </CellBody>
-      </Cell>
-      <Cell style={customStyles.formCellStyle}>
         <CellHeader><Label style={font.font24}>总量</Label></CellHeader>
         <CellBody>
           <Input
@@ -963,6 +974,22 @@ class InvoicingOrderGoodsScene extends Component {
             onChangeText={(val) => {
               let currentEditItem = self.state.currentEditItem;
               currentEditItem['unit_price'] = val;
+              this.setState({currentEditItem: currentEditItem});
+            }}
+          />
+        </CellBody>
+      </Cell>
+      <Cell style={customStyles.formCellStyle}>
+        <CellHeader><Label style={font.font24}>总价</Label></CellHeader>
+        <CellBody>
+          <Input
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="采购总价"
+            value={currentEditItem['total_cost']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['total_cost'] = val;
               this.setState({currentEditItem: currentEditItem});
             }}
           />
@@ -1091,6 +1118,18 @@ const list = {
     color: colors.fontBlue,
     borderWidth: 0.5,
     borderColor: colors.fontBlue,
+    fontSize: 13,
+  },
+  warn_btn: {
+    width: pxToDp(130),
+    height: pxToDp(70),
+    marginLeft: pxToDp(5),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderRadius: pxToDp(5),
+    color: colors.orange,
+    borderWidth: 0.5,
+    borderColor: colors.orange,
     fontSize: 13,
   },
   danger_btn: {

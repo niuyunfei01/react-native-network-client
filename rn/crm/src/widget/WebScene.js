@@ -3,7 +3,6 @@ import {BackHandler, InteractionManager, StyleSheet, View, WebView} from 'react-
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
-import pxToDp from "../util/pxToDp";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 
@@ -25,12 +24,16 @@ class WebScene extends PureComponent {
       headerLeft: (
         <NavigationItem
           icon={require('../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            params.backHandler();
-          }}
+          onPress={() => params.backHandler()}
         />),
       headerTitle: params.title,
+      headerRight: (
+        <NavigationItem
+          icon={require('../img/refresh.png')}
+          position={'right'}
+          onPress={() => params.refresh()}
+        />
+      )
     }
   };
 
@@ -64,6 +67,7 @@ class WebScene extends PureComponent {
           if (data && data['action'] && data['params']) {
             let action = data['action'];
             let params = data['params'];
+            console.log('webview to native => action', action, ' params ', params)
             if (action == 'nativeToGoods') {
               native.toGoods()
             } else {
@@ -85,9 +89,17 @@ class WebScene extends PureComponent {
     if(this.state.canGoBack) {
       this.webview.goBack();
       return true;
+    } else {
+      // native.nativeBack()
+      this.props.navigation.goBack()
     }
   };
-
+  
+  onRefresh = () => {
+    console.log(this)
+    this.webview.reload()
+  }
+  
   _do_go_back(msg) {
     const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
@@ -177,12 +189,12 @@ class WebScene extends PureComponent {
         const key = '608d75903d29ad471362f8c58c550daf';
         url = `https://www.cainiaoshicai.cn/amap.php?key=${key}&center=${center}`;
       }
-      this.setState({source: {uri: url}})
+      this.setState({source: {uri: url, headers: {'Cache-Control': 'no-cache'}}})
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-
-    this.props.navigation.setParams({backHandler: this.backHandler});
+  
+    this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
   };
 
   componentWillMount() {

@@ -67,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:layout_marginEnd="10dip"
+                android:padding="5dp"
                 android:text="张三丰"
                 android:textSize="@dimen/mini_text" />
             <TextView

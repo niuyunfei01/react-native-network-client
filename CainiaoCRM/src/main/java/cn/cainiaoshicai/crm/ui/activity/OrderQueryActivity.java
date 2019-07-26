@@ -21,6 +21,7 @@ import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.loader.RefreshOrderListTask;
 
@@ -153,7 +154,8 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 term = "store:" + selected_store;
                 lt = ListType.NONE;
             }
-            new RefreshOrderListTask(this, term, lt, this.maxPast, this.swipeRefreshLayout, callback, true).executeOnNormal();
+            boolean zitiMode = SettingHelper.useZitiMode();
+            new RefreshOrderListTask(this, term, lt, this.maxPast, this.swipeRefreshLayout, callback, true, zitiMode).executeOnNormal();
         }
     }
 

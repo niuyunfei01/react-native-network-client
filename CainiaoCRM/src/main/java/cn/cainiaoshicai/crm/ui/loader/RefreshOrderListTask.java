@@ -40,20 +40,21 @@ public class RefreshOrderListTask
     private SwipeRefreshLayout swipeRefreshLayout;
     private OrderQueriedDone doneCallback;
     private final boolean byPassCache;
+    private boolean zitiMode = false;
 
     public RefreshOrderListTask(FragmentActivity activity, long[] storeIds,
-                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
-        this(activity, "", listType, maxPastDays, swipeRefreshLayout, doneCallback, storeIds, byPassCache);
+                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache, boolean zitiMode) {
+        this(activity, "", listType, maxPastDays, swipeRefreshLayout, doneCallback, storeIds, byPassCache, zitiMode);
     }
 
     public RefreshOrderListTask(FragmentActivity activity, String searchTerm,
-                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
-        this(activity, searchTerm, listType, maxPastDays, swipeRefreshLayout, doneCallback, null, byPassCache);
+                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache, boolean zitiMode) {
+        this(activity, searchTerm, listType, maxPastDays, swipeRefreshLayout, doneCallback, null, byPassCache, zitiMode);
     }
 
     private RefreshOrderListTask(FragmentActivity activity, String searchTerm,
                                  ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, long[] storeIds,
-                                 boolean byPassCache) {
+                                 boolean byPassCache, boolean zitiMode) {
         this.activity = activity;
         this.searchTerm = searchTerm;
         this.maxPastDays = maxPastDays;
@@ -63,10 +64,12 @@ public class RefreshOrderListTask
 
         this.doneCallback = doneCallback;
         this.byPassCache = byPassCache;
+        this.zitiMode = zitiMode;
         if (this.byPassCache) {
             progressFragment = ProgressFragment.newInstance(R.string.searching);
         }
     }
+
 
     @Override
     protected void onPreExecute() {
@@ -89,12 +92,11 @@ public class RefreshOrderListTask
             int limit = listValue == ListType.DONE.getValue() ? 100 : 0;
             int offset = 0;
             if (TextUtils.isEmpty(searchTerm)) {
-                return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset, this.maxPastDays);
+                return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset, this.maxPastDays, this.zitiMode);
             } else {
-                return ordersDao.search(searchTerm, listValue, storeIds, limit, offset, this.maxPastDays);
+                return ordersDao.search(searchTerm, listValue, storeIds, limit, offset, this.maxPastDays, this.zitiMode);
             }
         } catch (ServiceException e) {
-//                cancel(true);
             this.error = e.getMessage();
             return null;
         }
@@ -121,7 +123,7 @@ public class RefreshOrderListTask
         if (progressFragment != null) {
             try {
                 progressFragment.dismissAllowingStateLoss();
-            }catch (Exception e) {
+            } catch (Exception e) {
                 AppLogger.e("exception:" + e.getMessage(), e);
             }
         }

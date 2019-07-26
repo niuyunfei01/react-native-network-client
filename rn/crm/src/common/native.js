@@ -130,6 +130,16 @@ export default {
       NativeModules.ActivityStarter.printSmPrinter(JSON.stringify(order), callback));
   },
 
+  printInventoryOrder: async function (supplierOrder, callback = function () {}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.printInventoryOrder(JSON.stringify(supplierOrder), callback));
+  },
+
+  printSupplierSummaryOrder: async function (callback = function () {}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.printSupplierSummaryOrder(callback));
+  },
+
   ordersByMobileTimes: async function(phone, times) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))
@@ -144,6 +154,17 @@ export default {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
+  
+  updatePidApplyPrice: async function (pid, applyPrice, cb = function () {
+  }) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
+  },
+
+  updatePidStorage: async function(pid, storage, clb = function(){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.updatePidStorage(pid, storage, clb))
+  },
 
   listenScan: async function(callback = function (scan_items){}) {
     await (NativeModules.ActivityStarter &&
@@ -153,6 +174,11 @@ export default {
   speakText: async function(text, callback = function (ok, msg){}) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.speakText(text, callback))
+  },
+  
+  playWarningSound: async function () {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.playWarningSound())
   },
 
   showInputKeyboard: async function () {

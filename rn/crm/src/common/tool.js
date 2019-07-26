@@ -575,6 +575,8 @@ export function toFixed (num, type = "", abs = false) {
     return parseInt(num) / 100;
   } else if (type === 'yuan') {
     return Number(num).toFixed(2);
+  } else if (type === 'percent') {
+    return Number(num * 100).toFixed(2) + '%';
   } else {
     return (parseInt(num) / 100).toFixed(2);
   }
@@ -761,6 +763,7 @@ function getTimeStamp (str) {
  * @return float|int
  */
 function priceOptimize ($spPrice) {
+  var $jiao;
   $jiao = Math.floor($spPrice / 10);
   if ($spPrice >= 200) { //超过此价才处理尾数
     $jiao_mod = $jiao % 10;

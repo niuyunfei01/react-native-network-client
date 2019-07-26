@@ -21,6 +21,7 @@ import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
+import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
@@ -354,11 +355,15 @@ public class SettingUtility {
 
     @NonNull
     public static String key_order_list(int listType, long[] storeIds) {
-        ShipAcceptStatus status = GlobalCtx.app().getAccountBean().shipAcceptStatus(SettingUtility.getListenerStore());
-        String cacheKey;
-        Arrays.sort(storeIds);
-        cacheKey = listType + "_" + TextUtil.join(",", storeIds);
-        return (status != null && status.getStatus() == Cts.SHIP_ACCEPT_ON) ? cacheKey + "-on" : cacheKey;
+        AccountBean accountBean = GlobalCtx.app().getAccountBean();
+        if (accountBean != null) {
+            ShipAcceptStatus status = accountBean.shipAcceptStatus(SettingUtility.getListenerStore());
+            String cacheKey;
+            Arrays.sort(storeIds);
+            cacheKey = listType + "_" + TextUtil.join(",", storeIds);
+            return (status != null && status.getStatus() == Cts.SHIP_ACCEPT_ON) ? cacheKey + "-on" : cacheKey;
+        }
+        return listType + "_0";
     }
 
     static class OrderEntry {
@@ -510,6 +515,10 @@ public class SettingUtility {
 
     public static void setDisableNewOrderSoundNotify(boolean isChecked) {
         SettingHelper.setEditor(getContext(), "disable_new_order_sound_notify", isChecked);
+    }
+
+    public static void setZitiMode(boolean isChecked) {
+        SettingHelper.setEditor(getContext(), "store_is_ziti_mode", isChecked);
     }
 
 

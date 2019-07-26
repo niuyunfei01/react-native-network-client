@@ -358,7 +358,7 @@ public class StoreStorageHelper {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
         final EditText totalReqTxt = npView.findViewById(R.id.total_req);
-        final EditText nowStatTxt = npView.findViewById(R.id.now_stat);
+        //final EditText nowStatTxt = npView.findViewById(R.id.now_stat);
         final EditText remark = npView.findViewById(R.id.remark);
         final EditText totalResp = npView.findViewById(R.id.total_resp);
         final Spinner selectUnitType = npView.findViewById(R.id.select_req_unit_type);
@@ -367,6 +367,7 @@ public class StoreStorageHelper {
         selectUnitType.setAdapter(adapter);
 
         int defaultSelect = 0;
+        //不是斤就按份调货
         if(!"斤".equals(item.getSkuUnit())){
             defaultSelect = 1;
         }
@@ -423,12 +424,12 @@ public class StoreStorageHelper {
                                     protected Void doInBackground(Void... params) {
                                         ResultEditReq rb;
                                         String s = totalReqTxt.getText().toString();
-                                        String nowStatStr = nowStatTxt.getText().toString();
+                                        //String nowStatStr = nowStatTxt.getText().toString();
                                         String respS = totalResp.getText().toString();
-                                        if (TextUtils.isEmpty(nowStatStr)) {
-                                            AlertUtil.errorOnActivity(activity, "订货前请盘点当前的库存，务必保持准确！");
-                                            return null;
-                                        }
+//                                        if (TextUtils.isEmpty(nowStatStr)) {
+//                                            AlertUtil.errorOnActivity(activity, "订货前请盘点当前的库存，务必保持准确！");
+//                                            return null;
+//                                        }
                                         if (TextUtils.isEmpty(s)) {
                                             activity.runOnUiThread(new Runnable() {
                                                 @Override
@@ -448,7 +449,8 @@ public class StoreStorageHelper {
                                             return null;
                                         }
                                         final int total_req_no = Integer.parseInt(s);
-                                        final int nowStat = Integer.parseInt(nowStatStr);
+                                        //final int nowStat = Integer.parseInt(nowStatStr);
+                                        final int nowStat = 0;
                                         float totalResp = 0;
                                         try {
                                             totalResp = Float.parseFloat(respS);
@@ -469,7 +471,7 @@ public class StoreStorageHelper {
                                             @Override
                                             public void run() {
                                                 if (finalRb.isOk()) {
-                                                    item.setLeft_since_last_stat(nowStat);
+                                                    //item.setLeft_since_last_stat(nowStat);
                                                     item.setTotalInReq(total_req_no);
                                                     item.setReqMark(remarkTxt);
                                                     activity.updateReqListBtn(total_req_cnt);

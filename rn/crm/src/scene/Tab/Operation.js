@@ -39,6 +39,9 @@ class Operation extends BaseComponent {
         },
         HotSaleProds: {
           tip: ''
+        },
+        MarketExamine: {
+          show: false
         }
       }
     }
@@ -121,6 +124,13 @@ class Operation extends BaseComponent {
             (<Text>规则处理</Text>),
             (<Text> </Text>),
             () => this.navigate(Config.ROUTE_STORE_RULE, {cnt: this.state.competition.StoreComment.cnt})
+          )}
+  
+          {this.renderItem(
+            this.state.competition.MarketExamine.show,
+            (<Text>市价调查</Text>),
+            (<Text> </Text>),
+            () => this.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE)
           )}
         </View>
       </ScrollView>

@@ -53,7 +53,7 @@ import GoodsPriceIndex from '../scene/Goods/GoodsPriceIndex'
 import GoodsPriceArea from "../scene/Goods/AreaGoodsPrice";
 import GoodsList from '../scene/Goods/GoodsList'
 import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
-
+// 订单相关
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
 import OrderTodoScene from "../scene/Order/OrderTodoScene";
@@ -64,6 +64,10 @@ import OrderSetPackDone from "../scene/Order/OrderSetPackDone";
 import OrderSetShipStart from "../scene/Order/OrderSetShipStart";
 import OrderShipDetail from "../scene/Order/OrderShipDetail";
 import OrderCancelShip from "../scene/Order/OrderCancelShip";
+import Refund from "../scene/Order/Refund";
+import OrderRefundByWeight from "../scene/Order/RefundByWeight";
+import OrderTransferThird from "../scene/Order/OrderTransferThird";
+import OrderScan from "../scene/Order/OrderScan";
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -99,23 +103,29 @@ import OnlineStoreProduct from "../scene/Goods/OnlineStoreProduct";
 //新产品详情
 import NewProductDetail from "../scene/Goods/NewProductDetail";
 import CreateApplyNewProductRemindScene from "../scene/Goods/CreateApplyNewProductRemindScene"
-//退款详情
-import Refund from "../scene/Order/Refund";
 import SelectCity from "../scene/Store/SelectCity";
 import Qualification from "../scene/Store/Qualification";
+// 库存相关
 import InventoryProductPutIn from '../scene/Inventory/ProductPutIn'
 import InventoryProductInfo from '../scene/Inventory/ProductInfo'
 import InventoryMaterialList from '../scene/Inventory/MaterialList'
 import InventoryMaterialPutIn from '../scene/Inventory/MaterialPutIn'
+import InventoryMaterialDetailUpdate from '../scene/Inventory/MaterialDetailUpdate'
 import InventoryStandardPutIn from '../scene/Inventory/StandardPutIn'
+import InventoryStandardDetailUpdate from '../scene/Inventory/StandardDetailUpdate'
 import InventoryMaterialTask from '../scene/Inventory/MaterialTask'
 import InventoryMaterialTaskFinish from '../scene/Inventory/MaterialTaskFinish'
+import InventoryStockCheck from '../scene/Inventory/StockCheck'
+import InventoryStockCheckHistory from '../scene/Inventory/StockCheckHistory'
+import InventoryReportLoss from '../scene/Inventory/ReportLoss'
+import InventoryDetail from '../scene/Inventory/Detail'
 import Cts from "../Cts";
 
 
 import _ from "lodash"
-import OrderTransferThird from "../scene/Order/OrderTransferThird";
-import OrderScan from "../scene/Order/OrderScan";
+import WorkerSchedule from "../scene/Worker/WorkerSchedule";
+import OrderSetReady from "../scene/Order/OrderSetReady";
+import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -295,7 +305,6 @@ class Navigator extends Component {
         Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
-        Worker: {screen: WorkerListScene},
         User: {screen: UserScene},
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
@@ -320,6 +329,8 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
         [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
         [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
+        [Config.ROUTE_ORDER_SCAN_REDAY]: {screen: OrderSetReady},
+        [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
         
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
@@ -342,6 +353,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
         [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
+        [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
         
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
@@ -386,9 +398,18 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
         [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
         [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
+        [Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE]: {screen: InventoryMaterialDetailUpdate},
         [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},
+        [Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE]: {screen: InventoryStandardDetailUpdate},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
         [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
+        [Config.ROUTE_INVENTORY_STOCK_CHECK]: {screen: InventoryStockCheck},
+        [Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY]: {screen: InventoryStockCheckHistory},
+        [Config.ROUTE_INVENTORY_REPORT_LOSS]: {screen: InventoryReportLoss},
+        [Config.ROUTE_INVENTORY_DETAIL]: {screen: InventoryDetail},
+        // 员工相关
+        [Config.ROUTE_WORKER]: {screen: WorkerListScene},
+        [Config.ROUTE_WORKER_SCHEDULE]: {screen: WorkerSchedule},
       },
       stackNavigatorConfigs
     );

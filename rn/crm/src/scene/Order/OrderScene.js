@@ -110,6 +110,7 @@ const MENU_PROVIDING = 8;
 const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
 const MENU_ORDER_SCAN = 11;
+const MENU_ORDER_SCAN_READY = 12;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -335,7 +336,8 @@ class OrderScene extends Component {
       as.push({key: MENU_SEND_MONEY, label: '发红包'})
     }
     as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
-    
+    as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
+
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
@@ -414,7 +416,9 @@ class OrderScene extends Component {
     } else if (option.key === MENU_SEND_MONEY) {
       navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.order.id, storeId: order.order.store_id})
     } else if (option.key === MENU_ORDER_SCAN) {
-      navigation.navigate(Config.ROUTE_ORDER_SCAN)
+      navigation.navigate(Config.ROUTE_ORDER_SCAN, {orderId: order.order.id})
+    } else if (option.key === MENU_ORDER_SCAN_READY) {
+      navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
     } else {
       ToastShort('未知的操作');
     }
@@ -1111,7 +1115,6 @@ class OrderScene extends Component {
                 onPress: this._hideCallStore.bind(this),
               }
             ]}
-            style={{maxHeight: '50%'}}
           />
           
           
@@ -1677,7 +1680,7 @@ class OrderScene extends Component {
             }}>
               <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
-            <CallBtn mobile={order.mobile} label={mobile_label}/>
+            <CallBtn mobile={order.mobile} label={mobile_label} phoneList={order.contacts}/>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
               <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
@@ -2187,7 +2190,7 @@ class ItemRow extends PureComponent {
         <InputNumber
           styles={inputNumberStyles}
           min={0}
-          value={parseInt((edited || item).num)}
+          value={(edited || item).num}
           style={{backgroundColor: 'white', width: 96}}
           onChange={(v) => {
             onInputNumberChange(item, v)

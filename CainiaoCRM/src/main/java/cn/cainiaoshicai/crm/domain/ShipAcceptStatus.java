@@ -1,5 +1,7 @@
 package cn.cainiaoshicai.crm.domain;
 
+import java.util.Map;
+
 import cn.cainiaoshicai.crm.Cts;
 
 /**
@@ -11,6 +13,10 @@ public class ShipAcceptStatus {
     private int expireTs;
     private int storeId;
     private String desc;
+    private String[] printers;
+    private String checkedPrinter;
+    private Map<String, String> users;
+
 
     public int getStatus() {
         return status;
@@ -42,5 +48,40 @@ public class ShipAcceptStatus {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String[] getPrinters() {
+        return printers;
+    }
+
+    public void setPrinters(String[] printers) {
+        this.printers = printers;
+    }
+
+    public String getCheckedPrinter() {
+        return checkedPrinter;
+    }
+
+    public void setCheckedPrinter(String checkedPrinter) {
+        this.checkedPrinter = checkedPrinter;
+    }
+
+    public int getCheckedIdx() {
+        if (printers != null && printers.length > 0) {
+            for (int i = 0; i < printers.length; i++) {
+                if (printers[i].equals(checkedPrinter)) {
+                    return i;
+                }
+            }
+        }
+        return 0;
+    }
+
+    public Map<String, String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Map<String, String> users) {
+        this.users = users;
     }
 }

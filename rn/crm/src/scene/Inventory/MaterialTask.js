@@ -10,7 +10,8 @@ import JbbButton from "../component/JbbButton";
 import JbbInput from "../component/JbbInput";
 import {tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
-import WorkerPopup from "../component/WorkerPopup";
+import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
+import {ToastShort} from "../../util/ToastUtils";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
@@ -65,6 +66,7 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_task?access_token=${accessToken}`
+    Toast.loading('请求中', 3)
     HttpUtils.get.bind(self.props)(api).then(res => {
       self.fetchData()
     })
@@ -74,12 +76,15 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
+    Toast.loading('请求中', 3)
     HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
     }).then(res => {
-      Toast.success('操作成功')
+      ToastShort('提交成功')
       self.fetchData()
+    }).catch(e => {
+      native.speakText(e.reason)
     })
   }
   
@@ -116,6 +121,7 @@ class MaterialTask extends React.Component {
             </Text>
             <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`}</Text>
           </View>
+          <Text style={{fontSize: 12}}>收货时间：{tool.shortTimeDesc(item.receipt_time)}</Text>
           <For each="task" of={item.task} index="taskIdx">
             <View style={styles.taskItem} key={taskIdx}>
               <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}</Text>
@@ -123,7 +129,7 @@ class MaterialTask extends React.Component {
                 <JbbInput
                   ref={`taskInput_${task.product_id}`}
                   onChange={(value) => this.setProductNum(task, idx, taskIdx, value)}
-                  value={task.num}
+                  value={task.num ? task.num : ''}
                   initValue={''}
                   styles={styles.taskInput}
                 />
@@ -191,15 +197,13 @@ class MaterialTask extends React.Component {
         <ScrollView style={{flex: 1}}>
           {this.renderPackingTask()}
           
-          <If condition={this.state.packingTask.length < 2}>
-            <View style={styles.getTaskBtnWrap}>
-              <TouchableOpacity onPress={() => this.getTask()}>
-                <View>
-                  <Text style={styles.getTaskBtn}>领取任务</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </If>
+          <View style={styles.getTaskBtnWrap}>
+            <TouchableOpacity onPress={() => this.getTask()}>
+              <View>
+                <Text style={styles.getTaskBtn}>领取任务</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
           
           {this.renderPendingTask()}
         </ScrollView>
@@ -208,8 +212,8 @@ class MaterialTask extends React.Component {
             <Text>我完成的任务</Text>
           </View>
         </TouchableOpacity>
-  
-        <WorkerPopup
+        
+        <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}
           onCancel={() => this.setState({workerPopup: false})}
@@ -248,7 +252,8 @@ const styles = StyleSheet.create({
     height: 30,
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'flex-end'
   },
   taskItem: {
     flexDirection: 'row',

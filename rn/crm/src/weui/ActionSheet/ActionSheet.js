@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     left: 0,
     width,
     backgroundColor: $V.pageDefaultBackgroundColor,
+    maxHeight: height / 2
   },
   actionsheetMenu: {
     backgroundColor: '#fff',

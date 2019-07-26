@@ -28,6 +28,7 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.StorageStatusResults;
 import cn.cainiaoshicai.crm.domain.Store;
+import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageChanged;
@@ -36,6 +37,7 @@ import cn.cainiaoshicai.crm.ui.activity.StoreStorageHelper;
 import static cn.cainiaoshicai.crm.Cts.PRICE_CONTROLLER_YES;
 
 public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
+    public static final String PREFIX_NOT_FILTER = "@@";
     private List<StorageItem> backendData = new ArrayList<>();
     private Activity context;
     private Store store;
@@ -66,8 +68,10 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
             holder.label = row.findViewById(R.id.product_name);
             holder.leftNumber = row.findViewById(R.id.total_last_stat);
+            holder.expect_check_time = row.findViewById(R.id.expect_check_time);
             holder.sold_5day = row.findViewById(R.id.sold_5day);
             holder.sold_weekend = row.findViewById(R.id.sold_weekend);
+            holder.sold_latest = row.findViewById(R.id.sold_latest);
 
             holder.shelfNo = row.findViewById(R.id.shelf_no);
             holder.prodStatus = row.findViewById(R.id.store_prod_status);
@@ -89,6 +93,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
             holder.sold_5day_fen = row.findViewById(R.id.sold_5day_fen);
             holder.sold_weekend_fen = row.findViewById(R.id.sold_weekend_fen);
+            holder.sold_latest_fen = row.findViewById(R.id.sold_latest_fen);
 
             convertView = row;
             convertView.setTag(holder);
@@ -116,7 +121,8 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
-            if (GlobalCtx.app().isDirectVendor()) {
+            Vendor v = GlobalCtx.app().getVendor();
+            if (v != null && v.isFnProviding()) {
                 holder.leftNumber.setVisibility(View.VISIBLE);
                 holder.leftNumber.setText(item.leftNumberStr());
             } else {
@@ -146,8 +152,14 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         holder.leftNumber.setOnClickListener(v -> {
             StoreStorageChanged ssc = (StoreStorageChanged) getContext();
-            AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
-            dlg.show();
+//            AlertDialog dlg = StoreStorageHelper.createEditLeftNum((Activity) getContext(), item, inflater, ssc.notifyDataSetChanged());
+//            dlg.show();
+            int productId = item.getProduct_id();
+            int storeId = item.getStore_id();
+            String productName = item.getName();
+            String shelfNo = item.getShelfNo();
+
+            GlobalCtx.app().toStockCheck(context, productId, storeId,productName,shelfNo);
         });
 
         holder.supplyPrice.setOnClickListener(view -> {
@@ -220,14 +232,38 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             }
         }
         holder.wmInfoBar.setVisibility(allInvisible ? View.GONE : View.VISIBLE);
-
         holder.sold_5day.setText(String.format("平日:%.1f", item.getSold_5day() / 5.0));
         holder.sold_weekend.setText(String.format("周末:%.1f", item.getSold_weekend() / 2.0));
-        if (!GlobalCtx.app().getVendor().isFnProviding()) {
+        holder.sold_latest.setText("最近:" + item.getSold_latest());
+        if (GlobalCtx.app().getVendor() != null && !GlobalCtx.app().getVendor().isFnProviding()) {
             holder.sold_5day.setVisibility(View.GONE);
             holder.sold_weekend.setVisibility(View.GONE);
+            holder.sold_latest.setVisibility(View.GONE);
+
             holder.sold_weekend_fen.setVisibility(View.GONE);
             holder.sold_5day_fen.setVisibility(View.GONE);
+            holder.sold_latest_fen.setVisibility(View.GONE);
+        }
+
+        if (!TextUtils.isEmpty(item.getExpect_check_time())) {
+            holder.sold_5day.setVisibility(View.GONE);
+            holder.sold_5day_fen.setVisibility(View.GONE);
+            holder.sold_latest.setVisibility(View.GONE);
+            holder.sold_latest_fen.setVisibility(View.GONE);
+            holder.sold_weekend.setVisibility(View.GONE);
+            holder.sold_weekend_fen.setVisibility(View.GONE);
+
+            holder.expect_check_time.setText(item.getExpect_check_time()+"前盘点");
+            holder.expect_check_time.setVisibility(View.VISIBLE);
+        } else {
+            holder.sold_5day.setVisibility(View.VISIBLE);
+            holder.sold_5day_fen.setVisibility(View.VISIBLE);
+            holder.sold_latest.setVisibility(View.VISIBLE);
+            holder.sold_latest_fen.setVisibility(View.VISIBLE);
+            holder.sold_weekend.setVisibility(View.VISIBLE);
+            holder.sold_weekend_fen.setVisibility(View.VISIBLE);
+
+            holder.expect_check_time.setVisibility(View.GONE);
         }
 
         holder.goodIcon.setOnClickListener(new View.OnClickListener() {
@@ -264,6 +300,27 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         return (convertView);
     }
 
+    public boolean updateItemStorage(int pid, int newStorage) {
+        for (StorageItem item : this.backendData) {
+            if (pid > 0 && item.getProduct_id() == pid) {
+                item.setLeft_since_last_stat(newStorage);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean updateItemApplyPrice(int pid, int applyPrice) {
+        for (StorageItem item : this.backendData) {
+            if (pid > 0 && item.getProduct_id() == pid) {
+                item.setApplyingPrice(applyPrice);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void filter(String text) {
         this.clear();
 
@@ -273,8 +330,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
 
         AppLogger.d("items count after clear:" + this.getCount());
 
-        if (!TextUtils.isEmpty(text)) {
-
+        if (!TextUtils.isEmpty(text) && !text.startsWith(PREFIX_NOT_FILTER)) {
             int id = 0;
             if (text.indexOf("#") > 0) {
                 id = Integer.parseInt(text.substring(0, text.indexOf("#")));
@@ -296,7 +352,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
                     }
                 }
             }
-        } else {
+        }  else {
             ((StorageItemAdapter<StorageItem>) this).addAll(this.backendData);
         }
 
@@ -311,10 +367,13 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
     private class ViewHolder {
         TextView label;
         TextView leftNumber;
+        TextView expect_check_time;
         TextView sold_5day;
         TextView sold_5day_fen;
         TextView sold_weekend;
         TextView sold_weekend_fen;
+        TextView sold_latest;
+        TextView sold_latest_fen;
 
         TextView prodStatus;
         TextView req_total;

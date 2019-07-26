@@ -13,7 +13,8 @@ export default class JbbPrompt extends React.Component {
     title: PropTypes.string,
     autoFocus: PropTypes.bool,
     visible: PropTypes.bool,
-    keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad'])
+    keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad']),
+    rows: PropTypes.number
   }
   
   static defaultProps = {
@@ -21,7 +22,8 @@ export default class JbbPrompt extends React.Component {
     title: '输入',
     visible: false,
     autoFocus: false,
-    keyboardType: 'default'
+    keyboardType: 'default',
+    rows: 1
   }
   
   constructor (props) {
@@ -62,11 +64,13 @@ export default class JbbPrompt extends React.Component {
         
         <View>
           <JbbInput
+            initValue={this.state.text}
             autoFocus={this.props.autoFocus}
             onChange={(text) => this.setState({text})}
             value={String(this.state.text)}
-            styles={{height: 35}}
+            styles={this.props.rows > 1 ? {} : {height: 35}}
             keyboardType={this.props.keyboardType}
+            rows={this.props.rows}
           />
         </View>
       </ConfirmDialog>
@@ -88,7 +92,9 @@ export default class JbbPrompt extends React.Component {
         {this.renderConfirm()}
   
         <TouchableOpacity onPress={this.handlePressChild.bind(this)}>
-          {this.props.children}
+          <View pointerEvents="none">
+            {this.props.children}
+          </View>
         </TouchableOpacity>
       </View>
     ) : this.renderConfirm()

@@ -94,7 +94,6 @@ class GoodsApplyPrice extends Component {
   fetchData () {
     const self = this
     const {store_id, product_id, access_token, type} = self.state
-    const navigation = this.props.navigation
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
     HttpUtils.get.bind(this.props)(url, {sortType: type}).then(res => {
       self.setState({
@@ -143,6 +142,8 @@ class GoodsApplyPrice extends Component {
       .then(resp => resp.json())
       .then(resp => {
         if (resp.ok) {
+          native.updatePidApplyPrice(product_id, supply_price * 100, () => {
+          })
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
           if (this.props.navigation.state.params.onBack) {
             this.props.navigation.state.params.onBack()

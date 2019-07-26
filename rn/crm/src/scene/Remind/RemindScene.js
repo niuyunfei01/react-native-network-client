@@ -358,14 +358,14 @@ class RemindScene extends PureComponent {
           contentContainerStyle={styles.no_data}
           style={{flex: 1}}
           refreshControl={
-            <RefreshControl
+            `<RefreshControl
               refreshing={loading}
               onRefresh={() => {
                 dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
               }}
               title={"加载中..."}
               colors={['#ffaa66cc', '#ff00ddff', '#ffffbb33', '#ffff4444']}
-            />}>
+            />`}>
           <View style={{alignItems: 'center'}}>
             <Text style={{fontSize: 16}}>
               正在加载...

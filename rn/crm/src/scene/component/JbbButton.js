@@ -69,7 +69,8 @@ class JbbButton extends React.Component {
       textStyle.textDecorationLine = this.props.textUnderline ? 'underline' : 'none'
     }
     textStyle.fontSize = this.props.fontSize
-    textStyle.color = this.props.disabled ? '#fff' : this.props.fontColor
+    // textStyle.color = this.props.disabled ? '#fff' : this.props.fontColor
+    textStyle.color = this.props.fontColor
     textStyle.fontWeight = this.props.fontWeight
     
     return (

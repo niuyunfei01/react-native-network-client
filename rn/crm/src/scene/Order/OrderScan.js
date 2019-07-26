@@ -1,20 +1,17 @@
 import BaseComponent from "../BaseComponent";
 import React from "react";
-import {DeviceEventEmitter, Dimensions, LayoutAnimation, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {DeviceEventEmitter, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from 'react-redux'
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
-import swipeable from '../../widget/react-native-gesture-recognizers/swipeable';
 import OrderList from "./_OrderScan/OrderList";
 import {ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
+import Moment from 'moment'
 
-const {directions: {SWIPE_LEFT, SWIPE_RIGHT}} = swipeable;
-let screenWidth = Dimensions.get('window').width;
-let screenHeight = Dimensions.get('window').height;
 let footerHeight = pxToDp(80);
 
 function mapStateToProps (state) {
@@ -40,12 +37,9 @@ class OrderScan extends BaseComponent {
   constructor (props) {
     super(props);
     this.state = {
-      x: 0,
-      y: 0,
-      idx: 0,
-      orderIds: [],
-      dataSource: [],
-      currentOrder: {}
+      currentOrder: {},
+      isLoading: false,
+      scanEnough: false,
     }
   }
   
@@ -57,17 +51,7 @@ class OrderScan extends BaseComponent {
     }
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
       console.log('scan bar code listener => order id :', orderId);
-      let {orderIds = [], dataSource = []} = self.state;
-      console.log('scan bar code listener => state order ids :', orderIds);
-      console.log('fetch order => state data sources :', dataSource)
-      const idx = orderIds.indexOf(orderId);
-      if (idx >= 0) {
-        self.setState({currentOrder: dataSource[idx]}, () => {
-          self.swipeToOrder(idx)
-        })
-      } else {
-        self.fetchOrder(orderId)
-      }
+      self.fetchOrder(orderId)
     });
   
     // 监听扫描打包品扫码
@@ -89,6 +73,13 @@ class OrderScan extends BaseComponent {
     })
   }
   
+  componentDidMount () {
+    super.componentDidMount();
+    if (this.props.navigation.state.params.orderId) {
+      this.fetchOrder(this.props.navigation.state.params.orderId)
+    }
+  }
+  
   componentWillUnmount () {
     if (this.listenScanBarCode) {
       this.listenScanBarCode.remove()
@@ -101,33 +92,16 @@ class OrderScan extends BaseComponent {
   fetchOrder (orderId) {
     const self = this;
     const accessToken = self.props.global.accessToken;
+    this.setState({isLoading: true})
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
-      let {dataSource = [], orderIds = []} = self.state;
-      dataSource.push(res);
-      orderIds.push(orderId);
-      console.log('fetch order => state order ids :', orderIds);
-      let newIdx = orderIds.indexOf(orderId);
-      self.setState({dataSource, orderIds, currentOrder: res}, () => {
-        self.swipeToOrder(newIdx)
-      })
+      self.setState({currentOrder: res, isLoading: false}, () => self.checkScanNum())
     })
-  }
-  
-  swipeToOrder (toIdx) {
-    let {x, y, idx, dataSource} = this.state;
-    console.log(`auto swipe to idx ${idx} toIdx ${toIdx}`)
-    if (toIdx != idx) {
-      let viewHeight = screenHeight - footerHeight
-      x = 0 - toIdx * screenWidth
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
-      this.setState({x, y, idx: toIdx});
-    }
   }
   
   handleScanProduct (prodCode, isStandard, num = 1) {
     const self = this
-    let {currentOrder, orderIds, dataSource} = this.state
+    let {currentOrder} = this.state
     if (!currentOrder || Object.keys(currentOrder).length === 0) {
       ToastShort('无订单数据！')
       native.speakText('无订单数据！')
@@ -135,7 +109,6 @@ class OrderScan extends BaseComponent {
     }
     const {tagCode, weight = 0, barCode = ''} = prodCode
     const {id, items, scan_count} = currentOrder
-    const idx = orderIds.indexOf(id)
     for (let i in items) {
       let item = items[i]
       if (
@@ -143,27 +116,31 @@ class OrderScan extends BaseComponent {
         (isStandard && item.product.upc && item.product.upc == tagCode)
       ) {
         if (item.scan_num && item.scan_num >= item.num) {
-          ToastShort('该商品已经拣够了！')
-          native.speakText('该商品已经拣够了！')
+          // ToastShort('该商品已经拣够了！')
+          // native.speakText('该商品已经拣够了！')
           return
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
           // 如果拣货数量够，就置底
-          if (Number(item.scan_num) >= Number(item.num)) {
-            items.splice(i, 1)
-            items.push(item)
-          }
+          // if (Number(item.scan_num) >= Number(item.num)) {
+          //   items.splice(i, 1)
+          //   items.push(item)
+          // }
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
           console.log('handle scan product current order : ', currentOrder)
-          console.log('handle scan product data source  before : ', dataSource)
-          dataSource.splice(idx, 1, currentOrder)
-          console.log('handle scan product data source after : ', dataSource)
-          self.setState({dataSource})
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
+          self.setState({currentOrder})
           
-          ToastShort(`商品减${num}！`)
-          native.speakText(`商品减${num}`)
+          let msg = `商品减${num}！`
+          if (!isStandard) {
+            const {datetime} = prodCode
+            let shortTime = Moment(datetime).format('MM月DD日')
+            msg = `${msg}${shortTime}打包`
+          }
+          ToastShort(msg)
+          native.speakText(msg)
+          // native.playWarningSound()
           if (currentOrder.scan_count >= currentOrder.items_count) {
             self.onForcePickUp()
           }
@@ -186,7 +163,10 @@ class OrderScan extends BaseComponent {
     }
     const {items} = currentOrder
     for (let item of items) {
-      if (item.product.upc && item.product.upc == barCode) {
+      if (
+        (item.product.upc && item.product.upc == barCode) ||
+        (barCode.indexOf('JBBUPC') && item.product.upc && item.product.upc.substring(0, 8) == barCode.substring(0, 8))
+      ) {
         if (item.scan_num && item.scan_num >= item.num) {
           ToastShort('该商品已经拣够了！')
           native.speakText('该商品已经拣够了！')
@@ -208,106 +188,69 @@ class OrderScan extends BaseComponent {
     HttpUtils.post.bind(self.props)(api, {
       order_id, item_id, num, code, type, weight, bar_code
     }).then(res => {
-    
-    })
-  }
-  
-  updateScanProdLogNum (order_id, item_id, num) {
-    const self = this
-    const accessToken = self.props.global.accessToken
-    const api = `/api_products/update_inventory_exit_log?access_token=${accessToken}`
-    HttpUtils.post.bind(self.props)(api, {
-      order_id, item_id, num
-    }).then(res => {
-    
+      self.checkScanNum()
     })
   }
   
   onForcePickUp () {
     const self = this
-    let {currentOrder, orderIds, dataSource} = this.state
+    let {currentOrder} = this.state
     const {id} = currentOrder
-    const idx = orderIds.indexOf(id)
-    console.log('force pick up dataSource before', dataSource, 'orderIds', orderIds, ' currentOrder', currentOrder, 'idx', idx)
   
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api).then(() => {
-      dataSource.splice(idx + 1, 1)
-      orderIds.splice(idx + 1, 1)
-      currentOrder = dataSource.length ? dataSource[0] : {}
-      self.setState({dataSource, currentOrder, orderIds}, () => self.swipeToOrder(0))
+    HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then(() => {
+      self.afterPackUp(currentOrder, self)
+    }).catch(e => {
+      if (e.obj == 'ALREADY_PACK_UP') {
+        self.afterPackUp(currentOrder, self)
+      }
     })
   }
   
-  onSwipeBegin = ({direction, distance, velocity}) => {
-    let {x, y, idx, dataSource} = this.state;
-    let length = dataSource.length
-    let viewHeight = screenHeight - footerHeight
-    console.log(`direction ${direction} distance ${distance} viewHeight ${viewHeight} speed ${velocity}`)
-    // if (Math.abs(distance) <= 8.5 || Math.abs(velocity) < 0.85) {
-    //   return
-    // }
-    
-    // x and y values are hardcoded for an iphone6 screen
-    switch (direction) {
-      case SWIPE_LEFT:
-        if (idx >= length - 1) {
-          ToastShort('没有更多了');
-          break;
-        }
-        x = x - screenWidth;
-        idx = idx + 1;
-        break;
-      case SWIPE_RIGHT:
-        if (idx === 0) {
-          ToastShort('已经到头了');
-          break;
-        }
-        x = x + screenWidth;
-        idx = idx - 1;
-        break;
-      default:
-        break
-    }
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
-    
-    this.setState({
-      x, y, idx,
-      currentOrder: dataSource[idx]
-    });
-  };
+  afterPackUp (currentOrder, self) {
+    currentOrder = {}
+    self.setState({currentOrder})
+    ToastShort('打包完成操作成功')
+    native.speakText('打包完成操作成功')
+  }
   
   onChgProdNum (prodIdx, number) {
-    let {currentOrder, orderIds, dataSource} = this.state
-    const {id} = currentOrder
-    const idx = orderIds.indexOf(id)
+    let {currentOrder} = this.state
     const oldNumber = currentOrder.items[prodIdx].scan_num
     currentOrder.items[prodIdx].scan_num = number
     const item = currentOrder.items[prodIdx]
     // 如果拣货数量够，就置底
-    if (Number(currentOrder.items[prodIdx].scan_num) >= Number(currentOrder.items[prodIdx].num)) {
-      currentOrder.items.splice(prodIdx, 1)
-      currentOrder.items.push(item)
-    }
+    // if (Number(currentOrder.items[prodIdx].scan_num) >= Number(currentOrder.items[prodIdx].num)) {
+    //   currentOrder.items.splice(prodIdx, 1)
+    //   currentOrder.items.push(item)
+    // }
     currentOrder.scan_count = currentOrder.scan_count - oldNumber + Number(number)
-    dataSource[idx] = currentOrder
-    this.setState({currentOrder, dataSource})
-    
-    this.updateScanProdLogNum(currentOrder.id, item.id, number)
+    this.setState({currentOrder})
+  
+    this.addScanProdLog(currentOrder.id, item.id, number)
+  }
+  
+  checkScanNum () {
+    let {currentOrder} = this.state
+    if (currentOrder.items_need_scan_num <= currentOrder.scan_count) {
+      this.setState({scanEnough: true})
+    } else {
+      this.setState({scanEnough: false})
+    }
   }
   
   renderBtn () {
+    const {scanEnough, currentOrder} = this.state
     return (
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.footerItem} onPress={() => console.log(1)}>
-          <View style={[styles.footerBtn, styles.successBtn]}>
-            <Text style={styles.footerBtnText}>联系用户</Text>
-          </View>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
-          <View style={[styles.footerBtn, styles.errorBtn]}>
-            <Text style={styles.footerBtnText}>强制打包完成</Text>
+          <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
+            <Text style={styles.footerBtnText}>
+              应扫{currentOrder.items_need_scan_num}件 |
+              已扫{currentOrder.scan_count}件 =>
+              {scanEnough ? '' : '强制'}打包完成
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -315,25 +258,15 @@ class OrderScan extends BaseComponent {
   }
   
   render () {
-    const {x, y, dataSource} = this.state;
-    const OrderListStyle = {
-      left: x,
-      top: y,
-      position: 'absolute',
-    }
-    return dataSource.length ? (
+    const {currentOrder} = this.state;
+    return currentOrder && Object.keys(currentOrder).length ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
           <OrderList
-            style={OrderListStyle}
+            isLoading={this.state.isLoading}
+            onRefresh={() => this.fetchOrder(currentOrder.id)}
             footerHeight={footerHeight}
-            dataSource={this.state.dataSource}
-            onSwipeBegin={this.onSwipeBegin}
-            swipeDecoratorStyle={{
-              left: x,
-              top: y,
-              position: 'absolute',
-            }}
+            dataSource={this.state.currentOrder}
             onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
           />
         </View>
@@ -351,7 +284,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   footerItem: {
-    width: '50%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center'
   },

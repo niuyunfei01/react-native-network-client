@@ -57,8 +57,8 @@ export default class ItemNumPrompt extends React.Component {
           <InputNumber
             styles={inputNumberStyles}
             min={0}
-            max={parseInt(this.props.maxNumber)}
-            value={parseInt(this.state.number)}
+            max={this.props.maxNumber}
+            value={this.state.number}
             style={{backgroundColor: 'white', width: '100%', height: 40}}
             onChange={(number) => this.setState({number})}
             keyboardType={'numeric'}

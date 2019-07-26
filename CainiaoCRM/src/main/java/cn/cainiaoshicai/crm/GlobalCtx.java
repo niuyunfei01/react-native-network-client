@@ -40,7 +40,6 @@ import com.fanjun.keeplive.config.KeepLiveService;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.i18n.reactnativei18n.ReactNativeI18n;
@@ -55,12 +54,12 @@ import com.xdandroid.hellodaemon.DaemonEnv;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -71,7 +70,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.dao.CRMService;
@@ -107,6 +105,8 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
@@ -164,6 +164,8 @@ public class GlobalCtx extends Application {
     private ReactInstanceManager mReactInstanceManager;
     private ReactContext reactContext;
     private Config configByServer;
+
+    public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -884,6 +886,18 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toInventoryMaterialTaskFinish(Activity ctx, String uid, String startTime, String endTime) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryMaterialTaskFinish");
+        Bundle params = new Bundle();
+        Gson gson = new Gson();
+        params.putString("uid", uid);
+        params.putString("start_time", startTime);
+        params.putString("end_time", endTime);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     //跳转到reactnative web页面
     public void toRNWebView(Activity ctx, Map<String, String> data) {
         Intent i = new Intent(ctx, MyReactActivity.class);
@@ -923,6 +937,18 @@ public class GlobalCtx extends Application {
         i.putExtra("_action", "InventoryProductInfo");
         Bundle params = new Bundle();
         params.putInt("pid", pid);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toStockCheck(Activity ctx, int pid, int storeId, String productName, String shelfNo) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryStockCheck");
+        Bundle params = new Bundle();
+        params.putInt("productId", pid);
+        params.putInt("storeId", storeId);
+        params.putString("shelfNo", shelfNo);
+        params.putString("productName", productName);
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
@@ -1054,7 +1080,11 @@ public class GlobalCtx extends Application {
     }
 
     public ShipAcceptStatus getWorkerStatus(long storeId) {
-        return this.getAccountBean().shipAcceptStatus(storeId);
+        AccountBean accountBean = this.getAccountBean();
+        if (accountBean != null) {
+            return accountBean.shipAcceptStatus(storeId);
+        }
+        return null;
     }
 
     public void handleUncaughtException(Thread t, Throwable e) {
@@ -1155,6 +1185,61 @@ public class GlobalCtx extends Application {
 
     private AtomicReference<ScanStatus> ssRef = new AtomicReference<>();
 
+    public void toReportLoss(Activity ctx, int productId, int storeId, String productName) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryReportLoss");
+        Bundle params = new Bundle();
+        params.putInt("productId", productId);
+        params.putInt("storeId", storeId);
+        params.putString("productName", productName);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public boolean updatePidStorage(int pid, int storage) {
+        WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
+        StorageItemAdapter adapter = ref.get();
+
+        boolean updated = false;
+        if (adapter != null) {
+            adapter.updateItemStorage(pid, storage);
+            updated = true;
+            if (currentRunningActivity != null) {
+                currentRunningActivity.runOnUiThread(adapter::notifyDataSetChanged);
+            }
+        }
+
+        AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, updated ? " null Adapter" : "done"));
+        return updated;
+    }
+
+    public boolean updatePidApplyPrice(int pid, int applyPrice) {
+        WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
+        StorageItemAdapter adapter = ref.get();
+
+        boolean updated = false;
+        if (adapter != null) {
+            adapter.updateItemApplyPrice(pid, applyPrice);
+            updated = true;
+            if (currentRunningActivity != null) {
+                currentRunningActivity.runOnUiThread(adapter::notifyDataSetChanged);
+            }
+        }
+
+        AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, updated ? " null Adapter" : "done"));
+        return updated;
+    }
+
+    public void toInventoryDetail(StoreStorageActivity storeStorageActivity, int productId, int storeId) {
+        Intent i = new Intent(storeStorageActivity, MyReactActivity.class);
+        i.putExtra("_action", "InventoryDetail");
+        Bundle params = new Bundle();
+        params.putInt("productId", productId);
+        params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
+        storeStorageActivity.startActivity(i);
+    }
+
     static public class ScanStatus {
         private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
         private Map<String, Map<String, String>> ls = Maps.newConcurrentMap();
@@ -1254,6 +1339,7 @@ public class GlobalCtx extends Application {
         private int new_ele_order_sound;
         private int new_eb_order_sound;
         private int todo_complain_sound;
+        private int warn_sound;
 
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
@@ -1283,6 +1369,7 @@ public class GlobalCtx extends Application {
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
             new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
+            warn_sound = soundPool.load(ctx, R.raw.warning, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1379,7 +1466,6 @@ public class GlobalCtx extends Application {
                 return storeSoundUnknown;
             }
         }
-
 
         public boolean play_new_simple_order_sound() {
             return this.play_single_sound(simpleNewOrderSound);
@@ -1499,21 +1585,31 @@ public class GlobalCtx extends Application {
             return !check_disabled() && AudioUtils.getInstance().speakText(s);
         }
 
+
+        public void play_warning_order() {
+            try{
+                //获取系统的Audio管理者
+                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                //最大音量
+                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                //当前音量
+                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+                this.play_single_sound(warn_sound);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
+            }catch (Exception e){
+            }
+        }
+
         public void notifyNewOrder(String text, String plat, String storeName, int notifyTimes) {
             try {
                 //获取系统的Audio管理者
                 AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 //最大音量
                 int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
                 //当前音量
                 int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                int currentAlarmVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-                int currentRingVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
-
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0);
                 for (int i = 0; i < notifyTimes; i++) {
                     if (storeName != null && !storeName.isEmpty()) {
                         GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
@@ -1533,8 +1629,6 @@ public class GlobalCtx extends Application {
                     Thread.sleep(8000);
                 }
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, currentAlarmVolume, 0);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_RING, currentRingVolume, 0);
             } catch (Exception e) {
                 AppLogger.e(e.getMessage());
             }

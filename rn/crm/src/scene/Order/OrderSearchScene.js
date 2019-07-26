@@ -1,26 +1,26 @@
 //import liraries
 import React, {PureComponent} from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
+  BackHandler,
   Image,
-  TouchableOpacity,
+  InteractionManager,
   ScrollView,
-  RefreshControl,
-  InteractionManager
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Toast from "../../weui/Toast/Toast";
 import SearchBar from "../../weui/SearchBar/SearchBar";
 import {native} from '../../common';
-import NavigationItem from "../../widget/NavigationItem";
 import Config from "../../config";
+import ModalSelector from "react-native-modal-selector";
+import HttpUtils from "../../util/http";
 
 
 function mapStateToProps(state) {
@@ -45,11 +45,36 @@ class OrderSearchScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       isSearching: false,
+      prefix: [],
+      selectPrefix: {}
     };
   }
 
   componentDidMount() {
   }
+
+  componentWillMount() {
+    this.fetchOrderSearchPrefix()
+    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+  
+  fetchOrderSearchPrefix () {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `/api/order_search_prefix?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then(res => {
+      self.setState({prefix: res, selectPrefix: res[0]})
+    })
+  }
+
+  onBackAndroid = () => {
+    native.toOrders()
+    return true;
+  };
 
 
   onHeaderRefresh() {
@@ -59,6 +84,7 @@ class OrderSearchScene extends PureComponent {
 
   onSearch = (search) => {
     console.log('search -> ', search);
+    search = this.state.selectPrefix.value + search
     native.ordersSearch(search)
   };
 
@@ -73,13 +99,35 @@ class OrderSearchScene extends PureComponent {
       return;
     } else if (route === Config.ROUTE_ORDER_PEND_PAYMENT) {
       this.onSearch("paid:offline");
+    } else if (route === 'to_revisit:') {
+      this.onSearch("to_revisit:");
     }
 
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-
+  
+  renderSearchBarPrefix () {
+    return (
+      <ModalSelector
+        data={this.state.prefix}
+        onChange={(item) => this.setState({selectPrefix: item})}
+        cancelText={'取消'}
+      >
+        <View style={styles.searchBarPrefix}>
+          <Text style={{fontSize: 12, fontWeight: 'bold'}}>
+            {this.state.selectPrefix.label}
+          </Text>
+          <Image
+            source={require('../../img/triangle_down.png')}
+            style={{width: 15, height: 15, marginTop: 2}}
+          />
+        </View>
+      </ModalSelector>
+    )
+  }
+  
   render() {
     return (
       <ScrollView
@@ -96,6 +144,7 @@ class OrderSearchScene extends PureComponent {
           placeholder="序号/编号/收货手机姓名/地址/备注/发票/商品"
           onBlurSearch={this.onSearch.bind(this)}
           lang={{cancel: '搜索'}}
+          prefix={this.renderSearchBarPrefix()}
         />
         <View style={styles.label_box}>
           <Text style={styles.alert_msg}>
@@ -110,6 +159,9 @@ class OrderSearchScene extends PureComponent {
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_PEND_PAYMENT)}>
               <Text style={styles.label_style}>需收款</Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress('to_revisit:')}>
+              <Text style={styles.label_style}>待回访</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -153,6 +205,13 @@ const styles = StyleSheet.create({
     paddingVertical: pxToDp(8),
     paddingHorizontal: pxToDp(20),
   },
+  searchBarPrefix: {
+    flexDirection: 'row',
+    width: pxToDp(140),
+    flex: 1,
+    position: 'relative',
+    alignItems: 'center'
+  }
 });
 
 

@@ -24,29 +24,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.ShipOptions;
-import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
-import cn.cainiaoshicai.crm.orders.util.TextUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.ui.activity.OrderQueryActivity;
 
 /**
+ *
  */
 public class OrderAdapter extends BaseAdapter {
 
@@ -126,7 +128,7 @@ public class OrderAdapter extends BaseAdapter {
             String expectTimeTxt = TextUtils.isEmpty(order.getExpectTimeStr()) ? (expectTime == null ? "立即送餐" : DateTimeUtils.dHourMinCh(expectTime)) : order.getExpectTimeStr();
             expect_time.setText(expectTimeTxt);
 
-            if(notTimeToShip) {
+            if (notTimeToShip) {
                 expect_time.setBackgroundColor(ContextCompat.getColor(activity, R.color.green));
                 expect_time.setTextColor(ContextCompat.getColor(activity, R.color.white));
             } else {
@@ -134,14 +136,15 @@ public class OrderAdapter extends BaseAdapter {
                 expect_time.setTextColor(lightBlue);
             }
 
-            if ( (!TextUtils.isEmpty(order.getPack_assign_name()) || !TextUtils.isEmpty(order.getPack_1st_worker())) &&
-                    (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() ==  Cts.WM_ORDER_STATUS_TO_SHIP)) {
+            if ((!TextUtils.isEmpty(order.getPack_assign_name()) || !TextUtils.isEmpty(order.getPack_1st_worker())) &&
+                    (order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP)) {
                 if (!TextUtils.isEmpty(order.getPack_assign_name())) {
-                    packAssigned.setText("派:"+order.getPack_assign_name());
+                    packAssigned.setText("派:" + order.getPack_assign_name());
                 } else {
-                    packAssigned.setText("领:"+order.getPack_1st_worker());
+                    packAssigned.setText("领:" + order.getPack_1st_worker());
                 }
                 packAssigned.setVisibility(View.VISIBLE);
+                packAssigned.setOnClickListener(new OrderAllotListener(order.getPack_assign_name(), order.getId(), order.getStore_id()));
             } else {
                 packAssigned.setVisibility(View.GONE);
             }
@@ -253,7 +256,7 @@ public class OrderAdapter extends BaseAdapter {
                     workerText.setText(order.getShip_worker_name());
                     workerText.setOnClickListener(shipWorkerClicked);
                     workerText.setVisibility(View.VISIBLE);
-                    shipTextView.setText(order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP ? "接单": "出发");
+                    shipTextView.setText(order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_READY || order.getOrderStatus() == Cts.WM_ORDER_STATUS_TO_SHIP ? "接单" : "出发");
                     shipTextView.setVisibility(View.VISIBLE);
                 } else {
                     workerText.setVisibility(View.GONE);
@@ -281,7 +284,7 @@ public class OrderAdapter extends BaseAdapter {
 
                 if (order.getTime_arrived() != null && order.getTime_start_ship() != null) {
                     shipTimeText.setText(DateTimeUtils.hourMin(order.getTime_arrived()));
-                    int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) /(60 * 1000));
+                    int minutes = (int) ((order.getTime_arrived().getTime() - order.getOrderTime().getTime()) / (60 * 1000));
                     shipTimeCost.setText(String.valueOf(minutes));
 //                    int colorResource = minutes <= Cts.MAX_EXCELL_SPENT_TIME ? R.color.green : R.color.red;
 //                    shipTimeCost.setTextColor(ContextCompat.getColor(GlobalCtx.app(), colorResource));
@@ -302,7 +305,7 @@ public class OrderAdapter extends BaseAdapter {
             TextView inTimeView = vi.findViewById(R.id.is_in_time);
             TextView print_times = vi.findViewById(R.id.print_times);
             TextView readyDelayWarn = vi.findViewById(R.id.ready_delay_warn);
-            if (order.getExpectTime() != null ) {
+            if (order.getExpectTime() != null) {
                 if (order.getTime_arrived() != null) {
                     Cts.DeliverReview reviewDeliver = Cts.DeliverReview.find(order.getReview_deliver());
                     int colorResource = (reviewDeliver.isGood()) ? R.color.green : R.color.red;
@@ -339,7 +342,7 @@ public class OrderAdapter extends BaseAdapter {
                             ship_schedule.setOnClickListener(new ScheClickedListener(order.getShip_sch(), order.getId(), order.getStore_id()));
                         }
 
-                        print_times.setText(order.getPrint_times() > 0 ? ("打印"+order.getPrint_times()+"次") : "未打印");
+                        print_times.setText(order.getPrint_times() > 0 ? ("打印" + order.getPrint_times() + "次") : "未打印");
                         print_times.setVisibility(View.VISIBLE);
                     } else {
                         readyDelayWarn.setVisibility(View.GONE);
@@ -353,7 +356,7 @@ public class OrderAdapter extends BaseAdapter {
                 inTimeView.setText("");
             }
 
-         }catch (Exception e) {
+        } catch (Exception e) {
             AppLogger.e("display a row:" + i + ": " + e.getMessage(), e);
         }
 
@@ -423,6 +426,109 @@ public class OrderAdapter extends BaseAdapter {
         }
     }
 
+
+    private class OrderAllotListener implements View.OnClickListener {
+        private final String initOption;
+        private final long orderId;
+        private final long storeId;
+
+
+        public OrderAllotListener(String initOption, long orderId, long storeId) {
+            this.initOption = initOption;
+            this.orderId = orderId;
+            this.storeId = storeId;
+        }
+
+        public Object getKeyFromValue(Map hm, Object value) {
+            for (Object o : hm.keySet()) {
+                if (hm.get(o).equals(value)) {
+                    return o;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void onClick(View v) {
+            GlobalCtx app = GlobalCtx.app();
+            ShipAcceptStatus acceptStatus = null;
+            if (app.getAccountBean() != null) {
+                acceptStatus = app.getAccountBean().shipAcceptStatus(storeId);
+            }
+
+            if (acceptStatus == null) {
+                AlertUtil.showAlert(activity, "错误提示", "查询不到店铺派单信息");
+                return;
+            }
+            Map<String, String> users = acceptStatus.getUsers();
+
+            if (users == null) {
+                AlertUtil.showAlert(activity, "错误提示", "查询不到店铺接单人员信息");
+                return;
+            }
+
+            final String[] selectedOption = {initOption};
+
+            String[] names = new String[users.size()];
+            int idx = 0;
+            for (Map.Entry<String, String> e : users.entrySet()) {
+                names[idx] = e.getValue();
+                idx++;
+            }
+            int checkedIdx = Arrays.binarySearch(names, initOption);
+
+            AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+            adb.setTitle("改派订单");
+
+            adb.setSingleChoiceItems(names, checkedIdx, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String checkedName = names[which];
+                    selectedOption[0] = checkedName;
+                }
+            });
+
+            adb.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
+                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
+                        new MyAsyncTask<Void, Void, Void>() {
+                            ResultBean rb;
+
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    String userId = (String) getKeyFromValue(users, selectedOption[0]);
+                                    rb = oad.order_re_assign(orderId + "", userId, storeId + "");
+                                } catch (ServiceException e) {
+                                    e.printStackTrace();
+                                    rb = ResultBean.serviceException(e.getMessage());
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                if (rb != null) {
+                                    if (!rb.isOk()) {
+                                        AlertUtil.showAlert(activity, "改派失败", rb.getDesc());
+                                    } else {
+                                        Toast.makeText(activity, "改派成功", Toast.LENGTH_LONG).show();
+                                        ((TextView) v).setText(rb.getDesc());
+                                    }
+                                }
+                            }
+                        }.execute();
+                    }
+                }
+            });
+            adb.setNegativeButton("取消", null);
+            adb.show();
+        }
+    }
+
     private class ScheClickedListener implements View.OnClickListener {
 
         private final String initOption;
@@ -463,7 +569,7 @@ public class OrderAdapter extends BaseAdapter {
 
                     if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
                         final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
-                        new MyAsyncTask<Void, Void, Void>(){
+                        new MyAsyncTask<Void, Void, Void>() {
 
                             ResultBean rb;
 
@@ -485,7 +591,7 @@ public class OrderAdapter extends BaseAdapter {
                                         AlertUtil.showAlert(activity, "排单失败", rb.getDesc());
                                     } else {
                                         Toast.makeText(activity, "排单成功", Toast.LENGTH_LONG).show();
-                                        ((TextView)v).setText(rb.getDesc());
+                                        ((TextView) v).setText(rb.getDesc());
                                     }
                                 }
                             }

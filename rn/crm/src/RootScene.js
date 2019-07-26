@@ -7,22 +7,14 @@
  */
 
 import React, {PureComponent} from "react";
-import {
-  StatusBar,
-  Platform,
-  StyleSheet,
-  View,
-  Text,
-  ToastAndroid
-} from "react-native";
+import {Platform, StatusBar, StyleSheet, ToastAndroid, View, YellowBox} from "react-native";
 
 import {Provider} from "react-redux";
-
 /**
  * ## Actions
  *  The necessary actions for dispatching our bootstrap values
  */
-import {setPlatform, setVersion} from "./reducers/device/deviceActions";
+import {setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,
@@ -34,7 +26,6 @@ import {
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
-import * as _g from "./global";
 
 import Config from "./config";
 
@@ -42,12 +33,17 @@ import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
 import _ from "lodash"
+import GlobalUtil from "./util/GlobalUtil";
+import {DeviceEventEmitter} from "react-native";
+
 
 const lightContentScenes = ["Home", "Mine", "Operation"];
 
 //global exception handlers
 const caught = new Caught();
-
+YellowBox.ignoreWarnings([
+  'Warning: isMounted(...) is deprecated'
+])
 function getCurrentRouteName (navigationState) {
   if (!navigationState) {
     return null;
@@ -118,13 +114,13 @@ class RootScene extends PureComponent {
             }))
           }
         }
-        _g.setHostPortNoDef(store.getState().global, native, () => {
+        GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
           this.setState({rehydrated: true});
         });
       }.bind(this)
     );
   }
-  
+
   render () {
     const launchProps = this.props.launchProps;
     const orderId = launchProps["order_id"];

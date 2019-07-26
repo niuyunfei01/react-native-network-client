@@ -74,7 +74,6 @@ const C = {
   ROUTE_ORDER: 'Order',
   ROUTE_ALERT: 'Tab', //Home for reminds
   ROUTE_ORDERS: 'Orders',
-  ROUTE_WORKER: 'Worker',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
   ROUTE_USER_CHOOSE: 'UserChoose',
@@ -97,6 +96,8 @@ const C = {
   ROUTE_ORDER_SEND_MONEY: 'OrderSendMoney',
   ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
   ROUTE_ORDER_SCAN: 'OrderScan', // 订单扫码过机
+  ROUTE_ORDER_REFUND_BY_WEIGHT: 'OrderRefundByWeight', // 订单按重退款
+  ROUTE_ORDER_SCAN_REDAY: 'OrderSetReady',
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
@@ -162,16 +163,27 @@ const C = {
   ROUTE_GOODS_APPLY_PRICE: 'GoodsApplyPrice',
   ROUTE_GOODS_PRICE_INDEX: 'GoodsPriceIndex',
   ROUTE_GOODS_ANALYSIS: 'GoodsAnalysis',
+  ROUTE_GOODS_MARKET_EXAMINE: 'GoodsMarketExamine',                             // 商品-市调
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',
+  // 员工相关
+  ROUTE_WORKER: 'Worker',
+  ROUTE_WORKER_SCHEDULE: 'WorkerSchedule',
+  // 库存相关
   ROUTE_INVENTORY_PRODUCT_PUT_IN: 'InventoryProductPutIn',                      // 库存 - 商品入库
   ROUTE_INVENTORY_PRODUCT_INFO: 'InventoryProductInfo',                         // 库存 - 商品库管详情
   ROUTE_INVENTORY_MATERIAL_LIST: 'InventoryMaterialList',                       // 库存 - 原材料列表
   ROUTE_INVENTORY_MATERIAL_PUT_IN: 'InventoryMaterialPutIn',                    // 库存 - 原材料手动入库
+  ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE: 'InventoryMaterialDetailUpdate',      // 库存 - 原材料详情修改
   ROUTE_INVENTORY_STANDARD_PUT_IN: 'InventoryStandardPutIn',                    // 库存 - 标品入库
+  ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE: 'InventoryStandardDetailUpdate',      // 库存 - 标品详情修改
   ROUTE_INVENTORY_MATERIAL_TASK: 'InventoryMaterialTask',                       // 库存 - 原材料任务
   ROUTE_INVENTORY_MATERIAL_TASK_FINISH: 'InventoryMaterialTaskFinish',          // 库存 - 原材料我完成的任务
+  ROUTE_INVENTORY_STOCK_CHECK: 'InventoryStockCheck',                           // 库存 - 库存盘点
+  ROUTE_INVENTORY_STOCK_CHECK_HISTORY: 'InventoryStockCheckHistory',            // 库存 - 库存盘点历史
+  ROUTE_INVENTORY_REPORT_LOSS: 'InventoryReportLoss',                           // 库存 - 库存报损
+  ROUTE_INVENTORY_DETAIL: 'InventoryDetail',                                    // 库存 - 商品出入库明细
   serverUrl,
   apiUrl,
   staticUrl,
@@ -182,9 +194,11 @@ const C = {
 };
 
 C.Listener = {
+  KEY_LISTENER_IDS: 'listenerIds',
   KEY_SCAN_ORDER_BAR_CODE: 'listenScanBarCode',                                 // 扫描订单条形码
   KEY_SCAN_PROD_QR_CODE: 'listenScanProductCode',                               // 扫描商品打包二维码
   KEY_SCAN_STANDARD_PROD_BAR_CODE: 'listenScanStandardProdBarCode',             // 扫描标准品条形码
+  KEY_SCAN_PACK_PROD_BAR_CODE: 'listenScanIrCode',                              // 扫描打包品条形码
 }
 
 

@@ -77,7 +77,7 @@ class ProductPutIn extends React.Component {
       productId: navigation.state.params.pid,
       storeId: this.state.storeId
     }
-  
+    Toast.loading('请求中', 3)
     HttpUtils.post.bind(self.props)(api, data).then(res => {
       Toast.success('操作成功')
       native.nativeBack()

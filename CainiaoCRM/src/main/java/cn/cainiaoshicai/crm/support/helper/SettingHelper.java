@@ -99,4 +99,8 @@ public class SettingHelper {
     public static boolean usePreviewHost() {
         return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_PREVIEW_HOST, "0"));
     }
+
+    public static boolean useZitiMode() {
+        return getSharedPreferences(GlobalCtx.app(), "store_is_ziti_mode", false);
+    }
 }

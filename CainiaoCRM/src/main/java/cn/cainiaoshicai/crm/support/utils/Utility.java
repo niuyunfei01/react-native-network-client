@@ -1237,6 +1237,12 @@ public class Utility {
                     ctx.startActivity(LoginActivity.newIntent(mobile));
                 } else if (url.indexOf("/users/login?") > 0 || url.indexOf("/users/login/") > 0) {
                     ctx.startActivity(LoginActivity.newIntent());
+                } else if(url.indexOf("/stores/worker_pack_details?") > 0) {
+                    Bundle urlParams = Utility.parseUrl(url);
+                    String uid = urlParams.getString("uid");
+                    String start = urlParams.getString("start");
+                    String end = urlParams.getString("end");
+                    GlobalCtx.app().toInventoryMaterialTaskFinish((Activity)ctx, uid, start, end);
                 }
             }
         }

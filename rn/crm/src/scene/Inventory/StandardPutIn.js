@@ -2,18 +2,23 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {InputItem, List, WhiteSpace} from "antd-mobile-rn";
+import {Checkbox, InputItem, List, WhiteSpace} from "antd-mobile-rn";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
 import C from '../../config'
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../Order/inputNumberStyles";
+import JbbCellTitle from "../component/JbbCellTitle";
+import color from "../../widget/color";
+import JbbButton from "../component/JbbButton";
+import EmptyData from "../component/EmptyData";
 
+const CheckboxItem = Checkbox.CheckboxItem;
 function mapStateToProps (state) {
   const {global} = state;
   return {global: global};
@@ -43,10 +48,12 @@ class StandardPutIn extends BaseComponent {
       supplierPopup: false,
       suppliers: [],
       supplier: {},
-      number: '0',
+      number: 0,
       price: '0',
       standardProducts: [],
-      standardProdPrompt: false
+      standardProdPrompt: false,
+      supplement: false,
+      checkHistory: []
     }
   }
   
@@ -70,7 +77,7 @@ class StandardPutIn extends BaseComponent {
       this.setSupplier(params.workerId)
     }
     this.setState(state)
-
+  
     native.showInputKeyboard();
   }
   
@@ -100,6 +107,7 @@ class StandardPutIn extends BaseComponent {
         self.setState({upc: ''})
       } else {
         self.setState({product: res})
+        self.fetchCheckHistory(res)
       }
     })
   }
@@ -117,7 +125,32 @@ class StandardPutIn extends BaseComponent {
     })
   }
   
+  fetchCheckHistory (product) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const uri = `/api_products/inventory_check_history?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(uri, {
+      productId: product.id,
+      storeId: this.state.store.id,
+      page: 1,
+      pageSize: 3
+    }).then(res => {
+      self.setState({checkHistory: res.lists})
+    })
+  }
+  
   doSubmit () {
+    if (this.state.supplement) {
+      Alert.alert('提示', '您已选择补货模式，此条记录将不记入库存。\n 确定继续操作么？', [
+        {text: '取消', style: 'cancel'},
+        {text: '继续', onPress: () => this._submit()},
+      ])
+    } else {
+      this._submit()
+    }
+  }
+  
+  _submit () {
     const self = this
     if (!this.state.product.upc) {
       ToastShort('未知商品')
@@ -130,10 +163,17 @@ class StandardPutIn extends BaseComponent {
       storeId: self.state.store.id,
       supplierId: self.state.supplier.id,
       price: self.state.price,
-      number: self.state.number
+      number: self.state.number,
+      supplement: self.state.supplement
     }).then(res => {
-      self.setState({product: {}, number: '0', price: '0', supplier: {}})
-      self.listenUpcInterval()
+      self.setState({
+        product: {},
+        number: 0,
+        price: '0',
+        upc: '',
+        supplement: false,
+        checkHistory: []
+      })
     })
   }
   
@@ -148,6 +188,28 @@ class StandardPutIn extends BaseComponent {
         }
       }
     ])
+  }
+  
+  /**
+   * 获取最近一次标品入库信息
+   * @param item
+   */
+  onSelectProduct (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `api_products/get_last_receipt_info/${item.upc}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      if (!res || !res.supplier || !res.weight) {
+        ToastLong('暂无最近收货信息，请手动录入')
+      }
+      this.setState({
+        supplier: res.supplier,
+        number: res.weight ? res.weight : 0,
+        product: item,
+        standardProdPrompt: false
+      })
+      self.fetchCheckHistory(item)
+    })
   }
   
   fetchStandardProducts () {
@@ -246,7 +308,7 @@ class StandardPutIn extends BaseComponent {
         <InputNumber
           styles={inputNumberStyles}
           min={0}
-          value={parseInt(this.state.number)}
+          value={this.state.number}
           style={{backgroundColor: 'white', width: '100%', height: 40}}
           onChange={(number) => this.setState({number})}
           keyboardType={'numeric'}
@@ -254,21 +316,76 @@ class StandardPutIn extends BaseComponent {
       </View>
     )
   }
-  render () {
+  
+  renderCheckHistory () {
+    const self = this
     return (
-      <ScrollView
-        contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}
-        style={{flex: 1}}
-      >
-        <View>
-          {this.renderProdInfo()}
-          <WhiteSpace/>
-          {this.renderInput()}
-          {this.renderStepper()}
-        </View>
+      <View>
+        <JbbCellTitle
+          right={<JbbButton
+            type={'text'}
+            text={'查看更多>>'}
+            onPress={() => self.props.navigation.navigate(C.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+              productId: self.state.product.id,
+              storeId: self.state.store.id
+            })}
+            disabled={!(self.state.product && self.state.product.id)}
+            fontColor={color.theme}
+          />}
+        >盘点历史</JbbCellTitle>
+        {
+          this.state.checkHistory.length ? (
+            <For of={this.state.checkHistory} each="item" index="idx">
+              <View key={idx} style={styles.item}>
+                <View style={styles.itemRow}>
+                  <Text style={styles.itemRowText}>盘点时间：{item.check_time}</Text>
+                  <Text style={styles.itemRowText}>盘点人：{item.check_user.nickname}</Text>
+                </View>
+                <View style={styles.itemRow}>
+                  <Text style={styles.itemRowText}>理论库存：{item.theoretical_num}</Text>
+                  <Text style={styles.itemRowText}>实际库存：{item.actual_num}</Text>
+                </View>
+                <View style={styles.itemRow}>
+                  <Text style={styles.itemRowText}>备注信息：{item.remark}</Text>
+                </View>
+              </View>
+            </For>
+          ) : (<EmptyData/>)
+        }
+      
+      </View>
+    )
+  }
+  
+  render () {
+    const {supplement} = this.state
+    return (
+      <View style={{flex: 1}}>
+        <ScrollView>
+          <View>
+            {this.renderProdInfo()}
+            <WhiteSpace/>
+            {this.renderInput()}
+            {this.renderStepper()}
         
+            <List>
+              <CheckboxItem
+                multipleLine
+                checked={supplement}
+                onChange={() => this.setState({supplement: !supplement})}
+              >
+                补充录入
+                <List.Item.Brief>(不增加库存)</List.Item.Brief>
+              </CheckboxItem>
+            </List>
+        
+            <WhiteSpace/>
+            {this.renderCheckHistory()}
+          </View>
+        </ScrollView>
+  
         {this.renderBtn()}
-        
+    
         <SearchPopup
           visible={this.state.supplierPopup}
           dataSource={this.state.suppliers}
@@ -279,20 +396,16 @@ class StandardPutIn extends BaseComponent {
             supplierPopup: false
           })}
         />
-  
+    
         <SearchPopup
           visible={this.state.standardProdPrompt}
           dataSource={this.state.standardProducts}
-          title={'选择供应商'}
+          title={'选择商品'}
           onClose={() => this.setState({standardProdPrompt: false})}
-          onSelect={(item) => this.setState({
-            product: item,
-            standardProdPrompt: false
-          })}
+          onSelect={(item) => this.onSelectProduct(item)}
         />
-      </ScrollView>
+      </View>
     )
-      ;
   }
 }
 
@@ -357,6 +470,21 @@ const styles = StyleSheet.create({
   },
   footerBtnText: {
     color: '#fff'
+  },
+  
+  item: {
+    paddingHorizontal: pxToDp(20),
+    backgroundColor: '#fff',
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: color.fontGray
+  },
+  itemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: pxToDp(10),
+  },
+  itemRowText: {
+    fontSize: 12
   }
 })
 

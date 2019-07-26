@@ -12,5 +12,30 @@ export default {
       value: '3',
       label: '下架'
     }
+  },
+  // 收货状态
+  RECEIPT_STATUS: {
+    TO_PACK: {
+      value: '0',
+      label: '待打包'
+    },
+    PACKING: {
+      value: '1',
+      label: '打包中'
+    },
+    ENTRY: {
+      value: '2',
+      label: '已入库'
+    }
+  },
+  RECEIPT_TYPE: {
+    NONSTANDARD: {
+      value: '1',
+      label: '非标品'
+    },
+    STANDARD: {
+      value: '2',
+      label: '标品'
+    }
   }
 }

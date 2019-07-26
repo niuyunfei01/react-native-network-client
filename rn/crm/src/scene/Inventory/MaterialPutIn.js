@@ -48,6 +48,7 @@ class MaterialPutIn extends React.Component {
       supplierId: 0,
       weight: '0',
       reduceWeight: '0',
+      packageWeight: '0',
       price: '0',
       datetime: null
     }
@@ -64,6 +65,8 @@ class MaterialPutIn extends React.Component {
     state.receiptId = params.receiptId ? params.receiptId : null
     state.barCode = params.barCode ? params.barCode : null
     state.weight = params.weight ? params.weight : '0'
+    state.reduceWeight = params.reduceWeight ? params.reduceWeight : '0'
+    state.packageWeight = params.packageWeight ? params.packageWeight : '0'
     state.price = params.price ? params.price : '0'
     state.datetime = params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
     this.setState(state)
@@ -125,17 +128,33 @@ class MaterialPutIn extends React.Component {
     const self = this
     const navigation = self.props.navigation
     const accessToken = self.props.global.accessToken
-    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId} = this.state
+    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId, packageWeight} = this.state
     const api = `api_products/material_put_in?access_token=${accessToken}`
+    Toast.loading('提交中。。', 3)
     HttpUtils.post.bind(self.props)(api, {
       id: receiptId,
-      skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime
+      skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, packageWeight
     }).then(res => {
       Toast.success('录入成功')
         navigation.goBack()
         navigation.state.params.onBack && navigation.state.params.onBack()
     }).catch(e => {
       Alert.alert('错误', e.reason)
+    })
+  }
+  
+  onSelectMaterial (item) {
+    const self = this
+    const accessToken = this.props.global.accessToken
+    const api = `api_products/get_supplier_by_last_time/${item.id}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      this.setState({
+        sku: item.name,
+        skuId: item.id,
+        skuPopup: false,
+        supplier: res.name,
+        supplierId: res.supplier_code,
+      })
     })
   }
   
@@ -167,7 +186,13 @@ class MaterialPutIn extends React.Component {
             value={this.state.reduceWeight}
             defaultValue={this.state.reduceWeight}
             onChange={(reduceWeight) => this.setState({reduceWeight})}
-          >扣重</InputItem>
+          >货损</InputItem>
+          <InputItem
+            extra={'公斤'}
+            value={this.state.packageWeight}
+            defaultValue={this.state.packageWeight}
+            onChange={(packageWeight) => this.setState({packageWeight})}
+          >皮重</InputItem>
           <InputItem
             extra={'元'}
             value={this.state.price}
@@ -192,7 +217,7 @@ class MaterialPutIn extends React.Component {
           dataSource={this.state.skus}
           title={'选择原料名称'}
           onClose={() => this.setState({skuPopup: false})}
-          onSelect={(item) => this.setState({sku: item.name, skuId: item.id, skuPopup: false})}
+          onSelect={(item) => this.onSelectMaterial(item)}
         />
         <SearchPopup
           visible={this.state.supplierPopup}

@@ -9,6 +9,7 @@ import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ProductTpl;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
@@ -66,8 +67,8 @@ public interface CRMService {
                                        @Field("product_id") int productId, @Field("before_price") int beforePrice,
                                        @Field("apply_price") int applyPrice, @Field("remark") String remark, @Field("auto_on_sale") int autoOnSale);
 
-    @POST("/api/shipping_start_accept/{storeId}")
-    Call<ResultBean<ShipAcceptStatus>> shippingStartAccept(@Path("storeId") long storeId);
+    @POST("/api/shipping_start_accept/{storeId}/{sn}")
+    Call<ResultBean<ShipAcceptStatus>> shippingStartAccept(@Path("storeId") long storeId, @Path("sn") String sn);
     @POST("/api/shipping_stop_accept/{storeId}")
     Call<ResultBean<ShipAcceptStatus>> shippingStopAccept(@Path("storeId") long storeId);
     @POST("/api/shipping_accept_status/{storeId}")
@@ -91,7 +92,8 @@ public interface CRMService {
     @GET("/api/query_store_prod_quota/{storeId}")
     Call<ResultBean<Map<String, String>>> getStoreQuota(@Path("storeId") long storeId);
 
-
+    @GET("/InventoryApi/list_summary_order_by_supplier")
+    Call<ResultBean<List<SupplierSummaryOrder>>> getSupplierOrderSummary();
 
     class UploadRes {
         private FileBean file;

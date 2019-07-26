@@ -25,7 +25,8 @@ const {
   AFTER_TRANSFER_ORDER_ITEM,
   AFTER_APPEND_SUPPLY_ORDER,
   REMOVE_SUPPLY_ORDER,
-  LIST_ALL_STORES
+  LIST_ALL_STORES,
+  LIST_ALL_ENABLE_SUPPLIERS
 } = require('./ActionTypes.js').default;
 
 function checkErrorCode(error_code) {
@@ -102,7 +103,7 @@ export function lockProvideReq(req, token, callBack) {
 
 export function loadAllSuppliers(token) {
   return dispatch => {
-    const url = `InventoryApi/list_supplier?access_token=${token}`;
+    const url = `InventoryApi/list_all_supplier?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -112,6 +113,24 @@ export function loadAllSuppliers(token) {
         } else {
           if (checkErrorCode(error_code)) {
             dispatch(receiveSuppliers([]))
+          }
+        }
+      })
+  }
+}
+
+export function loadEnableSuppliers(token) {
+  return dispatch => {
+    const url = `InventoryApi/list_supplier?access_token=${token}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+      .then(resp => resp.json())
+      .then(resp => {
+        let {ok, reason, obj, error_code} = resp;
+        if (ok) {
+          dispatch(receiveAvailableSuppliers(obj))
+        } else {
+          if (checkErrorCode(error_code)) {
+            dispatch(receiveAvailableSuppliers([]))
           }
         }
       })
@@ -357,7 +376,7 @@ export function createCheckHistory(token, productId, supplierId, storeId) {
 }
 
 function commonRespHandle(dispatch, resp, storeId, status, callback) {
-  let {ok, reason, obj, error_code} = resp;
+  let {ok, reason, obj} = resp;
   dispatch({type: REMOVE_SUPPLY_ORDER, ok: ok, data: obj, status: status, storeId: storeId})
   callback(ok, reason)
 }
@@ -498,6 +517,13 @@ function receiveLockedReq(data) {
 function receiveSuppliers(suppliers) {
   return {
     type: LIST_ALL_SUPPLIERS,
+    suppliers: suppliers
+  }
+}
+
+function receiveAvailableSuppliers(suppliers) {
+  return {
+    type: LIST_ALL_ENABLE_SUPPLIERS,
     suppliers: suppliers
   }
 }
