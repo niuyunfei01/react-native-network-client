@@ -14,6 +14,8 @@ import {CachedImage} from "react-native-img-cache";
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
 import JbbInput from "../component/JbbInput";
+import JbbPrompt from "../component/JbbPrompt";
+import JbbButton from "../component/JbbButton";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -131,13 +133,14 @@ class GoodsMarketExamine extends BaseComponent {
     }, () => this.search())
   }
   
-  onChgMarketPrice (idx, price) {
+  onChgMarketPrice (idx, price, remark) {
     const goods = this.state.goods
     goods[idx].market_price = price
+    goods[idx].market_remark = remark
     this.setState({goods})
   }
   
-  onSubmitMarketPrice (productId, price) {
+  onSubmitMarketPrice (idx, productId, price, remark) {
     console.log('on change product market price ', productId, price)
     const self = this
     let accessToken = this.props.global.accessToken
@@ -145,9 +148,10 @@ class GoodsMarketExamine extends BaseComponent {
     HttpUtils.post.bind(this.props)(uri, {
       productId: productId,
       price: price,
-      storeId: this.state.storeId
+      storeId: this.state.storeId,
+      remark: remark
     }).then(res => {
-    
+      self.onChgMarketPrice(idx, price, remark)
     })
   }
   
@@ -192,10 +196,17 @@ class GoodsMarketExamine extends BaseComponent {
             <JbbInput
               onChange={value => this.onChgMarketPrice(idx, value)}
               value={product.market_price}
-              onBlur={() => this.onSubmitMarketPrice(product.id, product.market_price)}
+              onBlur={() => this.onSubmitMarketPrice(idx, product.id, product.market_price, product.remark_remark)}
               keyboardType={'numeric'}
               styles={styles.marketPriceInput}
             />
+  
+            <JbbPrompt
+              rows={10}
+              initValue={product.market_remark}
+              onConfirm={text => this.onSubmitMarketPrice(idx, product.id, product.market_price, text)}>
+              <JbbButton text={'备注'} type={'hollow'} paddingVertical={pxToDp(1)}/>
+            </JbbPrompt>
           </View>
         </View>
       </View>
