@@ -163,6 +163,7 @@ const C = {
   ROUTE_GOODS_APPLY_PRICE: 'GoodsApplyPrice',
   ROUTE_GOODS_PRICE_INDEX: 'GoodsPriceIndex',
   ROUTE_GOODS_ANALYSIS: 'GoodsAnalysis',
+  ROUTE_GOODS_MARKET_EXAMINE: 'GoodsMarketExamine',                             // 商品-市调
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',

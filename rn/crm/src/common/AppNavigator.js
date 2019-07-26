@@ -125,6 +125,7 @@ import Cts from "../Cts";
 import _ from "lodash"
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import OrderSetReady from "../scene/Order/OrderSetReady";
+import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -352,6 +353,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
         [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
+        [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
         
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},

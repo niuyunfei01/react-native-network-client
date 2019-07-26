@@ -90,7 +90,11 @@ class SearchBar extends Component {
     this.handleBlur = this.handleBlur.bind(this)
     this.focus = this.focus.bind(this)
   }
-
+  
+  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+    this.setState({text: nextProps.text})
+  }
+  
   changeHandle(text) {
     this.setState({text})
     if (this.props.onChange) this.props.onChange(text)
@@ -110,6 +114,7 @@ class SearchBar extends Component {
 
   handleFocus() {
     this.setState({focus: true})
+    this.props.onFocus && this.props.onFocus()
   }
 
   handleBlur() {
@@ -183,6 +188,7 @@ SearchBar.propTypes = {
   onClear: PropTypes.func,
   onCancel: PropTypes.func,
   onBlurSearch: PropTypes.func,
+  onFocus: PropTypes.func,
   lang: PropTypes.object,
   style: ViewPropTypes.style,
   placeholder: PropTypes.string,
