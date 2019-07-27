@@ -184,6 +184,9 @@ const C = {
   ROUTE_INVENTORY_STOCK_CHECK_HISTORY: 'InventoryStockCheckHistory',            // 库存 - 库存盘点历史
   ROUTE_INVENTORY_REPORT_LOSS: 'InventoryReportLoss',                           // 库存 - 库存报损
   ROUTE_INVENTORY_DETAIL: 'InventoryDetail',                                    // 库存 - 商品出入库明细
+  // 自提相关
+  ROUTE_ZT_ORDER_PRINT: 'ZtOrderPrint',                                         // 自提 - 订单打印
+  
   serverUrl,
   apiUrl,
   staticUrl,

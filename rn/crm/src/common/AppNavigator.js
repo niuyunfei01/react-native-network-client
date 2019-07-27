@@ -126,6 +126,7 @@ import _ from "lodash"
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import OrderSetReady from "../scene/Order/OrderSetReady";
 import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
+import ZtOrderPrint from "../scene/Zt/OrderPrint";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -410,6 +411,8 @@ class Navigator extends Component {
         // 员工相关
         [Config.ROUTE_WORKER]: {screen: WorkerListScene},
         [Config.ROUTE_WORKER_SCHEDULE]: {screen: WorkerSchedule},
+        // 自提相关
+        [Config.ROUTE_ZT_ORDER_PRINT]: {screen: ZtOrderPrint}
       },
       stackNavigatorConfigs
     );

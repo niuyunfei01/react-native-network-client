@@ -41,7 +41,9 @@ import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
+import Dimensions from 'Dimensions'
 
+var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
   const {mine, user, global} = state;
   return {mine: mine, user: user, global: global};
@@ -689,8 +691,9 @@ class MineScene extends PureComponent {
           {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
           {currVersion === Cts.VERSION_DIRECT ? <NextSchedule/> : null}
           {this.renderStoreBlock()}
-          {this.renderVersionBlock()}
           {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
+          {currVersion === Cts.VERSION_DIRECT && this.renderZtBlock()}
+          {this.renderVersionBlock()}
           
           <Dialog
             onRequestClose={() => {
@@ -808,23 +811,67 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
         )}
-        
-        {fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr) ? (
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
-            activeOpacity={customerOpacity}
-          >
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../img/My/yunyingshouyi_.png")}
-            />
-            <Text style={[block_styles.block_name]}>运营收益</Text>
-          </TouchableOpacity>
-        ) : (
-          <View/>
-        )}
-        
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/yunyingshouyi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>订单补偿</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            this.onPress(Config.ROUTE_STORE, {
+              currentUser: this.state.currentUser,
+              currVendorId: this.state.currVendorId,
+              currVendorName: this.state.currVendorName
+            });
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/dianpu_.png")}
+          />
+          <Text style={[block_styles.block_name]}>店铺管理</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            this.onPress(Config.ROUTE_WORKER, {
+              type: "worker",
+              currentUser: this.state.currentUser,
+              currVendorId: this.state.currVendorId,
+              currVendorName: this.state.currVendorName
+            });
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/yuangong_.png")}
+          />
+          <Text style={[block_styles.block_name]}>员工管理</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/kaoqin_.png")}
+          />
+          <Text style={[block_styles.block_name]}>考勤记录</Text>
+        </TouchableOpacity>
         {fnPriceControlled > 0 &&
         is_service_mgr && (
           <TouchableOpacity
@@ -847,6 +894,21 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
         )}
+        {fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr) ? (
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
+            activeOpacity={customerOpacity}
+          >
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/yunyingshouyi_.png")}
+            />
+            <Text style={[block_styles.block_name]}>运营收益</Text>
+          </TouchableOpacity>
+        ) : (
+          <View/>
+        )}
         
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
@@ -865,56 +927,7 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>评价</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            this.onPress(Config.ROUTE_STORE, {
-              currentUser: this.state.currentUser,
-              currVendorId: this.state.currVendorId,
-              currVendorName: this.state.currVendorName
-            });
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/dianpu_.png")}
-          />
-          <Text style={[block_styles.block_name]}>店铺管理</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
-            let url = Config.serverUrl(path, Config.https);
-            this.onPress(Config.ROUTE_WEB, {url: url});
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/kaoqin_.png")}
-          />
-          <Text style={[block_styles.block_name]}>考勤记录</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            this.onPress(Config.ROUTE_WORKER, {
-              type: "worker",
-              currentUser: this.state.currentUser,
-              currVendorId: this.state.currVendorId,
-              currVendorName: this.state.currVendorName
-            });
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/yuangong_.png")}
-          />
-          <Text style={[block_styles.block_name]}>员工管理</Text>
-        </TouchableOpacity>
+  
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
@@ -940,29 +953,18 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>活动加价</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
-          activeOpacity={customerOpacity}
-        >
-          {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/shangpinqingbao_.png")}
-          />
-          <Text style={[block_styles.block_name]}>商品调整</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/yunyingshouyi_.png")}
-          />
-          <Text style={[block_styles.block_name]}>订单补偿</Text>
-        </TouchableOpacity>
+        {/*<TouchableOpacity*/}
+        {/*  style={[block_styles.block_box]}*/}
+        {/*  onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}*/}
+        {/*  activeOpacity={customerOpacity}*/}
+        {/*>*/}
+        {/*  {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}*/}
+        {/*  <Image*/}
+        {/*    style={[block_styles.block_img]}*/}
+        {/*    source={require("../../img/My/shangpinqingbao_.png")}*/}
+        {/*  />*/}
+        {/*  <Text style={[block_styles.block_name]}>商品调整</Text>*/}
+        {/*</TouchableOpacity>*/}
       </View>
     );
   }
@@ -1037,7 +1039,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
-        <View style={[block_styles.empty_box]}/>
+        {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     );
   }
@@ -1230,6 +1232,24 @@ class MineScene extends PureComponent {
       </View>
     );
   }
+  
+  renderZtBlock () {
+    return (
+      <View style={[block_styles.container]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_ZT_ORDER_PRINT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/print.png")}
+          />
+          <Text style={[block_styles.block_name]}>打印自提单</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -1380,12 +1400,14 @@ const block_styles = StyleSheet.create({
   },
   block_box: {
     //剩1个格子用正常样式占位
-    width: pxToDp(239),
-    height: pxToDp(188),
+    // width: pxToDp(239),
+    // height: pxToDp(188),
+    width: ScreenWidth / 4,
+    height: ScreenWidth / 4,
     backgroundColor: colors.white,
-    
-    borderColor: colors.main_back,
-    borderWidth: pxToDp(1),
+  
+    // borderColor: colors.main_back,
+    // borderWidth: pxToDp(1),
     alignItems: "center"
   },
   empty_box: {
@@ -1401,8 +1423,8 @@ const block_styles = StyleSheet.create({
   block_img: {
     marginTop: pxToDp(30),
     marginBottom: pxToDp(16),
-    width: pxToDp(100),
-    height: pxToDp(100)
+    width: pxToDp(60),
+    height: pxToDp(60)
   },
   block_name: {
     color: colors.color666,
