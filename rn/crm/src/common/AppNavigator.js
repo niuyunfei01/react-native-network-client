@@ -126,7 +126,7 @@ import _ from "lodash"
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import OrderSetReady from "../scene/Order/OrderSetReady";
 import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
-import ZtOrderPrint from "../scene/Zt/OrderPrint";
+import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
 const tabDef = function (store_) {
   let isBlx = false;

@@ -121,10 +121,8 @@ class StockCheck extends BaseComponent {
       ToastShort('无占用订单')
       return
     }
-    const storeId = this.state.storeId
-    let searchStr = ''
-    useOrderIds.forEach(item => searchStr = `${searchStr}##${item}|||`)
-    // searchStr = `${searchStr}store_id:${storeId}`
+  
+    let searchStr = 'id:' + useOrderIds.join(',')
     console.log(`order search term => ${searchStr}`)
     native.ordersSearch(searchStr)
   }
