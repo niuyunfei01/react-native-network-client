@@ -13,10 +13,13 @@ class SearchPopup extends React.Component {
     onSelect: PropType.func,
     onClose: PropType.func,
     placeholder: PropType.string,
-    title: PropType.string
+    title: PropType.string,
+    rowHeight: PropType.number
   }
   
-  static defaultProps = {}
+  static defaultProps = {
+    rowHeight: 40
+  }
   
   constructor (props) {
     super(props)
@@ -35,7 +38,7 @@ class SearchPopup extends React.Component {
       <Touchable onPress={() => {
         this.props.onSelect && this.props.onSelect(item)
       }}>
-        <View key={rowID} style={{flex: 1, marginLeft: 20, height: rowHeight, justifyContent: 'center'}}>
+        <View key={rowID} style={{flex: 1, marginLeft: 20, height: this.props.rowHeight, justifyContent: 'center'}}>
           {/*use `HighlightableText` to highlight the search result*/}
           <HighlightableText
             matcher={item.matcher}
@@ -105,7 +108,7 @@ class SearchPopup extends React.Component {
           renderBackButton={this.renderBackBtn.bind(this)}
           renderRightButton={this.renderRightBtn.bind(this)}
           renderEmpty={this.renderEmpty.bind(this)}
-          rowHeight={rowHeight}
+          rowHeight={this.props.rowHeight}
           toolbarBackgroundColor={'#2196f3'}
           title={this.props.title}
           cancelTitle='取消'
