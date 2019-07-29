@@ -51,7 +51,6 @@ import S from '../../stylekit';
 import Entypo from "react-native-vector-icons/Entypo";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
-import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import {getWithTpl} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
@@ -59,6 +58,7 @@ import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
+import {List, WhiteSpace} from "antd-mobile-rn";
 
 const numeral = require('numeral');
 
@@ -1976,12 +1976,18 @@ class OrderScene extends Component {
             </View>
           </View>
           <View style={{marginTop: pxToDp(1)}}>
-            {
-              this.renderChangeLogs()
-            }
+            {this.renderChangeLogs()}
           </View>
+          <WhiteSpace/>
+          <If condition={order.is_split_package}>
+            <List>
+              <List.Item
+                arrow={'horizontal'}
+                onClick={() => this.props.navigation.navigate(Config.ROUTE_ORDER_PACKAGE,{orderId: order.id})}
+              >订单拆包</List.Item>
+            </List>
+          </If>
         </View>
-      
       </View>
     )
   }

@@ -68,6 +68,7 @@ import Refund from "../scene/Order/Refund";
 import OrderRefundByWeight from "../scene/Order/RefundByWeight";
 import OrderTransferThird from "../scene/Order/OrderTransferThird";
 import OrderScan from "../scene/Order/OrderScan";
+import OrderPackage from '../scene/Order/OrderPackage'
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -127,6 +128,7 @@ import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import OrderSetReady from "../scene/Order/OrderSetReady";
 import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
 import ZtOrderPrint from "../scene/Ziti/OrderPrint";
+import GoodsMarketExamineHistory from "../scene/Goods/GoodsMarketExamineHistory";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -332,6 +334,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
         [Config.ROUTE_ORDER_SCAN_REDAY]: {screen: OrderSetReady},
         [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
+        [Config.ROUTE_ORDER_PACKAGE]: {screen: OrderPackage},
         
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
@@ -355,6 +358,7 @@ class Navigator extends Component {
         [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
         [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
+        [Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY]: {screen: GoodsMarketExamineHistory},
         
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
