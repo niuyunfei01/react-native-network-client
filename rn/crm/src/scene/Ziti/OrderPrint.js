@@ -1,11 +1,11 @@
 import React from 'react'
 import BaseComponent from "../BaseComponent"
-import {Alert, StyleSheet, View} from 'react-native'
-import {connect} from "react-redux"
-import {Button, DatePicker, List} from 'antd-mobile-rn'
-import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import TimeUtil from "../../util/TimeUtil";
+import {connect} from 'react-redux'
+import {Alert, ScrollView, StyleSheet, View} from 'react-native'
+import {Button, DatePicker, List, WhiteSpace} from 'antd-mobile-rn'
+import SearchPopup from "../component/SearchPopup";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -26,7 +26,9 @@ class OrderPrint extends BaseComponent {
       start: new Date(),
       end: new Date(),
       addressPoints: [],
-      addressPointPopup: false
+      addressPointPopup: false,
+      orders: [],
+      searched: false
     }
   }
   
@@ -47,55 +49,124 @@ class OrderPrint extends BaseComponent {
   }
   
   fetchPointOrders () {
+    const self = this
     const accessToken = this.props.global.accessToken
     const uri = `/crm_orders/query_wait_print_order?access_token=${accessToken}`
-    return HttpUtils.post.bind(this.props)(uri, {
+    HttpUtils.post.bind(this.props)(uri, {
       ext_store_id: this.state.addressPoint.es_id,
       start: TimeUtil.format('yyyy-MM-dd hh:mm:ss', this.state.start),
       end: TimeUtil.format('yyyy-MM-dd hh:mm:ss', this.state.end)
+    }).then(orders => {
+      self.setState({orders, searched: orders.length > 0})
+      if (!orders.length) {
+        Alert.alert('提示', '无待打印订单')
+      }
     })
   }
   
-  print () {
+  printOrder (orderId = 0) {
     const self = this
-    self.fetchPointOrders().then(orders => {
-      Alert.alert(orders.length)
+    const accessToken = this.props.global.accessToken
+    const uri = `/crm_orders/print_orders?access_token=${accessToken}`
+    let data = {
+      ext_store_id: this.state.addressPoint.es_id,
+      start: TimeUtil.format('yyyy-MM-dd hh:mm:ss', this.state.start),
+      end: TimeUtil.format('yyyy-MM-dd hh:mm:ss', this.state.end)
+    }
+    if (orderId > 0) {
+      data.order_id = orderId
+    }
+    HttpUtils.post.bind(this.props)(uri, data).then(res => {
+      Alert.alert('提示', '打印成功')
     })
+  }
+  
+  printOrderById (orderId) {
+    const self = this
+    Alert.alert('提示', `打印订单${orderId}?`, [{
+      text: '取消'
+    }, {
+      text: '打印',
+      onPress: () => self.printOrder(orderId)
+    }])
+  }
+  
+  batchPrint () {
+    const self = this
+    Alert.alert('提示', `${String(self.state.orders.length)}张待打印订单，全部打印？`, [{
+      text: '取消'
+    }, {
+      text: '打印',
+      onPress: () => self.printOrder()
+    }])
   }
   
   render () {
     return (
       <View style={style.container}>
-        <List>
-          <List.Item
-            arrow="horizontal"
-            extra={this.state.addressPoint.name}
-            onClick={() => this.setState({addressPointPopup: true})}
-          >自提点</List.Item>
-          <DatePicker
-            mode="datetime"
-            extra={this.state.start}
-            value={this.state.start}
-            onChange={time => this.setState({start: time})}
-          >
-            <List.Item arrow="horizontal">期望送达开始时间</List.Item>
-          </DatePicker>
-          <DatePicker
-            mode="datetime"
-            extra={this.state.end}
-            value={this.state.end}
-            onChange={time => this.setState({end: time})}
-          >
-            <List.Item arrow="horizontal">期望送达结束时间</List.Item>
-          </DatePicker>
-        </List>
-        <View style={style.printBtnBox}>
-          <Button
-            type={'primary'}
-            style={style.printBtn}
-            onClick={() => this.print()}
-          >打印</Button>
-        </View>
+        <ScrollView>
+          <List>
+            <List.Item
+              arrow="horizontal"
+              extra={this.state.addressPoint.name}
+              onClick={() => this.setState({addressPointPopup: true})}
+            >自提点</List.Item>
+            <DatePicker
+              mode="datetime"
+              extra={this.state.start}
+              value={this.state.start}
+              onChange={time => this.setState({start: time})}
+            >
+              <List.Item arrow="horizontal">期望送达开始时间</List.Item>
+            </DatePicker>
+            <DatePicker
+              mode="datetime"
+              extra={this.state.end}
+              value={this.state.end}
+              onChange={time => this.setState({end: time})}
+            >
+              <List.Item arrow="horizontal">期望送达结束时间</List.Item>
+            </DatePicker>
+          </List>
+    
+          <If condition={this.state.orders.length}>
+            <WhiteSpace/>
+            <List>
+              {this.state.orders.map(item => {
+                return (
+                  <List.Item
+                    key={item.id}
+                    arrow="horizontal"
+                    extra={'打印'}
+                    onClick={() => this.printOrderById(item.id)}
+                  >
+                    {`订单号：${item.id}`}
+                    <List.Item.Brief>{`序号：#${item.dayId}`}</List.Item.Brief>
+                  </List.Item>
+                )
+              })}
+            </List>
+          </If>
+    
+          <View style={[
+            style.printBtnBox,
+            this.state.searched ? {justifyContent: 'space-around'} : {justifyContent: 'center'}
+          ]}>
+            <Button
+              type={'primary'}
+              style={[style.printBtn, this.state.searched ? {width: '45%'} : null]}
+              onClick={() => this.fetchPointOrders()}
+            >{this.state.searched ? '重新搜索' : '搜索订单'}</Button>
+            <If condition={this.state.searched}>
+              <Button
+                type={'primary'}
+                style={[style.printBtn, {width: '45%'}]}
+                onClick={() => this.batchPrint()}
+              >全部打印</Button>
+            </If>
+          </View>
+        </ScrollView>
+        
   
         {/*自提点列表*/}
         <SearchPopup
@@ -118,7 +189,8 @@ const style = StyleSheet.create({
   },
   printBtnBox: {
     marginTop: 20,
-    alignItems: 'center'
+    alignItems: 'center',
+    flexDirection: 'row'
   },
   printBtn: {
     width: '90%'
