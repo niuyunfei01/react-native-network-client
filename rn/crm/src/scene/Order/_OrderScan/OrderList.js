@@ -72,7 +72,7 @@ class OrderList extends BaseComponent {
               <Text style={[styles.product_name]}>{prod.name}</Text>
               <JbbPrompt
                 onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}
-                initValue={prod.scan_num ? prod.scan_num : 0}
+                initValue={String(prod.scan_num ? prod.scan_num : 0)}
                 keyboardType={'numeric'}
               >
                 <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
@@ -86,6 +86,18 @@ class OrderList extends BaseComponent {
               </Text>
               <Text style={styles.product_num}>X{prod.num}</Text>
             </View>
+          </View>
+  
+          <View style={styles.canScanContainer}>
+            <If condition={prod.can_scan}>
+              <Image
+                style={styles.checkImage}
+                source={
+                  Number(prod.scan_num) >= Number(prod.num) ?
+                    require('../../../img/checked.png') :
+                    require('../../../img/checked_disable.png')}
+              />
+            </If>
           </View>
         </View>
         
@@ -144,6 +156,17 @@ class OrderList extends BaseComponent {
 
 const rowHeight = pxToDp(120)
 const styles = StyleSheet.create({
+  canScanContainer: {
+    width: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderLeftWidth: 1,
+    borderLeftColor: '#f7f7f7'
+  },
+  checkImage: {
+    width: 20,
+    height: 20
+  },
   container: {
     width: screenWidth
   },
