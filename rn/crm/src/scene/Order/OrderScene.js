@@ -1704,10 +1704,12 @@ class OrderScene extends Component {
         </View>
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
+        <If condition={!order.is_split_package}>
         {this.state.isJbbVendor ? <Delivery
           order={order}
           logistics={this.state.logistics}
           fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
+        </If>
     
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {

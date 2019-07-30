@@ -125,16 +125,15 @@ class OrderBottom extends PureComponent {
 
   _visibleShipInfoBtn() {
     let {
-      dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      dada_call_at
+      dada_status, orderStatus, ship_worker_id, is_split_package
     } = this.props.order;
     dada_status = parseInt(dada_status);
     orderStatus = parseInt(orderStatus);
 
-    return (orderStatus === Cts.ORDER_STATUS_SHIPPING && dada_status !== Cts.DADA_STATUS_NEVER_START)
+    return !is_split_package && ((orderStatus === Cts.ORDER_STATUS_SHIPPING && dada_status !== Cts.DADA_STATUS_NEVER_START)
       || (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER)
       || (orderStatus === Cts.ORDER_STATUS_TO_SHIP)
-      || (orderStatus === Cts.ORDER_STATUS_TO_READY);
+      || (orderStatus === Cts.ORDER_STATUS_TO_READY));
   }
 
   _defCloseBtn = (title) => {
@@ -401,7 +400,7 @@ class OrderBottom extends PureComponent {
   _actionBtnVisible() {
     const order = this.props.order;
     const iStatus = parseInt(order.orderStatus);
-    return iStatus !== Cts.ORDER_STATUS_ARRIVED && iStatus !== Cts.ORDER_STATUS_INVALID;
+    return iStatus !== Cts.ORDER_STATUS_ARRIVED && iStatus !== Cts.ORDER_STATUS_INVALID && !order.is_split_package;
   }
 
   _onActionBtnClicked() {
