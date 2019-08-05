@@ -247,6 +247,7 @@ class OrderScan extends BaseComponent {
         <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
           <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
             <Text style={styles.footerBtnText}>
+              共{currentOrder.items_count}件|
               应扫{currentOrder.items_need_scan_num}件 |
               已扫{currentOrder.scan_count}件 =>
               {scanEnough ? '' : '强制'}打包完成

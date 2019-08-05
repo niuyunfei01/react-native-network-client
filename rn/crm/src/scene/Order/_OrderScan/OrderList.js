@@ -72,7 +72,7 @@ class OrderList extends BaseComponent {
               <Text style={[styles.product_name]}>{prod.name}</Text>
               <JbbPrompt
                 onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}
-                initValue={String(prod.scan_num ? prod.scan_num : 0)}
+                initValue={''}
                 keyboardType={'numeric'}
               >
                 <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
