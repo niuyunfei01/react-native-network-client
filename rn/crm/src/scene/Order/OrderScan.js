@@ -118,7 +118,6 @@ class OrderScan extends BaseComponent {
         if (item.scan_num && item.scan_num >= item.num) {
           // ToastShort('该商品已经拣够了！')
           // native.speakText('该商品已经拣够了！')
-          return
         } else {
           item.scan_num = item.scan_num ? item.scan_num + num : num
           // 如果拣货数量够，就置底
