@@ -1,5 +1,5 @@
 import React from 'react'
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, WhiteSpace} from 'antd-mobile-rn';
 import {tool} from "../../common";
@@ -9,6 +9,7 @@ import BaseComponent from "../BaseComponent";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import HttpUtils from "../../util/http";
+import {ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -57,7 +58,7 @@ class ReportLoss extends BaseComponent {
     const {global} = self.props;
     const {productId, storeId} = this.state
     const api = `api_products/inventory_loss_history?access_token=${global.accessToken}`
-    HttpUtils.get.bind(self.props)(api, {page: 1, pageSize: 5, productId, storeId}).then(res => {
+    HttpUtils.get.bind(self.props)(api, {page: 1, pageSize: 10, productId, storeId}).then(res => {
       self.setState({history: res})
     })
   }
@@ -70,6 +71,28 @@ class ReportLoss extends BaseComponent {
     HttpUtils.post.bind(self.props)(api).then(res => {
       native.nativeBack()
     })
+  }
+  
+  onDisabledLoss (item) {
+    if (item.deleted > 0) {
+      ToastShort('当前记录已经置为无效')
+      return
+    }
+    
+    const self = this
+    const {global} = self.props;
+    const api = `api_products/inventory_report_loss_disabled/${item.id}?access_token=${global.accessToken}`
+    Alert.alert('提示', '是否将此条报损记录置为无效?', [
+      {text: '取消'},
+      {
+        text: '置为无效',
+        onPress: () => {
+          HttpUtils.post.bind(self.props)(api).then(res => {
+            self.fetchHistory()
+          })
+        }
+      }
+    ])
   }
   
   renderInfoItem (label, value, extra = '') {
@@ -103,13 +126,25 @@ class ReportLoss extends BaseComponent {
         <JbbCellTitle>报损历史</JbbCellTitle>
         <View style={{backgroundColor: '#fff', padding: pxToDp(20)}}>
           <For of={this.state.history.lists} each="item" index="index">
-            <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(40)}}>
-              <Text>{item.created}</Text>
-              <Text>{item.create_user.nickname}</Text>
-              <Text>-{item.num}份</Text>
-            </View>
+            {this.renderHistoryItem(item)}
           </For>
         </View>
+      </View>
+    )
+  }
+  
+  renderHistoryItem (item) {
+    let itemDisabled = item.deleted > 0 ? {textDecorationLine: 'line-through', color: '#dddddd'} : null
+    return (
+      <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(40)}} key={item.id}>
+        <Text style={[itemDisabled]}>{item.created}</Text>
+        <Text style={[{width: 50}, itemDisabled]}>{item.create_user.nickname}</Text>
+        <Text style={[{width: 50, textAlign: 'right'}, itemDisabled]}>-{item.num}份</Text>
+        <TouchableOpacity onPress={() => this.onDisabledLoss(item)}>
+          <View>
+            <Text>撤销</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     )
   }
