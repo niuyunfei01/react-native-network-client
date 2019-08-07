@@ -111,6 +111,7 @@ const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
 const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
+const MENU_ORDER_CANCEL_TO_ENTRY = 13;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -312,6 +313,9 @@ class OrderScene extends Component {
   }
   
   _navSetParams = () => {
+    let {order = {}} = this.props
+    order = order.order
+    
     let {backPage} = (this.props.navigation.state.params || {});
     const {enabled_special_menu = false} = this.props.global.config;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
@@ -337,7 +341,10 @@ class OrderScene extends Component {
     }
     as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
     as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
-
+    if (order && order.cancel_to_entry) {
+      as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
+    }
+    
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
@@ -419,6 +426,8 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_ORDER_SCAN, {orderId: order.order.id})
     } else if (option.key === MENU_ORDER_SCAN_READY) {
       navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
+    } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
+      navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.order.id})
     } else {
       ToastShort('未知的操作');
     }

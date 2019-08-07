@@ -99,6 +99,7 @@ const C = {
   ROUTE_ORDER_REFUND_BY_WEIGHT: 'OrderRefundByWeight',                // 订单按重退款
   ROUTE_ORDER_SCAN_REDAY: 'OrderSetReady',
   ROUTE_ORDER_PACKAGE: 'OrderPackage',                                // 订单拆单分包
+  ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
   
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
