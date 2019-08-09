@@ -1,7 +1,7 @@
 import React from 'react'
 import BaseComponent from "../BaseComponent";
 import {connect} from 'react-redux'
-import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import HttpUtils from "../../util/http";
 import InputNumber from "rc-input-number";
 import pxToDp from "../../util/pxToDp";
@@ -59,7 +59,7 @@ class OrderCancelToEntry extends BaseComponent {
     let {isCheckAll, orderItems} = this.state
     isCheckAll = !isCheckAll
     orderItems = orderItems.map(item => {
-      item.cancelToEntryNum = isCheckAll ? item.num : 0
+      item.cancelToEntryNum = item.num - item.entryNum > 0 && isCheckAll ? item.num - item.entryNum : 0
       return item
     })
     this.setState({isCheckAll, orderItems})
@@ -81,7 +81,7 @@ class OrderCancelToEntry extends BaseComponent {
     orderItems.map(item => {
       if (item.cancelToEntryNum > 0) {
         entryProdNum++
-        entryNum += item.cancelToEntryNum
+        entryNum += Number(item.cancelToEntryNum)
       }
       postData.push({
         orderItemId: item.id,
@@ -106,6 +106,7 @@ class OrderCancelToEntry extends BaseComponent {
           }).then(res => {
             ToastShort('提交成功')
             self.fetchData()
+            // self.props.navigation.goBack()
           })
         }
       }
@@ -114,7 +115,7 @@ class OrderCancelToEntry extends BaseComponent {
   
   render () {
     return (
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
         <For of={this.state.orderItems} each="item" index="idx">
           <View key={item.id} style={styles.productBox}>
             <Image
@@ -132,11 +133,12 @@ class OrderCancelToEntry extends BaseComponent {
               <Text>{item.name}</Text>
               <View style={styles.productBottom}>
                 <Text>购买数量{item.num}件</Text>
+                <Text>已入{item.entryNum}件</Text>
                 <View style={styles.numberInput}>
                   <InputNumber
                     styles={numberInputStyle}
                     min={0}
-                    max={Number(item.num)}
+                    max={Number(item.num) - item.entryNum}
                     value={Number(item.cancelToEntryNum)}
                     onChange={(v) => this.onEntryNumChanged(idx, v)}
                     keyboardType={'numeric'}

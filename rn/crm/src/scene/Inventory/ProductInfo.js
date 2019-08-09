@@ -357,7 +357,7 @@ class ProductInfo extends React.Component {
           </Swipeout>
           <List.Item
             arrow={"horizontal"}
-            extra={`${productInfo.sku.stock_check_cycle}天`}
+            extra={productInfo.sku.stock_check_cycle > 0 ? `${productInfo.sku.stock_check_cycle}天` : '无'}
             onClick={() => this.setState({stockCheckCyclePrompt: true})}
           >盘点周期</List.Item>
           <JbbPrompt

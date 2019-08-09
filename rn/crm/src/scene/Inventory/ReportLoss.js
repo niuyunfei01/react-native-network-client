@@ -69,7 +69,8 @@ class ReportLoss extends BaseComponent {
     const {productId, num} = this.state
     const api = `api_products/inventory_report_loss/${productId}/${num}?access_token=${global.accessToken}`
     HttpUtils.post.bind(self.props)(api).then(res => {
-      native.nativeBack()
+      ToastShort('报损成功')
+      self.fetchHistory()
     })
   }
   
@@ -136,7 +137,7 @@ class ReportLoss extends BaseComponent {
   renderHistoryItem (item) {
     let itemDisabled = item.deleted > 0 ? {textDecorationLine: 'line-through', color: '#dddddd'} : null
     return (
-      <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(40)}} key={item.id}>
+      <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(60)}} key={item.id}>
         <Text style={[itemDisabled]}>{item.created}</Text>
         <Text style={[{width: 50}, itemDisabled]}>{item.create_user.nickname}</Text>
         <Text style={[{width: 50, textAlign: 'right'}, itemDisabled]}>-{item.num}份</Text>
