@@ -128,6 +128,7 @@ class OrderScan extends BaseComponent {
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
           console.log('handle scan product current order : ', currentOrder)
+  
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
           self.setState({currentOrder})
           
@@ -139,12 +140,11 @@ class OrderScan extends BaseComponent {
           }
           ToastShort(msg)
           native.speakText(msg)
-          // native.playWarningSound()
           if (currentOrder.scan_count >= currentOrder.items_count) {
             self.onForcePickUp()
           }
-          return
         }
+        return
       }
     }
     ToastShort('该订单不存在此商品！')
@@ -188,6 +188,9 @@ class OrderScan extends BaseComponent {
       order_id, item_id, num, code, type, weight, bar_code
     }).then(res => {
       self.checkScanNum()
+    }).catch(e => {
+      native.playWarningSound()
+      native.speakText(e.reason)
     })
   }
   
