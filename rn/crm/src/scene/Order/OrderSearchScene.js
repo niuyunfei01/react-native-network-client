@@ -55,11 +55,6 @@ class OrderSearchScene extends PureComponent {
 
   componentWillMount() {
     this.fetchOrderSearchPrefix()
-    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
   }
   
   fetchOrderSearchPrefix () {
