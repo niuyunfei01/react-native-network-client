@@ -11,6 +11,9 @@ import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
 import Moment from 'moment'
+import {List} from "antd-mobile-rn";
+import {tool} from "../../common";
+import ModalSelector from "react-native-modal-selector";
 
 let footerHeight = pxToDp(80);
 
@@ -36,10 +39,14 @@ class OrderScan extends BaseComponent {
   
   constructor (props) {
     super(props);
+    const store = tool.store(this.props.global)
     this.state = {
+      store,
       currentOrder: {},
       isLoading: false,
       scanEnough: false,
+      currentWorker: {label: '', key: ''},
+      workers: []
     }
   }
   
@@ -78,6 +85,7 @@ class OrderScan extends BaseComponent {
     if (this.props.navigation.state.params.orderId) {
       this.fetchOrder(this.props.navigation.state.params.orderId)
     }
+    this.fetchWorker()
   }
   
   componentWillUnmount () {
@@ -95,7 +103,21 @@ class OrderScan extends BaseComponent {
     this.setState({isLoading: true})
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
-      self.setState({currentOrder: res, isLoading: false}, () => self.checkScanNum())
+      self.setState({
+        currentOrder: res,
+        isLoading: false,
+        currentWorker: {label: res.assignUser.nickname, key: res.assignUser.id}
+      }, () => self.checkScanNum())
+    })
+  }
+  
+  fetchWorker () {
+    const self = this
+    const accessToken = self.props.global.accessToken
+    const api = `/api/store_contacts/${this.state.store.id}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      let workers = res.map(item => ({label: item.label, key: item.id}))
+      self.setState({workers: workers})
     })
   }
   
@@ -185,7 +207,8 @@ class OrderScan extends BaseComponent {
     const accessToken = self.props.global.accessToken
     const api = `/api_products/add_inventory_exit_log?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      order_id, item_id, num, code, type, weight, bar_code
+      order_id, item_id, num, code, type, weight, bar_code,
+      packUid: this.state.currentWorker.key
     }).then(res => {
       self.checkScanNum()
     }).catch(e => {
@@ -201,7 +224,10 @@ class OrderScan extends BaseComponent {
   
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then(() => {
+    HttpUtils.get.bind(self.props)(api, {
+      from: 'ORDER_SCAN',
+      packUid: this.state.currentWorker.key
+    }).then(() => {
       self.afterPackUp(currentOrder, self)
     }).catch(e => {
       if (e.obj == 'ALREADY_PACK_UP') {
@@ -260,11 +286,42 @@ class OrderScan extends BaseComponent {
     )
   }
   
+  renderOrderInfo (item) {
+    return (
+      <View style={styles.headerContainer}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId}</Text>
+            <Text style={styles.dayId}>(总单：#{item.dayId})</Text>
+          </View>
+          <View>
+            <Text>期望送达：{item.expectTime}</Text>
+          </View>
+        </View>
+        <View>
+          <Text style={{fontSize: 16}}>客户备注：{item.remark}</Text>
+        </View>
+        <If condition={item.store_remark}>
+          <View>
+            <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
+          </View>
+        </If>
+        <List>
+          <ModalSelector data={this.state.workers} onChange={item => this.setState({currentWorker: item})}>
+            <List.Item extra={this.state.currentWorker.label} arrow={'horizontal'}>
+              拣货员
+            </List.Item>
+          </ModalSelector>
+        </List>
+      </View>
+    )
+  }
   render () {
     const {currentOrder} = this.state;
     return currentOrder && Object.keys(currentOrder).length ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
+          {this.renderOrderInfo(this.state.currentOrder)}
           <OrderList
             isLoading={this.state.isLoading}
             onRefresh={() => this.fetchOrder(currentOrder.id)}
@@ -281,6 +338,16 @@ class OrderScan extends BaseComponent {
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: '#f0f9ef',
+    padding: pxToDp(20)
+  },
+  platDayId: {
+    fontWeight: 'bold'
+  },
+  dayId: {
+    fontSize: 10
+  },
   footerContainer: {
     flexDirection: 'row',
     height: footerHeight,
