@@ -32,7 +32,8 @@ class OrderList extends BaseComponent {
   }
   
   onProductSwipeout (goodsItemIdx, product, direction) {
-    if (direction == 'right' && product.scan_num >= product.num) {
+    console.log(product.scan_num, product.num, direction, product.scan_num >= product.num)
+    if (direction == 'right' && product.scan_num < product.num) {
       Alert.alert('警告', `确定商品「${product.name}」${product.num}件 已经拣货完成？`, [
         {text: '取消'},
         {text: '确定', onPress: () => this.props.onChgProdNum(goodsItemIdx, product.num)}
@@ -40,35 +41,12 @@ class OrderList extends BaseComponent {
     }
   }
   
-  renderOrderInfo (item) {
-    return (
-      <View style={styles.headerContainer}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId}</Text>
-            <Text style={styles.dayId}>(总单：#{item.dayId})</Text>
-          </View>
-          <View>
-            <Text>期望送达：{item.expectTime}</Text>
-          </View>
-        </View>
-        <View>
-          <Text style={{fontSize: 16}}>客户备注：{item.remark}</Text>
-        </View>
-        <If condition={item.store_remark}>
-          <View>
-            <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
-          </View>
-        </If>
-      </View>
-    )
-  }
-  
   renderProduct (prod, goodsItemIdx) {
+    const self = this
     return (
       <Swipeout
         key={`goodsItemIdx_${goodsItemIdx}`}
-        onOpen={(sectionID, rowId, direction) => this.onProductSwipeout(goodsItemIdx, prod, direction)}
+        onOpen={(sectionID, rowId, direction) => self.onProductSwipeout(goodsItemIdx, prod, direction)}
         right={[]}
         backgroundColor={'#fff'}
       >
@@ -100,7 +78,7 @@ class OrderList extends BaseComponent {
                 <Text style={styles.product_num}>X{prod.num}</Text>
               </View>
             </View>
-        
+  
             <View style={styles.canScanContainer}>
               <If condition={prod.can_scan}>
                 <Image
@@ -113,7 +91,7 @@ class OrderList extends BaseComponent {
               </If>
             </View>
           </View>
-      
+  
           <If condition={Number(prod.scan_num) >= Number(prod.num)}>
             <View style={styles.mask}>
               <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
@@ -160,7 +138,6 @@ class OrderList extends BaseComponent {
     return (
       <View style={[{flexDirection: 'row'}, this.props.style]}>
         <View style={[styles.container, containerStyle]}>
-          {this.renderOrderInfo(dataSource)}
           {this.renderOrderItem(dataSource)}
         </View>
       </View>
@@ -183,16 +160,6 @@ const styles = StyleSheet.create({
   },
   container: {
     width: screenWidth
-  },
-  headerContainer: {
-    backgroundColor: '#f0f9ef',
-    padding: pxToDp(20)
-  },
-  platDayId: {
-    fontWeight: 'bold'
-  },
-  dayId: {
-    fontSize: 10
   },
   itemContainer: {
     marginTop: pxToDp(15),
