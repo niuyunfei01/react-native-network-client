@@ -1,13 +1,13 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import color from '../../../widget/color'
 import {screen} from "../../../common";
 import PropTypes from 'prop-types'
 import {ToastShort} from "../../../util/ToastUtils";
-import JbbPrompt from "../../component/JbbPrompt";
+import Swipeout from 'react-native-swipeout'
 
 var Dimensions = require('Dimensions');
 var screenWidth = Dimensions.get('window').width;
@@ -31,6 +31,14 @@ class OrderList extends BaseComponent {
     return true
   }
   
+  onProductSwipeout (goodsItemIdx, product, direction) {
+    if (direction == 'right' && product.scan_num >= product.num) {
+      Alert.alert('警告', `确定商品「${product.name}」${product.num}件 已经拣货完成？`, [
+        {text: '取消'},
+        {text: '确定', onPress: () => this.props.onChgProdNum(goodsItemIdx, product.num)}
+      ])
+    }
+  }
   
   renderOrderInfo (item) {
     return (
@@ -57,56 +65,62 @@ class OrderList extends BaseComponent {
   }
   
   renderProduct (prod, goodsItemIdx) {
-    console.log(prod)
     return (
-      <View key={`goodsItemIdx_${goodsItemIdx}`} style={[styles.row]}>
-        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <TouchableOpacity onPress={() => console.log('click product image')}>
-            <Image
-              style={styles.product_img}
-              source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
-            />
-          </TouchableOpacity>
-          <View style={{flex: 1}}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={[styles.product_name]}>{prod.name}</Text>
-              <JbbPrompt
-                onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}
-                initValue={''}
-                keyboardType={'numeric'}
-              >
-                <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
-              </JbbPrompt>
-            </View>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text>
-                {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
-                &nbsp;
-                {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
-              </Text>
-              <Text style={styles.product_num}>X{prod.num}</Text>
-            </View>
-          </View>
-  
-          <View style={styles.canScanContainer}>
-            <If condition={prod.can_scan}>
+      <Swipeout
+        key={`goodsItemIdx_${goodsItemIdx}`}
+        onOpen={(sectionID, rowId, direction) => this.onProductSwipeout(goodsItemIdx, prod, direction)}
+        right={[]}
+        backgroundColor={'#fff'}
+      >
+        <View style={[styles.row]}>
+          <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => console.log('click product image')}>
               <Image
-                style={styles.checkImage}
-                source={
-                  Number(prod.scan_num) >= Number(prod.num) ?
-                    require('../../../img/checked.png') :
-                    require('../../../img/checked_disable.png')}
+                style={styles.product_img}
+                source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
               />
-            </If>
-          </View>
-        </View>
+            </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={[styles.product_name]}>{prod.name}</Text>
+                {/*<JbbPrompt*/}
+                {/*  onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}*/}
+                {/*  initValue={''}*/}
+                {/*  keyboardType={'numeric'}*/}
+                {/*>*/}
+                <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
+                {/*</JbbPrompt>*/}
+              </View>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text>
+                  {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
+                  &nbsp;
+                  {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
+                </Text>
+                <Text style={styles.product_num}>X{prod.num}</Text>
+              </View>
+            </View>
         
-        <If condition={Number(prod.scan_num) >= Number(prod.num)}>
-          <View style={styles.mask}>
-            <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
+            <View style={styles.canScanContainer}>
+              <If condition={prod.can_scan}>
+                <Image
+                  style={styles.checkImage}
+                  source={
+                    Number(prod.scan_num) >= Number(prod.num) ?
+                      require('../../../img/checked.png') :
+                      require('../../../img/checked_disable.png')}
+                />
+              </If>
+            </View>
           </View>
-        </If>
-      </View>
+      
+          <If condition={Number(prod.scan_num) >= Number(prod.num)}>
+            <View style={styles.mask}>
+              <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
+            </View>
+          </If>
+        </View>
+      </Swipeout>
     )
   }
   
@@ -148,7 +162,7 @@ class OrderList extends BaseComponent {
         <View style={[styles.container, containerStyle]}>
           {this.renderOrderInfo(dataSource)}
           {this.renderOrderItem(dataSource)}
-          </View>
+        </View>
       </View>
     )
   }

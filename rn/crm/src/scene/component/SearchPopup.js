@@ -4,8 +4,6 @@ import {Modal, StyleSheet, Text, View} from "react-native";
 import SearchList, {HighlightableText} from "@unpourtous/react-native-search-list"
 import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable"
 
-const rowHeight = 40
-
 class SearchPopup extends React.Component {
   static propTypes = {
     dataSource: PropType.array,
