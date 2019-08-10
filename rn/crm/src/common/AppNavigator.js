@@ -74,6 +74,7 @@ import OrderScan from "../scene/Order/OrderScan";
 import OrderSetReady from "../scene/Order/OrderSetReady";
 import OrderPackage from '../scene/Order/OrderPackage'
 import OrderCancelToEntry from "../scene/Order/OrderCancelToEntry";
+import OrderExitLog from '../scene/Order/OrderExitLog'
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -337,6 +338,7 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
         [Config.ROUTE_ORDER_PACKAGE]: {screen: OrderPackage},
         [Config.ROUTE_ORDER_CANCEL_TO_ENTRY]: {screen: OrderCancelToEntry},
+        [Config.ROUTE_ORDER_EXIT_LOG]: {screen: OrderExitLog},
         
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
