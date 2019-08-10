@@ -248,7 +248,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     void dialNumber(@Nonnull String number) {
         Context activity = GlobalCtx.app().getCurrentRunningActivity();
-        if (activity != null) {
+        //商米设备不支持拨打电话
+        boolean supportSunMi = OrderPrinter.supportSunMiPrinter();
+        if (activity != null && !supportSunMi) {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
             activity.startActivity(intent);
         }
