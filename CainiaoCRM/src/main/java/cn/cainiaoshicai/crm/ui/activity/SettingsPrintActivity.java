@@ -154,6 +154,7 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
             });
             toggleSetZiti.setChecked(SettingHelper.useZitiMode());
         } else {
+            SettingUtility.setZitiMode(false);
             Toast.makeText(this, "暂不支持该功能！", Toast.LENGTH_SHORT).show();
         }
 
