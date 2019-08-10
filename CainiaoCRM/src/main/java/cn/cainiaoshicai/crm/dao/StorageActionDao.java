@@ -158,16 +158,21 @@ public class StorageActionDao {
             String json = getJson(String.format("/list_store_storage_status/0/%d/%d/%s", store.getId(), filter, term), params);
             AppLogger.i("list_store_storage_status json result " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-            StorageStatusResults storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
-            }.getType());
 
+            StorageStatusResults storagesMap = null;
+            try {
+                storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
+                }.getType());
+            } catch (JsonSyntaxException e) {
+                throw new ServiceException(e.getMessage());
+            }
 
             if (storagesMap == null || !storagesMap.isSuccess()) {
                 String msg = storagesMap == null ? "请求失败" : storagesMap.getErrorAlert();
                 throw new ServiceException(msg);
             }
 
-            if (storagesMap.getStore_products() != null) {
+            if (storagesMap!=null && storagesMap.getStore_products() != null) {
 
                 StorageStatusResults.ExtPrice ep = storagesMap.getExt_price();
                 HashMap<Integer, Integer> plOfExt = ep == null ? null : ep.getExt_store();
