@@ -1990,14 +1990,20 @@ class OrderScene extends Component {
             {this.renderChangeLogs()}
           </View>
           <WhiteSpace/>
-          <If condition={order.is_split_package}>
-            <List>
+          <List>
+            <If condition={order.is_split_package}>
               <List.Item
                 arrow={'horizontal'}
-                onClick={() => this.props.navigation.navigate(Config.ROUTE_ORDER_PACKAGE,{orderId: order.id})}
+                onClick={() => this.props.navigation.navigate(Config.ROUTE_ORDER_PACKAGE, {orderId: order.id})}
               >订单拆包</List.Item>
-            </List>
-          </If>
+            </If>
+            <If condition={order.is_scan_prod}>
+              <List.Item
+                arrow={'horizontal'}
+                onClick={() => this.props.navigation.navigate(Config.ROUTE_ORDER_EXIT_LOG, {orderId: order.id})}
+              >出库详情</List.Item>
+            </If>
+          </List>
         </View>
       </View>
     )
