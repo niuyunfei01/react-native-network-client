@@ -384,7 +384,7 @@ class ProductInfo extends React.Component {
             <List.Item
               arrow={"horizontal"}
               extra={`${productInfo.sku.name}(${this.state.productInfo.sku.id})`}
-            >秤签名称</List.Item>
+            > 品名(货号)</List.Item>
             <List.Item
               onClick={() => this.setState({tagCodePrompt: true})}
               arrow={"horizontal"}
