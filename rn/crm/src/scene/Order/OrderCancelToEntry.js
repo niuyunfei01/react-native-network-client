@@ -118,12 +118,12 @@ class OrderCancelToEntry extends BaseComponent {
       <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
         <For of={this.state.orderItems} each="item" index="idx">
           <View key={item.id} style={styles.productBox}>
-            <Image
+            {Number(item.num) - item.entryNum <= 0 ? <View style={styles.checkImage}/> : <Image
               source={
                 item.cancelToEntryNum > 0 ? require('../../img/checked.png') : require('../../img/checked_disable.png')
               }
               style={styles.checkImage}
-            />
+            />}
             <Image
               source={
                 !!item.productImage ? {uri: item.productImage} : require('../../img/Order/zanwutupian_.png')
