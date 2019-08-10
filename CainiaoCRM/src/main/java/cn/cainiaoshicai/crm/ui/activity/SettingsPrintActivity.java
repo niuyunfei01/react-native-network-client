@@ -145,18 +145,19 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
 
         final Switch toggleSetZiti = findViewById(R.id.toggleSetZitiMode);
-        if (isDirect) {
-            toggleSetZiti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        toggleSetZiti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isDirect) {
                     SettingUtility.setZitiMode(isChecked);
+                } else {
+                    SettingUtility.setZitiMode(false);
+                    Toast.makeText(SettingsPrintActivity.this, "暂不支持该功能！", Toast.LENGTH_SHORT).show();
                 }
-            });
-            toggleSetZiti.setChecked(SettingHelper.useZitiMode());
-        } else {
-            SettingUtility.setZitiMode(false);
-            Toast.makeText(this, "暂不支持该功能！", Toast.LENGTH_SHORT).show();
-        }
+            }
+        });
+
+        toggleSetZiti.setChecked(SettingHelper.useZitiMode());
 
         BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
         boolean connected = GlobalCtx.app().isConnectPrinter();
