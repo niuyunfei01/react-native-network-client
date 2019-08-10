@@ -112,10 +112,12 @@ class ProductPutIn extends React.Component {
       <List renderHeader={'表单信息'}>
         <InputItem
           defaultValue={this.state.totalPrice}
+          type="digit"
           onChange={(value) => this.setState({totalPrice: value})}
         >成本总计</InputItem>
         <InputItem
           defaultValue={this.state.number}
+          type="digit"
           onChange={(value) => this.setState({number: value})}
         >份数</InputItem>
         <Item extra={this.state.date}>入库日期</Item>
