@@ -133,7 +133,7 @@ class OrderCancelToEntry extends BaseComponent {
               <Text>{item.name}</Text>
               <View style={styles.productBottom}>
                 <Text>购买数量{item.num}件</Text>
-                <Text>已入{item.entryNum}件</Text>
+                <Text>已入<Text style={{color: '#f00'}}>{item.entryNum}</Text>件</Text>
                 <View style={styles.numberInput}>
                   <InputNumber
                     styles={numberInputStyle}
