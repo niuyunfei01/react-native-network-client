@@ -1,6 +1,6 @@
 import BaseComponent from "../BaseComponent";
 import React from "react";
-import {DeviceEventEmitter, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {DeviceEventEmitter, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from 'react-redux'
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
@@ -44,6 +44,7 @@ class OrderScan extends BaseComponent {
       store,
       currentOrder: {},
       isLoading: false,
+      scanCount:0,
       scanEnough: false,
       currentWorker: {label: '', key: ''},
       workers: []
@@ -261,10 +262,16 @@ class OrderScan extends BaseComponent {
   
   checkScanNum () {
     let {currentOrder} = this.state
-    if (currentOrder.items_need_scan_num <= currentOrder.scan_count) {
-      this.setState({scanEnough: true})
+    let count = 0
+    this.state.currentOrder.items.map(item => {
+      if (item.need_scan > 0) {
+        count += item.scan_num
+      }
+    })
+    if (currentOrder.items_need_scan_num <= count) {
+      this.setState({scanEnough: true,scanCount:count})
     } else {
-      this.setState({scanEnough: false})
+      this.setState({scanEnough: false,scanCount:count})
     }
   }
   
@@ -275,9 +282,9 @@ class OrderScan extends BaseComponent {
         <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
           <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
             <Text style={styles.footerBtnText}>
-              共{currentOrder.items_count}件|
+              共{currentOrder.items_count}件 |
               应扫{currentOrder.items_need_scan_num}件 |
-              已扫{currentOrder.scan_count}件 =>
+              已扫{this.state.scanCount}件 =>
               {scanEnough ? '' : '强制'}打包完成
             </Text>
           </View>
@@ -316,19 +323,26 @@ class OrderScan extends BaseComponent {
       </View>
     )
   }
+  
   render () {
     const {currentOrder} = this.state;
     return currentOrder && Object.keys(currentOrder).length ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
-          {this.renderOrderInfo(this.state.currentOrder)}
-          <OrderList
-            isLoading={this.state.isLoading}
-            onRefresh={() => this.fetchOrder(currentOrder.id)}
-            footerHeight={footerHeight}
-            dataSource={this.state.currentOrder}
-            onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
-          />
+          <ScrollView refreshControl={
+            <RefreshControl
+              refreshing={this.state.isLoading}
+              onRefresh={() => this.fetchOrder(currentOrder.id)}
+            />
+          }>
+            {this.renderOrderInfo(this.state.currentOrder)}
+            <OrderList
+              scanCount={this.state.scanCount}
+              footerHeight={footerHeight}
+              dataSource={this.state.currentOrder}
+              onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
+            />
+          </ScrollView>
         </View>
         
         {this.renderBtn()}

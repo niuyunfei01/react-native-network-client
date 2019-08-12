@@ -1,6 +1,6 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import color from '../../../widget/color'
@@ -66,7 +66,9 @@ class OrderList extends BaseComponent {
                 {/*  initValue={''}*/}
                 {/*  keyboardType={'numeric'}*/}
                 {/*>*/}
-                <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
+                <Text style={[styles.scanNum, Number(prod.scan_num) >= Number(prod.num) ? styles.scanNumFinish : null]}>
+                  {prod.scan_num ? prod.scan_num : 0}
+                </Text>
                 {/*</JbbPrompt>*/}
               </View>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -92,11 +94,11 @@ class OrderList extends BaseComponent {
             </View>
           </View>
   
-          <If condition={Number(prod.scan_num) >= Number(prod.num)}>
-            <View style={styles.mask}>
-              <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
-            </View>
-          </If>
+          {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
+          {/*  <View style={styles.mask}>*/}
+          {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
+          {/*  </View>*/}
+          {/*</If>*/}
         </View>
       </Swipeout>
     )
@@ -111,33 +113,23 @@ class OrderList extends BaseComponent {
           <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
           <Text style={styles.itemTitleTip}>应扫{item.items_need_scan_num}件商品</Text>
           <Text style={styles.itemTitleScanTip} onPress={() => console.log('click scan num')}>
-            已扫{item.scan_count}件商品
+            已扫{this.props.scanCount}件商品
           </Text>
         </View>
-        <View style={{marginBottom: this.props.footerHeight * 2}}>
-          <ScrollView refreshControl={
-            <RefreshControl
-              refreshing={this.props.isLoading}
-              onRefresh={() => this.props.onRefresh()}
-            />
-          }>
-            {item.items.map((prod, index) => {
-              return self.renderProduct.bind(self)(prod, index)
-            })}
-          </ScrollView>
+        <View style={{paddingBottom: 30}}>
+          {item.items.map((prod, index) => {
+            return self.renderProduct.bind(self)(prod, index)
+          })}
         </View>
       </View>
     )
   }
   
   render () {
-    const containerStyle = {
-      height: screenHeight - this.props.footerHeight
-    }
     const {dataSource} = this.props
     return (
-      <View style={[{flexDirection: 'row'}, this.props.style]}>
-        <View style={[styles.container, containerStyle]}>
+      <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
+        <View style={[styles.container]}>
           {this.renderOrderItem(dataSource)}
         </View>
       </View>
@@ -159,7 +151,8 @@ const styles = StyleSheet.create({
     height: 20
   },
   container: {
-    width: screenWidth
+    width: screenWidth,
+    flex: 1
   },
   itemContainer: {
     marginTop: pxToDp(15),
@@ -235,6 +228,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(15),
     color: color.theme,
     fontSize: pxToDp(26)
+  },
+  scanNumFinish: {
+    backgroundColor: color.theme,
+    color: '#fff',
+    fontWeight: 'bold'
   }
 })
 
