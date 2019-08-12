@@ -265,7 +265,7 @@ class OrderScan extends BaseComponent {
     let count = 0
     this.state.currentOrder.items.map(item => {
       if (item.need_scan > 0) {
-        count += item.scan_num
+        count += Number(item.scan_num)
       }
     })
     if (currentOrder.items_need_scan_num <= count) {
@@ -283,7 +283,6 @@ class OrderScan extends BaseComponent {
           <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
             <Text style={styles.footerBtnText}>
               共{currentOrder.items_count}件 |
-              应扫{currentOrder.items_need_scan_num}件 |
               已扫{this.state.scanCount}件 =>
               {scanEnough ? '' : '强制'}打包完成
             </Text>

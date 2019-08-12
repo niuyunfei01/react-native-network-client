@@ -71,26 +71,23 @@ class OrderList extends BaseComponent {
                 </Text>
                 {/*</JbbPrompt>*/}
               </View>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text>
-                  {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
-                  &nbsp;
-                  {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
-                </Text>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text>
+                    {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
+                    &nbsp;
+                    {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
+                  </Text>
+                  <If condition={prod.can_scan}>
+                    <Text style={
+                      [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: color.theme} : null]
+                    }>
+                      扫
+                    </Text>
+                  </If>
+                </View>
                 <Text style={styles.product_num}>X{prod.num}</Text>
               </View>
-            </View>
-  
-            <View style={styles.canScanContainer}>
-              <If condition={prod.can_scan}>
-                <Image
-                  style={styles.checkImage}
-                  source={
-                    Number(prod.scan_num) >= Number(prod.num) ?
-                      require('../../../img/checked.png') :
-                      require('../../../img/checked_disable.png')}
-                />
-              </If>
             </View>
           </View>
   
@@ -139,17 +136,6 @@ class OrderList extends BaseComponent {
 
 const rowHeight = pxToDp(120)
 const styles = StyleSheet.create({
-  canScanContainer: {
-    width: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderLeftWidth: 1,
-    borderLeftColor: '#f7f7f7'
-  },
-  checkImage: {
-    width: 20,
-    height: 20
-  },
   container: {
     width: screenWidth,
     flex: 1
@@ -233,6 +219,14 @@ const styles = StyleSheet.create({
     backgroundColor: color.theme,
     color: '#fff',
     fontWeight: 'bold'
+  },
+  scanTip: {
+    backgroundColor: '#999',
+    color: '#fff',
+    fontSize: 10,
+    padding: 1,
+    textAlign: 'center',
+    textAlignVertical: 'center'
   }
 })
 
