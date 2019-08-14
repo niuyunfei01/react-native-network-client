@@ -153,10 +153,11 @@ public class StorageActionDao {
             if (!TextUtils.isEmpty(sortBy)) {
                 params.put("sort_by", sortBy);
             }
-
             params.put("sale_price", "1");
-            String json = getJson(String.format("/list_store_storage_status/0/%d/%d/%s", store.getId(), filter, term), params);
-            AppLogger.i("list_store_storage_status json result " + json);
+            params.put("search_word", term);
+            String url = String.format("/list_store_storage_status/0/%d/%d", store.getId(), filter);
+            String json = getJson(url, params);
+            AppLogger.i(url + " list_store_storage_status json result " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
             StorageStatusResults storagesMap = null;
