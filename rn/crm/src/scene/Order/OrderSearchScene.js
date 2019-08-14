@@ -1,15 +1,6 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  BackHandler,
-  Image,
-  InteractionManager,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
@@ -103,11 +94,19 @@ class OrderSearchScene extends PureComponent {
     });
   }
   
+  onSelectPrefix (item) {
+    const self = this
+    this.setState({selectPrefix: item})
+    const accessToken = self.props.global.accessToken
+    const uri = `/api/last_search_prefix?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(uri, {key: item.key})
+  }
+  
   renderSearchBarPrefix () {
     return (
       <ModalSelector
         data={this.state.prefix}
-        onChange={(item) => this.setState({selectPrefix: item})}
+        onChange={(item) => this.onSelectPrefix(item)}
         cancelText={'取消'}
       >
         <View style={styles.searchBarPrefix}>

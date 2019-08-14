@@ -77,7 +77,7 @@ class OrderScan extends BaseComponent {
     }
     this.listenScanUpc = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
       console.log('listen scan upc => barCode :', barCode);
-      self.handleScanStandardProduct(barCode)
+      self.handleScanProduct({tagCode: barCode}, true, 1)
     })
   }
   
@@ -132,6 +132,7 @@ class OrderScan extends BaseComponent {
     }
     const {tagCode, weight = 0, barCode = ''} = prodCode
     const {id, items, scan_count} = currentOrder
+    let prodExist = 0;
     for (let i in items) {
       let item = items[i]
       if (
@@ -139,9 +140,9 @@ class OrderScan extends BaseComponent {
         (isStandard && item.product.upc && item.product.upc == tagCode)
       ) {
         if (item.scan_num && item.scan_num >= item.num) {
-          // ToastShort('该商品已经拣够了！')
-          // native.speakText('该商品已经拣够了！')
+          prodExist = 1
         } else {
+          prodExist = 2
           item.scan_num = item.scan_num ? item.scan_num + num : num
           // 如果拣货数量够，就置底
           // if (Number(item.scan_num) >= Number(item.num)) {
@@ -167,40 +168,16 @@ class OrderScan extends BaseComponent {
             self.onForcePickUp()
           }
         }
-        return
       }
     }
-    ToastShort('该订单不存在此商品！')
-    native.speakText('该订单不存在此商品！')
-  }
-  
-  handleScanStandardProduct (barCode) {
-    const self = this
-    let {currentOrder} = this.state
-    
-    if (!currentOrder || Object.keys(currentOrder).length === 0) {
-      ToastShort('无订单数据！')
-      native.speakText('无订单数据！')
-      return
+    console.log('prod exist value => ', prodExist)
+    if (prodExist === 1) {
+      ToastShort('该商品已经拣够了！')
+      native.speakText('该商品已经拣够了！')
+    } else if (prodExist === 0) {
+      ToastShort('该订单不存在此商品！')
+      native.speakText('该订单不存在此商品！')
     }
-    const {items} = currentOrder
-    for (let item of items) {
-      if (
-        (item.product.upc && item.product.upc == barCode) ||
-        (barCode.indexOf('JBBUPC') && item.product.upc && item.product.upc.substring(0, 8) == barCode.substring(0, 8))
-      ) {
-        if (item.scan_num && item.scan_num >= item.num) {
-          ToastShort('该商品已经拣够了！')
-          native.speakText('该商品已经拣够了！')
-          return
-        } else {
-          self.handleScanProduct({tagCode: barCode}, true, 1)
-          return
-        }
-      }
-    }
-    ToastShort('该订单不存在此商品！')
-    native.speakText('该订单不存在此商品！')
   }
   
   addScanProdLog (order_id, item_id, num, code, bar_code, type, weight) {
