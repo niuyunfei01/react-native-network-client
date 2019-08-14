@@ -201,6 +201,8 @@ public class StorageActionDao {
                     si.setExpect_check_time(sp.getExpect_check_time());
                     si.setApplyingPrice(sp.getApplying_price());
                     si.setSold_latest(sp.getSold_latest());
+                    si.setRefer_prod_id(sp.getRefer_prod_id());
+                    si.setOccupy(sp.getOccupy());
                     HashMap<Integer, Product> products = storagesMap.getProducts();
                     Product pd = products.get(sp.getProduct_id());
                     if (pd != null) {

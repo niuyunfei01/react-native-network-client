@@ -53,6 +53,7 @@ public class StorageItem {
     private String skuUnit;
     private int weight;
     private String expect_check_time;
+    private int refer_prod_id = 0;
 
     public int getProduct_id() {
         return product_id;
@@ -370,5 +371,13 @@ public class StorageItem {
 
     public void setOccupy(int occupy) {
         this.occupy = occupy;
+    }
+
+    public int getRefer_prod_id() {
+        return refer_prod_id;
+    }
+
+    public void setRefer_prod_id(int refer_prod_id) {
+        this.refer_prod_id = refer_prod_id;
     }
 }

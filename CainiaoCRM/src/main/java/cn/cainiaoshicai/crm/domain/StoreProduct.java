@@ -41,6 +41,9 @@ public class StoreProduct {
 
     private int applying_price;
 
+    private int occupy = 0;
+    private int refer_prod_id = 0;
+
     public int getId() {
         return id;
     }
@@ -279,5 +282,21 @@ public class StoreProduct {
 
     public void setExpect_check_time(String expect_check_time) {
         this.expect_check_time = expect_check_time;
+    }
+
+    public int getOccupy() {
+        return occupy;
+    }
+
+    public void setOccupy(int occupy) {
+        this.occupy = occupy;
+    }
+
+    public int getRefer_prod_id() {
+        return refer_prod_id;
+    }
+
+    public void setRefer_prod_id(int refer_prod_id) {
+        this.refer_prod_id = refer_prod_id;
     }
 }
