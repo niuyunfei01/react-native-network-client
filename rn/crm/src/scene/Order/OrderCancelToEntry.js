@@ -1,27 +1,41 @@
 import React from 'react'
 import BaseComponent from "../BaseComponent";
 import {connect} from 'react-redux'
-import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native'
 import HttpUtils from "../../util/http";
 import InputNumber from "rc-input-number";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import {Button} from 'antd-mobile-rn'
 import {ToastShort} from "../../util/ToastUtils";
+import ModalSelector from "react-native-modal-selector";
 
 function mapStateToProps (state) {
   return {global: state.global}
 }
 
+const MENU_TYPE_ALL_ENTRY = 1
+const MENU_TYPE_ALL_LOSS = 2
+const MENU_TYPE_ALL_SOLD = 3
+
 class OrderCancelToEntry extends BaseComponent {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
+    const menu = [
+      {key: MENU_TYPE_ALL_ENTRY, label: '全部入库'},
+      {key: MENU_TYPE_ALL_LOSS, label: '全部报损'},
+      {key: MENU_TYPE_ALL_SOLD, label: '全部售出'},
+    ]
     return {
       headerTitle: '退单商品入库',
       headerRight: (
-        <TouchableOpacity style={styles.headerRight} onPress={() => params.selectAll()}>
-          <View><Text>{params.isCheckAll ? '取消' : ''}全选</Text></View>
-        </TouchableOpacity>
+        <ModalSelector
+          onChange={(option) => params.selectAll(option)}
+          cancelText={'取消'}
+          data={menu}
+        >
+          <View style={styles.headerRight}><Text>全选</Text></View>
+        </ModalSelector>
       )
     }
   }
@@ -29,21 +43,18 @@ class OrderCancelToEntry extends BaseComponent {
   constructor (props) {
     super(props)
     this.state = {
-      orderItems: [],
-      isCheckAll: false
+      orderItems: []
     }
   }
   
   componentWillMount () {
     this.fetchData()
-    this.props.navigation.setParams({selectAll: () => this.onSelectAll(), isCheckAll: this.state.isCheckAll})
+    this.props.navigation.setParams({
+      selectAll: (option) => this.onSelectAll(option)
+    })
   }
   
   componentWillUpdate (nextProps: Readonly<P>, nextState: Readonly<S>, nextContext: any): void {
-    console.log('component will update next props => ', nextState)
-    if (this.props.navigation.state.params.isCheckAll != nextState.isCheckAll) {
-      this.props.navigation.setParams({isCheckAll: nextState.isCheckAll})
-    }
   }
   
   fetchData () {
@@ -55,19 +66,58 @@ class OrderCancelToEntry extends BaseComponent {
     })
   }
   
-  onSelectAll () {
-    let {isCheckAll, orderItems} = this.state
-    isCheckAll = !isCheckAll
+  onSelectAll (option) {
+    let {orderItems} = this.state
+    
     orderItems = orderItems.map(item => {
-      item.cancelToEntryNum = item.num - item.entryNum > 0 && isCheckAll ? item.num - item.entryNum : 0
+      item.cancelToEntry = 0
+      item.cancelToLoss = 0
+      item.cancelToSale = 0
       return item
     })
-    this.setState({isCheckAll, orderItems})
+    
+    this.setState({orderItems}, () => this.onResetAllNum(option))
   }
   
-  onEntryNumChanged (idx, value) {
+  onResetAllNum (option) {
     let {orderItems} = this.state
-    orderItems[idx].cancelToEntryNum = value
+    orderItems = orderItems.map(item => {
+      switch (option.key) {
+        case MENU_TYPE_ALL_ENTRY:
+          item.cancelToEntry = item.num - item.dealNum
+          break;
+        case MENU_TYPE_ALL_LOSS:
+          item.cancelToLoss = item.num - item.dealNum
+          break;
+        case MENU_TYPE_ALL_SOLD:
+          item.cancelToSale = item.num - item.dealNum
+          break;
+        default:
+          break;
+      }
+      return item
+    })
+    
+    this.setState({orderItems})
+  }
+  
+  onNumChanged (idx, value, type) {
+    console.log(idx, value, type)
+    let {orderItems} = this.state
+    switch (type) {
+      case MENU_TYPE_ALL_ENTRY:
+        orderItems[idx].cancelToEntry = value
+        break;
+      case MENU_TYPE_ALL_LOSS:
+        orderItems[idx].cancelToLoss = value
+        break;
+      case MENU_TYPE_ALL_SOLD:
+        orderItems[idx].cancelToSale = value
+        break;
+      default:
+        break;
+    }
+    console.log(JSON.parse(JSON.stringify(orderItems)))
     this.setState({orderItems})
   }
   
@@ -76,18 +126,35 @@ class OrderCancelToEntry extends BaseComponent {
     const {orderItems} = this.state
     let entryProdNum = 0
     let entryNum = 0
+    let lossNum = 0
+    let saleNum = 0
     
     let postData = []
     orderItems.map(item => {
-      if (item.cancelToEntryNum > 0) {
-        entryProdNum++
-        entryNum += Number(item.cancelToEntryNum)
+      let flag = false
+      if (item.cancelToEntry > 0) {
+        flag = true
+        entryNum += Number(item.cancelToEntry)
       }
-      postData.push({
-        orderItemId: item.id,
-        entryNum: item.cancelToEntryNum ? item.cancelToEntryNum : 0,
-        productId: item.product_id
-      })
+      if (item.cancelToLoss > 0) {
+        flag = true
+        lossNum += Number(item.cancelToLoss)
+      }
+      if (item.cancelToSale > 0) {
+        flag = true
+        saleNum += Number(item.cancelToSale)
+      }
+  
+      if (flag) {
+        entryProdNum++
+        postData.push({
+          orderItemId: item.id,
+          cancelToEntry: item.cancelToEntry ? item.cancelToEntry : 0,
+          cancelToLoss: item.cancelToLoss ? item.cancelToLoss : 0,
+          cancelToSale: item.cancelToSale ? item.cancelToSale : 0,
+          productId: item.product_id
+        })
+      }
     })
     
     if (entryNum == 0 || entryProdNum == 0) {
@@ -96,7 +163,7 @@ class OrderCancelToEntry extends BaseComponent {
     }
     const {global} = self.props
     const uri = `/crm_orders/order_cancel_to_entry?access_token=${global.accessToken}`
-    Alert.alert('提示', `确定入库${entryProdNum}个商品共${entryNum}件`, [
+    Alert.alert('提示', `确定处理${entryProdNum}个商品：\n入库${entryNum}件\n报损${lossNum}件\n未收回${saleNum}件`, [
       {text: '取消'},
       {
         text: '确定', onPress: () => {
@@ -118,9 +185,9 @@ class OrderCancelToEntry extends BaseComponent {
       <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
         <For of={this.state.orderItems} each="item" index="idx">
           <View key={item.id} style={styles.productBox}>
-            {Number(item.num) - item.entryNum <= 0 ? <View style={styles.checkImage}/> : <Image
+            {Number(item.num) - item.dealNum <= 0 ? <View style={styles.checkImage}/> : <Image
               source={
-                item.cancelToEntryNum > 0 ? require('../../img/checked.png') : require('../../img/checked_disable.png')
+                item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? require('../../img/checked.png') : require('../../img/checked_disable.png')
               }
               style={styles.checkImage}
             />}
@@ -132,17 +199,48 @@ class OrderCancelToEntry extends BaseComponent {
             <View style={styles.productRight}>
               <Text>{item.name}</Text>
               <View style={styles.productBottom}>
-                <Text>购买数量{item.num}件</Text>
-                <Text>已入<Text style={{color: '#f00'}}>{item.entryNum}</Text>件</Text>
-                <View style={styles.numberInput}>
-                  <InputNumber
-                    styles={numberInputStyle}
-                    min={0}
-                    max={Number(item.num) - item.entryNum}
-                    value={Number(item.cancelToEntryNum)}
-                    onChange={(v) => this.onEntryNumChanged(idx, v)}
-                    keyboardType={'numeric'}
-                  />
+                <Text>售出<Text style={{color: '#f00'}}>{item.num}</Text>件</Text>
+                <Text>已处理<Text style={{color: '#f00'}}>{item.dealNum}</Text>件</Text>
+              </View>
+              <View>
+                <View style={styles.operateRow}>
+                  <Text>重新入库</Text>
+                  <View style={styles.numberInput}>
+                    <InputNumber
+                      styles={numberInputStyle}
+                      min={0}
+                      max={item.num - item.dealNum - item.cancelToLoss - item.cancelToSale}
+                      value={Number(item.cancelToEntry)}
+                      onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_ENTRY)}
+                      keyboardType={'numeric'}
+                    />
+                  </View>
+                </View>
+                <View style={styles.operateRow}>
+                  <Text>报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;损</Text>
+                  <View style={styles.numberInput}>
+                    <InputNumber
+                      styles={numberInputStyle}
+                      min={0}
+                      max={item.num - item.dealNum - item.cancelToEntry - item.cancelToSale}
+                      value={Number(item.cancelToLoss)}
+                      onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_LOSS)}
+                      keyboardType={'numeric'}
+                    />
+                  </View>
+                </View>
+                <View style={styles.operateRow}>
+                  <Text>未&nbsp;&nbsp;取&nbsp;&nbsp;回</Text>
+                  <View style={styles.numberInput}>
+                    <InputNumber
+                      styles={numberInputStyle}
+                      min={0}
+                      max={item.num - item.dealNum - item.cancelToEntry - item.cancelToLoss}
+                      value={Number(item.cancelToSale)}
+                      onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_SOLD)}
+                      keyboardType={'numeric'}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
@@ -150,7 +248,7 @@ class OrderCancelToEntry extends BaseComponent {
         </For>
         
         <View style={styles.btnContainer}>
-          <Button type={'primary'} onClick={() => this.onSubmit()}>提交入库</Button>
+          <Button type={'primary'} onClick={() => this.onSubmit()}>提交处理结果</Button>
         </View>
       </ScrollView>
     )
@@ -166,9 +264,8 @@ const styles = StyleSheet.create({
   productBox: {
     flexDirection: 'row',
     paddingHorizontal: 15,
-    height: 70,
     backgroundColor: '#fff',
-    borderBottomColor: '#f8f8f8',
+    borderBottomColor: '#bbb',
     borderBottomWidth: 1,
     alignItems: 'center',
     flex: 1
@@ -191,7 +288,15 @@ const styles = StyleSheet.create({
   },
   productBottom: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 40
+  },
+  operateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 40
   },
   numberInput: {
     height: 20,
