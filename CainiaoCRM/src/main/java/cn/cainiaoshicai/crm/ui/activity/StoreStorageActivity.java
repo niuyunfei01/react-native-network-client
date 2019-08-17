@@ -943,12 +943,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             case MENU_CONTEXT_TO_SALE_ID:
                 Runnable after;
                 if (item != null && item.getStatus() == STORE_PROD_OFF_SALE) {
-                    changed.setAdditional(new Runnable() {
-                        @Override
-                        public void run() {
-                            listAdapterRefresh();
-                            refreshData();
-                        }
+                    changed.setAdditional(() -> {
+                        listAdapterRefresh();
+                        refreshData();
                     });
                 }
                 StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "恢复售卖", changed);
