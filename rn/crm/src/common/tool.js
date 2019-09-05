@@ -237,7 +237,9 @@ export function user_info (mine, currVendorId, currentUser) {
   let user_info = {};
   if (
     Object.keys(mine.user_list).length > 0 &&
+    mine.user_list[currVendorId] &&
     Object.keys(mine.user_list[currVendorId]).length > 0 &&
+    mine.user_list[currVendorId][currentUser] &&
     Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
   ) {
     // let {
