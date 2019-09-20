@@ -131,6 +131,7 @@ import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
 import Cts from "../Cts";
 import _ from "lodash"
+import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -339,7 +340,8 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_PACKAGE]: {screen: OrderPackage},
         [Config.ROUTE_ORDER_CANCEL_TO_ENTRY]: {screen: OrderCancelToEntry},
         [Config.ROUTE_ORDER_EXIT_LOG]: {screen: OrderExitLog},
-        
+        [Config.ROUTE_ORDER_GOOD_COUPON]: {screen: SendRedeemCoupon},
+
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_STORE_RATE]: {screen: StoreRate},

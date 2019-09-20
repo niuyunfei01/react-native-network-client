@@ -112,6 +112,7 @@ const MENU_RECEIVE_QR = 10;
 const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
 const MENU_ORDER_CANCEL_TO_ENTRY = 13;
+const MENU_REDEEM_GOOD_COUPON = 14;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -335,14 +336,23 @@ class OrderScene extends Component {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
+    if (order && order.fn_scan_items) {
+      as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
+    }
+    if (order && order.fn_scan_ready) {
+      as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
+    }
     as.push({key: MENU_RECEIVE_QR, label: '收款码'});
     if (is_service_mgr) {
-      as.push({key: MENU_SEND_MONEY, label: '发红包'})
+      as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
-    as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
-    as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
+
     if (order && order.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
+    }
+
+    if (order && order.fn_coupon_redeem_good) {
+      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
     
     let params = {
@@ -428,6 +438,13 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
     } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
       navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.order.id})
+    } else if (option.key === MENU_REDEEM_GOOD_COUPON) {
+      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {type: 'select', storeId: order.order.store_id,
+        coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
+        to_u_id: order.order.user_id,
+        to_u_name: order.order.userName,
+        to_u_mobile: order.order.mobile,
+      })
     } else {
       ToastShort('未知的操作');
     }

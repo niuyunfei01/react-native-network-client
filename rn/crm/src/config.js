@@ -101,6 +101,7 @@ const C = {
   ROUTE_ORDER_PACKAGE: 'OrderPackage',                                // 订单拆单分包
   ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
   ROUTE_ORDER_EXIT_LOG: 'OrderExitLog',                               // 订单出库记录
+  ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
   
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',

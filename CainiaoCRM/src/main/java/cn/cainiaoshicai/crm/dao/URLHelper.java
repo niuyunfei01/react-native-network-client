@@ -13,7 +13,7 @@ public class URLHelper {
     public static final String PROTO = "https://";
 
     public static String getHost() {
-        return (SettingHelper.usePreviewHost() ? "preview" : "www")  + ".cainiaoshicai.cn";
+        return (SettingHelper.useAlphaHost() ? "alpha"  : (SettingHelper.usePreviewHost() ? "preview" : "www"))  + ".cainiaoshicai.cn";
     }
 
     public static final String WEB_URL_ROOT = "https://" + getHost();

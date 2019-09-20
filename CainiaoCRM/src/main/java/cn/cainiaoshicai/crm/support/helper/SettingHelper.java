@@ -18,6 +18,7 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 public class SettingHelper {
 
     private static final String USE_PREVIEW_HOST = "use_preview_host";
+    private static final String USE_ALPHA_HOST = "use_alpha_host";
     private static SharedPreferences.Editor editor = null;
     private static SharedPreferences sharedPreferences = null;
 
@@ -96,8 +97,15 @@ public class SettingHelper {
         setEditor(GlobalCtx.app(), USE_PREVIEW_HOST, isChecked ? "1" : "0");
     }
 
+    public static void setUserAlphaHost(boolean isChecked) {
+        setEditor(GlobalCtx.app(), USE_ALPHA_HOST, isChecked ? "1" : "0");
+    }
+
     public static boolean usePreviewHost() {
         return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_PREVIEW_HOST, "0"));
+    }
+    public static boolean useAlphaHost() {
+        return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_ALPHA_HOST, "0"));
     }
 
     public static boolean useZitiMode() {

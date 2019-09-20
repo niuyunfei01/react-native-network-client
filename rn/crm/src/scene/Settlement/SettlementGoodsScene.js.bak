@@ -23,7 +23,7 @@ import Config from "../../config";
 import {Button} from "../../weui/index";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from '../../Cts'
-import {NavigationActions} from 'react-navigation';
+
 
 function mapStateToProps (state) {
   const {global} = state;
