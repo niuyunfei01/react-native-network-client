@@ -189,10 +189,10 @@ class SendRedeemCoupon extends BaseComponent {
           </List>
 
           <If condition={this.state.preview}>
-            <Text>{preview.code}</Text>
+            <Text>{this.state.preview.code}</Text>
             <WhiteSpace/>
             <Text>短信预览</Text>
-            <Text>{preview.sms}</Text>
+            <Text>{this.state.preview.sms}</Text>
           </If>
 
           <View style={[styles.printBtnBox,]}>
