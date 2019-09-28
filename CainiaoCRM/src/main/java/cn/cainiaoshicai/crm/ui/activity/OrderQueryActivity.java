@@ -154,8 +154,7 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
                 term = "store:" + selected_store;
                 lt = ListType.NONE;
             }
-            boolean zitiMode = SettingHelper.useZitiMode();
-            new RefreshOrderListTask(this, term, lt, this.maxPast, this.swipeRefreshLayout, callback, true, zitiMode).executeOnNormal();
+            new RefreshOrderListTask(this, term, lt, this.maxPast, this.swipeRefreshLayout, callback, true).executeOnNormal();
         }
     }
 

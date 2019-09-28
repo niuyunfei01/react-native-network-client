@@ -849,13 +849,14 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
                 if (item.getStatus() != STORE_PROD_OFF_SALE) {
                     menu.add(Menu.NONE, MENU_CONTEXT_EDIT_REQ, Menu.NONE, item.getTotalInReq() > 0 ? "编辑订货" : "订货");
                 }
-                menu.add(Menu.NONE, MENU_CONTEXT_ADD_BUY_RECORD, Menu.NONE, "入库");
+                if (item.getRefer_prod_id() == 0) {
+                    menu.add(Menu.NONE, MENU_CONTEXT_ADD_BUY_RECORD, Menu.NONE, "入库");
+                    menu.add(Menu.NONE, MENU_CONTEXT_STOCK_CHECK, Menu.NONE, "盘点");
+                }
                 menu.add(Menu.NONE, MENU_CONTEXT_TO_LOSS, Menu.NONE, "报损");
-                menu.add(Menu.NONE, MENU_CONTEXT_STOCK_CHECK, Menu.NONE, "盘点");
                 menu.add(Menu.NONE, MENU_CONTEXT_WAREHOUSE, Menu.NONE, "库管");
                 menu.add(Menu.NONE, MENU_CONTEXT_INVENTORY_DETAIL, Menu.NONE, "商品出入库明细");
             }
-
             menu.add(Menu.NONE, MENU_CONTEXT_VIEW_DETAIL, Menu.NONE, "修改历史");
         }
     }
@@ -942,12 +943,9 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             case MENU_CONTEXT_TO_SALE_ID:
                 Runnable after;
                 if (item != null && item.getStatus() == STORE_PROD_OFF_SALE) {
-                    changed.setAdditional(new Runnable() {
-                        @Override
-                        public void run() {
-                            listAdapterRefresh();
-                            refreshData();
-                        }
+                    changed.setAdditional(() -> {
+                        listAdapterRefresh();
+                        refreshData();
                     });
                 }
                 StoreStorageHelper.action_chg_status(this, currStore, item, StorageItem.STORE_PROD_ON_SALE, "恢复售卖", changed);

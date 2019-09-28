@@ -1,44 +1,35 @@
 import React, {PureComponent} from 'react'
 import {
-	View,
-	Text,
-	StyleSheet,
 	Image,
-	TouchableOpacity,
-	ScrollView,
+	InteractionManager,
 	RefreshControl,
-	InteractionManager, TouchableWithoutFeedback
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	TouchableWithoutFeedback,
+	View
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-	Cells,
-	CellsTitle,
-	Cell,
-	CellHeader,
-	CellBody,
-	CellFooter,
-	Button,
-	ButtonArea,
-	Toast,
-} from "../../weui/index";
+import {Button, Cell, CellBody, CellFooter, Cells, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {fetchUserCount, fetchWorkers, editWorkerStatus, getUserWageData} from "../../reducers/mine/mineActions";
+import {editWorkerStatus, fetchUserCount, fetchWorkers, getUserWageData} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
-import {tool, native} from "../../common";
+import {native, tool} from "../../common";
 import {NavigationActions} from 'react-navigation';
 import {logout} from "../../reducers/global/globalActions";
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
 	const {mine, global} = state;
 	return {mine: mine, global: global}
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
 	return {
 		dispatch, ...bindActionCreators({
 			fetchUserCount,
@@ -82,7 +73,7 @@ class UserScene extends PureComponent {
 		}
 	};
 	
-	constructor(props: Object) {
+	constructor (props: Object) {
 		super(props);
 		
 		let {
@@ -126,7 +117,7 @@ class UserScene extends PureComponent {
 			
 			last_nav_key: navigation_key,
 		};
-		
+		console.log('state => ', this.state)
 		if (mine.sign_count[currentUser] === undefined || mine.sign_count[currentUser] === undefined) {
 			this.onGetUserCount();
 		}
@@ -134,17 +125,17 @@ class UserScene extends PureComponent {
 		this._onLogout = this._onLogout.bind(this)
 	}
 	
-	_onLogout() {
+	_onLogout () {
 		const {dispatch} = this.props;
 		dispatch(logout());
 		native.gotoLoginWithNoHistory();
 	}
 	
-	componentWillMount() {
+	// componentWillMount() {
 //		this.getExceptSupplement()
-	}
+// 	}
 	
-	onGetUserCount() {
+	onGetUserCount () {
 		const {accessToken} = this.props.global;
 		const {currentUser} = this.state;
 		let _this = this;
@@ -180,13 +171,13 @@ class UserScene extends PureComponent {
 	// 	})
 	// }
 	
-	onHeaderRefresh() {
+	onHeaderRefresh () {
 		this.setState({isRefreshing: true});
 		
 		this.onGetUserCount();
 	}
 	
-	render() {
+	render () {
 		let {type, user_status} = this.state;
 		return (
 			<ScrollView
@@ -261,7 +252,7 @@ class UserScene extends PureComponent {
 		);
 	}
 	
-	componentDidUpdate() {
+	componentDidUpdate () {
 		let {key, params} = this.props.navigation.state;
 		let {shouldRefresh, user_name, mobile, store_id} = (params || {});
 		
@@ -280,7 +271,7 @@ class UserScene extends PureComponent {
 		}
 	}
 	
-	onPress(user_status) {
+	onPress (user_status) {
 		if (this.state.onSubmitting) {
 			return false;
 		}
@@ -328,7 +319,7 @@ class UserScene extends PureComponent {
 		});
 	}
 	
-	onRouteJump(route, params = {}) {
+	onRouteJump (route, params = {}) {
 		let _this = this;
 		if (route === Config.ROUTE_SETTING) {
 			native.toSettings();

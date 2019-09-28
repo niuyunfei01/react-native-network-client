@@ -1,6 +1,6 @@
 import BaseComponent from "../BaseComponent";
 import React from "react";
-import {DeviceEventEmitter, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {DeviceEventEmitter, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from 'react-redux'
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
@@ -11,6 +11,9 @@ import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
 import Moment from 'moment'
+import {List} from "antd-mobile-rn";
+import {tool} from "../../common";
+import ModalSelector from "react-native-modal-selector";
 
 let footerHeight = pxToDp(80);
 
@@ -36,10 +39,15 @@ class OrderScan extends BaseComponent {
   
   constructor (props) {
     super(props);
+    const store = tool.store(this.props.global)
     this.state = {
+      store,
       currentOrder: {},
       isLoading: false,
+      scanCount:0,
       scanEnough: false,
+      currentWorker: {label: '', key: ''},
+      workers: []
     }
   }
   
@@ -69,7 +77,7 @@ class OrderScan extends BaseComponent {
     }
     this.listenScanUpc = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
       console.log('listen scan upc => barCode :', barCode);
-      self.handleScanStandardProduct(barCode)
+      self.handleScanProduct({tagCode: barCode}, true, 1)
     })
   }
   
@@ -78,6 +86,7 @@ class OrderScan extends BaseComponent {
     if (this.props.navigation.state.params.orderId) {
       this.fetchOrder(this.props.navigation.state.params.orderId)
     }
+    this.fetchWorker()
   }
   
   componentWillUnmount () {
@@ -95,7 +104,21 @@ class OrderScan extends BaseComponent {
     this.setState({isLoading: true})
     const api = `/api/order_info_by_scan_order_code/${orderId}?access_token=${accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
-      self.setState({currentOrder: res, isLoading: false}, () => self.checkScanNum())
+      self.setState({
+        currentOrder: res,
+        isLoading: false,
+        currentWorker: {label: res.assignUser.nickname, key: res.assignUser.id}
+      }, () => self.checkScanNum())
+    })
+  }
+  
+  fetchWorker () {
+    const self = this
+    const accessToken = self.props.global.accessToken
+    const api = `/api/store_contacts/${this.state.store.id}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props)(api).then(res => {
+      let workers = res.map(item => ({label: item.label, key: item.id}))
+      self.setState({workers: workers})
     })
   }
   
@@ -109,6 +132,7 @@ class OrderScan extends BaseComponent {
     }
     const {tagCode, weight = 0, barCode = ''} = prodCode
     const {id, items, scan_count} = currentOrder
+    let prodExist = 0;
     for (let i in items) {
       let item = items[i]
       if (
@@ -116,10 +140,9 @@ class OrderScan extends BaseComponent {
         (isStandard && item.product.upc && item.product.upc == tagCode)
       ) {
         if (item.scan_num && item.scan_num >= item.num) {
-          // ToastShort('该商品已经拣够了！')
-          // native.speakText('该商品已经拣够了！')
-          return
+          prodExist = 1
         } else {
+          prodExist = 2
           item.scan_num = item.scan_num ? item.scan_num + num : num
           // 如果拣货数量够，就置底
           // if (Number(item.scan_num) >= Number(item.num)) {
@@ -129,6 +152,7 @@ class OrderScan extends BaseComponent {
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
           console.log('handle scan product current order : ', currentOrder)
+  
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
           self.setState({currentOrder})
           
@@ -140,45 +164,20 @@ class OrderScan extends BaseComponent {
           }
           ToastShort(msg)
           native.speakText(msg)
-          // native.playWarningSound()
           if (currentOrder.scan_count >= currentOrder.items_count) {
             self.onForcePickUp()
           }
-          return
         }
       }
     }
-    ToastShort('该订单不存在此商品！')
-    native.speakText('该订单不存在此商品！')
-  }
-  
-  handleScanStandardProduct (barCode) {
-    const self = this
-    let {currentOrder} = this.state
-    
-    if (!currentOrder || Object.keys(currentOrder).length === 0) {
-      ToastShort('无订单数据！')
-      native.speakText('无订单数据！')
-      return
+    console.log('prod exist value => ', prodExist)
+    if (prodExist === 1) {
+      ToastShort('该商品已经拣够了！')
+      native.speakText('该商品已经拣够了！')
+    } else if (prodExist === 0) {
+      ToastShort('该订单不存在此商品！')
+      native.speakText('该订单不存在此商品！')
     }
-    const {items} = currentOrder
-    for (let item of items) {
-      if (
-        (item.product.upc && item.product.upc == barCode) ||
-        (barCode.indexOf('JBBUPC') && item.product.upc && item.product.upc.substring(0, 8) == barCode.substring(0, 8))
-      ) {
-        if (item.scan_num && item.scan_num >= item.num) {
-          ToastShort('该商品已经拣够了！')
-          native.speakText('该商品已经拣够了！')
-          return
-        } else {
-          self.handleScanProduct({tagCode: barCode}, true, 1)
-          return
-        }
-      }
-    }
-    ToastShort('该订单不存在此商品！')
-    native.speakText('该订单不存在此商品！')
   }
   
   addScanProdLog (order_id, item_id, num, code, bar_code, type, weight) {
@@ -186,9 +185,13 @@ class OrderScan extends BaseComponent {
     const accessToken = self.props.global.accessToken
     const api = `/api_products/add_inventory_exit_log?access_token=${accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      order_id, item_id, num, code, type, weight, bar_code
+      order_id, item_id, num, code, type, weight, bar_code,
+      packUid: this.state.currentWorker.key
     }).then(res => {
       self.checkScanNum()
+    }).catch(e => {
+      native.playWarningSound()
+      native.speakText(e.reason)
     })
   }
   
@@ -199,7 +202,10 @@ class OrderScan extends BaseComponent {
   
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api, {from: 'ORDER_SCAN'}).then(() => {
+    HttpUtils.get.bind(self.props)(api, {
+      from: 'ORDER_SCAN',
+      packUid: this.state.currentWorker.key
+    }).then(() => {
       self.afterPackUp(currentOrder, self)
     }).catch(e => {
       if (e.obj == 'ALREADY_PACK_UP') {
@@ -233,10 +239,16 @@ class OrderScan extends BaseComponent {
   
   checkScanNum () {
     let {currentOrder} = this.state
-    if (currentOrder.items_need_scan_num <= currentOrder.scan_count) {
-      this.setState({scanEnough: true})
+    let count = 0
+    this.state.currentOrder.items.map(item => {
+      if (item.need_scan > 0) {
+        count += Number(item.scan_num)
+      }
+    })
+    if (currentOrder.items_need_scan_num <= count) {
+      this.setState({scanEnough: true,scanCount:count})
     } else {
-      this.setState({scanEnough: false})
+      this.setState({scanEnough: false,scanCount:count})
     }
   }
   
@@ -247,12 +259,43 @@ class OrderScan extends BaseComponent {
         <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
           <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
             <Text style={styles.footerBtnText}>
-              应扫{currentOrder.items_need_scan_num}件 |
-              已扫{currentOrder.scan_count}件 =>
+              共{currentOrder.items_count}件 |
+              已扫{this.state.scanCount}件 =>
               {scanEnough ? '' : '强制'}打包完成
             </Text>
           </View>
         </TouchableOpacity>
+      </View>
+    )
+  }
+  
+  renderOrderInfo (item) {
+    return (
+      <View style={styles.headerContainer}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId}</Text>
+            <Text style={styles.dayId}>(总单：#{item.dayId})</Text>
+          </View>
+          <View>
+            <Text>期望送达：{item.expectTime}</Text>
+          </View>
+        </View>
+        <View>
+          <Text style={{fontSize: 16}}>客户备注：{item.remark}</Text>
+        </View>
+        <If condition={item.store_remark}>
+          <View>
+            <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
+          </View>
+        </If>
+        <List>
+          <ModalSelector data={this.state.workers} onChange={item => this.setState({currentWorker: item})}>
+            <List.Item extra={this.state.currentWorker.label} arrow={'horizontal'}>
+              拣货员
+            </List.Item>
+          </ModalSelector>
+        </List>
       </View>
     )
   }
@@ -262,13 +305,20 @@ class OrderScan extends BaseComponent {
     return currentOrder && Object.keys(currentOrder).length ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{flex: 1}}>
-          <OrderList
-            isLoading={this.state.isLoading}
-            onRefresh={() => this.fetchOrder(currentOrder.id)}
-            footerHeight={footerHeight}
-            dataSource={this.state.currentOrder}
-            onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
-          />
+          <ScrollView refreshControl={
+            <RefreshControl
+              refreshing={this.state.isLoading}
+              onRefresh={() => this.fetchOrder(currentOrder.id)}
+            />
+          }>
+            {this.renderOrderInfo(this.state.currentOrder)}
+            <OrderList
+              scanCount={this.state.scanCount}
+              footerHeight={footerHeight}
+              dataSource={this.state.currentOrder}
+              onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
+            />
+          </ScrollView>
         </View>
         
         {this.renderBtn()}
@@ -278,6 +328,16 @@ class OrderScan extends BaseComponent {
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: '#f0f9ef',
+    padding: pxToDp(20)
+  },
+  platDayId: {
+    fontWeight: 'bold'
+  },
+  dayId: {
+    fontSize: 10
+  },
   footerContainer: {
     flexDirection: 'row',
     height: footerHeight,

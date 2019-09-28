@@ -1,6 +1,5 @@
 import React from "react";
 import BaseComponent from "../BaseComponent";
-import NavigationItem from "../../widget/NavigationItem";
 import tool from "../../common/tool";
 import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
@@ -25,13 +24,7 @@ function mapStateToProps (state) {
 class GoodsMarketExamine extends BaseComponent {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: `价格市调`,
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => navigation.goBack()}
-        />
-      )
+      headerTitle: `价格市调`
     }
   }
   
@@ -192,21 +185,28 @@ class GoodsMarketExamine extends BaseComponent {
               {product.name}
             </Text>
           </View>
+          <JbbInput
+            onChange={value => this.onChgMarketPrice(idx, value)}
+            value={product.market_price}
+            onBlur={() => this.onSubmitMarketPrice(idx, product.id, product.market_price, product.remark_remark)}
+            keyboardType={'numeric'}
+            styles={styles.marketPriceInput}
+          />
           <View style={styles.productRowBottom}>
-            <JbbInput
-              onChange={value => this.onChgMarketPrice(idx, value)}
-              value={product.market_price}
-              onBlur={() => this.onSubmitMarketPrice(idx, product.id, product.market_price, product.remark_remark)}
-              keyboardType={'numeric'}
-              styles={styles.marketPriceInput}
-            />
-  
             <JbbPrompt
               rows={10}
               initValue={product.market_remark}
               onConfirm={text => this.onSubmitMarketPrice(idx, product.id, product.market_price, text)}>
-              <JbbButton text={'备注'} type={'hollow'} paddingVertical={pxToDp(1)}/>
+              <JbbButton text={'备注'} type={'text'} touchStyle={{marginHorizontal: 5}}/>
             </JbbPrompt>
+  
+            <JbbButton
+              text={'市调历史>>'}
+              type={'text'}
+              onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {
+                productId: product.id
+              })}
+            />
           </View>
         </View>
       </View>
@@ -384,6 +384,7 @@ const styles = StyleSheet.create({
   productRowBottom: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     height: pxToDp(50),
     width: '100%'
   },

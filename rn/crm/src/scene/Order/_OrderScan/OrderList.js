@@ -1,13 +1,13 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import color from '../../../widget/color'
 import {screen} from "../../../common";
 import PropTypes from 'prop-types'
 import {ToastShort} from "../../../util/ToastUtils";
-import JbbPrompt from "../../component/JbbPrompt";
+import Swipeout from 'react-native-swipeout'
 
 var Dimensions = require('Dimensions');
 var screenWidth = Dimensions.get('window').width;
@@ -31,70 +31,73 @@ class OrderList extends BaseComponent {
     return true
   }
   
-  
-  renderOrderInfo (item) {
-    return (
-      <View style={styles.headerContainer}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId}</Text>
-            <Text style={styles.dayId}>(总单：#{item.dayId})</Text>
-          </View>
-          <View>
-            <Text>期望送达：{item.expectTime}</Text>
-          </View>
-        </View>
-        <View>
-          <Text style={{fontSize: 16}}>客户备注：{item.remark}</Text>
-        </View>
-        <If condition={item.store_remark}>
-          <View>
-            <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
-          </View>
-        </If>
-      </View>
-    )
+  onProductSwipeout (goodsItemIdx, product, direction) {
+    console.log(product.scan_num, product.num, direction, product.scan_num >= product.num)
+    if (direction == 'right' && product.scan_num < product.num) {
+      Alert.alert('警告', `确定商品「${product.name}」${product.num}件 已经拣货完成？`, [
+        {text: '取消'},
+        {text: '确定', onPress: () => this.props.onChgProdNum(goodsItemIdx, product.num)}
+      ])
+    }
   }
   
   renderProduct (prod, goodsItemIdx) {
-    console.log(prod)
+    const self = this
     return (
-      <View key={`goodsItemIdx_${goodsItemIdx}`} style={[styles.row]}>
-        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-          <TouchableOpacity onPress={() => console.log('click product image')}>
-            <Image
-              style={styles.product_img}
-              source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
-            />
-          </TouchableOpacity>
-          <View style={{flex: 1}}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={[styles.product_name]}>{prod.name}</Text>
-              <JbbPrompt
-                onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}
-                initValue={prod.scan_num ? prod.scan_num : 0}
-                keyboardType={'numeric'}
-              >
-                <Text style={styles.scanNum}>{prod.scan_num ? prod.scan_num : 0}</Text>
-              </JbbPrompt>
-            </View>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text>
-                {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
-                &nbsp;
-                {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
-              </Text>
-              <Text style={styles.product_num}>X{prod.num}</Text>
+      <Swipeout
+        key={`goodsItemIdx_${goodsItemIdx}`}
+        onOpen={(sectionID, rowId, direction) => self.onProductSwipeout(goodsItemIdx, prod, direction)}
+        right={[]}
+        backgroundColor={'#fff'}
+      >
+        <View style={[styles.row]}>
+          <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => console.log('click product image')}>
+              <Image
+                style={styles.product_img}
+                source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
+              />
+            </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={[styles.product_name]}>{prod.name}</Text>
+                {/*<JbbPrompt*/}
+                {/*  onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}*/}
+                {/*  initValue={''}*/}
+                {/*  keyboardType={'numeric'}*/}
+                {/*>*/}
+                <Text style={[styles.scanNum, Number(prod.scan_num) >= Number(prod.num) ? styles.scanNumFinish : null]}>
+                  {prod.scan_num ? prod.scan_num : 0}
+                </Text>
+                {/*</JbbPrompt>*/}
+              </View>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text>
+                    {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
+                    &nbsp;
+                    {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
+                  </Text>
+                  <If condition={prod.can_scan}>
+                    <Text style={
+                      [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: color.theme} : null]
+                    }>
+                      扫
+                    </Text>
+                  </If>
+                </View>
+                <Text style={styles.product_num}>X{prod.num}</Text>
+              </View>
             </View>
           </View>
+  
+          {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
+          {/*  <View style={styles.mask}>*/}
+          {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
+          {/*  </View>*/}
+          {/*</If>*/}
         </View>
-        
-        <If condition={Number(prod.scan_num) >= Number(prod.num)}>
-          <View style={styles.mask}>
-            <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>
-          </View>
-        </If>
-      </View>
+      </Swipeout>
     )
   }
   
@@ -107,36 +110,25 @@ class OrderList extends BaseComponent {
           <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
           <Text style={styles.itemTitleTip}>应扫{item.items_need_scan_num}件商品</Text>
           <Text style={styles.itemTitleScanTip} onPress={() => console.log('click scan num')}>
-            已扫{item.scan_count}件商品
+            已扫{this.props.scanCount}件商品
           </Text>
         </View>
-        <View style={{marginBottom: this.props.footerHeight * 2}}>
-          <ScrollView refreshControl={
-            <RefreshControl
-              refreshing={this.props.isLoading}
-              onRefresh={() => this.props.onRefresh()}
-            />
-          }>
-            {item.items.map((prod, index) => {
-              return self.renderProduct.bind(self)(prod, index)
-            })}
-          </ScrollView>
+        <View style={{paddingBottom: 30}}>
+          {item.items.map((prod, index) => {
+            return self.renderProduct.bind(self)(prod, index)
+          })}
         </View>
       </View>
     )
   }
   
   render () {
-    const containerStyle = {
-      height: screenHeight - this.props.footerHeight
-    }
     const {dataSource} = this.props
     return (
-      <View style={[{flexDirection: 'row'}, this.props.style]}>
-        <View style={[styles.container, containerStyle]}>
-          {this.renderOrderInfo(dataSource)}
+      <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
+        <View style={[styles.container]}>
           {this.renderOrderItem(dataSource)}
-          </View>
+        </View>
       </View>
     )
   }
@@ -145,17 +137,8 @@ class OrderList extends BaseComponent {
 const rowHeight = pxToDp(120)
 const styles = StyleSheet.create({
   container: {
-    width: screenWidth
-  },
-  headerContainer: {
-    backgroundColor: '#f0f9ef',
-    padding: pxToDp(20)
-  },
-  platDayId: {
-    fontWeight: 'bold'
-  },
-  dayId: {
-    fontSize: 10
+    width: screenWidth,
+    flex: 1
   },
   itemContainer: {
     marginTop: pxToDp(15),
@@ -231,6 +214,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(15),
     color: color.theme,
     fontSize: pxToDp(26)
+  },
+  scanNumFinish: {
+    backgroundColor: color.theme,
+    color: '#fff',
+    fontWeight: 'bold'
+  },
+  scanTip: {
+    backgroundColor: '#999',
+    color: '#fff',
+    fontSize: 10,
+    padding: 1,
+    textAlign: 'center',
+    textAlignVertical: 'center'
   }
 })
 

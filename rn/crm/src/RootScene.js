@@ -34,7 +34,6 @@ import native from "./common/native";
 import Moment from "moment/moment";
 import _ from "lodash"
 import GlobalUtil from "./util/GlobalUtil";
-import {DeviceEventEmitter} from "react-native";
 
 
 const lightContentScenes = ["Home", "Mine", "Operation"];

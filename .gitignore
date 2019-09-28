@@ -74,3 +74,6 @@ CainiaoCRM/.project
 CainiaoCRM/.classpath
 .settings/org.eclipse.buildship.core.prefs
 CainiaoCRM/release/*
+CainiaoCRM/gradle/
+CainiaoCRM/gradlew
+CainiaoCRM/gradlew.bat
