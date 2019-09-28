@@ -11,13 +11,11 @@
  *
  * redux functions
  */
-import {createStore, applyMiddleware, compose} from 'redux'
+import {applyMiddleware, compose, createStore} from 'redux'
 import thunk from 'redux-thunk'
-import logger from 'redux-logger'
-import {persistStore, autoRehydrate} from 'redux-persist'
+import {autoRehydrate, persistStore} from 'redux-persist'
 import {AsyncStorage} from 'react-native'
 import createExpirationTransform from 'redux-persist-transform-expire';
-
 /**
  * ## Reducer
  * The reducer contains the 4 reducers from
@@ -31,17 +29,15 @@ import reducer from '../reducers'
  * the state with for keys:
  * device, global, auth, profile
  */
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 export default function configureStore(persistDoneCall) {
   const store = createStore(
     reducer,
-    undefined,
-    compose(
-      applyMiddleware(
-        thunk,
-        // logger
+    composeEnhancers(applyMiddleware(
+      thunk,
+      // logger
       ),
-      autoRehydrate()
-    )
+      autoRehydrate())
   );
 
   const expireTransform = createExpirationTransform({

@@ -140,9 +140,7 @@ public class OrdersDao {
         map.put("limit", String.valueOf(limit));
         map.put("offset", String.valueOf(offset));
         map.put("max_past_day", String.valueOf(maxPastDays));
-
-        int zitiType = zitiMode ? 1 : 0;
-        map.put("ziti", zitiType+"");
+        map.put("ziti", "-1");
 
         String store_id_str = TextUtil.join(",", storeIds);
         if (storeIds != null && storeIds.length > 0 ) {

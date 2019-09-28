@@ -51,7 +51,6 @@ import S from '../../stylekit';
 import Entypo from "react-native-vector-icons/Entypo";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
-import {Array} from 'core-js/library/web/timers';
 import styles from './OrderStyles'
 import {getWithTpl} from "../../util/common";
 import {Colors, Metrics, Styles} from "../../themes";
@@ -59,6 +58,7 @@ import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
+import {List, WhiteSpace} from "antd-mobile-rn";
 
 const numeral = require('numeral');
 
@@ -111,6 +111,8 @@ const MENU_SEND_MONEY = 9;
 const MENU_RECEIVE_QR = 10;
 const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
+const MENU_ORDER_CANCEL_TO_ENTRY = 13;
+const MENU_REDEEM_GOOD_COUPON = 14;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -312,6 +314,9 @@ class OrderScene extends Component {
   }
   
   _navSetParams = () => {
+    let {order = {}} = this.props
+    order = order.order
+    
     let {backPage} = (this.props.navigation.state.params || {});
     const {enabled_special_menu = false} = this.props.global.config;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
@@ -331,13 +336,25 @@ class OrderScene extends Component {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
+    if (order && order.fn_scan_items) {
+      as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
+    }
+    if (order && order.fn_scan_ready) {
+      as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
+    }
     as.push({key: MENU_RECEIVE_QR, label: '收款码'});
     if (is_service_mgr) {
-      as.push({key: MENU_SEND_MONEY, label: '发红包'})
+      as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
-    as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
-    as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
 
+    if (order && order.cancel_to_entry) {
+      as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
+    }
+
+    if (order && order.fn_coupon_redeem_good) {
+      as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
+    }
+    
     let params = {
       onMenuOptionSelected: this.onMenuOptionSelected,
       onPrint: this.onPrint,
@@ -419,6 +436,15 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_ORDER_SCAN, {orderId: order.order.id})
     } else if (option.key === MENU_ORDER_SCAN_READY) {
       navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
+    } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
+      navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.order.id})
+    } else if (option.key === MENU_REDEEM_GOOD_COUPON) {
+      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {type: 'select', storeId: order.order.store_id,
+        coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
+        to_u_id: order.order.user_id,
+        to_u_name: order.order.userName,
+        to_u_mobile: order.order.mobile,
+      })
     } else {
       ToastShort('未知的操作');
     }
@@ -1704,10 +1730,12 @@ class OrderScene extends Component {
         </View>
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
+        <If condition={!order.is_split_package}>
         {this.state.isJbbVendor ? <Delivery
           order={order}
           logistics={this.state.logistics}
           fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
+        </If>
     
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
@@ -1976,12 +2004,24 @@ class OrderScene extends Component {
             </View>
           </View>
           <View style={{marginTop: pxToDp(1)}}>
-            {
-              this.renderChangeLogs()
-            }
+            {this.renderChangeLogs()}
           </View>
+          <WhiteSpace/>
+          <List>
+            <If condition={order.is_split_package}>
+              <List.Item
+                arrow={'horizontal'}
+                onClick={() => this.props.navigation.navigate(Config.ROUTE_ORDER_PACKAGE, {orderId: order.id})}
+              >订单拆包</List.Item>
+            </If>
+            <If condition={order.is_scan_prod}>
+              <List.Item
+                arrow={'horizontal'}
+                onClick={() => this.props.navigation.navigate(Config.ROUTE_ORDER_EXIT_LOG, {orderId: order.id})}
+              >出库详情</List.Item>
+            </If>
+          </List>
         </View>
-      
       </View>
     )
   }

@@ -122,7 +122,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         if (store != null && store.getFn_price_controlled() == PRICE_CONTROLLER_YES) {
             holder.supplyPrice.setVisibility(View.VISIBLE);
             Vendor v = GlobalCtx.app().getVendor();
-            if (v != null && v.isFnProviding()) {
+            if (v != null && v.isFnProviding() && item.getRefer_prod_id() == 0) {
                 holder.leftNumber.setVisibility(View.VISIBLE);
                 holder.leftNumber.setText(item.leftNumberStr());
             } else {
@@ -139,9 +139,13 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         } else {
             holder.supplyPrice.setVisibility(View.INVISIBLE);
             holder.applyingPrice.setVisibility(View.INVISIBLE);
-            holder.leftNumber.setVisibility(View.VISIBLE);
             holder.salePrice.setVisibility(View.VISIBLE);
-            holder.leftNumber.setText(item.leftNumberStr());
+            if (item.getRefer_prod_id() > 0) {
+                holder.leftNumber.setVisibility(View.INVISIBLE);
+            } else {
+                holder.leftNumber.setVisibility(View.VISIBLE);
+                holder.leftNumber.setText(item.leftNumberStr());
+            }
             holder.salePrice.setText(item.getPricePrecision());
             holder.salePrice.setOnClickListener(v -> {
                 StoreStorageChanged ssc = (StoreStorageChanged) getContext();

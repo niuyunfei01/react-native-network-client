@@ -17,6 +17,7 @@ import ApplyScene from "../scene/Apply/ApplyScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
+import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import UserScene from "../scene/User/UserScene";
 import UserAddScene from "../scene/User/UserAddScene";
 import ProductAutocomplete from "../scene/Order/ProductAutocomplete.android";
@@ -53,6 +54,8 @@ import GoodsPriceIndex from '../scene/Goods/GoodsPriceIndex'
 import GoodsPriceArea from "../scene/Goods/AreaGoodsPrice";
 import GoodsList from '../scene/Goods/GoodsList'
 import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
+import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
+import GoodsMarketExamineHistory from "../scene/Goods/GoodsMarketExamineHistory";
 // 订单相关
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
@@ -68,6 +71,10 @@ import Refund from "../scene/Order/Refund";
 import OrderRefundByWeight from "../scene/Order/RefundByWeight";
 import OrderTransferThird from "../scene/Order/OrderTransferThird";
 import OrderScan from "../scene/Order/OrderScan";
+import OrderSetReady from "../scene/Order/OrderSetReady";
+import OrderPackage from '../scene/Order/OrderPackage'
+import OrderCancelToEntry from "../scene/Order/OrderCancelToEntry";
+import OrderExitLog from '../scene/Order/OrderExitLog'
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -119,13 +126,12 @@ import InventoryStockCheck from '../scene/Inventory/StockCheck'
 import InventoryStockCheckHistory from '../scene/Inventory/StockCheckHistory'
 import InventoryReportLoss from '../scene/Inventory/ReportLoss'
 import InventoryDetail from '../scene/Inventory/Detail'
+
+import ZtOrderPrint from "../scene/Ziti/OrderPrint";
+
 import Cts from "../Cts";
-
-
 import _ from "lodash"
-import WorkerSchedule from "../scene/Worker/WorkerSchedule";
-import OrderSetReady from "../scene/Order/OrderSetReady";
-import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
+import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -331,7 +337,11 @@ class Navigator extends Component {
         [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
         [Config.ROUTE_ORDER_SCAN_REDAY]: {screen: OrderSetReady},
         [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
-        
+        [Config.ROUTE_ORDER_PACKAGE]: {screen: OrderPackage},
+        [Config.ROUTE_ORDER_CANCEL_TO_ENTRY]: {screen: OrderCancelToEntry},
+        [Config.ROUTE_ORDER_EXIT_LOG]: {screen: OrderExitLog},
+        [Config.ROUTE_ORDER_GOOD_COUPON]: {screen: SendRedeemCoupon},
+
         [Config.ROUTE_STORE]: {screen: StoreScene},
         [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
         [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
@@ -354,6 +364,7 @@ class Navigator extends Component {
         [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
         [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
+        [Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY]: {screen: GoodsMarketExamineHistory},
         
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
@@ -410,6 +421,8 @@ class Navigator extends Component {
         // 员工相关
         [Config.ROUTE_WORKER]: {screen: WorkerListScene},
         [Config.ROUTE_WORKER_SCHEDULE]: {screen: WorkerSchedule},
+        // 自提相关
+        [Config.ROUTE_ZT_ORDER_PRINT]: {screen: ZtOrderPrint}
       },
       stackNavigatorConfigs
     );

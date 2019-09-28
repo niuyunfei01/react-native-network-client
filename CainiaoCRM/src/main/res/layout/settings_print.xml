@@ -41,7 +41,7 @@
         android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/label_new_sound_notify" />
 
-    <TextView android:text="使用预发布(工程师使用)"
+    <TextView android:text="预发布(工程师使用)"
         android:id="@+id/label_use_preview"
         android:layout_below="@+id/label_new_sound_notify"
         android:layout_width="wrap_content"
@@ -56,11 +56,26 @@
         android:layout_marginEnd="10dp"
         android:layout_height="30dp" />
 
+    <TextView android:text="alpha(工程师使用)"
+        android:id="@+id/label_use_alpha"
+        android:layout_below="@+id/label_use_preview"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUseAlpha"
+        android:layout_below="@+id/toggleUsePreview"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_alpha"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
     <TextView
         android:id="@+id/label_add_app_to_white_list"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_below="@+id/label_use_preview"
+        android:layout_below="@+id/label_use_alpha"
         android:layout_marginStart="10dp"
         android:text="设置应用后台运行" />
 
@@ -69,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/toggleUsePreview"
+        android:layout_below="@+id/toggleUseAlpha"
         android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/label_add_app_to_white_list" />
 

@@ -48,8 +48,8 @@ public class RefreshOrderListTask
     }
 
     public RefreshOrderListTask(FragmentActivity activity, String searchTerm,
-                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache, boolean zitiMode) {
-        this(activity, searchTerm, listType, maxPastDays, swipeRefreshLayout, doneCallback, null, byPassCache, zitiMode);
+                                ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache) {
+        this(activity, searchTerm, listType, maxPastDays, swipeRefreshLayout, doneCallback, null, byPassCache, false);
     }
 
     private RefreshOrderListTask(FragmentActivity activity, String searchTerm,

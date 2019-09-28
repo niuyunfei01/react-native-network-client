@@ -115,6 +115,18 @@ class StockCheck extends BaseComponent {
     })
   }
   
+  toSearchUseOrders () {
+    const useOrderIds = this.state.productInfo.useOrderIds
+    if (!useOrderIds || !useOrderIds.length) {
+      ToastShort('无占用订单')
+      return
+    }
+  
+    let searchStr = 'id:' + useOrderIds.join(',')
+    console.log(`order search term => ${searchStr}`)
+    native.ordersSearch(searchStr)
+  }
+  
   renderInfoItem (label, value, extra = '') {
     return (
       <View style={styles.infoItem}>
@@ -170,27 +182,17 @@ class StockCheck extends BaseComponent {
         {this.renderInfo()}
         <WhiteSpace/>
         <List renderHeader={this.renderFormHeader()}>
-          <InputItem
-            value={String(remainNum)}
-            defaultValue={String(remainNum)}
-            type='number'
-            editable={false}
-            extra={'件'}
-          >剩余库存</InputItem>
-          <InputItem
-            value={String(orderUse)}
-            defaultValue={String(orderUse)}
-            type='number'
-            editable={false}
-            extra={'件'}
-          >待打包</InputItem>
-          <InputItem
-            value={String(totalRemain)}
-            defaultValue={String(totalRemain)}
-            type='number'
-            editable={false}
-            extra={'件'}
-          >理论库存</InputItem>
+          <List.Item
+            extra={`${String(remainNum)}件`}
+          >剩余库存</List.Item>
+          <List.Item
+            arrow={'horizontal'}
+            extra={`${String(orderUse)}件`}
+            onClick={() => this.toSearchUseOrders()}
+          >待打包</List.Item>
+          <List.Item
+            extra={`${String(totalRemain)}件`}
+          >理论库存</List.Item>
         </List>
         <WhiteSpace/>
         <List>

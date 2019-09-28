@@ -276,6 +276,13 @@ class ProductInfo extends React.Component {
     })
   }
   
+  onChgSkuSaleDays (value) {
+    this._baseRequest('/api_products/chg_sku_sale_days', {
+      skuId: this.state.productInfo.sku.id,
+      value
+    })
+  }
+  
   onSaveProductSaleTime (value) {
     let times = []
     value.map((item) => item.start && item.end ? times.push(`${item.start}-${item.end}`) : null)
@@ -350,9 +357,19 @@ class ProductInfo extends React.Component {
           </Swipeout>
           <List.Item
             arrow={"horizontal"}
-            extra={`${productInfo.sku.stock_check_cycle}天`}
+            extra={productInfo.sku.stock_check_cycle > 0 ? `${productInfo.sku.stock_check_cycle}天` : '无'}
             onClick={() => this.setState({stockCheckCyclePrompt: true})}
           >盘点周期</List.Item>
+          <JbbPrompt
+            initValue={productInfo.sku.sale_days}
+            onConfirm={value => this.onChgSkuSaleDays(value)}
+          >
+            <List.Item
+              arrow={"horizontal"}
+              extra={productInfo.sku.sale_days > 0 ? `${productInfo.sku.sale_days}天` : '不限'}
+              onClick={() => this.setState({stockCheckCyclePrompt: true})}
+            >售卖天数</List.Item>
+          </JbbPrompt>
           <List.Item
             arrow={"horizontal"}
             extra={`${productInfo.risk_min_stat_voc}`}
@@ -367,7 +384,7 @@ class ProductInfo extends React.Component {
             <List.Item
               arrow={"horizontal"}
               extra={`${productInfo.sku.name}(${this.state.productInfo.sku.id})`}
-            >秤签名称</List.Item>
+            > 品名(货号)</List.Item>
             <List.Item
               onClick={() => this.setState({tagCodePrompt: true})}
               arrow={"horizontal"}
@@ -424,11 +441,11 @@ class ProductInfo extends React.Component {
             >商品份含量</List.Item>
           </JbbPrompt>
           <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
-          <List.Item
-            onClick={() => this.setState({refProdPrompt: true})}
-            extra={productInfo.refer_prod_name}
-            arrow="horizontal"
-          >关联单份商品</List.Item>
+            <List.Item
+              onClick={() => this.setState({refProdPrompt: true})}
+              extra={productInfo.refer_prod_name}
+              arrow="horizontal"
+            >关联单份商品</List.Item>
           </Swipeout>
           <ModalSelector
             onChange={(option) => this.onChgSkuFreshDegree(option.value)}

@@ -2,10 +2,11 @@ import React from 'react'
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
-import Http from "../../util/http";
+import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
+import {Toast} from "antd-mobile-rn";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -46,13 +47,17 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    Http.get.bind(this.props)(api, {}, this.props.navigation).then(res => {
+    Toast.loading('请求中...', 0)
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
       self.setState({
         all_close: res.all_close,
         all_open: res.all_open,
         allow_self_open: res.allow_self_open,
         business_status: res.business_status
       })
+      Toast.hide()
+    }).catch(() => {
+      Toast.hide()
     })
   }
   
@@ -61,8 +66,13 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
-    Http.get.bind(this.props)(api, {}, this.props.navigation).then(res => {
+    console.log(api)
+    Toast.loading('请求中...', 0)
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      Toast.hide()
       self.fetchData()
+    }).catch(() => {
+      Toast.hide()
     })
   }
   
@@ -71,7 +81,7 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-    Http.get.bind(this.props)(api, {}, this.props.navigation).then(res => {
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
       self.fetchData()
     })
   }

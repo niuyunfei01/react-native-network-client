@@ -109,31 +109,24 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
             }
         });
 
-        final Switch toggleSetZiti = findViewById(R.id.toggleSetZitiMode);
-        toggleSetZiti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SettingUtility.setZitiMode(isChecked);
-            }
-        });
-        toggleSetZiti.setChecked(SettingHelper.useZitiMode());
-
         GlobalCtx app = GlobalCtx.app();
         boolean isDirect = app.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(app.getVendor().getVersion());
 
-        boolean showUsePreview = isDirect || BuildConfig.DEBUG;
+        boolean supportBeta = isDirect || BuildConfig.DEBUG;
 
-        findViewById(R.id.label_use_preview).setVisibility(showUsePreview ? View.VISIBLE : View.GONE);
+        findViewById(R.id.label_use_preview).setVisibility(supportBeta ? View.VISIBLE : View.GONE);
         final Switch toggleUsePreview = findViewById(R.id.toggleUsePreview);
-        toggleUsePreview.setVisibility(showUsePreview ? View.VISIBLE : View.GONE);
+        toggleUsePreview.setVisibility(supportBeta ? View.VISIBLE : View.GONE);
 
         toggleUsePreview.setChecked(SettingHelper.usePreviewHost());
-        toggleUsePreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SettingHelper.setUserPreviewHost(isChecked);
-            }
-        });
+        toggleUsePreview.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserPreviewHost(isChecked));
+
+        findViewById(R.id.label_use_alpha).setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        final Switch toggleUseAlpha = findViewById(R.id.toggleUseAlpha);
+        toggleUseAlpha.setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+
+        toggleUseAlpha.setChecked(SettingHelper.useAlphaHost());
+        toggleUseAlpha.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserAlphaHost(isChecked));
 
         final Switch toggleAutoPrint = findViewById(R.id.toggleAutoPrint);
         toggleAutoPrint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -152,6 +145,21 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
             }
         });
         toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
+
+        final Switch toggleSetZiti = findViewById(R.id.toggleSetZitiMode);
+        toggleSetZiti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isDirect) {
+                    SettingUtility.setZitiMode(isChecked);
+                } else {
+                    SettingUtility.setZitiMode(false);
+                    Toast.makeText(SettingsPrintActivity.this, "暂不支持该功能！", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        toggleSetZiti.setChecked(SettingHelper.useZitiMode());
 
         BluetoothPrinters.DeviceStatus p = BluetoothPrinters.INS.getCurrentPrinter();
         boolean connected = GlobalCtx.app().isConnectPrinter();

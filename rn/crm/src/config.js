@@ -94,10 +94,15 @@ const C = {
   ROUTE_ORDER_TODO: 'OrderTodo',
   ROUTE_ORDER_STORE: 'OrderChgStore',
   ROUTE_ORDER_SEND_MONEY: 'OrderSendMoney',
-  ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',//订单补偿
-  ROUTE_ORDER_SCAN: 'OrderScan', // 订单扫码过机
-  ROUTE_ORDER_REFUND_BY_WEIGHT: 'OrderRefundByWeight', // 订单按重退款
+  ROUTE_ORDER_SURCHARGE: 'OrderSurcharge',                            // 订单补偿
+  ROUTE_ORDER_SCAN: 'OrderScan',                                      // 订单扫码过机
+  ROUTE_ORDER_REFUND_BY_WEIGHT: 'OrderRefundByWeight',                // 订单按重退款
   ROUTE_ORDER_SCAN_REDAY: 'OrderSetReady',
+  ROUTE_ORDER_PACKAGE: 'OrderPackage',                                // 订单拆单分包
+  ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
+  ROUTE_ORDER_EXIT_LOG: 'OrderExitLog',                               // 订单出库记录
+  ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
+  
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
@@ -164,6 +169,7 @@ const C = {
   ROUTE_GOODS_PRICE_INDEX: 'GoodsPriceIndex',
   ROUTE_GOODS_ANALYSIS: 'GoodsAnalysis',
   ROUTE_GOODS_MARKET_EXAMINE: 'GoodsMarketExamine',                             // 商品-市调
+  ROUTE_GOODS_MARKET_EXAMINE_HISTORY: 'GoodsMarketExamineHistory',              // 商品-市调历史
   ROUTE_AREA_GOODS_PRICE: 'AreaGoodsPrice',
   ROUTE_SUPPLEMENT_WAGE: 'SupplementWage',
   ROUTE_OPERATION: 'Operation',
@@ -184,6 +190,9 @@ const C = {
   ROUTE_INVENTORY_STOCK_CHECK_HISTORY: 'InventoryStockCheckHistory',            // 库存 - 库存盘点历史
   ROUTE_INVENTORY_REPORT_LOSS: 'InventoryReportLoss',                           // 库存 - 库存报损
   ROUTE_INVENTORY_DETAIL: 'InventoryDetail',                                    // 库存 - 商品出入库明细
+  // 自提相关
+  ROUTE_ZT_ORDER_PRINT: 'ZtOrderPrint',                                         // 自提 - 订单打印
+  
   serverUrl,
   apiUrl,
   staticUrl,

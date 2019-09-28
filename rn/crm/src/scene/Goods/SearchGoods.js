@@ -5,6 +5,7 @@ import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
 import tool from "../../common/tool";
 import native from "../../common/native";
+import {NavigationActions} from 'react-navigation';
 import SearchInputNavigation from "../component/SearchInputNavigation";
 import color from "../../widget/color";
 import HttpUtils from "../../util/http";
@@ -29,24 +30,25 @@ function mapDispatchToProps (dispatch) {
 class SearchGoods extends Component {
   //导航
   static navigationOptions = ({navigation}) => {
-    const {params} = navigation.state;
+    const type = navigation.state.params.type;
     return {
       headerLeft: (
         <SearchInputNavigation
           onSearch={(text) => params.search(text)}
-          onBack={() => native.toGoods()}
+          onBack={() => {if (type != 'select_for_store') {native.toGoods();}}}
         />
       )
     };
   };
-  
+
   constructor (props) {
     super(props);
     const vendor = tool.vendor(this.props.global)
     let {fnPriceControlled} = vendor
+    const {limit_store} = this.props.navigation.state.params;
     
     this.state = {
-      storeId: this.props.global.currStoreId,
+      storeId: limit_store ? limit_store : this.props.global.currStoreId,
       fnPriceControlled: fnPriceControlled,
       goods: [],
       page: 1,
@@ -60,7 +62,7 @@ class SearchGoods extends Component {
       // 上线类型: 浏览(browse)、搜索(search)
       onlineType: 'browse',
       bigImageVisible: false,
-      bigImageUri: []
+      bigImageUri: [],
     }
   }
   
@@ -73,8 +75,11 @@ class SearchGoods extends Component {
   fetchCategories () {
     const self = this
     let accessToken = this.props.global.accessToken;
-    let storeId = this.state.storeId
-    HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`).then(res => {
+    const {type, limit_store, prod_status} = this.props.navigation.state.params;
+    let storeId = limit_store ? limit_store : this.state.storeId
+    const hideAreaHot = prod_status ? 1 : 0;
+
+    HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
       self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
@@ -94,7 +99,10 @@ class SearchGoods extends Component {
     const self = this
     let accessToken = this.props.global.accessToken;
     let {currVendorId} = tool.vendor(this.props.global);
-    let storeId = this.state.storeId
+
+    const {type, limit_store, prod_status} = this.props.navigation.state.params;
+
+    let storeId = type == 'select_for_store' ? limit_store : this.state.storeId;
     this.setState({isLoading: true})
     const params = {
       vendor_id: currVendorId,
@@ -102,8 +110,13 @@ class SearchGoods extends Component {
       page: this.state.page,
       pageNum: this.state.pageNum,
       name: this.state.text ? this.state.text : '',
-      storeId: storeId
+      storeId: storeId,
     }
+    if (limit_store) {
+      params['hideAreaHot'] = 1;
+      params['limit_status'] = (prod_status || []).join(",");
+    }
+
     console.log('find_prod_with_pagination => ', params)
     HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
       let totalPage = res.count / res.pageSize
@@ -161,7 +174,12 @@ class SearchGoods extends Component {
    */
   showSupplyPrice (product) {
     return this.state.fnPriceControlled == 1
+      && product
       && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
+  }
+
+  showSelect(product) {
+    return this.props.navigation.state.params.type == 'select_for_store' && product;
   }
   
   renderRow = (product, idx) => {
@@ -187,7 +205,7 @@ class SearchGoods extends Component {
                 <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
               </If>
             </View>
-            <If condition={!this.showOnlineBtn(product)}>
+            <If condition={self.showSelect(product) && product.is_exist}>
               <View style={{flexDirection: 'row'}}>
                 <If condition={this.showSupplyPrice(product.is_exist)}>
                   <View style={{marginRight: pxToDp(10)}}>
@@ -199,20 +217,44 @@ class SearchGoods extends Component {
                     {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
                   </Text>
                 </View>
+                <TouchableOpacity onPress={() => {
+                  self.props.navigation.state.params.onBack(product.name, product.is_exist);
+                  this.props.navigation.dispatch(NavigationActions.back())
+                }}>
+                  <View style={styles.toOnlineBtn}>
+                    <Text style={styles.toOnlineBtnText}>选择</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
             </If>
-            <If condition={this.showOnlineBtn(product)}>
-              <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
-                store_id: this.state.storeId,
-                product_id: product.id,
-                mode: 2,
-                onlineType: this.state.onlineType,
-                onBack: (supplyPrice) => this.changeRowExist(idx,supplyPrice)
-              })}>
-                <View style={styles.toOnlineBtn}>
-                  <Text style={styles.toOnlineBtnText}>上架</Text>
+            <If condition={!self.showSelect(product)}>
+              <If condition={!this.showOnlineBtn(product)}>
+                <View style={{flexDirection: 'row'}}>
+                  <If condition={this.showSupplyPrice(product.is_exist)}>
+                    <View style={{marginRight: pxToDp(10)}}>
+                      <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
+                    </View>
+                  </If>
+                  <View style={styles.isOnlineBtn}>
+                    <Text style={styles.isOnlineBtnText}>
+                      {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
+                    </Text>
+                  </View>
                 </View>
-              </TouchableOpacity>
+              </If>
+              <If condition={this.showOnlineBtn(product)}>
+                <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
+                  store_id: this.state.storeId,
+                  product_id: product.id,
+                  mode: 2,
+                  onlineType: this.state.onlineType,
+                  onBack: (supplyPrice) => this.changeRowExist(idx, supplyPrice)
+                })}>
+                  <View style={styles.toOnlineBtn}>
+                    <Text style={styles.toOnlineBtnText}>上架</Text>
+                  </View>
+                </TouchableOpacity>
+              </If>
             </If>
           </View>
         </View>

@@ -67,7 +67,7 @@ class HttpUtils {
         uri += `store_id=${store.id}&vendor_id=${vendor.currVendorId}`
       }
     }
-    
+    console.log('uri => ', uri, 'options => ', options)
     return new Promise((resolve, reject) => {
       fetch(uri, options)
         .then((response) => {

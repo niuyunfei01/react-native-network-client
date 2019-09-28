@@ -10,7 +10,7 @@ import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 public class URLHelper {
 
     public static String getHost() {
-        return (SettingHelper.usePreviewHost() ? "preview" : "www")  + ".cainiaoshicai.cn";
+        return SettingHelper.useAlphaHost() ? "alpha" : ((SettingHelper.usePreviewHost() ? "preview" : "www"))  + ".cainiaoshicai.cn";
     }
 
     public static final String WEB_URL_ROOT = "https://" + getHost();
