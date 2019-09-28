@@ -1,7 +1,8 @@
-import React, { PropTypes } from 'react'
-import { View } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, ViewPropTypes} from 'react-native'
 
-const Flex = ({ direction = 'row', wrap = 'wrap', style, children, ...others }) =>
+const Flex = ({direction = 'row', wrap = 'wrap', style, children, ...others}) =>
   <View
     style={[{
       flexDirection: direction,
@@ -13,7 +14,7 @@ const Flex = ({ direction = 'row', wrap = 'wrap', style, children, ...others }) 
 Flex.propTypes = {
   direction: PropTypes.oneOf(['row', 'column']),
   wrap: PropTypes.oneOf(['wrap', 'nowrap']),
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
 }
 

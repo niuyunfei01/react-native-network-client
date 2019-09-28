@@ -23,6 +23,7 @@ public class Order implements Serializable {
     private String mobile;
     private double orderMoney;
     private double paid_by_user;
+    private double supplyMoney = 0;
     private Date expectTime;
     private String expectTimeStr;
     private Date orderTime;
@@ -47,6 +48,7 @@ public class Order implements Serializable {
     private int ship_worker_id;
     private int pack_operator;
     private String pack_workers;
+    private String pack_1st_worker;
     private int order_times;
     private int paid_done;
     private int readyLeftMin;
@@ -85,6 +87,13 @@ public class Order implements Serializable {
 
     private String mobile_suffix;
     private String real_mobile;
+
+    private String ele_id;
+    private int eb_order_from;
+
+    //外卖店铺标示
+    private String es_mark_name;
+    private String pack_assign_name;
 
     public int getId() {
         return id;
@@ -287,7 +296,7 @@ public class Order implements Serializable {
     }
 
     public void incrPrintTimes() {
-        this.print_times ++;
+        this.print_times++;
     }
 
     public long getStore_id() {
@@ -330,7 +339,16 @@ public class Order implements Serializable {
         if (this.getPlatform() == Cts.PLAT_JDDJ.id && (dayNo != null && dayNo.length() > 8)) {
             dayNo = "";
         }
-        return String.format("(%s#%s)", Cts.Platform.find(this.getPlatform()).name, dayNo);
+        String esMarkName = this.getEs_mark_name();
+        if (esMarkName == null) {
+            esMarkName = "";
+        }
+        esMarkName = esMarkName.trim();
+        //饿百订单显示饿了么信息
+        if (this.getPlatform() == Cts.PLAT_BD.id && this.getEb_order_from() == Cts.EB_ORDER_FROM_ELE) {
+            return String.format("(%s %s#%s)", Cts.Platform.find(Cts.PLAT_ELEME.id).name, esMarkName, dayNo);
+        }
+        return String.format("(%s %s#%s)", Cts.Platform.find(this.getPlatform()).name, esMarkName, dayNo);
     }
 
     public boolean shouldTryAutoPrint() {
@@ -445,7 +463,7 @@ public class Order implements Serializable {
     public List<Integer> getPackWorkers() {
         ArrayList<Integer> workers = new ArrayList<>();
         String[] w = TextUtils.split(this.pack_workers, ",");
-        for(String sId : w) {
+        for (String sId : w) {
             workers.add(Integer.parseInt(sId));
         }
         return workers;
@@ -483,6 +501,30 @@ public class Order implements Serializable {
         this.ship_sch_desc = ship_sch_desc;
     }
 
+    public String getEle_id() {
+        return ele_id;
+    }
+
+    public void setEle_id(String ele_id) {
+        this.ele_id = ele_id;
+    }
+
+    public int getEb_order_from() {
+        return eb_order_from;
+    }
+
+    public void setEb_order_from(int eb_order_from) {
+        this.eb_order_from = eb_order_from;
+    }
+
+    public String getEs_mark_name() {
+        return es_mark_name;
+    }
+
+    public void setEs_mark_name(String es_mark_name) {
+        this.es_mark_name = es_mark_name;
+    }
+
     public void copy(Order updatedO) {
         this.id = updatedO.id;
         user_id = updatedO.user_id;
@@ -493,6 +535,7 @@ public class Order implements Serializable {
         address = updatedO.address;
         mobile = updatedO.mobile;
         orderMoney = updatedO.orderMoney;
+        supplyMoney = updatedO.supplyMoney;
         paid_by_user = updatedO.paid_by_user;
         expectTime = updatedO.expectTime;
         expectTimeStr = updatedO.expectTimeStr;
@@ -517,6 +560,9 @@ public class Order implements Serializable {
         ship_worker_name = updatedO.ship_worker_name;
         ship_worker_id = updatedO.ship_worker_id;
         pack_operator = updatedO.pack_operator;
+        pack_1st_worker = updatedO.pack_1st_worker;
+        pack_assign_name = updatedO.pack_assign_name;
+
         pack_workers = updatedO.pack_workers;
         order_times = updatedO.order_times;
         paid_done = updatedO.paid_done;
@@ -542,6 +588,9 @@ public class Order implements Serializable {
         additional_to_pay = updatedO.additional_to_pay;
         ship_worker_mobile = updatedO.ship_worker_mobile;
         remark_warning = updatedO.remark_warning;
+        ele_id = updatedO.ele_id;
+        eb_order_from = updatedO.eb_order_from;
+        es_mark_name = updatedO.es_mark_name;
     }
 
     public boolean isRemark_warning() {
@@ -622,7 +671,7 @@ public class Order implements Serializable {
     }
 
     public int getSelectedCallOptionIdx() {
-        for(int idx = 0; idx < this.callWays.size(); idx++) {
+        for (int idx = 0; idx < this.callWays.size(); idx++) {
             if (this.selected_way == this.callWays.get(idx).getWay()) {
                 return idx;
             }
@@ -672,6 +721,30 @@ public class Order implements Serializable {
 
     public void setReal_mobile(String real_mobile) {
         this.real_mobile = real_mobile;
+    }
+
+    public double getSupplyMoney() {
+        return supplyMoney;
+    }
+
+    public void setSupplyMoney(double supplyMoney) {
+        this.supplyMoney = supplyMoney;
+    }
+
+    public String getPack_assign_name() {
+        return pack_assign_name;
+    }
+
+    public void setPack_assign_name(String pack_assign_name) {
+        this.pack_assign_name = pack_assign_name;
+    }
+
+    public String getPack_1st_worker() {
+        return pack_1st_worker;
+    }
+
+    public void setPack_1st_worker(String pack_1st_worker) {
+        this.pack_1st_worker = pack_1st_worker;
     }
 }
 

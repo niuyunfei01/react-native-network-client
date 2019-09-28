@@ -64,6 +64,7 @@ import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.RemindersActivity;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.basefragment.UserFeedbackDialogFragment;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -524,12 +525,11 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 
     protected void connectAndPrint(final int platform, final String platformOid) {
         final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-        if(ds == null || ds.getSocket() == null || !ds.isConnected()){
+        if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
             Intent BTIntent = new Intent(this, SettingsPrintActivity.class);
             this.startActivityForResult(BTIntent, SettingsPrintActivity.REQUEST_CONNECT_BT);
-        }
-        else{
-            new MyAsyncTask<Void,Order, Boolean>(){
+        } else {
+            new MyAsyncTask<Void, Order, Boolean>() {
                 private String error;
                 private boolean gotoConnecting = false;
                 OrderSingleActivity context = OrderSingleActivity.this;
@@ -544,11 +544,12 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     } else {
                         orderRef.set(order);
                         try {
-                            OrderPrinter.printOrder(ds.getSocket(), order);
+                            //OrderPrinter.printOrder(ds.getSocket(), order);
+                            PrintQueue.getQueue(GlobalCtx.app()).add(order);
                         } catch (Exception e) {
                             this.error = "打印错误: 请重新连接打印机";
                             gotoConnecting = true;
-                            if (e instanceof IOException) {
+                            if ((e instanceof IOException) && ds != null) {
                                 ds.closeSocket();
                             }
                             return false;
@@ -713,59 +714,49 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 AlertDialog.Builder couponsAdb = new AlertDialog.Builder(this);
                 final String[] coupons = GlobalCtx.app().getCoupons();
                 final int[] checkedIdx = new int[1];
-                couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        checkedIdx[0] = which;
-                    }
-                });
+                couponsAdb.setSingleChoiceItems(coupons, checkedIdx[0], (dialog, which) -> checkedIdx[0] = which);
                 couponsAdb.setTitle("发放优惠券")
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.ok, (dialog, which) -> new MyAsyncTask<Void, Void, Void>() {
+                            private String errorDesc = null;
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                new MyAsyncTask<Void, Void, Void>() {
-                                    private String errorDesc = null;
-                                    @Override
-                                    protected Void doInBackground(Void... params) {
+                            protected Void doInBackground(Void... params) {
 
-                                        int type = checkedIdx[0] + 1;
-                                        Pattern pattern = Pattern.compile(".*\\[(\\d+)\\]$");
-                                        Matcher matcher = pattern.matcher(coupons[checkedIdx[0]]);
-                                        if(matcher.find()) {
-                                            int typeInt = Integer.parseInt(matcher.group(1));
-                                            if (typeInt > coupons.length) {
-                                                type = typeInt;
-                                            }
-                                        }
-
-                                        if (type > 0) {
-                                            OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
-                                            try {
-                                                ResultBean resultBean = dao.genCoupon(type, orderId);
-                                                if (!resultBean.isOk()) {
-                                                    errorDesc = "err:" + resultBean.getDesc();
-                                                }
-                                            } catch (ServiceException e) {
-                                                AppLogger.e("error:" + e.getMessage(), e);
-                                                errorDesc = "操作失败:" + e.getMessage();
-                                            }
-                                        }
-                                        return null;
+                                int type = checkedIdx[0] + 1;
+                                Pattern pattern = Pattern.compile(".*\\[(\\d+)\\]$");
+                                Matcher matcher = pattern.matcher(coupons[checkedIdx[0]]);
+                                if(matcher.find()) {
+                                    int typeInt = Integer.parseInt(matcher.group(1));
+                                    if (typeInt > coupons.length) {
+                                        type = typeInt;
                                     }
+                                }
 
-                                    @Override
-                                    protected void onPostExecute(Void aVoid) {
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                String text = TextUtils.isEmpty(errorDesc) ? "操作成功" : errorDesc;
-                                                Toast.makeText(OrderSingleActivity.this, text, Toast.LENGTH_LONG).show();
-                                            }
-                                        });
+                                if (type > 0) {
+                                    OrderActionDao dao = new OrderActionDao(GlobalCtx.app().token());
+                                    try {
+                                        ResultBean resultBean = dao.genCoupon(type, orderId);
+                                        if (!resultBean.isOk()) {
+                                            errorDesc = "err:" + resultBean.getDesc();
+                                        }
+                                    } catch (ServiceException e) {
+                                        AppLogger.e("error:" + e.getMessage(), e);
+                                        errorDesc = "操作失败:" + e.getMessage();
                                     }
-                                }.executeOnNormal();
+                                }
+                                return null;
                             }
-                        }).setNegativeButton(R.string.cancel, null);
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String text = TextUtils.isEmpty(errorDesc) ? "操作成功" : errorDesc;
+                                        Toast.makeText(OrderSingleActivity.this, text, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }.executeOnNormal()).setNegativeButton(R.string.cancel, null);
                 couponsAdb.show();
                 return true;
             case R.id.menu_kf_coupon:

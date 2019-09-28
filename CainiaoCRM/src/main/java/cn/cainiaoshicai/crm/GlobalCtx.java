@@ -26,23 +26,35 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
+import com.fanjun.keeplive.KeepLive;
+import com.fanjun.keeplive.config.ForegroundNotification;
+import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
+import com.fanjun.keeplive.config.KeepLiveService;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.i18n.reactnativei18n.ReactNativeI18n;
+import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
-import com.zmxv.RNSound.RNSoundPackage;
+import com.xdandroid.hellodaemon.DaemonEnv;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -56,8 +68,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.dao.CRMService;
 import cn.cainiaoshicai.crm.dao.CommonConfigDao;
 import cn.cainiaoshicai.crm.dao.StaffDao;
@@ -70,12 +84,14 @@ import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
+import cn.cainiaoshicai.crm.notify.service.KeepAliveService;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
 import cn.cainiaoshicai.crm.orders.service.ImageLoader;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
@@ -89,16 +105,16 @@ import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
-import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
+import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
+import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.cainiaoshicai.crm.utils.PrinterCallback;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
-import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
 
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
@@ -146,7 +162,10 @@ public class GlobalCtx extends Application {
     //private SpeechSynthesizer mTts;
 
     private ReactInstanceManager mReactInstanceManager;
+    private ReactContext reactContext;
     private Config configByServer;
+
+    public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
 
     public GlobalCtx() {
         timedCache = CacheBuilder.newBuilder()
@@ -268,26 +287,59 @@ public class GlobalCtx extends Application {
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(this)
                 .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("index.android")
+                .setJSMainModulePath("index")
                 .addPackage(new MainReactPackage())
                 .addPackage(new ActivityStarterReactPackage())
                 .addPackage(new SplashScreenReactPackage())
+                .addPackage(new RNFetchBlobPackage())
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
-                .addPackage(new RNSoundPackage())
-                .addPackage(new BleManagerPackage())
                 .addPackage(new PickerPackage())
-
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
 
         // 初始化合成对象
-        SpeechUtility.createUtility(getApplicationContext(), "appid=" + R.string.app_id);
+        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
         AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
+
+        //初始化蓝牙管理
+        AppInfo.init(this);
+        startKeepAlive();
+    }
+
+    public void startKeepAlive() {
+        try {
+            LoadedApkHuaWei.hookHuaWeiVerifier(this);
+            //需要在 Application 的 onCreate() 中调用一次 DaemonEnv.initialize()
+            DaemonEnv.initialize(this, KeepAliveService.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
+            KeepAliveService.sShouldStopService = false;
+            DaemonEnv.startServiceMayBind(KeepAliveService.class);
+
+            //定义前台服务的默认样式。即标题、描述和图标
+            ForegroundNotification foregroundNotification = new ForegroundNotification("外送帮", "请保持外送帮常驻通知栏", R.drawable.ic_launcher, new ForegroundNotificationClickListener() {
+                @Override
+                public void foregroundNotificationClick() {
+
+                }
+            });
+
+            //启动保活服务
+            KeepLive.startWork(this, foregroundNotification, new KeepLiveService() {
+                @Override
+                public void onWorking(Context context) {
+                }
+
+                @Override
+                public void onStop(Context context) {
+                }
+            });
+        } catch (Exception e) {
+
+        }
     }
 
     public void updateAfterGap(final int fiveMin) {
@@ -299,7 +351,6 @@ public class GlobalCtx extends Application {
             }
         }, fiveMin);
     }
-
 
     public void updateCfgInterval() {
         if (!TextUtils.isEmpty(this.token())) {
@@ -317,7 +368,8 @@ public class GlobalCtx extends Application {
             try {
                 String uid = ctx.getCurrentAccountId();
                 if (!TextUtils.isEmpty(uid)) {
-                    JPushInterface.setAliasAndTags(ctx, "uid_" + uid, null);
+                    JPushInterface.resumePush(ctx);
+                    JPushInterface.setAlias(ctx, (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
                 }
             } catch (Exception e) {
                 AppLogger.w("error to set jpush alias");
@@ -329,7 +381,7 @@ public class GlobalCtx extends Application {
 
             ss.put("printer", SettingUtility.getLastConnectedPrinterAddress());
             ss.put("printer_auto_store", storeId);
-            ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
+            //ss.put("printer_connected", SettingsPrintActivity.isPrinterConnected());
             Config cfg = ctx.serverCfg.get(storeId);
             final String lastHash = cfg == null ? "" : cfg.getLastHash();
             ss.put("last_hash", lastHash);
@@ -403,19 +455,6 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-//        MQConfig.ui.backArrowIconResId = android.support.v7.appcompat.R.drawable.abc_ic_ab_back_holo_light;
-
-        //.abc_ic_ab_back_mtrl_am_alpha;
-
-//        MQConfig.ui.titleBackgroundResId = R.color.test_red;
-//        MQConfig.ui.titleTextColorResId = R.color.test_blue;
-//        MQConfig.ui.leftChatBubbleColorResId = R.color.test_green;
-//        MQConfig.ui.leftChatTextColorResId = R.color.test_red;
-//        MQConfig.ui.rightChatBubbleColorResId = R.color.test_red;
-//        MQConfig.ui.rightChatTextColorResId = R.color.test_green;
-//        MQConfig.ui.robotEvaluateTextColorResId = R.color.test_red;
-//        MQConfig.ui.robotMenuItemTextColorResId = R.color.test_blue;
-//        MQConfig.ui.robotMenAuTipTextColorResId = R.color.test_blue;
     }
 
     public ReactInstanceManager getmReactInstanceManager() {
@@ -508,7 +547,6 @@ public class GlobalCtx extends Application {
                 accountBean = AccountDBTask.getAccount(id);
             }
         }
-
         return accountBean;
     }
 
@@ -617,6 +655,11 @@ public class GlobalCtx extends Application {
     public static boolean isAutoPrint(long store_id) {
         return store_id == Cts.STORE_UNKNOWN
                 || (SettingUtility.isAutoPrint(store_id));
+    }
+
+    public boolean isConnectPrinter() {
+        BtService btService = new BtService(this);
+        return btService.getState() == BtService.STATE_CONNECTED || !TextUtil.isEmpty(PrintUtil.getDefaultBluethoothDeviceAddress(this));
     }
 
     public SoundManager getSoundManager() {
@@ -771,11 +814,26 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toProductAdjust(Context ctx) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsAdjust");
+        ctx.startActivity(i);
+    }
+
     public void toMineActivity(Activity ctx) {
         Intent i = new Intent(ctx, MyReactActivity.class);
         i.putExtra("_action", "Tab");
         Bundle params = new Bundle();
         params.putString("initTab", "Mine");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toOperationActivity(Activity ctx){
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "Tab");
+        Bundle params = new Bundle();
+        params.putString("initTab", "Operation");
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
@@ -797,7 +855,7 @@ public class GlobalCtx extends Application {
 
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", /*isPriceControlled ?*/ "GoodsApplyNewProduct" /*: "GoodsEdit"*/);
+        i.putExtra("_action", /*isPriceControlled ?*/ "SearchGoods" /*: "GoodsEdit"*/);
         Bundle params = new Bundle();
         params.putString("type", "add");
         params.putString("store_id", String.valueOf(storeId));
@@ -828,6 +886,18 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
+    public void toInventoryMaterialTaskFinish(Activity ctx, String uid, String startTime, String endTime) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryMaterialTaskFinish");
+        Bundle params = new Bundle();
+        Gson gson = new Gson();
+        params.putString("uid", uid);
+        params.putString("start_time", startTime);
+        params.putString("end_time", endTime);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
     //跳转到reactnative web页面
     public void toRNWebView(Activity ctx, Map<String, String> data) {
         Intent i = new Intent(ctx, MyReactActivity.class);
@@ -836,6 +906,106 @@ public class GlobalCtx extends Application {
         for (Map.Entry<String, String> entry : data.entrySet()) {
             params.putString(entry.getKey(), entry.getValue());
         }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toStoreProductIndex(Activity ctx, Map<String, String> data){
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsPriceIndex");
+        Bundle params = new Bundle();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            params.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toAddBuyRecordView(Activity ctx, int pid, String productName, int storeId) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryProductPutIn");
+        Bundle params = new Bundle();
+        params.putInt("pid", pid);
+        params.putString("productName", productName);
+        params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toWarehouseManage(Activity ctx, int pid) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryProductInfo");
+        Bundle params = new Bundle();
+        params.putInt("pid", pid);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toStockCheck(Activity ctx, int pid, int storeId, String productName, String shelfNo) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryStockCheck");
+        Bundle params = new Bundle();
+        params.putInt("productId", pid);
+        params.putInt("storeId", storeId);
+        params.putString("shelfNo", shelfNo);
+        params.putString("productName", productName);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public void toRnView(Activity ctx, String action, Map<String, String> params) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", action);
+        Bundle bundle = new Bundle();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            bundle.putString(entry.getKey(), entry.getValue());
+        }
+        i.putExtra("_action_params", bundle);
+        ctx.startActivity(i);
+    }
+
+    public void sendRNEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
+        if (reactContext == null) {
+            return;
+        }
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
+    }
+
+    public ReactContext getReactContext() {
+        return reactContext != null ? reactContext : mReactInstanceManager != null ? mReactInstanceManager.getCurrentReactContext() : null;
+    }
+
+    /**
+     * 跳转到新的调价页面
+     *
+     * @param ctx
+     * @param mod
+     * @param storeId
+     * @param productId
+     * @param json
+     */
+    public void toSupplyPriceApplyView(Activity ctx, int mod, int storeId, int productId, String currentSupplyPrice, String json) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "GoodsApplyPrice");
+        Bundle params = new Bundle();
+        params.putInt("mode", mod);
+        params.putInt("pid", productId);
+        params.putInt("storeId", storeId);
+        params.putString("supplyPrice", currentSupplyPrice);
+        params.putString("detail", json);
+        params.putString("from", "native");
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    /**
+     * 跳转到开关店页面
+     * @param ctx
+     */
+    public void toSetStoreStatusView(Activity ctx){
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "StoreStatus");
+        Bundle params = new Bundle();
         i.putExtra("_action_params", params);
         ctx.startActivity(i);
     }
@@ -910,7 +1080,11 @@ public class GlobalCtx extends Application {
     }
 
     public ShipAcceptStatus getWorkerStatus(long storeId) {
-        return this.getAccountBean().shipAcceptStatus(storeId);
+        AccountBean accountBean = this.getAccountBean();
+        if (accountBean != null) {
+            return accountBean.shipAcceptStatus(storeId);
+        }
+        return null;
     }
 
     public void handleUncaughtException(Thread t, Throwable e) {
@@ -949,6 +1123,10 @@ public class GlobalCtx extends Application {
 
     public boolean fnEnabledReqProvide() {
         return this.getVendor() != null && Cts.BLX_TYPE_DIRECT.equals(this.getVendor().getVersion());
+    }
+
+    public boolean isDirectVendor() {
+        return this.getVendor() != null && this.getVendor().isDirect();
     }
 
     public boolean fnEnabledStoreInfoMgr() {
@@ -998,6 +1176,94 @@ public class GlobalCtx extends Application {
     public boolean appEnabledGoodMgr() {
         Config cfg = this.serverCfg.get(SettingUtility.getListenerStore());
         return cfg != null && cfg.isEnabled_good_mgr();
+    }
+
+    public ScanStatus scanInfo() {
+        ssRef.compareAndSet(null, new ScanStatus());
+        return ssRef.get();
+    }
+
+    private AtomicReference<ScanStatus> ssRef = new AtomicReference<>();
+
+    public void toReportLoss(Activity ctx, int productId, int storeId, String productName) {
+        Intent i = new Intent(ctx, MyReactActivity.class);
+        i.putExtra("_action", "InventoryReportLoss");
+        Bundle params = new Bundle();
+        params.putInt("productId", productId);
+        params.putInt("storeId", storeId);
+        params.putString("productName", productName);
+        i.putExtra("_action_params", params);
+        ctx.startActivity(i);
+    }
+
+    public boolean updatePidStorage(int pid, int storage) {
+        WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
+        StorageItemAdapter adapter = ref.get();
+
+        boolean updated = false;
+        if (adapter != null) {
+            adapter.updateItemStorage(pid, storage);
+            updated = true;
+            if (currentRunningActivity != null) {
+                currentRunningActivity.runOnUiThread(adapter::notifyDataSetChanged);
+            }
+        }
+
+        AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, updated ? " null Adapter" : "done"));
+        return updated;
+    }
+
+    public boolean updatePidApplyPrice(int pid, int applyPrice) {
+        WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
+        StorageItemAdapter adapter = ref.get();
+
+        boolean updated = false;
+        if (adapter != null) {
+            adapter.updateItemApplyPrice(pid, applyPrice);
+            updated = true;
+            if (currentRunningActivity != null) {
+                currentRunningActivity.runOnUiThread(adapter::notifyDataSetChanged);
+            }
+        }
+
+        AppLogger.e(String.format("updatePidApplyPrice %d-%d-%s", pid, applyPrice, updated ? " null Adapter" : "done"));
+        return updated;
+    }
+
+    public void toInventoryDetail(StoreStorageActivity storeStorageActivity, int productId, int storeId) {
+        Intent i = new Intent(storeStorageActivity, MyReactActivity.class);
+        i.putExtra("_action", "InventoryDetail");
+        Bundle params = new Bundle();
+        params.putInt("productId", productId);
+        params.putInt("storeId", storeId);
+        i.putExtra("_action_params", params);
+        storeStorageActivity.startActivity(i);
+    }
+
+    static public class ScanStatus {
+        private AtomicLong lastTalking = new AtomicLong(Long.MAX_VALUE);
+        private Map<String, Map<String, String>> ls = Maps.newConcurrentMap();
+        private Map<String, String> upcList = Maps.newConcurrentMap();
+
+        public long getLastTalking() {
+            return lastTalking.longValue();
+        }
+
+        public List<Map<String, String>> notConsumed() {
+            return new ArrayList<>(ls.values());
+        }
+
+        public void add(Map<String, String> result) {
+            ls.put(result.get("barCode"), result);
+        }
+
+        public void clearCode(String code) {
+            ls.remove(code);
+        }
+
+        public void markTalking() {
+            lastTalking.set(System.currentTimeMillis());
+        }
     }
 
     public interface TaskCountUpdated {
@@ -1071,7 +1337,9 @@ public class GlobalCtx extends Application {
         private int new_mt_order_sound;
         private int new_jd_order_sound;
         private int new_ele_order_sound;
+        private int new_eb_order_sound;
         private int todo_complain_sound;
+        private int warn_sound;
 
         public void load(GlobalCtx ctx) {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
@@ -1100,6 +1368,8 @@ public class GlobalCtx extends Application {
             new_mt_order_sound = soundPool.load(ctx, R.raw.order_sound1, 1);
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
+            new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
+            warn_sound = soundPool.load(ctx, R.raw.warning, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
             numberSound[1] = soundPool.load(ctx, R.raw.n2, 1);
@@ -1170,7 +1440,6 @@ public class GlobalCtx extends Application {
                         return null;
                     }
                 }.executeOnExecutor(MyAsyncTask.SERIAL_EXECUTOR);
-                ;
                 return true;
             } else {
                 AppLogger.e("no sound");
@@ -1200,6 +1469,10 @@ public class GlobalCtx extends Application {
 
         public boolean play_new_simple_order_sound() {
             return this.play_single_sound(simpleNewOrderSound);
+        }
+
+        public boolean play_new_eb_order_sound() {
+            return this.play_single_sound(new_eb_order_sound);
         }
 
         public boolean play_new_ele_order_sound() {
@@ -1310,6 +1583,55 @@ public class GlobalCtx extends Application {
 
         public boolean play_by_xunfei(String s) {
             return !check_disabled() && AudioUtils.getInstance().speakText(s);
+        }
+
+
+        public void play_warning_order() {
+            try{
+                //获取系统的Audio管理者
+                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                //最大音量
+                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                //当前音量
+                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+                this.play_single_sound(warn_sound);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
+            }catch (Exception e){
+            }
+        }
+
+        public void notifyNewOrder(String text, String plat, String storeName, int notifyTimes) {
+            try {
+                //获取系统的Audio管理者
+                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                //最大音量
+                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                //当前音量
+                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+                for (int i = 0; i < notifyTimes; i++) {
+                    if (storeName != null && !storeName.isEmpty()) {
+                        GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
+                        Thread.sleep(1300);
+                    }
+                    if (plat.equals("6")) {
+                        GlobalCtx.app().getSoundManager().play_new_jd_order_sound();
+                    } else if (plat.equals("4")) {
+                        GlobalCtx.app().getSoundManager().play_new_ele_order_sound();
+                    } else if (plat.equals("3") || plat.equals("7")) {
+                        GlobalCtx.app().getSoundManager().play_new_mt_order_sound();
+                    } else if (plat.equals("1")) {
+                        GlobalCtx.app().getSoundManager().play_new_eb_order_sound();
+                    } else {
+                        GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
+                    }
+                    Thread.sleep(8000);
+                }
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
+            } catch (Exception e) {
+                AppLogger.e(e.getMessage());
+            }
         }
     }
 }

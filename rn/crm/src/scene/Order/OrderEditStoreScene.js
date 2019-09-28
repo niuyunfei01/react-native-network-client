@@ -58,21 +58,23 @@ class OrderEditStoreScene extends Component {
 
   _doReply() {
     const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
-    this.setState({onSubmitting: true});
-    dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
-      console.log(ok, msg, data);
-      this.setState({onSubmitting: false});
-      if (ok) {
-        this.setState({doneSubmitting: true});
-        setTimeout(() => {
-          this.setState({doneSubmitting: false});
-          navigation.goBack();
-        }, 1000);
-      } else {
-        this.setState({errorHints: msg});
-      }
-    }))
+    const {order} = (navigation.state.params || {});
+    if (order) {
+      this.setState({onSubmitting: true});
+      dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
+        console.log(ok, msg, data);
+        this.setState({onSubmitting: false});
+        if (ok) {
+          this.setState({doneSubmitting: true});
+          setTimeout(() => {
+            this.setState({doneSubmitting: false});
+            navigation.goBack();
+          }, 1000);
+        } else {
+          this.setState({errorHints: msg});
+        }
+      }))
+    }
   }
 
   render() {
@@ -80,11 +82,14 @@ class OrderEditStoreScene extends Component {
     const {global} = this.props;
 
     const currStoreId = order.store_id;
-    const currVendorId = (tool.store(currStoreId, global) || {}).vendor_id;
+    const currVendorId = (tool.store( global,currStoreId) || {}).vendor_id;
 
-    const availableStores = tool.objectFilter(global.canReadStores, (store) => store.vendor_id === currVendorId && store.id !== currStoreId );
+    //菜鸟和菜鸟食材视作同一个品牌
+    //以后要在服务器端实现
+    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.vendor_id == currVendorId || (currVendorId == 1 && store.vendor_id == 2) || (currVendorId == 2 && store.vendor_id == 1)) && store.id != currStoreId);
+
     const availableOptions = Object.keys(availableStores).map(store_id => {
-      if(store_id > 0){
+      if (store_id > 0) {
         return {label: availableStores[store_id].name, value: store_id};
       }
     });

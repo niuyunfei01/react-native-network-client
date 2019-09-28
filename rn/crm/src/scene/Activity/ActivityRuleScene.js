@@ -16,7 +16,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchSavePriceRule,activityRuleList} from '../../reducers/activity/activityAction';
+import {fetchSavePriceRule, activityRuleList} from '../../reducers/activity/activityAction';
 import pxToDp from "../../util/pxToDp";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -30,6 +30,8 @@ import style from './commonStyle'
 import ImgBtn from "./imgBtn";
 import BottomBtn from './ActivityBottomBtn'
 import Percentage from './ActivityPercentage'
+import {jsonWithTpl} from "../../util/common";
+
 function mapStateToProps(state) {
   const {mine, global, activity, product} = state;
   return {mine: mine, global: global, activity: activity, product: product}
@@ -111,36 +113,11 @@ class ActivityRuleScene extends PureComponent {
         ]
       ],
       stPicker: false,
-      edPicker:false,
+      edPicker: false,
       startTime: '',
       endTime: '',
       vendorId: 0,
-      vendorList: [
-        {
-          key: Cts.STORE_TYPE_SELF,
-          label: '菜鸟食材',
-        },
-        {
-          key: Cts.STORE_TYPE_AFFILIATE,
-          label: '菜鸟',
-        },
-        {
-          key: Cts.STORE_TYPE_GZW,
-          label: '鲜果集',
-        },
-        {
-          key: Cts.STORE_TYPE_BLX,
-          label: '比邻鲜',
-        },
-        {
-          key: Cts.STORE_TYPE_HLCS,
-          label: '华联'
-        },
-        {
-          key: Cts.STORE_TYPE_JNGY,
-          label: '嘉农果园'
-        }
-      ],
+      vendorList: [],
       price_rules: {},
       interval_rules: {},
       goods_data: [],
@@ -170,8 +147,26 @@ class ActivityRuleScene extends PureComponent {
     return arr;
   }
 
+  getVendorList() {
+    let getVendorListUrl = `api/list_user_vendors?access_token=${this.props.global.accessToken}`;
+    let _self = this;
+    jsonWithTpl(getVendorListUrl, {}, function (json) {
+      let {ok, reason, obj} = json;
+      let list = obj;
+      let vendors = [];
+      list.forEach(function (item) {
+        vendors.push({key: item['id'], label: item['brand_name']});
+      });
+      _self.setState({vendorList: vendors});
+      _self.forceUpdate();
+    }, function () {
+      ToastLong("获取品牌列表失败!")
+    })
+  }
+
 
   componentWillMount() {
+    this.getVendorList();
     try {
       if (this.props.navigation.state.params) {
         let {rules, type} = this.props.navigation.state.params;
@@ -202,7 +197,7 @@ class ActivityRuleScene extends PureComponent {
           goods_data: goods_data,
           id: id,
           type: type,
-        })
+        });
       }
     } catch (e) {
       console.log(e)
@@ -212,46 +207,45 @@ class ActivityRuleScene extends PureComponent {
   renderCommon() {
     let {commonRule, price_rules} = this.state;
     return (
-        <Cells style={style.cells}>
-          <Cell customStyle={style.cell} >
-            <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
-            <ImgBtn require={require('../../img/Activity/bianji_.png')}
-                    onPress={() =>
-                    {
-                      console.log(commonRule);
-                      console.log(tool.deepClone(commonRule));
-                      this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
-                        rule: tool.deepClone(commonRule),
-                        key: 'commonRule',
-                        type_id: Cts.RULE_TYPE_GENERAL,
-                      })
-                    }
-                    }/>
-          </Cell>
-          {
-            commonRule.map((item, index) => {
-              let {min_price, max_price, percent} = tool.deepClone(item);
-              return (
-                  <Percentage
-                      key={index}
-                      min_price={min_price}
-                      max_price={max_price}
-                      percent={percent}
-                      tail={index == (commonRule.length - 1)}
-                      text={true}
-                      onPressReduce={() => {
-                        item.percent--;
-                        this.forceUpdate();
-                      }}
-                      onPressAdd={() => {
-                        item.percent++;
-                        this.forceUpdate();
-                      }}
-                  />
-              )
-            })
-          }
-        </Cells>
+      <Cells style={style.cells}>
+        <Cell customStyle={style.cell}>
+          <CellHeader><Text style={style.cell_header_text}>基础加价比例设置</Text></CellHeader>
+          <ImgBtn require={require('../../img/Activity/bianji_.png')}
+                  onPress={() => {
+                    console.log(commonRule);
+                    console.log(tool.deepClone(commonRule));
+                    this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
+                      rule: tool.deepClone(commonRule),
+                      key: 'commonRule',
+                      type_id: Cts.RULE_TYPE_GENERAL,
+                    })
+                  }
+                  }/>
+        </Cell>
+        {
+          commonRule.map((item, index) => {
+            let {min_price, max_price, percent} = tool.deepClone(item);
+            return (
+              <Percentage
+                key={index}
+                min_price={min_price}
+                max_price={max_price}
+                percent={percent}
+                tail={index == (commonRule.length - 1)}
+                text={true}
+                onPressReduce={() => {
+                  item.percent--;
+                  this.forceUpdate();
+                }}
+                onPressAdd={() => {
+                  item.percent++;
+                  this.forceUpdate();
+                }}
+              />
+            )
+          })
+        }
+      </Cells>
     )
   }
 
@@ -259,7 +253,7 @@ class ActivityRuleScene extends PureComponent {
     if (index < 0) {
       this.setState({[key]: obj})
     } else {
-       this.state.specialRuleList[key] = obj
+      this.state.specialRuleList[key] = obj
     }
     console.log(obj);
     this.forceUpdate();
@@ -274,91 +268,92 @@ class ActivityRuleScene extends PureComponent {
     this.setState({goods_data: goods_data});
     this.forceUpdate();
   }
+
 //类别加价
   renderSpecial() {
     let {specialRuleList, vendorId} = this.state;
     return specialRuleList.map((item, inex) => {
       return (
-          <View key={inex}>
-            <Cell customStyle={style.cell} >
-              <CellHeader style={{flexDirection: 'row'}}>
-                <Text style={[style.cell_header_text]}>加价比例设置 </Text>
-                <TouchableOpacity
-                    onPress={() => {
-                      specialRuleList.splice(inex, 1);
-                      this.forceUpdate()
-                    }}
-                >
-                  <Icon
-                      name={'clear'}
-                      size={pxToDp(40)}
-                      style={{backgroundColor: '#fff'}}
-                      color={'#d81e06'}
-                      msg={false}
-                  />
-                </TouchableOpacity>
-              </CellHeader>
-              <ImgBtn require={require('../../img/Activity/bianji_.png')}
-                      onPress={() =>
-                          this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
-                            rule: item,
-                            key: inex,
-                            categories: item[0].categories,
-                            type_id: Cts.RULE_TYPE_SPECIAL,
-                            specialRuleList:specialRuleList
-                          })}
-              />
-            </Cell>
-            <Cell customStyle={style.cell}
-                  onPress={() => {
-                    if(vendorId<=0){
-                      ToastLong('请选择品牌');
-                      return false
-                    }
-                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_CLASSIFY, {
-                      vendorId: vendorId,
-                      nextSetBeforeCategories: (specialRuleList, index) => {
-                        this.nextSetBeforeCategories(specialRuleList, index)
-                      },
-                      index: inex,
-                      specialRuleList: specialRuleList,
-                      categories: item[0]['categories'],
-                    })
-                  }}
-            >
-              <CellHeader><Text style={style.cell_header_text}>选择分类</Text></CellHeader>
-              <CellFooter>
-                <Text style={style.cell_footer_text}>已选({tool.length(item[0]['categories'])})</Text>
-                <Image
-                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                    source={require('../../img/Public/xiangxia_.png')}
+        <View key={inex}>
+          <Cell customStyle={style.cell}>
+            <CellHeader style={{flexDirection: 'row'}}>
+              <Text style={[style.cell_header_text]}>加价比例设置 </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  specialRuleList.splice(inex, 1);
+                  this.forceUpdate()
+                }}
+              >
+                <Icon
+                  name={'clear'}
+                  size={pxToDp(40)}
+                  style={{backgroundColor: '#fff'}}
+                  color={'#d81e06'}
+                  msg={false}
                 />
-              </CellFooter>
-            </Cell>
-            {
-              tool.objectMap(item, (ite, index) => {
-                let {min_price, max_price, percent} = ite;
-                return (
-                    <Percentage
-                        key={index}
-                        min_price={min_price}
-                        max_price={max_price}
-                        percent={percent}
-                        tail={index == (item.length - 1)}
-                        onPressReduce={() => {
-                          ite.percent--;
-                          this.forceUpdate();
-                        }}
-                        onPressAdd={() => {
-                          ite.percent++;
-                          this.forceUpdate();
-                        }}
-                        text={true}
-                    />
-                )
-              })
-            }
-          </View>
+              </TouchableOpacity>
+            </CellHeader>
+            <ImgBtn require={require('../../img/Activity/bianji_.png')}
+                    onPress={() =>
+                      this.toSonPage(Config.ROUTE_ACTIVITY_EDIT_RULE, {
+                        rule: item,
+                        key: inex,
+                        categories: item[0].categories,
+                        type_id: Cts.RULE_TYPE_SPECIAL,
+                        specialRuleList: specialRuleList
+                      })}
+            />
+          </Cell>
+          <Cell customStyle={style.cell}
+                onPress={() => {
+                  if (vendorId <= 0) {
+                    ToastLong('请选择品牌');
+                    return false
+                  }
+                  this.props.navigation.navigate(Config.ROUTE_ACTIVITY_CLASSIFY, {
+                    vendorId: vendorId,
+                    nextSetBeforeCategories: (specialRuleList, index) => {
+                      this.nextSetBeforeCategories(specialRuleList, index)
+                    },
+                    index: inex,
+                    specialRuleList: specialRuleList,
+                    categories: item[0]['categories'],
+                  })
+                }}
+          >
+            <CellHeader><Text style={style.cell_header_text}>选择分类</Text></CellHeader>
+            <CellFooter>
+              <Text style={style.cell_footer_text}>已选({tool.length(item[0]['categories'])})</Text>
+              <Image
+                style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                source={require('../../img/Public/xiangxia_.png')}
+              />
+            </CellFooter>
+          </Cell>
+          {
+            tool.objectMap(item, (ite, index) => {
+              let {min_price, max_price, percent} = ite;
+              return (
+                <Percentage
+                  key={index}
+                  min_price={min_price}
+                  max_price={max_price}
+                  percent={percent}
+                  tail={index == (item.length - 1)}
+                  onPressReduce={() => {
+                    ite.percent--;
+                    this.forceUpdate();
+                  }}
+                  onPressAdd={() => {
+                    ite.percent++;
+                    this.forceUpdate();
+                  }}
+                  text={true}
+                />
+              )
+            })
+          }
+        </View>
       )
     })
   }
@@ -370,93 +365,96 @@ class ActivityRuleScene extends PureComponent {
       return new Date()
     }
   }
-  initMinDate(date){
+
+  initMinDate(date) {
     if (date) {
       return new Date(date.replace(/-/g, "/"))
     } else {
       return new Date()
     }
   }
-  initMaxDate(date){
+
+  initMaxDate(date) {
     if (date) {
       return new Date(date.replace(/-/g, "/"))
     } else {
-      return new Date(Date.now()+ 180*86400000);
+      return new Date(Date.now() + 180 * 86400000);
     }
   }
+
   renderGoods() {
     let {goods_data, vendorId, store_id} = this.state;
     return goods_data.map((item, index) => {
       let {product_id, percent} = item;
       return (
-          <View key={index}>
-            <Cell customStyle={style.cell}
-                  onPress={() => {
-                    if ((tool.length(store_id) <= 0) || (vendorId <= 0)) {
-                      ToastLong('请选择品牌,店铺');
-                      return false
-                    }
-                    this.props.navigation.navigate(Config.ROUTE_ACTIVITY_SELECT_GOOD, {
-                      vendorId: vendorId,
-                      store_ids: store_id,
-                      index: index,
-                      goods_data: goods_data,
-                      product_id: product_id,
-                      nextSetBeforeGoods: (goods_data) => {
-                        this.nextSetBeforeGoods(goods_data)
-                      },
-                    })
-                  }}
-            >
-              <CellHeader style={{flexDirection: 'row'}}>
-                <Text style={style.cell_header_text}>选择商品</Text>
-                <TouchableOpacity
-                    onPress={() => {
-                      goods_data.splice(index, 1);
-                      this.forceUpdate()
-                    }}
-                >
-                  <Icon
-                      name={'clear'}
-                      size={pxToDp(40)}
-                      style={{backgroundColor: '#fff'}}
-                      color={'#d81e06'}
-                      msg={false}
-                  />
-                </TouchableOpacity>
-              </CellHeader>
-              <CellFooter>
-                <Text style={style.cell_footer_text}>已选({product_id.length}个)</Text>
-                <Image
-                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                    source={require('../../img/Public/xiangxia_.png')}
+        <View key={index}>
+          <Cell customStyle={style.cell}
+                onPress={() => {
+                  if ((tool.length(store_id) <= 0) || (vendorId <= 0)) {
+                    ToastLong('请选择品牌,店铺');
+                    return false
+                  }
+                  this.props.navigation.navigate(Config.ROUTE_ACTIVITY_SELECT_GOOD, {
+                    vendorId: vendorId,
+                    store_ids: store_id,
+                    index: index,
+                    goods_data: goods_data,
+                    product_id: product_id,
+                    nextSetBeforeGoods: (goods_data) => {
+                      this.nextSetBeforeGoods(goods_data)
+                    },
+                  })
+                }}
+          >
+            <CellHeader style={{flexDirection: 'row'}}>
+              <Text style={style.cell_header_text}>选择商品</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  goods_data.splice(index, 1);
+                  this.forceUpdate()
+                }}
+              >
+                <Icon
+                  name={'clear'}
+                  size={pxToDp(40)}
+                  style={{backgroundColor: '#fff'}}
+                  color={'#d81e06'}
+                  msg={false}
                 />
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={style.cell} first={false}>
-              <CellHeader>
-                <Text>加价规则</Text>
-              </CellHeader>
-              <CellFooter>
-                <Percentage
-                    key={index}
-                    min_price={''}
-                    max_price={''}
-                    percent={percent}
-                    tail={index == (item.length - 1)}
-                    text={false}
-                    onPressReduce={() => {
-                      item.percent--;
-                      this.forceUpdate();
-                    }}
-                    onPressAdd={() => {
-                      item.percent++;
-                      this.forceUpdate();
-                    }}
-                />
-              </CellFooter>
-            </Cell>
-          </View>
+              </TouchableOpacity>
+            </CellHeader>
+            <CellFooter>
+              <Text style={style.cell_footer_text}>已选({product_id.length}个)</Text>
+              <Image
+                style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                source={require('../../img/Public/xiangxia_.png')}
+              />
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={style.cell} first={false}>
+            <CellHeader>
+              <Text>加价规则</Text>
+            </CellHeader>
+            <CellFooter>
+              <Percentage
+                key={index}
+                min_price={''}
+                max_price={''}
+                percent={percent}
+                tail={index == (item.length - 1)}
+                text={false}
+                onPressReduce={() => {
+                  item.percent--;
+                  this.forceUpdate();
+                }}
+                onPressAdd={() => {
+                  item.percent++;
+                  this.forceUpdate();
+                }}
+              />
+            </CellFooter>
+          </Cell>
+        </View>
       )
     })
 
@@ -536,13 +534,13 @@ class ActivityRuleScene extends PureComponent {
         }
       }
     }
-    if (tool.length(interval_data) > 0){
+    if (tool.length(interval_data) > 0) {
       for (let i = 0; i < interval_data.length; i++) {
-        let {percent,min_price,max_price} = interval_data[i];
+        let {percent, min_price, max_price} = interval_data[i];
         if (percent < 100) {
           ToastLong('加价比例,不能小于100%');
           return false
-        }else if(min_price<0 || max_price<0){
+        } else if (min_price < 0 || max_price < 0) {
           ToastLong('价格不能小于0');
           return false
         }
@@ -552,7 +550,7 @@ class ActivityRuleScene extends PureComponent {
   }
 
   uploadData() {
-    let _this=this;
+    let _this = this;
     let {rule_name, vendorId, startTime, endTime, ext_store_id, commonRule, specialRuleList, goods_data, type, id} = this.state;
     let interval_data = [];
     commonRule.forEach((item) => {
@@ -584,216 +582,215 @@ class ActivityRuleScene extends PureComponent {
       const {dispatch} = this.props;
       const {accessToken} = this.props.global;
       dispatch(fetchSavePriceRule(all, accessToken, (ok, reason, obj) => {
-        this.setState({uploading:false});
+        this.setState({uploading: false});
         if (ok) {
           console.log('save rule result', ok, reason, obj)
           ToastLong('提交成功');
           dispatch(activityRuleList(true))
-          setTimeout(()=>{
+          setTimeout(() => {
             _this.props.navigation.goBack();
-          },1000)
-        }else {
+          }, 1000)
+        } else {
           ToastLong(reason);
         }
       }))
-    }else{
-      this.setState({uploading:false});
+    } else {
+      this.setState({uploading: false});
     }
   }
 
   render() {
-    let {startTime, endTime, vendorId, rule_name, ext_store_id,timeKey} = this.state;
+    let {startTime, endTime, vendorId, rule_name, ext_store_id, timeKey} = this.state;
     return (
-        <View style={{flex: 1}}>
-          <ScrollView >
-            <Cells style={style.cells}>
-              <ModalSelector
-                  skin='customer'
-                  data={this.state.vendorList}
-                  onChange={(option) => {
-                    if (vendorId != option.key) {
-                      this.setState({
-                        ext_store_id: [],
-                        store_id: [],
-                        goods_data: [],
-                        vendorId: option.key,
-                        specialRuleList: [],
-                      })
+      <View style={{flex: 1}}>
+        <ScrollView>
+          <Cells style={style.cells}>
+            <ModalSelector
+              skin='customer'
+              data={this.state.vendorList}
+              onChange={(option) => {
+                if (vendorId != option.key) {
+                  this.setState({
+                    ext_store_id: [],
+                    store_id: [],
+                    goods_data: [],
+                    vendorId: option.key,
+                    specialRuleList: [],
+                  })
+                }
+              }}
+            >
+              <Cell customStyle={style.cell} first={true}>
+                <CellHeader><Text style={style.cell_header_text}>选择品牌</Text></CellHeader>
+                <CellFooter>
+                  <Text>
+                    {
+                      vendorId > 0 ? tool.getVendorName(vendorId) : ''
                     }
-                  }}
-              >
-                <Cell customStyle={style.cell} first={true}>
-                  <CellHeader><Text style={style.cell_header_text}>选择品牌</Text></CellHeader>
-                  <CellFooter>
-                    <Text>
-                      {
-                        vendorId > 0 ? tool.getVendorName(vendorId) : ''
-                      }
-                    </Text>
-                    <Image
-                        style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                        source={require('../../img/Public/xiangxia_.png')}
-                    />
-                  </CellFooter>
-                </Cell>
-              </ModalSelector>
-            </Cells>
-
-            <Cells style={style.cells}>
-              <Cell customStyle={style.cell} first={true}>
-                <CellHeader><Text style={style.cell_header_text}>活动加价名称</Text></CellHeader>
-                <CellFooter>
-                  <TextInput
-                      multiline={true}
-                      underlineColorAndroid='transparent'
-                      style={{minWidth: pxToDp(400), textAlign: 'right',minHeight:pxToDp(100)}}
-                      placeholderTextColor={"#7A7A7A"}
-                      placeholder={'请输入活动名称'}
-                      value={rule_name}
-                      onChangeText={(text) => {
-                        this.setState({rule_name: text})
-                      }}
-                  />
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={style.cell} first={false}>
-                <TouchableOpacity
-                    style={{flex: 1, height: pxToDp(65)}}
-                    onPress={() => {
-                      this.setState({stPicker: true,})
-                    }}
-                >
-                  <Text style={style.time}>{startTime == '' ? '开始时间' : startTime}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(40)}}
-                    onPress={() => {
-                      if(startTime==''){
-                        ToastLong('请先选择开始时间')
-                        return false
-                      }
-                      this.setState({edPicker:true})
-                    }}
-                >
-                  <Text style={[style.time]}>{endTime == '' ? '结束时间' : endTime}</Text>
-                </TouchableOpacity>
-              </Cell>
-              <Cell customStyle={style.cell} onPress={() => {
-                if (vendorId < 1 ) {
-                  ToastLong("请选择品牌");
-                  return false;
-                }
-                if(endTime ===''|| startTime ===''){
-                  ToastLong("请选择时间");
-                  return false;
-                }
-
-                this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE, {vendorId: vendorId, ext_store_id: ext_store_id})
-              }}>
-                <CellHeader><Text style={style.cell_header_text}>选择店铺</Text></CellHeader>
-                <CellFooter>
-                  <Text style={style.cell_footer_text}>已选({tool.length(ext_store_id)})</Text>
+                  </Text>
                   <Image
-                      style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
-                      source={require('../../img/Public/xiangxia_.png')}
+                    style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                    source={require('../../img/Public/xiangxia_.png')}
                   />
                 </CellFooter>
               </Cell>
-            </Cells>
+            </ModalSelector>
+          </Cells>
+
+          <Cells style={style.cells}>
+            <Cell customStyle={style.cell} first={true}>
+              <CellHeader><Text style={style.cell_header_text}>活动加价名称</Text></CellHeader>
+              <CellFooter>
+                <TextInput
+                  multiline={true}
+                  underlineColorAndroid='transparent'
+                  style={{minWidth: pxToDp(400), textAlign: 'right', minHeight: pxToDp(100)}}
+                  placeholderTextColor={"#7A7A7A"}
+                  placeholder={'请输入活动名称'}
+                  value={rule_name}
+                  onChangeText={(text) => {
+                    this.setState({rule_name: text})
+                  }}
+                />
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={style.cell} first={false}>
+              <TouchableOpacity
+                style={{flex: 1, height: pxToDp(65)}}
+                onPress={() => {
+                  this.setState({stPicker: true,})
+                }}
+              >
+                <Text style={style.time}>{startTime == '' ? '开始时间' : startTime}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{flex: 1, height: pxToDp(65), marginLeft: pxToDp(40)}}
+                onPress={() => {
+                  if (startTime == '') {
+                    ToastLong('请先选择开始时间')
+                    return false
+                  }
+                  this.setState({edPicker: true})
+                }}
+              >
+                <Text style={[style.time]}>{endTime == '' ? '结束时间' : endTime}</Text>
+              </TouchableOpacity>
+            </Cell>
+            <Cell customStyle={style.cell} onPress={() => {
+              if (vendorId < 1) {
+                ToastLong("请选择品牌");
+                return false;
+              }
+              if (endTime === '' || startTime === '') {
+                ToastLong("请选择时间");
+                return false;
+              }
+
+              this.toSonPage(Config.ROUTE_ACTIVITY_SELECT_STORE, {vendorId: vendorId, ext_store_id: ext_store_id})
+            }}>
+              <CellHeader><Text style={style.cell_header_text}>选择店铺</Text></CellHeader>
+              <CellFooter>
+                <Text style={style.cell_footer_text}>已选({tool.length(ext_store_id)})</Text>
+                <Image
+                  style={{alignItems: 'center', transform: [{scale: 0.6}, {rotate: '-90deg'}]}}
+                  source={require('../../img/Public/xiangxia_.png')}
+                />
+              </CellFooter>
+            </Cell>
+          </Cells>
+          {
+            this.renderCommon()
+          }
+          <Cells style={style.cells}>
+            <Cell customStyle={style.cell} first={true}>
+              <CellHeader><Text style={style.cell_header_text}>特殊分类加价规则</Text></CellHeader>
+              <CellFooter>
+                <TouchableOpacity
+                  onPress={() => {
+                    let {specialRuleList, specialRule} = this.state;
+                    let newSpecial = tool.deepClone(specialRule)
+                    specialRuleList.push(...newSpecial);
+                    this.forceUpdate();
+                  }}
+                >
+                  <Image style={{height: pxToDp(42), width: pxToDp(42)}}
+                         source={require('../../img/Activity/xinjian_.png')}/>
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
             {
-              this.renderCommon()
+              this.renderSpecial()
             }
-            <Cells style={style.cells}>
-              <Cell customStyle={style.cell} first={true}>
-                <CellHeader><Text style={style.cell_header_text}>特殊分类加价规则</Text></CellHeader>
-                <CellFooter>
-                  <TouchableOpacity
+          </Cells>
+          {/*商品*/}
+          <Cells style={style.cells}>
+            <Cell customStyle={style.cell} first={true}>
+              <CellHeader><Text style={style.cell_header_text}>特殊商品规则</Text></CellHeader>
+              <ImgBtn require={require('../../img/Activity/xinjian_.png')}
                       onPress={() => {
-                        let {specialRuleList, specialRule} = this.state;
-                        let newSpecial = tool.deepClone(specialRule)
-                        specialRuleList.push(...newSpecial);
+                        let {goods_data, goods_rule} = this.state;
+                        let clone_goods_rule = tool.deepClone(goods_rule)
+                        goods_data.push(clone_goods_rule);
                         this.forceUpdate();
-                      }}
-                  >
-                    <Image style={{height: pxToDp(42), width: pxToDp(42)}}
-                           source={require('../../img/Activity/xinjian_.png')}/>
-                  </TouchableOpacity>
-                </CellFooter>
-              </Cell>
-              {
-                this.renderSpecial()
-              }
-            </Cells>
-            {/*商品*/}
-            <Cells style={style.cells}>
-              <Cell customStyle={style.cell} first={true}>
-                <CellHeader><Text style={style.cell_header_text}>特殊商品规则</Text></CellHeader>
-                <ImgBtn require={require('../../img/Activity/xinjian_.png')}
-                        onPress={() => {
-                          let {goods_data, goods_rule} = this.state;
-                          let clone_goods_rule = tool.deepClone(goods_rule)
-                          goods_data.push(clone_goods_rule);
-                          this.forceUpdate();
-                        }}/>
-              </Cell>
-              {
-                this.renderGoods()
-              }
-            </Cells>
-            <BottomBtn onPress={async () => {
-              let {uploading} = this.state;
-              if(uploading){
-                return false
-              }
-              await this.setState({uploading:true});
-              this.uploadData()
-            }}/>
-          </ScrollView>
-          <DateTimePicker
-              date={this.initDate(this.state.startTime)}
-              mode='datetime'
-              minimumDate={new Date()}
-              maximumDate={this.initMaxDate(this.state.endTime)}
-              isVisible={this.state.stPicker}
-              onConfirm={async (date) => {
-                let confirm_data = tool.fullDate(date);
-                this.setState({
-                  startTime:confirm_data,
-                  stPicker:false,
-                })
-              }}
-              onCancel={() => {
-                this.setState({stPicker: false});
-              }}
-          />
-          <DateTimePicker
-              date={this.initDate(this.state.endTime)}
-              mode='datetime'
-              minimumDate={this.initMinDate(this.state.startTime)}
-              isVisible={this.state.edPicker}
-              onConfirm={async (date) => {
-                let confirm_data = tool.fullDate(date);
-                this.setState({
-                  endTime:confirm_data,
-                  edPicker:false,
-                })
-              }}
-              onCancel={() => {
-                this.setState({edPicker: false});
-              }}
-          />
-          <Toast
-              icon="loading"
-              show={this.state.uploading}
-              onRequestClose={() => {
-              }}
-          >提交中</Toast>
-        </View>
+                      }}/>
+            </Cell>
+            {
+              this.renderGoods()
+            }
+          </Cells>
+          <BottomBtn onPress={async () => {
+            let {uploading} = this.state;
+            if (uploading) {
+              return false
+            }
+            await this.setState({uploading: true});
+            this.uploadData()
+          }}/>
+        </ScrollView>
+        <DateTimePicker
+          date={this.initDate(this.state.startTime)}
+          mode='datetime'
+          minimumDate={new Date()}
+          maximumDate={this.initMaxDate(this.state.endTime)}
+          isVisible={this.state.stPicker}
+          onConfirm={async (date) => {
+            let confirm_data = tool.fullDate(date);
+            this.setState({
+              startTime: confirm_data,
+              stPicker: false,
+            })
+          }}
+          onCancel={() => {
+            this.setState({stPicker: false});
+          }}
+        />
+        <DateTimePicker
+          date={this.initDate(this.state.endTime)}
+          mode='datetime'
+          minimumDate={this.initMinDate(this.state.startTime)}
+          isVisible={this.state.edPicker}
+          onConfirm={async (date) => {
+            let confirm_data = tool.fullDate(date);
+            this.setState({
+              endTime: confirm_data,
+              edPicker: false,
+            })
+          }}
+          onCancel={() => {
+            this.setState({edPicker: false});
+          }}
+        />
+        <Toast
+          icon="loading"
+          show={this.state.uploading}
+          onRequestClose={() => {
+          }}
+        >提交中</Toast>
+      </View>
     )
   }
 }
-
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityRuleScene)

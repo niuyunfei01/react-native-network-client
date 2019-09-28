@@ -20,10 +20,10 @@ const SIZES = ['small', 'normal', 'large'];
 let tag;
 
 const propTypes = {
-  visible: React.PropTypes.bool,
-  color: React.PropTypes.string,
-  size: React.PropTypes.oneOf(SIZES),
-  overlayColor: React.PropTypes.string
+  visible: PropTypes.bool,
+  color: PropTypes.string,
+  size: PropTypes.oneOf(SIZES),
+  overlayColor: PropTypes.string
 }
 
 class Loading extends React.Component {

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   Picker as RNPicker,
   View,
@@ -8,9 +9,10 @@ import {
   Dimensions,
   StyleSheet,
   Easing,
+  ViewPropTypes
 } from 'react-native'
 
-const { width, height } = Dimensions.get('window')
+const {width, height} = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   picker: {
@@ -68,9 +70,12 @@ class Picker extends Component {
     pickerCancelBtnText: '取消',
     duration: 300,
     selectedValue: [],
-    onPickerDone: () => {},
-    onValueChange: () => {},
-    onRequestClose: () => {},
+    onPickerDone: () => {
+    },
+    onValueChange: () => {
+    },
+    onRequestClose: () => {
+    },
   }
 
   constructor(props) {
@@ -92,7 +97,7 @@ class Picker extends Component {
     }
     if (this.props.visible !== nextProps.visible) {
       if (nextProps.visible) {
-        this.setState({ visible: true })
+        this.setState({visible: true})
         Animated.timing(
           this.state.fadeAnim,
           {
@@ -110,7 +115,7 @@ class Picker extends Component {
             easing: Easing.easeOut,
           }
         ).start((e) => {
-          if (e.finished) this.setState({ visible: false })
+          if (e.finished) this.setState({visible: false})
         })
       }
     }
@@ -132,7 +137,7 @@ class Picker extends Component {
   }
 
   _getStateFromProps(props) {
-    let { pickerData, selectedValue } = props
+    let {pickerData, selectedValue} = props
     let cascadeData = {}
 
     // compatible single wheel sence
@@ -150,9 +155,9 @@ class Picker extends Component {
       }
       this.pickedValue = JSON.parse(JSON.stringify(
         selectedValue.length ? selectedValue :
-        [pickerData[0][0]]
-          .concat(pickerData[1] ? pickerData[1][0] : [])
-          .concat(pickerData[2] ? pickerData[2][0] : [])
+          [pickerData[0][0]]
+            .concat(pickerData[1] ? pickerData[1][0] : [])
+            .concat(pickerData[2] ? pickerData[2][0] : [])
       ))
     } else if (this.pickerType === 'cascade') {
       if (!Array.isArray(pickerData)) {
@@ -205,7 +210,7 @@ class Picker extends Component {
 
   handleLayout() {
     this.refs.picker.measure((x, y, w, h) => {
-      this.setState({ height: h })
+      this.setState({height: h})
     })
   }
 
@@ -222,7 +227,7 @@ class Picker extends Component {
             this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), index)
           }}
         >
-          {item.map((v, i) => <RNPicker.Item key={i} value={v} label={v.toString()} />)}
+          {item.map((v, i) => <RNPicker.Item key={i} value={v} label={v.toString()}/>)}
         </RNPicker>
       </View>
     )
@@ -254,7 +259,7 @@ class Picker extends Component {
     )
 
     return (
-      <View style={[styles.pickerWrap, { width: this.width || width }]}>
+      <View style={[styles.pickerWrap, {width: this.width || width}]}>
         <View style={styles.pickerWheel}>
           <RNPicker
             ref={'firstWheel'}
@@ -367,14 +372,14 @@ class Picker extends Component {
         onShow={onShow}
         onRequestClose={onRequestClose}
       >
-        <View style={{ width, height }}>
+        <View style={{width, height}}>
           <Animated.View
-            style={[{ width, height }, wrapperStyle, {
+            style={[{width, height}, wrapperStyle, {
               opacity: this.state.fadeAnim
             }]}
           >
             <Text
-              style={{ width, height }}
+              style={{width, height}}
               onPress={onRequestClose}
             />
           </Animated.View>
@@ -382,14 +387,15 @@ class Picker extends Component {
             style={[styles.picker, style, {
               transform: [{
                 translateY: this.state.fadeAnim.interpolate({
-                  inputRange: [0, 1], outputRange: [this.state.height, 0] })
+                  inputRange: [0, 1], outputRange: [this.state.height, 0]
+                })
               }]
             }]}
           >
             <View ref="picker" onLayout={this.handleLayout}>
               <View
                 style={[styles.pickerToolbar, pickerToolBarStyle,
-                  { width: this.width || width }]}
+                  {width: this.width || width}]}
               >
                 <View style={styles.pickerCancelBtn}>
                   <Text
@@ -407,7 +413,7 @@ class Picker extends Component {
                   >{pickerBtnText}</Text>
                 </View>
               </View>
-              <View style={[styles.pickerWrap, { width: this.width || width }]}>
+              <View style={[styles.pickerWrap, {width: this.width || width}]}>
                 {this._renderWheel()}
               </View>
             </View>
@@ -419,13 +425,13 @@ class Picker extends Component {
 }
 
 Picker.propTypes = {
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   pickerBtnText: PropTypes.string,
   pickerCancelBtnText: PropTypes.string,
   pickerBtnStyle: Text.propTypes.style,
   pickerTitle: PropTypes.string,
   pickerTitleStyle: Text.propTypes.style,
-  pickerToolBarStyle: View.propTypes.style,
+  pickerToolBarStyle: ViewPropTypes.style,
   duration: PropTypes.number,
   pickerData: PropTypes.array.isRequired,
   selectedValue: PropTypes.any.isRequired,
@@ -434,7 +440,7 @@ Picker.propTypes = {
   visible: PropTypes.bool,
   onShow: PropTypes.func,
   onRequestClose: PropTypes.func,
-  wrapperStyle: View.propTypes.style,
+  wrapperStyle: ViewPropTypes.style,
 }
 
 export default Picker

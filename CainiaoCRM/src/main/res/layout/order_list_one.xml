@@ -1,264 +1,308 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical"
-            android:id="@+id/one_order"
-            android:layout_width="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/one_order"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5.0dip"
+    android:background="@drawable/list_item_bg"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    android:padding="2dp"
+    android:paddingBottom="8dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/order_head_styled"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/feedbackId"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="2dp"
-        android:layout_marginTop="5.0dip"
-        android:paddingBottom="8dp"
-        android:baselineAligned="false"
-        android:background="@drawable/list_item_bg">
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="5dip"
+            android:layout_marginEnd="2.0dip"
+            android:ellipsize="middle"
+            android:paddingStart="5.0dip"
+            android:singleLine="true"
+            android:text="#13"
+            android:textColor="@color/light_blue"
+            android:textSize="24sp" />
 
-        <RelativeLayout
-            android:background="@color/order_head_styled"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/fb_from_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="1.0dip"
+            android:layout_toEndOf="@+id/feedbackId"
+            android:ellipsize="middle"
+            android:paddingStart="3.0dip"
+            android:text="期望送达"
+            android:textColor="#555555"
+            android:textSize="@dimen/mini_text" />
+
+        <TextView
+            android:id="@+id/fb_reported_at"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="2.0dip"
+            android:layout_toEndOf="@+id/fb_from_user"
+            android:ellipsize="middle"
+            android:paddingEnd="2.0dip"
+            android:paddingStart="2.0dip"
+            android:singleLine="true"
+            android:text="立即"
+            android:textColor="@color/light_blue" />
+        <LinearLayout
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
             <TextView
-                android:textSize="24sp"
-                android:textColor="@color/light_blue"
-                android:ellipsize="middle"
-                android:id="@+id/feedbackId"
-                android:paddingStart="5.0dip"
+                android:id="@+id/pack_assigned"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="2.0dip"
-                android:layout_alignParentStart="true"
-                android:text="#13"
-                android:singleLine="true"
-                android:layout_marginBottom="5dip"/>
-            <TextView
-                android:id="@+id/fb_from_user"
-                android:textColor="#555555"
-                android:textSize="@dimen/mini_text"
-                android:ellipsize="middle"
-                android:paddingStart="3.0dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="1.0dip"
-                android:layout_toEndOf="@+id/feedbackId"
-                android:layout_centerVertical="true"
-                android:text="期望送达"/>
-
-            <TextView
-                android:textColor="@color/light_blue"
-                    android:ellipsize="middle"
-                    android:id="@+id/fb_reported_at"
-                    android:paddingStart="2.0dip"
-                    android:paddingEnd="2.0dip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="2.0dip"
-                    android:text="立即"
-                    android:layout_toEndOf="@+id/fb_from_user"
-                android:layout_centerVertical="true"
-                    android:singleLine="true"/>
-
+                android:visibility="invisible"
+                android:layout_marginEnd="10dip"
+                android:padding="5dp"
+                android:text="张三丰"
+                android:textSize="@dimen/mini_text" />
             <TextView
                 android:id="@+id/fb_status"
-                android:textSize="@dimen/mini_text"
-                android:layout_marginEnd="10dip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:text="货到付款"/>
-        </RelativeLayout>
+                android:layout_marginEnd="10dip"
+                android:visibility="invisible"
+                android:text="货到付款"
+                android:textSize="@dimen/mini_text" />
+        </LinearLayout>
+    </RelativeLayout>
 
-        <TextView
-                android:id="@+id/fb_content"
-                android:paddingLeft="5.0dip"
-                android:paddingRight="5.0dip"
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                android:text="龙腾苑四区43号楼 3单元202"
-                android:textSize="16.0sp"/>
+    <TextView
+        android:id="@+id/fb_content"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:paddingLeft="5.0dip"
+        android:paddingRight="5.0dip"
+        android:text="龙腾苑四区43号楼 3单元202"
+        android:textSize="16.0sp" />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
         <TextView
-                android:id="@+id/userName"
-                android:paddingLeft="5.0dip"
-                android:paddingRight="5.0dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="耿秋刚"
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5.0dip"
+            android:paddingRight="5.0dip"
             android:singleLine="true"
-                android:textSize="16.0sp"/>
+            android:text="耿秋刚"
+            android:textSize="16.0sp" />
 
         <TextView
-                android:id="@+id/gender_text"
-                android:paddingLeft="5.0dip"
-                android:paddingRight="5.0dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="先生"/>
+            android:id="@+id/gender_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5.0dip"
+            android:paddingRight="5.0dip"
+            android:text="先生"
+            android:visibility="gone" />
 
         <TextView
-                android:id="@+id/phone_text"
-            android:textColor="@color/light_blue"
-                android:paddingLeft="5.0dip"
-                android:paddingRight="5.0dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="18910275339"
-                android:linksClickable="true" />
+            android:id="@+id/phone_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:paddingLeft="5.0dip"
+            android:paddingRight="5.0dip"
+            android:text="18910275339"
+            android:textColor="@color/light_blue" />
 
 
         <TextView
             android:id="@+id/user_order_times"
-            android:paddingLeft="5.0dip"
-            android:paddingRight="5.0dip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/list_text_border_grey"
-            android:text="第几次下单"/>
+            android:paddingLeft="5.0dip"
+            android:paddingRight="5.0dip"
+            android:text="第几次下单" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/view_more_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dip"
+            android:paddingLeft="5.0dip"
+            android:paddingRight="5.0dip"
+            android:text="查看 >>" />
 
         <!--<LinearLayout-->
-                <!--android:gravity="right"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1.0">-->
-                <!--<TextView-->
-                    <!--android:id="@+id/source_platform"-->
-                    <!--android:paddingLeft="5.0dip"-->
-                    <!--android:paddingRight="5.0dip"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="top|right|center"-->
-                    <!--android:text="微信 #01"-->
-                    <!--android:background="@drawable/list_text_border_green"/>-->
-            <!--</LinearLayout>-->
-        </LinearLayout>
+        <!--android:gravity="right"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1.0">-->
+        <!--<TextView-->
+        <!--android:id="@+id/source_platform"-->
+        <!--android:paddingLeft="5.0dip"-->
+        <!--android:paddingRight="5.0dip"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="top|right|center"-->
+        <!--android:text="微信 #01"-->
+        <!--android:background="@drawable/list_text_border_green"/>-->
+        <!--</LinearLayout>-->
+    </LinearLayout>
 
-        <LinearLayout
-                android:orientation="horizontal"
-                android:id="@+id/post_footer"
-                android:layout_marginBottom="8dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/post_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
 
-            <TextView
-                    android:paddingLeft="5.0dip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="￥"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:paddingLeft="5.0dip"
+            android:text="￥" />
 
-            <TextView
-                android:paddingRight="5.0dip"
-                    android:id="@+id/total_money"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="59.95"/>
-            <TextView
-                android:paddingLeft="5.0dip"
-                android:id="@+id/orderTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="17:06"/>
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="下单"/>
+        <TextView
+            android:id="@+id/total_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="5.0dip"
+            android:text="59.95" />
 
-            <TextView
-                android:paddingLeft="5.0dip"
-                android:id="@+id/source_platform"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="微信 #01"/>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/orderTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5.0dip"
+            android:text="17:06" />
 
-        <LinearLayout
-                android:orientation="horizontal"
-                android:id="@+id/order_status_state"
-                android:background="@color/order_head_styled"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            <TextView
-                android:paddingLeft="5.0dip"
-                android:id="@+id/ship_worker_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:linksClickable="true"
-                android:textColor="@color/light_blue"
-                android:text="王小强"/>
-            <TextView
-                android:id="@+id/start_ship_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                android:linksClickable="true"
-                    android:text="16"/>
-            <TextView android:id="@+id/start_ship_text"
-                android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                android:linksClickable="true"
-                    android:text="出发"/>
-            <TextView
-                android:id="@+id/ship_time_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                android:linksClickable="true"
-                    android:text="12:23"/>
-            <TextView android:id="@+id/text_ship_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:linksClickable="true"
-                android:text="送达("/>
-            <TextView
-                android:id="@+id/ship_time_cost"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                android:linksClickable="true"
-                    android:text="32"/>
-            <TextView android:id="@+id/text_ship_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:linksClickable="true"
-                android:text="分)"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:text="下单" />
 
-            <TextView
-                android:id="@+id/is_in_time"
-                android:layout_marginStart="5dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="延时送达"/>
+        <TextView
+            android:id="@+id/source_platform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5.0dip"
+            android:text="微信 #01" />
+    </LinearLayout>
 
-            <TextView android:id="@+id/ready_delay_warn"
-                android:layout_marginStart="5.0dip"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/order_status_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@color/order_head_styled"
+        android:orientation="horizontal"
+        android:visibility="gone">
 
-            <TextView
-                android:id="@+id/print_times"
-                android:layout_marginStart="5dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="未打印"/>
+        <TextView
+            android:id="@+id/ship_worker_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:linksClickable="true"
+            android:paddingLeft="5.0dip"
+            android:text="王小强"
+            android:textColor="@color/light_blue" />
 
-            <TextView
-                android:id="@+id/ship_schedule"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/list_text_border_grey"
-                android:visibility="gone"
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/start_ship_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:text="16" />
 
-        </LinearLayout>
+        <TextView
+            android:id="@+id/start_ship_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:text="出发" />
+
+        <TextView
+            android:id="@+id/ship_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:text="12:23" />
+
+        <TextView
+            android:id="@+id/text_ship_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:text="送达(" />
+
+        <TextView
+            android:id="@+id/ship_time_cost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:text="32" />
+
+        <TextView
+            android:id="@+id/text_ship_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:linksClickable="true"
+            android:text="分)" />
+
+        <TextView
+            android:id="@+id/is_in_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dip"
+            android:text="延时送达" />
+
+        <TextView
+            android:id="@+id/ready_delay_warn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5.0dip"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/print_times"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dip"
+            android:text="未打印"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/ship_schedule"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/list_text_border_grey"
+            android:text=""
+            android:visibility="gone" />
 
     </LinearLayout>
+
+</LinearLayout>

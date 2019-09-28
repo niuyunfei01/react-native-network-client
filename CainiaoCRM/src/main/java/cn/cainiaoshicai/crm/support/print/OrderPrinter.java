@@ -1,29 +1,41 @@
 package cn.cainiaoshicai.crm.support.print;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.text.TextUtils;
-
-import com.facebook.react.ReactActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+import cn.cainiaoshicai.crm.AppInfo;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.domain.ProductEstimate;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
+import cn.cainiaoshicai.crm.domain.SupplierOrder;
+import cn.cainiaoshicai.crm.domain.SupplierOrderItem;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.util.DateTimeUtils;
+import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.util.TextUtil;
+import cn.cainiaoshicai.crm.print.PrinterWriter;
+import cn.cainiaoshicai.crm.print.PrinterWriter58mm;
 import cn.cainiaoshicai.crm.service.ServiceException;
 import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
 
 /**
  * Created by liuzhr on 10/27/16.
@@ -38,24 +50,80 @@ public class OrderPrinter {
     }
 
     public static void printWhenNeverPrinted(final int platform, final String platformOid, final BasePrinter.PrintCallback printedCallback) {
-        BluetoothPrinters.DeviceStatus printer = BluetoothPrinters.INS.getCurrentPrinter();
-        if (printer == null || !printer.isConnected()) {
-            AppLogger.e("skip to print for printer is not connected!");
-            return;
-        }
-        new MyAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
-                final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
-                if (order != null) {
-                    OrderPrinter._print(order, true, printedCallback);
-                } else {
-                    AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+        if (SettingUtility.getAutoPrintSetting()) {
+            new MyAsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        final boolean supportSunMiPrinter = supportSunMiPrinter();
+                        final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
+                        final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
+                        if (supportSunMiPrinter) {
+                            smPrintOrder(order);
+                        } else {
+                            if (order != null && order.getPrint_times() == 0) {
+                                PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                            } else {
+                                AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e("auto print order error", e);
+                    }
+                    return null;
                 }
-                return null;
+            }.executeOnNormal();
+        }
+    }
+
+    public static BluetoothPrinters.DeviceStatus resetDeviceStatus(BluetoothPrinters.DeviceStatus ds) {
+        boolean shouldReconnect = true;
+        if (ds == null) {
+            boolean connectSuccess = autoConnectBluetoothPrinters();
+            if (connectSuccess) {
+                shouldReconnect = false;
+                ds = BluetoothPrinters.INS.getCurrentPrinter();
             }
-        }.executeOnNormal();
+        }
+        if (ds != null && shouldReconnect) {
+            try {
+                android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+                final BluetoothConnector btConnector = new BluetoothConnector(ds.getDevice(), false, btAdapter, null);
+                final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+                ds.resetSocket(socketWrapper);
+            } catch (Exception e) {
+                Log.e("reset bt socket error ", e);
+                ds = null;
+            }
+        }
+        return ds;
+    }
+
+    public static boolean autoConnectBluetoothPrinters() {
+        String lastAddress = SettingUtility.getLastConnectedPrinterAddress();
+        android.bluetooth.BluetoothAdapter btAdapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> btDeviceList = btAdapter.getBondedDevices();
+        BluetoothDevice lastDevice = null;
+        for (BluetoothDevice device : btDeviceList) {
+            if (device.getAddress().equals(lastAddress)) {
+                lastDevice = device;
+                break;
+            }
+        }
+        if (lastDevice != null) {
+            try {
+                final BluetoothConnector btConnector = new BluetoothConnector(lastDevice, false, btAdapter, null);
+                final BluetoothConnector.BluetoothSocketWrapper socketWrapper = btConnector.connect();
+                BluetoothPrinters.DeviceStatus deviceStatus = new BluetoothPrinters.DeviceStatus(lastDevice);
+                deviceStatus.resetSocket(socketWrapper);
+                SettingUtility.setLastConnectedPrinterAddress(lastDevice.getAddress());
+                BluetoothPrinters.INS.setCurrentPrinter(deviceStatus);
+                return true;
+            } catch (Exception e) {
+                Log.e("skip to print for printer is not connected!", e);
+            }
+        }
+        return false;
     }
 
     public static void printEstimate(BluetoothConnector.BluetoothSocketWrapper btsocket,
@@ -113,24 +181,22 @@ public class OrderPrinter {
         }
     }
 
-    public static void printTest(BluetoothConnector.BluetoothSocketWrapper btsocket) throws IOException {
+    public static void printTest() throws IOException {
         try {
-            OutputStream btos = btsocket.getOutputStream();
-            BasePrinter printer = new BasePrinter(btos);
-
-            btos.write(new byte[]{0x1B, 0x21, 0});
-            btos.write(GPrinterCommand.left);
-
-            printer.starLine().highBigText("   打印测试单").newLine();
-            printer.highText(String.format("合计 %27s", "x100")).newLine();
-
-            printer.starLine().normalText("比邻鲜，好生意！").newLine();
-
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(GPrinterCommand.walkPaper((byte) 4));
-            btos.flush();
+            BasePrinter printer = new BasePrinter();
+            byte[] testData = new byte[]{0x1B, 0x21, 0};
+            testData = printer.concatenate(testData, GPrinterCommand.left);
+            testData = printer.concatenate(testData, printer.startLineBytes());
+            testData = printer.concatenate(testData, printer.highTextBytes("   打印测试单"));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, printer.highTextBytes(String.format("合计 %27s", "x100")));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, printer.startLineBytes());
+            testData = printer.concatenate(testData, printer.normalTextBytes("外送帮，好生意！"));
+            testData = printer.concatenate(testData, printer.newLineBytes());
+            testData = printer.concatenate(testData, new byte[]{0x0D, 0x0D, 0x0D});
+            testData = printer.concatenate(testData, GPrinterCommand.walkPaper((byte) 4));
+            PrintQueue.getQueue(GlobalCtx.app()).write(testData);
         } catch (Exception e) {
             AppLogger.e("error in printing test", e);
             throw e;
@@ -196,121 +262,283 @@ public class OrderPrinter {
         }
     }
 
-    public static void smPrintOrder(Order order) {
-        String mobile = order.getMobile();
-        mobile = mobile.replace("_", "转").replace(",", "转");
-
-        try {
-            ByteArrayOutputStream btos = new ByteArrayOutputStream();
-            BasePrinter printer = new BasePrinter(btos);
-            btos.write(new byte[]{0x1B, 0x21, 0});
-            btos.write(GPrinterCommand.left);
-
-            printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
-                    .newLine().highBigText("  #" + order.getDayId());
-
-            printer.normalText(order.platformWithId()).newLine();
-
-            printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
-
-            printer.starLine()
-                    .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + mobile)
-                    .newLine()
-                    .highText(TextUtil.replaceWhiteStr(order.getAddress()));
-            if (!TextUtils.isEmpty(order.getDirection())) {
-                printer.highText("[" + order.getDirection() + "]");
-            }
-            printer.newLine();
-
-            String expectedStr = order.getExpectTimeStr();
-            if (expectedStr == null) {
-                expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
-            }
-            printer.starLine().highText("期望送达：" + expectedStr).newLine();
-            if (!TextUtils.isEmpty(order.getRemark())) {
-                printer.highText("用户备注：" + order.getRemark())
-                        .newLine();
-            }
-
-            printer.starLine()
-                    .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
-                    .newLine()
-                    .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
-                    .newLine();
-
-            printer.starLine().highText(String.format("食材名称%22s", "数量")).newLine().splitLine();
-
-            int total = 0;
-            for (CartItem item : order.getItems()) {
-                String name = item.getProduct_name();
-                String tagCode = item.getTag_code();
-                if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
-                    name = name + "#" + tagCode;
-                }
-                if (item.getPrice() >= 0) {
-                    for (int idx = 0; idx < name.length(); ) {
-
-                        String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
-
-                        boolean isEnd = idx + MAX_TITLE_PART >= name.length();
-                        if (isEnd) {
-                            String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
-                            text = String.format(format, text, "x" + item.getNum());
-                        }
-                        printer.highText(text).newLine();
-                        if (isEnd) {
-                            printer.spaceLine();
-                        }
-
-                        idx += MAX_TITLE_PART;
-                    }
-                    total += item.getNum();
-                }
-            }
-            printer.highText(String.format("合计 %27s", "x" + total)).newLine();
-            if (!TextUtils.isEmpty(order.getLine_additional())) {
-                printer.starLine().normalText(order.getLine_additional());
-            }
-            printer.starLine().highText(order.getLine_money_total()).newLine();
-
-            printer.starLine().normalText(order.getPrintFooter1())
-                    .newLine().normalText(order.getPrintFooter2());
-
-            String printFooter3 = order.getPrintFooter3();
-            if (!TextUtils.isEmpty(printFooter3)) {
-                printer.newLine().normalText(printFooter3);
-            }
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(0x0D);
-            btos.write(GPrinterCommand.walkPaper((byte) 4));
-            AidlUtil.getInstance().sendRawData(btos.toByteArray());
-            try {
-                final String access_token = GlobalCtx.app().token();
-                new OrderActionDao(access_token).logOrderPrinted(order.getId());
-            } catch (ServiceException e) {
-                AppLogger.e("error Service Exception:" + e.getMessage());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    static String getUnitTypeName(int type) {
+        switch (type) {
+            case 0:
+                return "斤";
+            case 1:
+                return "份";
+            case 2:
+                return "克";
+            case 3:
+                return "千克";
+            default:
+                return "";
         }
     }
 
-    public static void printOrder(BluetoothConnector.BluetoothSocketWrapper btsocket, Order order) throws IOException {
+    public static void smPrintSupplierSummaryOrder(SupplierSummaryOrder order) {
+        int state = AidlUtil.getInstance().printerState();
+        if (state == 1) {
+            try {
+                ArrayList<byte[]> data = new ArrayList<>();
+                PrinterWriter printer = new PrinterWriter58mm();
+                printer.setAlignCenter();
+                data.add(printer.getDataAndReset());
+
+                printer.printLineFeed();
+                printer.setFontSize(0);
+                printer.setAlignCenter();
+                printer.print("供应商采货单：" + order.getName());
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.print("供应商联系方式: " + order.getMobile());
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+                printer.printInOneLine("货名", "数量", 0);
+                printer.printLine();
+                printer.printLineFeed();
+
+                double total = 0;
+
+                for (SupplierOrderItem item : order.getItems()) {
+                    printer.printInOneLine(item.getName(), item.getReq_amount() + getUnitTypeName(item.getUnit_type()), 0);
+                    printer.printLineFeed();
+                    printer.printLineFeed();
+                    total += 1;
+                }
+
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.printInOneLine("合计：", total + "", 0);
+
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+                data.add(printer.getDataAndClose());
+                for (byte[] bs : data) {
+                    AidlUtil.getInstance().sendRawData(bs);
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    public static void smPrintSupplierOrder(SupplierOrder order) {
+        int state = AidlUtil.getInstance().printerState();
+        if (state == 1) {
+            try {
+                ArrayList<byte[]> data = new ArrayList<>();
+                PrinterWriter printer = new PrinterWriter58mm();
+                printer.setAlignCenter();
+                data.add(printer.getDataAndReset());
+
+                printer.printLineFeed();
+                printer.setFontSize(0);
+                printer.setAlignCenter();
+                printer.print("订货单：" + order.getId());
+                printer.printLineFeed();
+
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.print("店铺名: " + order.getStoreName());
+                printer.printLineFeed();
+                printer.print("送达时间: " + order.getDate());
+                printer.printLineFeed();
+                printer.print("订货员姓名: " + order.getCreateName());
+                printer.printLineFeed();
+                printer.print("供应商姓名: " + order.getSupplierName());
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+                printer.printInOneLine("货名", "数量", "单价", 0);
+                printer.printLine();
+                printer.printLineFeed();
+                double total = 0;
+                for (SupplierOrderItem item : order.getItems()) {
+                    printer.printInOneLine(item.getName(), item.getReq_amount() + getUnitTypeName(item.getUnit_type()), item.getUnit_price() + "", 0);
+                    printer.printLineFeed();
+                    printer.printLineFeed();
+                    total += item.getUnit_price() * item.getReq_amount();
+                }
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.setAlignLeft();
+                printer.printInOneLine("总额：", total + "", 0);
+
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+                printer.printLineFeed();
+                printer.printLine();
+                printer.printLineFeed();
+
+
+                data.add(printer.getDataAndClose());
+
+                for (byte[] bs : data) {
+                    AidlUtil.getInstance().sendRawData(bs);
+                }
+
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    public static void smPrintOrder(Order order) {
+        int state = AidlUtil.getInstance().printerState();
+        if (state == 1) {
+            String mobile = order.getMobile();
+            mobile = mobile.replace("_", "转").replace(",", "转");
+            try {
+                ByteArrayOutputStream btos = new ByteArrayOutputStream();
+                BasePrinter printer = new BasePrinter(btos);
+                btos.write(new byte[]{0x1B, 0x21, 0});
+                btos.write(GPrinterCommand.left);
+
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText("  #" + order.getDayId());
+
+                printer.normalText(order.platformWithId()).newLine();
+
+                printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
+
+                printer.starLine()
+                        .highText(TextUtil.replaceWhiteStr(order.getUserName()) + " " + mobile)
+                        .newLine()
+                        .highText(TextUtil.replaceWhiteStr(order.getAddress()));
+                if (!TextUtils.isEmpty(order.getDirection())) {
+                    printer.highText("[" + order.getDirection() + "]");
+                }
+                printer.newLine();
+
+                String expectedStr = order.getExpectTimeStr();
+                if (expectedStr == null) {
+                    expectedStr = DateTimeUtils.mdHourMinCh(order.getExpectTime());
+                }
+                printer.starLine().highText("期望送达：" + expectedStr).newLine();
+                if (!TextUtils.isEmpty(order.getRemark())) {
+                    printer.highText("用户备注：" + order.getRemark())
+                            .newLine();
+                }
+
+                printer.starLine()
+                        .normalText("订单编号：" + Cts.Platform.find(order.getPlatform()).name + "-" + order.getPlatform_oid())
+                        .newLine()
+                        .normalText("下单时间：" + DateTimeUtils.shortYmdHourMin(order.getOrderTime()))
+                        .newLine();
+
+                printer.starLine().normalText(String.format("食材名称%22s", "数量")).newLine().splitLine();
+
+                int total = 0;
+                for (CartItem item : order.getItems()) {
+                    String name = item.getProduct_name();
+                    String tagCode = item.getTag_code();
+                    String shelfNo = item.getShelf_no();
+                    if (tagCode != null && !"".equals(tagCode) && !"0".equals(tagCode)) {
+                        name = name + "#" + tagCode;
+                    }
+                    if (shelfNo != null && !"".equals(shelfNo) && !"0".equals(shelfNo)) {
+                        name = shelfNo + " " + name;
+                    }
+                    if (item.getPrice() >= 0) {
+                        for (int idx = 0; idx < name.length(); ) {
+
+                            String text = name.substring(idx, Math.min(name.length(), idx + MAX_TITLE_PART));
+
+                            boolean isEnd = idx + MAX_TITLE_PART >= name.length();
+                            if (isEnd) {
+                                String format = "%s%" + Math.max(32 - (printer.printWidth(text)), 1) + "s";
+                                text = String.format(format, text, "x" + item.getNum());
+                            }
+                            printer.normalText(text).newLine();
+                            if (isEnd) {
+                                printer.spaceLine();
+                            }
+
+                            idx += MAX_TITLE_PART;
+                        }
+                        total += item.getNum();
+                    }
+                }
+                printer.highText(String.format("合计 %27s", "x" + total)).newLine();
+                if (!TextUtils.isEmpty(order.getLine_additional())) {
+                    printer.starLine().normalText(order.getLine_additional());
+                }
+                printer.starLine().highText(order.getLine_money_total()).newLine();
+
+                printer.starLine().normalText(order.getPrintFooter1())
+                        .newLine().normalText(order.getPrintFooter2());
+
+                String printFooter3 = order.getPrintFooter3();
+                if (!TextUtils.isEmpty(printFooter3)) {
+                    printer.newLine().normalText(printFooter3);
+                }
+                printer.newLine();
+                printer.starLine();
+                btos.write(0x0D);
+                btos.write(0x0D);
+                btos.write(0x0D);
+                AidlUtil.getInstance().sendRawData(btos.toByteArray());
+                AidlUtil.getInstance().printBarCode("WO" + order.getId(), 8, 81, 2, 2);
+                AidlUtil.getInstance().print3Line();
+                try {
+                    final String access_token = GlobalCtx.app().token();
+                    new OrderActionDao(access_token).logOrderPrinted(order.getId());
+                } catch (ServiceException e) {
+                    AppLogger.e("error Service Exception:" + e.getMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static byte[] printOrder(Order order) throws IOException {
+        if (order == null) {
+            return new byte[]{};
+        }
         String mobile = order.getMobile();
         mobile = mobile.replace("_", "转").replace(",", "转");
+        ByteArrayOutputStream btos = new ByteArrayOutputStream();
+        boolean isDirectVendor = false;
         try {
-            OutputStream btos = btsocket.getOutputStream();
+            isDirectVendor = GlobalCtx.app().isDirectVendor();
+        } catch (Exception e) {
+
+        }
+        try {
             BasePrinter printer = new BasePrinter(btos);
-
-
             btos.write(new byte[]{0x1B, 0x21, 0});
             btos.write(GPrinterCommand.left);
 
-            printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
-                    .newLine().highBigText("  #" + order.getDayId());
-
-            printer.normalText(order.platformWithId()).newLine();
+            if (isDirectVendor) {
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText("  #" + order.getDayId());
+                printer.highBigText(order.platformWithId()).newLine();
+            } else {
+                printer.starLine().highBigText(" " + order.getFullStoreName()).newLine()
+                        .newLine().highBigText(order.platformWithId());
+                printer.highBigText("  #" + order.getDayId()).newLine();
+            }
 
             printer.starLine().highText("支付状态：" + (order.isPaidDone() ? "在线支付" : "待付款(以平台为准)")).newLine();
 
@@ -395,11 +623,23 @@ public class OrderPrinter {
             btos.write(0x0D);
             btos.write(0x0D);
             btos.write(GPrinterCommand.walkPaper((byte) 4));
+
+            byte[] data;
             btos.flush();
+            data = btos.toByteArray();
+            btos.close();
+            btos = null;
+            return data;
         } catch (Exception e) {
-            AppLogger.e("error in printing order", e);
-            throw e;
+            CrashReportHelper.handleUncaughtException(null, e);
+        } finally {
+            if (btos != null) {
+                btos.flush();
+                btos.close();
+                btos = null;
+            }
         }
+        return new byte[]{};
     }
 
 
@@ -428,7 +668,7 @@ public class OrderPrinter {
         return enable;
     }
 
-    public static void logOrderPrint(Order order){
+    public static void logOrderPrint(Order order) {
         try {
             final String access_token = GlobalCtx.app().token();
             new OrderActionDao(access_token).logOrderPrinted(order.getId());
@@ -461,20 +701,15 @@ public class OrderPrinter {
                     } else {
                         String speak = "";
                         Throwable ex = null;
-                        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
-                        if (ds != null && ds.getSocket() != null && ds.isConnected()) {
+                        if (GlobalCtx.app().isConnectPrinter()) {
                             try {
-                                OrderPrinter.printOrder(ds.getSocket(), order);
+                                //OrderPrinter.printOrder(ds.getSocket(), order);
+                                PrintQueue.getQueue(GlobalCtx.app()).write(printOrder(order));
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);
                                 reason = "打印错误：请从运行中程序列表清除CRM，重新启动CRM并连接打印机";
-                                //FIXME: should try to reset the socket
-                                if (e instanceof IOException) {
-                                    ds.closeSocket();
-                                    ds.reconnect();
-                                }
                                 speak = "订单打印发生错误，请重新连接打印机！";
                                 ex = e;
                             }
@@ -483,7 +718,7 @@ public class OrderPrinter {
                             }
                         } else if (supportSunMiPrinter) {
                             try {
-                                OrderPrinter.smPrintOrder(order);
+                                smPrintOrder(order);
                                 result = true;
                             } catch (Exception e) {
                                 AppLogger.e("[print]error IOException:" + e.getMessage(), e);
@@ -497,8 +732,7 @@ public class OrderPrinter {
                         } else {
                             reason = "未连接到打印机";
                             speak = "订单打印失败，请重新连接打印机，然后手动打印！";
-                            String msg = ds == null ? "ds=null," : "socket=" + ds.getSocket() + ", connected:" + ds.isConnected();
-                            ex = new Exception(msg);
+                            ex = new Exception(reason);
                         }
 
                         if (ex != null) {

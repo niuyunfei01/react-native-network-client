@@ -1,13 +1,16 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
+  Animated,
+  Dimensions,
+  Easing,
   Modal,
-  View,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableHighlight,
-  Animated,
-  Easing,
-  StyleSheet,
-  Dimensions,
+  View,
+  ViewPropTypes
 } from 'react-native'
 import $V from '../variable'
 
@@ -20,6 +23,7 @@ const styles = StyleSheet.create({
     left: 0,
     width,
     backgroundColor: $V.pageDefaultBackgroundColor,
+    maxHeight: height / 2
   },
   actionsheetMenu: {
     backgroundColor: '#fff',
@@ -183,17 +187,19 @@ class ActionSheet extends Component {
               }]
             }]}
           >
-            <View
-              ref="actionsheet"
-              onLayout={this.handleLayout}
-            >
-              <View style={[styles.actionsheetMenu]}>
-                {this._renderMenuItems()}
+            <ScrollView>
+              <View
+                ref="actionsheet"
+                onLayout={this.handleLayout}
+              >
+                <View style={[styles.actionsheetMenu]}>
+                  {this._renderMenuItems()}
+                </View>
+                <View style={[styles.actionsheetAction]}>
+                  {this._renderActions()}
+                </View>
               </View>
-              <View style={[styles.actionsheetAction]}>
-                {this._renderActions()}
-              </View>
-            </View>
+            </ScrollView>
           </Animated.View>
         </View>
       </Modal>
@@ -202,14 +208,14 @@ class ActionSheet extends Component {
 }
 
 ActionSheet.propTypes = {
-  menus: React.PropTypes.array,
-  actions: React.PropTypes.array,
+  menus: PropTypes.array,
+  actions: PropTypes.array,
   visible: PropTypes.bool,
   onShow: PropTypes.func,
   onRequestClose: PropTypes.func,
   duration: PropTypes.number,
-  style: View.propTypes.style,
-  wrapperStyle: View.propTypes.style,
+  style: ViewPropTypes.style,
+  wrapperStyle: ViewPropTypes.style,
   children: PropTypes.node
 }
 

@@ -16,6 +16,7 @@
 
 package cn.cainiaoshicai.crm;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,7 +28,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -48,18 +48,20 @@ import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
 import com.roughike.bottombar.TabSelectionInterceptor;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import cn.cainiaoshicai.crm.dao.StaffDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
 import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.notify.service.Bootstrap;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -75,6 +77,7 @@ import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
+import cn.cainiaoshicai.crm.ui.activity.SingleChoiceDialogFragment;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
@@ -82,10 +85,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_CN;
+
 public class MainActivity extends AbstractActionBarActivity {
 
     private static final List<ListType> TAB_LIST_TYPES = Arrays.asList(ListType.WAITING_READY,
-            ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.ARRIVED);
+            ListType.WAITING_SENT, ListType.WAITING_ARRIVE, ListType.DONE);
     public static final int REQUEST_DAY = 1;
     public static final int REQUEST_INFO = 1;
     private static final int OVERLAY_PERMISSION_REQ_CODE = 990;
@@ -93,14 +98,11 @@ public class MainActivity extends AbstractActionBarActivity {
     public static String POSITION = "tab_position";
 
     private Date day = new Date();
-    private AccountBean accountBean;
     private LocationHelper locationHelper;
     private TextView notifCount;
     private int mNotifCount = 1;
-    private BottomBarTab remindIconView;
     private ViewPager ordersViewPager;
     private TabLayout tabLayout;
-    private BottomBar bottomBar;
 
     public static Intent newIntent() {
         return new Intent(GlobalCtx.app(), MainActivity.class);
@@ -112,23 +114,29 @@ public class MainActivity extends AbstractActionBarActivity {
         return intent;
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (ordersViewPager != null) {
-            ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
+    private void setViewPagerCurrentItem(Bundle savedInstanceState) {
+        if (ordersViewPager != null && savedInstanceState != null) {
+            ordersViewPager.setCurrentItem(1);
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-        outState.putInt(POSITION, tabLayout.getSelectedTabPosition());
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        this.setViewPagerCurrentItem(savedInstanceState);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (tabLayout != null)
+            outState.putInt(POSITION, tabLayout.getSelectedTabPosition());
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AccountBean accountBean;
         if (savedInstanceState != null) {
             accountBean = savedInstanceState.getParcelable(BundleArgsConstants.ACCOUNT_EXTRA);
         } else {
@@ -158,11 +166,11 @@ public class MainActivity extends AbstractActionBarActivity {
         setContentView(R.layout.order_list_main);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        ordersViewPager = (ViewPager) findViewById(R.id.viewpager);
+        ordersViewPager = findViewById(R.id.viewpager);
         final OrdersPagerAdapter adapter = new OrdersPagerAdapter(getSupportFragmentManager(),
                 MainActivity.this);
         ordersViewPager.setAdapter(adapter);
-        ordersViewPager.setOffscreenPageLimit(adapter.getCount());
+//        ordersViewPager.setOffscreenPageLimit(adapter.getCount());
         ordersViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -181,11 +189,9 @@ public class MainActivity extends AbstractActionBarActivity {
             }
         });
 
-        tabLayout = (TabLayout) findViewById(R.id.order_list_main);
+        tabLayout = findViewById(R.id.order_list_main);
         tabLayout.setupWithViewPager(ordersViewPager);
-        if (savedInstanceState != null) {
-            ordersViewPager.setCurrentItem(savedInstanceState.getInt(POSITION));
-        }
+        this.setViewPagerCurrentItem(savedInstanceState);
 
         // Get the intent, verify the action and userTalkStatus the query
         Intent intent = getIntent();
@@ -195,7 +201,15 @@ public class MainActivity extends AbstractActionBarActivity {
         Map<String, String> serviceExtras = Maps.newHashMap();
         serviceExtras.put("accessToken", accountBean.getAccess_token());
         serviceExtras.put("storeId", store_id + "");
-        Bootstrap.startAlwaysOnService(this, "Crm", serviceExtras);
+        //Bootstrap.startAlwaysOnService(this, "Crm", serviceExtras);
+
+        Store store = GlobalCtx.app().findStore(store_id);
+        BottomBar bottomBar = findViewById(R.id.toolbar_bottom);
+        if (store != null && (store.getType() == Cts.STORE_VENDOR_BLX || store.getType() == Cts.STORE_VENDOR_CN) && store.getFn_price_controlled() == Cts.PRICE_CONTROLLER_YES) {
+            bottomBar.setItems(R.xml.bottombar_with_op_tabs);
+        }
+
+        resetPrinterStatusBar();
     }
 
     private void resetPrinterStatusBar() {
@@ -223,12 +237,7 @@ public class MainActivity extends AbstractActionBarActivity {
         TextView signInTxt = this.findViewById(R.id.head_orders_waiting);
 
         ImageButton searchBtn = this.findViewById(R.id.head_order_search);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.app().toSearchActivity(MainActivity.this, "");
-            }
-        });
+        searchBtn.setOnClickListener(v -> GlobalCtx.app().toSearchActivity(MainActivity.this, ""));
 
         TextView tmpBuy = this.findViewById(R.id.head_orders_schedule);
         RelativeLayout.LayoutParams params = null;
@@ -237,7 +246,9 @@ public class MainActivity extends AbstractActionBarActivity {
         }
         if (app.fnEnabledTmpBuy()) {
             if (params != null) {
-                params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    params.removeRule(RelativeLayout.ALIGN_PARENT_END);
+                }
                 signInTxt.setLayoutParams(params);
             }
 
@@ -261,7 +272,7 @@ public class MainActivity extends AbstractActionBarActivity {
                         }
 
                         String token = app.token();
-                        intent.putExtra("url", String.format("%s/orders_processing/%s.html?access_token=" + token,
+                        intent.putExtra("url", String.format("%s/orders_to_buy/%s.html?access_token=" + token,
                                 URLHelper.getStoresPrefix(), storeId));
                         startActivity(intent);
                     }
@@ -286,7 +297,7 @@ public class MainActivity extends AbstractActionBarActivity {
         if (!autoPrintStores.isEmpty()) {
             final String printStatusTxt;
             String autoPrintNames = app.getStoreNames(autoPrintStores);
-            if (SettingsPrintActivity.isPrinterConnected()) {
+            if (GlobalCtx.app().isConnectPrinter()) {
                 printStatusTxt = "自动打印(" + autoPrintNames + ")，已连接！";
                 bgColorResId = R.color.green;
             } else {
@@ -307,7 +318,7 @@ public class MainActivity extends AbstractActionBarActivity {
             }
         });
 
-        bottomBar = findViewById(R.id.toolbar_bottom);
+        BottomBar bottomBar = findViewById(R.id.toolbar_bottom);
         bottomBar.setDefaultTab(R.id.menu_process);
         bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
             @Override
@@ -335,30 +346,28 @@ public class MainActivity extends AbstractActionBarActivity {
             bottomBar.selectTabWithId(R.id.menu_process);
         }
 
-        remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
+        BottomBarTab remindIconView = bottomBar.getTabWithId(R.id.menu_accept);
 
 /**
-        MenuItem item = menu.findItem(R.id.menu_accept);
-        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+ MenuItem item = menu.findItem(R.id.menu_accept);
+ MenuItemCompat.setActionView(item, R.layout.feed_update_count);
 
-        View count = item.getActionView();
-        notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
-        notifCount.setText(String.valueOf(mNotifCount));
+ View count = item.getActionView();
+ notifCount = (TextView) count.findViewById(R.id.hotlist_hot);
+ notifCount.setText(String.valueOf(mNotifCount));
 
-        GlobalCtx.app().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
-            @Override
-            public void callback(int count) {
-                mNotifCount = count;
-                updateHotCount(mNotifCount);
-            }
-        });
+ GlobalCtx.app().getTaskCount(this, new GlobalCtx.TaskCountUpdated() {
+@Override public void callback(int count) {
+mNotifCount = count;
+updateHotCount(mNotifCount);
+}
+});
 
-        new MyMenuItemStuffListener(count, "查看任务") {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx.app().toTaskListActivity(MainActivity.this);
-            }
-        }; */
+ new MyMenuItemStuffListener(count, "查看任务") {
+@Override public void onClick(View v) {
+GlobalCtx.app().toTaskListActivity(MainActivity.this);
+}
+}; */
     }
 
     private void initSignButton(final GlobalCtx app, final TextView signingText) {
@@ -368,106 +377,108 @@ public class MainActivity extends AbstractActionBarActivity {
             @SuppressLint("HardwareIds")
             @Override
             public void onClick(View v) {
-
+                //手机要地理位置权限
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+                }
                 final Long signInStore = SettingUtility.getSignInStore();
                 final Integer signInStatus = SettingUtility.getSignInStatus();
                 final int vendorId = app.getVendor() != null ? app.getVendor().getId() : 0;
-
-                if (signInStatus == Cts.SIGN_ACTION_IN) {
-
-                    final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                    Utility.forceShowDialog(MainActivity.this, pf);
-
-                    new MyAsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            pf.dismissAllowingStateLoss();
-
-                            String err = "";
-                            try {
-                                StaffDao staffDao = new StaffDao(app.token());
-                                final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
-                                if (msg != null && msg.isOk()) {
-                                    MainActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AlertUtil.showAlert(MainActivity.this, R.string.working_status,
-                                                    msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
-                                                    new SignOffOnClickListener(signInStore, signingText));
-                                        }
-                                    });
-                                } else {
-                                    err = "获取工作状态失败:" + msg.getDesc();
-                                }
-                            } catch (ServiceException e) {
-                                err = "异常:" + e.getMessage();
-                            }
-
-                            if (!TextUtils.isEmpty(err)) {
-                                AlertUtil.errorOnActivity(MainActivity.this, "发生错误" + err);
-                            }
-
-                            return null;
-                        }
-                    }.executeOnNormal();
-
+                if (vendorId != STORE_VENDOR_CN) {
+                    GlobalCtx.app().toSetStoreStatusView(MainActivity.this);
                 } else {
-                    final Long defStoreId = signInStore > 0 ? signInStore : Long.valueOf(SettingUtility.getListenerStore());
+                    if (signInStatus == Cts.SIGN_ACTION_IN) {
+                        final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                        Utility.forceShowDialog(MainActivity.this, pf);
+                        new MyAsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                pf.dismissAllowingStateLoss();
 
-                    Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", defStoreId,
-                            new StoreSelectedListener() {
-                                @Override
-                                public void done(final long selectedId) {
-                                    final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                                    Utility.forceShowDialog(MainActivity.this, pf);
-
-                                    periodEnabledLocation();
-                                    final HashMap<String, String> envInfos = extraEnvInfo();
-
-                                    new MyAsyncTask<Void, Void, Void>() {
-                                        private ResultBean<HashMap<String, String>> resultBean;
-
-                                        @Override
-                                        protected Void doInBackground(Void... params) {
-                                            StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
-                                            try {
-                                                resultBean = fbDao.sign_in(selectedId, envInfos);
-                                            } catch (ServiceException e) {
-                                                resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
+                                String err = "";
+                                try {
+                                    StaffDao staffDao = new StaffDao(app.token());
+                                    final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
+                                    if (msg != null && msg.isOk()) {
+                                        MainActivity.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                AlertUtil.showAlert(MainActivity.this, R.string.working_status,
+                                                        msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
+                                                        new SignOffOnClickListener(signInStore, signingText));
                                             }
-                                            return null;
-                                        }
-
-                                        @Override
-                                        protected void onPostExecute(Void aVoid) {
-                                            pf.dismissAllowingStateLoss();
-                                            if (resultBean != null && resultBean.isOk()) {
-                                                final HashMap<String, String> obj = resultBean.getObj();
-
-                                                final String okTips = "打卡成功，今日值班店长："
-                                                        + (obj != null ? obj.get("working_mgr") : "未安排")
-                                                        + resultBean.getDesc();
-
-                                                MainActivity.this.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
-                                                        updateSignInStatus(obj, signingText);
-                                                    }
-                                                });
-                                            } else {
-                                                Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
-                                                MainActivity.this.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        updateSignInStatus(resultBean.getObj(), signingText);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }.executeOnNormal();
+                                        });
+                                    } else {
+                                        err = "获取工作状态失败:" + msg.getDesc();
+                                    }
+                                } catch (ServiceException e) {
+                                    err = "异常:" + e.getMessage();
                                 }
-                            }, "查看考勤表", new StaffDetailsClickListener(vendorId), true);
+                                if (!TextUtils.isEmpty(err)) {
+                                    AlertUtil.errorOnActivity(MainActivity.this, "发生错误" + err);
+                                }
+                                return null;
+                            }
+                        }.executeOnNormal();
+
+                    } else {
+                        final Long defStoreId = signInStore > 0 ? signInStore : Long.valueOf(SettingUtility.getListenerStore());
+                        Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", defStoreId,
+                                new StoreSelectedListener() {
+                                    @Override
+                                    public void done(final long selectedId) {
+                                        final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                        Utility.forceShowDialog(MainActivity.this, pf);
+
+                                        periodEnabledLocation();
+                                        final HashMap<String, String> envInfos = extraEnvInfo();
+
+                                        new MyAsyncTask<Void, Void, Void>() {
+                                            private ResultBean<HashMap<String, String>> resultBean;
+
+                                            @Override
+                                            protected Void doInBackground(Void... params) {
+                                                StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
+                                                try {
+                                                    resultBean = fbDao.sign_in(selectedId, envInfos);
+                                                } catch (ServiceException e) {
+                                                    resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
+                                                }
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void onPostExecute(Void aVoid) {
+                                                pf.dismissAllowingStateLoss();
+                                                if (resultBean != null && resultBean.isOk()) {
+                                                    final HashMap<String, String> obj = resultBean.getObj();
+
+                                                    final String okTips = "打卡成功，今日值班店长："
+                                                            + (obj != null ? obj.get("working_mgr") : "未安排")
+                                                            + resultBean.getDesc();
+
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
+                                                            updateSignInStatus(obj, signingText);
+                                                        }
+                                                    });
+                                                } else {
+                                                    Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            updateSignInStatus(resultBean.getObj(), signingText);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }.executeOnNormal();
+                                    }
+                                }, "查看考勤表", new StaffDetailsClickListener(vendorId), true);
+                    }
                 }
             }
         });
@@ -486,11 +497,11 @@ public class MainActivity extends AbstractActionBarActivity {
             public void run() {
                 locationHelper.removeUpdates();
             }
-        }, 2 *  LocationHelper.MINUTES);
+        }, 2 * LocationHelper.MINUTES);
     }
 
     private void initShipAccept(final GlobalCtx app) {
-        final TextView shipStatusText = (TextView) this.findViewById(R.id.head_ship_status);
+        final TextView shipStatusText = this.findViewById(R.id.head_ship_status);
         shipStatusText.setVisibility(View.GONE);
 
         long store_id = SettingUtility.getListenerStore();
@@ -515,7 +526,7 @@ public class MainActivity extends AbstractActionBarActivity {
                             app.getAccountBean().setShipAcceptStatus(body.getObj());
                             initShipAccept(app);
                         } else {
-                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());;
+                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());
                         }
                     }
 
@@ -533,12 +544,9 @@ public class MainActivity extends AbstractActionBarActivity {
 
                     final long storeId = SettingUtility.getListenerStore();
                     if (storeId <= 0) {
-                        Utility.tellSelectStore("请先选择工作门店", new StoreSelectedListener() {
-                            @Override
-                            public void done(long selectedId) {
-                                SettingUtility.setListenerStores(selectedId);
-                                resetPrinterStatusBar();
-                            }
+                        Utility.tellSelectStore("请先选择工作门店", selectedId -> {
+                            SettingUtility.setListenerStores(selectedId);
+                            resetPrinterStatusBar();
                         }, MainActivity.this);
                         return;
                     }
@@ -547,6 +555,7 @@ public class MainActivity extends AbstractActionBarActivity {
                 }
 
                 void dlg(final long storeId) {
+                    final ShipAcceptStatus workStatus = app.getWorkerStatus(store_id);
                     final int shipAcceptStatus = workStatus.getStatus();
                     final String labelBtn = shipAcceptStatus == Cts.SHIP_ACCEPT_OFF ? "开始接单" : "停止接单";
 
@@ -554,66 +563,86 @@ public class MainActivity extends AbstractActionBarActivity {
                     final String msg = myStatus + "\n" + workStatus.getDesc();
 
                     AlertUtil.showAlert(MainActivity.this, R.string.ship_accept_status, msg,
-                            "刷新状态", new DialogInterface.OnClickListener() {
+                            "刷新状态", (dialog, which) -> app.dao.shippingAcceptStatus(storeId).enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    app.dao.shippingAcceptStatus(storeId).enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
-                                        @Override
-                                        public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
-                                                               Response<ResultBean<ShipAcceptStatus>> response) {
-                                            ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body != null && body.isOk()) {
-                                                app.getAccountBean().setShipAcceptStatus(body.getObj());
-                                                dlg(storeId);
-                                            } else {
-                                                AlertUtil.error(MainActivity.this, "刷新失败，请稍后重试：" + body.getDesc());
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
-                                            AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
-                                        }
-                                    });
+                                public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                                       Response<ResultBean<ShipAcceptStatus>> response) {
+                                    ResultBean<ShipAcceptStatus> body = response.body();
+                                    if (body != null && body.isOk()) {
+                                        app.getAccountBean().setShipAcceptStatus(body.getObj());
+                                        dlg(storeId);
+                                    } else {
+                                        AlertUtil.error(MainActivity.this, "刷新失败，请稍后重试：" + body.getDesc());
+                                    }
                                 }
-                            }
+
+                                @Override
+                                public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                                    AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+                                }
+                            })
                             ,
                             "关闭", null,
-                            labelBtn, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Call<ResultBean<ShipAcceptStatus>> resultBeanCall;
-                                    if (shipAcceptStatus == Cts.SHIP_ACCEPT_ON) {
-                                        resultBeanCall = app.dao.shippingStopAccept(storeId);
-                                    } else {
-                                        resultBeanCall = app.dao.shippingStartAccept(storeId);
-                                    }
-
-                                    resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
-                                        @Override
-                                        public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
-                                                               Response<ResultBean<ShipAcceptStatus>> response) {
-                                            ResultBean<ShipAcceptStatus> body = response.body();
-                                            if (body!=null && body.isOk()) {
-                                                app.getAccountBean().setShipAcceptStatus(body.getObj());
-                                                initShipAccept(app);
-                                                Utility.toast("操作成功", MainActivity.this);
-                                            } else {
-                                                AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + body.getDesc());
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
-                                            AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
-                                        }
-                                    });
+                            labelBtn, (dialog, which) -> {
+                                if (shipAcceptStatus == Cts.SHIP_ACCEPT_ON) {
+                                    Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStopAccept(storeId);
+                                    handleChangeShipAcceptStatus(resultBeanCall);
+                                } else {
+                                    showChoosePrinterDialog(storeId);
                                 }
                             }
                     );
                 }
             });
         }
+    }
+
+    private void showChoosePrinterDialog(final long storeId) {
+        GlobalCtx app = GlobalCtx.app();
+        ShipAcceptStatus shipAcceptStatus = null;
+        if (app.getAccountBean() != null) {
+            shipAcceptStatus = app.getAccountBean().shipAcceptStatus(storeId);
+        }
+        String[] items = shipAcceptStatus == null ? new String[]{} : shipAcceptStatus.getPrinters();
+        int checkedIdx = shipAcceptStatus == null ? 0 : shipAcceptStatus.getCheckedIdx();
+        SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
+        singleChoiceDialogFragment.show("请选择接单打印机", items, checkedIdx, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String sn = items[which];
+                Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId, sn);
+                handleChangeShipAcceptStatus(resultBeanCall);
+                singleChoiceDialogFragment.dismiss();
+            }
+        }, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                singleChoiceDialogFragment.dismiss();
+            }
+        }, getFragmentManager());
+    }
+
+    private void handleChangeShipAcceptStatus(Call<ResultBean<ShipAcceptStatus>> resultBeanCall){
+        resultBeanCall.enqueue(new Callback<ResultBean<ShipAcceptStatus>>() {
+            @Override
+            public void onResponse(Call<ResultBean<ShipAcceptStatus>> call,
+                                   Response<ResultBean<ShipAcceptStatus>> response) {
+                ResultBean<ShipAcceptStatus> body = response.body();
+                if (body != null && body.isOk()) {
+                    GlobalCtx app = GlobalCtx.app();
+                    app.getAccountBean().setShipAcceptStatus(body.getObj());
+                    initShipAccept(app);
+                    Utility.toast("操作成功", MainActivity.this);
+                } else {
+                    AlertUtil.error(MainActivity.this, "操作失败，请稍后重试：" + Objects.requireNonNull(body).getDesc());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResultBean<ShipAcceptStatus>> call, Throwable t) {
+                AlertUtil.error(MainActivity.this, "系统错误，稍后重试");
+            }
+        });
     }
 
     private void requestUpdateBadges() {
@@ -658,10 +687,12 @@ public class MainActivity extends AbstractActionBarActivity {
         if (wifiInfo != null) {
 
             envInfos.put("wifi_name", wifiInfo.getSSID());
-            envInfos.put("device_mac", wifiInfo.getMacAddress());
+            if (wifiInfo != null) {
+                envInfos.put("device_mac", wifiInfo.getMacAddress());
+            }
             envInfos.put("wifi_mac", wifiInfo.getBSSID());
 
-            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：" + wifiInfo.getBSSID());
+            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：").append(wifiInfo.getBSSID());
             //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
             sb.append("\n\n获取SSID 是否被隐藏：" + wifiInfo.getHiddenSSID());
             sb.append("\n\n获取IP 地址：" + wifiInfo.getIpAddress());
@@ -679,25 +710,29 @@ public class MainActivity extends AbstractActionBarActivity {
 
         ListType list_type;
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            list_type = ListType.ARRIVED;
+            list_type = ListType.DONE;
         } else {
             list_type = ListType.findByType(intent.getIntExtra("list_type", 0));
         }
 
         if (list_type != null && list_type.getValue() > 0) {
-            this.ordersViewPager.setCurrentItem(list_type.getValue() - 1);
+            this.ordersViewPager.setCurrentItem(list_type.getCurrItem());
         }
         this.resetPrinterStatusBar();
     }
 
     public void updateStatusCnt(HashMap<Integer, Integer> totalByStatus) {
         OrdersPagerAdapter adapter = (OrdersPagerAdapter) this.ordersViewPager.getAdapter();
-        for(ListType listType : TAB_LIST_TYPES) {
+        for (ListType listType : TAB_LIST_TYPES) {
             Integer count = totalByStatus.get(listType.getValue());
             if (count == null) count = 0;
-            adapter.setCount(listType, count);
+            if (adapter != null) {
+                adapter.setCount(listType, count);
+            }
         }
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -716,7 +751,7 @@ public class MainActivity extends AbstractActionBarActivity {
         } else if (position == 2) {
             listType = ListType.WAITING_ARRIVE;
         } else if (position == 3) {
-            listType = ListType.ARRIVED;
+            listType = ListType.DONE;
         }
         return listType;
     }
@@ -750,6 +785,9 @@ public class MainActivity extends AbstractActionBarActivity {
                 return true;
             case R.id.menu_store_maint:
                 startActivity(new Intent(this, StoreStorageActivity.class));
+                return true;
+            case R.id.menu_store_operation:
+                GlobalCtx.app().toOperationActivity(this);
                 return true;
 //            case R.id.menu_operation:
 //                startActivity(new Intent(this, DataActivity.class));
@@ -798,6 +836,7 @@ public class MainActivity extends AbstractActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(MainActivity.this);
     }
 
     private class SignOffOnClickListener implements DialogInterface.OnClickListener {

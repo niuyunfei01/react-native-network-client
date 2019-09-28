@@ -1,8 +1,10 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   Text,
   View,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 import Picker from './Picker'
 import $V from '../variable'
@@ -53,7 +55,7 @@ class Select extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ label: this.initLabel(nextProps) })
+    this.setState({label: this.initLabel(nextProps)})
   }
 
   initLabel(props) {
@@ -79,11 +81,11 @@ class Select extends Component {
 
   handlePickerDone(value) {
     if (this.props.onChange) this.props.onChange(value)
-    this.setState({ visible: false })
+    this.setState({visible: false})
   }
 
   handleRequestClose() {
-    this.setState({ visible: false })
+    this.setState({visible: false})
   }
 
   render() {
@@ -99,7 +101,7 @@ class Select extends Component {
       <View>
         <Text
           style={[styles.text, style]}
-          onPress={() => this.setState({ visible: true })}
+          onPress={() => this.setState({visible: true})}
         >{this.state.label}</Text>
         <Picker
           style={pickerStyle}
@@ -119,7 +121,7 @@ Select.propTypes = {
   value: PropTypes.any,
   style: Text.propTypes.style,
   pickerData: PropTypes.array,
-  pickerStyle: View.propTypes.style,
+  pickerStyle: ViewPropTypes.style,
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
 }

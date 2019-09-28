@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react';import PropTypes from 'prop-types';
 
 const FlexItem = ({ component, children, style, ...others }) =>
   <component style={[{ flex: 1 }, style]} {...others}>{children}</component>

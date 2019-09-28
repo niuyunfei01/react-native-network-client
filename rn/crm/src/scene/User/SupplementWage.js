@@ -8,7 +8,7 @@ import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
 import {ToastShort} from "../../util/ToastUtils";
 
-var Accordion = require('react-native-accordion')
+import Accordion from '@ercpereda/react-native-accordion';
 
 function mapStateToProps(state) {
 	const {global, mine} = state;
@@ -27,7 +27,7 @@ class SupplementWage extends PureComponent {
 		this.state = {
 			supplementDetail: mine.wage_data
 		}
-		
+		console.log(this.state.supplementDetail)
 		const {uid, date} = this.props.navigation.state.params
 		console.log(`uid => ${uid} ; date => ${date}`)
 		if (uid && date) {
@@ -51,7 +51,7 @@ class SupplementWage extends PureComponent {
 		})
 	}
 	
-	renderOrderHeader() {
+	renderOrderHeader = ({isOpen}) => {
 		const self = this
 		const {expect_order_supplement} = self.state.supplementDetail
 		return (
@@ -97,7 +97,7 @@ class SupplementWage extends PureComponent {
 		return <View>{items}</View>
 	}
 	
-	renderPunctualHeader() {
+	renderPunctualHeader = ({isOpen}) => {
 		const self = this
 		const {expect_punctual_supplement} = self.state.supplementDetail
 		return (
@@ -143,7 +143,7 @@ class SupplementWage extends PureComponent {
 		return <View>{items}</View>
 	}
 	
-	renderScoreHeader() {
+	renderScoreHeader = ({isOpen}) => {
 		const self = this
 		const {expect_score_supplement} = self.state.supplementDetail
 		return (
@@ -162,7 +162,7 @@ class SupplementWage extends PureComponent {
 		)
 	}
 	
-	renderScoreListHeader(detail) {
+	renderScoreListHeader = (detail, isOpen) => {
 		const self = this
 		const {except_score_supplement, store} = detail
 		return (
@@ -216,7 +216,7 @@ class SupplementWage extends PureComponent {
 			items.push(
 				<Accordion
 					key={i + 1}
-					header={self.renderScoreListHeader(detail[i])}
+					header={({isOpen}) => self.renderScoreListHeader(detail[i], isOpen)}
 					content={self.renderScoreListContent(detail[i])}
 					activeOpacity={0}
 					easing="easeOutCubic"
@@ -232,10 +232,11 @@ class SupplementWage extends PureComponent {
 	render() {
 		const self = this
 		const {expect_total_supplement} = self.state.supplementDetail
+		console.log(expect_total_supplement)
 		return (
 			<ScrollView>
 				<Accordion
-					header={this.renderOrderHeader()}
+					header={this.renderOrderHeader}
 					content={this.renderOrderContent()}
 					activeOpacity={0}
 					easing="easeOutCubic"
@@ -244,7 +245,7 @@ class SupplementWage extends PureComponent {
 					style={{marginTop: pxToDp(20)}}
 				/>
 				<Accordion
-					header={this.renderPunctualHeader()}
+					header={this.renderPunctualHeader}
 					content={this.renderPunctualContent()}
 					activeOpacity={0}
 					easing="easeOutCubic"
@@ -253,7 +254,7 @@ class SupplementWage extends PureComponent {
 					style={{marginTop: pxToDp(20)}}
 				/>
 				<Accordion
-					header={this.renderScoreHeader()}
+					header={this.renderScoreHeader}
 					content={this.renderScoreContent()}
 					activeOpacity={0}
 					easing="easeOutCubic"

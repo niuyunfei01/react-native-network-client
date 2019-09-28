@@ -3,6 +3,7 @@ package cn.cainiaoshicai.crm.notify.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.collect.Maps;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
+import cn.jpush.android.api.JPushInterface;
 
 public class RebootBroadcastReceiver extends BroadcastReceiver {
 	private static final String LOG_TAG = RebootBroadcastReceiver.class.getSimpleName();
@@ -29,7 +31,14 @@ public class RebootBroadcastReceiver extends BroadcastReceiver {
 			}
 			serviceExtras.put("accessToken", accessToken);
 			serviceExtras.put("storeId", store_id + "");
-			Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
+			//Bootstrap.startAlwaysOnService(context, "Crm", serviceExtras);
+			if (JPushInterface.isPushStopped(GlobalCtx.app())) {
+				String uid = GlobalCtx.app().getCurrentAccountId();
+				if (!TextUtils.isEmpty(uid)) {
+					JPushInterface.setAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+					JPushInterface.resumePush(GlobalCtx.app());
+				}
+			}
 		}
 	}
 }

@@ -1,8 +1,9 @@
 "use strict";
-import { jsonWithTpl, jsonWithTpl2 } from "../../util/common";
+import {jsonWithTpl, jsonWithTpl2} from "../../util/common";
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
-import { ToastLong } from "../../util/ToastUtils";
+import {ToastLong} from "../../util/ToastUtils";
+import md5 from "../../common/md5";
 
 const {
   GET_NAME_PRICES,
@@ -11,12 +12,14 @@ const {
   ACTIVITY_VENDOR_TAGS,
   GET_MANAGE_SELECT
 } = require("../../common/constants").default;
+
 export function saveVendorTags(json) {
   return {
     type: ACTIVITY_VENDOR_TAGS,
     json: json
   };
 }
+
 export function saveMangeSelect(id, platformId) {
   return {
     type: GET_MANAGE_SELECT,
@@ -24,6 +27,7 @@ export function saveMangeSelect(id, platformId) {
     platformId: platformId
   };
 }
+
 export function getProdPricesList(token, esId, platform, storeId, callback) {
   return dispatch => {
     const url = `api/on_sale_prod_prices/${esId}/${platform}/${storeId}.json?access_token=${token}`;
@@ -143,6 +147,7 @@ export function productSave(data, token, callback) {
     }
   );
 }
+
 export function newProductSave(data, token, callback) {
   let url = `api/up_product_task.json?access_token=${token}`;
   return jsonWithTpl2(
@@ -216,31 +221,39 @@ function receiveVendorTags(_v_id, vendor_tags = {}) {
           }
  */
 //理解为封装上传图片的函数
-export function uploadImg(image_info, callback, file_model_name = "Product") {
+export function uploadImg(image_info, callback, file_model_name = "Product", keep_origin_img = 0) {
   let formData = new FormData();
   if (image_info && image_info.uri) {
-    let { uri, name } = image_info;
+    let {uri, name} = image_info;
+    let fileInfo = name.split('.');
+    if (fileInfo.length > 1) {
+      let fileExt = fileInfo.pop();
+      name = md5.hex_md5(fileInfo[0]) + "." + fileExt;
+    } else {
+      name = md5.hex_md5(name);
+    }
     let photo = {
       uri: uri,
       type: "application/octet-stream",
       name: name
     };
-
     formData.append("file_post_name", "photo"); //上传类型
     formData.append("file_model_name", file_model_name); //理解为模块的名字
     formData.append("no_db", 0); //这个不懂啥意思
     formData.append("return_type", "json"); //返回值类型
     formData.append("data_id", 0); //给个dataid吧
     formData.append("photo", photo);
+    formData.append("keepOrigin", keep_origin_img);
+
     const url = `uploadfiles/upload`; //上传图片的服务器地址
     console.log("上传的形式:%o", formData);
-    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
+    return FetchEx.timeout(AppConfig.LongFetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())
       .then(resp => {
         let ok = false;
         let desc = "";
         console.log("uploadImg resp --->", resp);
-        let { status, fspath, file_id, message } = resp;
+        let {status, fspath, file_id, message} = resp;
         if (parseInt(status) === 1) {
           ok = true;
           desc = "图片上传成功";
@@ -265,6 +278,7 @@ export function uploadImg(image_info, callback, file_model_name = "Product") {
       });
   }
 }
+
 export function getGoodsProduct(task_id, token, callback) {
   let url = `api/get_up_goods_task/${task_id}.json?access_token=${token}`;
   return jsonWithTpl2(
@@ -277,6 +291,7 @@ export function getGoodsProduct(task_id, token, callback) {
     }
   );
 }
+
 export function getUnRelationGoodsStores(product_id, token, callback) {
   let url = `api/get_un_relation_goods_stores/${product_id}.json?access_token=${token}`;
   return jsonWithTpl2(
@@ -314,7 +329,7 @@ export function UpdateWMGoods(product_id, include_img, token, callback) {
       })
       .catch(error => {
         ToastLong(error.message);
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }
@@ -325,22 +340,20 @@ export function fetchListVendorTags(vendor_id, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        dispatch(saveVendorTags({ [vendor_id]: resp.obj }));
+        dispatch(saveVendorTags({[vendor_id]: resp.obj}));
         callback(resp.ok, resp.desc, resp.obj);
       })
       .catch(error => {
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }
 
-export function fetchListVendorGoods(
-  vendor_id,
-  platform_id,
-  sortId,
-  token,
-  callback
-) {
+export function fetchListVendorGoods(vendor_id,
+                                     platform_id,
+                                     sortId,
+                                     token,
+                                     callback) {
   return dispatch => {
     let url = `api/list_vendor_goods/${vendor_id}/${platform_id}/${sortId}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
@@ -350,10 +363,11 @@ export function fetchListVendorGoods(
         callback(resp.ok, resp.desc, resp.obj);
       })
       .catch(error => {
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }
+
 export function fetchListStoresGoods(vendor_id, product_id, token, callback) {
   return dispatch => {
     let url = `api/list_stores_goods/${vendor_id}/${product_id}.json?access_token=${token}`;
@@ -363,18 +377,16 @@ export function fetchListStoresGoods(vendor_id, product_id, token, callback) {
         callback(resp.ok, resp.desc, resp.obj);
       })
       .catch(error => {
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }
 
-export function fetchStoreChgPrice(
-  store_id,
-  product_id,
-  new_price_cents,
-  token,
-  callback
-) {
+export function fetchStoreChgPrice(store_id,
+                                   product_id,
+                                   new_price_cents,
+                                   token,
+                                   callback) {
   return dispatch => {
     let url = `api/store_chg_price/${store_id}/${product_id}/${new_price_cents}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
@@ -383,7 +395,7 @@ export function fetchStoreChgPrice(
         callback(resp.ok, resp.desc, resp.obj);
       })
       .catch(error => {
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }
@@ -411,7 +423,7 @@ export function queryUpcCode(code, token, callback) {
         callback(resp.ok, resp.desc, resp.obj);
       })
       .catch(error => {
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }
@@ -425,7 +437,7 @@ export function queryProductByKey(key_word, token, callback) {
         callback(resp.ok, resp.desc, resp.obj);
       })
       .catch(error => {
-        callback({ ok: false, desc: error.message });
+        callback({ok: false, desc: error.message});
       });
   };
 }

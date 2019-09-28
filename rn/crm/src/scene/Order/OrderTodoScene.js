@@ -162,7 +162,7 @@ class OrderTodoScene extends Component {
           <Cell>
             <CellBody>
             <TextArea
-              maxLength={20}
+              maxLength={60}
               placeholder="输入需要给处理人的其他信息"
               onChange={(v)=>{this.setState({custom: v})}}
               value={this.state.custom}

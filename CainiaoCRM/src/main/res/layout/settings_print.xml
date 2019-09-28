@@ -56,11 +56,45 @@
         android:layout_marginEnd="10dp"
         android:layout_height="30dp" />
 
+    <TextView
+        android:id="@+id/label_add_app_to_white_list"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_use_preview"
+        android:layout_marginStart="10dp"
+        android:text="设置应用后台运行" />
+
+    <Switch
+        android:id="@+id/toggleSetAppWhiteList"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toggleUsePreview"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_add_app_to_white_list" />
+
+    <TextView
+        android:id="@+id/label_open_ziti"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_add_app_to_white_list"
+        android:layout_marginStart="10dp"
+        android:text="自提模式" />
+
+    <Switch
+        android:id="@+id/toggleSetZitiMode"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/toggleSetAppWhiteList"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_open_ziti" />
+
     <RelativeLayout
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:id="@+id/settings_order_filter"
-        android:layout_below="@+id/toggleUsePreview"
+        android:layout_below="@+id/toggleSetZitiMode"
         android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -135,13 +169,42 @@
 
     </RelativeLayout>
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/settings_order_filter"
-        android:layout_marginTop="30dp"
-        android:layout_alignEnd="@+id/storage_item_status"/>
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/btn_scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/start_scan" />
+
+        <TextView
+            android:id="@+id/tv_bluename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_scan"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:id="@+id/tv_blueadress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tv_bluename"
+            android:layout_alignStart="@+id/tv_bluename"
+            android:layout_below="@+id/tv_bluename"
+            android:layout_marginTop="23dp"
+            android:textColor="@color/blue" />
+    </RelativeLayout>
+
 
     <TextView
         android:id="@+id/text1"

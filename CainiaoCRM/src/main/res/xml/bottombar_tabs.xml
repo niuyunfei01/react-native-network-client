@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tabs>
     <tab
-        id="@+id/menu_accept"
-        title="@string/menu_reminders"
+        actionLayout="@layout/feed_update_count"
         icon="@drawable/ic_add_alert_black_24dp"
-        actionLayout="@layout/feed_update_count"/>
-    
-    <tab
-        id="@+id/menu_process"
-        title="@string/menu_manage_order"
-        icon="@drawable/ic_list_black_24dp"
-        />
+        id="@+id/menu_accept"
+        title="@string/menu_reminders" />
 
     <tab
-        id="@+id/menu_store_maint"
-        title="@string/menu_good_maint"
+        icon="@drawable/ic_list_black_24dp"
+        id="@+id/menu_process"
+        title="@string/menu_manage_order" />
+
+    <tab
         icon="@drawable/ic_widgets_black_24dp"
-        />
+        id="@+id/menu_store_maint"
+        title="@string/menu_good_maint" />
 
     <!--tab
         id="@+id/menu_operation"
@@ -25,14 +23,13 @@
         /-->
 
     <tab
-        id="@+id/menu_mine"
-        title="@string/menu_mine"
         icon="@drawable/ic_settings_applications_black_24dp"
-        />
+        id="@+id/menu_mine"
+        title="@string/menu_mine" />
 
     <!--<tab id="@+id/menu_search"-->
-        <!--title="@string/action_search"-->
-        <!--icon="@drawable/ic_search_black_24dp"-->
-         <!--/>-->
-    
+    <!--title="@string/action_search"-->
+    <!--icon="@drawable/ic_search_black_24dp"-->
+    <!--/>-->
+
 </tabs>

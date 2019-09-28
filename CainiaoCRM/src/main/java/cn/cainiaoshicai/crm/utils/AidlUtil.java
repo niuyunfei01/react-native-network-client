@@ -293,6 +293,18 @@ public class AidlUtil {
         }
     }
 
+    public int printerState() {
+        if (woyouService == null) {
+            return 0;
+        }
+        try {
+            return woyouService.updatePrinterState();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     /*
      * 空打三行！
      */

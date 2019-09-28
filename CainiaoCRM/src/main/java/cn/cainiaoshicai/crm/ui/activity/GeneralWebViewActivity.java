@@ -17,6 +17,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
+import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
@@ -31,7 +32,7 @@ public class GeneralWebViewActivity extends AppCompatActivity {
 
     private final int contentViewRes;
     private WebView mWebView;
-
+    private long mExitTime = 0;
     public GeneralWebViewActivity() {
         AppLogger.v("start general web view activity");
         this.contentViewRes = R.layout.quality_case_list;
@@ -78,6 +79,12 @@ public class GeneralWebViewActivity extends AppCompatActivity {
         mWebView.addJavascriptInterface(new WebAppInterface(this), "crm_andorid");
 
         String url = this.getIntent().getStringExtra("url");
+        String token = GlobalCtx.app().getAccountBean().getAccess_token();
+        if (url.indexOf("?") >= 0) {
+            url = url + "&access_token=" + token;
+        } else {
+            url = url + "?access_token=" + token;
+        }
         AppLogger.i("loading url:" + url);
         mWebView.loadUrl(url);
     }
@@ -93,10 +100,15 @@ public class GeneralWebViewActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(mWebView.canGoBack()) {
-            mWebView.goBack();
+        if (System.currentTimeMillis() - mExitTime > 2000) {
+            mExitTime = System.currentTimeMillis();
+            if (mWebView.canGoBack()) {
+                mWebView.goBack();
+            } else {
+                super.onBackPressed();
+            }
         } else {
-            super.onBackPressed();
+            startActivity(MainActivity.newIntent());
         }
     }
 

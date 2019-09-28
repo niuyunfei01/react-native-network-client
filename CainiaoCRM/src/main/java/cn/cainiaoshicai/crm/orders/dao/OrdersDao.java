@@ -57,10 +57,10 @@ public class OrdersDao {
     }
 
     public OrderContainer get(int listType, long[] storeIds) throws ServiceException {
-        return this.get(listType, storeIds, true, 0, 0, 0);
+        return this.get(listType, storeIds, true, 0, 0, 0, false);
     }
 
-    public OrderContainer get(int listType, long[] storeIds, boolean useCache, int limit, int offset, int maxPastDays) throws ServiceException {
+    public OrderContainer get(int listType, long[] storeIds, boolean useCache, int limit, int offset, int maxPastDays, boolean zitiMode) throws ServiceException {
         this.listType = listType;
         this.storeIds = storeIds;
 
@@ -81,12 +81,16 @@ public class OrdersDao {
         map.put("status", String.valueOf(this.listType));
         map.put("max_past_day", String.valueOf(maxPastDays));
 
+        int zitiType = zitiMode ? 1 : 0;
+        map.put("ziti", zitiType+"");
+
+        String store_id_str = TextUtil.join(",", storeIds);
         if (hasStores) {
-            map.put("search", "store:" + TextUtil.join(",", this.storeIds));
+            map.put("search", "store:" + store_id_str);
         }
 
         OrderContainer oc = convert(getJson(map));
-        if (useCache && hasStores && oc != null && listType != ListType.ARRIVED.getValue()) {
+        if (useCache && hasStores && oc != null && listType != ListType.DONE.getValue()) {
             SettingUtility.putOrderContainerCache(cacheKey, oc);
         }
         return oc;
@@ -122,10 +126,10 @@ public class OrdersDao {
 
     public OrderContainer search(String searchTerm, int listType, long[] storeIds, int limit, int offset)
             throws ServiceException{
-        return this.search(searchTerm, listType, storeIds, limit, offset, 0);
+        return this.search(searchTerm, listType, storeIds, limit, offset, 0, false);
     }
 
-    public OrderContainer search(String searchTerm, int listType, long[] storeIds, int limit, int offset, int maxPastDays)
+    public OrderContainer search(String searchTerm, int listType, long[] storeIds, int limit, int offset, int maxPastDays, boolean zitiMode)
             throws ServiceException {
         this.listType = listType;
         this.storeIds = storeIds;
@@ -137,11 +141,15 @@ public class OrdersDao {
         map.put("offset", String.valueOf(offset));
         map.put("max_past_day", String.valueOf(maxPastDays));
 
+        int zitiType = zitiMode ? 1 : 0;
+        map.put("ziti", zitiType+"");
+
+        String store_id_str = TextUtil.join(",", storeIds);
         if (storeIds != null && storeIds.length > 0 ) {
             if (!TextUtils.isEmpty(searchTerm)) {
-                searchTerm += "|||store:" + TextUtil.join(",", storeIds);
+                searchTerm += "|||store:" + store_id_str;
             } else {
-                searchTerm = TextUtil.join(",", storeIds);
+                searchTerm = store_id_str;
             }
         }
 

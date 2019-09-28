@@ -1,7 +1,9 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 import Grid from './Grid'
 import V from '../variable'
@@ -33,7 +35,7 @@ export default class Grids extends Component {
   }
 
   render() {
-    const { children, data, style, ...others } = this.props
+    const {children, data, style, ...others} = this.props
     return (
       <View style={[styles.grids, style]} {...others}>
         {data.length > 0 ? this.renderData(data) : children}
@@ -44,6 +46,6 @@ export default class Grids extends Component {
 
 Grids.propTypes = {
   data: PropTypes.array,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
 }

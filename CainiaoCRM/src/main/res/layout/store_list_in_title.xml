@@ -9,6 +9,7 @@
     <Spinner android:id="@+id/spinner_curr_store"
         android:focusable="true"
         android:layout_alignParentStart="true"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -18,10 +19,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <Button android:id="@+id/btn_empty_list"
+    <LinearLayout
+        android:id="@+id/store_prod_quota"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_toEndOf="@id/spinner_curr_status"
+        android:background="@color/green"
+        android:minHeight="35dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/store_prod_price_score"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:paddingTop="3dp"
+            android:text="价格：4.5分"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/store_prod_score_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="16个高于同行"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
+    <Button android:id="@+id/btn_refill_list"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@id/btn_req_list"
-        android:text="零库存(0)"
+        android:text="待补货(0)"
         android:textSize="@dimen/tiny_text"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
@@ -42,16 +78,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button android:id="@+id/add_new_prod"
-        android:text="@string/add_prod"
+    <Button
+        android:id="@+id/add_new_prod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@id/btn_apply_price_list"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:minWidth="40dp"
         android:minHeight="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:minWidth="40dp"
+        android:paddingEnd="6dp"
+        android:paddingStart="6dp"
+        android:text="@string/add_prod" />
 
     <Button
         android:id="@+id/btn_apply_price_list"

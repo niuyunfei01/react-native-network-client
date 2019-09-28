@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,6 +22,7 @@ import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
+import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BasePrinter;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
@@ -78,37 +77,30 @@ public class OrderListFragment extends Fragment {
             return;
         }
         adapter = new OrderAdapter(getActivity(), data, this.listType.getValue());
-		listView.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                FragmentActivity act = getActivity();
-                if (act != null) {
-                    Intent openOrder = new Intent(act, MyReactActivity.class);
-                    Order item = (Order) adapter.getItem(position);
-                    openOrder.putExtra("order_id", Long.valueOf(item.getId()));
-                    openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
-                    openOrder.putExtra("order", item);
-                    try {
-                        act.startActivity(openOrder);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            FragmentActivity act = getActivity();
+            if (act != null) {
+                Intent openOrder = new Intent(act, MyReactActivity.class);
+                Order item = (Order) adapter.getItem(position);
+                openOrder.putExtra("order_id", Long.valueOf(item.getId()));
+                openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
+                openOrder.putExtra("order", item);
+                try {
+                    act.startActivity(openOrder);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
 
 
-		swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.list_order_view);
+		swipeRefreshLayout = v.findViewById(R.id.list_order_view);
 		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
-			swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    refresh(true);
-                }
-            });
+			swipeRefreshLayout.setOnRefreshListener(() -> refresh(true));
 
         refresh();
 	}
@@ -118,11 +110,12 @@ public class OrderListFragment extends Fragment {
     }
 
     public void refresh(boolean byPassCache) {
-        AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter);
+        AppLogger.d("do refresh..., byPassCache= " + byPassCache + ", adapter=" + adapter + ", listTYpe:" + listType);
         if (adapter != null) {
             FragmentActivity activity = this.getActivity();
+            boolean zitiMode = SettingHelper.useZitiMode();
             RefreshOrderListTask task = new RefreshOrderListTask(activity, SettingUtility.listenStoreIds(), listType,
-                   0,  swipeRefreshLayout, new QueryDoneCallback(this), byPassCache);
+                   0,  swipeRefreshLayout, new QueryDoneCallback(this), true, zitiMode);
             task.executeOnNormal();
         }
     }

@@ -1,12 +1,5 @@
 import React, {Component} from "react";
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -69,6 +62,8 @@ class GoodsApplyRecordScene extends Component {
 
   constructor(props) {
     super(props);
+    const vendor = tool.vendor(this.props.global)
+    const {is_service_mgr = false} = vendor
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
       list: [],
@@ -79,23 +74,15 @@ class GoodsApplyRecordScene extends Component {
       refresh: false,
       onSendingConfirm: true,
       dialog: false,
-      isKf: false
+      isKf: is_service_mgr
     };
     this.tab = this.tab.bind(this);
     this.getApplyList = this.getApplyList.bind(this);
   }
 
   componentWillMount() {
-    let token = this.props.global.accessToken;
-    let self = this;
-    globalActions.checkIsKf(token, function (ok, reason, data) {
-      if (ok) {
-        self.setState({isKf: data['is_kf']});
-      }
-    });
     let {viewStoreId} = this.props.navigation.state.params;
-    let currStoreId = this.props.global.currStoreId;
-    let storeId = currStoreId;
+    let storeId = this.props.global.currStoreId;
     if (viewStoreId) {
       storeId = viewStoreId;
     }
@@ -211,7 +198,7 @@ class GoodsApplyRecordScene extends Component {
                     </View>
                     <View>
                       <Text style={styles.name_time}>
-                        #{item.product_id} {tool.orderExpectTime(item.updated)}
+                        #{item.product_id} {tool.orderExpectTime(item.created)}
                       </Text>
                     </View>
                   </View>

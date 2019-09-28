@@ -1,6 +1,7 @@
-import React, { PropTypes } from 'react'
-import { TouchableWithoutFeedback, View, Text, StyleSheet } from 'react-native'
-import { Icon } from '../Icon'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {TouchableWithoutFeedback, View, Text, StyleSheet, ViewPropTypes} from 'react-native'
+import {Icon} from '../Icon'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -31,12 +32,12 @@ const styles = StyleSheet.create({
   }
 })
 
-const Agreement = ({ value = false, onChange, disabled, style, textStyle, children, ...others }) =>
-  <TouchableWithoutFeedback {...(disabled ? {} : { onPress: () => onChange(!value) })} {...others}>
+const Agreement = ({value = false, onChange, disabled, style, textStyle, children, ...others}) =>
+  <TouchableWithoutFeedback {...(disabled ? {} : {onPress: () => onChange(!value)})} {...others}>
     <View style={[styles.agreement, style]}>
       <View style={[styles.checkbox, disabled ? styles.disabled : null]}>
         {value
-          ? <Icon name="success_no_circle" size={10} {...(disabled ? { color: '#ADADAD' } : {})} />
+          ? <Icon name="success_no_circle" size={10} {...(disabled ? {color: '#ADADAD'} : {})} />
           : false
         }
       </View>
@@ -48,7 +49,7 @@ Agreement.propTypes = {
   value: PropTypes.bool,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node,
 }

@@ -13,7 +13,7 @@ const {
   SESSION_TOKEN_SUCCESS,
   SET_CURR_STORE,
   SET_CURR_PROFILE,
-  
+
   LOGOUT_SUCCESS,
   UPDATE_CFG,
   HOST_UPDATED,
@@ -31,11 +31,12 @@ const initialState = {
   currentUserProfile: {},
   canReadStores: {},  // store_id => store, 当前用户可以访问的店铺列表
   canReadVendors: {},  // vendor_id => vendor, 当前用户可以访问的品牌信息, store 里的 vendor_id 可通过这里获得,
-  remindTags:null,
+  remindTags: null,
   host: '',
   cfgOfKey: {},
   last_get_cfg_ts: 0,
-  currentNewProductStoreId: 0
+  currentNewProductStoreId: 0,
+  listeners: []
 };
 
 /**
@@ -43,7 +44,7 @@ const initialState = {
  * @param {Object} state - initialState
  * @param {Object} action - type and payload
  */
-export default function globalReducer (state = initialState, action) {
+export default function globalReducer(state = initialState, action) {
 
   switch (action.type) {
     case LOGIN_PROFILE_SUCCESS:
@@ -87,7 +88,7 @@ export default function globalReducer (state = initialState, action) {
         canReadVendors: {},
         currentNewProductStoreId: 0
       };
-      
+
     case UPDATE_CFG:
       return action.payload ? {
         ...state,

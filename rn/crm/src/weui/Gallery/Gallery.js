@@ -1,9 +1,10 @@
-import React, { Component, PropTypes } from 'react'
-import { Modal, View, StyleSheet, Dimensions, StatusBar, ActivityIndicator } from 'react-native'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {Modal, View, StyleSheet, Dimensions, StatusBar, ActivityIndicator, ViewPropTypes} from 'react-native'
 import PhotoView from 'react-native-photo-view'
-import { Mask } from '../Mask'
+import {Mask} from '../Mask'
 
-const { width, height } = Dimensions.get('window')
+const {width, height} = Dimensions.get('window')
 const styles = StyleSheet.create({
   galleryWrapper: {
     backgroundColor: '#000'
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
 class Gallery extends Component {
   constructor(props) {
     super(props)
-    this.state = { laoding: false }
+    this.state = {laoding: false}
   }
 
   render() {
@@ -57,7 +58,7 @@ class Gallery extends Component {
         onShow={onShow}
         onRequestClose={onClose}
       >
-        <StatusBar hidden={!false} />
+        <StatusBar hidden={!false}/>
         <Mask style={[styles.galleryWrapper, maskStyle]} onPress={onClose}>
           <View>
             <PhotoView
@@ -65,13 +66,13 @@ class Gallery extends Component {
               style={[styles.gallery, style]}
               minimumZoomScale={minimumZoomScale}
               onTap={onPress || onClose}
-              onLoadStart={() => this.setState({ loading: true })}
-              onLoadEnd={() => this.setState({ loading: false })}
+              onLoadStart={() => this.setState({loading: true})}
+              onLoadEnd={() => this.setState({loading: false})}
               {...others}
             />
             {this.state.loading ? (
               <View style={styles.loading}>
-                <ActivityIndicator color="#fff" animating={this.state.loading} />
+                <ActivityIndicator color="#fff" animating={this.state.loading}/>
               </View>
             ) : false}
             <View style={[styles.operation, oprStyle]}>{children}</View>
@@ -87,9 +88,9 @@ Gallery.propTypes = {
   onShow: PropTypes.func,
   onClose: PropTypes.func,
   onPress: PropTypes.func,
-  maskStyle: View.propTypes.style,
-  style: View.propTypes.style,
-  oprStyle: View.propTypes.style,
+  maskStyle: ViewPropTypes.style,
+  style: ViewPropTypes.style,
+  oprStyle: ViewPropTypes.style,
   source: PropTypes.object,
   minimumZoomScale: PropTypes.number,
   children: PropTypes.node,

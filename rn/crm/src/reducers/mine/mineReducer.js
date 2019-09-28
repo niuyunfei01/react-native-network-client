@@ -6,24 +6,25 @@ const {
 	GET_VENDOR_STORES,
 	GET_STORE_TURNOVER,
 	GET_WM_STORES,
-	GET_USER_WAGE_DATA
+	GET_USER_WAGE_DATA,
+  GET_VENDOR_DUTY_USERS
 } = require('../../common/constants').default;
-import Cts from "../../Cts";
 
 /**
  * ## Initial State
  */
 const initialState = {
-	sign_count: {},
-	bad_cases_of: {},
-	normal: {},
-	forbidden: {},
-	vendor_stores: {},
-	user_list: {},
-	order_num: {},
-	turnover: {},
-	wm_list: {},
-	wage_data: {}
+  sign_count: {},
+  bad_cases_of: {},
+  normal: {},
+  forbidden: {},
+  vendor_stores: {},
+  user_list: {},
+  order_num: {},
+  turnover: {},
+  wm_list: {},
+  wage_data: {},
+  duty_users: []
 };
 
 export default function mine(state = initialState, action) {
@@ -33,6 +34,11 @@ export default function mine(state = initialState, action) {
 				...state,
 				sign_count: sign_count(state, action),
 				bad_cases_of: bad_cases_of(state, action),
+			};
+		case GET_VENDOR_DUTY_USERS:
+			return {
+				...state,
+				duty_users: action.users
 			};
 		case GET_WORKER:
 			return {
@@ -88,17 +94,23 @@ function vendor_stores(state, action) {
 }
 
 function order_num(state, action) {
-	state.order_num[action.store_id] = action.order_num;
-	return state.order_num;
+  if (action && action.store_id) {
+    state.order_num[action.store_id] = action.order_num;
+  }
+  return state.order_num;
 }
 
 function turnover(state, action) {
-	state.turnover[action.store_id] = action.turnover;
-	return state.turnover;
+  if (action && action.store_id) {
+    state.turnover[action.store_id] = action.turnover;
+  }
+  return state.turnover;
 }
 
 function wm_list(state, action) {
-	state.wm_list[action.store_id] = action.wm_list;
+  if(action&&action.store_id){
+    state.wm_list[action.store_id] = action.wm_list;
+  }
 	return state.wm_list;
 }
 

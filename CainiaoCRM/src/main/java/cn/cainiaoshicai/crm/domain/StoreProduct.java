@@ -30,8 +30,12 @@ public class StoreProduct {
     private int auto_off_sale;
     private int sold_7day;
     private int sold_weekend;
+    private int sold_latest;
     private int req_total;
     private String req_mark;
+    private String expect_check_time;
+
+    private String shelf_no;
 
     private int supply_price;
 
@@ -251,5 +255,29 @@ public class StoreProduct {
 
     public void setApplying_price(int applying_price) {
         this.applying_price = applying_price;
+    }
+
+    public String getShelf_no() {
+        return shelf_no;
+    }
+
+    public void setShelf_no(String shelf_no) {
+        this.shelf_no = shelf_no;
+    }
+
+    public int getSold_latest() {
+        return sold_latest;
+    }
+
+    public void setSold_latest(int sold_latest) {
+        this.sold_latest = sold_latest;
+    }
+
+    public String getExpect_check_time() {
+        return expect_check_time;
+    }
+
+    public void setExpect_check_time(String expect_check_time) {
+        this.expect_check_time = expect_check_time;
     }
 }

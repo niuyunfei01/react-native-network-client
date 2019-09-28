@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Callback;
@@ -27,6 +29,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -35,9 +38,11 @@ import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.MainActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
-import cn.cainiaoshicai.crm.notify.service.Bootstrap;
+import cn.cainiaoshicai.crm.domain.SupplierOrder;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.orders.domain.Order;
+import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.util.Log;
 import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
 import cn.cainiaoshicai.crm.service.ServiceException;
@@ -46,8 +51,6 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
-import cn.cainiaoshicai.crm.support.print.BasePrinter;
-import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
 import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
@@ -56,6 +59,10 @@ import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.activity.UserCommentsActivity;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.PrintQueue;
+import cn.jpush.android.api.JPushInterface;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -66,6 +73,10 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     private static DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter = null;
+
+
+    private long mLastClickTime = 0;
+    public static final long TIME_INTERVAL = 5000L;
 
     ActivityStarterModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -93,7 +104,8 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void logout() {
         SettingUtility.setDefaultAccountId("");
         GlobalCtx.app().setAccountBean(null);
-        Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+        //Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+        JPushInterface.deleteAlias(GlobalCtx.app(), (int) (System.currentTimeMillis() / 1000L));
     }
 
     @ReactMethod
@@ -131,7 +143,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 callback.invoke(false, "Account is null", null);
             }
 
-            Bootstrap.stopAlwaysOnService(GlobalCtx.app());
+            //Bootstrap.stopAlwaysOnService(GlobalCtx.app());
 
             long store_id = SettingUtility.getListenerStore();
             Map<String, String> serviceExtras = Maps.newHashMap();
@@ -143,7 +155,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
             serviceExtras.put("storeId", store_id + "");
             SettingHelper.setEditor(GlobalCtx.app(), "accessToken", accessToken);
             SettingHelper.setEditor(GlobalCtx.app(), "storeId", store_id + "");
-            Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
+            //Bootstrap.startAlwaysOnService(GlobalCtx.app(), "Crm", serviceExtras);
         } catch (IOException | ServiceException e) {
             e.printStackTrace();
             String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
@@ -259,6 +271,41 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void clearScan(@Nonnull String code, @Nonnull final Callback callback) {
+        GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
+
+        try {
+            ss.clearCode(code);
+            callback.invoke(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @ReactMethod
+    void listenScan(@Nonnull final Callback callback) {
+        GlobalCtx.ScanStatus ss = GlobalCtx.app().scanInfo();
+        List<Map<String, String>> results = ss.notConsumed();
+        ss.markTalking();
+        callback.invoke(true, DaoHelper.gson().toJson(results));
+    }
+
+    @ReactMethod
+    void speakText(@Nonnull final String text, @Nonnull final Callback clb) {
+        GlobalCtx.app().getSoundManager().play_by_xunfei(text);
+        clb.invoke(true, "");
+    }
+
+    @ReactMethod
+    void playWarningSound() {
+        try{
+            GlobalCtx.app().getSoundManager().play_warning_order();
+        }catch (Exception e){
+
+        }
+    }
+
+    @ReactMethod
     void printBtPrinter(@Nonnull String orderJson, @Nonnull final Callback callback) {
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
         final Order o = gson.fromJson(orderJson, new TypeToken<Order>() {
@@ -266,27 +313,33 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
         ReactApplicationContext ctx = this.getReactApplicationContext();
 
-        final BluetoothPrinters.DeviceStatus ds = BluetoothPrinters.INS.getCurrentPrinter();
-        if (ds == null || ds.getSocket() == null || !ds.isConnected()) {
+        if (!GlobalCtx.app().isConnectPrinter()) {
             Intent intent = new Intent(ctx, SettingsPrintActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent, new Bundle());
             callback.invoke(false, "打印机未连接");
+            PrintQueue.getQueue(GlobalCtx.app()).addManual(o);
         } else {
             new MyAsyncTask<Void, Void, Void>() {
-
                 @Override
                 protected Void doInBackground(Void... params) {
-                    OrderPrinter._print(o, false, new BasePrinter.PrintCallback() {
-                        @Override
-                        public void run(boolean result, String desc) {
-                            callback.invoke(result, desc);
-                        }
-                    });
+                    PrintQueue.getQueue(GlobalCtx.app()).addManual(o);
                     return null;
                 }
             }.executeOnNormal();
         }
+    }
+
+    @ReactMethod
+    void updatePidApplyPrice(int pid, int applyPrice, @Nonnull final Callback callback)  {
+        boolean updated = GlobalCtx.app().updatePidApplyPrice(pid, applyPrice);
+        callback.invoke(updated, "");
+    }
+
+    @ReactMethod
+    void updatePidStorage(int pid, int storage, @Nonnull final Callback callback) {
+        boolean updated = GlobalCtx.app().updatePidStorage(pid, storage);
+        callback.invoke(updated, "");
     }
 
     @ReactMethod
@@ -310,6 +363,73 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
         if (!success) {
             callback.invoke(false, "不支持该设备");
+        }
+    }
+
+    @ReactMethod
+    void printInventoryOrder(@Nonnull String orderJson, @Nonnull final Callback callback) {
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        final SupplierOrder order = gson.fromJson(orderJson, new TypeToken<SupplierOrder>() {
+        }.getType());
+        int tryTimes = 3;
+        boolean success = false;
+
+        while (tryTimes > 0) {
+            AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
+            AidlUtil.getInstance().initPrinter();
+            boolean isEnable = GlobalCtx.smPrintIsEnable();
+            if (isEnable) {
+                AidlUtil.getInstance().initPrinter();
+                OrderPrinter.smPrintSupplierOrder(order);
+                success = true;
+                break;
+            }
+            tryTimes--;
+        }
+        if (!success) {
+            callback.invoke(false, "打印失败！");
+        }
+    }
+
+    @ReactMethod
+    void printSupplierSummaryOrder(@Nonnull final Callback callback) {
+        long nowTime = System.currentTimeMillis();
+        if (nowTime - mLastClickTime > TIME_INTERVAL) {
+            mLastClickTime = nowTime;
+            try {
+                int tryTimes = 3;
+                while (tryTimes > 0) {
+                    AidlUtil.getInstance().connectPrinterService(this.getReactApplicationContext());
+                    AidlUtil.getInstance().initPrinter();
+                    boolean isEnable = GlobalCtx.smPrintIsEnable();
+                    if (isEnable) {
+                        AidlUtil.getInstance().initPrinter();
+                    }
+                    tryTimes--;
+                }
+                Call<ResultBean<List<SupplierSummaryOrder>>> rbCall = GlobalCtx.app().dao.getSupplierOrderSummary();
+                rbCall.enqueue(new retrofit2.Callback<ResultBean<List<SupplierSummaryOrder>>>() {
+                    @Override
+                    public void onResponse(Call<ResultBean<List<SupplierSummaryOrder>>> call, Response<ResultBean<List<SupplierSummaryOrder>>> response) {
+                        ResultBean<List<SupplierSummaryOrder>> data = response.body();
+                        List<SupplierSummaryOrder> orders = data.getObj();
+                        for (SupplierSummaryOrder order : orders) {
+                            OrderPrinter.smPrintSupplierSummaryOrder(order);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResultBean<List<SupplierSummaryOrder>>> call, Throwable t) {
+                    }
+                });
+            } catch (Exception e) {
+                android.util.Log.e("Error", e.getMessage());
+            }
+        } else {
+            try {
+                Toast.makeText(getReactApplicationContext(), "稍后重试", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -387,12 +507,9 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             final FragmentManager fm = activity.getFragmentManager();
             if (fm.getBackStackEntryCount() > 0) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.i("MainActivity popping backstack");
-                        fm.popBackStack();
-                    }
+                activity.runOnUiThread(() -> {
+                    Log.i("MainActivity popping backstack");
+                    fm.popBackStack();
                 });
             } else {
                 activity.runOnUiThread(new Runnable() {
@@ -404,6 +521,23 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 });
             }
         }
+    }
+
+    @ReactMethod
+    void navigateToRnView(String action, String params) {
+        final Activity activity = getCurrentActivity();
+        if (activity != null) {
+            Gson gson = new Gson();
+            Map<String, String> p = gson.fromJson(params, Map.class);
+            GlobalCtx.app().toRnView(activity, action, p);
+        }
+    }
+
+    @ReactMethod
+    public void showInputMethod() {
+        final Activity activity = getCurrentActivity();
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     /**

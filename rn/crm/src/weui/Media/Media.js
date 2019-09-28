@@ -1,8 +1,10 @@
-import React, { PropTypes } from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   TouchableHighlight,
   StyleSheet,
   View,
+  ViewPropTypes
 } from 'react-native'
 
 const lineColor = '#E5E5E5'
@@ -47,7 +49,7 @@ const Media = (props) => {
 
   const childrenWithProps = React.Children.map(children, child => {
     if (child.type.name === 'MediaTitle') {
-      return React.cloneElement(child, { style: [{ marginBottom: 8 }, child.props.style] })
+      return React.cloneElement(child, {style: [{marginBottom: 8}, child.props.style]})
     }
     return child
   })
@@ -67,7 +69,7 @@ const Media = (props) => {
 
 Media.propTypes = {
   type: PropTypes.oneOf(['text', 'appmsg', 'small_appmsg']),
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   children: PropTypes.node,
   first: PropTypes.bool,
 }

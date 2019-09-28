@@ -1,4 +1,4 @@
-import React, {PropTypes, PureComponent} from 'react';
+import React, {PureComponent} from 'react';
 import pxToDp from "../../util/pxToDp";
 import font from "./fontStyles";
 import colors from "../../styles/colors";
@@ -8,7 +8,7 @@ import CallBtn from './CallBtn'
 import {padNum} from "../../util/common"
 import numeral from "numeral";
 import _ from "lodash"
-
+import PropTypes from 'prop-types';
 import Constant from "../../Constat"
 
 class OrderComponent extends PureComponent {
@@ -39,7 +39,7 @@ class OrderComponent extends PureComponent {
           <Text style={{width: pxToDp(150)}}>{item['name']}</Text>
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_req']}</Text>
+          {/*<Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_req']}</Text>*/}
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['unit_price']}</Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_cost']}</Text>
@@ -53,7 +53,7 @@ class OrderComponent extends PureComponent {
           <Text style={[font.font26, font.fontGray, {width: pxToDp(200)}]}>商品名</Text>
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={[font.font26, font.fontGray, list.goods_title]}>分数</Text>
+          {/*<Text style={[font.font26, font.fontGray, list.goods_title]}>分数</Text>*/}
           <Text style={[font.font26, font.fontGray, list.goods_title]}>总量</Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>单价</Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>总价</Text>

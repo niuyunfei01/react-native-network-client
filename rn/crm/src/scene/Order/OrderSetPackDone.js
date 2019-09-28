@@ -45,35 +45,35 @@ class OrderSetPackDone extends Component {
   componentWillMount() {
     const {dispatch, global, navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
-
-    this.setState({notAutoConfirmed: !order.remark_warning, storeRemarkConfirmed: !order.store_remark});
-
-    const packWorkers = store.packWorkers[order.store_id];
-    if (!packWorkers || packWorkers.length === 0) {
-      this.setState({loadingPacker: true});
-      dispatch(getStorePackers(global.accessToken, order.store_id, (ok, msg, workers) => {
-        if (ok) {
-          this.setState({loadingPacker: false});
-          this.__setCurrentAsDefault();
-        } else {
-          this.setState({loadingPacker: false, errorHints: msg});
-        }
-      }))
-    } else {
-      this.__setCurrentAsDefault();
+    if (order) {
+      this.setState({notAutoConfirmed: !order.remark_warning, storeRemarkConfirmed: !order.store_remark});
+      const packWorkers = store.packWorkers[order.store_id];
+      if (!packWorkers || packWorkers.length === 0) {
+        this.setState({loadingPacker: true});
+        dispatch(getStorePackers(global.accessToken, order.store_id, (ok, msg, workers) => {
+          if (ok) {
+            this.setState({loadingPacker: false});
+            this.__setCurrentAsDefault();
+          } else {
+            this.setState({loadingPacker: false, errorHints: msg});
+          }
+        }))
+      }
+      return;
     }
+    this.__setCurrentAsDefault();
   }
 
   __setCurrentAsDefault = () => {
-
     const {global, store, navigation} = this.props;
     const {order} = (navigation.state.params || {});
-    const workers = (store.packWorkers || {})[order.store_id];
-
-    if (workers && this.state.checked.length === 0) {
-      const currUid = '' + global.currentUser;
-      if (workers.filter(w => w.id === currUid).length > 0) {
-        this.setState({checked: [currUid]})
+    if(order){
+      const workers = (store.packWorkers || {})[order.store_id];
+      if (workers && this.state.checked.length === 0) {
+        const currUid = '' + global.currentUser;
+        if (workers.filter(w => w.id === currUid).length > 0) {
+          this.setState({checked: [currUid]})
+        }
       }
     }
   };
@@ -107,17 +107,13 @@ class OrderSetPackDone extends Component {
   };
 
   render() {
-    const {dispatch, global, navigation, store} = this.props;
+    const {navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
-
     const workers = store.packWorkers[order.store_id];
-
     const packOpts = workers ? workers.map((worker, idx) => {
       return {label: `${worker.nickname}`, value: worker.id}
     }) : [];
-
     console.log(packOpts);
-
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {}}

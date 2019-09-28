@@ -1,10 +1,12 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   TouchableOpacity,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
-import { Icon } from '../Icon'
+import {Icon} from '../Icon'
 import $V from '../variable'
 
 const styles = StyleSheet.create({
@@ -35,6 +37,7 @@ class Progress extends Component {
     }
     this.onLayout = this.onLayout.bind(this)
   }
+
   onLayout() {
     this.refs.progressBar.measure((x, y, width) => {
       this.setState({
@@ -42,21 +45,23 @@ class Progress extends Component {
       })
     })
   }
+
   _renderOpr = (onCancel) => {
     if (!onCancel) return null
     return (
       <TouchableOpacity onPress={onCancel} style={styles.progressOpr}>
-        <Icon name="cancel" />
+        <Icon name="cancel"/>
       </TouchableOpacity>
     )
   }
+
   render() {
     const {
       onCancel,
       style
     } = this.props
 
-    let { value = 0 } = this.props
+    let {value = 0} = this.props
     if (value < 0) value = 0
     if (value > 100) value = 100
 
@@ -64,7 +69,7 @@ class Progress extends Component {
       <View style={[styles.progress, style]}>
         <View style={styles.progressBar} ref="progressBar" onLayout={this.onLayout}>
           <View
-            style={[styles.progressInnerBar, { width: value * this.state.base }]}
+            style={[styles.progressInnerBar, {width: value * this.state.base}]}
           />
         </View>
         {this._renderOpr(onCancel)}
@@ -76,7 +81,7 @@ class Progress extends Component {
 Progress.propTypes = {
   value: PropTypes.number,
   onCancel: PropTypes.func,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
 }
 
 export default Progress

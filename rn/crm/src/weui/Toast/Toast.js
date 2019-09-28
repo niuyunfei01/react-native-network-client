@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Modal,
   View,
@@ -9,6 +10,7 @@ import {
   ActivityIndicator,
   ProgressBarAndroid,
   ActivityIndicatorIOS,
+  ViewPropTypes
 } from 'react-native'
 import {Icon} from '../Icon'
 import $V from '../variable'
@@ -60,7 +62,8 @@ const Toast = (props) => {
     wrapperStyle,
     textStyle,
     children,
-    onRequestClose = (() => {})
+    onRequestClose = (() => {
+    })
   } = props;
 
   return (
@@ -86,8 +89,8 @@ Toast.propTypes = {
   show: PropTypes.bool,
   onShow: PropTypes.func,
   onRequestClose: PropTypes.func,
-  wrapperStyle: View.propTypes.style,
-  style: View.propTypes.style,
+  wrapperStyle: ViewPropTypes.style,
+  style: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node
 }

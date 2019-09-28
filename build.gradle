@@ -2,35 +2,43 @@
 
 buildscript {
     repositories {
-        jcenter()
-        maven {
-            url 'https://dl.google.com/dl/android/maven2'
-        }
-        google()
+//        jcenter()
+//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+//        maven { url 'https://dl.google.com/dl/android/maven2' }
+//        google()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.2.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        classpath 'com.google.gms:google-services:3.2.1'
+
+        classpath 'de.undercouch:gradle-download-task:3.1.2'
     }
 }
 
 allprojects {
     repositories {
-        jcenter()
-        google()
-        maven {
-            //All of React Native (JS, Android binaries) is installed from npm
-            url "$rootDir/rn/crm/node_modules/react-native/android"
-        }
+//        jcenter()
+//        mavenCentral()
+//        google()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        //All of React Native (JS, Android binaries) is installed from npm
+//        maven {
+//            url "$rootDir/rn/crm/node_modules/react-native/android"
+//        }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-
 
 
 

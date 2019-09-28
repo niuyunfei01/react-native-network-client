@@ -52,7 +52,7 @@ function mapDispatchToProps(dispatch) {
 class GoodsDetailScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
-    console.log('navigation',navigation)
+    console.log('navigation', navigation)
     const {params = {}} = navigation.state;
     let {backPage, product_detail} = params;
 
@@ -62,9 +62,9 @@ class GoodsDetailScene extends PureComponent {
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
-            if(!!backPage){
+            if (!!backPage) {
               native.nativeBack();
-            }else {
+            } else {
               navigation.goBack()
             }
           }}
@@ -73,13 +73,13 @@ class GoodsDetailScene extends PureComponent {
       headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'edit',
-                  product_detail,
-                  detail_key:navigation.state.key
-                });
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+                product_detail,
+                detail_key: navigation.state.key
               });
+            });
           }}
         >
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
@@ -114,7 +114,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {productId, backPage,vendorId} = (this.props.navigation.state.params || {});
+    let {productId, backPage, vendorId} = (this.props.navigation.state.params || {});
     let {currVendorId} = tool.vendor(this.props.global);
     currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
@@ -122,18 +122,19 @@ class GoodsDetailScene extends PureComponent {
     this.getProductDetail();
     this.getVendorProduct();
 
-    if(store_tags[currVendorId] === undefined || basic_category[currVendorId] === undefined){
+    if (store_tags[currVendorId] === undefined || basic_category[currVendorId] === undefined) {
       this.getVendorTags(currVendorId);
     }
   }
+
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
     let {isRefreshing} = (params || {});
-    if(isRefreshing){
-      this.setState({isRefreshing:isRefreshing})
-      const setRefresh =  this.props.navigation.setParams({
-        isRefreshing:  false,
-        key:key
+    if (isRefreshing) {
+      this.setState({isRefreshing: isRefreshing})
+      const setRefresh = this.props.navigation.setParams({
+        isRefreshing: false,
+        key: key
       });
       this.props.navigation.dispatch(setRefresh);
       this.getProductDetail();
@@ -141,13 +142,14 @@ class GoodsDetailScene extends PureComponent {
     }
 
   }
+
   getVendorTags(_v_id) {
     if (_v_id > 0) {
       const {accessToken} = this.props.global;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
-            console.log('fetchVendorTags -> ', resp.ok);
+          console.log('fetchVendorTags -> ', resp.ok);
         }));
       });
     }
@@ -155,7 +157,7 @@ class GoodsDetailScene extends PureComponent {
 
   componentDidMount() {
     let {backPage} = (this.props.navigation.state.params || {});
-    if(!!backPage){
+    if (!!backPage) {
       this.props.navigation.setParams({backPage: backPage});
     }
   }
@@ -194,13 +196,13 @@ class GoodsDetailScene extends PureComponent {
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
-        dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async(resp) => {
+        dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async (resp) => {
           if (resp.ok) {
             let store_product = resp.obj.goods;
-          await _this.setState({
+            await _this.setState({
               store_product: store_product,
-            batch_edit_supply: resp.obj.batch_edit_supply_price,
-            isLoading: false,
+              batch_edit_supply: resp.obj.batch_edit_supply_price,
+              isLoading: false,
             });
           } else {
             _this.setState({isLoading: false});
@@ -226,11 +228,11 @@ class GoodsDetailScene extends PureComponent {
     return map[mode]
   };
 
-  IncludeImg(include_img){
+  IncludeImg(include_img) {
     this.setState({include_img: !include_img});
   }
 
-  onSyncWMGoods(){
+  onSyncWMGoods() {
     this.setState({isSyncGoods: true});
     let {include_img} = this.state;
     let product_id = this.productId;
@@ -241,7 +243,7 @@ class GoodsDetailScene extends PureComponent {
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
-        dispatch(UpdateWMGoods(product_id, include_img, accessToken, async(resp) => {
+        dispatch(UpdateWMGoods(product_id, include_img, accessToken, async (resp) => {
           console.log('UpdateWMGoods -> ', resp);
           ToastLong(resp.desc);
           _this.setState({isSyncGoods: false});
@@ -256,7 +258,7 @@ class GoodsDetailScene extends PureComponent {
       return <LoadingView/>;
     }
 
-    if(full_screen){
+    if (full_screen) {
       return this.renderImg(product_detail.list_img, product_detail.source_img);
     }
 
@@ -279,7 +281,7 @@ class GoodsDetailScene extends PureComponent {
               {product_detail.name}
               <Text style={styles.goods_id}> (#{product_detail.id})</Text>
             </Text>
-            {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function(cat_name, idx) {
+            {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function (cat_name, idx) {
               return (
                 <Text key={idx} style={styles.goods_cats}>
                   {cat_name}
@@ -332,7 +334,7 @@ class GoodsDetailScene extends PureComponent {
                 </CellBody>
               </Cell>
             </Cells>
-          </View>) }
+          </View>)}
         {!!product_detail.tag_info_nur && (
           <View>
             <View style={[styles.box_title, styles.top_line]}>
@@ -345,7 +347,7 @@ class GoodsDetailScene extends PureComponent {
                 </CellBody>
               </Cell>
             </Cells>
-          </View>) }
+          </View>)}
 
         {this.renderALlStore()}
 
@@ -356,7 +358,7 @@ class GoodsDetailScene extends PureComponent {
 
   renderSyncGoods = () => {
     let {isLoading, include_img, sync_goods_info, isSyncGoods, is_service_mgr, is_helper} = this.state;
-    if((!is_service_mgr && !is_helper) || isLoading){
+    if ((!is_service_mgr && !is_helper) || isLoading) {
       return null;
     }
 
@@ -381,7 +383,8 @@ class GoodsDetailScene extends PureComponent {
           >同步商品信息至外卖平台</Button>
         </View>
         <Dialog
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
           visible={sync_goods_info}
           title='商品信息同步'
           buttons={[{
@@ -422,14 +425,15 @@ class GoodsDetailScene extends PureComponent {
         <Toast
           icon="loading"
           show={isSyncGoods}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
         >同步中</Toast>
       </View>
     );
   };
 
   renderALlStore = () => {
-    let {store_product ,product_detail, isLoading, batch_edit_supply} = this.state;
+    let {store_product, product_detail, isLoading, batch_edit_supply} = this.state;
     let {navigation} = this.props;
     if (isLoading) {
       return <LoadingView/>;
@@ -441,31 +445,32 @@ class GoodsDetailScene extends PureComponent {
           <Text style={styles.title_name}>门店商品信息</Text>
           <View style={{flex: 1}}/>
           <TouchableOpacity
-              style = {styles.related_edit}
-              onPress={() => {
-                let {name ,coverimg,id,vendor_id}  = this.state.product_detail;
-                let {store_product} =this.state;
-                InteractionManager.runAfterInteractions(() => {
-                  navigation.navigate(Config.ROUTE_GOODS_PRICE_DETAIL,{
-                   item:{
-                     list_img:coverimg,
-                     name:name,
-                     product_id:id,
-                     sale_store_num:tool.length(store_product)
-                   },
-                    vendorId:vendor_id
-                  });
+            style={styles.related_edit}
+            onPress={() => {
+              let {name, coverimg, id, vendor_id} = this.state.product_detail;
+              let {store_product} = this.state;
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_PRICE_DETAIL, {
+                  item: {
+                    list_img: coverimg,
+                    name: name,
+                    product_id: id,
+                    sale_store_num: tool.length(store_product)
+                  },
+                  vendorId: vendor_id
                 });
-              }}
+              });
+            }}
           >
             <Text style={
-              {fontSize: pxToDp(30),
+              {
+                fontSize: pxToDp(30),
                 color: '#59b26a',
                 textAlignVertical: 'center',
-                marginRight:pxToDp(30),
-                borderRightColor:colors.fontGray,
-                borderRightWidth:pxToDp(1),
-                paddingRight:pxToDp(20)
+                marginRight: pxToDp(30),
+                borderRightColor: colors.fontGray,
+                borderRightWidth: pxToDp(1),
+                paddingRight: pxToDp(20)
               }
             }>
               比价
@@ -473,44 +478,52 @@ class GoodsDetailScene extends PureComponent {
           </TouchableOpacity>
 
           <TouchableOpacity
-              style = {[styles.related_edit]}
-              onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  navigation.navigate(Config.ROUTE_GOODS_RELATE,{
-                    productId:this.productId,
-                    store_product:store_product,
-                    product_detail:product_detail,
-                    detail_key:navigation.state.key,
-                    refreshStoreList:() => this.getVendorProduct()
-                  });
+            style={[styles.related_edit]}
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_RELATE, {
+                  productId: this.productId,
+                  store_product: store_product,
+                  product_detail: product_detail,
+                  detail_key: navigation.state.key,
+                  refreshStoreList: () => this.getVendorProduct()
                 });
-              }}
+              });
+            }}
           >
-            <Text style={{fontSize: pxToDp(30), color: '#59b26a',  textAlignVertical: 'center',marginRight:pxToDp(30)}}>
+            <Text
+              style={{fontSize: pxToDp(30), color: '#59b26a', textAlignVertical: 'center', marginRight: pxToDp(30)}}>
               关联
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-              style = {styles.related_edit}
-              onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  console.log('batch_edit_supply:' + batch_edit_supply);
-                  navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE,{
-                    productId:this.productId,
-                    store_product:store_product,
-                    batch_edit_supply: batch_edit_supply,
-                    detail_key:navigation.state.key
-                  });
-
+            style={styles.related_edit}
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                console.log('batch_edit_supply:' + batch_edit_supply);
+                navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE, {
+                  productId: this.productId,
+                  store_product: store_product,
+                  batch_edit_supply: batch_edit_supply,
+                  detail_key: navigation.state.key
                 });
-              }}
+
+              });
+            }}
           >
-            <Text style={{fontSize: pxToDp(30), color: '#59b26a', textAlignVertical: 'center',paddingLeft:pxToDp(30),borderLeftWidth:pxToDp(1),borderColor:'#ccc'}}>
+            <Text style={{
+              fontSize: pxToDp(30),
+              color: '#59b26a',
+              textAlignVertical: 'center',
+              paddingLeft: pxToDp(30),
+              borderLeftWidth: pxToDp(1),
+              borderColor: '#ccc'
+            }}>
               编辑
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={[styles.store_head, styles.top_line,styles.show_providing]}>
+        <View style={[styles.store_head, styles.top_line, styles.show_providing]}>
           <Text style={[styles.title_text, styles.store_title]}>门店</Text>
           <Text style={[styles.title_text, styles.stock_title]}>库存</Text>
           <Text style={[styles.title_text, styles.sale_title]}>售价</Text>
@@ -531,23 +544,23 @@ class GoodsDetailScene extends PureComponent {
     return tool.objectMap(store_product, function (s_product, store_id) {
       is_dark_bg = !is_dark_bg;
       return (
-        <View key={store_id} style={[styles.store_info, styles.top_line,styles.show_providing]}>
+        <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
           <View style={[styles.store_view]}>
-            <Text style={[styles.info_text, styles.store_name,{flex:1}]}>{s_product.store_name}</Text>
+            <Text style={[styles.info_text, styles.store_name, {flex: 1}]}>{s_product.store_name}</Text>
             {_this.renderIcon(parseInt(s_product.status))}
           </View>
 
           <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
-          <View style = {{flexDirection:'row',alignItems:'center',width:pxToDp(150)}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', width: pxToDp(150)}}>
             <Text style={[styles.info_text, styles.sale_price]}>
-              ¥ {parseInt(s_product.fn_price_controlled) === 0  ?  s_product.price / 100 : s_product.supply_price / 100 }
+              ¥ {parseInt(s_product.fn_price_controlled) === 0 ? s_product.price / 100 : s_product.supply_price / 100}
             </Text>
             {parseInt(s_product.fn_price_controlled) === 0 ? null :
-                <Image
-                    resizeMode={'contain'}
-                    style={{height: pxToDp(34), width: pxToDp(34)}}
-                    source={require('../../img/Goods/bao_.png')}
-                />
+              <Image
+                resizeMode={'contain'}
+                style={{height: pxToDp(34), width: pxToDp(34)}}
+                source={require('../../img/Goods/bao_.png')}
+              />
             }
 
           </View>
@@ -561,11 +574,11 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderIcon = (status) => {
-    if(status === Cts.STORE_PROD_ON_SALE){
+    if (status === Cts.STORE_PROD_ON_SALE) {
       return <Image style={[styles.icon_style]} source={require('../../img/Goods/shangjia_.png')}/>;
-    } else if (status === Cts.STORE_PROD_OFF_SALE){
+    } else if (status === Cts.STORE_PROD_OFF_SALE) {
       return <Image style={[styles.icon_style]} source={require('../../img/Goods/xiajia_.png')}/>;
-    } else if (status === Cts.STORE_PROD_SOLD_OUT){
+    } else if (status === Cts.STORE_PROD_SOLD_OUT) {
       return <Image style={[styles.icon_style]} source={require('../../img/Goods/quehuo_.png')}/>;
     }
   };
@@ -575,7 +588,7 @@ class GoodsDetailScene extends PureComponent {
     let wrapper = full_screen ? full_styles.wrapper : styles.wrapper;
     let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
 
-    if(tool.length(list_img) > 0){
+    if (tool.length(list_img) > 0) {
       let _this = this;
       let img_list = tool.objectMap(list_img, (img_data, img_id) => {
         let img_url = img_data['url'];
@@ -597,7 +610,7 @@ class GoodsDetailScene extends PureComponent {
           {img_list}
         </Swiper>
       );
-    }  else {
+    } else {
       return (
         <TouchableHighlight
           style={wrapper}
@@ -612,7 +625,7 @@ class GoodsDetailScene extends PureComponent {
     }
   };
 
-  onToggleFullScreen(){
+  onToggleFullScreen() {
     let {full_screen} = this.state;
     this.setState({
       full_screen: !full_screen,
@@ -788,8 +801,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  store_name: {
-  },
+  store_name: {},
   stock_num: {
     textAlign: 'center',
     width: pxToDp(150),
@@ -820,8 +832,8 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(28),
     color: '#bfbfbf',
   },
-  show_providing:{
-    justifyContent:'space-between'
+  show_providing: {
+    justifyContent: 'space-between'
   },
   related_edit: {
     flexDirection: 'row',

@@ -52,8 +52,8 @@ import cn.cainiaoshicai.crm.support.utils.Utility;
  */
 public class JavaHttpUtility {
 
-    private static final int CONNECT_TIMEOUT = 30 * 1000;
-    private static final int READ_TIMEOUT = 30 * 1000;
+    private static final int CONNECT_TIMEOUT = 60 * 1000;
+    private static final int READ_TIMEOUT = 60 * 1000;
     private static final int DOWNLOAD_CONNECT_TIMEOUT = 15 * 1000;
     private static final int DOWNLOAD_READ_TIMEOUT = 60 * 1000;
     private static final int UPLOAD_CONNECT_TIMEOUT = 15 * 1000;
@@ -112,8 +112,12 @@ public class JavaHttpUtility {
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
         if (!TextUtils.isEmpty(proxyHost) && !TextUtils.isEmpty(proxyPort)) {
-            return new Proxy(Proxy.Type.HTTP,
-                    new InetSocketAddress(proxyHost, Integer.valueOf(proxyPort)));
+            try {
+                return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, Integer.valueOf(proxyPort)));
+            } catch (Exception e) {
+                AppLogger.e("error getProxy Exception:" + e.getMessage());
+                return null;
+            }
         } else {
             return null;
         }

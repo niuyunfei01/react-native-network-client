@@ -5,9 +5,13 @@ import InvoicingGatherScene from './InvoicingGatherScene'
 import InvoicingShippingScene from './InvoicingShippingScene'
 import InvoicingOrderGoodsScene from './InvoicingOrderGoodsScene'
 import InvoicingReceiptScene from './InvoicingReceiptScene'
+import {NavigationItem} from '../../widget'
 import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import native from "../../common/native";
+
+
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -28,6 +32,15 @@ class InvoicingScene extends PureComponent {
     headerStyle: {
       backgroundColor: colors.fontBlue,
     },
+    headerRight: (
+      <NavigationItem
+        iconStyle={{tintColor: colors.white,}}
+        icon={require('../../img/Order/print_white.png')}
+        position={'right'}
+        onPress={() => {
+          native.printSupplierSummaryOrder()
+        }}
+      />),
   });
 
   constructor(props) {

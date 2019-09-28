@@ -105,15 +105,30 @@ const styles = StyleSheet.create({
     paddingTop: 2,
     paddingBottom: 2
   },
-  product_img:{
+  product_img: {
     height: pxToDp(90),
     width: pxToDp(90),
-    marginRight:pxToDp(15),
-    borderRadius:10,
-    borderWidth:pxToDp(1),
-    borderColor:'#999'
+    marginRight: pxToDp(15),
+    borderRadius: 10,
+    borderWidth: pxToDp(1),
+    borderColor: '#999'
+  },
+  priceMode: {
+    borderWidth: pxToDp(1),
+    borderColor: '#ff6600',
+    color: '#ff6600',
+    marginRight: pxToDp(10),
+    height: pxToDp(25),
+    width: pxToDp(25),
+    fontSize: pxToDp(20),
+    textAlign: 'center'
+  },
+  goodsItem:{
+    paddingTop: pxToDp(14),
+    paddingBottom: pxToDp(14),
+    borderBottomColor: colors.color999,
+    borderBottomWidth: screen.onePixel
   }
-
 });
 
 export default styles;

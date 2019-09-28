@@ -1,9 +1,13 @@
-
 apply plugin: 'com.android.application'
 apply from: "../rn/crm/node_modules/react-native-vector-icons/fonts.gradle"
 
 repositories {
-    jcenter()
+    google()
+    maven { url "https://jitpack.io" }
+}
+
+configurations.all {
+    exclude group: 'com.facebook.react', module: 'react-native'
 }
 
 dependencies {
@@ -13,63 +17,74 @@ dependencies {
     final ANDROID_LIB_VERSION = '27.0.1';
 
     //noinspection GradleDependency
-    compile "com.android.support:support-v4:$ANDROID_LIB_VERSION"
-    compile "com.android.support:gridlayout-v7:$ANDROID_LIB_VERSION"
-    compile "com.android.support:cardview-v7:$ANDROID_LIB_VERSION"
-    compile "com.android.support:recyclerview-v7:$ANDROID_LIB_VERSION"
-    compile "com.android.support:appcompat-v7:$ANDROID_LIB_VERSION"
-    compile "com.android.support:design:$ANDROID_LIB_VERSION"
+    implementation "com.android.support:support-v4:$ANDROID_LIB_VERSION"
+    implementation "com.android.support:gridlayout-v7:$ANDROID_LIB_VERSION"
+    implementation "com.android.support:cardview-v7:$ANDROID_LIB_VERSION"
+    implementation "com.android.support:recyclerview-v7:$ANDROID_LIB_VERSION"
+    implementation "com.android.support:appcompat-v7:$ANDROID_LIB_VERSION"
+    implementation "com.android.support:design:$ANDROID_LIB_VERSION"
 
-    compile "com.facebook.react:react-native:+" // From node_modules.
+    compile project(':ReactAndroid') // From node_modules.
 
 //    compile 'com.github.lzyzsd:jsbridge:1.0.4'
-    compile "com.github.johnpersano:supertoasts:$SUPPER_TOAST_VERSION"
+    implementation "com.github.johnpersano:supertoasts:$SUPPER_TOAST_VERSION"
 
-    compile 'com.google.guava:guava:20.0'
-    compile 'in.srain.cube:ultra-ptr:1.0.11'
-    compile fileTree(include: '*.jar', exclude: ['*-javadoc.jar', '*-sources.jar'], dir: 'libs')
+    implementation 'com.google.guava:guava:20.0'
+    implementation 'in.srain.cube:ultra-ptr:1.0.11'
+    implementation fileTree(include: '*.jar', exclude: ['*-javadoc.jar', '*-sources.jar'], dir: 'libs')
 
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    compile ("com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION") {
-        exclude group : 'com.google.code.gson'
+    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    implementation "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    implementation("com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION") {
+        exclude group: 'com.google.code.gson'
     }
-    compile "com.squareup.retrofit2:adapter-rxjava:$RETROFIT_VERSION"
-    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
-    compile 'com.google.code.gson:gson:2.7'
-    provided 'com.squareup.okhttp3:okhttp:3.3.1'
-    provided 'com.github.bumptech.glide:glide:3.7.0'
+    implementation "com.squareup.retrofit2:adapter-rxjava:$RETROFIT_VERSION"
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    implementation 'com.google.code.gson:gson:2.7'
+    compileOnly 'com.squareup.okhttp3:okhttp:3.3.1'
+    compileOnly 'com.github.bumptech.glide:glide:3.7.0'
 
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    provided 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    compile 'org.xutils:xutils:3.3.36'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    compileOnly 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    implementation 'org.xutils:xutils:3.3.36'
 
-    compile 'com.android.support:multidex:1.0.2'
-    compile 'com.roughike:bottom-bar:2.3.1'
-    compile 'me.dm7.barcodescanner:zxing:1.9.8'
+    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.roughike:bottom-bar:2.3.1'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
-    compile project(':react-native-vector-icons')
-    compile project(':react-native-i18n')
-    compile project(':react-native-splash-screen')
-    compile project(':react-native-sound')
-    compile project(':react-native-ble-manager')
-    compile project(':react-native-image-crop-picker')
+    implementation 'com.github.yalantis:ucrop:2.2.1-native'
+    implementation 'id.zelory:compressor:2.1.0'
 
-    releaseCompile 'ch.acra:acra:4.9.2'
+    implementation 'com.xdandroid:hellodaemon:+'
 
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-i18n')
+    implementation project(':react-native-splash-screen')
+
+    releaseImplementation 'ch.acra:acra:4.9.2'
+
+    implementation 'cn.jiguang.sdk:jpush:3.1.6'  // 此处以JPush 3.1.6 版本为例。
+    implementation 'cn.jiguang.sdk:jcore:1.2.5'  // 此处以JCore 1.2.5 版本为例。
+
+    implementation 'com.clj.fastble:FastBleLib:2.3.2'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+
+    implementation project(path: ':rn-fetch-blob')
+
+    implementation 'com.llew.huawei:verifier:1.1.1'
 }
 
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
 // the print sample code.
 List<String> dirs = [
-    'print',     // print sample code; look here for the interesting stuff.
-    'common',   // components that are reused by multiple samples
-    'template'] // boilerplate code that is generated by the sample template process
+        'print',     // print sample code; look here for the interesting stuff.
+        'common',   // components that are reused by multiple samples
+        'template'] // boilerplate code that is generated by the sample template process
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '28.0.2'
 
     dexOptions {
         javaMaxHeapSize "4g"
@@ -77,7 +92,7 @@ android {
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
 
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -91,11 +106,19 @@ android {
             exclude '/lib/arm64-v8a/**'
             exclude '/lib/x86_64/**'
         }
+
+        applicationId "cn.cainiaoshicai.crm"
+
+        manifestPlaceholders = [
+                JPUSH_PKGNAME: applicationId,
+                JPUSH_APPKEY : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
+                JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
+        ]
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     sourceSets {

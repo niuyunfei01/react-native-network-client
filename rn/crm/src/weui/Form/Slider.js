@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react'
-import { StyleSheet, View, Slider as RNSlider, Text } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, View, Slider as RNSlider, Text, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -20,19 +21,19 @@ const styles = StyleSheet.create({
 })
 
 const Slider = ({
-  max = 100,
-  min = 0,
-  step = 1,
-  defaultValue = 0,
-  disabled = false,
-  showValue = true,
-  value,
-  onChange,
-  style,
-  sliderStyle,
-  textStyle,
-  ...others
-}) =>
+                  max = 100,
+                  min = 0,
+                  step = 1,
+                  defaultValue = 0,
+                  disabled = false,
+                  showValue = true,
+                  value,
+                  onChange,
+                  style,
+                  sliderStyle,
+                  textStyle,
+                  ...others
+                }) =>
   <View style={[styles.sliderWrapper, style]}>
     <RNSlider
       maximumValue={max}
@@ -58,7 +59,7 @@ Slider.propTypes = {
   value: PropTypes.number,
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   sliderStyle: RNSlider.propTypes.style,
   textStyle: Text.propTypes.style,
 }

@@ -1,8 +1,10 @@
-import React, { PropTypes } from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
-  StyleSheet
+  StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 
 const styles = StyleSheet.create({
@@ -40,7 +42,7 @@ const MediaInfoMeta = (props) => {
 
 MediaInfoMeta.propTypes = {
   extra: PropTypes.bool,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node,
 }

@@ -116,14 +116,14 @@ public class LoginActivity extends AbstractActionBarActivity {
         });
 
 
-        ((TextView)findViewById(R.id.link_register)).setOnClickListener(new View.OnClickListener() {
+        ((TextView) findViewById(R.id.link_register)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 GeneralWebViewActivity.gotoWeb(LoginActivity.this, URLHelper.getRigsterForCRM());
             }
         });
 
-        ((TextView)findViewById(R.id.link_reset)).setOnClickListener(new View.OnClickListener() {
+        ((TextView) findViewById(R.id.link_reset)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 GeneralWebViewActivity.gotoWeb(LoginActivity.this, URLHelper.getForgotPasswd());
@@ -242,7 +242,7 @@ public class LoginActivity extends AbstractActionBarActivity {
                     DBResult dbResult = GlobalCtx.app().afterTokenUpdated(token, expiresInSeconds);
                     if (dbResult != null) return dbResult;
                 } else {
-                    AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()) );
+                    AppLogger.e("login error:" + (loginResult == null ? "" : loginResult.getError()));
                 }
             } catch (ServiceException e) {
                 AppLogger.e(e.getError());
@@ -271,7 +271,7 @@ public class LoginActivity extends AbstractActionBarActivity {
                 if (Cts.ERR_INVALID_GRANT.equals(e.getError())) {
                     AlertUtil.showAlert(activity, R.string.tip_dialog_title, R.string.auth_error_invalid_grant,
                             "知道了", null,
-                            "重置密码", new DialogInterface.OnClickListener(){
+                            "重置密码", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     GeneralWebViewActivity.gotoWeb(activity, URLHelper.getForgotPasswd());

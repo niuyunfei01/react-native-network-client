@@ -18,6 +18,15 @@ public class Cts {
     public static final int STORE_UNKNOWN = -1;
     public static final int STORE_ALL = 0;
 
+    //菜鸟品牌
+    public static final int STORE_VENDOR_CN = 1;
+    //比邻鲜品牌
+    public static final int STORE_VENDOR_BLX = 5;
+
+
+    //保底模式
+    public static final int STORE_CONTROL_MODE_SUPPLY = 2;
+
     public static final String BLX_TYPE_BASIC = "basic";
     public static final String BLX_TYPE_PRO = "pro"; //带基本连锁功能
     public static final String BLX_TYPE_FULL = "full"; //带完整连锁功能
@@ -44,12 +53,18 @@ public class Cts {
     public static final String FB_STATUS_FIXED_T = "已解决";
     public static final String FB_STATUS_UNKNOWN_T = "未知";
 
+
+    public static final int EB_ORDER_FORM_BD = 1;
+    public static final int EB_ORDER_FROM_ELE = 2;
     public static final Platform PLAT_BD = new Platform("百度", 1);
     public static final Platform PLAT_WX = new Platform("微信", 2);
     public static final Platform PLAT_MT  = new Platform("美团", 3);
     public static final Platform PLAT_ELEME  = new Platform("饿了么", 4);
     public static final Platform PLAT_APP  = new Platform("菜鸟APP", 5);
     public static final Platform PLAT_JDDJ  = new Platform("JD到家", 6);
+    public static final Platform PLAT_MTSG  = new Platform("美团", 7);
+    public static final Platform PLAT_SS  = new Platform("嗖嗖", 8);
+    public static final Platform PLAT_CM  = new Platform("小程序", 9);
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", -1);
 
     public static final String ERR_INVALID_GRANT = "invalid_grant";
@@ -61,6 +76,9 @@ public class Cts {
 
     public static final int PRICE_CONTROLLER_NO = 0;
     public static final int PRICE_CONTROLLER_YES = 1;
+
+    public static final int RATE_PRICE_CONTROLLER_NO = 0;
+    public static final int RATE_PRICE_CONTROLLER_YES = 1;
 
     public static final int PROFIT_CONTROLLER_NO = 0;
     public static final int PROFIT_CONTROLLER_YES = 1;
@@ -131,7 +149,7 @@ public class Cts {
         }
 
         static public Platform find(int id) {
-            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP, PLAT_JDDJ)) {
+            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP, PLAT_JDDJ, PLAT_MTSG, PLAT_SS, PLAT_CM)) {
                 if (next.id == id) {
                     return next;
                 }
@@ -188,7 +206,8 @@ public class Cts {
     public static final String PUSH_TYPE_ORDER_UPDATE = "order_update";
     public static final String PUSH_TYPE_TODO_COMPLAIN = "task_complain";
     public static final String PUSH_TYPE_SYS_ERROR = "system_error";
-    public static final String  PUSH_TYPE_TASK_REMIND = "task_remind";
+    public static final String PUSH_TYPE_TASK_REMIND = "task_remind";
+    public static final String PUSH_TYPE_PRODUCT_ADJUST = "product_adjust";
 
     public static final String PUSH_TYPE_USER_TALK = "talk";
 }

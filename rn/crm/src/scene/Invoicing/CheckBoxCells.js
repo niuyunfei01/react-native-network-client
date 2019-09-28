@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react'
+import React from 'react';import PropTypes from 'prop-types';
 import {StyleSheet,} from 'react-native'
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText, Icon,} from "../../weui/index";
 import $V from '../../weui/variable'

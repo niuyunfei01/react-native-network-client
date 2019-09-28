@@ -1,8 +1,10 @@
-import React, { PropTypes } from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
-  StyleSheet
+  StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 
 const $lineColor = '#E5E5E5'
@@ -24,7 +26,7 @@ const styles = StyleSheet.create({
 })
 
 const PanelHeader = (props) => {
-  const { children, style, textStyle, ...others } = props
+  const {children, style, textStyle, ...others} = props
   return (
     <View style={[styles.panelHeader, style]} {...others}>
       <Text style={[styles.panelHeaderText, textStyle]}>{children}</Text>
@@ -33,7 +35,7 @@ const PanelHeader = (props) => {
 }
 PanelHeader.propTypes = {
   children: PropTypes.node,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   others: PropTypes.object
 }

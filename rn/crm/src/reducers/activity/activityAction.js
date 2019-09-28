@@ -54,9 +54,9 @@ export function fetchWmStores(vendor_id, token, callback, with_price_ratio = 0) 
   }
 }
 
-export function fetchRuleList(is_active = '', token, callback) {
+export function fetchRuleList(is_active = '', vendor = '', token, callback) {
   return dispatch => {
-    const url = `api/get_rule_list/${is_active}.json?access_token=${token}`;
+    const url = `api/get_rule_list/${is_active}/${vendor}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {

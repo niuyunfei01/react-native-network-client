@@ -1,9 +1,10 @@
-import React, { PropTypes } from 'react'
-import { View, Text, ActivityIndicator, Dimensions, StyleSheet } from 'react-native'
-import { create } from '../StyleSheet'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {View, Text, ActivityIndicator, Dimensions, StyleSheet, ViewPropTypes} from 'react-native'
+import {create} from '../StyleSheet'
 import V from '../variable'
 
-const { width } = Dimensions.get('window')
+const {width} = Dimensions.get('window')
 const styles = create({
   loadMore: {
     width: width * 0.65,
@@ -48,7 +49,7 @@ const styles = create({
   }
 })
 
-const LoadMore = ({ loading, showLine, showDot, style, textStyle, children, ...others }) =>
+const LoadMore = ({loading, showLine, showDot, style, textStyle, children, ...others}) =>
   <View
     style={[
       styles.loadMore,
@@ -58,7 +59,7 @@ const LoadMore = ({ loading, showLine, showDot, style, textStyle, children, ...o
     ]}
     {...others}
   >
-    {loading ? <ActivityIndicator style={{ marginRight: 5 }} /> : false}
+    {loading ? <ActivityIndicator style={{marginRight: 5}}/> : false}
     <Text
       style={[
         styles.loadMoreTips,
@@ -67,7 +68,7 @@ const LoadMore = ({ loading, showLine, showDot, style, textStyle, children, ...o
         textStyle,
       ]}
     >
-      {showDot ? <View style={styles.dot} /> : false}
+      {showDot ? <View style={styles.dot}/> : false}
       {children}
     </Text>
   </View>
@@ -76,7 +77,7 @@ LoadMore.propTypes = {
   loading: PropTypes.bool,
   showLine: PropTypes.bool,
   showDot: PropTypes.bool,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node
 }

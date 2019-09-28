@@ -1,12 +1,14 @@
-import React, { Component, PropTypes } from 'react'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
-import { Icon } from '../Icon'
+import {Icon} from '../Icon'
 import ImagePicker from 'react-native-image-picker'
 import $V from '../variable'
 import concat from 'lodash/concat'
@@ -32,7 +34,7 @@ const styles = StyleSheet.create({
   },
   uploaderBody: {
     marginBottom: $V.weuiCellGapH - ($V.weuiCellGapV + $V.weuiUploaderFileSpacing),
-    marginRight: - $V.weuiUploaderFileSpacing,
+    marginRight: -$V.weuiUploaderFileSpacing,
     flexDirection: 'row',
     flexWrap: 'wrap',
     overflow: 'hidden',
@@ -133,7 +135,7 @@ class Uploader extends Component {
       } else if (response.error) {
       } else {
         return this.props.onChange &&
-        this.props.onChange(concat(this.props.files, response), response)
+          this.props.onChange(concat(this.props.files, response), response)
       }
       return false
     })
@@ -162,21 +164,21 @@ class Uploader extends Component {
         </View>
         <View style={styles.uploaderBody}>
           {files.map((file, idx) => {
-            const { data, error, status, isVertical } = file
-            const source = { uri: `data:image/jpeg;base64,${data}`, isStatic: true, isVertical }
+            const {data, error, status, isVertical} = file
+            const source = {uri: `data:image/jpeg;base64,${data}`, isStatic: true, isVertical}
             return (
               <View key={idx} style={styles.uploaderFile}>
-                <Image source={source} style={styles.uploaderFileImage} />
+                <Image source={source} style={styles.uploaderFileImage}/>
                 {error || status ?
                   <View style={styles.uploaderStatus}>
-                    {error ? <Icon name="warn" />
-                    : <Text style={styles.uploaderStatusContent}>{status}</Text>}
+                    {error ? <Icon name="warn"/>
+                      : <Text style={styles.uploaderStatusContent}>{status}</Text>}
                   </View> : null}
                 <Text
                   style={styles.uploaderRemove}
                   onPress={() => this.handleRemove(idx, file)}
                 >
-                  <Icon name="clear" />
+                  <Icon name="clear"/>
                 </Text>
               </View>
             )
@@ -186,10 +188,10 @@ class Uploader extends Component {
               style={styles.uploaderAddButton}
               onPress={this.showImagePicker}
             >
-              <View style={styles.uploaderAddButtonRec} />
-              <View style={[styles.uploaderAddButtonRec, { transform: [{ rotate: '90deg' }] }]} />
+              <View style={styles.uploaderAddButtonRec}/>
+              <View style={[styles.uploaderAddButtonRec, {transform: [{rotate: '90deg'}]}]}/>
             </TouchableOpacity>
-          : null}
+            : null}
         </View>
       </View>
     )
@@ -204,7 +206,7 @@ Uploader.propTypes = {
   onError: PropTypes.func,
   files: PropTypes.array,
   lang: PropTypes.object,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
 }
 
 export default Uploader

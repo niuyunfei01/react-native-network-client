@@ -81,7 +81,8 @@ export default {
   SHIP_AUTO_NEW_DADA: 2,//新达达
   SHIP_AUTO_BD: 5,//百度
   SHIP_AUTO_SX: 6,//闪送
-  SHIP_AUTO_MT: 7,//美团配送
+  SHIP_AUTO_MT: 7,//美团跑腿
+  SHIP_AUTO_MT_ZB: 8, //美团众包
 
   ID_DADA_SHIP_WORKER: -999,
   ID_DADA_MANUAL_WORKER: -998,
@@ -119,7 +120,9 @@ export default {
   SHIP_ZS_BD: 24, //百度专送
   SHIP_KS_MT: 25, //美团快送
   SHIP_KS_ELE: 26, //饿了么快送
-
+  SHIP_SELF: 30, //自配送
+  SHIP_THIRD: 40, // 三方配送
+  
   TAG_HIDE: '74911547', //列表中隐藏tag_id
   ORDER_CANCEL_SHIP_REASON: 10000,
   //运营结算的详情的类型  收入的类型
@@ -148,4 +151,8 @@ export default {
   RULE_TYPE_GENERAL : 1,//1-通用规则
   RULE_TYPE_SPECIAL : 2,//2-特殊分类规则
   Rule_PRICE_UPPER:1000000,
+  
+  // 同行商品变动类型
+  TRACK_PROD_CHG_UP: 3,
+  TRACK_PROD_CHG_DOWN: 4
 }
