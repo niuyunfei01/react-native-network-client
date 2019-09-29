@@ -50,7 +50,7 @@ public class CrashReportHelper {
         final ACRAConfiguration config;
         try {
             config = new ConfigurationBuilder(ctx)
-                    .setFormUri("http://www.cainiaoshicai.cn/util/crm_error_report")
+                    .setFormUri("http://api.waisongbang.com/util/crm_error_report")
                     .setCustomReportContent(REPORT_ID, APP_VERSION_CODE, APP_VERSION_NAME,
                             PACKAGE_NAME, FILE_PATH, PHONE_MODEL, BRAND, PRODUCT, ANDROID_VERSION, BUILD, TOTAL_MEM_SIZE,
                             AVAILABLE_MEM_SIZE, BUILD_CONFIG, CUSTOM_DATA, IS_SILENT, STACK_TRACE, INITIAL_CONFIGURATION, CRASH_CONFIGURATION,
