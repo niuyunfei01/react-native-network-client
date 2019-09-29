@@ -54,10 +54,10 @@ export function serverUrl (path, useHttps = true) {
 const C = {
   https: true,
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
-  defaultHost: "www.cainiaoshicai.cn",
+  defaultHost: "api.waisongbang.com",
   AppName: "Crm",
   
-  DownloadUrl: `https://www.cainiaoshicai.cn/util/crm_dl`,
+  DownloadUrl: `https://api.waisongbang.com/util/crm_dl`,
   MAP_WAY_URL: "util/amap_way",
   FetchTimeout: 60000,
   LongFetchTimeout: 200000,
