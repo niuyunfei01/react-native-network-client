@@ -88,7 +88,7 @@ public class MineActivity extends AbstractActionBarActivity {
 					startActivity(new Intent(getApplicationContext(), SettingsPrintActivity.class));
 				} else if (item.getType() == TYPE_VERSION_UPDATE) {
 					Intent intent = new Intent(Intent.ACTION_VIEW,
-							Uri.parse("http://www.cainiaoshicai.cn/cc.apk"));
+							Uri.parse("http://api.waisongbang.com/cc.apk"));
 					startActivity(intent);
 				} else if (item.getType() == TYPE_VERSION_LOGOUT) {
 					new AlertDialog.Builder(MineActivity.this)
