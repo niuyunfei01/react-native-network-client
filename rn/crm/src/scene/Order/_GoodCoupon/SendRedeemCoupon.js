@@ -14,9 +14,10 @@ import {ToastShort} from "../../../util/ToastUtils";
 import Swipeout from 'react-native-swipeout'
 import CommonStyle from "../../../common/CommonStyles";
 import HttpUtils from "../../../util/http";
-import {Button, DatePicker, List, WhiteSpace, Radio, InputItem, Modal, Portal, Toast} from 'antd-mobile-rn'
+import {Button, DatePicker, List, WhiteSpace, PickerView, Radio, InputItem, Modal, Portal, Toast} from 'antd-mobile-rn'
 import Mapping from "../../../Mapping/index";
 import product from "../../../Mapping/modules/product";
+import moment from 'moment'
 
 const RadioItem = Radio.RadioItem;
 const Brief = List.Item.Brief;
@@ -64,6 +65,7 @@ class SendRedeemCoupon extends BaseComponent {
       to_u_id: params.to_u_id,
       to_u_name: params.to_u_name,
       to_u_mobile: params.to_u_mobile,
+      mobiles:[],
       valid_until: '',
       preview: {},
     };
@@ -76,15 +78,16 @@ class SendRedeemCoupon extends BaseComponent {
   fetchRedeemGoodCoupon () {
     const {accessToken, order_id} = this.state
     const self = this
-    HttpUtils.get.bind(this.props)(`/api/redeem_good_coupon_type?access_token=${accessToken}`, {order_id}).then(res => {
-      self.setState({coupon_type_list: res})
+    const params = {order_id, };
+    HttpUtils.get.bind(this.props)(`/api/redeem_good_coupon_type?access_token=${accessToken}`, params).then(res => {
+      self.setState({coupon_type_list: res.type_list, mobiles: res.mobiles})
     })
   }
 
   fetchPreview () {
     const {accessToken, selected_type, selected_prod, to_u_id, valid_until} = this.state
     const self = this
-    const params = {selected_type, product_id: selected_prod.product_id, to_u_id, valid_until}
+    const params = {selected_type, product_id: selected_prod.product_id, to_u_id, valid_until:  moment(valid_until).format('YYYY-MM-DD')}
     HttpUtils.post.bind(this.props)(`/api/redeem_good_coupon_preview?access_token=${accessToken}`, params).then(res => {
       self.setState({preview: res})
     })
@@ -110,6 +113,12 @@ class SendRedeemCoupon extends BaseComponent {
       })
     } else {
       console.log("no sms code")
+    }
+  }
+
+  onMobileChange (m: any) {
+    if (m) {
+      this.setState({to_u_mobile: m});
     }
   }
 
@@ -142,7 +151,7 @@ class SendRedeemCoupon extends BaseComponent {
           <RadioItem
             key={t.type}
             onChange={() => this._on_type_selected(t.type)}
-            checked={selected_type === t.type}
+            checked={selected_type == t.type}
             defaultChecked={t.type == Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U}
             disabled={t.type != Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U}
           >
@@ -176,16 +185,28 @@ class SendRedeemCoupon extends BaseComponent {
               extra={this.state.valid_until}
               value={this.state.valid_until}
               minDate = {new Date()}
-              onChange={time => this.setState({valid_until: time})}>
+              format={'YYYY-MM-DD'}
+              onChange={time => this.setState({valid_until:time})}>
               <List.Item arrow="horizontal" multipleLine>失效日期<Brief>至当日23:59分</Brief></List.Item>
             </DatePicker>
             {this.state.to_u_id && <List.Item multipleLine
+              arrow="horizontal"
               extra={<View>
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_name}</Brief>
-              <Brief style={{ textAlign: 'right' }}>{this.state.to_u_mobile}</Brief>
-            </View>}>
-              用户账户
+              <Brief style={{ textAlign: 'right' }}>{self.state.to_u_mobile}</Brief>
+            </View>}
+              onClick={() => self.setState({show_mobiles: true})}
+            >
+              用户信息
+              <Brief>优先使用正常号</Brief>
             </List.Item>}
+            {this.state.show_mobiles && <PickerView
+              onChange={this.onMobileChange}
+              value={this.state.to_u_mobile}
+              data={this.state.mobiles}
+              cascade={false}
+            >
+            </PickerView> }
             <InputItem
               clear
               value={this.state.remark}

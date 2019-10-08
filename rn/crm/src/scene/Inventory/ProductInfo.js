@@ -62,6 +62,7 @@ class ProductInfo extends React.Component {
       riskMinStatPrompt: false,
       skuRefineLevels: [],
       skuFreshDegrees: [],
+      refer_prod_id: 0,
       refProdPrompt: false, // 关联商品
     }
   }
@@ -126,7 +127,8 @@ class ProductInfo extends React.Component {
         productInfo: res,
         refreshing: false,
         selectShelfNo: res.shelf_no,
-        isStandard: !!res.product.upc
+        isStandard: !!res.product.upc,
+        refer_prod_id: res.productInfo.refer_prod_id
       })
     })
   }
@@ -265,7 +267,7 @@ class ProductInfo extends React.Component {
       product_id: this.state.productInfo.product_id,
       refer_product_id: productId,
       unit_num: unitNum
-    }, () => this.setState({unitNumPrompt: false, refProdPrompt: false}))
+    }, () => this.setState({unitNumPrompt: false, refProdPrompt: false, refer_prod_id: productId}))
   }
   
   onChgSkuFreshDegree (value) {
@@ -427,26 +429,24 @@ class ProductInfo extends React.Component {
               arrow="horizontal"
             >商品码</List.Item>
           </If>
-  
-          <JbbPrompt
-            autoFocus={true}
-            title={'输入商品单份含量'}
-            onConfirm={(value) => this.onChgStoreProdUnitNum(this.state.productInfo.refer_prod_id, value)}
-            onCancel={() => this.setState({unitNumPrompt: false})}
-            initValue={productInfo.unit_num}
-          >
-            <List.Item
-              extra={productInfo.unit_num}
-              arrow="horizontal"
-            >商品份含量</List.Item>
-          </JbbPrompt>
           <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
             <List.Item
               onClick={() => this.setState({refProdPrompt: true})}
               extra={productInfo.refer_prod_name}
               arrow="horizontal"
-            >关联单份商品</List.Item>
+            >使用关联商品库存</List.Item>
           </Swipeout>
+          <If condition={this.state.productInfo.refer_prod_id}>
+            <JbbPrompt
+              autoFocus={true}
+              title={'输入每份相当于关联商品的份数'}
+              onConfirm={(value) => this.onChgStoreProdUnitNum(this.state.productInfo.refer_prod_id, value)}
+              onCancel={() => this.setState({unitNumPrompt: false})}
+              initValue={productInfo.unit_num}
+            >
+              <List.Item extra={productInfo.unit_num} arrow="horizontal">份含量</List.Item>
+            </JbbPrompt>
+          </If>
           <ModalSelector
             onChange={(option) => this.onChgSkuFreshDegree(option.value)}
             cancelText={'取消'}
