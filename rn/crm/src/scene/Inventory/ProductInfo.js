@@ -128,7 +128,7 @@ class ProductInfo extends React.Component {
         refreshing: false,
         selectShelfNo: res.shelf_no,
         isStandard: !!res.product.upc,
-        refer_prod_id: res.productInfo.refer_prod_id
+        refer_prod_id: res.refer_prod_id
       })
     })
   }
