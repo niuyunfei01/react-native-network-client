@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
+import Dialog from "../component/Dialog";
 import {List, Picker, Switch, Toast, WhiteSpace} from "antd-mobile-rn";
 import HttpUtils from "../../util/http";
 import Swipeout from 'react-native-swipeout';
@@ -13,6 +14,7 @@ import JbbPrompt from "../component/JbbPrompt";
 import ModalSelector from "react-native-modal-selector";
 import SearchProduct from "../component/SearchProduct";
 import JbbTimeRange from "../component/JbbTimeRange";
+import _ from "underscore";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -63,7 +65,9 @@ class ProductInfo extends React.Component {
       skuRefineLevels: [],
       skuFreshDegrees: [],
       refer_prod_id: 0,
+      referred_by: [],
       refProdPrompt: false, // 关联商品
+      referredPrompt: false, //被关联商品
     }
   }
   
@@ -128,7 +132,8 @@ class ProductInfo extends React.Component {
         refreshing: false,
         selectShelfNo: res.shelf_no,
         isStandard: !!res.product.upc,
-        refer_prod_id: res.productInfo.refer_prod_id
+        refer_prod_id: res.refer_prod_id,
+        referred_by: res.referred_by
       })
     })
   }
@@ -429,13 +434,21 @@ class ProductInfo extends React.Component {
               arrow="horizontal"
             >商品码</List.Item>
           </If>
-          <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
-            <List.Item
-              onClick={() => this.setState({refProdPrompt: true})}
-              extra={productInfo.refer_prod_name}
-              arrow="horizontal"
-            >使用关联商品库存</List.Item>
-          </Swipeout>
+          <If condition={!_.isEmpty(this.state.referred_by)}>
+            <List.Item onClick={() => this.setState({referredPrompt: true})}
+                       extra={Object.keys(this.state.referred_by).length}
+                       arrow="horizontal">被关联商品数
+            </List.Item>
+          </If>
+          <If condition={_.isEmpty(this.state.referred_by)}>
+            <Swipeout right={refProductSwipeOutBtns} autoClose={true}>
+              <List.Item
+                onClick={() => this.setState({refProdPrompt: true})}
+                extra={productInfo.refer_prod_name}
+                arrow="horizontal"
+              >关联库存商品</List.Item>
+            </Swipeout>
+          </If>
           <If condition={this.state.productInfo.refer_prod_id}>
             <JbbPrompt
               autoFocus={true}
@@ -553,6 +566,14 @@ class ProductInfo extends React.Component {
           onCancel={() => this.setState({refProdPrompt: false})}
           onSelect={product => this.onChgStoreProdUnitNum(product.id, this.state.productInfo.unit_num)}
         />
+
+        <Dialog visible={this.state.referredPrompt} onRequestClose={() => this.setState({referredPrompt: false})}>
+          {this.state.referred_by && tool.objectMap(this.state.referred_by, (item, idx) => {
+            return (
+              <View key={idx}><Text>{item.name}#{item.id}  份含量: {item.unit_num}</Text></View>
+            );
+          })}
+        </Dialog>
       </ScrollView>
     );
   }
