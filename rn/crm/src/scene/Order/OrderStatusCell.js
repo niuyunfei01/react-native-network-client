@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import {View, Text, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native'
 import {tool, native, screen} from '../../common'
 import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
@@ -9,6 +9,7 @@ import _ from 'underscore'
 import moment from 'moment'
 import Cts from '../../Cts'
 import Styles from '../../common/CommonStyles'
+import HttpUtils from "../../util/http";
 
 
 class OrderStatusCell extends PureComponent {
@@ -25,6 +26,10 @@ class OrderStatusCell extends PureComponent {
     } else {
       return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
     }
+  }
+
+  onPressOid (oid) {
+    Alert.alert('提示', oid, [{text: '确定',}])
   }
 
   _callShip = () => {
@@ -60,9 +65,9 @@ class OrderStatusCell extends PureComponent {
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
         <View>
-          <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>{order.pl_name}#{order.platform_dayId} {order.platform_oid}</Text>
+          <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18)}]} onLongPress={()=> this.onPressOid(order.platform_oid)}>{order.pl_name}#{order.platform_dayId} {order.platform_oid}</Text>
           <If condition={order.eb_order_from == '1'}>
-            <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(20), fontWeight: 'bold'}]}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
+            <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18), fontWeight: 'bold'}]}  onLongPress={()=> this.onPressOid(order.ele_id)}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
           </If>
         </View>
         <View style={{flex: 1}}/>
