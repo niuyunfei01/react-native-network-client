@@ -516,8 +516,8 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                         if (body != null && body.isOk()) {
                             app.getAccountBean().setShipAcceptStatus(body.getObj());
                             initShipAccept(app);
-                        } else {
-                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());
+                        } else  {
+                            AppLogger.e("error to shippingAcceptStatus:" + (body != null ? body.getDesc() : ""));
                         }
                     }
 
@@ -675,31 +675,31 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
         }
 
         WifiManager mWifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (!mWifi.isWifiEnabled()) {
-            mWifi.setWifiEnabled(true);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        WifiInfo wifiInfo = mWifi.getConnectionInfo();
-        if (wifiInfo != null) {
-
-            envInfos.put("wifi_name", wifiInfo.getSSID());
-            if (wifiInfo != null) {
-                envInfos.put("device_mac", wifiInfo.getMacAddress());
+        if (mWifi != null) {
+            if (!mWifi.isWifiEnabled()) {
+                mWifi.setWifiEnabled(true);
             }
-            envInfos.put("wifi_mac", wifiInfo.getBSSID());
 
-            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：").append(wifiInfo.getBSSID());
-            //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
-            sb.append("\n\n获取SSID 是否被隐藏：" + wifiInfo.getHiddenSSID());
-            sb.append("\n\n获取IP 地址：" + wifiInfo.getIpAddress());
-            sb.append("\n\n获取连接的速度：" + wifiInfo.getLinkSpeed());
-            sb.append("\n\n获取Mac 地址（手机本身网卡的MAC地址）：" + wifiInfo.getMacAddress());
-            sb.append("\n\n获取802.11n 网络的信号：" + wifiInfo.getRssi());
-            sb.append("\n\n获取SSID（所连接的WIFI的网络名称）：" + wifiInfo.getSSID());
-            sb.append("\n\n获取具体客户端状态的信息：" + wifiInfo.getSupplicantState());
+            StringBuilder sb = new StringBuilder();
+            WifiInfo wifiInfo = mWifi.getConnectionInfo();
+            if (wifiInfo != null) {
+
+                envInfos.put("wifi_name", wifiInfo.getSSID());
+                envInfos.put("device_mac", wifiInfo.getMacAddress());
+                envInfos.put("wifi_mac", wifiInfo.getBSSID());
+
+                sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：").append(wifiInfo.getBSSID());
+                //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
+                sb.append("\n\n获取SSID 是否被隐藏：").append(wifiInfo.getHiddenSSID());
+                sb.append("\n\n获取IP 地址：").append(wifiInfo.getIpAddress());
+                sb.append("\n\n获取连接的速度：").append(wifiInfo.getLinkSpeed());
+                sb.append("\n\n获取Mac 地址（手机本身网卡的MAC地址）：").append(wifiInfo.getMacAddress());
+                sb.append("\n\n获取802.11n 网络的信号：").append(wifiInfo.getRssi());
+                sb.append("\n\n获取SSID（所连接的WIFI的网络名称）：").append(wifiInfo.getSSID());
+                sb.append("\n\n获取具体客户端状态的信息：").append(wifiInfo.getSupplicantState());
+            }
+            AppLogger.e("wifi info:" + sb.toString());
         }
-        AppLogger.e("wifi info:" + sb.toString());
         return envInfos;
     }
 
