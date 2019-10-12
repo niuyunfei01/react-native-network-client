@@ -30,6 +30,7 @@ function mapDispatchToProps (dispatch) {
 class SearchGoods extends Component {
   //导航
   static navigationOptions = ({navigation}) => {
+    const {params} = navigation.state;
     const type = navigation.state.params.type;
     return {
       headerLeft: (
