@@ -185,7 +185,7 @@ public class LocationHelper {
                 // for ActivityCompat#requestPermissions for more details.
                 ActivityCompat.requestPermissions(ctx,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 465);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 Utility.toast("发生错误:" + e.getMessage(), ctx);
             }
@@ -193,30 +193,35 @@ public class LocationHelper {
             return null;
         }
 
+        Location locationGPS;
         try {
-            Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            long GPSLocationTime = 0;
-            if (null != locationGPS) {
-                GPSLocationTime = locationGPS.getTime();
-            }
-
-            long NetLocationTime = 0;
-
-            if (null != locationNet) {
-                NetLocationTime = locationNet.getTime();
-            }
-
-            if (0 < GPSLocationTime - NetLocationTime) {
-                return locationGPS;
-            } else {
-                return locationNet;
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
+            locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
+            locationGPS = null;
         }
 
-        return null;
+        Location locationNet;
+        try {
+            locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex) {
+            locationNet = null;
+        }
+
+        long GPSLocationTime = 0;
+        if (null != locationGPS) {
+            GPSLocationTime = locationGPS.getTime();
+        }
+
+        long NetLocationTime = 0;
+
+        if (null != locationNet) {
+            NetLocationTime = locationNet.getTime();
+        }
+
+        if (0 < GPSLocationTime - NetLocationTime) {
+            return locationGPS;
+        } else {
+            return locationNet;
+        }
     }
 }
