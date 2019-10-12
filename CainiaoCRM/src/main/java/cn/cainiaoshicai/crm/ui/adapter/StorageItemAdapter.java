@@ -337,12 +337,16 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         if (!TextUtils.isEmpty(text) && !text.startsWith(PREFIX_NOT_FILTER)) {
             int id = 0;
             if (text.indexOf("#") > 0) {
-                id = Integer.parseInt(text.substring(0, text.indexOf("#")));
+                try {
+                    id = Integer.parseInt(text.substring(0, text.indexOf("#")));
+                }catch (Exception ex) {
+                    AppLogger.e("exception parse int1:" + text, ex);
+                }
             } else {
                 try {
                     id = Integer.parseInt(text);
                 } catch (Exception e) {
-                    AppLogger.e("exception parse int:" + text, e);
+                    AppLogger.e("exception parse int2:" + text, e);
                 }
             }
 

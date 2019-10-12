@@ -373,112 +373,103 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
     private void initSignButton(final GlobalCtx app, final TextView signingText) {
         signingText.setText(Cts.getSignInLabel(SettingUtility.getSignInStatus()));
 
-        signingText.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("HardwareIds")
-            @Override
-            public void onClick(View v) {
-                //手机要地理位置权限
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
-                }
-                final Long signInStore = SettingUtility.getSignInStore();
-                final Integer signInStatus = SettingUtility.getSignInStatus();
-                final int vendorId = app.getVendor() != null ? app.getVendor().getId() : 0;
-                if (vendorId != STORE_VENDOR_CN) {
-                    GlobalCtx.app().toSetStoreStatusView(MainActivity.this);
-                } else {
-                    if (signInStatus == Cts.SIGN_ACTION_IN) {
-                        final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                        Utility.forceShowDialog(MainActivity.this, pf);
-                        new MyAsyncTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                pf.dismissAllowingStateLoss();
+        signingText.setOnClickListener(v -> {
+            final Long signInStore = SettingUtility.getSignInStore();
+            final Integer signInStatus = SettingUtility.getSignInStatus();
+            final int vendorId = app.getVendor() != null ? app.getVendor().getId() : 0;
+            if (vendorId != STORE_VENDOR_CN) {
+                GlobalCtx.app().toSetStoreStatusView(MainActivity.this);
+            } else {
+                if (signInStatus == Cts.SIGN_ACTION_IN) {
+                    final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                    Utility.forceShowDialog(MainActivity.this, pf);
+                    new MyAsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            pf.dismissAllowingStateLoss();
 
-                                String err = "";
-                                try {
-                                    StaffDao staffDao = new StaffDao(app.token());
-                                    final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
-                                    if (msg != null && msg.isOk()) {
-                                        MainActivity.this.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                AlertUtil.showAlert(MainActivity.this, R.string.working_status,
-                                                        msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
-                                                        new SignOffOnClickListener(signInStore, signingText));
-                                            }
-                                        });
-                                    } else {
-                                        err = "获取工作状态失败:" + msg.getDesc();
-                                    }
-                                } catch (ServiceException e) {
-                                    err = "异常:" + e.getMessage();
+                            String err = "";
+                            try {
+                                StaffDao staffDao = new StaffDao(app.token());
+                                final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
+                                if (msg != null && msg.isOk()) {
+                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            AlertUtil.showAlert(MainActivity.this, R.string.working_status,
+                                                    msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
+                                                    new SignOffOnClickListener(signInStore, signingText));
+                                        }
+                                    });
+                                } else {
+                                    err = "获取工作状态失败:" + msg.getDesc();
                                 }
-                                if (!TextUtils.isEmpty(err)) {
-                                    AlertUtil.errorOnActivity(MainActivity.this, "发生错误" + err);
-                                }
-                                return null;
+                            } catch (ServiceException e) {
+                                err = "异常:" + e.getMessage();
                             }
-                        }.executeOnNormal();
+                            if (!TextUtils.isEmpty(err)) {
+                                AlertUtil.errorOnActivity(MainActivity.this, "发生错误" + err);
+                            }
+                            return null;
+                        }
+                    }.executeOnNormal();
 
-                    } else {
-                        final Long defStoreId = signInStore > 0 ? signInStore : Long.valueOf(SettingUtility.getListenerStore());
-                        Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", defStoreId,
-                                new StoreSelectedListener() {
-                                    @Override
-                                    public void done(final long selectedId) {
-                                        final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
-                                        Utility.forceShowDialog(MainActivity.this, pf);
+                } else {
+                    final Long defStoreId = signInStore > 0 ? signInStore : Long.valueOf(SettingUtility.getListenerStore());
+                    Utility.showStoreSelector(MainActivity.this, "选择工作门店", "签到", "暂不签到", defStoreId,
+                            new StoreSelectedListener() {
+                                @Override
+                                public void done(final long selectedId) {
+                                    final ProgressFragment pf = ProgressFragment.newInstance(R.string.signing);
+                                    Utility.forceShowDialog(MainActivity.this, pf);
 
-                                        periodEnabledLocation();
-                                        final HashMap<String, String> envInfos = extraEnvInfo();
+                                    periodEnabledLocation();
+                                    final HashMap<String, String> envInfos = extraEnvInfo();
 
-                                        new MyAsyncTask<Void, Void, Void>() {
-                                            private ResultBean<HashMap<String, String>> resultBean;
+                                    new MyAsyncTask<Void, Void, Void>() {
+                                        private ResultBean<HashMap<String, String>> resultBean;
 
-                                            @Override
-                                            protected Void doInBackground(Void... params) {
-                                                StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
-                                                try {
-                                                    resultBean = fbDao.sign_in(selectedId, envInfos);
-                                                } catch (ServiceException e) {
-                                                    resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
-                                                }
-                                                return null;
+                                        @Override
+                                        protected Void doInBackground(Void... params) {
+                                            StaffDao fbDao = new StaffDao(GlobalCtx.app().token());
+                                            try {
+                                                resultBean = fbDao.sign_in(selectedId, envInfos);
+                                            } catch (ServiceException e) {
+                                                resultBean = ResultBean.serviceException("服务异常:" + e.getMessage());
                                             }
+                                            return null;
+                                        }
 
-                                            @Override
-                                            protected void onPostExecute(Void aVoid) {
-                                                pf.dismissAllowingStateLoss();
-                                                if (resultBean != null && resultBean.isOk()) {
-                                                    final HashMap<String, String> obj = resultBean.getObj();
+                                        @Override
+                                        protected void onPostExecute(Void aVoid) {
+                                            pf.dismissAllowingStateLoss();
+                                            if (resultBean != null && resultBean.isOk()) {
+                                                final HashMap<String, String> obj = resultBean.getObj();
 
-                                                    final String okTips = "打卡成功，今日值班店长："
-                                                            + (obj != null ? obj.get("working_mgr") : "未安排")
-                                                            + resultBean.getDesc();
+                                                final String okTips = "打卡成功，今日值班店长："
+                                                        + (obj != null ? obj.get("working_mgr") : "未安排")
+                                                        + resultBean.getDesc();
 
-                                                    MainActivity.this.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
-                                                            updateSignInStatus(obj, signingText);
-                                                        }
-                                                    });
-                                                } else {
-                                                    Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
-                                                    MainActivity.this.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            updateSignInStatus(resultBean.getObj(), signingText);
-                                                        }
-                                                    });
-                                                }
+                                                MainActivity.this.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        AlertUtil.showAlert(MainActivity.this, "门店提醒", okTips);
+                                                        updateSignInStatus(obj, signingText);
+                                                    }
+                                                });
+                                            } else {
+                                                Utility.toast("签到失败:" + resultBean.getDesc(), MainActivity.this);
+                                                MainActivity.this.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        updateSignInStatus(resultBean.getObj(), signingText);
+                                                    }
+                                                });
                                             }
-                                        }.executeOnNormal();
-                                    }
-                                }, "查看考勤表", new StaffDetailsClickListener(vendorId), true);
-                    }
+                                        }
+                                    }.executeOnNormal();
+                                }
+                            }, "查看考勤表", new StaffDetailsClickListener(vendorId), true);
                 }
             }
         });
@@ -525,8 +516,8 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                         if (body != null && body.isOk()) {
                             app.getAccountBean().setShipAcceptStatus(body.getObj());
                             initShipAccept(app);
-                        } else {
-                            AppLogger.e("error to shippingAcceptStatus:" + body.getDesc());
+                        } else  {
+                            AppLogger.e("error to shippingAcceptStatus:" + (body != null ? body.getDesc() : ""));
                         }
                     }
 
@@ -667,6 +658,12 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
 
     @NonNull
     public HashMap<String, String> extraEnvInfo() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        }
+
         final HashMap<String, String> envInfos = new HashMap<>();
         Location location = locationHelper.getLastBestLocation();
         if (location != null) {
@@ -678,31 +675,31 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
         }
 
         WifiManager mWifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (!mWifi.isWifiEnabled()) {
-            mWifi.setWifiEnabled(true);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        WifiInfo wifiInfo = mWifi.getConnectionInfo();
-        if (wifiInfo != null) {
-
-            envInfos.put("wifi_name", wifiInfo.getSSID());
-            if (wifiInfo != null) {
-                envInfos.put("device_mac", wifiInfo.getMacAddress());
+        if (mWifi != null) {
+            if (!mWifi.isWifiEnabled()) {
+                mWifi.setWifiEnabled(true);
             }
-            envInfos.put("wifi_mac", wifiInfo.getBSSID());
 
-            sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：").append(wifiInfo.getBSSID());
-            //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
-            sb.append("\n\n获取SSID 是否被隐藏：" + wifiInfo.getHiddenSSID());
-            sb.append("\n\n获取IP 地址：" + wifiInfo.getIpAddress());
-            sb.append("\n\n获取连接的速度：" + wifiInfo.getLinkSpeed());
-            sb.append("\n\n获取Mac 地址（手机本身网卡的MAC地址）：" + wifiInfo.getMacAddress());
-            sb.append("\n\n获取802.11n 网络的信号：" + wifiInfo.getRssi());
-            sb.append("\n\n获取SSID（所连接的WIFI的网络名称）：" + wifiInfo.getSSID());
-            sb.append("\n\n获取具体客户端状态的信息：" + wifiInfo.getSupplicantState());
+            StringBuilder sb = new StringBuilder();
+            WifiInfo wifiInfo = mWifi.getConnectionInfo();
+            if (wifiInfo != null) {
+
+                envInfos.put("wifi_name", wifiInfo.getSSID());
+                envInfos.put("device_mac", wifiInfo.getMacAddress());
+                envInfos.put("wifi_mac", wifiInfo.getBSSID());
+
+                sb.append("\n获取BSSID属性（所连接的WIFI设备的MAC地址）：").append(wifiInfo.getBSSID());
+                //		sb.append("getDetailedStateOf()  获取客户端的连通性：");
+                sb.append("\n\n获取SSID 是否被隐藏：").append(wifiInfo.getHiddenSSID());
+                sb.append("\n\n获取IP 地址：").append(wifiInfo.getIpAddress());
+                sb.append("\n\n获取连接的速度：").append(wifiInfo.getLinkSpeed());
+                sb.append("\n\n获取Mac 地址（手机本身网卡的MAC地址）：").append(wifiInfo.getMacAddress());
+                sb.append("\n\n获取802.11n 网络的信号：").append(wifiInfo.getRssi());
+                sb.append("\n\n获取SSID（所连接的WIFI的网络名称）：").append(wifiInfo.getSSID());
+                sb.append("\n\n获取具体客户端状态的信息：").append(wifiInfo.getSupplicantState());
+            }
+            AppLogger.e("wifi info:" + sb.toString());
         }
-        AppLogger.e("wifi info:" + sb.toString());
         return envInfos;
     }
 
