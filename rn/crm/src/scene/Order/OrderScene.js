@@ -439,7 +439,9 @@ class OrderScene extends Component {
     } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
       navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.order.id})
     } else if (option.key === MENU_REDEEM_GOOD_COUPON) {
-      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {type: 'select', storeId: order.order.store_id,
+      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {type: 'select',
+        storeId: order.order.store_id,
+        orderId: order.order.id,
         coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
         to_u_id: order.order.user_id,
         to_u_name: order.order.userName,

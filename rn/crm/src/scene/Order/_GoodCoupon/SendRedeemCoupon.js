@@ -76,31 +76,39 @@ class SendRedeemCoupon extends BaseComponent {
   }
 
   fetchRedeemGoodCoupon () {
-    const {accessToken, order_id} = this.state
+    const {accessToken, orderId} = this.state
     const self = this
-    const params = {order_id, };
+    const params = {orderId};
     HttpUtils.get.bind(this.props)(`/api/redeem_good_coupon_type?access_token=${accessToken}`, params).then(res => {
       self.setState({coupon_type_list: res.type_list, mobiles: res.mobiles})
     })
   }
 
   fetchPreview () {
-    const {accessToken, selected_type, selected_prod, to_u_id, valid_until} = this.state
+    const {accessToken, selected_type, selected_prod, to_u_id, to_u_mobile, valid_until} = this.state
     const self = this
-    const params = {selected_type, product_id: selected_prod.product_id, to_u_id, valid_until:  moment(valid_until).format('YYYY-MM-DD')}
+    const params = {selected_type, product_id: selected_prod.product_id, to_u_id,
+      valid_until:  moment(valid_until).format('YYYY-MM-DD'),
+      to_u_mobile
+    }
     HttpUtils.post.bind(this.props)(`/api/redeem_good_coupon_preview?access_token=${accessToken}`, params).then(res => {
       self.setState({preview: res})
     })
   }
 
   commitCoupon () {
-    const {accessToken, selected_type, selected_prod, to_u_id, preview, valid_until} = this.state
+    const {accessToken, selected_type, selected_prod, to_u_mobile, to_u_id, preview, valid_until} = this.state
     const self = this
-    const params = {selected_type, product_id: selected_prod.product_id, to_u_id, code: preview.code, valid_until}
+    const params = {selected_type, product_id: selected_prod.product_id, to_u_id, code: preview.code,
+      wm_id: this.state.orderId,
+      valid_until:  moment(valid_until).format('YYYY-MM-DD'),
+      to_u_mobile
+    }
 
     if (preview.code) {
-      HttpUtils.get.bind(this.props)(`/api/redeem_good_coupon_save?access_token=${accessToken}`, params).then(res => {
+      HttpUtils.post.bind(this.props)(`/api/redeem_good_coupon_save?access_token=${accessToken}`, params).then(res => {
         self.setState({preview: res})
+        Modal.alert("成功提示", "发放优惠券成功", [{text: 'OK'}])
       }, resp => {
         Modal.alert('错误提示', resp.reason, [
           {
@@ -114,6 +122,10 @@ class SendRedeemCoupon extends BaseComponent {
     } else {
       console.log("no sms code")
     }
+  }
+
+  onDateChanged(time) {
+    this.setState({valid_until: time})
   }
 
   onMobileChange (m: any) {
@@ -138,37 +150,11 @@ class SendRedeemCoupon extends BaseComponent {
     })
   }
 
-  _on_type_selected (selected_type) {
-    this.setState({selected_type})
-  }
-
-  renderCouponTypes () {
-    const {coupon_type_list, selected_type} = this.state
-    console.log(coupon_type_list)
-    return (
-      <List renderHeader={() => '优惠类型'}>
-        {coupon_type_list.map(t => (
-          <RadioItem
-            key={t.type}
-            onChange={() => this._on_type_selected(t.type)}
-            checked={selected_type == t.type}
-            defaultChecked={t.type == Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U}
-            disabled={t.type != Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U}
-          >
-            {t.name}
-            {/*<List.Item.Brief>{t.desc}</List.Item.Brief>*/}
-          </RadioItem>
-        ))}
-      </List>
-    )
-  }
-  
   renderCouponDispatch (item) {
     const self = this
     return (
       <View style={styles.itemContainer}>
         <ScrollView>
-          {this.renderCouponTypes()}
           <List renderHeader={() => '优惠详情'}>
             <List.Item
               arrow="horizontal"
@@ -186,7 +172,7 @@ class SendRedeemCoupon extends BaseComponent {
               value={this.state.valid_until}
               minDate = {new Date()}
               format={'YYYY-MM-DD'}
-              onChange={time => this.setState({valid_until:time})}>
+              onChange={t => this.onDateChanged(t)}>
               <List.Item arrow="horizontal" multipleLine>失效日期<Brief>至当日23:59分</Brief></List.Item>
             </DatePicker>
             {this.state.to_u_id && <List.Item multipleLine
@@ -195,7 +181,7 @@ class SendRedeemCoupon extends BaseComponent {
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_name}</Brief>
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_mobile}</Brief>
             </View>}
-              onClick={() => self.setState({show_mobiles: true})}
+              onClick={() => {self.setState({show_mobiles: true}); console.log("show mobiles clicked!");}}
             >
               用户信息
               <Brief>优先使用正常号</Brief>
@@ -230,11 +216,16 @@ class SendRedeemCoupon extends BaseComponent {
             </List>
           </If>
 
+          {!this.state.preview.sent_coupon_id &&
           <View style={[styles.printBtnBox,]}>
-            <Button type={ this.state.preview.code ? 'primary' : 'ghost'} size="small" disalbed={!this.state.preview.code}
-                    style={[this.state.preview.code ?styles.printBtn : styles.printBtnDisabled,]} onClick={() => this.commitCoupon()}>{'发出兑换码'}</Button>
-            <Button type={'ghost'} size="small" style={[styles.printBtn,]} onClick={() => this.fetchPreview()}>{'试算兑换码'}</Button>
+            <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
+                    disalbed={!this.state.preview.code}
+                    style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
+                    onClick={() => this.commitCoupon()}>{'发出兑换码'}</Button>
+            <Button type={'ghost'} size="small" style={[styles.printBtn,]}
+                    onClick={() => this.fetchPreview()}>{'试算兑换码'}</Button>
           </View>
+          }
         </ScrollView>
       </View>
     )
