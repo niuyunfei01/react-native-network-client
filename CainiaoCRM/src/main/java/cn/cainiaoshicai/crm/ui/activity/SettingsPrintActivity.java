@@ -129,33 +129,27 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         toggleUseAlpha.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserAlphaHost(isChecked));
 
         final Switch toggleAutoPrint = findViewById(R.id.toggleAutoPrint);
-        toggleAutoPrint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked && SettingUtility.getListenerStores().isEmpty()) {
-                    Utility.toast("您必须先指定【待处理订单显示店铺】", SettingsPrintActivity.this, new Runnable() {
-                        @Override
-                        public void run() {
-                            toggleAutoPrint.setChecked(false);
-                        }
-                    });
-                } else {
-                    SettingUtility.setAutoPrint(isChecked);
-                }
+        toggleAutoPrint.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && SettingUtility.getListenerStores().isEmpty()) {
+                Utility.toast("您必须先指定【待处理订单显示店铺】", SettingsPrintActivity.this, new Runnable() {
+                    @Override
+                    public void run() {
+                        toggleAutoPrint.setChecked(false);
+                    }
+                });
+            } else {
+                SettingUtility.setAutoPrint(isChecked);
             }
         });
         toggleAutoPrint.setChecked(SettingUtility.getAutoPrintSetting());
 
         final Switch toggleSetZiti = findViewById(R.id.toggleSetZitiMode);
-        toggleSetZiti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isDirect) {
-                    SettingUtility.setZitiMode(isChecked);
-                } else {
-                    SettingUtility.setZitiMode(false);
-                    Toast.makeText(SettingsPrintActivity.this, "暂不支持该功能！", Toast.LENGTH_SHORT).show();
-                }
+        toggleSetZiti.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isDirect) {
+                SettingUtility.setZitiMode(isChecked);
+            } else {
+                SettingUtility.setZitiMode(false);
+                Toast.makeText(SettingsPrintActivity.this, "暂不支持该功能！", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -201,12 +195,9 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         updateStoreFilterText(list_store_filter_values, longs);
 
         final Switch toggleSetAppWhiteList = findViewById(R.id.toggleSetAppWhiteList);
-        toggleSetAppWhiteList.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    IntentWrapper.whiteListMatters(SettingsPrintActivity.this, "外送帮后台运行");
-                }
+        toggleSetAppWhiteList.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                IntentWrapper.whiteListMatters(SettingsPrintActivity.this, "外送帮后台运行");
             }
         });
 
