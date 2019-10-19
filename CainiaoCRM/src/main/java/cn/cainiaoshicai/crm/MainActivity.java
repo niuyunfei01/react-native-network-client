@@ -246,9 +246,7 @@ public class MainActivity extends AbstractActionBarActivity {
         }
         if (app.fnEnabledTmpBuy()) {
             if (params != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    params.removeRule(RelativeLayout.ALIGN_PARENT_END);
-                }
+                params.removeRule(RelativeLayout.ALIGN_PARENT_END);
                 signInTxt.setLayoutParams(params);
             }
 
