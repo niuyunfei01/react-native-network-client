@@ -1,22 +1,16 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
-import color from '../../../widget/color'
-import {screen,native, tool} from "../../../common";
+import {screen, tool} from "../../../common";
 import Config from '../../../config'
 import Cts from '../../../Cts'
-import {connect, bind} from "react-redux";
+import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
-import {ToastShort} from "../../../util/ToastUtils";
-import Swipeout from 'react-native-swipeout'
-import CommonStyle from "../../../common/CommonStyles";
 import HttpUtils from "../../../util/http";
-import {Button, DatePicker, List, WhiteSpace, PickerView, Radio, InputItem, Modal, Portal, Toast} from 'antd-mobile-rn'
-import Mapping from "../../../Mapping/index";
-import product from "../../../Mapping/modules/product";
+import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio} from 'antd-mobile-rn'
 import moment from 'moment'
 
 const RadioItem = Radio.RadioItem;
@@ -30,7 +24,7 @@ function mapStateToProps (state) {
   return {
     global: state.global,
     store: state.store,
-  }                                                                  
+  }
 }
 
 function mapDispatchToProps (dispatch) {
@@ -76,11 +70,11 @@ class SendRedeemCoupon extends BaseComponent {
   }
 
   fetchRedeemGoodCoupon () {
-    const {accessToken, orderId} = this.state
+    const {accessToken, orderId, to_u_mobile} = this.state
     const self = this
-    const params = {orderId};
+    const params = {orderId, to_u_mobile};
     HttpUtils.get.bind(this.props)(`/api/redeem_good_coupon_type?access_token=${accessToken}`, params).then(res => {
-      self.setState({coupon_type_list: res.type_list, mobiles: res.mobiles})
+      self.setState({coupon_type_list: res.type_list, mobiles: res.mobiles, to_u_mobile: res.to_u_mobile})
     })
   }
 
@@ -136,18 +130,29 @@ class SendRedeemCoupon extends BaseComponent {
 
   _on_prod_selection () {
     const self = this
-    this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS, {
-      limit_store: this.state.storeId,
-      onBack: (name, prod) => {
-        prod.name = name;
-        console.log(prod);
-        if (prod) {
-          self.setState({selected_prod: prod})
-        }
-      },
-      'type':'select_for_store',
-      'prod_status': [Cts.STORE_PROD_ON_SALE, Cts.STORE_PROD_SOLD_OUT],
-    })
+    if (!this.state.preview.sent_coupon_id) {
+      this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS, {
+        limit_store: this.state.storeId,
+        onBack: (name, prod) => {
+          prod.name = name;
+          console.log(prod);
+          if (prod) {
+            self.setState({selected_prod: prod})
+          }
+        },
+        'type': 'select_for_store',
+        'prod_status': [Cts.STORE_PROD_ON_SALE, Cts.STORE_PROD_SOLD_OUT],
+      })
+    } else {
+      console.log("coupon is done, Don't allow modifies")
+    }
+  }
+  
+  _on_press_mobile () {
+    if (this.state.mobiles.length > 1) {
+      this.setState({show_mobiles: true});
+    }
+    console.log("show mobiles clicked! but mobiles:", this.state.mobiles);
   }
 
   renderCouponDispatch (item) {
@@ -167,6 +172,7 @@ class SendRedeemCoupon extends BaseComponent {
               wrap
             >兑换商品</List.Item>
             <DatePicker
+              disabled={this.state.preview.sent_coupon_id}
               mode="date"
               extra={this.state.valid_until}
               value={this.state.valid_until}
@@ -176,12 +182,12 @@ class SendRedeemCoupon extends BaseComponent {
               <List.Item arrow="horizontal" multipleLine>失效日期<Brief>至当日23:59分</Brief></List.Item>
             </DatePicker>
             {this.state.to_u_id && <List.Item multipleLine
-              arrow="horizontal"
-              extra={<View>
+                                              arrow="horizontal"
+                                              extra={<View>
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_name}</Brief>
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_mobile}</Brief>
             </View>}
-              onClick={() => {self.setState({show_mobiles: true}); console.log("show mobiles clicked!");}}
+                                              onClick={() => this._on_press_mobile()}
             >
               用户信息
               <Brief>优先使用正常号</Brief>
