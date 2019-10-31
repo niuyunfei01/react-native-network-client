@@ -17,7 +17,7 @@ public class StoreProduct {
     private int deleted;
     private int status;
     private int price;
-    private int sold_from_last_stat;
+    private float sold_from_last_stat;
     private Date last_stat;
     private int total_last_stat;
     private float store_gap;
@@ -132,11 +132,11 @@ public class StoreProduct {
         this.price = price;
     }
 
-    public int getSold_from_last_stat() {
+    public float getSold_from_last_stat() {
         return sold_from_last_stat;
     }
 
-    public void setSold_from_last_stat(int sold_from_last_stat) {
+    public void setSold_from_last_stat(float sold_from_last_stat) {
         this.sold_from_last_stat = sold_from_last_stat;
     }
 

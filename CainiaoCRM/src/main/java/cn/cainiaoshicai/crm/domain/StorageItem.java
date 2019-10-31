@@ -2,7 +2,6 @@ package cn.cainiaoshicai.crm.domain;
 
 import java.util.HashMap;
 
-import cn.cainiaoshicai.crm.orders.service.MemoryCache;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
 /**
@@ -25,7 +24,7 @@ public class StorageItem {
     private int id;
     private String name;
     private float total_last_stat;
-    private int total_sold;
+    private float total_sold;
     private float left_since_last_stat;
     private int product_id;
     private int status;
@@ -34,7 +33,7 @@ public class StorageItem {
     private int sold_5day = 0;
     private int sold_weekend = 0;
     private int sold_latest = 0;
-    private int occupy = 0;
+    private float occupy = 0;
     private int store_id;
 
     private int totalInReq;
@@ -110,11 +109,11 @@ public class StorageItem {
         this.total_last_stat = total_last_stat;
     }
 
-    public int getTotal_sold() {
+    public float getTotal_sold() {
         return total_sold;
     }
 
-    public void setTotal_sold(int total_sold) {
+    public void setTotal_sold(float total_sold) {
         this.total_sold = total_sold;
     }
 
@@ -366,11 +365,11 @@ public class StorageItem {
         this.expect_check_time = expect_check_time;
     }
 
-    public int getOccupy() {
+    public float getOccupy() {
         return occupy;
     }
 
-    public void setOccupy(int occupy) {
+    public void setOccupy(float occupy) {
         this.occupy = occupy;
     }
 
