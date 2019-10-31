@@ -280,7 +280,7 @@ public class GlobalCtx extends Application {
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
         initTalkSDK();
-        updateAfterGap(5 * 60 * 1000);
+        updateAfterGap(30 * 60 * 1000);
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
         //init react
@@ -342,14 +342,9 @@ public class GlobalCtx extends Application {
         }
     }
 
-    public void updateAfterGap(final int fiveMin) {
+    public void updateAfterGap(final int gap) {
         updateCfgInterval();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                updateAfterGap(fiveMin);
-            }
-        }, fiveMin);
+        new Handler().postDelayed(() -> updateAfterGap(gap), gap);
     }
 
     public void updateCfgInterval() {
