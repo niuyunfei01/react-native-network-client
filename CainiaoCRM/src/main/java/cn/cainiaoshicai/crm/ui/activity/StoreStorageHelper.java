@@ -409,7 +409,7 @@ public class StoreStorageHelper {
 
 
         int totalInReq = item.getTotalInReq();
-        int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
+        int defaultReq = (int) Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
         totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
         remark.setText(item.getReqMark());
 //        nowStatTxt.setText(String.valueOf(item.getLeft_since_last_stat()));
@@ -502,7 +502,7 @@ public class StoreStorageHelper {
     }
 
     private static class PostLeftNum {
-        private final int lastStat;
+        private final float lastStat;
         private final StorageItem item;
         private final Activity activity;
         private final Runnable succCallback;

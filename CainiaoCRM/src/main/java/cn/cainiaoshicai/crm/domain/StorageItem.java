@@ -24,9 +24,9 @@ public class StorageItem {
 
     private int id;
     private String name;
-    private int total_last_stat;
+    private float total_last_stat;
     private int total_sold;
-    private int left_since_last_stat;
+    private float left_since_last_stat;
     private int product_id;
     private int status;
     private int self_provided;
@@ -102,11 +102,11 @@ public class StorageItem {
         this.name = name;
     }
 
-    public int getTotal_last_stat() {
+    public float getTotal_last_stat() {
         return total_last_stat;
     }
 
-    public void setTotal_last_stat(int total_last_stat) {
+    public void setTotal_last_stat(float total_last_stat) {
         this.total_last_stat = total_last_stat;
     }
 
@@ -143,11 +143,11 @@ public class StorageItem {
         return String.format("%s#%s", name, product_id);
     }
 
-    public int getLeft_since_last_stat() {
+    public float getLeft_since_last_stat() {
         return left_since_last_stat;
     }
 
-    public void setLeft_since_last_stat(int left_since_last_stat) {
+    public void setLeft_since_last_stat(float left_since_last_stat) {
         this.left_since_last_stat = left_since_last_stat;
     }
 
@@ -302,7 +302,8 @@ public class StorageItem {
     }
 
     public String leftNumberStr() {
-        String txt = "库:" + this.getLeft_since_last_stat();
+        float left = this.getLeft_since_last_stat();
+        String txt = (left - Math.floor(left)) >= 0.1 ? String.format("库:%.1f", left) : "库:" + (int) left;
         if (this.getOccupy() > 0) {
             txt = txt + "\n占:" + this.getOccupy();
         }

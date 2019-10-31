@@ -41,7 +41,7 @@ import cn.cainiaoshicai.crm.support.http.HttpUtility;
  */
 public class StorageActionDao {
 
-    public ResultBean store_status_reset_stat_num(int storeId, int product_id, int lastStat) throws ServiceException {
+    public ResultBean store_status_reset_stat_num(int storeId, int product_id, float lastStat) throws ServiceException {
         return actionWithResult(String.format("/store_status_reset_stat_num/%d/%d/%d", storeId, product_id, lastStat), null);
     }
 
@@ -173,7 +173,7 @@ public class StorageActionDao {
                 throw new ServiceException(msg);
             }
 
-            if (storagesMap!=null && storagesMap.getStore_products() != null) {
+            if (storagesMap.getStore_products() != null) {
 
                 StorageStatusResults.ExtPrice ep = storagesMap.getExt_price();
                 HashMap<Integer, Integer> plOfExt = ep == null ? null : ep.getExt_store();

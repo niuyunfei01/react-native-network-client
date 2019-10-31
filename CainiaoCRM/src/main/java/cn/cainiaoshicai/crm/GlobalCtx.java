@@ -1196,7 +1196,7 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public boolean updatePidStorage(int pid, int storage) {
+    public boolean updatePidStorage(int pid, float storage) {
         WeakReference<StorageItemAdapter> ref = this.storageItemAdapterRef.get();
         StorageItemAdapter adapter = ref.get();
 
@@ -1209,7 +1209,7 @@ public class GlobalCtx extends Application {
             }
         }
 
-        AppLogger.e(String.format("updatePidStorage %d-%d-%s", pid, storage, updated ? " null Adapter" : "done"));
+        AppLogger.e(String.format("updatePidStorage %d-%.2f-%s", pid, storage, updated ? " null Adapter" : "done"));
         return updated;
     }
 

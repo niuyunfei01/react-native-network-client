@@ -339,7 +339,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    void updatePidStorage(int pid, int storage, @Nonnull final Callback callback) {
+    void updatePidStorage(int pid, float storage, @Nonnull final Callback callback) {
         boolean updated = GlobalCtx.app().updatePidStorage(pid, storage);
         callback.invoke(updated, "");
     }

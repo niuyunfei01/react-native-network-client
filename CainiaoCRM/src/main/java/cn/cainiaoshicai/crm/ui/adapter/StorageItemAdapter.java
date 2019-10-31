@@ -304,7 +304,7 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
         return (convertView);
     }
 
-    public boolean updateItemStorage(int pid, int newStorage) {
+    public boolean updateItemStorage(int pid, float newStorage) {
         for (StorageItem item : this.backendData) {
             if (pid > 0 && item.getProduct_id() == pid) {
                 item.setLeft_since_last_stat(newStorage);
