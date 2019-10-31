@@ -184,32 +184,28 @@ public class OrderSingleHelper {
     static AlertDialog createRefundDialog(final StoreStorageActivity activity, final StorageItem item) {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View npView = inflater.inflate(R.layout.storage_edit_provide_layout, null);
-        final EditText totalReqTxt = (EditText) npView.findViewById(R.id.total_req);
-        final EditText remark = (EditText) npView.findViewById(R.id.remark);
+        final EditText totalReqTxt = npView.findViewById(R.id.total_req);
+        final EditText remark = npView.findViewById(R.id.remark);
         int totalInReq = item.getTotalInReq();
-        int defaultReq = Math.max(item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0), 1);
+        float min_stat = item.getRisk_min_stat() - Math.max(item.getLeft_since_last_stat(), 0);
+        int defaultReq = (int) Math.max(min_stat, 1);
         totalReqTxt.setText(String.valueOf(totalInReq > 0 ? totalInReq : defaultReq));
         remark.setText(item.getReqMark());
         AlertDialog dlg = new AlertDialog.Builder(activity)
                 .setTitle(String.format("订货:(%s)", item.getName()))
                 .setView(npView)
                 .setPositiveButton(R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new MyAsyncTask<Void, Void, Void>() {
-                                    @Override
-                                    protected Void doInBackground(Void... params) {
-                                        return null;
-                                    }
-                                }.executeOnIO();
+                        (dialog, whichButton) -> new MyAsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                return null;
                             }
-                        })
+                        }.executeOnIO())
                 .setNegativeButton(R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
+                        (dialog, whichButton) -> {
                         })
                 .create();
+
         dlg.show();
         totalReqTxt.requestFocus();
         return dlg;

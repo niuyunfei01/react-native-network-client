@@ -595,20 +595,12 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
         String[] items = shipAcceptStatus == null ? new String[]{} : shipAcceptStatus.getPrinters();
         int checkedIdx = shipAcceptStatus == null ? 0 : shipAcceptStatus.getCheckedIdx();
         SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
-        singleChoiceDialogFragment.show("请选择接单打印机", items, checkedIdx, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String sn = items[which];
-                Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId, sn);
-                handleChangeShipAcceptStatus(resultBeanCall);
-                singleChoiceDialogFragment.dismiss();
-            }
-        }, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                singleChoiceDialogFragment.dismiss();
-            }
-        }, getFragmentManager());
+        singleChoiceDialogFragment.show("请选择接单打印机", items, checkedIdx, (dialog, which) -> {
+            String sn = items[which];
+            Call<ResultBean<ShipAcceptStatus>> resultBeanCall = app.dao.shippingStartAccept(storeId, sn);
+            handleChangeShipAcceptStatus(resultBeanCall);
+            singleChoiceDialogFragment.dismiss();
+        }, (dialog, which) -> singleChoiceDialogFragment.dismiss(), getFragmentManager());
     }
 
     private void handleChangeShipAcceptStatus(Call<ResultBean<ShipAcceptStatus>> resultBeanCall){
