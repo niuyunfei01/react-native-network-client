@@ -88,7 +88,7 @@ class OrderPackage extends BaseComponent {
                 <Text>主单号：{item.wm_order_id}</Text>
               </View>
               <View style={styles.row}>
-                <Text>子单号：{item.id}</Text>
+                <Text>子单号：{item.id} 取货码: {item.verify_code}</Text>
               </View>
               <View style={styles.row}>
                 <Text>温区：</Text>
