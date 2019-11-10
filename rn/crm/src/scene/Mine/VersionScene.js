@@ -21,6 +21,10 @@ import {Platform} from 'react-native';
 import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
+import {getCommonConfig} from "../../reducers/global/globalActions";
+import {setCurrentStore} from "../../reducers/global/globalActions";
+import tool from "../../common/tool";
+import {ToastLong} from "../../util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -49,17 +53,12 @@ class VersionScene extends PureComponent {
   constructor(props: Object) {
     super(props);
 
-    let platform = Platform.OS === 'ios' ? 'ios' : 'android';
-    let plat_version = this.props.global.config.v_b;
-    let newest_version = plat_version[platform];
-    let newest_version_name = plat_version['name-'+platform];
-
     this.state = {
       isRefreshing: false,
       isSearchingVersion: true,
-      platform: platform,
-      newest_version: newest_version,
-      newest_version_name: newest_version_name,
+      platform: '',
+      newest_version: 0,
+      newest_version_name: '',
       curr_version: '未知',
       curr_version_name: '未知',
     };
@@ -67,7 +66,7 @@ class VersionScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
-    this._check_version();
+    this._update_cfg_and_check_again();
   }
 
   onPress(route, params = {}) {
@@ -81,8 +80,25 @@ class VersionScene extends PureComponent {
     this._check_version();
   }
 
+  _update_cfg_and_check_again() {
+    const {accessToken, currStoreId} = this.props.global;
+    const {dispatch, } = this.props;
+    dispatch(getCommonConfig(accessToken, currStoreId, (ok) => {
+      if (ok) {
+        this._check_version();
+      } else {
+         this.setState({isRefreshing: false});
+        return '获取服务器端版本信息失败';
+      }
+    }));
+  }
+
   _check_version() {
-    let {platform, newest_version} = this.state;
+    let platform = Platform.OS === 'ios' ? 'ios' : 'android';
+    let plat_version = this.props.global.config.v_b;
+    let newest_version = plat_version[platform];
+    let newest_version_name = plat_version['name-'+platform];
+
     native.currentVersion((resp) => {
       //{"version_name":"2.3.1-debug","version_code":"280"}
       resp = JSON.parse(resp);
@@ -93,6 +109,9 @@ class VersionScene extends PureComponent {
       }
       this.setState({
         isSearchingVersion: false,
+        newest_version: newest_version,
+        newest_version_name: newest_version_name,
+        platform: platform,
         is_newest_version: is_newest_version,
         curr_version: version_code,
         curr_version_name: version_name,
