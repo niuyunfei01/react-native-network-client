@@ -67,7 +67,7 @@ class VersionScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
-    this.setState({isRefreshing: false});
+    this._check_version();
   }
 
   onPress(route, params = {}) {
@@ -78,13 +78,17 @@ class VersionScene extends PureComponent {
   }
 
   componentWillMount(){
+    this._check_version();
+  }
+
+  _check_version() {
     let {platform, newest_version} = this.state;
     native.currentVersion((resp) => {
       //{"version_name":"2.3.1-debug","version_code":"280"}
       resp = JSON.parse(resp);
       let {version_name, version_code} = resp;
       let is_newest_version = false;
-      if(version_code == newest_version){
+      if (version_code === newest_version) {
         is_newest_version = true;
       }
       this.setState({
@@ -92,6 +96,7 @@ class VersionScene extends PureComponent {
         is_newest_version: is_newest_version,
         curr_version: version_code,
         curr_version_name: version_name,
+        isRefreshing: false
       });
     });
   }
