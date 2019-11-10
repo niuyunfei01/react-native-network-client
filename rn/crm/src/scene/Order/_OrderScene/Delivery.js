@@ -33,7 +33,6 @@ class Delivery extends React.Component {
     super(props)
     let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
-      isJbbVendor: tool.isJbbVendor(currVendorId),
       logistics: this.props.logistics,
       accessToken: this.props.global.accessToken,
       timer: null
@@ -256,12 +255,10 @@ class Delivery extends React.Component {
   
   render (): React.ReactNode {
     return (
-      <If condition={this.state.isJbbVendor}>
         <View>
           {this.renderShips()}
           {this.renderBtn()}
         </View>
-      </If>
     )
   }
 }
