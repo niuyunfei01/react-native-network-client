@@ -160,7 +160,6 @@ class OrderScene extends Component {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
-      isJbbVendor: tool.isJbbVendor(currVendorId),
       isFetching: false,
       orderReloading: false,
       
@@ -1733,7 +1732,7 @@ class OrderScene extends Component {
         
         <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
         <If condition={!order.is_split_package}>
-        {this.state.isJbbVendor ? <Delivery
+        {order.fn_delivery_v2 ? <Delivery
           order={order}
           logistics={this.state.logistics}
           fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
