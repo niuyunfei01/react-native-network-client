@@ -50,7 +50,8 @@ class SeparatedExpense extends PureComponent {
     super(props);
     this.state = {
       records: [],
-      by_labels: []
+      by_labels: [],
+      data_labels: []
     }
   }
 
@@ -63,7 +64,7 @@ class SeparatedExpense extends PureComponent {
     const {global} = self.props
     const url = `api/store_separated_items/${global.currStoreId}?access_token=${global.accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels})
+      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
     })
   }
 
@@ -84,7 +85,7 @@ class SeparatedExpense extends PureComponent {
   }
 
   renderAccordionItems () {
-    return this.state.records.map((record, idx) => {
+    return this.state.records && this.state.records.map((record, idx) => {
           return <Accordion.Panel header={this.renderAccordionHeader(record)}
               key={idx} index={idx}
               style={{backgroundColor: '#fff'}} >
@@ -95,10 +96,10 @@ class SeparatedExpense extends PureComponent {
   }
 
   onItemClicked (item) {
+      console.log("item clicked:", item)
       if (item.wm_id) {
         this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
       }
-    console.log("item clicked:", item)
   }
 
   renderRecordsOfDay(record) {
@@ -108,13 +109,13 @@ class SeparatedExpense extends PureComponent {
         {record.items.map((item, idx) => {
           return <List.Item arrow="horizontal"
                             multipleLine
-                            onPress={(item) => this.onItemClicked(item)}
+                            onPress={(item) => console.log(item)}
                             extra={<View>
                               {`${item.amount > 0 && '+' || ''}${item.amount}`}
                               <Brief style={{'textAlign': 'right'}}>{self.state.by_labels[item.by]}</Brief>
                             </View>}>
             {item.name}
-            <Brief>{item.hm} {item.wm_id}</Brief>
+            <Brief>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Brief>
           </List.Item>
         })}
       </List>
