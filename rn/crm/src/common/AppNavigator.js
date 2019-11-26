@@ -132,6 +132,7 @@ import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 import Cts from "../Cts";
 import _ from "lodash"
 import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
+import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -157,7 +158,7 @@ const tabDef = function (store_) {
         )
       })
     },
-    
+
     Orders: {
       screen: OrderScene,
       navigationOptions: ({navigation}) => ({
@@ -176,7 +177,7 @@ const tabDef = function (store_) {
         }
       })
     },
-    
+
     Goods: {
       screen: GoodsScene,
       navigationOptions: ({navigation}) => ({
@@ -201,7 +202,7 @@ const tabDef = function (store_) {
       })
     }
   }
-  
+
   if (isBlx) {
     tab.Operation = {
       screen: TabOperation,
@@ -218,7 +219,7 @@ const tabDef = function (store_) {
       })
     }
   }
-  
+
   tab.Mine = {
     screen: MineScene,
     navigationOptions: ({navigation}) => ({
@@ -233,7 +234,7 @@ const tabDef = function (store_) {
       )
     })
   }
-  
+
   return tab
 };
 
@@ -255,11 +256,11 @@ class Navigator extends Component {
   constructor (props) {
     super(props);
   }
-  
+
   render () {
     console.log('app navigation', this.props)
     const {initialRouteName, screenProps, initialRouteParams, store_} = this.props;
-    
+
     let stackNavigatorConfigs = {
       navigationOptions: {
         headerStyle: {
@@ -281,7 +282,7 @@ class Navigator extends Component {
         showIcon: true
       }
     };
-    
+
     if (initialRouteName) {
       stackNavigatorConfigs = {
         ...stackNavigatorConfigs,
@@ -289,7 +290,7 @@ class Navigator extends Component {
         initialRouteParams: initialRouteParams || {}
       };
     }
-    
+
     let tabInitN;
     if (initialRouteName === "Tab" && (initialRouteParams || {}).initTab) {
       tabInitN = {
@@ -299,9 +300,9 @@ class Navigator extends Component {
     } else {
       tabInitN = tabInit;
     }
-    
+
     // console.log(tabInitN);
-    
+
     const CustomNavigator = StackNavigator(
       {
         Tab: {screen: TabNavigator(tabDef(store_), tabInitN)},
@@ -315,7 +316,7 @@ class Navigator extends Component {
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
-  
+
         [Config.ROUTE_SETTING]: {screen: SettingScene},
         [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
         [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
@@ -365,7 +366,7 @@ class Navigator extends Component {
         [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
         [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
         [Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY]: {screen: GoodsMarketExamineHistory},
-        
+
         [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
         [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
         [Config.ROUTE_SELECT_WORKER]: {screen: SelectWorkerScene},
@@ -400,6 +401,9 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
+
+        [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
+
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
         [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
         [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},

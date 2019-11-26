@@ -73,17 +73,17 @@ const customerOpacity = 0.6;
 
 class MineScene extends PureComponent {
   static navigationOptions = {title: "Mine", header: null};
-  
+
   constructor (props) {
     super(props);
-    
+
     const {
       currentUser,
       currStoreId,
       currentUserProfile,
     } = this.props.global;
-    
-    
+
+
     let prefer_store = "";
     let screen_name = "";
     let mobilephone = "";
@@ -94,7 +94,7 @@ class MineScene extends PureComponent {
       mobilephone = currentUserProfile.mobilephone;
       cover_image = currentUserProfile.cover_image;
     }
-    
+
     let {
       currStoreName,
       currVendorName,
@@ -109,24 +109,24 @@ class MineScene extends PureComponent {
       fnProfitControlled
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    
+
     // let storeActionSheet = tool.storeActionSheet(
     // 	canReadStores,
     // 	is_helper || is_service_mgr
     // );
-    
+
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
     }
-    
+
     this.state = {
       isRefreshing: false,
       onNavigating: false,
       FnPriceMsg: false,
       onStoreChanging: false,
       // storeActionSheet: storeActionSheet,
-      
+
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
       order_num:
@@ -141,7 +141,7 @@ class MineScene extends PureComponent {
           : !!turnover[currStoreId]
           ? turnover[currStoreId]
           : 0,
-      
+
       currentUser: currentUser,
       prefer_store: prefer_store,
       screen_name: screen_name,
@@ -161,9 +161,10 @@ class MineScene extends PureComponent {
       adjust_cnt: 0,
       dutyUsers: [],
       searchStoreVisible: false,
-      storeStatus: {}
+      storeStatus: {},
+      fnSeparatedExpense: false
     };
-    
+
     this._doChangeStore = this._doChangeStore.bind(this);
     this.onCanChangeStore = this.onCanChangeStore.bind(this);
     this.onPress = this.onPress.bind(this);
@@ -174,21 +175,21 @@ class MineScene extends PureComponent {
     this.getTimeoutCommonConfig = this.getTimeoutCommonConfig.bind(this);
     this.getNotifyCenter = this.getNotifyCenter.bind(this);
     this.onGetDutyUser = this.onGetDutyUser.bind(this);
-    
+
     if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
       this.onGetUserCount();
     }
     if (is_mgr || is_helper) {
       this.onGetStoreTurnover();
     }
-    
+
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
-    
+
     this.onGetDutyUser();
   }
-  
+
   componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
@@ -200,7 +201,7 @@ class MineScene extends PureComponent {
     this.getNotifyCenter();
     this.getStoreStatus()
   }
-  
+
   onGetUserInfo (uid) {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -210,7 +211,7 @@ class MineScene extends PureComponent {
       );
     });
   }
-  
+
   onGetUserCount () {
     const {currentUser, accessToken} = this.props.global;
     let _this = this;
@@ -230,7 +231,7 @@ class MineScene extends PureComponent {
       );
     });
   }
-  
+
   onGetDutyUser () {
     const {accessToken, currStoreId} = this.props.global;
     let _this = this;
@@ -248,7 +249,7 @@ class MineScene extends PureComponent {
       );
     });
   }
-  
+
   getNotifyCenter () {
     let _this = this;
     const {currStoreId, accessToken} = this.props.global;
@@ -262,23 +263,23 @@ class MineScene extends PureComponent {
         }
       })
   }
-  
+
   getStoreStatus () {
     const self = this
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
-    const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
+    const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      self.setState({storeStatus: res})
+      self.setState({storeStatus: res.store_status, fnSeparatedExpense: res.fnSeparatedExpense})
     })
   }
-  
+
   onGetStoreTurnover () {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     let {currStoreId, fnPriceControlled} = this.state;
     let _this = this;
-    
+
     InteractionManager.runAfterInteractions(() => {
       if (fnPriceControlled > 0) {
         dispatch(
@@ -318,7 +319,7 @@ class MineScene extends PureComponent {
       }
     });
   }
-  
+
   callCustomerService () {
     let server_info = tool.server_info(this.props);
     let dutyUsers = this.state.dutyUsers;
@@ -332,21 +333,21 @@ class MineScene extends PureComponent {
     }
     native.dialNumber(server_info.mobilephone);
   }
-  
+
   componentWillReceiveProps () {
     const {
       currentUser,
       currStoreId,
       currentUserProfile,
     } = this.props.global;
-    
+
     let {
       prefer_store,
       screen_name,
       mobilephone,
       cover_image
     } = currentUserProfile;
-    
+
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
     let {
       currStoreName,
@@ -359,12 +360,12 @@ class MineScene extends PureComponent {
       is_service_mgr,
       fnPriceControlled
     } = tool.vendor(this.props.global);
-    
+
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
     }
-    
+
     this.setState({
       sign_count: sign_count[currentUser],
       bad_cases_of: bad_cases_of[currentUser],
@@ -384,7 +385,7 @@ class MineScene extends PureComponent {
       cover_image: cover_image,
     });
   }
-  
+
   onHeaderRefresh () {
     this.setState({isRefreshing: true});
     let {is_mgr, is_helper} = this.state;
@@ -393,7 +394,7 @@ class MineScene extends PureComponent {
     } else {
       this.onGetUserCount();
     }
-    
+
     let _this = this;
     const {dispatch} = this.props;
     const {accessToken, currStoreId} = this.props.global;
@@ -414,7 +415,7 @@ class MineScene extends PureComponent {
       })
     );
   }
-  
+
   _doChangeStore (store_id, is_skip = true) {
     if (this.state.onStoreChanging) {
       return false;
@@ -464,7 +465,7 @@ class MineScene extends PureComponent {
       }
     });
   }
-  
+
   getTimeoutCommonConfig (store_id,
                           should_refresh = false,
                           callback = () => {
@@ -472,7 +473,7 @@ class MineScene extends PureComponent {
     const {accessToken, last_get_cfg_ts} = this.props.global;
     let current_time = Moment(new Date()).unix();
     let diff_time = current_time - last_get_cfg_ts;
-    
+
     if (should_refresh || diff_time > 300) {
       const {dispatch} = this.props;
       dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
@@ -480,7 +481,7 @@ class MineScene extends PureComponent {
       }));
     }
   }
-  
+
   onCanChangeStore (store_id) {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -495,7 +496,7 @@ class MineScene extends PureComponent {
       })
     );
   }
-  
+
   renderHeader () {
     return (
       <View style={header_styles.container}>
@@ -532,7 +533,7 @@ class MineScene extends PureComponent {
       </View>
     );
   }
-  
+
   renderManager () {
     let {
       order_num,
@@ -540,7 +541,7 @@ class MineScene extends PureComponent {
       fnPriceControlled,
       fnProfitControlled
     } = this.state;
-    
+
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -611,7 +612,7 @@ class MineScene extends PureComponent {
       </TouchableOpacity>
     );
   }
-  
+
   renderWorker () {
     return (
       <TouchableOpacity
@@ -672,7 +673,7 @@ class MineScene extends PureComponent {
       </TouchableOpacity>
     );
   }
-  
+
   render () {
     let {currVersion, is_mgr, is_helper} = this.state;
     return (
@@ -694,7 +695,7 @@ class MineScene extends PureComponent {
           {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
           {currVersion === Cts.VERSION_DIRECT && this.renderZtBlock()}
           {this.renderVersionBlock()}
-          
+
           <Dialog
             onRequestClose={() => {
             }}
@@ -745,7 +746,7 @@ class MineScene extends PureComponent {
       </View>
     );
   }
-  
+
   onPress (route, params = {}) {
     let _this = this;
     if (route === Config.ROUTE_SETTING) {
@@ -755,12 +756,12 @@ class MineScene extends PureComponent {
       native.toUserComments();
       return;
     }
-    
+
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-  
+
   renderStoreBlock () {
     const {
       show_activity_mgr = false,
@@ -909,7 +910,22 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        
+        {this.state.fnSeparatedExpense ? (
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
+            activeOpacity={customerOpacity}
+          >
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/yunyingshouyi_.png")}
+            />
+            <Text style={[block_styles.block_name]}>费用账单</Text>
+          </TouchableOpacity>
+        ) : (
+          <View/>
+        )}
+
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -927,7 +943,7 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>评价</Text>
           </TouchableOpacity>
         )}
-  
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
@@ -939,7 +955,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        
+
         {(show_activity_mgr && (is_helper || is_service_mgr)) && (
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -968,7 +984,7 @@ class MineScene extends PureComponent {
       </View>
     );
   }
-  
+
   renderVersionBlock () {
     let server_info = tool.server_info(this.props);
     const {
@@ -976,7 +992,7 @@ class MineScene extends PureComponent {
     } = this.props.global.config;
     return (
       <View style={[block_styles.container]}>
-        
+
         {show_expense_center && (<TouchableOpacity
             style={[block_styles.block_box]}
             activeOpacity={customerOpacity}>
@@ -987,7 +1003,7 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>我的钱包</Text>
           </TouchableOpacity>
         )}
-        
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           activeOpacity={customerOpacity}
@@ -1001,7 +1017,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>帮助</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
@@ -1043,7 +1059,7 @@ class MineScene extends PureComponent {
       </View>
     );
   }
-  
+
   renderDirectBlock () {
     let token = `?access_token=${this.props.global.accessToken}`;
     let {currStoreId,currVendorId} = this.state;
@@ -1232,7 +1248,7 @@ class MineScene extends PureComponent {
       </View>
     );
   }
-  
+
   renderZtBlock () {
     return (
       <View style={[block_styles.container]}>
@@ -1405,7 +1421,7 @@ const block_styles = StyleSheet.create({
     width: ScreenWidth / 4,
     height: ScreenWidth / 4,
     backgroundColor: colors.white,
-  
+
     // borderColor: colors.main_back,
     // borderWidth: pxToDp(1),
     alignItems: "center"
@@ -1415,7 +1431,7 @@ const block_styles = StyleSheet.create({
     width: pxToDp(478),
     height: pxToDp(188),
     backgroundColor: colors.white,
-    
+
     borderColor: colors.main_back,
     borderWidth: pxToDp(1),
     alignItems: "center"

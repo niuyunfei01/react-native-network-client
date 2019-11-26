@@ -19,7 +19,7 @@ export function host (globalRed, dispatch, native) {
         dispatch({type: HOST_UPDATED, host: host});
       }
     });
-    
+
     return C.defaultHost;
   }
 }
@@ -56,19 +56,19 @@ const C = {
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
   defaultHost: "api.waisongbang.com",
   AppName: "Crm",
-  
+
   DownloadUrl: `https://api.waisongbang.com/util/crm_dl`,
   MAP_WAY_URL: "util/amap_way",
   FetchTimeout: 60000,
   LongFetchTimeout: 200000,
-  
+
   GRANT_TYP_PASSWORD: "password",
   GRANT_CLIENT_ID: "NTQ5NTE5MGViMTgzMDUw",
-  
+
   ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
-  
+
   LOC_PICKER: "loc_picker",
-  
+
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
@@ -102,7 +102,7 @@ const C = {
   ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
   ROUTE_ORDER_EXIT_LOG: 'OrderExitLog',                               // 订单出库记录
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
-  
+
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
@@ -137,6 +137,7 @@ const C = {
   ROUTE_OPERATE_INCOME_DETAIL: 'OperateIncomeDetail',
   ROUTE_OPERATE_EXPEND_DETAIL: 'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
+  ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
@@ -192,7 +193,7 @@ const C = {
   ROUTE_INVENTORY_DETAIL: 'InventoryDetail',                                    // 库存 - 商品出入库明细
   // 自提相关
   ROUTE_ZT_ORDER_PRINT: 'ZtOrderPrint',                                         // 自提 - 订单打印
-  
+
   serverUrl,
   apiUrl,
   staticUrl,
