@@ -1061,13 +1061,12 @@ class MineScene extends PureComponent {
   }
 
   renderCopyRight() {
+    const css = {justifyContent: 'center', alignItems: 'center', height: pxToDp(300)};
     return (
-        <View style={[block_styles.container, {justifyContent: 'center', paddingTop: pxToDp(22), marginBottom: 0, height: pxToDp(300)}]}>
-          <TouchableOpacity style={{alignItems: 'center', textAlign: 'center'}} >
-            <Text>版权所有</Text>
-            <Text>@北京家帮帮科技有限公司</Text>
-            <Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../img/Login/ic_launcher.png")} />
-          </TouchableOpacity>
+        <View style={[css]}>
+            <Text style={{color: colors.colorDDD}}>版权所有</Text>
+            <Text style={{color: colors.colorDDD}}>@北京家帮帮科技有限公司</Text>
+            {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../img/Login/ic_launcher.png")} />*/}
         </View>
     );
   }
