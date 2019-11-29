@@ -49,6 +49,7 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.theweflex.react.WeChatPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
@@ -296,6 +297,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new ReactNativeI18n())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
+                .addPackage(new WeChatPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

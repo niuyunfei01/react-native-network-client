@@ -15,3 +15,6 @@ project(':react-native-i18n').projectDir = new File(rootProject.projectDir, './r
 
 include ':rn-fetch-blob'
 project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, 'rn-fetch-blob-android')
+
+include ':RCTWeChat'
+project(':RCTWeChat').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-wechat/android')

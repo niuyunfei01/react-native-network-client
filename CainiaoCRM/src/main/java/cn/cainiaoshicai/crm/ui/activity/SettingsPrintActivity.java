@@ -161,15 +161,12 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         final TextView printerStatus = findViewById(R.id.printer_status);
         printerStatus.setVisibility(connected ? View.VISIBLE : View.GONE);
 
-        printerStatus.setText(PrintUtil.getDefaultBluethoothDeviceAddress(this) + ":" + (connected ? "已连接" : "未连接"));
-        printerStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!GlobalCtx.app().isConnectPrinter()) {
-                    AppLogger.e("skip to print for printer is not connected!");
-                }
-                showTestDlg(SettingsPrintActivity.this, GlobalCtx.app().isConnectPrinter() ? "打印机未连接？" : "点击测试");
+        printerStatus.setText(connected ? "已连接(点击测试打印)" : "未连接");
+        printerStatus.setOnClickListener(v -> {
+            if (!GlobalCtx.app().isConnectPrinter()) {
+                AppLogger.e("skip to print for printer is not connected!");
             }
+            showTestDlg(SettingsPrintActivity.this, GlobalCtx.app().isConnectPrinter() ? "打印机未连接？" : "点击测试");
         });
 
 

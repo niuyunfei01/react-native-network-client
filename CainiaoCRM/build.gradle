@@ -60,6 +60,7 @@ dependencies {
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-i18n')
     implementation project(':react-native-splash-screen')
+    implementation project(':RCTWeChat')
 
     releaseImplementation 'ch.acra:acra:4.9.2'
 

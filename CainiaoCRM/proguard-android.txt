@@ -221,6 +221,9 @@
 -keep class com.tencent.** {*;  }
 -dontwarn com.tencent.**
 -keep class com.tencent.mm.sdk.openapi.** implements com.tencent.mm.sdk.openapi.WXMediaMessage$IMediaObject {*; }
+-keep class com.tencent.mm.sdk.** {
+  *;
+}
 
 -keep class com.alipay.sdk{*;}
 -keep class com.alipay.android{*;}

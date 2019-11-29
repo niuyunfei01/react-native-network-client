@@ -695,7 +695,7 @@ class MineScene extends PureComponent {
           {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
           {currVersion === Cts.VERSION_DIRECT && this.renderZtBlock()}
           {this.renderVersionBlock()}
-
+          {this.renderCopyRight()}
           <Dialog
             onRequestClose={() => {
             }}
@@ -1057,6 +1057,18 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
+    );
+  }
+
+  renderCopyRight() {
+    return (
+        <View style={[block_styles.container, {justifyContent: 'center', paddingTop: pxToDp(22), marginBottom: 0, height: pxToDp(300)}]}>
+          <TouchableOpacity style={{alignItems: 'center', textAlign: 'center'}} >
+            <Text>版权所有</Text>
+            <Text>@北京家帮帮科技有限公司</Text>
+            <Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../img/Login/ic_launcher.png")} />
+          </TouchableOpacity>
+        </View>
     );
   }
 
