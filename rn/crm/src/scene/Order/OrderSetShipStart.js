@@ -1,13 +1,25 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import React, {Component} from 'react'
+import {ScrollView, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
-import {orderChgPackWorker, orderStartShip} from '../../reducers/order/orderActions'
+import {orderStartShip} from '../../reducers/order/orderActions'
 import {getStoreShippers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, ButtonArea,Toast, Dialog, Cells, CellsTitle, Cell,  Switch, CellFooter, RadioCells, CellBody} from "../../weui/index";
+import {
+  Button,
+  ButtonArea,
+  Cell,
+  CellBody,
+  CellFooter,
+  Cells,
+  CellsTitle,
+  Dialog,
+  RadioCells,
+  Switch,
+  Toast
+} from "../../weui/index";
 import S from '../../stylekit'
 import Cts from "../../Cts";
 
@@ -43,7 +55,7 @@ class OrderSetShipStart extends Component {
   componentWillMount() {
     const {dispatch, global, navigation, store} = this.props;
     const {order} = (navigation.state.params || {});
-    this.setState({notAutoConfirmed: order.ship_worker_id !== `${Cts.ID_DADA_SHIP_WORKER}`});
+    this.setState({notAutoConfirmed: !this.should_show_ship_auto(order)});
     const shipWorkers = store && store.shipWorkers ? store.shipWorkers[order.store_id] : null;
     if (!shipWorkers || shipWorkers.length === 0) {
       this.setState({loadingShippers: true});
@@ -95,12 +107,6 @@ class OrderSetShipStart extends Component {
     }) : [];
 
     console.log(shipperOpts);
-
-    const iDadaStatus = parseInt(order.dada_status);
-    const shipAuto = order.ship_worker_id === `${Cts.ID_DADA_SHIP_WORKER}`
-      && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
-      && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
-
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {
@@ -116,7 +122,7 @@ class OrderSetShipStart extends Component {
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
 
-      {shipAuto && <View>
+      {this.should_show_ship_auto(order) && <View>
         <CellsTitle style={{marginTop: 2}}>强制出发确认</CellsTitle>
         <Cells>
           <Cell>
@@ -151,6 +157,13 @@ class OrderSetShipStart extends Component {
         show={this.state.doneSubmitting}
       >保存成功</Toast>
     </ScrollView>
+  }
+
+  should_show_ship_auto(order) {
+    const iDadaStatus = parseInt(order.dada_status);
+    return `${order.ship_worker_id}` === `${Cts.ID_DADA_SHIP_WORKER}`
+        && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
+        && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
   }
 }
 
