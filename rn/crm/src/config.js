@@ -138,6 +138,7 @@ const C = {
   ROUTE_OPERATE_EXPEND_DETAIL: 'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
+  ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',

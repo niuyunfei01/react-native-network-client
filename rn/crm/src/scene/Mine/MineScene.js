@@ -1064,8 +1064,8 @@ class MineScene extends PureComponent {
     const css = {justifyContent: 'center', alignItems: 'center', height: pxToDp(300)};
     return (
         <View style={[css]}>
-            <Text style={{color: colors.colorDDD}}>版权所有</Text>
-            <Text style={{color: colors.colorDDD}}>@北京家帮帮科技有限公司</Text>
+            <Text style={{color: colors.colorDDD}}>@版权所有</Text>
+            <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
             {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../img/Login/ic_launcher.png")} />*/}
         </View>
     );

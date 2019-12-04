@@ -24,27 +24,11 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-class SeparatedExpense extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '帐户清单',
-        headerRight: (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                <View style={{
-                        width: pxToDp(96),
-                        height: pxToDp(46),
-                        backgroundColor: colors.main_color,
-                        marginRight: 8,
-                        borderRadius: 10,
-                        justifyContent: "center",
-                        alignItems: "center"
-                    }} >
-                    <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}} > 充值 </Text>
-                </View>
-            </TouchableOpacity>
-        )
-    }
-  }
+class SeparatedAccountFill extends PureComponent {
+
+  static navigationOptions = {
+    headerTitle: '帐户充值',
+  };
 
   constructor (props: Object) {
     super(props);
@@ -86,8 +70,7 @@ class SeparatedExpense extends PureComponent {
 
   renderAccordionItems () {
     return this.state.records && this.state.records.map((record, idx) => {
-          return <Accordion.Panel header={this.renderAccordionHeader(record)}
-              key={idx} index={idx}
+          return <Accordion.Panel header={this.renderAccordionHeader(record)} key={idx} index={idx}
               style={{backgroundColor: '#fff'}} >
             {record && this.renderRecordsOfDay(record)}
           </Accordion.Panel>
@@ -108,7 +91,6 @@ class SeparatedExpense extends PureComponent {
       return  <List>
         {record.items.map((item, idx) => {
           return <List.Item arrow="horizontal"
-                            key={idx}
                             multipleLine
                             onPress={(item) => console.log(item)}
                             extra={<View>
@@ -127,10 +109,14 @@ class SeparatedExpense extends PureComponent {
 
   render () {
     return (
-        <ScrollView maintainVisibleContentPosition={true}>
-        <Accordion accordion defaultActiveKey="0">
-          {this.renderAccordionItems()}
-        </Accordion>
+        <ScrollView>
+            <List>
+              <List.Item extra={''}/>
+              <List.Item/>
+              <List.Item/>
+              <List.Item/>
+              <List.Item/>
+            </List>
       </ScrollView>
     )
   }
@@ -167,4 +153,4 @@ const style = StyleSheet.create({
 })
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(SeparatedExpense)
+export default connect(mapStateToProps, mapDispatchToProps)(SeparatedAccountFill)
