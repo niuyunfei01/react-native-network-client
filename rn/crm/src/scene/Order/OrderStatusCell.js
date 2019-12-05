@@ -34,9 +34,20 @@ class OrderStatusCell extends PureComponent {
 
   _callShip = () => {
     const {order} = this.props;
+    let msg = order.ship_worker_mobile ? `电话：${order.ship_worker_mobile}` : '暂无骑手电话';
+    const buttons = [
+      {text: '关闭', style: 'cancel', },
+    ];
+
     if (order.ship_worker_mobile) {
-      native.dialNumber(order.ship_worker_mobile)
+      buttons.push({
+        text: '呼叫骑手',
+        onPress: () => native.dialNumber(order.ship_worker_mobile),
+        style: 'default',
+      });
     }
+
+    Alert.alert("骑手信息", msg, buttons);
   };
 
   render() {

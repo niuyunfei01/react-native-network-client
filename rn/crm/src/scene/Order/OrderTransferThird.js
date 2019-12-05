@@ -34,11 +34,11 @@ class OrderTransferThird extends Component {
       logistics: []
     };
   }
-  
+
   componentWillMount (): void {
     this.fetchThirdWays()
   }
-  
+
   fetchThirdWays () {
     const self = this
     const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`
@@ -46,7 +46,7 @@ class OrderTransferThird extends Component {
       self.setState({logistics: res})
     })
   }
-  
+
   onCallThirdShip () {
     const self = this
     const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`
@@ -56,12 +56,12 @@ class OrderTransferThird extends Component {
       storeId: storeId,
       logisticCode: newSelected
     }).then(res => {
-      Toast.success('正在呼叫第三方配送，请稍等')
-      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack(res)
+      Toast.success('正在呼叫第三方配送，请稍等');
+      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack(res);
       self.props.navigation.goBack()
     })
   }
-  
+
   onSelectLogistic (code) {
     let selected = this.state.newSelected
     let index = selected.indexOf(code)
@@ -73,7 +73,7 @@ class OrderTransferThird extends Component {
     console.log(selected)
     this.setState({newSelected: selected})
   }
-  
+
   renderHeader () {
     return (
       <View style={styles.header}>
@@ -82,7 +82,7 @@ class OrderTransferThird extends Component {
       </View>
     )
   }
-  
+
   renderLogistics () {
     const {logistics, selected} = this.state
     console.log(logistics, selected)
@@ -102,7 +102,7 @@ class OrderTransferThird extends Component {
       </List>
     )
   }
-  
+
   renderBtn () {
     return (
       <View style={styles.btnCell}>
@@ -118,18 +118,18 @@ class OrderTransferThird extends Component {
       </View>
     )
   }
-  
+
   render() {
     return (
       <ScrollView>
         {this.renderHeader()}
-  
+
         <If condition={this.state.logistics.length}>
           {this.renderLogistics()}
           <WhiteSpace/>
           {this.renderBtn()}
         </If>
-  
+
         <If condition={!this.state.logistics.length}>
           <EmptyData placeholder={'无可用配送方式'}/>
         </If>

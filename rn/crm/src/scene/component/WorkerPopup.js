@@ -73,7 +73,8 @@ class WorkerPopup extends React.Component {
           list.push({name: '不任命任何人', id: '0'});
           if (workerList && workerList.length > 0) {
             workerList.forEach(function (item) {
-              list.push({name: item['user']['nickname'], id: item['user']['id']});
+              const user = item['user'];
+              list.push({name: `${user['nickname']}-${user['mobilephone']}`, id: user['id']});
             });
           }
           self.setState({originWorkerList: list, workerList: list})

@@ -19,7 +19,7 @@ class StoreStatusScene extends React.Component {
       headerTitle: '店铺状态'
     }
   }
-  
+
   constructor (props) {
     super(props)
     this.state = {
@@ -37,11 +37,11 @@ class StoreStatusScene extends React.Component {
       business_status: []
     }
   }
-  
+
   componentWillMount () {
     this.fetchData()
   }
-  
+
   fetchData () {
     const self = this
     const access_token = this.props.global.accessToken
@@ -60,7 +60,7 @@ class StoreStatusScene extends React.Component {
       Toast.hide()
     })
   }
-  
+
   openStore () {
     const self = this
     const access_token = this.props.global.accessToken
@@ -75,7 +75,7 @@ class StoreStatusScene extends React.Component {
       Toast.hide()
     })
   }
-  
+
   closeStore (minutes) {
     const self = this
     const access_token = this.props.global.accessToken
@@ -85,7 +85,7 @@ class StoreStatusScene extends React.Component {
       self.fetchData()
     })
   }
-  
+
   renderBody () {
     const business_status = this.state.business_status
     let items = []
@@ -100,7 +100,7 @@ class StoreStatusScene extends React.Component {
               </CellBody>
               <CellFooter>
                 <Text>
-                  {store.open ? store.pre_order ? '接受预订单中' : '接单中' : `开店时间${store.next_open_time}`}
+                  {store.open ? store.pre_order ? '接受预订单中' : '接单中' : `开店时间${store.next_open_desc || store.next_open_time}`}
                 </Text>
               </CellFooter>
             </Cell>
@@ -108,14 +108,14 @@ class StoreStatusScene extends React.Component {
         </View>
       )
     }
-    
+
     return (
       <ScrollView style={styles.bodyContainer}>
         {items}
       </ScrollView>
     )
   }
-  
+
   renderFooter () {
     let canOpen = !this.state.all_open && this.state.allow_self_open
     let canClose = !this.state.all_close && this.state.allow_self_open
@@ -133,8 +133,8 @@ class StoreStatusScene extends React.Component {
             <Text style={styles.footerBtnText}>开店接单</Text>
           </View>
         </If>
-        
-        
+
+
         <If condition={canClose}>
           <ModalSelector
             style={[styles.footerItem, {flex: 1}]}
@@ -159,12 +159,12 @@ class StoreStatusScene extends React.Component {
       </View>
     )
   }
-  
+
   render () {
     return (
       <View style={{flex: 1}}>
         {this.renderBody()}
-        
+
         {this.renderFooter()}
       </View>
     )
