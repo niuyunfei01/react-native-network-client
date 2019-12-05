@@ -1,15 +1,15 @@
 import React, {PureComponent} from 'react'
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {ScrollView, StyleSheet, Image, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Accordion, List} from 'antd-mobile-rn';
+import {InputItem, List, Button, Item, Radio} from 'antd-mobile-rn';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
-import Config from "../../config";
 
 const Brief = List.Item.Brief;
+const RadioItem = Radio.RadioItem;
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
@@ -24,6 +24,8 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
+const PAY_WECHAT_APP = 'wechat_app';
+
 class SeparatedAccountFill extends PureComponent {
 
   static navigationOptions = {
@@ -33,14 +35,12 @@ class SeparatedAccountFill extends PureComponent {
   constructor (props: Object) {
     super(props);
     this.state = {
-      records: [],
-      by_labels: [],
-      data_labels: []
+      to_fill_yuan: '100',
+      pay_by: PAY_WECHAT_APP,
     }
   }
 
   componentWillMount () {
-    this.fetchExpenses()
   }
 
   fetchExpenses () {
@@ -52,77 +52,46 @@ class SeparatedAccountFill extends PureComponent {
     })
   }
 
-  renderAccordionHeader (record) {
-    return (
-      <View style={{
-        flexDirection: "row",
-        justifyContent: 'space-between',
-        width: '95%',
-        height: 40,
-        alignItems: 'center',
-        paddingRight: '5%'
-      }}>
-        <Text>{record.day}</Text>
-        <Text style={{textAlign: 'right'}}>余额：{record.total_balanced} </Text>
-      </View>
-    )
-  }
-
-  renderAccordionItems () {
-    return this.state.records && this.state.records.map((record, idx) => {
-          return <Accordion.Panel header={this.renderAccordionHeader(record)} key={idx} index={idx}
-              style={{backgroundColor: '#fff'}} >
-            {record && this.renderRecordsOfDay(record)}
-          </Accordion.Panel>
-        }
-      )
-  }
-
-  onItemClicked (item) {
-      console.log("item clicked:", item)
-      if (item.wm_id) {
-        this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
-      }
-  }
-
-  renderRecordsOfDay(record) {
-      const self = this
-    if (record.items) {
-      return  <List>
-        {record.items.map((item, idx) => {
-          return <List.Item arrow="horizontal"
-                            multipleLine
-                            onPress={(item) => console.log(item)}
-                            extra={<View>
-                              {`${item.amount > 0 && '+' || ''}${item.amount}`}
-                              <Brief style={{'textAlign': 'right'}}>{self.state.by_labels[item.by]}</Brief>
-                            </View>}>
-            {item.name}
-            <Brief>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Brief>
-          </List.Item>
-        })}
-      </List>
-    } else {
-      return <View><Text>没有详细记录</Text></View>
-    }
+  pay_by_text() {
+    return this.state.pay_by === PAY_WECHAT_APP ? '微信支付' : '';
   }
 
   render () {
-    return (
-        <ScrollView>
-            <List>
-              <List.Item extra={''}/>
-              <List.Item/>
-              <List.Item/>
-              <List.Item/>
-              <List.Item/>
+      const self = this
+    return  ( <View style={{flex: 1, justifyContent: 'space-between'}}>
+          <ScrollView style={{ flex: 1 }} automaticallyAdjustContentInsets={false} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} >
+            <List renderHeader={'充值金额'}>
+              <InputItem clear error={self.state.to_fill_yuan<=0} type="number" value={self.state.to_fill_yuan} onChange={to_fill_yuan => { self.setState({ to_fill_yuan, }); }}
+                         extra="元"
+                         placeholder="帐户充值金额" >
+              </InputItem>
             </List>
-      </ScrollView>
-    )
+            <List renderHeader={'支付方式'}>
+              <RadioItem checked={self.state.pay_by === PAY_WECHAT_APP}
+                         thumb={'http://wsb-images-backup.waisongbang.com/wechat_pay_logo_in_wsb_app.png'}
+                         onChange={event => { if (event.target.checked) { self.setState({ pay_by: 'wechat_app' }); } }}
+                         extra={<Image style={style.wechat_thumb} source={require('../../img/wechat_pay_logo.png')}/>} >微信支付</RadioItem>
+            </List>
+          </ScrollView>
+          <View>
+            <Button onPress={() => { this.inputRef.focus(); }} disabled={!this.state.pay_by} type="primary" >
+              {this.pay_by_text()}{this.state.to_fill_yuan || 0}元
+            </Button>
+          </View>
+        </View>
+    );
   }
 }
 
 const style = StyleSheet.create({
+    wechat_thumb: {
+      width: pxToDp(60), height: pxToDp(60)
+    },
+  payBtn: {
+    marginTop: 20,
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
   status: {
     borderWidth: pxToDp(1),
     height: pxToDp(30),
@@ -134,21 +103,6 @@ const style = StyleSheet.create({
     color: colors.fontGray,
     borderColor: colors.fontGray,
     lineHeight: pxToDp(28)
-  },
-  success: {
-    color: colors.main_color,
-    borderColor: colors.main_color
-  },
-  warn: {
-    color: colors.orange,
-    borderColor: colors.orange
-  },
-  detailBox: {
-    padding: pxToDp(40),
-    backgroundColor: '#fff'
-  },
-  remarkBox: {
-    flexDirection: 'row'
   }
 })
 
