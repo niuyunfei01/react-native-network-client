@@ -99,6 +99,24 @@ const shouldShowItems = (orderStatus) => {
     orderStatus === Cts.ORDER_STATUS_TO_READY
 };
 
+
+const onCallNumber = (mobile, title) => {
+  let msg = mobile ? `电话：${mobile}` : `暂无${title}`;
+  const buttons = [
+    {text: '关闭', style: 'cancel',},
+  ];
+
+  if (mobile) {
+    buttons.push({
+      text: '呼叫',
+      onPress: () => native.dialNumber(mobile),
+      style: 'default',
+    });
+  }
+
+  Alert.alert(title, msg, buttons);
+};
+
 const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
 const MENU_EDIT_STORE = 3;
@@ -1730,11 +1748,12 @@ class OrderScene extends Component {
 
         </View>
 
-        <OrderStatusCell order={order} onPressCall={this._onShowStoreCall}/>
+        <OrderStatusCell order={order} onCallNum={onCallNumber} onPressCall={this._onShowStoreCall}/>
         <If condition={!order.is_split_package}>
         {order.fn_delivery_v2 ? <Delivery
           order={order}
           logistics={this.state.logistics}
+          onCallNum={onCallNumber}
           fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
         </If>
 

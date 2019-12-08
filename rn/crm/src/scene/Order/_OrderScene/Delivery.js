@@ -24,13 +24,14 @@ class Delivery extends React.Component {
   static propTypes = {
     order: PropType.object,
     logistics: PropType.array,
-    fetchData:PropType.func
-  }
-  
-  static defaultProps = {}
-  
+    fetchData:PropType.func,
+    onCallNum: PropType.func
+  };
+
+  static defaultProps = {};
+
   constructor (props) {
-    super(props)
+    super(props);
     let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
       logistics: this.props.logistics,
@@ -38,7 +39,7 @@ class Delivery extends React.Component {
       timer: null
     }
   }
-  
+
   componentWillMount (): void {
     const self = this
     let orderStatus = this.props.order.orderStatus
@@ -51,18 +52,23 @@ class Delivery extends React.Component {
     //   self.setState({timer: timer})
     // }
   }
-  
+
   componentWillUnmount (): void {
     if (this.state.timer) {
       clearInterval(this.state.timer)
       this.setState({timer: null})
     }
   }
-  
+
   componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
     this.setState({logistics: nextProps.logistics})
   }
-  
+
+  _callNum = (num, title) => {
+    const {onCallNum} = this.props;
+    onCallNum(num, title);
+  };
+
   onConfirmAddTip (logisticId, val) {
     const self = this
     const navigation = self.props.navigation
@@ -76,11 +82,11 @@ class Delivery extends React.Component {
       self.props.fetchData()
     })
   }
-  
+
   onCallThirdShip () {
     const logistics = this.state.logistics
     let logisticsCodes = _.map(logistics, 'type')
-    
+
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
@@ -95,7 +101,7 @@ class Delivery extends React.Component {
       }
     });
   }
-  
+
   onTransferSelf () {
     const self = this
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
@@ -108,11 +114,11 @@ class Delivery extends React.Component {
       self.props.fetchData()
     })
   }
-  
+
   onPackUp () {
     this.props.navigation.navigate(Config.ROUTE_ORDER_PACK, {order: this.props.order});
   }
-  
+
   onRemindShip () {
     const self = this
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`
@@ -120,7 +126,7 @@ class Delivery extends React.Component {
       self.props.fetchData()
     })
   }
-  
+
   onRemindArrived () {
     const self = this
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`
@@ -128,7 +134,7 @@ class Delivery extends React.Component {
       self.props.fetchData()
     })
   }
-  
+
   onCallSelf () {
     const self = this
     Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
@@ -140,13 +146,13 @@ class Delivery extends React.Component {
       }
     ])
   }
-  
+
   showCallDriverBtn (ship) {
     return ship.driver_phone &&
       this.props.order.orderStatus != Cts.ORDER_STATUS_ARRIVED &&
       this.props.order.orderStatus != Cts.ORDER_STATUS_INVALID
   }
-  
+
   renderShips () {
     return (
       <View>
@@ -179,7 +185,7 @@ class Delivery extends React.Component {
               </If>
               <If condition={this.showCallDriverBtn(ship)}>
                 <JbbButton
-                  onPress={() => native.dialNumber(ship.driver_phone)}
+                  onPress={() => this._callNum(ship.driver_phone, '骑手信息')}
                   text={'呼叫骑手'}
                   borderColor={'#E84E2A'}
                   backgroundColor={'#E84E2A'}
@@ -194,7 +200,7 @@ class Delivery extends React.Component {
       </View>
     )
   }
-  
+
   renderBtn () {
     const {orderStatus, auto_ship_type} = this.props.order
     return (
@@ -252,7 +258,7 @@ class Delivery extends React.Component {
       </If>
     )
   }
-  
+
   render (): React.ReactNode {
     return (
         <View>

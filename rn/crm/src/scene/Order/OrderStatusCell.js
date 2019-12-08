@@ -1,15 +1,13 @@
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native'
-import {tool, native, screen} from '../../common'
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {tool} from '../../common'
 import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
 import CallBtn from './CallBtn'
 import colors from "../../styles/colors";
-import _ from 'underscore'
 import moment from 'moment'
 import Cts from '../../Cts'
 import Styles from '../../common/CommonStyles'
-import HttpUtils from "../../util/http";
 
 
 class OrderStatusCell extends PureComponent {
@@ -33,26 +31,13 @@ class OrderStatusCell extends PureComponent {
   }
 
   _callShip = () => {
-    const {order} = this.props;
-    let msg = order.ship_worker_mobile ? `电话：${order.ship_worker_mobile}` : '暂无骑手电话';
-    const buttons = [
-      {text: '关闭', style: 'cancel', },
-    ];
-
-    if (order.ship_worker_mobile) {
-      buttons.push({
-        text: '呼叫骑手',
-        onPress: () => native.dialNumber(order.ship_worker_mobile),
-        style: 'default',
-      });
-    }
-
-    Alert.alert("骑手信息", msg, buttons);
+    const {order, onCallNum} = this.props;
+    onCallNum(order.ship_worker_mobile, '骑手信息');
   };
 
   render() {
 
-    const {order, onPressCall} = this.props;
+    const {order, onPressCall, onCallShip} = this.props;
 
     const packWorkersStr = order.pack_workers  ? order.pack_workers : '';
     const packWorkers = packWorkersStr.split(',').map(function(uid){return (order.workers[uid] || {}).nickname})
