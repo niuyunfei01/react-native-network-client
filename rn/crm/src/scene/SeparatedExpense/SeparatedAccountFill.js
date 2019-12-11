@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {ScrollView, StyleSheet, Image, Text, TouchableOpacity, View} from 'react-native';
+import {ScrollView, StyleSheet, Image, Alert, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -7,6 +7,11 @@ import {InputItem, List, Button, Item, Radio} from 'antd-mobile-rn';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
+import * as wechat from 'react-native-wechat'
+import {ToastLong} from "../../util/ToastUtils";
+import Config from "../../config";
+
+const APP_ID = 'wx0ffb81c6dc194253';
 
 const Brief = List.Item.Brief;
 const RadioItem = Radio.RadioItem;
@@ -40,7 +45,10 @@ class SeparatedAccountFill extends PureComponent {
     }
   }
 
-  componentWillMount () {
+  componentDidMount(): void {
+      console.log("to register ", APP_ID);
+    wechat.registerApp(APP_ID);
+    this.onPay();
   }
 
   fetchExpenses () {
@@ -50,6 +58,36 @@ class SeparatedAccountFill extends PureComponent {
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
     })
+  }
+
+  onPay() {
+      console.log("start to :", this.state);
+      if (this.state.to_fill_yuan <= 1) {
+          Alert.alert("充值金额不应少于1元");
+          return;
+      }
+      const navigation = this.props.navigation;
+      wechat.isWXAppInstalled()
+          .then((isInstalled) => {
+              console.log('isInstalled:', isInstalled);
+              if (isInstalled) {
+                  const url = `api/gen_pay_app_order/${this.state.to_fill_yuan}`;
+                  HttpUtils.get.bind(this.props)(url).then(res => {
+                      console.log("res", res);
+                      wechat.pay(res.result).then((requestJson) => {
+                          console.log("----微信支付成功----", requestJson);
+                          if (requestJson.errCode === "0"){
+                              ToastLong('支付成功');
+                              navigation.navigate(Config.ROUTE_SEP_EXPENSE, );
+                          }
+                      }).catch((err)=>{
+                    ToastLong(`支付失败:${err}`)
+                });
+            });
+          } else {
+            Alert.alert('没有安装微信软件，请您安装微信之后再试');
+          }
+        });
   }
 
   pay_by_text() {
@@ -74,7 +112,7 @@ class SeparatedAccountFill extends PureComponent {
             </List>
           </ScrollView>
           <View>
-            <Button onPress={() => { this.inputRef.focus(); }} disabled={!this.state.pay_by} type="primary" >
+            <Button onPress={this.onPay} disabled={!this.state.pay_by} type="primary">
               {this.pay_by_text()}{this.state.to_fill_yuan || 0}元
             </Button>
           </View>

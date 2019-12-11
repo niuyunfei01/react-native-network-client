@@ -127,7 +127,7 @@ class SeparatedExpense extends PureComponent {
 
   render () {
     return (
-        <ScrollView maintainVisibleContentPosition={true}>
+        <ScrollView>
         <Accordion accordion defaultActiveKey="0">
           {this.renderAccordionItems()}
         </Accordion>
