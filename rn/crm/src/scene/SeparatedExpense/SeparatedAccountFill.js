@@ -46,18 +46,8 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   componentDidMount(): void {
-      console.log("to register ", APP_ID);
+    console.log("to register ", APP_ID);
     wechat.registerApp(APP_ID);
-    this.onPay();
-  }
-
-  fetchExpenses () {
-    const self = this
-    const {global} = self.props
-    const url = `api/store_separated_items/${global.currStoreId}?access_token=${global.accessToken}`
-    HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
-    })
   }
 
   onPay() {
