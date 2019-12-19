@@ -41,7 +41,7 @@ class OrderTransferThird extends Component {
 
   fetchThirdWays () {
     const self = this
-    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`
+    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       self.setState({logistics: res})
     })
@@ -49,7 +49,7 @@ class OrderTransferThird extends Component {
 
   onCallThirdShip () {
     const self = this
-    const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`
+    const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
     const {orderId, storeId, newSelected} = this.state
     HttpUtils.post.bind(self.props.navigation)(api, {
       orderId: orderId,
@@ -63,8 +63,8 @@ class OrderTransferThird extends Component {
   }
 
   onSelectLogistic (code) {
-    let selected = this.state.newSelected
-    let index = selected.indexOf(code)
+    let selected = this.state.newSelected;
+    let index = selected.indexOf(code);
     if (index >= 0) {
       selected.splice(index, 1)
     } else {

@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="532"
-    android:versionName="3.9.10">
+    android:versionCode="533"
+    android:versionName="3.9.12">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -66,6 +66,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="wx0ffb81c6dc194253"/>
+            </intent-filter>
         </activity>
 
         <activity
@@ -77,13 +83,27 @@
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:label="@string/app_name"
-            android:exported="true" />
+            android:launchMode="singleTop"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="wx0ffb81c6dc194253"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".wxapi.WXPayEntryActivity"
             android:label="@string/app_name"
-            android:exported="true" />
+            android:launchMode="singleTop"
+            android:exported="true">
 
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="wx0ffb81c6dc194253"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.activity.RemindersActivity"
             android:screenOrientation="portrait">

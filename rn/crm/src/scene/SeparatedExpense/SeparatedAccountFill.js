@@ -42,38 +42,56 @@ class SeparatedAccountFill extends PureComponent {
     this.state = {
       to_fill_yuan: '100',
       pay_by: PAY_WECHAT_APP,
+        paid_done: false,
     }
   }
 
   componentDidMount(): void {
     console.log("to register ", APP_ID);
-    wechat.registerApp(APP_ID);
+    wechat.registerApp(APP_ID).then(r => console.log("register done:", r));
+    console.log("after register");
+  }
+
+  onToExpense() {
+    this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE);
   }
 
   onPay() {
       console.log("start to :", this.state);
-      if (this.state.to_fill_yuan <= 1) {
+      if (this.state.to_fill_yuan < 1) {
           Alert.alert("充值金额不应少于1元");
           return;
       }
-      const navigation = this.props.navigation;
+      const self = this;
       wechat.isWXAppInstalled()
           .then((isInstalled) => {
               console.log('isInstalled:', isInstalled);
               if (isInstalled) {
-                  const url = `api/gen_pay_app_order/${this.state.to_fill_yuan}`;
-                  HttpUtils.get.bind(this.props)(url).then(res => {
+                  const {accessToken} = self.props.global;
+                  const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
+                  HttpUtils.post.bind(self.props)(url).then(res => {
                       console.log("res", res);
-                      wechat.pay(res.result).then((requestJson) => {
-                          console.log("----微信支付成功----", requestJson);
+                      res = res.result;
+                      const params = {
+                          partnerId: res.partnerid,
+                          prepayId: res.prepayid,
+                          nonceStr: res.noncestr,
+                          timeStamp: res.timestamp,
+                          package: res.package,
+                          sign: res.sign,
+                      };
+                      wechat.pay(params).then((requestJson) => {
+                          console.log("----微信支付成功----", requestJson, params);
                           if (requestJson.errCode === "0"){
                               ToastLong('支付成功');
-                              navigation.navigate(Config.ROUTE_SEP_EXPENSE, );
+                              self.setState({paid_done: true})
                           }
                       }).catch((err)=>{
-                    ToastLong(`支付失败:${err}`)
-                });
-            });
+                          console.log(err, "params", params);
+                          //FIXME: 用户取消支付时，需要显示一个错误
+                          ToastLong(`支付失败:${err}`)
+                      });
+                  });
           } else {
             Alert.alert('没有安装微信软件，请您安装微信之后再试');
           }
@@ -85,27 +103,35 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   render () {
-      const self = this
-    return  ( <View style={{flex: 1, justifyContent: 'space-between'}}>
+    return  (<View style={{flex: 1}}>
+        {!this.state.paid_done && <View style={{flex: 1, justifyContent: 'space-between'}}>
           <ScrollView style={{ flex: 1 }} automaticallyAdjustContentInsets={false} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} >
             <List renderHeader={'充值金额'}>
-              <InputItem clear error={self.state.to_fill_yuan<=0} type="number" value={self.state.to_fill_yuan} onChange={to_fill_yuan => { self.setState({ to_fill_yuan, }); }}
+              <InputItem clear error={this.state.to_fill_yuan<=0} type="number" value={this.state.to_fill_yuan} onChange={to_fill_yuan => { this.setState({ to_fill_yuan, }); }}
                          extra="元"
                          placeholder="帐户充值金额" >
               </InputItem>
             </List>
             <List renderHeader={'支付方式'}>
-              <RadioItem checked={self.state.pay_by === PAY_WECHAT_APP}
+              <RadioItem checked={this.state.pay_by === PAY_WECHAT_APP}
                          thumb={'http://wsb-images-backup.waisongbang.com/wechat_pay_logo_in_wsb_app.png'}
-                         onChange={event => { if (event.target.checked) { self.setState({ pay_by: 'wechat_app' }); } }}
+                         onChange={event => { if (event.target.checked) { this.setState({ pay_by: PAY_WECHAT_APP }); } }}
                          extra={<Image style={style.wechat_thumb} source={require('../../img/wechat_pay_logo.png')}/>} >微信支付</RadioItem>
             </List>
           </ScrollView>
           <View>
-            <Button onPress={this.onPay} disabled={!this.state.pay_by} type="primary">
+            <Button onClick={() => this.onPay()} disabled={!this.state.pay_by} type="primary">
               {this.pay_by_text()}{this.state.to_fill_yuan || 0}元
             </Button>
           </View>
+          </View>
+          }
+        {this.state.paid_done && <View style={{flex: 1, justifyContent: 'space-between'}}>
+          <View>
+            <Text style={{flex: 1}}>支付完成!</Text>
+          </View>
+          <Button onClick={() => this.onToExpense()} type="primary">查看账单记录</Button>
+        </View>}
         </View>
     );
   }
@@ -133,6 +159,5 @@ const style = StyleSheet.create({
     lineHeight: pxToDp(28)
   }
 })
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeparatedAccountFill)

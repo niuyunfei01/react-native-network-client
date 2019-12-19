@@ -60,9 +60,9 @@ class SeparatedExpense extends PureComponent {
   }
 
   fetchExpenses () {
-    const self = this
-    const {global} = self.props
-    const url = `api/store_separated_items/${global.currStoreId}?access_token=${global.accessToken}`
+    const self = this;
+    const {global} = self.props;
+    const url = `api/store_separated_items/${global.currStoreId}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
     })
