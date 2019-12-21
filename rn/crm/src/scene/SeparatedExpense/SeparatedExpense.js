@@ -79,7 +79,7 @@ class SeparatedExpense extends PureComponent {
         paddingRight: '5%'
       }}>
         <Text>{record.day}</Text>
-        <Text style={{textAlign: 'right'}}>余额：{record.total_balanced} </Text>
+        <Text style={{textAlign: 'right'}}>{record.total_balanced !== '' && (`外送帮余额：${record.total_balanced}`) || ''} </Text>
       </View>
     )
   }

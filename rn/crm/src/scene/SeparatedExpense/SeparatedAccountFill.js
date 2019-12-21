@@ -30,6 +30,9 @@ function mapDispatchToProps (dispatch) {
 }
 
 const PAY_WECHAT_APP = 'wechat_app';
+const PAID_OK = 1;
+const PAID_FAIL = 2;
+const PAID_WAIT = 0;
 
 class SeparatedAccountFill extends PureComponent {
 
@@ -42,7 +45,7 @@ class SeparatedAccountFill extends PureComponent {
     this.state = {
       to_fill_yuan: '100',
       pay_by: PAY_WECHAT_APP,
-        paid_done: false,
+      paid_done: PAID_WAIT,
     }
   }
 
@@ -57,45 +60,46 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   onPay() {
-      console.log("start to :", this.state);
-      if (this.state.to_fill_yuan < 1) {
-          Alert.alert("充值金额不应少于1元");
-          return;
-      }
-      const self = this;
-      wechat.isWXAppInstalled()
-          .then((isInstalled) => {
-              console.log('isInstalled:', isInstalled);
-              if (isInstalled) {
-                  const {accessToken} = self.props.global;
-                  const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
-                  HttpUtils.post.bind(self.props)(url).then(res => {
-                      console.log("res", res);
-                      res = res.result;
-                      const params = {
-                          partnerId: res.partnerid,
-                          prepayId: res.prepayid,
-                          nonceStr: res.noncestr,
-                          timeStamp: res.timestamp,
-                          package: res.package,
-                          sign: res.sign,
-                      };
-                      wechat.pay(params).then((requestJson) => {
-                          console.log("----微信支付成功----", requestJson, params);
-                          if (requestJson.errCode === "0"){
-                              ToastLong('支付成功');
-                              self.setState({paid_done: true})
-                          }
-                      }).catch((err)=>{
-                          console.log(err, "params", params);
-                          //FIXME: 用户取消支付时，需要显示一个错误
-                          ToastLong(`支付失败:${err}`)
-                      });
-                  });
-          } else {
-            Alert.alert('没有安装微信软件，请您安装微信之后再试');
-          }
-        });
+    console.log("start to :", this.state);
+    if (this.state.to_fill_yuan < 1) {
+      Alert.alert("充值金额不应少于1元");
+      return;
+    }
+    const self = this;
+    wechat.isWXAppInstalled()
+      .then((isInstalled) => {
+        console.log('isInstalled:', isInstalled);
+        if (isInstalled) {
+          const {accessToken} = self.props.global;
+          const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
+          HttpUtils.post.bind(self.props)(url).then(res => {
+            console.log("res", res);
+            res = res.result;
+            const params = {
+              partnerId: res.partnerid,
+              prepayId: res.prepayid,
+              nonceStr: res.noncestr,
+              timeStamp: res.timestamp,
+              package: res.package,
+              sign: res.sign,
+            };
+            wechat.pay(params).then((requestJson) => {
+              console.log("----微信支付成功----", requestJson, params);
+              if (requestJson.errCode === 0){
+                ToastLong('支付成功');
+                self.setState({paid_done: PAID_OK})
+              }
+            }).catch((err)=>{
+              console.log(err, "params", params);
+              self.setState({paid_done: PAID_FAIL});
+              //FIXME: 用户取消支付时，需要显示一个错误
+              ToastLong(`支付失败:${err}`);
+            });
+          });
+        } else {
+          Alert.alert('没有安装微信软件，请您安装微信之后再试');
+        }
+      });
   }
 
   pay_by_text() {
@@ -104,7 +108,7 @@ class SeparatedAccountFill extends PureComponent {
 
   render () {
     return  (<View style={{flex: 1}}>
-        {!this.state.paid_done && <View style={{flex: 1, justifyContent: 'space-between'}}>
+        {this.state.paid_done === PAID_WAIT && <View style={{flex: 1, justifyContent: 'space-between'}}>
           <ScrollView style={{ flex: 1 }} automaticallyAdjustContentInsets={false} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} >
             <List renderHeader={'充值金额'}>
               <InputItem clear error={this.state.to_fill_yuan<=0} type="number" value={this.state.to_fill_yuan} onChange={to_fill_yuan => { this.setState({ to_fill_yuan, }); }}
@@ -126,13 +130,21 @@ class SeparatedAccountFill extends PureComponent {
           </View>
           </View>
           }
-        {this.state.paid_done && <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View>
-            <Text style={{flex: 1}}>支付完成!</Text>
+
+        {this.state.paid_done === PAID_OK && <View style={{flex: 1, justifyContent: 'space-between'}}>
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text>支付完成!</Text>
           </View>
-          <Button onClick={() => this.onToExpense()} type="primary">查看账单记录</Button>
+          <Button onClick={() => this.onToExpense()} type="ghost">查看余额</Button>
         </View>}
-        </View>
+
+        {this.state.paid_done === PAID_FAIL && <View style={{flex: 1, justifyContent: 'space-between'}}>
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text>支付失败!</Text>
+          </View>
+          <Button onClick={() => this.onToExpense()} type="warning">返回账单</Button>
+        </View>}
+      </View>
     );
   }
 }
