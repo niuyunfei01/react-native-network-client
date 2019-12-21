@@ -170,6 +170,6 @@ const style = StyleSheet.create({
     borderColor: colors.fontGray,
     lineHeight: pxToDp(28)
   }
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeparatedAccountFill)

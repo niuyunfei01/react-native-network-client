@@ -79,7 +79,7 @@ class SeparatedExpense extends PureComponent {
         paddingRight: '5%'
       }}>
         <Text>{record.day}</Text>
-        <Text style={{textAlign: 'right'}}>{record.total_balanced !== '' && (`外送帮余额：${record.total_balanced}`) || ''} </Text>
+        <Text style={[{textAlign: 'right'}, this.onHeaderStyle(record)]}>{record.total_balanced !== '' ? (`外送帮余额：${record.total_balanced}`) : ''} </Text>
       </View>
     )
   }
@@ -88,7 +88,7 @@ class SeparatedExpense extends PureComponent {
     return this.state.records && this.state.records.map((record, idx) => {
           return <Accordion.Panel header={this.renderAccordionHeader(record)}
               key={idx} index={idx}
-              style={{backgroundColor: '#fff'}} >
+              style={{backgroundColor: '#fff'}}>
             {record && this.renderRecordsOfDay(record)}
           </Accordion.Panel>
         }
@@ -96,10 +96,18 @@ class SeparatedExpense extends PureComponent {
   }
 
   onItemClicked (item) {
-      console.log("item clicked:", item)
-      if (item.wm_id) {
-        this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
-      }
+    console.log("clicked:", item);
+    if (item.wm_id) {
+      this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
+    }
+  }
+
+  onHeaderStyle(record) {
+    return record.sa === 1 ? record.total_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
+  }
+
+  onItemAccountStyle(item) {
+    return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
   }
 
   renderRecordsOfDay(record) {
@@ -110,10 +118,10 @@ class SeparatedExpense extends PureComponent {
           return <List.Item arrow="horizontal"
                             key={idx}
                             multipleLine
-                            onPress={(item) => console.log(item)}
-                            extra={<View>
-                              {`${item.amount > 0 && '+' || ''}${item.amount}`}
-                              <Brief style={{'textAlign': 'right'}}>{self.state.by_labels[item.by]}</Brief>
+                            onClick={(item) => this.onItemClicked(item)}
+                            extra={<View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
+                              <Text style={[{'textAlign': 'right', 'margin-left': 'auto'}, self.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
+                              <Brief style={{'textAlign': 'right'}}><Text style={self.onItemAccountStyle(item)}>{self.state.by_labels[item.by]}</Text></Brief>
                             </View>}>
             {item.name}
             <Brief>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Brief>
@@ -137,6 +145,12 @@ class SeparatedExpense extends PureComponent {
 }
 
 const style = StyleSheet.create({
+  saAmountStyle: {
+    color: colors.orange,
+  },
+  saAmountAddStyle: {
+    color: colors.main_vice_color,
+  },
   status: {
     borderWidth: pxToDp(1),
     height: pxToDp(30),
@@ -164,7 +178,6 @@ const style = StyleSheet.create({
   remarkBox: {
     flexDirection: 'row'
   }
-})
+});
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(SeparatedExpense)
+export default connect(mapStateToProps, mapDispatchToProps)(SeparatedExpense);
