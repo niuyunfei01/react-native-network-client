@@ -118,7 +118,7 @@ class SeparatedAccountFill extends PureComponent {
             </List>
             <List renderHeader={'支付方式'}>
               <RadioItem checked={this.state.pay_by === PAY_WECHAT_APP}
-                         thumb={'https://wsb-images-backup.waisongbang.com/wechat_pay_logo_in_wsb_app.png'}
+                         thumb={'https://qiniu.cainiaoshicai.cn/wechat_pay_logo_in_wsb_app.png'}
                          onChange={event => { if (event.target.checked) { this.setState({ pay_by: PAY_WECHAT_APP }); } }}
                          extra={<Image style={style.wechat_thumb} source={require('../../img/wechat_pay_logo.png')}/>} >微信支付</RadioItem>
             </List>
