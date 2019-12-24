@@ -40,7 +40,7 @@ class OrderTransferThird extends Component {
   }
 
   fetchThirdWays () {
-    const self = this
+    const self = this;
     const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       self.setState({logistics: res})
@@ -48,9 +48,9 @@ class OrderTransferThird extends Component {
   }
 
   onCallThirdShip () {
-    const self = this
+    const self = this;
     const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
-    const {orderId, storeId, newSelected} = this.state
+    const {orderId, storeId, newSelected} = this.state;
     HttpUtils.post.bind(self.props.navigation)(api, {
       orderId: orderId,
       storeId: storeId,
@@ -70,7 +70,7 @@ class OrderTransferThird extends Component {
     } else {
       selected.push(code)
     }
-    console.log(selected)
+    console.log(selected);
     this.setState({newSelected: selected})
   }
 
@@ -84,8 +84,8 @@ class OrderTransferThird extends Component {
   }
 
   renderLogistics () {
-    const {logistics, selected} = this.state
-    console.log(logistics, selected)
+    const {logistics, selected} = this.state;
+    console.log(logistics, selected);
     return (
       <List renderHeader={() => '选择配送方式'}>
         {logistics.map(i => (
@@ -93,8 +93,7 @@ class OrderTransferThird extends Component {
             key={i.logisticCode}
             onChange={() => this.onSelectLogistic(i.logisticCode)}
             disabled={selected.includes(String(i.logisticCode))}
-            defaultChecked={selected.includes(String(i.logisticCode))}
-          >
+            defaultChecked={selected.includes(String(i.logisticCode))}>
             {i.logisticName}
             <List.Item.Brief>{i.logisticDesc}</List.Item.Brief>
           </CheckboxItem>
@@ -147,7 +146,7 @@ const styles = StyleSheet.create({
   btnCell: {
     padding: pxToDp(30)
   }
-})
+});
 
 export default connect(mapStateToProps)(OrderTransferThird)
 

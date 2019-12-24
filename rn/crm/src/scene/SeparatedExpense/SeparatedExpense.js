@@ -96,7 +96,6 @@ class SeparatedExpense extends PureComponent {
   }
 
   onItemClicked (item) {
-    console.log("clicked:", item);
     if (item.wm_id) {
       this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
     }
@@ -111,16 +110,16 @@ class SeparatedExpense extends PureComponent {
   }
 
   renderRecordsOfDay(record) {
-      const self = this
+    const self = this
     if (record.items) {
       return  <List>
         {record.items.map((item, idx) => {
           return <List.Item arrow="horizontal"
                             key={idx}
                             multipleLine
-                            onClick={(item) => this.onItemClicked(item)}
-                            extra={<View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
-                              <Text style={[{'textAlign': 'right', 'margin-left': 'auto'}, self.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
+                            onClick={() => self.onItemClicked(item)}
+                            extra={<View>
+                              <Text style={[{'textAlign': 'right'}, self.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
                               <Brief style={{'textAlign': 'right'}}><Text style={self.onItemAccountStyle(item)}>{self.state.by_labels[item.by]}</Text></Brief>
                             </View>}>
             {item.name}
