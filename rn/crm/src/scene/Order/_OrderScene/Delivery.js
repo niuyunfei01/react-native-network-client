@@ -7,6 +7,7 @@ import JbbButton from "../../component/JbbButton";
 import {withNavigation} from 'react-navigation'
 import {connect} from "react-redux";
 import Config from "../../../config";
+import colors from "../../../styles/colors";
 import Cts from "../../../Cts";
 import {native} from "../../../common";
 import {Modal, Toast} from "antd-mobile-rn";
@@ -55,7 +56,7 @@ class Delivery extends React.Component {
 
   componentWillUnmount (): void {
     if (this.state.timer) {
-      clearInterval(this.state.timer)
+      clearInterval(this.state.timer);
       this.setState({timer: null})
     }
   }
@@ -69,9 +70,16 @@ class Delivery extends React.Component {
     onCallNum(num, title);
   };
 
+  onConfirmCancel = (ship_id) => {
+    const {navigation, order} = this.props;
+    this.setState({dlgShipVisible: false});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, ship_id, onCancelled: (ok, reason) => {
+        this.props.fetchData()
+      }});
+  };
+
   onConfirmAddTip (logisticId, val) {
-    const self = this
-    const navigation = self.props.navigation
+    const self = this;
     const api = `/api/order_add_tips/${this.props.order.id}?access_token=${this.state.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       logisticId: logisticId,
@@ -84,15 +92,12 @@ class Delivery extends React.Component {
   }
 
   onCallThirdShip () {
-    const logistics = this.state.logistics
-    let logisticsCodes = _.map(logistics, 'type')
-
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
       selectedWay: [],
       onBack: (res) => {
-        if (res.count > 0) {
+        if (res && res.count > 0) {
           Toast.success('发配送成功')
         } else {
           Toast.fail('发配送失败，请联系运营人员')
@@ -103,12 +108,12 @@ class Delivery extends React.Component {
   }
 
   onTransferSelf () {
-    const self = this
+    const self = this;
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api, {
       orderId: this.props.order.id
     }).then(res => {
-      Toast.success('操作成功')
+      Toast.success('操作成功');
       self.props.fetchData()
     }).catch(e => {
       self.props.fetchData()
@@ -120,37 +125,31 @@ class Delivery extends React.Component {
   }
 
   onRemindShip () {
-    const self = this
-    const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`
+    const self = this;
+    const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       self.props.fetchData()
     })
   }
 
   onRemindArrived () {
-    const self = this
-    const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`
+    const self = this;
+    const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       self.props.fetchData()
     })
   }
 
   onCallSelf () {
-    const self = this
+    const self = this;
     Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
       {
         text: '确定',
-        onPress: () => self.onTransferSelf()
+        onPress: () => self.onTransferSelf(),
       }, {
         text: '取消'
       }
     ])
-  }
-
-  showCallDriverBtn (ship) {
-    return ship.driver_phone &&
-      this.props.order.orderStatus != Cts.ORDER_STATUS_ARRIVED &&
-      this.props.order.orderStatus != Cts.ORDER_STATUS_INVALID
   }
 
   renderShips () {
@@ -183,15 +182,22 @@ class Delivery extends React.Component {
                   />
                 </JbbPrompt>
               </If>
-              <If condition={this.showCallDriverBtn(ship)}>
+              <If condition={!!ship.driver_phone}>
                 <JbbButton
                   onPress={() => this._callNum(ship.driver_phone, '骑手信息')}
                   text={'呼叫骑手'}
-                  borderColor={'#E84E2A'}
-                  backgroundColor={'#E84E2A'}
-                  fontColor={'#fff'}
+                  borderColor={colors.main_color}
+                  //backgroundColor={'#E84E2A'}
+                  //fontColor={'#fff'}
                   fontWeight={'bold'}
-                  fontSize={pxToDp(30)}
+                  fontSize={pxToDp(20)}
+                />
+              </If>
+              <If condition={ship.can_cancel}>
+                <JbbButton text={'撤回呼叫'}
+                           borderColor={colors.color999}
+                           onPress={() => this.onConfirmCancel(ship.id)}
+                           fontSize={pxToDp(20)}
                 />
               </If>
             </View>

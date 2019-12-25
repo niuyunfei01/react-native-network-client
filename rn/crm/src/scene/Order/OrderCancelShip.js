@@ -26,10 +26,8 @@ function mapDispatchToProps(dispatch) {
 
 class OrderCancelShip extends Component {
   static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
     return {
-      headerTitle: type == 'call' ? '撤回呼叫' : '强行撤单'
+      headerTitle: '撤回呼叫'
     }
   };
 
@@ -49,7 +47,6 @@ class OrderCancelShip extends Component {
     };
 
     this._onTypeSelected = this._onTypeSelected.bind(this);
-
   }
 
   componentWillMount() {
@@ -79,15 +76,14 @@ class OrderCancelShip extends Component {
 
   getCancelReasons() {
     let token = this.props.global.accessToken;
-    let {id} = this.props.navigation.state.params.order;
+    let {ship_id} = this.props.navigation.state.params;
     let {dispatch} = this.props;
-    dispatch(cancelReasonsList(id, token, async (resp) => {
+    dispatch(cancelReasonsList(ship_id, token, async (resp) => {
       this.setState({loading: false});
       if (resp.ok) {
         this.setState({list: resp.obj, loading: false});
       } else {
-        //TODO
-        ToastLong('请检查网络')
+        ToastLong(`错误${resp.desc}`)
       }
     }));
   }
@@ -97,19 +93,17 @@ class OrderCancelShip extends Component {
     if (this.state.upLoading) {
       return false
     }
-    let {id, auto_ship_type,} = this.props.navigation.state.params.order;
+    let {ship_id} = this.props.navigation.state.params;
     let reason_id = this.state.option;
     let token = this.props.global.accessToken;
     let {dispatch} = this.props;
-    let data = {
-      type: auto_ship_type,
-      reason_text: this.state.reason
-    };
 
-    dispatch(cancelShip(id, reason_id, data, token, async (ok, reason) => {
+    const self = this;
+    dispatch(cancelShip(ship_id, reason_id, token, async (ok, reason) => {
       this.setState({upLoading: false});
       if (ok) {
-        ToastLong('撤回成功,即将返回订单详情页');
+        ToastLong('撤回成功, 即将返回');
+        self.props.navigation.state.params.onCancelled && self.props.navigation.state.params.onCancelled(ok, reason);
         this.timeOutBack(3000);
       } else {
         ToastLong(reason)
@@ -132,7 +126,7 @@ class OrderCancelShip extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type={this.state.option > 0 ? 'primary' : 'default'}
-                disabled={this.state.option > 0 ? false : true}
+                disabled={this.state.option <= 0}
                 onPress={() => {
                   this.isShowDialog()
                 }}
@@ -153,8 +147,7 @@ class OrderCancelShip extends Component {
         }}
       >提交中</Toast>
 
-      <Dialog onRequestClose={() => {
-      }}
+      <Dialog onRequestClose={() => { }}
               visible={this.state.showOtherDialog}
               title={'撤回理由'}
               buttons={[{
@@ -167,12 +160,10 @@ class OrderCancelShip extends Component {
                 type: 'primary',
                 label: '确定',
                 onPress: async () => {
-                  this.setState({showOtherDialog: false, upLoading: true})
+                  this.setState({showOtherDialog: false, upLoading: true});
                   this.upCancelShip()
-
                 }
-              }]}
-      >
+              }]}>
         <Input
           multiline={true}
           style={{height: pxToDp(90)}}
@@ -183,8 +174,7 @@ class OrderCancelShip extends Component {
         />
       </Dialog>
 
-      <Dialog onRequestClose={() => {
-      }}
+      <Dialog onRequestClose={() => {}}
               visible={this.state.showDialog}
               title={''}
               buttons={[{
@@ -197,7 +187,7 @@ class OrderCancelShip extends Component {
                 type: 'primary',
                 label: '确定',
                 onPress: async () => {
-                  this.setState({showDialog: false, upLoading: true})
+                  this.setState({showDialog: false, upLoading: true});
                   this.upCancelShip()
                 }
               }]}

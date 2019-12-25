@@ -30,14 +30,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderBottom extends PureComponent {
-  
+
   static propTypes = {
     mobile: PropTypes.string,
     label: PropTypes.string,
     onPress: PropTypes.func,
     style: PropTypes.object,
   }
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -79,9 +79,10 @@ class OrderBottom extends PureComponent {
   };
 
   _cancelShip = (title) => {
-    const {navigation, order} = this.props;
-    this.setState({dlgShipVisible: false});
-    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, type: title});
+    ToastLong("发生错误：本取消方法已经废止");
+    // const {navigation, order} = this.props;
+    // this.setState({dlgShipVisible: false});
+    // navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, type: title});
   };
 
   _setOrderArrived = () => {
