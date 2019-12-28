@@ -79,10 +79,9 @@ class OrderBottom extends PureComponent {
   };
 
   _cancelShip = (title) => {
-    ToastLong("发生错误：本取消方法已经废止");
-    // const {navigation, order} = this.props;
-    // this.setState({dlgShipVisible: false});
-    // navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, type: title});
+    const {navigation, order} = this.props;
+    this.setState({dlgShipVisible: false});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, ship_id: order['dada_order_id'], type: title});
   };
 
   _setOrderArrived = () => {

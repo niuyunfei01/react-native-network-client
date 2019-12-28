@@ -159,7 +159,7 @@ class Delivery extends React.Component {
           <View style={styles.shipCell} key={idx}>
             <View style={styles.cellLeft}>
               <Text style={styles.shipWay}>{ship.logistic_name}：{ship.status_name}</Text>
-              <Text style={styles.shipFee}>距离{ship.distance}米，配送费{ship.fee}元，已加小费{ship.tip}元</Text>
+              <Text style={styles.shipFee}>{ship.distance >= 0?`${ship.distance}米`:''}{ship.fee > 0 ? `, 合计${ship.fee}元`:''}{ship.tip > 0?`, 小费${ship.tip}元`:''}{ship.driver_name ? ` 骑手${ship.driver_name}`:''}</Text>
             </View>
             <View style={styles.cellRight}>
               <If condition={ship.time_away}>
@@ -169,8 +169,7 @@ class Delivery extends React.Component {
                 <JbbPrompt
                   title={'输入小费'}
                   onConfirm={(value) => this.onConfirmAddTip(ship.id, value)}
-                  initValue={ship.tip}
-                >
+                  initValue={ship.tip}>
                   <JbbButton
                     text={'加小费'}
                     type={'hollow'}
@@ -208,7 +207,7 @@ class Delivery extends React.Component {
   }
 
   renderBtn () {
-    const {orderStatus, auto_ship_type} = this.props.order
+    const {orderStatus, auto_ship_type} = this.props.order;
     return (
       <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
         <View style={styles.btnCell}>
@@ -286,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   cellLeft: {
-    height: pxToDp(100),
+    // height: pxToDp(100),
     justifyContent: 'space-between',
     alignItems: 'flex-start'
   },
