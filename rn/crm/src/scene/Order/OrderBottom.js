@@ -109,7 +109,10 @@ class OrderBottom extends PureComponent {
 
   _callShipDlg() {
     const {callShip} = this.props;
-    callShip();
+    let { fn_delivery_v1 } = this.props.order;
+    if (fn_delivery_v1) {
+      callShip();
+    }
   }
 
   _onToProvide() {
@@ -164,7 +167,7 @@ class OrderBottom extends PureComponent {
   _onShipInfoBtnClicked() {
     let {
       dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      auto_ship_type, zs_status = Cts.ZS_STATUS_TO_ACCEPT_EX, dada_call_at
+      auto_ship_type, zs_status = Cts.ZS_STATUS_TO_ACCEPT_EX, dada_call_at, fn_delivery_v1
     } = this.props.order;
     dada_status = parseInt(dada_status);
     zs_status = parseInt(zs_status);
