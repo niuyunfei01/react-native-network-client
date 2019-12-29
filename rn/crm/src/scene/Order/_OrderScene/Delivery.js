@@ -152,19 +152,27 @@ class Delivery extends React.Component {
     ])
   }
 
+  _descText = (ship) => {
+    return ship.desc_text ||
+      (ship.distance >= 0?`${ship.distance}米`:'')+(ship.fee > 0 ? `, 合计${ship.fee}元`:'') + (ship.tip > 0?`, 小费${ship.tip}元`:'') + (ship.driver_name ? ` 骑手${ship.driver_name}`:'');
+  };
+
   renderShips () {
     return (
       <View>
         <For each='ship' index='idx' of={this.state.logistics}>
+          {
+          }
           <View style={styles.shipCell} key={idx}>
             <View style={styles.cellLeft}>
               <Text style={styles.shipWay}>{ship.logistic_name}：{ship.status_name}</Text>
-              <Text style={styles.shipFee}>{ship.distance >= 0?`${ship.distance}米`:''}{ship.fee > 0 ? `, 合计${ship.fee}元`:''}{ship.tip > 0?`, 小费${ship.tip}元`:''}{ship.driver_name ? ` 骑手${ship.driver_name}`:''}</Text>
+              <Text style={styles.shipFee}>{this._descText(ship)}</Text>
             </View>
             <View style={styles.cellRight}>
               <If condition={ship.time_away}>
                 <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
               </If>
+              <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <If condition={ship.can_add_tip && !ship.driver_phone}>
                 <JbbPrompt
                   title={'输入小费'}
@@ -173,11 +181,10 @@ class Delivery extends React.Component {
                   <JbbButton
                     text={'加小费'}
                     type={'hollow'}
-                    fontColor={'#000'}
-                    borderColor={'#000'}
-                    fontSize={pxToDp(24)}
-                    width={pxToDp(120)}
-                    height={pxToDp(40)}
+                    borderColor={colors.color999}
+                    fontSize={pxToDp(20)}
+                    paddingHorizontal={pxToDp(10)}
+                    marginLeft={pxToDp(20)}
                   />
                 </JbbPrompt>
               </If>
@@ -186,10 +193,9 @@ class Delivery extends React.Component {
                   onPress={() => this._callNum(ship.driver_phone, '骑手信息')}
                   text={'呼叫骑手'}
                   borderColor={colors.main_color}
-                  //backgroundColor={'#E84E2A'}
-                  //fontColor={'#fff'}
                   fontWeight={'bold'}
                   fontSize={pxToDp(20)}
+                  marginLeft={pxToDp(20)}
                 />
               </If>
               <If condition={ship.can_cancel}>
@@ -197,8 +203,10 @@ class Delivery extends React.Component {
                            borderColor={colors.color999}
                            onPress={() => this.onConfirmCancel(ship.id)}
                            fontSize={pxToDp(20)}
+                           marginLeft={pxToDp(20)}
                 />
               </If>
+              </View>
             </View>
           </View>
         </For>

@@ -76,30 +76,39 @@ class OrderCancelShip extends Component {
 
   getCancelReasons() {
     let token = this.props.global.accessToken;
-    let {ship_id} = this.props.navigation.state.params;
+    let {ship_id = 0} = this.props.navigation.state.params;
     let {dispatch} = this.props;
-    dispatch(cancelReasonsList(ship_id, token, async (resp) => {
+
+    let {} = this.props.navigation.state.params;
+    let {order} = this.props.navigation.state.params;
+    const order_id = order ? order.id : 0;
+    const dada_order_id = order ? order.dada_order_id : 0;
+
+    dispatch(cancelReasonsList(ship_id, order_id, dada_order_id, token, async (resp) => {
       this.setState({loading: false});
       if (resp.ok) {
         this.setState({list: resp.obj, loading: false});
       } else {
-        ToastLong(`错误${resp.desc}`)
+        ToastLong(`错误: ${resp.desc}`)
       }
     }));
   }
-
 
   async upCancelShip() {
     if (this.state.upLoading) {
       return false
     }
-    let {ship_id} = this.props.navigation.state.params;
+    let {ship_id = 0} = this.props.navigation.state.params;
     let reason_id = this.state.option;
     let token = this.props.global.accessToken;
     let {dispatch} = this.props;
 
+    let {order} = this.props.navigation.state.params;
+    const order_id = order ? order.id : 0;
+    const dada_order_id = order ? order.dada_order_id : 0;
+
     const self = this;
-    dispatch(cancelShip(ship_id, reason_id, token, async (ok, reason) => {
+    dispatch(cancelShip(ship_id, reason_id, order_id, dada_order_id, token, async (ok, reason) => {
       this.setState({upLoading: false});
       if (ok) {
         ToastLong('撤回成功, 即将返回');
