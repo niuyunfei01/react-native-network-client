@@ -81,7 +81,7 @@ class OrderBottom extends PureComponent {
   _cancelShip = (title) => {
     const {navigation, order} = this.props;
     this.setState({dlgShipVisible: false});
-    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, ship_id: order['dada_order_id'], type: title});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order: order, type: title});
   };
 
   _setOrderArrived = () => {
