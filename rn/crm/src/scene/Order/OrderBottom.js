@@ -317,7 +317,7 @@ class OrderBottom extends PureComponent {
 
   _shipInfoBtnText() {
     let label;
-    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store} = this.props.order;
+    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store, ship_btn_label} = this.props.order;
     let {zs_way} = ext_store;
     zs_way = parseInt(zs_way);
     auto_ship_type = parseInt(auto_ship_type);
@@ -394,7 +394,7 @@ class OrderBottom extends PureComponent {
         }
       }
     }
-    return label;
+    return ship_btn_label || label;
   }
 
   _actionBtnVisible() {

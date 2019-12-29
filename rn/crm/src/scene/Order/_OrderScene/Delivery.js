@@ -80,7 +80,7 @@ class Delivery extends React.Component {
 
   onConfirmAddTip (logisticId, val) {
     const self = this;
-    const api = `/api/order_add_tips/${this.props.order.id}?access_token=${this.state.accessToken}`
+    const api = `/api/order_add_tips/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.post.bind(self.props)(api, {
       logisticId: logisticId,
       tips: val
