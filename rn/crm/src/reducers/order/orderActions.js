@@ -355,9 +355,9 @@ export function addTipMoney(order_id,money,token,callback) {
   }
 }
 
-export function cancelReasonsList(ship_id, order_id, order_dada_id, token, callback) {
+export function cancelReasonsList(ship_id, order_id, token, callback) {
   return dispatch => {
-    const url = `api/third_ship_cancel_reasons/${ship_id}/${order_id}/${order_dada_id}.json?access_token=${token}`;
+    const url = `api/third_ship_cancel_reasons/${ship_id}/${order_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
         .then(resp => resp.json())
         .then(resp => {
@@ -369,8 +369,8 @@ export function cancelReasonsList(ship_id, order_id, order_dada_id, token, callb
   }
 }
 
-export function cancelShip(ship_id, reason_id, order_id, order_dada_id, token, callback) {
-  const url = `api/third_ship_cancel/${ship_id}/${reason_id}/${order_id}/${order_dada_id}.json?access_token=${token}`;
+export function cancelShip(ship_id, reason_id, order_id, token, callback) {
+  const url = `api/third_ship_cancel/${ship_id}/${reason_id}/${order_id}.json?access_token=${token}`;
   return jsonReqThenInvalidate(url, order_id, callback);
 }
 
