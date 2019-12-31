@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.dao;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import cn.cainiaoshicai.crm.domain.LoginResult;
 import cn.cainiaoshicai.crm.domain.ProductProvideList;
 import cn.cainiaoshicai.crm.domain.ProductTpl;
 import cn.cainiaoshicai.crm.domain.ShipAcceptStatus;
+import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
@@ -76,6 +78,9 @@ public interface CRMService {
 
     @POST("/api/common_config2")
     Call<ResultBean<Config>> commonConfig(@Query("client_status") String clientStatus);
+
+    @GET("/api/list_store")
+    Call<LinkedHashMap<Long, Store>> list_stores(@Query("_sid") long sid, @Query("access_token") String token);
 
     @GET("/api/user_info2")
     Call<ResultBean<UserBean>> userInfo(@Query("access_token") String token);
