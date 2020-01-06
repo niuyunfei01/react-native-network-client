@@ -30,10 +30,11 @@ class OrderSendMoney extends PureComponent {
       headerTitle: '发红包'
     }
   }
-  
+
   constructor (props: Object) {
     super(props);
-    const store = tool.store(this.props.global)
+    const store_id  = navigation.state.params.storeId;
+    const store = tool.store(this.props.global, store_id);
     this.state = {
       storeName: store.name,
       storeCity: store.city,
@@ -44,7 +45,7 @@ class OrderSendMoney extends PureComponent {
       submitting: false
     }
   }
-  
+
   handleSubmit () {
     const self = this
     const {global, navigation} = self.props;
@@ -78,7 +79,7 @@ class OrderSendMoney extends PureComponent {
         self.setState({submitting: false});
       });
   }
-  
+
   renderInfoItem (label, value) {
     return (
       <View style={styles.infoItem}>
@@ -87,7 +88,7 @@ class OrderSendMoney extends PureComponent {
       </View>
     )
   }
-  
+
   renderInfo () {
     const {storeName, storeCity, storeVendor, storeOwnerName} = this.state
     return (
@@ -100,7 +101,7 @@ class OrderSendMoney extends PureComponent {
       </View>
     )
   }
-  
+
   render () {
     return (
       <View>
