@@ -301,7 +301,7 @@ public class Store {
         Bundle b = new Bundle();
         b.putString("name", name);
         b.putString("loc_lng", loc_lng);
-        b.putString("loc_lat", loc_lat);
+        b.putString(" loc_lat", loc_lat);
         b.putString("mobile", mobile);
         b.putString("tel", tel);
         b.putString("vendor_id", String.valueOf(type));
