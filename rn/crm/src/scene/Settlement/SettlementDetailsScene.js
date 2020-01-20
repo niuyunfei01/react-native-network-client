@@ -9,6 +9,7 @@ import colors from "../../styles/colors";
 import tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
 import TabButton from "../component/TabButton";
+import Config from "../../config";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -21,7 +22,7 @@ class SettlementDetailsScene extends React.Component {
       headerTitle: '结算详情',
     }
   }
-  
+
   constructor (props) {
     super(props)
     let {date, status, id, key, profit} = this.props.navigation.state.params || {};
@@ -49,18 +50,18 @@ class SettlementDetailsScene extends React.Component {
       activeTab: 'goods',
     }
   }
-  
+
   componentDidMount () {
     this.fetchData()
   }
-  
+
   fetchData () {
     const self = this
     let store_id = this.props.global.currStoreId;
     let date = this.state.date;
     let id = this.state.id;
     let token = this.props.global.accessToken;
-  
+
     HttpUtils.get.bind(this.props)(`/api/settlement_detail/${id}/${store_id}/${date}?access_token=${token}`).then(res => {
       self.setState({
         goodsList: res.goods_list,
@@ -77,7 +78,11 @@ class SettlementDetailsScene extends React.Component {
       })
     })
   }
-  
+
+  to_order = (id) => {
+    this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})
+  };
+
   renderStatus () {
     const {status} = this.state
     if (status == Cts.BILL_STATUS_PAID) {
@@ -90,7 +95,7 @@ class SettlementDetailsScene extends React.Component {
       )
     }
   }
-  
+
   renderHeader () {
     const {date, totalPrice} = this.state
     return (
@@ -106,7 +111,7 @@ class SettlementDetailsScene extends React.Component {
       </View>
     )
   }
-  
+
   render () {
     return (
       <View style={styles.container}>
@@ -126,6 +131,7 @@ class SettlementDetailsScene extends React.Component {
           </If>
           <If condition={this.state.activeTab === 'order'}>
             <SettlementOrderScene
+              func_to_order={this.to_order}
               tabLabel='订单详情'
               orderList={this.state.orderList}
               orderNum={this.state.orderNum}
