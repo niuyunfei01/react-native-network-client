@@ -84,6 +84,7 @@ import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.newrelic.agent.android.NewRelic;
 
 import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_CN;
 
@@ -210,6 +211,10 @@ public class MainActivity extends AbstractActionBarActivity {
         }
 
         resetPrinterStatusBar();
+
+        NewRelic.withApplicationToken(
+                "AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA"
+        ).start(this.getApplication());
     }
 
     private void resetPrinterStatusBar() {
