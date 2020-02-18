@@ -244,15 +244,17 @@ class Delivery extends React.Component {
               />
             </If>
           </View>
-          <View>
-            <JbbButton
-              type={'text'}
-              text={'我自己送'}
-              onPress={() => this.onCallSelf()}
-              fontColor={'#000'}
-              textUnderline={true}
-            />
-          </View>
+          <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
+            <View>
+              <JbbButton
+                type={'text'}
+                text={'我自己送'}
+                onPress={() => this.onCallSelf()}
+                fontColor={'#000'}
+                textUnderline={true}
+              />
+            </View>
+          </If>
         </View>
     )
   }
