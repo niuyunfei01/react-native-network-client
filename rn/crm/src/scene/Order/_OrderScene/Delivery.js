@@ -204,7 +204,6 @@ class Delivery extends React.Component {
   renderBtn () {
     const {orderStatus, auto_ship_type} = this.props.order
     return (
-      <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
         <View style={styles.btnCell}>
           <View style={styles.btnBox}>
             <JbbButton
@@ -255,7 +254,6 @@ class Delivery extends React.Component {
             />
           </View>
         </View>
-      </If>
     )
   }
 
