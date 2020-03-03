@@ -30,7 +30,7 @@ class HttpUtils {
     }
     return url
   }
-  
+
   static getOptions (method, params) {
     const options = {
       method: method,
@@ -47,20 +47,20 @@ class HttpUtils {
     method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
     return options
   }
-  
+
   static apiBase (method, url, params, props) {
-    let store = {}, vendor = {}
+    let store = {}, vendor = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
-    
+
     if (props && props.global) {
       store = tool.store(props.global)
       vendor = tool.vendor(props.global)
-  
+
       if (store && vendor) {
         options.headers.store_id = store.id
         options.headers.vendor_id = vendor.currVendorId
-    
+
         if (uri.substr(uri.length - 1) != '&') {
           uri += '&'
         }
@@ -86,20 +86,20 @@ class HttpUtils {
             if (response.ok) {
               resolve(response.obj)
             } else {
-              this.error(response, props.navigation)
+              this.error(response, props.navigation);
               reject && reject(response)
             }
           }
         })
         .catch((error) => {
-          ToastShort(`服务器错误:${error.message}`)
-          console.log('http error => ', error.message)
-          console.log('uri => ', uri)
+          ToastShort(`服务器错误:${error.message}`);
+          console.log('http error => ', error.message);
+          console.log('uri => ', uri);
           reject && reject(error.message)
         })
     })
   }
-  
+
   static error (response, navigation) {
     if (response.error_code === 10001) {
       ToastShort('权限错误')
@@ -114,7 +114,7 @@ class HttpUtils {
       ToastShort(text)
     }
   }
-  
+
   static logout (navigation) {
     native.logout()
     if (navigation !== HttpUtils) {
@@ -125,22 +125,22 @@ class HttpUtils {
       navigation.dispatch(resetAction);
     }
   }
-  
+
   static get (url, params) {
     const props = this
     return HttpUtils.apiBase('GET', url, params, props)
   }
-  
+
   static post (url, params) {
     const props = this
     return HttpUtils.apiBase('POST', url, params, props)
   }
-  
+
   static put (url, params) {
     const props = this
     return HttpUtils.apiBase('PUT', url, params, props)
   }
-  
+
   static delete (url, params) {
     const props = this
     return HttpUtils.apiBase('DELETE', url, params, props)

@@ -61,24 +61,21 @@ public class DaoHelper {
 
                 return chain.proceed(requestWithUserAgent);
             }
-        }).addInterceptor(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request request = chain.request();
-                String token = GlobalCtx.app().token();
-                final long storeId = SettingUtility.getListenerStore();
-                HttpUrl originUrl = request.url();
-                HttpUrl.Builder b = originUrl.newBuilder();
-                if(TextUtils.isEmpty(originUrl.queryParameter("access_token"))){
-                    b = b.addQueryParameter("access_token", token);
-                }
-
-                HttpUrl url = b
-                        .addQueryParameter("_sid", String.valueOf(storeId))
-                        .build();
-                request = request.newBuilder().url(url).build();
-                return chain.proceed(request);
+        }).addInterceptor(chain -> {
+            Request request = chain.request();
+            String token = GlobalCtx.app().token();
+            final long storeId = SettingUtility.getListenerStore();
+            HttpUrl originUrl = request.url();
+            HttpUrl.Builder b = originUrl.newBuilder();
+            if(TextUtils.isEmpty(originUrl.queryParameter("access_token"))){
+                b = b.addQueryParameter("access_token", token);
             }
+
+            HttpUrl url = b
+                    .addQueryParameter("_sid", String.valueOf(storeId))
+                    .build();
+            request = request.newBuilder().url(url).build();
+            return chain.proceed(request);
         });
 
         GsonConverterFactory factory = GsonConverterFactory.create(gson());

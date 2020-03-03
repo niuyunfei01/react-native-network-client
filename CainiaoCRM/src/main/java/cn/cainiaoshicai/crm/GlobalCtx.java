@@ -703,28 +703,27 @@ public class GlobalCtx extends Application {
         final long storeId = SettingUtility.getListenerStore();
         LinkedHashMap<Long, Store> stores = storesRef.get();
         if (forceUpdate || stores == null || stores.isEmpty()) {
-            new MyAsyncTask<Void, Void, List<Store>>() {
+
+            GlobalCtx app = GlobalCtx.app();
+            Call<LinkedHashMap<Long, Store>> rbCall = app.dao.list_stores(storeId, app.token());
+            rbCall.enqueue(new Callback<LinkedHashMap<Long, Store>>() {
                 @Override
-                protected List<Store> doInBackground(Void... params) {
-                    String token = app().token();
-                    if (null != token && token.length() > 0) {
-                        CommonConfigDao cfgDao = new CommonConfigDao(app().token());
-                        try {
-                            LinkedHashMap<Long, Store> s = cfgDao.listStores(storeId);
-                            if (s != null) {
-                                storesRef.set(s);
-                            }
-                        } catch (ServiceException e) {
-                            AppLogger.e("获取店铺列表错误:" + e.getMessage(), e);
-                            Activity runningActivity = app().getCurrentRunningActivity();
-//                        if (runningActivity != null) {
-                            //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
-//                        }
-                        }
+                public void onResponse(Call<LinkedHashMap<Long, Store>> call, Response<LinkedHashMap<Long, Store>> response) {
+                    LinkedHashMap<Long, Store> b = response.body();
+                    if (b != null) {
+                        storesRef.set(b);
                     }
-                    return null;
                 }
-            }.executeOnNormal();
+
+                @Override
+                public void onFailure(Call<LinkedHashMap<Long, Store>> call, Throwable t) {
+                    AppLogger.w("error to list store:" + t.getMessage(), t);
+                    Activity runningActivity = app().getCurrentRunningActivity();
+//                        if (runningActivity != null) {
+                    //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
+//                        }
+                }
+            });
         }
         if (stores == null || limitVendorId <= 0) {
             return stores != null ? stores.values() : null;

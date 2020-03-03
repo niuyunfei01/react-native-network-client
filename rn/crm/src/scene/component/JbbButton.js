@@ -21,9 +21,10 @@ class JbbButton extends React.Component {
     width: PropTypes.number,
     height: PropTypes.number,
     touchStyle: PropTypes.object,
-    disabled: PropTypes.bool
+    disabled: PropTypes.bool,
+    marginLeft: PropTypes.number,
   }
-  
+
   static defaultProps = {
     backgroundColor: '#fff',
     borderColor: color.theme,
@@ -38,32 +39,36 @@ class JbbButton extends React.Component {
     width: 0,
     height: 0,
     touchStyle: {},
-    disabled: false
+    disabled: false,
+    marginLeft: 0,
   }
-  
-  
+
+
   renderBtn () {
     const btnStyle = {
       alignItems: 'center',
       justifyContent: 'center'
     }
     if (this.props.type === 'default') {
-      btnStyle.backgroundColor = this.props.disabled ? color.fontGray : this.props.backgroundColor
+      btnStyle.backgroundColor = this.props.disabled ? color.fontGray : this.props.backgroundColor;
     }
     if (this.props.type !== 'text') {
-      btnStyle.borderColor = this.props.disabled ? color.fontGray : this.props.borderColor
-      btnStyle.borderWidth = this.props.borderWidth
-      btnStyle.paddingHorizontal = this.props.paddingHorizontal
-      btnStyle.paddingVertical = this.props.paddingVertical
-      
+      btnStyle.borderColor = this.props.disabled ? color.fontGray : this.props.borderColor;
+      btnStyle.borderWidth = this.props.borderWidth;
+      btnStyle.paddingHorizontal = this.props.paddingHorizontal;
+      btnStyle.paddingVertical = this.props.paddingVertical;
+
       if (this.props.width > 0) {
         btnStyle.width = this.props.width
       }
       if (this.props.height > 0) {
         btnStyle.height = this.props.height
       }
+      if (this.props.marginLeft) {
+        btnStyle.marginLeft = this.props.marginLeft;
+      }
     }
-    
+
     const textStyle = {}
     if (this.props.type === 'text') {
       textStyle.textDecorationLine = this.props.textUnderline ? 'underline' : 'none'
@@ -72,16 +77,16 @@ class JbbButton extends React.Component {
     // textStyle.color = this.props.disabled ? '#fff' : this.props.fontColor
     textStyle.color = this.props.fontColor
     textStyle.fontWeight = this.props.fontWeight
-    
+
     return (
       <View style={btnStyle}>
         <Text style={textStyle}>{this.props.text}</Text>
       </View>
     )
   }
-  
+
   render (): React.ReactNode {
-  
+
     return this.props.disabled || !this.props.onPress ? this.renderBtn() : (
       <TouchableOpacity
         onPress={() => this.props.onPress && this.props.onPress()}

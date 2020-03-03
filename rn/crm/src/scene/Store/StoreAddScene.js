@@ -823,7 +823,7 @@ class StoreAddScene extends Component {
                   <MIcon name="map-marker-outline" style={styles.map_icon}/>
                   <Text style={[styles.body_text]}>
                     {location_long !== "" && location_lat !== ""
-                      ? location_long + "," + location_lat
+                      ? `${location_long},${location_lat}`
                       : "点击选择地址"}
                   </Text>
                 </TouchableOpacity>

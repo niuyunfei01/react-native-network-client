@@ -30,14 +30,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderBottom extends PureComponent {
-  
+
   static propTypes = {
     mobile: PropTypes.string,
     label: PropTypes.string,
     onPress: PropTypes.func,
     style: PropTypes.object,
   }
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -81,7 +81,7 @@ class OrderBottom extends PureComponent {
   _cancelShip = (title) => {
     const {navigation, order} = this.props;
     this.setState({dlgShipVisible: false});
-    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, type: title});
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order: order, type: title});
   };
 
   _setOrderArrived = () => {
@@ -109,7 +109,10 @@ class OrderBottom extends PureComponent {
 
   _callShipDlg() {
     const {callShip} = this.props;
-    callShip();
+    let { fn_delivery_v1 } = this.props.order;
+    if (fn_delivery_v1) {
+      callShip();
+    }
   }
 
   _onToProvide() {
@@ -164,7 +167,7 @@ class OrderBottom extends PureComponent {
   _onShipInfoBtnClicked() {
     let {
       dada_status, orderStatus, ship_worker_id, dada_distance, auto_plat, dada_fee, dada_dm_name, dada_mobile,
-      auto_ship_type, zs_status = Cts.ZS_STATUS_TO_ACCEPT_EX, dada_call_at
+      auto_ship_type, zs_status = Cts.ZS_STATUS_TO_ACCEPT_EX, dada_call_at, fn_delivery_v1
     } = this.props.order;
     dada_status = parseInt(dada_status);
     zs_status = parseInt(zs_status);
@@ -317,7 +320,7 @@ class OrderBottom extends PureComponent {
 
   _shipInfoBtnText() {
     let label;
-    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store} = this.props.order;
+    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store, ship_btn_label} = this.props.order;
     let {zs_way} = ext_store;
     zs_way = parseInt(zs_way);
     auto_ship_type = parseInt(auto_ship_type);
@@ -394,7 +397,7 @@ class OrderBottom extends PureComponent {
         }
       }
     }
-    return label;
+    return ship_btn_label || label;
   }
 
   _actionBtnVisible() {

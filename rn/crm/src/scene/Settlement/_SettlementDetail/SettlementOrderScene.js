@@ -19,6 +19,7 @@ function mapStateToProps (state) {
 class SettlementOrderScene extends PureComponent {
   constructor (props) {
     super(props);
+    console.log(props);
     this.state = {
       tab: [
         {label: '订单', value: 'order'},
@@ -32,11 +33,11 @@ class SettlementOrderScene extends PureComponent {
       other_list: this.props.otherList ? this.props.otherList : []
     }
   }
-  
+
   componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
     this.setState({order_list: nextProps.orderList})
   }
-  
+
   toggleDropdown (key, listKey, item) {
     this.state[listKey][key].down = !item.down
     for (let i = 0; i < this.state[listKey].length; i++) {
@@ -46,7 +47,7 @@ class SettlementOrderScene extends PureComponent {
     }
     this.forceUpdate()
   }
-  
+
   renderHeader () {
     const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount} = this.props
     return (
@@ -66,7 +67,7 @@ class SettlementOrderScene extends PureComponent {
       </View>
     )
   }
-  
+
   renderDropdownImage (item) {
     return (
       <Image
@@ -75,7 +76,7 @@ class SettlementOrderScene extends PureComponent {
       />
     )
   }
-  
+
   renderDropdownRow (products, productName = 'name') {
     return (
       <View>
@@ -94,10 +95,10 @@ class SettlementOrderScene extends PureComponent {
           })
         }
       </View>
-    
+
     )
   }
-  
+
   renderOrderList () {
     const self = this
     if (this.state.order_list.length > 0) {
@@ -110,7 +111,7 @@ class SettlementOrderScene extends PureComponent {
         return (
           <View key={key} style={styles.itemRow}>
             <View style={styles.item_title}>
-              <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})}>
+              <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
                 <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`}</Text>
               </TouchableOpacity>
               <Text>商品数量:{total_goods_num}</Text>
@@ -127,7 +128,7 @@ class SettlementOrderScene extends PureComponent {
       }))
     }
   }
-  
+
   renderRefundList () {
     const self = this
     return (
@@ -143,7 +144,7 @@ class SettlementOrderScene extends PureComponent {
           return (
             <View key={index} style={styles.itemRow}>
               <View style={styles.item_title}>
-                <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})}>
+                <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
                   <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refund_list', item)}>
@@ -159,7 +160,7 @@ class SettlementOrderScene extends PureComponent {
       />
     )
   }
-  
+
   renderOtherList () {
     return (
       <FlatList
@@ -198,7 +199,7 @@ class SettlementOrderScene extends PureComponent {
             {this.renderOtherList()}
           </If>
         </ScrollView>
-        
+
         <Toast
           icon="loading"
           show={this.state.query}
@@ -206,10 +207,10 @@ class SettlementOrderScene extends PureComponent {
           }}
         >加载中</Toast>
       </View>
-    
+
     )
   }
-  
+
 }
 
 const styles = StyleSheet.create({

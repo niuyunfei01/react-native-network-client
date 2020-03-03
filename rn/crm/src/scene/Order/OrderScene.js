@@ -313,10 +313,9 @@ class OrderScene extends Component {
   };
 
   fetchShipData () {
-    const self = this
-    const navigation = self.props.navigation
+    const self = this;
     const orderId = (this.props.navigation.state.params || {}).orderId;
-    const api = `/api/order_deliveries/${orderId}?access_token=${this.props.global.accessToken}`
+    const api = `/api/third_ship_deliveries/${orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
       this.setState({logistics: res})
     })

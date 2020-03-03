@@ -57,6 +57,7 @@ class OrderTransferThird extends Component {
       logisticCode: newSelected
     }).then(res => {
       Toast.success('正在呼叫第三方配送，请稍等');
+      console.log("call third ship", res);
       self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack(res);
       self.props.navigation.goBack()
     })
