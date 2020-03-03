@@ -47,7 +47,7 @@ class SearchGoods extends Component {
     const vendor = tool.vendor(this.props.global)
     let {fnPriceControlled} = vendor
     const {limit_store} = this.props.navigation.state.params;
-    
+
     this.state = {
       storeId: limit_store ? limit_store : this.props.global.currStoreId,
       fnPriceControlled: fnPriceControlled,
@@ -66,13 +66,13 @@ class SearchGoods extends Component {
       bigImageUri: [],
     }
   }
-  
+
   componentWillMount () {
     //设置函数
     this.props.navigation.setParams({search: this.searchWithKeyword})
     this.fetchCategories()
   }
-  
+
   fetchCategories () {
     const self = this
     let accessToken = this.props.global.accessToken;
@@ -84,7 +84,7 @@ class SearchGoods extends Component {
       self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
-  
+
   searchWithKeyword = (text) => {
     const self = this
     let showCategory = !text
@@ -95,7 +95,7 @@ class SearchGoods extends Component {
       onlineType: showCategory ? 'browse' : 'search'
     }, () => self.search())
   }
-  
+
   search = () => {
     const self = this
     let accessToken = this.props.global.accessToken;
@@ -103,7 +103,7 @@ class SearchGoods extends Component {
 
     const {type, limit_store, prod_status} = this.props.navigation.state.params;
 
-    let storeId = type == 'select_for_store' ? limit_store : this.state.storeId;
+    let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
     this.setState({isLoading: true})
     const params = {
       vendor_id: currVendorId,
@@ -126,17 +126,17 @@ class SearchGoods extends Component {
       self.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
     })
   };
-  
+
   onRefresh () {
     this.setState({page: 1}, () => this.search())
   }
-  
-  
+
+
   onLoadMore () {
     let page = this.state.page
     this.setState({page: page + 1}, () => this.search())
   }
-  
+
   onSelectCategory (category) {
     this.setState({
       selectTagId: category.id,
@@ -144,32 +144,32 @@ class SearchGoods extends Component {
       onlineType: 'browse'
     }, () => this.search())
   }
-  
+
   changeRowExist (idx, supplyPrice) {
     const products = this.state.goods
     products[idx].is_exist = {supply_price: supplyPrice, status: 1}
     this.setState({goods: products})
   }
-  
+
   showBigImage (product) {
     this.setState({
       bigImageUri: [{url: Config.staticUrl(product.coverimg)}],
       bigImageVisible: true
     })
   }
-  
+
   closeBigImage () {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
-  
+
   showOnlineBtn (product) {
     return !product.is_exist
       || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
   }
-  
+
   /**
    * 保底模式并且是售卖中的商品显示保底价
    */
@@ -182,7 +182,7 @@ class SearchGoods extends Component {
   showSelect(product) {
     return this.props.navigation.state.params.type == 'select_for_store' && product;
   }
-  
+
   renderRow = (product, idx) => {
     const self = this
     return (
@@ -262,7 +262,7 @@ class SearchGoods extends Component {
       </View>
     );
   };
-  
+
   renderNoFoundBtn = () => {
     const storeId = this.state.storeId
     return (
@@ -278,7 +278,7 @@ class SearchGoods extends Component {
       </TouchableOpacity>
     )
   }
-  
+
   renderList () {
     const products = this.state.goods
     let items = []
@@ -290,7 +290,7 @@ class SearchGoods extends Component {
     }
     return items
   }
-  
+
   renderCategory (category) {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
@@ -302,7 +302,7 @@ class SearchGoods extends Component {
       </TouchableOpacity>
     )
   }
-  
+
   renderCategories () {
     const categories = this.state.categories
     let item = []
@@ -311,7 +311,7 @@ class SearchGoods extends Component {
     }
     return item
   }
-  
+
   render () {
     return (
       <View style={styles.container}>
@@ -335,13 +335,13 @@ class SearchGoods extends Component {
               isLoading={this.state.isLoading}
             />
           </If>
-          
+
           <If condition={!(this.state.goods && this.state.goods.length)}>
             <NoFoundDataView/>
             {this.renderNoFoundBtn()}
           </If>
         </View>
-        
+
         <BigImage
           visible={this.state.bigImageVisible}
           urls={this.state.bigImageUri}
