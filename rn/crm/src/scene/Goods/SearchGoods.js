@@ -36,7 +36,7 @@ class SearchGoods extends Component {
       headerLeft: (
         <SearchInputNavigation
           onSearch={(text) => params.search(text)}
-          onBack={() => {if (type != 'select_for_store') {native.toGoods();}}}
+          onBack={() => {if (type !== 'select_for_store') {native.toGoods();}}}
         />
       )
     };
@@ -180,7 +180,7 @@ class SearchGoods extends Component {
   }
 
   showSelect(product) {
-    return this.props.navigation.state.params.type == 'select_for_store' && product;
+    return this.props.navigation.state.params.type === 'select_for_store' && product;
   }
 
   renderRow = (product, idx) => {
