@@ -128,6 +128,18 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         toggleUseAlpha.setChecked(SettingHelper.useAlphaHost());
         toggleUseAlpha.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserAlphaHost(isChecked));
 
+        findViewById(R.id.label_use_fire5).setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        final Switch toggleUseFire5 = findViewById(R.id.toggleUseFire5);
+        toggleUseFire5.setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        toggleUseFire5.setChecked(SettingHelper.useFire5Host());
+        toggleUseFire5.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserFire5Host(isChecked));
+
+        findViewById(R.id.label_use_fire7).setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        final Switch toggleUseFire7 = findViewById(R.id.toggleUseFire7);
+        toggleUseFire7.setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        toggleUseFire7.setChecked(SettingHelper.useFire7Host());
+        toggleUseFire7.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserFire7Host(isChecked));
+
         final Switch toggleAutoPrint = findViewById(R.id.toggleAutoPrint);
         toggleAutoPrint.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && SettingUtility.getListenerStores().isEmpty()) {

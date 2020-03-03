@@ -10,7 +10,19 @@ import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 public class URLHelper {
 
     public static String getHost() {
-        return SettingHelper.useAlphaHost() ? "alpha.cainiaoshicai.cn" : ((SettingHelper.usePreviewHost() ? "preview.cainiaoshicai.cn" : "api.waisongbang.com"));
+        final String host;
+        if (SettingHelper.useAlphaHost()) {
+            return "alpha.cainiaoshicai.cn";
+        } else if (SettingHelper.usePreviewHost()){
+            return "preview.cainiaoshicai.cn";
+        } else if (SettingHelper.useFire5Host()){
+            return "fire5.waisongbang.com";
+        } else if (SettingHelper.useFire7Host()){
+            return "fire7.waisongbang.com";
+        } else {
+            return "api.waisongbang.com";
+        }
+        return host;
     }
 
     public static final String WEB_URL_ROOT = "https://" + getHost();
