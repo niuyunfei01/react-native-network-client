@@ -217,7 +217,6 @@ class Delivery extends React.Component {
   renderBtn () {
     const {orderStatus, auto_ship_type} = this.props.order;
     return (
-      <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
         <View style={styles.btnCell}>
           <View style={styles.btnBox}>
             <JbbButton
@@ -227,48 +226,51 @@ class Delivery extends React.Component {
               fontWeight={'bold'}
               backgroundColor={color.theme}
             />
-            <If condition={orderStatus == Cts.ORDER_STATUS_TO_READY}>
-              <JbbButton
-                type={'hollow'}
-                text={'打包完成'}
-                onPress={() => this.onPackUp()}
-                fontWeight={'bold'}
-                backgroundColor={color.theme}
-                touchStyle={{marginLeft: pxToDp(10)}}
-              />
-            </If>
-            <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_TO_SHIP}>
-              <JbbButton
-                type={'hollow'}
-                text={'提现出发'}
-                onPress={() => this.onRemindShip()}
-                fontWeight={'bold'}
-                backgroundColor={color.theme}
-                touchStyle={{marginLeft: pxToDp(10)}}
-              />
-            </If>
-            <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_ARRIVED}>
-              <JbbButton
-                type={'hollow'}
-                text={'提醒送达'}
-                onPress={() => this.onRemindArrived()}
-                fontWeight={'bold'}
-                backgroundColor={color.theme}
-                touchStyle={{marginLeft: pxToDp(10)}}
-              />
+            <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
+              <If condition={orderStatus == Cts.ORDER_STATUS_TO_READY}>
+                <JbbButton
+                  type={'hollow'}
+                  text={'打包完成'}
+                  onPress={() => this.onPackUp()}
+                  fontWeight={'bold'}
+                  backgroundColor={color.theme}
+                  touchStyle={{marginLeft: pxToDp(10)}}
+                />
+              </If>
+              <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_TO_SHIP}>
+                <JbbButton
+                  type={'hollow'}
+                  text={'提醒出发'}
+                  onPress={() => this.onRemindShip()}
+                  fontWeight={'bold'}
+                  backgroundColor={color.theme}
+                  touchStyle={{marginLeft: pxToDp(10)}}
+                />
+              </If>
+              <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_ARRIVED}>
+                <JbbButton
+                  type={'hollow'}
+                  text={'提醒送达'}
+                  onPress={() => this.onRemindArrived()}
+                  fontWeight={'bold'}
+                  backgroundColor={color.theme}
+                  touchStyle={{marginLeft: pxToDp(10)}}
+                />
+              </If>
             </If>
           </View>
-          <View>
-            <JbbButton
-              type={'text'}
-              text={'我自己送'}
-              onPress={() => this.onCallSelf()}
-              fontColor={'#000'}
-              textUnderline={true}
-            />
-          </View>
+          <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
+            <View>
+              <JbbButton
+                type={'text'}
+                text={'我自己送'}
+                onPress={() => this.onCallSelf()}
+                fontColor={'#000'}
+                textUnderline={true}
+              />
+            </View>
+          </If>
         </View>
-      </If>
     )
   }
 
