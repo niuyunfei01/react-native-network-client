@@ -13,7 +13,17 @@ public class URLHelper {
     public static final String PROTO = "https://";
 
     public static String getHost() {
-        return (SettingHelper.useAlphaHost() ? "alpha.waisongbang.com"  : (SettingHelper.usePreviewHost() ? "preview" : "www")  + ".cainiaoshicai.cn");
+        if (SettingHelper.useAlphaHost()) {
+            return "alpha.cainiaoshicai.cn";
+        } else if (SettingHelper.usePreviewHost()){
+            return "preview.cainiaoshicai.cn";
+        } else if (SettingHelper.useFire5Host()){
+            return "fire5.waisongbang.com";
+        } else if (SettingHelper.useFire7Host()){
+            return "fire7.waisongbang.com";
+        } else {
+            return "api.waisongbang.com";
+        }
     }
 
     public static final String WEB_URL_ROOT = "https://" + getHost();
