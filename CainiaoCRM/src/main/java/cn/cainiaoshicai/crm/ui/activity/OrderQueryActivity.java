@@ -134,16 +134,13 @@ public class OrderQueryActivity extends AbstractActionBarActivity {
 
     private void onTypeChanged() {
         if (adapter != null) {
-            RefreshOrderListTask.OrderQueriedDone callback = new RefreshOrderListTask.OrderQueriedDone() {
-                @Override
-                public void done(OrderContainer value, String error) {
-                    if (value != null) {
-                        OrderQueryActivity.this.data.clear();
-                        ArrayList<Order> orders = value.getOrders();
-                        if(orders!=null&&orders.size() > 0){
-                            OrderQueryActivity.this.data.addAll(value.getOrders());
-                            adapter.notifyDataSetChanged();
-                        }
+            RefreshOrderListTask.OrderQueriedDone callback = (value, error) -> {
+                if (value != null) {
+                    OrderQueryActivity.this.data.clear();
+                    ArrayList<Order> orders = value.getOrders();
+                    if(orders!=null&&orders.size() > 0){
+                        OrderQueryActivity.this.data.addAll(value.getOrders());
+                        adapter.notifyDataSetChanged();
                     }
                 }
             };

@@ -78,7 +78,7 @@ public abstract class MyAsyncTask<Params, Progress, Result> {
             new ThreadPoolExecutor.DiscardOldestPolicy());
 
     public static final Executor THREAD_POOL_EXECUTOR
-            = new ThreadPoolExecutor(8, 10, KEEP_ALIVE,
+            = new ThreadPoolExecutor(3, 10, KEEP_ALIVE,
             TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(128) {
         @Override
         public boolean offer(Runnable runnable) {

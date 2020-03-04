@@ -5,6 +5,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.facebook.react.bridge.UiThreadUtil;
+
 import java.util.List;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
@@ -109,24 +111,35 @@ public class RefreshOrderListTask
 
     @Override
     protected void onCancelled() {
-        swipeRefreshLayout.setRefreshing(false);
-        if (progressFragment != null) {
-            progressFragment.dismissAllowingStateLoss();
-        }
-        Toast.makeText(this.activity, "已取消刷新", Toast.LENGTH_LONG).show();
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+                if (progressFragment != null) {
+                    progressFragment.dismissAllowingStateLoss();
+                }
+                Toast.makeText(RefreshOrderListTask.this.activity, "已取消刷新", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
     protected void onPostExecute(final OrderContainer value) {
         super.onPostExecute(value);
-        swipeRefreshLayout.setRefreshing(false);
-        if (progressFragment != null) {
-            try {
-                progressFragment.dismissAllowingStateLoss();
-            } catch (Exception e) {
-                AppLogger.e("exception:" + e.getMessage(), e);
+
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+                if (progressFragment != null) {
+                    try {
+                        progressFragment.dismissAllowingStateLoss();
+                    } catch (Exception e) {
+                        AppLogger.e("exception:" + e.getMessage(), e);
+                    }
+                }
             }
-        }
+        });
 
         if (doneCallback != null) {
             doneCallback.done(value, this.error);

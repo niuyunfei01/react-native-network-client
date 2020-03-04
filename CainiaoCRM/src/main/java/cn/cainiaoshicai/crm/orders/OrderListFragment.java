@@ -160,14 +160,11 @@ public class OrderListFragment extends Fragment {
                 final MainActivity context = (MainActivity) fragment.getActivity();
                 if (context != null) {
                     //notify reset on main thread
-                    context.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            fragment.data.clear();
-                            fragment.data.addAll(value.getOrders());
-                            fragment.getAdapter().notifyDataSetChanged();
-                            context.updateStatusCnt(value.getTotals());
-                        }
+                    context.runOnUiThread(() -> {
+                        fragment.data.clear();
+                        fragment.data.addAll(value.getOrders());
+                        fragment.getAdapter().notifyDataSetChanged();
+                        context.updateStatusCnt(value.getTotals());
                     });
                 }
 

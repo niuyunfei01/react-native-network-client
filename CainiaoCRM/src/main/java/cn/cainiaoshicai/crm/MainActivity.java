@@ -486,12 +486,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
 
         long nextRecycleTs = System.currentTimeMillis() + LocationHelper.MINUTES;
         locationHelper.nextRecycleTime(nextRecycleTs);
-        Utility.runUIActionDelayed(new Runnable() {
-            @Override
-            public void run() {
-                locationHelper.removeUpdates();
-            }
-        }, 2 * LocationHelper.MINUTES);
+        Utility.runUIActionDelayed(() -> locationHelper.removeUpdates(), 2 * LocationHelper.MINUTES);
     }
 
     private void initShipAccept(final GlobalCtx app) {
