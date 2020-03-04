@@ -151,6 +151,11 @@ export function orderSetReady(token, id, workerIdList, callback) {
   return getReqThenInvalidate(url, id, callback);
 }
 
+export function orderTransferSelf(token, orderId, callback) {
+  const url = `/api/order_transfer_self?access_token=${token}&orderId=${orderId}`;
+  return getReqThenInvalidate(url, id, callback);
+}
+
 /**
  *
  * @param token
