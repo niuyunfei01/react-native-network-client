@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Text, View, ViewPropTypes} from 'react-native'
+import {Text, View} from 'react-native'
 import {Button, Dialog} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
 import {native, tool} from "../../common"
@@ -440,9 +440,8 @@ class OrderBottom extends PureComponent {
     } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
       navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
     } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      const title2 = '提醒用户出发';
       this.setState({
-        dlgShipTitle: title,
+        dlgShipTitle: '提醒用户出发',
         dlgShipButtons: [{
           label: '是',
           onPress: this._setTransferSelfThenStart
