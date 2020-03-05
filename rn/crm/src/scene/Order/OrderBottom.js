@@ -102,7 +102,7 @@ class OrderBottom extends PureComponent {
 
   // 提醒出发
   _setTransferSelfThenStart = () => {
-    const {dispatch, order, global} = this.props;
+    const {navigation, dispatch, order, global} = this.props;
     this.setState({onSubmitting: true, dlgShipVisible: false});
     dispatch(orderTransferSelf(global.accessToken, order.id, (ok, msg, data) => {
       if (ok) {
