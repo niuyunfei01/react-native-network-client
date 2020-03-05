@@ -10,7 +10,7 @@ import Config from "../../config";
 import styles from './OrderStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {orderCallShip, orderSetArrived} from '../../reducers/order/orderActions'
+import {orderCallShip, orderSetArrived, orderTransferSelf} from '../../reducers/order/orderActions'
 import Toast from "../../weui/Toast/Toast";
 
 const numeral = require('numeral');
@@ -94,6 +94,20 @@ class OrderBottom extends PureComponent {
         setTimeout(() => {
           this.setState({doneSubmitting: false});
         }, 2000);
+      } else {
+        this.setState({errorHints: msg});
+      }
+    }))
+  };
+
+  // 提醒出发
+  _setTransferSelfThenStart = () => {
+    const {dispatch, order, global} = this.props;
+    this.setState({onSubmitting: true, dlgShipVisible: false});
+    dispatch(orderTransferSelf(global.accessToken, order.id, (ok, msg, data) => {
+      if (ok) {
+        this.setState({doneSubmitting: true});
+        navigation.navigate(Config.ROUTE_ORDER_START_SHIP, {order: order});
       } else {
         this.setState({errorHints: msg});
       }
@@ -426,7 +440,17 @@ class OrderBottom extends PureComponent {
     } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
       navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
     } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      navigation.navigate(Config.ROUTE_ORDER_START_SHIP, {order: order});
+      const title2 = '提醒用户出发';
+      this.setState({
+        dlgShipTitle: title,
+        dlgShipButtons: [{
+          label: '确定',
+          onPress: this._setTransferSelfThenStart
+        }],
+        left_buttons: [this._defCloseBtn()],
+        dlgShipContent: '确认后，本订单将会转为自配送订单，并取消所有第三方配送订单，是否确定自配送？',
+        dlgShipVisible: true,
+      });
     }
   }
 
