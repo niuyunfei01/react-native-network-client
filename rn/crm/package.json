@@ -64,7 +64,8 @@
     "rn-fetch-blob": "^0.10.15",
     "stacktrace-parser": "^0.1.3",
     "underscore": "^1.9.1",
-    "validate.js": "0.10.0"
+    "validate.js": "0.10.0",
+    "react-native-newrelic": "git+ssh://git@github.com/Jeffliu/react-native-newrelic.git"
   },
   "devDependencies": {
     "babel-jest": "24.1.0",

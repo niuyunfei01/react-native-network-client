@@ -35,6 +35,8 @@ import Moment from "moment/moment";
 import _ from "lodash"
 import GlobalUtil from "./util/GlobalUtil";
 
+import {default as newRelic} from 'react-native-newrelic';
+import DeviceInfo from "react-native-device-info";
 
 const lightContentScenes = ["Home", "Mine", "Operation"];
 
@@ -70,20 +72,20 @@ class RootScene extends PureComponent {
   constructor () {
     super();
     StatusBar.setBarStyle("light-content");
-    
+
     this.state = {
       rehydrated: false
     };
-    
+
     this.store = null;
   }
-  
+
   componentDidMount () {
   }
-  
+
   componentWillMount () {
     const launchProps = this.props.launchProps;
-    
+
     this.store = configureStore(
       function (store) {
         const {
@@ -94,7 +96,7 @@ class RootScene extends PureComponent {
           canReadVendors,
           configStr
         } = launchProps;
-        
+
         let config = configStr ? JSON.parse(configStr) : {};
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
@@ -118,6 +120,14 @@ class RootScene extends PureComponent {
         });
       }.bind(this)
     );
+
+    newRelic.init({
+      overrideConsole: true,
+      reportUncaughtExceptions: true,
+      globalAttributes: {
+        'wsb-app': DeviceInfo.getBuildNumber()
+      }
+    });
   }
 
   render () {
@@ -129,7 +139,7 @@ class RootScene extends PureComponent {
       launchProps["_action_params"]["backPage"] = backPage;
     }
     let initialRouteParams = launchProps["_action_params"] || {};
-    
+
     if (this.state.rehydrated) {
       //hiding after state recovered
       SplashScreen.hide();
@@ -147,21 +157,21 @@ class RootScene extends PureComponent {
           initialRouteParams = {orderId};
         }
       }
-      
+
       let {accessToken, currStoreId} = this.store.getState().global;
       const {last_get_cfg_ts} = this.store.getState().global;
       let current_time = Moment(new Date()).unix();
       let diff_time = current_time - last_get_cfg_ts;
-      
+
       if (diff_time > 300) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-          
+
           })
         );
       }
     }
-    
+
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (
