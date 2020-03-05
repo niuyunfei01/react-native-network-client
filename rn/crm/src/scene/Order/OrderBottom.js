@@ -102,7 +102,7 @@ class OrderBottom extends PureComponent {
 
   // 提醒出发
   _setTransferSelfThenStart = () => {
-    const {dispatch, order, global} = this.props;
+    const {navigation, dispatch, order, global} = this.props;
     this.setState({onSubmitting: true, dlgShipVisible: false});
     dispatch(orderTransferSelf(global.accessToken, order.id, (ok, msg, data) => {
       if (ok) {
@@ -444,11 +444,11 @@ class OrderBottom extends PureComponent {
       this.setState({
         dlgShipTitle: title,
         dlgShipButtons: [{
-          label: '确定',
+          label: '是',
           onPress: this._setTransferSelfThenStart
         }],
         left_buttons: [this._defCloseBtn()],
-        dlgShipContent: '确认后，本订单将会转为自配送订单，并取消所有第三方配送订单，是否确定自配送？',
+        dlgShipContent: '您确定要自己送吗？点击“是”会取消第三方配送，有可能产生违约金',
         dlgShipVisible: true,
       });
     }
