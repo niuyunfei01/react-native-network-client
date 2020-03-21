@@ -16,7 +16,7 @@ public class URLHelper {
         if (SettingHelper.useAlphaHost()) {
             return "alpha.cainiaoshicai.cn";
         } else if (SettingHelper.usePreviewHost()){
-            return "preview.cainiaoshicai.cn";
+            return "beta.waisongbang.com";
         } else if (SettingHelper.useFire5Host()){
             return "fire5.waisongbang.com";
         } else if (SettingHelper.useFire7Host()){
