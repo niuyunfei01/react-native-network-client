@@ -45,6 +45,15 @@ const caught = new Caught();
 YellowBox.ignoreWarnings([
   'Warning: isMounted(...) is deprecated'
 ])
+
+newRelic.init({
+  overrideConsole: true,
+  reportUncaughtExceptions: true,
+  globalAttributes: {
+    'wsb-app': DeviceInfo.getBuildNumber()
+  }
+});
+
 function getCurrentRouteName (navigationState) {
   if (!navigationState) {
     return null;
@@ -120,14 +129,6 @@ class RootScene extends PureComponent {
         });
       }.bind(this)
     );
-
-    newRelic.init({
-      overrideConsole: true,
-      reportUncaughtExceptions: true,
-      globalAttributes: {
-        'wsb-app': DeviceInfo.getBuildNumber()
-      }
-    });
   }
 
   render () {

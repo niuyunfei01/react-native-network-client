@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Text, View, ViewPropTypes} from 'react-native'
+import {Text, View} from 'react-native'
 import {Button, Dialog} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
 import {native, tool} from "../../common"
@@ -102,7 +102,7 @@ class OrderBottom extends PureComponent {
 
   // 提醒出发
   _setTransferSelfThenStart = () => {
-    const {dispatch, order, global} = this.props;
+    const {navigation, dispatch, order, global} = this.props;
     this.setState({onSubmitting: true, dlgShipVisible: false});
     dispatch(orderTransferSelf(global.accessToken, order.id, (ok, msg, data) => {
       if (ok) {
@@ -440,15 +440,14 @@ class OrderBottom extends PureComponent {
     } else if (iStatus === Cts.ORDER_STATUS_TO_READY) {
       navigation.navigate(Config.ROUTE_ORDER_PACK, {order});
     } else if (iStatus === Cts.ORDER_STATUS_TO_SHIP) {
-      const title2 = '提醒用户出发';
       this.setState({
-        dlgShipTitle: title,
+        dlgShipTitle: '提醒用户出发',
         dlgShipButtons: [{
-          label: '确定',
+          label: '是',
           onPress: this._setTransferSelfThenStart
         }],
         left_buttons: [this._defCloseBtn()],
-        dlgShipContent: '确认后，本订单将会转为自配送订单，并取消所有第三方配送订单，是否确定自配送？',
+        dlgShipContent: '您确定要自己送吗？点击“是”会取消第三方配送，有可能产生违约金',
         dlgShipVisible: true,
       });
     }
