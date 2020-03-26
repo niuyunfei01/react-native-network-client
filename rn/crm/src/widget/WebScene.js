@@ -5,6 +5,7 @@ import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import GlobalUtil from "../util/GlobalUtil";
 
 function mapStateToProps(state) {
   return {
@@ -94,12 +95,12 @@ class WebScene extends PureComponent {
       this.props.navigation.goBack()
     }
   };
-  
+
   onRefresh = () => {
     console.log(this)
     this.webview.reload()
   }
-  
+
   _do_go_back(msg) {
     const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
@@ -187,13 +188,14 @@ class WebScene extends PureComponent {
       if (action === Config.LOC_PICKER) {
         let {center,} = this.props.navigation.state.params;
         const key = '608d75903d29ad471362f8c58c550daf';
-        url = `https://www.cainiaoshicai.cn/amap.php?key=${key}&center=${center}`;
+        url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
+        console.log("log_picker url: ", url)
       }
       this.setState({source: {uri: url, headers: {'Cache-Control': 'no-cache'}}})
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-  
+
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
   };
 
