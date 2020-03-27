@@ -25,6 +25,7 @@ function mapDispatchToProps (dispatch) {
 }
 
 class OrderSendMoney extends PureComponent {
+
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: '发红包'
@@ -33,7 +34,7 @@ class OrderSendMoney extends PureComponent {
 
   constructor (props: Object) {
     super(props);
-    const store_id  = navigation.state.params.storeId;
+    const store_id  = this.props.navigation.state.params.storeId;
     const store = tool.store(this.props.global, store_id);
     this.state = {
       storeName: store.name,

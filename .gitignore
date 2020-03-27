@@ -7,7 +7,6 @@ build/
 local.properties
 node_modules/*
 CainiaoCRM/src/main/assets/index.android.*
-rn/crm/yarn.lock
 
 # OSX
 #
@@ -64,7 +63,6 @@ fastlane/Preview.html
 fastlane/screenshots
 
 .tmp/
-rn/crm/package-lock.json
 .project
 .project
 .project

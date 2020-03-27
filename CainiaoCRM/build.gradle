@@ -35,7 +35,7 @@ dependencies {
     implementation fileTree(include: '*.jar', exclude: ['*-javadoc.jar', '*-sources.jar'], dir: 'libs')
 
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    implementation("com.squareup.retrofit2:retrofit:$RETROFIT_VERSION")
     implementation("com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION") {
         exclude group: 'com.google.code.gson'
     }
@@ -54,9 +54,15 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
     implementation 'com.github.yalantis:ucrop:2.2.1-native'
-    implementation 'id.zelory:compressor:2.1.0'
 
-    implementation 'com.xdandroid:hellodaemon:+'
+    implementation('io.reactivex.rxjava2:rxjava:2.2.19')
+    implementation ('id.zelory:compressor:2.1.0') {
+        exclude module: 'io.reactivex.rxjava2'
+    }
+
+    implementation ('com.xdandroid:hellodaemon:+') {
+        exclude module: 'io.reactivex.rxjava2'
+    }
 
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-i18n')

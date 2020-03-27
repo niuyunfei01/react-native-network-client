@@ -491,7 +491,7 @@ class MineScene extends PureComponent {
         if (resp.obj.auth_store_change) {
           _this._doChangeStore(store_id);
         } else {
-          ToastLong("您没有访问该门店的权限");
+          ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }
       })
     );
