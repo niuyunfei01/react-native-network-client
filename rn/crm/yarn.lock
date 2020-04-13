@@ -7190,6 +7190,14 @@ rmc-cascader@~5.0.0:
     babel-runtime "6.x"
     rmc-picker "~5.0.0"
 
+rmc-date-picker@^6.0.10:
+  version "6.0.10"
+  resolved "https://registry.npm.taobao.org/rmc-date-picker/download/rmc-date-picker-6.0.10.tgz#34dc7dfd424248be2d43527421576247c31583f6"
+  integrity sha1-NNx9/UJCSL4tQ1J0IVdiR8MVg/Y=
+  dependencies:
+    babel-runtime "6.x"
+    rmc-picker "~5.0.0"
+
 rmc-date-picker@^6.0.8:
   version "6.0.8"
   resolved "http://registry.npm.taobao.org/rmc-date-picker/download/rmc-date-picker-6.0.8.tgz#9aab87b3aa8dc9c5a57349d8f0b05de4e8f4808a"

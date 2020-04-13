@@ -133,6 +133,7 @@ import Cts from "../Cts";
 import _ from "lodash"
 import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
+import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 
 const tabDef = function (store_) {
@@ -404,6 +405,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
 
         [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
+          [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
+          },
         [Config.ROUTE_ACCOUNT_FILL]: {screen: SeparatedAccountFill},
 
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
