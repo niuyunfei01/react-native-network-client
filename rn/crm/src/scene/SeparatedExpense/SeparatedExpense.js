@@ -7,6 +7,7 @@ import {
     View,
     InteractionManager
 } from 'react-native';
+import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -15,6 +16,10 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
 import Config from "../../config";
+import classNames from 'classnames';
+// import 'rmc-date-picker/assets/index.css';
+// import 'rmc-picker/assets/popup.css';
+import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
 const Item = List;
@@ -57,6 +62,7 @@ class SeparatedExpense extends PureComponent {
 
   constructor (props: Object) {
     super(props);
+
     let date = new Date();
     this.state = {
         records: [],
@@ -86,6 +92,7 @@ class SeparatedExpense extends PureComponent {
   }
 
     onChange =(date)=> {
+        console.log(this.props)
         console.log(date, this.format(date));
         this.setState({ date: date, start_day:this.format(date)},function(){
             this.fetchExpenses();
@@ -119,6 +126,7 @@ class SeparatedExpense extends PureComponent {
               maxDate={new Date()}
               defaultDate={date}
               mode="month"
+              locale={zh_CN}
           />
       );
     return (
@@ -133,7 +141,10 @@ class SeparatedExpense extends PureComponent {
                         datePicker={datePicker}
                         transitionName="rmc-picker-popup-slide-fade"
                         maskTransitionName="rmc-picker-popup-fade"
-                        title="Date picker"
+                        styles={styles}
+                        title={'选择日期'}
+                        okText={'确认'}
+                        dismissText={'取消'}
                         date={date}
                         onDismiss={this.onDismiss}
                         onChange={this.onChange}
@@ -168,6 +179,8 @@ class SeparatedExpense extends PureComponent {
 }
 
 const style = StyleSheet.create({
+    popPicker:{
+    },
   saAmountStyle: {
     color: colors.orange,
   },
