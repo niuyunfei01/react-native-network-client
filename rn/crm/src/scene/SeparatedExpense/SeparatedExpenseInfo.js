@@ -83,9 +83,18 @@ onItemAccountStyle(item) {
 
   render () {
       const { records } = this.state;
+      const {params} = this.props.navigation.state;
+      console.log(params);
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f9' }}>
-            <List style={{width:"100%"}}>
+            <List style={{width:"100%"}}
+                  renderHeader={()=>{
+                      return <View style={{flexDirection: 'row', alignItems: 'center',  width:"100%",height: 40, backgroundColor:"#fff"}}>
+                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.navigation.state.params.day}</Text>
+                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.navigation.state.params.total_balanced !== '' ? (`外送帮余额：${this.props.navigation.state.params.total_balanced}`) : ''}</Text>
+                      </View>
+                  }}
+            >
                 {records.map((item, idx) => {
                     return <List.Item arrow="horizontal"
                                       key={idx}

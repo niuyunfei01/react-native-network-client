@@ -113,7 +113,7 @@ class SeparatedExpense extends PureComponent {
     onItemClicked(item){
         let _this = this;
         InteractionManager.runAfterInteractions(() => {
-            _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {day:item});
+            _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {day:item.day,total_balanced:item.total_balanced});
         });
     }
   render () {
@@ -166,7 +166,7 @@ class SeparatedExpense extends PureComponent {
                     return <List.Item
                         arrow="horizontal"
                         key={id}
-                        onClick={()=>this.onItemClicked(item.day)}
+                        onClick={()=>this.onItemClicked(item)}
                         extra={<Text style={[this.onHeaderStyle]}>{item.total_balanced !== '' ? (`外送帮余额：${item.total_balanced}`) : ''}</Text>}
                     >
                         <Text> {item.day}</Text>
