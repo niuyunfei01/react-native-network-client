@@ -6526,9 +6526,9 @@ react-native-modal@3.1.0:
     prop-types "15.5.10"
     react-native-animatable "^1.2.3"
 
-"react-native-newrelic@git+ssh://git@github.com/Jeffliu/react-native-newrelic.git":
+"react-native-newrelic@github:Jeffliu/react-native-newrelic":
   version "1.1.1"
-  resolved "git+ssh://git@github.com/Jeffliu/react-native-newrelic.git#a1b64afe379b8da6d8a23948288a13c061d5d404"
+  resolved "https://codeload.github.com/Jeffliu/react-native-newrelic/tar.gz/a1b64afe379b8da6d8a23948288a13c061d5d404"
   dependencies:
     lodash "^4.11.1"
 
