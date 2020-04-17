@@ -50,6 +50,10 @@ export default {
   SHIP_AUTO: 0, //不自动
   SHIP_AUTO_FN_DD: 64, //自动排单
 
+
+  RESERVATION_ORDER_PRINT_REAL_TIME: 0, //实时打印
+  RESERVATION_ORDER_PRINT_AUTO: -1, //默认送达前打印
+
   REFUND_AUDIT_AGREE: 1, //同意退款
   REFUND_AUDIT_REFUSE: 0, //拒绝退款
   //审核状态
