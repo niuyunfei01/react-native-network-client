@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
+import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.bt.BtService;
 import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.print.PrintUtil;
@@ -216,12 +217,14 @@ public class PrintQueue {
                 }
             } else {
                 if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                    AudioUtils.getInstance().speakText(SPEAK_WORD);
+                    GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+                    soundManager.play_by_xunfei(SPEAK_WORD);
                 }
             }
         } catch (Exception e) {
             if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                AudioUtils.getInstance().speakText(SPEAK_WORD);
+                GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+                soundManager.play_by_xunfei(SPEAK_WORD);
             }
             if (pOrder != null) {
                 queue.add(pOrder);
@@ -308,12 +311,14 @@ public class PrintQueue {
                 mBtService.write(bytes);
             } else {
                 if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                    AudioUtils.getInstance().speakText(SPEAK_WORD);
+                    GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+                    soundManager.play_by_xunfei(SPEAK_WORD);
                 }
             }
         } catch (Exception e) {
             if (rateLimiter.tryAcquire() && getAutoPrintSetting()) {
-                AudioUtils.getInstance().speakText(SPEAK_WORD);
+                GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+                soundManager.play_by_xunfei(SPEAK_WORD);
             }
             CrashReportHelper.handleUncaughtException(null, e);
         }
