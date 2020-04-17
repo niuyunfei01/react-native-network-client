@@ -3,11 +3,12 @@ Application/build
 .idea
 .gradle
 gradle/wrapper/gradle-wrapper.properties
+gradle/wrapper/gradle-wrapper.jar
 build/
 local.properties
 node_modules/*
 CainiaoCRM/src/main/assets/index.android.*
-
+CainiaoCRM/src/*
 # OSX
 #
 .DS_Store

@@ -372,6 +372,19 @@ public class OrderAdapter extends BaseAdapter {
     }
 
     private void callMobilePhone(View v, String mobile) {
+
+        if (mobile.indexOf(",") > 0) {
+            String[] parts = mobile.split(",");
+            AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, String.format("如提示输入分机号，请输入：%s", parts[1]),
+                    "拨打", (dialogInterface, i) -> OrderAdapter.this.callMobilePhoneDirectly(v, mobile),
+                    "关闭", (dialogInterface, i) -> { }
+                    );
+        } else {
+            callMobilePhoneDirectly(v, mobile);
+        }
+    }
+
+    private void callMobilePhoneDirectly(View v, String mobile) {
         Intent callIntent = new Intent(Intent.ACTION_DIAL);
         callIntent.setData(Uri.parse("tel:" + mobile));
         Context context = v.getContext();
@@ -552,7 +565,7 @@ public class OrderAdapter extends BaseAdapter {
 
             final String[] selectedOption = new String[]{initOption};
             final int checkedIdx = options.getValues().indexOf(initOption);
-            String[] names = options.getNames().toArray(new String[options.getNames().size()]);
+            String[] names = options.getNames().toArray(new String[0]);
 
             AlertDialog.Builder adb = new AlertDialog.Builder(activity);
             adb.setTitle("修改排单");
