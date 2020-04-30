@@ -31,6 +31,7 @@ import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
+import PlatformBind from "../scene/Login/PlatformBind"
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import TakeOutScene from "../scene/Store/TakeOutScene";
@@ -349,6 +350,7 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
         [Config.ROUTE_STORE_RULE]: {screen: StoreRule},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
+        [Config.PLATFORM_BIND]: {screen: PlatformBind},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
