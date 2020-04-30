@@ -26,20 +26,18 @@ import {
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
-
 import Config from "./config";
-
 import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
 import _ from "lodash"
 import GlobalUtil from "./util/GlobalUtil";
-
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
-
+import dva from "./util/dva";
+import RegisterModel from "./reducers/user/Register";
+console.log(RegisterModel);
 const lightContentScenes = ["Home", "Mine", "Operation"];
-
 //global exception handlers
 const caught = new Caught();
 YellowBox.ignoreWarnings([
@@ -76,6 +74,13 @@ const styles = StyleSheet.create({
   }
 });
 
+const app = dva({
+  initialState: {},
+  models: [RegisterModel],
+  onError(e) {
+    console.log('onError', e)
+  },
+});
 // create a component
 class RootScene extends PureComponent {
   constructor () {
