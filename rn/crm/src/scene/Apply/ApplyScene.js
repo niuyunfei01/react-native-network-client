@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
-import {List, Picker, Provider } from "antd-mobile-rn";
+import {List, Picker,Provider } from "antd-mobile-rn";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
@@ -25,6 +25,7 @@ import {
 import {NavigationItem} from "../../widget/index"
 
 import stringEx from "../../util/stringEx"
+const data = require('./data.json');
 
 /**
  * ## Redux boilerplate
@@ -57,30 +58,6 @@ const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入店铺名字";
 const validEmptyClassify = "请输入经营项目";
-
-const seasons = [
-  [
-    {
-      label: '2013',
-      value: '2013',
-    },
-    {
-      label: '2014',
-      value: '2014',
-    },
-  ],
-  [
-    {
-      label: '春',
-      value: '春',
-    },
-    {
-      label: '夏',
-      value: '夏',
-    },
-  ],
-];
-
 class ApplyScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => ({
@@ -126,22 +103,22 @@ class ApplyScene extends PureComponent {
       visibleDialog: false,
       toastTimer: null,
       loadingTimer: null,
-      data: [],
       value: [],
       pickerValue: [],
     };
+    this.onChange = this.onChange.bind(this)
     this.doApply = this.doApply.bind(this)
     this.onApply = this.onApply.bind(this)
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
     this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
     this.doneApply = this.doneApply.bind(this)
-    this.onMobileChange = this.onMobileChange.bind(this)
     this.onPickerPress = this.onPickerPress.bind(this)
-    this.onClose2 = this.onClose2.bind(this)
     this.showSuccessToast = this.showSuccessToast.bind(this)
-
     this.showErrorToast = this.showErrorToast.bind(this)
   }
+  onChange (value: any){
+    this.setState({ value });
+  };
   onPickerPress() {
     setTimeout(() => {
       this.setState({
@@ -149,12 +126,6 @@ class ApplyScene extends PureComponent {
       });
     }, 500);
   };
-  onMobileChange (value: any) {
-    console.log(value);
-    if (value) {
-      this.setState({value: value});
-    }
-  }
   onApply() {
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       this.showErrorToast(validErrorMobile)
@@ -215,9 +186,6 @@ class ApplyScene extends PureComponent {
   clearTimeouts() {
     if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
     if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
-  }
-  onClose2(){
-    this.setState({visible2: false})
   }
   showSuccessToast(msg) {
     this.setState({
@@ -328,9 +296,14 @@ class ApplyScene extends PureComponent {
 
             <Cell first>
               <CellBody>
-                <Button onPress={() => this.setState({ visible2: !this.state.visible2 })}>
-                  popup
-                </Button>
+                <Picker
+                    data={data}
+                    cols={3}
+                    value={this.state.value}
+                    onChange={this.onChange}
+                >
+                  <List.Item arrow="horizontal">省市选择</List.Item>
+                </Picker>
               </CellBody>
             </Cell>
             <Cell first>
@@ -386,22 +359,6 @@ class ApplyScene extends PureComponent {
             ]}
           ><Text>客服马上会联系你</Text></Dialog>
         </View>
-        <Provider>
-          <View style={{ marginTop: 30 }}>
-            <List>
-              <Picker
-                  data={seasons}
-                  cols={3}
-                  value={this.state.value}
-                  onChange={this.onChange}
-              >
-                <List.Item arrow="horizontal" onPress={this.onPickerPress}>
-                  省市选择
-                </List.Item>
-              </Picker>
-            </List>
-          </View>
-        </Provider>
       </ScrollView>
     )
   }
