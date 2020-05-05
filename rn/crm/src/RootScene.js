@@ -74,13 +74,13 @@ const styles = StyleSheet.create({
   }
 });
 
-const app = dva({
-  initialState: {},
-  models: [RegisterModel],
-  onError(e) {
-    console.log('onError', e)
-  },
-});
+// const app = dva({
+//   initialState: {},
+//   models: [RegisterModel],
+//   onError(e) {
+//     console.log('onError', e)
+//   },
+// });
 // create a component
 class RootScene extends PureComponent {
   constructor () {

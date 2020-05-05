@@ -14,6 +14,7 @@ import GoodsScene from "../scene/Goods/GoodsScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
+import RegisterScene from "../scene/Login/RegisterScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
@@ -312,6 +313,7 @@ class Navigator extends Component {
         Web: {screen: WebScene},
         Home: {screen: RemindScene},
         Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
+        Register: {screen: RegisterScene},
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
         User: {screen: UserScene},

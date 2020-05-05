@@ -1,12 +1,10 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
-import {connect} from "react-redux";
+import {View, StyleSheet, Image, Text, ScrollView, Linking} from 'react-native'
 import {bindActionCreators} from "redux";
+import {Checkbox} from "antd-mobile-rn";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
-import native from "../../common/native";
-import dva from "../../util/dva";
 import {
     Cell,
     CellHeader,
@@ -23,6 +21,7 @@ import {
 import {NavigationItem} from "../../widget/index"
 import {create} from  'dva-core';
 import stringEx from "../../util/stringEx"
+import colors from "../../styles/colors";
 /**
  * ## Redux boilerplate
  */
@@ -40,24 +39,17 @@ function mapDispatchToProps(dispatch) {
 
 const mobileInputPlaceHold = "手机号码";
 const validCodePlaceHold = "短信验证码";
-const namePlaceHold = "负责人";
-const shopNamePlaceHold = "店名";
-const classifyPlaceHold = "经营项目 如:生鲜、水果";
-const addressPlaceHold = "店铺详细地址";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
-const applySuccessMsg = "申请成功";
-const applyErrorMsg = "申请失败，请重试!";
+const RegisterSuccessMsg = "申请成功";
+const RegisterErrorMsg = "申请失败，请重试!";
 
 
 const validErrorMobile = "手机号有误";
-const validEmptyName = "请输入负责人";
-const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
-const validEmptyShopName = "请输入店铺名字";
-const validEmptyClassify = "请输入经营项目";
+const validEmptyCheckBox = "请阅读并同意「外送帮使用协议」";
 
-class RegisterScens extends PureComponent {
+class RegisterScene extends PureComponent {
 
     static navigationOptions = ({navigation}) => ({
         headerTitle: (
@@ -68,7 +60,7 @@ class RegisterScens extends PureComponent {
                     color: "#ffffff",
                     fontWeight: 'bold',
                     fontSize: 20
-                }}>我要开店</Text>
+                }}>我要注册</Text>
             </View>
         ),
         headerStyle: {backgroundColor: '#59b26a'},
@@ -94,7 +86,7 @@ class RegisterScens extends PureComponent {
             classify: '',
             canAskReqSmsCode: false,
             reRequestAfterSeconds: 60,
-            doingApply: false,
+            doingRegister: false,
             opSuccessMsg: '',
             opErrorMsg: '',
             visibleSuccessToast: false,
@@ -102,18 +94,19 @@ class RegisterScens extends PureComponent {
             visibleDialog: false,
             toastTimer: null,
             loadingTimer: null,
+            checkBox:true,
         }
 
-        this.doApply = this.doApply.bind(this)
-        this.onApply = this.onApply.bind(this)
+        this.doRegister = this.doRegister.bind(this)
+        this.onRegister = this.onRegister.bind(this)
         this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
         this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
-        this.doneApply = this.doneApply.bind(this)
+        this.doneRegister = this.doneRegister.bind(this)
         this.showSuccessToast = this.showSuccessToast.bind(this)
         this.showErrorToast = this.showErrorToast.bind(this)
     }
 
-    onApply() {
+    onRegister() {
         if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
             this.showErrorToast(validErrorMobile)
             return false
@@ -122,31 +115,20 @@ class RegisterScens extends PureComponent {
             this.showErrorToast(validEmptyCode)
             return false
         }
-        if (!this.state.name) {
-            this.showErrorToast(validEmptyName)
+        if (!this.state.checkBox) {
+            this.showErrorToast(validEmptyCheckBox)
             return false
         }
-        if (!this.state.shopName) {
-            this.showErrorToast(validEmptyShopName)
-            return false
-        }
-        if (!this.state.classify) {
-            this.showErrorToast(validEmptyClassify)
-            return false
-        }
-        if (!this.state.address) {
-            this.showErrorToast(validEmptyAddress)
-            return false
-        }
-        if (this.state.doingApply) {
+
+        if (this.state.doingRegister) {
             return false;
         }
-        this.doApply();
+        this.doRegister();
     }
 
-    doApply() {
+    doRegister() {
         var self = this;
-        this.setState({doingApply: true});
+        this.setState({doingRegister: true});
         let data = {
             mobile: this.state.mobile,
             address: this.state.address,
@@ -155,19 +137,19 @@ class RegisterScens extends PureComponent {
             classify: this.state.classify,
             name: this.state.name
         };
-        this.props.actions.customerApply(data, (success) => {
-            self.doneApply();
+        this.props.actions.customerRegister(data, (success) => {
+            self.doneRegister();
             if (success) {
-                this.showSuccessToast(applySuccessMsg);
+                this.showSuccessToast(RegisterSuccessMsg);
                 setTimeout(()=>this.props.navigation.goBack(),2000)
             } else {
-                this.showErrorToast(applyErrorMsg)
+                this.showErrorToast(RegisterErrorMsg)
             }
         })
     }
 
-    doneApply() {
-        this.setState({doingApply: false})
+    doneRegister() {
+        this.setState({doingRegister: false})
     }
 
     clearTimeouts() {
@@ -287,97 +269,28 @@ class RegisterScens extends PureComponent {
                                 }
                             </CellFooter>
                         </Cell>
+                        <Cell first>
 
-                        <Cell first>
-                            <CellHeader>
-                                <Image source={require('../../img/Register/login_name_.png')} style={{
-                                    width: pxToDp(39),
-                                    height: pxToDp(39),
-                                }}/>
-                            </CellHeader>
                             <CellBody>
-                                <Input placeholder={namePlaceHold}
-                                       onChangeText={(name) => {
-                                           this.setState({name})
-                                       }}
-                                       value={this.state.name}
-                                       placeholderTextColor={'#ccc'}
-                                       style={styles.input}
-                                       underlineColorAndroid="transparent"/>
+                                <Checkbox
+                                    checked={this.state.checkBox}
+                                    onChange={event => {
+                                        this.setState({ checkBox: event.target.checked });
+                                    }}
+                                >我已阅读并同意</Checkbox>
                             </CellBody>
-                        </Cell>
-
-                        <Cell first>
-                            <CellHeader>
-                                <Image source={require('../../img/Register/dianming_.png')} style={{
-                                    width: pxToDp(39),
-                                    height: pxToDp(35),
-                                }}/>
-                            </CellHeader>
-                            <CellBody>
-                                <Input placeholder={shopNamePlaceHold}
-                                       onChangeText={(shopName) => {
-                                           this.setState({shopName})
-                                       }}
-                                       value={this.state.shopName}
-                                       placeholderTextColor={'#ccc'}
-                                       style={styles.input}
-                                       underlineColorAndroid="transparent"/>
-                            </CellBody>
-                        </Cell>
-
-                        <Cell first>
-                            <CellHeader>
-                                <Image source={require('../../img/Register/jingying_.png')} style={{
-                                    width: pxToDp(39),
-                                    height: pxToDp(39),
-                                }}/>
-                            </CellHeader>
-                            <CellBody>
-                                <Input placeholder={classifyPlaceHold}
-                                       onChangeText={(classify) => {
-                                           this.setState({classify})
-                                       }}
-                                       value={this.state.classify}
-                                       placeholderTextColor={'#ccc'}
-                                       style={styles.input}
-                                       underlineColorAndroid="transparent"/>
-                            </CellBody>
-                        </Cell>
-                        <Cell first>
-                            <CellHeader>
-                                <Image source={require('../../img/Register/map_.png')} style={{
-                                    width: pxToDp(39),
-                                    height: pxToDp(45),
-                                }}/>
-                            </CellHeader>
-                            <CellBody>
-                                <Input placeholder={addressPlaceHold}
-                                       onChangeText={(address) => {
-                                           this.setState({address})
-                                       }}
-                                       placeholderTextColor={'#ccc'}
-                                       value={this.state.address}
-                                       style={styles.input}
-                                       underlineColorAndroid="transparent"
-                                />
-                            </CellBody>
+                            <CellFooter>
+                                <Text onPress={()=>{
+                                    Linking.openURL("https://e.waisongbang.com/PrivacyPolicy.html")
+                                }} style={{color:colors.main_color}}>外送帮使用协议</Text>
+                            </CellFooter>
                         </Cell>
                     </Cells>
-
-                    <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-                        <Button type="primary" onPress={()=>this.onApply()}>我要开店</Button>
+                  <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
+                        <Button type="primary" onPress={()=>this.onRegister()}>我要开店</Button>
                     </ButtonArea>
 
-                    <View  style={{flex: 1, justifyContent: 'center', alignItems: 'center',flexDirection:'row'}}>
-                        <Text style={{fontSize: 16}}>有不明处?</Text>
-                        <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
-                            native.dialNumber('18910275329');
-                        }}>
-                            联系客服
-                        </Text>
-                    </View>
-                    <Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {
+                    <Toast icon="loading" show={this.state.doingRegister} onRequestClose={() => {
                     }}>提交中</Toast>
                     <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
                     }}>{this.state.opSuccessMsg}</Toast>
@@ -431,4 +344,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default RegisterScens;
+export default RegisterScene;
