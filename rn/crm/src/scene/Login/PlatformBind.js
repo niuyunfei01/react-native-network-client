@@ -5,6 +5,7 @@ import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
 import Dialog from "react-native-dialog"
 import * as globalActions from "../../reducers/global/globalActions"
+import HttpUtils from "../../util/http";
 
 mapStateToProps = state => {
   let {global} = state
@@ -25,7 +26,8 @@ class PlatformBind extends PureComponent {
   }
 
   constructor(props) {
-    super(props);
+    super(props)
+    const params = this.props.navigation.state.params
     this.state = {
       platformsList: [
         {
@@ -54,14 +56,25 @@ class PlatformBind extends PureComponent {
         }
       ],
       dialogVisible: false,
-
       developerId: '',
       businessId: '',
-      ePoiId: '',
+      ePoiId: params.ePoiId,
       sign: '',
-      ePoiName: '',
+      ePoiName: params.ePoiName,
       timestamp: ''
     }
+  }
+  componentDidMount () {
+    this.fetch()
+  }
+
+  fetch() {
+    const {accessToken, orderId, to_u_mobile} = this.state
+    const self = this
+    const params = {orderId, to_u_mobile};
+    HttpUtils.get.bind(this.props)(`/api/redeem_good_coupon_type?access_token=${accessToken}`, params).then(res => {
+      self.setState({coupon_type_list: res.type_list, mobiles: res.mobiles, to_u_mobile: res.to_u_mobile})
+    })
   }
 
   keyExtractor = (item, index) => index.toString()
