@@ -14,6 +14,7 @@ import GoodsScene from "../scene/Goods/GoodsScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
+import RegisterScene from "../scene/Login/RegisterScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
@@ -134,6 +135,7 @@ import Cts from "../Cts";
 import _ from "lodash"
 import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
+import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 
 const tabDef = function (store_) {
@@ -312,6 +314,7 @@ class Navigator extends Component {
         Web: {screen: WebScene},
         Home: {screen: RemindScene},
         Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
+        Register: {screen: RegisterScene},
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
         User: {screen: UserScene},
@@ -406,6 +409,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
 
         [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
+          [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
+          },
         [Config.ROUTE_ACCOUNT_FILL]: {screen: SeparatedAccountFill},
 
         [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},

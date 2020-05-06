@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {
   Image,
-  ImageBackground,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -256,7 +256,7 @@ class LoginScene extends PureComponent {
             ToastAndroid.show(err_msg, ToastAndroid.LONG);
           }
         }));
-  
+
         self.doSaveUserInfo(token)
       } else {
         this.doneReqSign();
@@ -269,13 +269,13 @@ class LoginScene extends PureComponent {
   doneReqSign() {
     this.setState({doingSign: false})
   }
-  
+
   doSaveUserInfo (token) {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
       GlobalUtil.setUser(res)
     })
   }
-  
+
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7',width:width,height:height}}>
@@ -403,8 +403,11 @@ class LoginScene extends PureComponent {
           width:'100%',
           bottom:pxToDp(100),
           zIndex:100}}>登录即表示您已同意
-          <Text style={{color:colors.main_color}}>外送帮使用协议</Text>
+          <Text onPress={()=>{
+            Linking.openURL("https://e.waisongbang.com/PrivacyPolicy.html")
+          }} style={{color:colors.main_color}}>外送帮使用协议</Text>
         </Text>
+
         <Image style={{
           bottom: pxToDp(40),
           width: pxToDp(684),
