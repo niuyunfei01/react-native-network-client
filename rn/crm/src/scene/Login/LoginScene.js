@@ -385,7 +385,7 @@ class LoginScene extends PureComponent {
 
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
-                  this.props.navigation.navigate('Apply')
+                  this.props.navigation.navigate('Platform')
                 }}>
                   <Text style={{
                     color: colors.main_color,
