@@ -1,11 +1,10 @@
-import {ListItem} from "react-native-elements"
-import {View } from 'react-native'
+import {ScrollView,Image } from 'react-native'
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
+import {SwipeAction, List } from 'antd-mobile-rn';
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http";
-
 mapStateToProps = state => {
     let {global} = state
     return {global: global}
@@ -16,7 +15,6 @@ mapDispatchToProps = dispatch => {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
 }
-
 class PlatformScene extends PureComponent {
     static navigationOptions = ({navigation}) => {
         return {
@@ -52,38 +50,40 @@ class PlatformScene extends PureComponent {
     componentDidMount () {
 
     }
-    keyExtractor = (item, index) => index.toString()
-
-    renderItem = ({item}) => (
-        <ListItem
-            title={item.name}
-            subtitle={item.subtitle}
-            leftAvatar={{
-                source: item.avatar_url,
-                title: item.name
-            }}
-            bottomDivider
-            chevron
-            onPress={() => {
-                if (item.enable) {
-                    this.props.navigation.navigate('Web', {url: 'https://open-erp.meituan.com/error'})
-                } else {
-                    this.setState({dialogVisible: true});
-                }
-            }}
-            disable={!item.enable}
-        />
-    )
-
     render() {
+        const right = [
+            {
+                text: 'Delete',
+                onPress: () => console.log('delete'),
+                style: { backgroundColor: 'red', color: 'white' },
+            },
+        ];
+
         return (
-            <View>
-                <FlatList
-                    keyExtractor={this.keyExtractor}
-                    data={this.state.platformsList}
-                    renderItem={this.renderItem}
-                />
-            </View>
+            <ScrollView
+                style={{ flex: 1, backgroundColor: '#f5f5f9' }}
+                automaticallyAdjustContentInsets={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+            >
+                <List>
+                    <SwipeAction
+                        autoClose
+                        style={{ backgroundColor: 'transparent' }}
+                        right={right}
+                    >
+                    <List.Item thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png">
+                        thumb
+                    </List.Item>
+                    </SwipeAction>
+                    <List.Item
+                        thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png"
+                        arrow="horizontal"
+                    >
+                        thumb
+                    </List.Item>
+                </List>
+            </ScrollView>
         )
     }
 }

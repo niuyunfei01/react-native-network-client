@@ -22,6 +22,7 @@ import {NavigationItem} from "../../widget/index"
 import {create} from  'dva-core';
 import stringEx from "../../util/stringEx"
 import colors from "../../styles/colors";
+import {connect} from "react-redux";
 /**
  * ## Redux boilerplate
  */
@@ -80,10 +81,6 @@ class RegisterScene extends PureComponent {
         this.state = {
             mobile: '',
             verifyCode: '',
-            name: '',
-            address: '',
-            shopName: '',
-            classify: '',
             canAskReqSmsCode: false,
             reRequestAfterSeconds: 60,
             doingRegister: false,
@@ -180,6 +177,7 @@ class RegisterScene extends PureComponent {
     onRequestSmsCode() {
         if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
             this.setState({canAskReqSmsCode: true});
+            console.log(  this.props)
             this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
                 if (success) {
                     this.showSuccessToast(requestCodeSuccessMsg)
@@ -220,8 +218,11 @@ class RegisterScene extends PureComponent {
                             </CellHeader>
                             <CellBody>
                                 <Input onChangeText={(mobile) => {
+                                    mobile = mobile.replace(/[^\d]+/, '');
                                     this.setState({mobile})
                                 }}
+                                       type={"number"}
+                                       maxLength={11}
                                        value={this.state.mobile}
                                        style={styles.input}
                                        keyboardType="numeric"
@@ -239,7 +240,10 @@ class RegisterScene extends PureComponent {
                                 }}/>
                             </CellHeader>
                             <CellBody>
-                                <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
+                                <Input onChangeText={(verifyCode) =>{
+                                    verifyCode= verifyCode.replace(/[^\d]+/, '');
+                                    this.setState({verifyCode})
+                                }}
                                        value={this.state.verifyCode}
                                        style={styles.input}
                                        placeholder={validCodePlaceHold}
@@ -287,7 +291,7 @@ class RegisterScene extends PureComponent {
                         </Cell>
                     </Cells>
                   <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-                        <Button type="primary" onPress={()=>this.onRegister()}>我要开店</Button>
+                        <Button type="primary" onPress={()=>this.onRegister()}>注册门店</Button>
                     </ButtonArea>
 
                     <Toast icon="loading" show={this.state.doingRegister} onRequestClose={() => {
@@ -344,4 +348,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default RegisterScene;
+export default  connect(mapStateToProps, mapDispatchToProps)(RegisterScene);
