@@ -1,11 +1,15 @@
-import {ListItem} from "react-native-elements"
-import {View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native'
+import {View, Image, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native'
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
 import Dialog from "react-native-dialog"
 import * as globalActions from "../../reducers/global/globalActions"
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../util/http"
+import {List} from 'antd-mobile-rn'
+import PropType from 'prop-types'
+
+const Item = List.Item
+const Brief = Item.Brief
 
 mapStateToProps = state => {
   let {global} = state
@@ -23,6 +27,17 @@ class PlatformBind extends PureComponent {
     return {
       headerTitle: '绑定平台信息',
     }
+  }
+
+  static propTypes = {
+    dialogVisible: PropType.bool,
+    platformsList: PropType.array,
+    developerId: PropType.string,
+    businessId: PropType.string,
+    ePoiId: PropType.string,
+    sign: PropType.string,
+    ePoiName: PropType.string,
+    timestamp: PropType.string,
   }
 
   constructor(props) {
@@ -64,7 +79,8 @@ class PlatformBind extends PureComponent {
       timestamp: ''
     }
   }
-  componentDidMount () {
+
+  componentDidMount() {
     this.fetch()
   }
 
@@ -83,36 +99,42 @@ class PlatformBind extends PureComponent {
     this.setState({dialogVisible: false});
   };
 
-  renderItem = ({item}) => (
-    <ListItem
-      title={item.name}
-      subtitle={item.subtitle}
-      leftAvatar={{
-        source: item.avatar_url,
-        title: item.name
-      }}
-      bottomDivider
-      chevron
-      onPress={() => {
-        if (item.enable) {
-          this.props.navigation.navigate('Web', {url: 'https://open-erp.meituan.com/error'})
-        } else {
-          this.setState({dialogVisible: true});
-        }
-      }}
-      disable={!item.enable}
-    />
-  )
+  renderItemWithImg = () => {
+    const platformsList = this.state.platformsList
+    let returnArray = []
+    platformsList.map((item, index) => {
+        returnArray.push(
+          <Item
+            wrap
+            multipleLine
+            align="top"
+            arrow="horizontal"
+            thumb={item.avatar_url}
+            key={index}
+            onClick={() => {
+              if (item.enable) {
+                this.props.navigation.navigate('Web', {url: 'https://open-erp.meituan.com/error'})
+              } else {
+                this.setState({dialogVisible: true});
+              }
+            }}
+          >
+            {item.name}
+            <Brief>{item.subtitle}</Brief>
+          </Item>
+        )
+      }
+    )
+    return returnArray
+  }
 
 
   render() {
     return (
       <View>
-        <FlatList
-          keyExtractor={this.keyExtractor}
-          data={this.state.platformsList}
-          renderItem={this.renderItem}
-        />
+        <List>
+          {this.renderItemWithImg()}
+        </List>
         <Dialog.Container visible={this.state.dialogVisible}>
           <Dialog.Title>绑定信息</Dialog.Title>
           <Dialog.Description>该平台暂未开放</Dialog.Description>
