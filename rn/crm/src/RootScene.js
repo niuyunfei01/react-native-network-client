@@ -52,7 +52,7 @@ newRelic.init({
   }
 });
 
-function getCurrentRouteName (navigationState) {
+function getCurrentRouteName(navigationState) {
   if (!navigationState) {
     return null;
   }
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
 // });
 // create a component
 class RootScene extends PureComponent {
-  constructor () {
+  constructor() {
     super();
     StatusBar.setBarStyle("light-content");
 
@@ -94,10 +94,10 @@ class RootScene extends PureComponent {
     this.store = null;
   }
 
-  componentDidMount () {
+  componentDidMount() {
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const launchProps = this.props.launchProps;
 
     this.store = configureStore(
@@ -136,7 +136,7 @@ class RootScene extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     const launchProps = this.props.launchProps;
     const orderId = launchProps["order_id"];
     let backPage = launchProps["backPage"];

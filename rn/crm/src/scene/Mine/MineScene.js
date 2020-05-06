@@ -1055,6 +1055,17 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>设置</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.PLATFORM_BIND)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/shezhi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>平台绑定</Text>
+        </TouchableOpacity>
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>
     );
