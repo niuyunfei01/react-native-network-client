@@ -44,8 +44,6 @@ const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const RegisterSuccessMsg = "申请成功";
 const RegisterErrorMsg = "申请失败，请重试!";
-
-
 const validErrorMobile = "手机号有误";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyCheckBox = "请阅读并同意「外送帮使用协议」";
@@ -124,21 +122,16 @@ class RegisterScene extends PureComponent {
     }
 
     doRegister() {
-        var self = this;
         this.setState({doingRegister: true});
         let data = {
             mobile: this.state.mobile,
-            address: this.state.address,
-            shop_name: this.state.shopName,
             verifyCode: this.state.verifyCode,
-            classify: this.state.classify,
-            name: this.state.name
         };
-        this.props.actions.customerRegister(data, (success) => {
-            self.doneRegister();
+        this.props.actions.checkPhone(data, (success) => {
+            this.doneRegister();
             if (success) {
                 this.showSuccessToast(RegisterSuccessMsg);
-                setTimeout(()=>this.props.navigation.goBack(),2000)
+                setTimeout(()=>this.props.navigation.navigate('Apply', data),1000)
             } else {
                 this.showErrorToast(RegisterErrorMsg)
             }
@@ -177,7 +170,6 @@ class RegisterScene extends PureComponent {
     onRequestSmsCode() {
         if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
             this.setState({canAskReqSmsCode: true});
-            console.log(  this.props)
             this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
                 if (success) {
                     this.showSuccessToast(requestCodeSuccessMsg)

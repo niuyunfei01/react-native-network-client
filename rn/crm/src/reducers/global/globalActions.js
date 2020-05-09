@@ -11,7 +11,7 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-
+import {checkMessageCode,addStores,queryAddress} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
@@ -220,10 +220,35 @@ export function requestSmsCode(mobile, type, callback) {
     });
   }
 }
+export function checkPhone(params,callback) {
 
-export function customerApply(applyData, callback) {
   return dispatch => {
-    return customerApplyRequest(applyData)
+    return checkMessageCode({device_uuid:getDeviceUUID(),...params})
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          console.log(error);
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function getAddress(callback) {
+
+  return dispatch => {
+    return queryAddress()
+        .then(json => {
+          callback(true, json)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+
+  }
+}
+export function customerApply(params, callback) {
+  return dispatch => {
+    return addStores({device_uuid:getDeviceUUID(),...params})
       .then(response => response.json())
       .then(json => {
         console.log("customerApply res", json);

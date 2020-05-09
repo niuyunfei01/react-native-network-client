@@ -45,10 +45,11 @@ class HttpUtils {
       }
     }
     method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
+    console.log(options);
     return options
   }
 
-  static apiBase (method, url, params, props) {
+  static apiBase (method, url, params, props = this) {
     let store = {}, vendor = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
@@ -79,6 +80,7 @@ class HttpUtils {
           }
         })
         .then((response) => {
+          console.log(response);
           // Toast.hide()
           if (authUrl.includes(url)) {
             resolve(response)
@@ -111,6 +113,7 @@ class HttpUtils {
     } else {
       let text = response.reason.toString()
       // native.speakText(text)
+
       ToastShort(text)
     }
   }
