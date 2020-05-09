@@ -385,13 +385,13 @@ class LoginScene extends PureComponent {
 
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
-                  this.props.navigation.navigate('Platform')
+                  this.props.navigation.navigate('Register')
                 }}>
                   <Text style={{
                     color: colors.main_color,
                     fontSize: pxToDp(colors.actionSecondSize),
                     marginTop: pxToDp(50)
-                  }}>我要开店</Text>
+                  }}>注册门店</Text>
                 </TouchableOpacity>
               </View>
             </View>

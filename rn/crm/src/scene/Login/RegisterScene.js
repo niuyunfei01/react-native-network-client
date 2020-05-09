@@ -22,6 +22,7 @@ import {NavigationItem} from "../../widget/index"
 import {create} from  'dva-core';
 import stringEx from "../../util/stringEx"
 import colors from "../../styles/colors";
+import {connect} from "react-redux";
 /**
  * ## Redux boilerplate
  */
@@ -43,8 +44,6 @@ const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const RegisterSuccessMsg = "申请成功";
 const RegisterErrorMsg = "申请失败，请重试!";
-
-
 const validErrorMobile = "手机号有误";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyCheckBox = "请阅读并同意「外送帮使用协议」";
@@ -80,10 +79,6 @@ class RegisterScene extends PureComponent {
         this.state = {
             mobile: '',
             verifyCode: '',
-            name: '',
-            address: '',
-            shopName: '',
-            classify: '',
             canAskReqSmsCode: false,
             reRequestAfterSeconds: 60,
             doingRegister: false,
@@ -127,21 +122,16 @@ class RegisterScene extends PureComponent {
     }
 
     doRegister() {
-        var self = this;
         this.setState({doingRegister: true});
         let data = {
             mobile: this.state.mobile,
-            address: this.state.address,
-            shop_name: this.state.shopName,
             verifyCode: this.state.verifyCode,
-            classify: this.state.classify,
-            name: this.state.name
         };
-        this.props.actions.customerRegister(data, (success) => {
-            self.doneRegister();
+        this.props.actions.checkPhone(data, (success) => {
+            this.doneRegister();
             if (success) {
                 this.showSuccessToast(RegisterSuccessMsg);
-                setTimeout(()=>this.props.navigation.goBack(),2000)
+                setTimeout(()=>this.props.navigation.navigate('Apply', data),1000)
             } else {
                 this.showErrorToast(RegisterErrorMsg)
             }
@@ -220,8 +210,11 @@ class RegisterScene extends PureComponent {
                             </CellHeader>
                             <CellBody>
                                 <Input onChangeText={(mobile) => {
+                                    mobile = mobile.replace(/[^\d]+/, '');
                                     this.setState({mobile})
                                 }}
+                                       type={"number"}
+                                       maxLength={11}
                                        value={this.state.mobile}
                                        style={styles.input}
                                        keyboardType="numeric"
@@ -239,7 +232,10 @@ class RegisterScene extends PureComponent {
                                 }}/>
                             </CellHeader>
                             <CellBody>
-                                <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
+                                <Input onChangeText={(verifyCode) =>{
+                                    verifyCode= verifyCode.replace(/[^\d]+/, '');
+                                    this.setState({verifyCode})
+                                }}
                                        value={this.state.verifyCode}
                                        style={styles.input}
                                        placeholder={validCodePlaceHold}
@@ -287,7 +283,7 @@ class RegisterScene extends PureComponent {
                         </Cell>
                     </Cells>
                   <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-                        <Button type="primary" onPress={()=>this.onRegister()}>我要开店</Button>
+                        <Button type="primary" onPress={()=>this.onRegister()}>注册门店</Button>
                     </ButtonArea>
 
                     <Toast icon="loading" show={this.state.doingRegister} onRequestClose={() => {
@@ -344,4 +340,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default RegisterScene;
+export default  connect(mapStateToProps, mapDispatchToProps)(RegisterScene);

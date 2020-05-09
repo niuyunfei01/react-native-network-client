@@ -6572,7 +6572,6 @@ react-native-modal@3.1.0:
     prop-types "15.5.10"
     react-native-animatable "^1.2.3"
 
-<<<<<<< HEAD
 react-native-modal@^9.0.0:
   version "9.0.0"
   resolved "https://registry.npmjs.org/react-native-modal/-/react-native-modal-9.0.0.tgz#0bfd0770361a2e5c6e0072bfdb0f1277f9662dba"
@@ -6582,9 +6581,6 @@ react-native-modal@^9.0.0:
     react-native-animatable "^1.2.4"
 
 "react-native-newrelic@git+ssh://git@github.com/Jeffliu/react-native-newrelic.git":
-=======
-"react-native-newrelic@github:Jeffliu/react-native-newrelic":
->>>>>>> origin/YF-727-app-zk
   version "1.1.1"
   resolved "https://codeload.github.com/Jeffliu/react-native-newrelic/tar.gz/a1b64afe379b8da6d8a23948288a13c061d5d404"
   dependencies:

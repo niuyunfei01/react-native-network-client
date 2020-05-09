@@ -34,9 +34,6 @@ import _ from "lodash"
 import GlobalUtil from "./util/GlobalUtil";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
-import dva from "./util/dva";
-import RegisterModel from "./reducers/user/Register";
-console.log(RegisterModel);
 const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
 const caught = new Caught();
@@ -73,15 +70,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.20)"
   }
 });
-
-// const app = dva({
-//   initialState: {},
-//   models: [RegisterModel],
-//   onError(e) {
-//     console.log('onError', e)
-//   },
-// });
-// create a component
 class RootScene extends PureComponent {
   constructor() {
     super();

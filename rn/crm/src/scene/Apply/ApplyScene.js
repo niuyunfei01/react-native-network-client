@@ -25,7 +25,7 @@ import {
 import {NavigationItem} from "../../widget/index"
 
 import stringEx from "../../util/stringEx"
-const data = require('./data.json');
+
 
 /**
  * ## Redux boilerplate
@@ -43,21 +43,20 @@ function mapDispatchToProps(dispatch) {
 }
 const namePlaceHold = "店铺联系人称呼";
 const shopNamePlaceHold = "门店名称";
-const classifyPlaceHold = "经营项目 如:生鲜、水果";
 const addressPlaceHold = "店铺详细地址，便于起手快速找到门店";
-const referrerId = "推荐人ID";
+const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const applySuccessMsg = "申请成功";
 const applyErrorMsg = "申请失败，请重试!";
-
-
+const addressErroMsg = "获取地址错误!";
 const validErrorMobile = "手机号有误";
 const validEmptyName = "请输入负责人";
 const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入店铺名字";
-const validEmptyClassify = "请输入经营项目";
+const validEmptyRefereesId = "推荐人id";
+let labels_city =[] ;
 class ApplyScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => ({
@@ -87,12 +86,14 @@ class ApplyScene extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      mobile: '',
-      verifyCode: '',
+
+      mobile: this.props.navigation.state.params.mobile,
+      verifyCode:this.props.navigation.state.params.verifyCode,
       name: '',
       address: '',
       shopName: '',
-      classify: '',
+      referees_id:'',
+      value: [],
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       doingApply: false,
@@ -103,29 +104,37 @@ class ApplyScene extends PureComponent {
       visibleDialog: false,
       toastTimer: null,
       loadingTimer: null,
-      value: [],
-      pickerValue: [],
     };
+
     this.onChange = this.onChange.bind(this)
+    this.onFormat = this.onFormat.bind(this)
+    this.onGetAddress = this.onGetAddress.bind(this)
     this.doApply = this.doApply.bind(this)
     this.onApply = this.onApply.bind(this)
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
     this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
     this.doneApply = this.doneApply.bind(this)
-    this.onPickerPress = this.onPickerPress.bind(this)
     this.showSuccessToast = this.showSuccessToast.bind(this)
     this.showErrorToast = this.showErrorToast.bind(this)
+  }
+
+  onGetAddress(){
+    this.props.actions.getAddress((success,json) => {
+      if (!success) {
+        this.showErrorToast(addressErroMsg)
+      }else{
+        this.setState({address_data:json})
+      }
+
+    })
   }
   onChange (value: any){
     this.setState({ value });
   };
-  onPickerPress() {
-    setTimeout(() => {
-      this.setState({
-        data: district,
-      });
-    }, 500);
-  };
+  onFormat(labels:any){
+    labels_city =labels;
+    return labels.join(',');
+  }
   onApply() {
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       this.showErrorToast(validErrorMobile)
@@ -143,8 +152,8 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(validEmptyShopName)
       return false
     }
-    if (!this.state.classify) {
-      this.showErrorToast(validEmptyClassify)
+    if (!this.state.referrer_id) {
+      this.showErrorToast(validEmptyRefereesId)
       return false
     }
     if (!this.state.address) {
@@ -162,11 +171,12 @@ class ApplyScene extends PureComponent {
     this.setState({doingApply: true});
     let data = {
       mobile: this.state.mobile,
-      address: this.state.address,
-      shop_name: this.state.shopName,
+      dada_address: this.state.address,
+      name: this.state.shopName,
       verifyCode: this.state.verifyCode,
-      classify: this.state.classify,
-      name: this.state.name
+      referrer_id: this.state.referrer_id,
+      owner_name: this.state.name,
+      labels:labels_city,
     };
     this.props.actions.customerApply(data, (success) => {
       self.doneApply();
@@ -234,13 +244,10 @@ class ApplyScene extends PureComponent {
 
   componentDidMount() {
     this.setState({})
+    this.onGetAddress();
   }
 
   render() {
-    const footerButtons = [
-      { text: 'Cancel', onPress: () => console.log('cancel') },
-      { text: 'Ok', onPress: () => console.log('ok') },
-    ];
     return (
       <ScrollView style={styles.container}>
         <View style={styles.register_panel}>
@@ -253,7 +260,7 @@ class ApplyScene extends PureComponent {
                 }}/>
               </CellHeader>
               <CellBody>
-                18518472702
+                {this.state.mobile}
               </CellBody>
             </Cell>
             <Cell first>
@@ -297,10 +304,11 @@ class ApplyScene extends PureComponent {
             <Cell first>
               <CellBody>
                 <Picker
-                    data={data}
+                    data={this.state.address_data}
                     cols={3}
                     value={this.state.value}
                     onChange={this.onChange}
+                    format={this.onFormat}
                 >
                   <List.Item arrow="horizontal">省市选择</List.Item>
                 </Picker>
@@ -320,6 +328,26 @@ class ApplyScene extends PureComponent {
                        }}
                        placeholderTextColor={'#ccc'}
                        value={this.state.address}
+                       style={styles.input}
+                       underlineColorAndroid="transparent"
+                />
+              </CellBody>
+            </Cell>
+
+            <Cell first>
+              <CellHeader>
+                <Image source={require('../../img/Register/map_.png')} style={{
+                  width: pxToDp(39),
+                  height: pxToDp(45),
+                }}/>
+              </CellHeader>
+              <CellBody>
+                <Input placeholder={referrerIdPlaceHold}
+                       onChangeText={(referrer_id) => {
+                         this.setState({referrer_id})
+                       }}
+                       placeholderTextColor={'#ccc'}
+                       value={this.state.referrer_id}
                        style={styles.input}
                        underlineColorAndroid="transparent"
                 />
