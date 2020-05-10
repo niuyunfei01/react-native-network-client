@@ -86,13 +86,12 @@ class PlatformBind extends React.Component {
       ePoiId: params.ePoiId,
       sign: '',
       ePoiName: params.ePoiName,
-      // es_id: params.es_id,
       es_id: params.es_id,
       timestamp: '',
       mtSignKey: '',
       eleClientId: '',
       eleRedirectUri: '',
-      vendorId: '',
+      vendorId: params.vendorId,
       accessToken: this.props.global.accessToken,
     }
   }
@@ -181,7 +180,7 @@ class PlatformBind extends React.Component {
         </List>
         <Dialog.Container visible={this.state.dialogVisible}>
           <Dialog.Title>绑定信息</Dialog.Title>
-          <Dialog.Description>该平台暂未开放</Dialog.Description>
+          <Dialog.Description>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理, 现在呼叫</Dialog.Description>
           <Dialog.Button label="确定" onPress={this.handleConfirm}/>
         </Dialog.Container>
       </View>
