@@ -63,8 +63,8 @@ class PlatformScene extends PureComponent {
                             right={right}
                         >
                             <List.Item thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png">
-                                {item.platform}
-                                <List.Item.Brief>{item.name}</List.Item.Brief>
+                                {item.name}
+                                <List.Item.Brief>{item.wid}</List.Item.Brief>
                             </List.Item>
                         </SwipeAction>
                     })}
