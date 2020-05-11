@@ -4668,6 +4668,11 @@ js-pinyin@^0.1.9:
   resolved "http://registry.npm.taobao.org/js-pinyin/download/js-pinyin-0.1.9.tgz#cdf19335645ddb20d4630df1058aac25d256adfd"
   integrity sha1-zfGTNWRd2yDUYw3xBYqsJdJWrf0=
 
+js-sha1@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.npm.taobao.org/js-sha1/download/js-sha1-0.6.0.tgz#adbee10f0e8e18aa07cdea807cf08e9183dbc7f9"
+  integrity sha1-rb7hDw6OGKoHzeqAfPCOkYPbx/k=
+
 js-tokens@1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/js-tokens/download/js-tokens-1.0.1.tgz#cc435a5c8b94ad15acb7983140fc80182c89aeae"
