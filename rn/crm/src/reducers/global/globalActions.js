@@ -11,7 +11,7 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-import {checkMessageCode,addStores,queryAddress,queryPlatform} from  "../../services/global"
+import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
@@ -102,6 +102,18 @@ export function getConfigItem(token, configKey, callback) {
   }
 }
 
+export function check_is_bind_ext(params, callback) {
+  return dispatch => {
+    return checkBindExt(params)
+    .then(response => {
+        callback(true, response)
+      })
+    .catch((error) => {
+      callback(false, '网络错误，请检查您的网络连接')
+    })
+
+  }
+}
 export function getCommonConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
@@ -241,7 +253,6 @@ export function platformList(user_id,callback) {
           callback(true, response)
         })
         .catch((error) => {
-          console.log(error);
           callback(false, '网络错误，请检查您的网络连接')
         })
   }

@@ -5,6 +5,9 @@ import {bindActionCreators} from "redux"
 import {SwipeAction, List,Button } from 'antd-mobile-rn';
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http";
+import NavigationItem from "../../widget/NavigationItem";
+import tool from "../../common/tool";
+import Config from "../../config";
 mapStateToProps = state => {
     let {global} = state
     return {global: global}
@@ -17,11 +20,21 @@ mapDispatchToProps = dispatch => {
 }
 class PlatformScene extends PureComponent {
     static navigationOptions = ({navigation}) => {
+        console.log(navigation)
         return {
             headerTitle: '绑定平台信息',
+            headerLeft: (
+                <NavigationItem
+                    icon={require('../../img/a.png')}
+                    position={'left'}
+                    onPress={() =>{
+                        navigation.navigate('MineScene')
+                        tool.resetNavStack(navigation, Config.ROUTE_ALERT);
+                    }}
+                />
+            )
         }
     }
-
     constructor(props) {
         super(props)
         const params = this.props.navigation.state.params
@@ -36,9 +49,7 @@ class PlatformScene extends PureComponent {
     }
     componentDidMount () {
         this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
-           this.setState({platformsList:[]})
-            console.log(success)
-            console.log(response)
+           this.setState({platformsList:response})
         })
     }
     render() {
@@ -50,7 +61,6 @@ class PlatformScene extends PureComponent {
             },
         ];
         const records = this.state.platformsList;
-        console.log(records);
         return (
             <ScrollView
                 style={{ flex: 1, backgroundColor: '#f5f5f9' }}
@@ -65,8 +75,8 @@ class PlatformScene extends PureComponent {
                             style={{ backgroundColor: 'transparent' }}
                             right={right}
                         >
-                            <List.Item thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png">
-                                {item.name}
+                            <List.Item thumb= {item.img}>
+                                {item.poi_name}
                                 <List.Item.Brief>{item.wid}</List.Item.Brief>
                             </List.Item>
                         </SwipeAction>
@@ -90,8 +100,7 @@ class PlatformScene extends PureComponent {
                     fontSize: 25}}>绑定平台以后方可使用。</Text></View> : null}
                 <Button
                     onClick={() =>{
-
-                     this.props.navigation.navigate('PlatformBind', {ePoiId:this.props.global.currStoreId,ePoiName:"四季生鲜"})
+                     this.props.navigation.navigate('PlatformBind')
                     }}
                     style={{backgroundColor: '#f5f5f9',
                     textAlignVertical: "center",

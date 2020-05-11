@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {
+  Alert,
   Image,
   Linking,
   ScrollView,
@@ -14,7 +15,7 @@ import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
-import {getCommonConfig, logout, requestSmsCode, setCurrentStore, signIn} from '../../reducers/global/globalActions'
+import {getCommonConfig, logout, requestSmsCode, setCurrentStore, signIn,check_is_bind_ext} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
@@ -26,6 +27,7 @@ import {Button} from "../../weui";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
+import StorageUtil from "../../util/StorageUtil";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
@@ -199,7 +201,7 @@ class LoginScene extends PureComponent {
       if (ok) {
         const sid = this.props.global ? this.props.global.currStoreId : 0;
         let params = {
-          doneSelectStore: (storeId) => {
+          doneSelectStore: (storeId,flag=false) => {
             dispatch(getCommonConfig(token, storeId, (ok) => {
               if (ok) {
                 native.setCurrStoreId(storeId, (set_ok, msg) => {
@@ -207,11 +209,18 @@ class LoginScene extends PureComponent {
                   if (set_ok) {
                     dispatch(setCurrentStore(storeId));
                     console.log('this.next -> ', this.next);
+                    if(flag){
+                      navigation.navigate(Config.ROUTE_PLATFORM_LIST)
+                      return true;
+                    }
                     if (Config.ROUTE_ORDERS === this.next || !this.next) {
+
                       native.toOrders();
                     } else {
+
                       navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
                     }
+
                     tool.resetNavStack(navigation, Config.ROUTE_ALERT);
                     return true;
                   } else {
@@ -228,6 +237,7 @@ class LoginScene extends PureComponent {
         };
 
         let storeId = sid;
+        let flag =false
         dispatch(getCommonConfig(token, storeId, (ok, err_msg, cfg) => {
           if(ok){
             let store_num = 0;
@@ -241,11 +251,10 @@ class LoginScene extends PureComponent {
                 only_store_id = store.id;
               }
             }
-
             if (!(storeId > 0)) {
               if(store_num === 1 && only_store_id > 0){//单店直接跳转
                 console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
-                params.doneSelectStore(only_store_id);
+                flag =true;
               } else {
                 navigation.navigate(Config.ROUTE_SELECT_STORE, params);
               }
@@ -256,8 +265,44 @@ class LoginScene extends PureComponent {
             ToastAndroid.show(err_msg, ToastAndroid.LONG);
           }
         }));
+          self.doSaveUserInfo(token)
+       const user= StorageUtil._get('user').then(user => {
+          if (user && Object.keys(user).length) {
+            _this.setUser(user)
+            resolve && resolve(user)
+          } else {
+            if (reject) {
+              reject()
+            } else {
+              Alert('错误', '获取用户信息失败，请重新登录', [{
+                text: '确定',
+                onPress: () => {
+                  native.logout()
+                  native.gotoLoginWithNoHistory()
+                }
+              }])
+            }
+          }
+        }).catch(e => {
+          if (reject) {
+            reject()
+          } else {
+            Alert('错误', '获取用户信息失败，请重新登录', [{
+              text: '确定',
+              onPress: () => {
+                native.logout()
+                native.gotoLoginWithNoHistory()
+              }
+            }])
+          }
+        })
 
-        self.doSaveUserInfo(token)
+        dispatch(check_is_bind_ext({token:token,user_id:user.id,storeId:storeId}, (ok) => {
+          if(flag && ok){
+            params.doneSelectStore(storeId,flag);
+          }
+        }));
+
       } else {
         this.doneReqSign();
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
@@ -271,7 +316,7 @@ class LoginScene extends PureComponent {
   }
 
   doSaveUserInfo (token) {
-    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
+     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
       GlobalUtil.setUser(res)
     })
   }
