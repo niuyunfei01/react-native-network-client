@@ -11,7 +11,7 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-import {checkMessageCode,addStores,queryAddress} from  "../../services/global"
+import {checkMessageCode,addStores,queryAddress,queryPlatform} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
@@ -224,6 +224,19 @@ export function checkPhone(params,callback) {
 
   return dispatch => {
     return checkMessageCode({device_uuid:getDeviceUUID(),...params})
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          console.log(error);
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function platformList(user_id,callback) {
+
+  return dispatch => {
+    return queryPlatform(user_id)
         .then(response => {
           callback(true, response)
         })

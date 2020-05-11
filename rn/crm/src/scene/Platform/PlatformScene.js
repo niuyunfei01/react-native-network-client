@@ -26,20 +26,7 @@ class PlatformScene extends PureComponent {
         super(props)
         const params = this.props.navigation.state.params
         this.state = {
-            platformsList: [
-                {
-                    platform: '美团',
-                    avatar_url: 'http://s0.meituan.net/bs/fe-web-meituan/fa5f0f0/img/logo.png',
-                    name: '建议sku数量少于200的商户选用',
-                    enable: true,
-                },
-                {
-                    platform: '饿了么',
-                    avatar_url: '',
-                    name: '建议sku数量少于200的商户选用',
-                    enable: false,
-                },
-            ],
+            platformsList:[],
             dialogVisible: false,
             developerId: '',
             businessId: '',
@@ -48,7 +35,9 @@ class PlatformScene extends PureComponent {
         }
     }
     componentDidMount () {
-
+        this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
+           this.setState({platformsList:response.obj})
+        })
     }
     render() {
         const right = [
