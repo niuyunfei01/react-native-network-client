@@ -1,12 +1,8 @@
-export interface ICheckPhoneParams {
+export interface ICheckRegisterParams {
     mobile?: string,
     verifyCode?: string,
+    device_uuid?:string,
 }
-export interface IUser {
-    ...ICheckPhoneParams,
-    mobile?: string
-    name?:string,
-    address?: string,
-    shopName?: string,
-    classify?: string,
+export interface IOfflineStores{
+
 }
