@@ -48,6 +48,7 @@ class PlatformBind extends React.Component {
   constructor(props) {
     super(props)
     const params = this.props.navigation.state.params
+    console.log(params);
     this.state = {
       platformsList: [
         //TODO fix avatar for platforms
@@ -82,7 +83,7 @@ class PlatformBind extends React.Component {
       ],
       dialogVisible: false,
       mtDeveloperId: '',
-      businessId: '',
+      businessId: 2,
       ePoiId: params.ePoiId,
       sign: '',
       ePoiName: params.ePoiName,
@@ -90,7 +91,7 @@ class PlatformBind extends React.Component {
       mtSignKey: '',
       eleClientId: '',
       eleRedirectUri: '',
-      vendorId: params.vendorId,
+      vendorId: 68,
       accessToken: this.props.global.accessToken,
     }
   }
@@ -115,7 +116,7 @@ class PlatformBind extends React.Component {
     let tempStr = ''
     let timestamp = Math.floor(new Date().getTime() / 1000)
     let tempObj = {
-      'mtDeveloperId': this.state.mtDeveloperId,
+      'developerId': this.state.mtDeveloperId,
       'ePoiId': 'mt' + this.state.ePoiId,
       'businessId': this.state.businessId,
       'ePoiName': this.state.ePoiName,
@@ -124,7 +125,8 @@ class PlatformBind extends React.Component {
     tempObj = keySort(tempObj)
     tempStr = makeObjToString(tempObj)
     let sign = sha1(this.state.mtSignKey + tempStr)
-    return `https://open-erp.meituan.com/storemap?mtDeveloperId=${tempObj.mtDeveloperId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`
+
+    return `https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`
   }
 
   makeEleUrl() {
@@ -157,6 +159,7 @@ class PlatformBind extends React.Component {
                 this.props.navigation.navigate('BindPlatformWebView', {
                   url: this.makeEleUrl()
                 })
+                console.log(this.makeEleUrl());
               } else {
                 this.setState({dialogVisible: true})
               }
