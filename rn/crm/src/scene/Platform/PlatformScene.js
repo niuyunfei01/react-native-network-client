@@ -36,7 +36,9 @@ class PlatformScene extends PureComponent {
     }
     componentDidMount () {
         this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
-           this.setState({platformsList:response.obj})
+           this.setState({platformsList:[]})
+            console.log(success)
+            console.log(response)
         })
     }
     render() {
@@ -48,6 +50,7 @@ class PlatformScene extends PureComponent {
             },
         ];
         const records = this.state.platformsList;
+        console.log(records);
         return (
             <ScrollView
                 style={{ flex: 1, backgroundColor: '#f5f5f9' }}
