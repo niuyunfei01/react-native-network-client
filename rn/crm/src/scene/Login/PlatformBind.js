@@ -86,7 +86,6 @@ class PlatformBind extends React.Component {
       ePoiId: params.ePoiId,
       sign: '',
       ePoiName: params.ePoiName,
-      es_id: params.es_id,
       timestamp: '',
       mtSignKey: '',
       eleClientId: '',
@@ -101,7 +100,7 @@ class PlatformBind extends React.Component {
   }
 
   fetchDevData() {
-    HttpUtils.get.bind(this.props)(`/api/get_dev_data?es_id=${this.state.es_id}&access_token=${this.state.accessToken}`)
+    HttpUtils.get.bind(this.props)(`/api/get_dev_data?es_id=${this.state.ePoiId}&access_token=${this.state.accessToken}`)
       .then(res => {
         this.setState({
           mtDeveloperId: res.mtDeveloperId,
