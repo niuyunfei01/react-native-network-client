@@ -1,8 +1,8 @@
-import {ScrollView,Image } from 'react-native'
+import {ScrollView, Image, Text,View} from 'react-native'
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
-import {SwipeAction, List } from 'antd-mobile-rn';
+import {SwipeAction, List,Button } from 'antd-mobile-rn';
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http";
 mapStateToProps = state => {
@@ -58,7 +58,7 @@ class PlatformScene extends PureComponent {
                 style: { backgroundColor: 'red', color: 'white' },
             },
         ];
-
+        const records = this.state.platformsList;
         return (
             <ScrollView
                 style={{ flex: 1, backgroundColor: '#f5f5f9' }}
@@ -67,22 +67,43 @@ class PlatformScene extends PureComponent {
                 showsVerticalScrollIndicator={false}
             >
                 <List>
-                    <SwipeAction
-                        autoClose
-                        style={{ backgroundColor: 'transparent' }}
-                        right={right}
-                    >
-                    <List.Item thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png">
-                        thumb
-                    </List.Item>
-                    </SwipeAction>
-                    <List.Item
-                        thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png"
-                        arrow="horizontal"
-                    >
-                        thumb
-                    </List.Item>
+                    {records&&records.map((item,id) => {
+                        return <SwipeAction
+                            autoClose
+                            style={{ backgroundColor: 'transparent' }}
+                            right={right}
+                        >
+                            <List.Item thumb="https://os.alipayobjects.com/rmsportal/mOoPurdIfmcuqtr.png">
+                                {item.platform}
+                                <List.Item.Brief>{item.name}</List.Item.Brief>
+                            </List.Item>
+                        </SwipeAction>
+                    })}
                 </List>
+                {!records.length? <View><Text style={{
+                    flex: 1,
+                    marginTop:30,
+                    backgroundColor: '#f5f5f9',
+                    textAlignVertical: "center",
+                    textAlign: "center",
+                    fontWeight: 'bold',
+                    fontSize: 25}}>您还没有绑定任何平台，
+                </Text><Text style={{
+                    flex: 1,
+                    marginTop:5,
+                    backgroundColor: '#f5f5f9',
+                    textAlignVertical: "center",
+                    textAlign: "center",
+                    fontWeight: 'bold',
+                    fontSize: 25}}>绑定平台以后方可使用。</Text></View> : null}
+                <Button
+                    onClick={() =>{
+
+                     this.props.navigation.navigate('PlatformBind', {ePoiId:this.props.global.currStoreId,ePoiName:"四季生鲜"})
+                    }}
+                    style={{backgroundColor: '#f5f5f9',
+                    textAlignVertical: "center",
+                    textAlign: "center",  marginTop:30}}>添加平台信息</Button>
             </ScrollView>
         )
     }

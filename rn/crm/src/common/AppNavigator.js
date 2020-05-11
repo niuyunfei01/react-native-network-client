@@ -411,7 +411,7 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
-
+          [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
         [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
           [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
           },
