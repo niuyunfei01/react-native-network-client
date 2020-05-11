@@ -36,7 +36,7 @@ class PlatformScene extends PureComponent {
     }
     componentDidMount () {
         this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
-           this.setState({platformsList:response.obj})
+           this.setState({platformsList:[]})
         })
     }
     render() {
