@@ -925,7 +925,17 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-
+        <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+            activeOpacity={customerOpacity}
+        >
+          <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/yunyingshouyi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>平台信息</Text>
+        </TouchableOpacity>
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
             style={[block_styles.block_box]}
@@ -1054,6 +1064,17 @@ class MineScene extends PureComponent {
             source={require("../../img/My/shezhi_.png")}
           />
           <Text style={[block_styles.block_name]}>设置</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.PLATFORM_BIND)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/shezhi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>平台绑定</Text>
         </TouchableOpacity>
         {/*<View style={[block_styles.empty_box]}/>*/}
       </View>

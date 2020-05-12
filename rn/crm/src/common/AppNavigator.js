@@ -14,6 +14,8 @@ import GoodsScene from "../scene/Goods/GoodsScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
+import RegisterScene from "../scene/Login/RegisterScene";
+import PlatformScene from "../scene/Platform/PlatformScene";
 import native from "./native";
 import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
@@ -31,6 +33,7 @@ import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
+import PlatformBind from "../scene/Login/PlatformBind"
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import TakeOutScene from "../scene/Store/TakeOutScene";
@@ -135,6 +138,7 @@ import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
+import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -312,6 +316,8 @@ class Navigator extends Component {
         Web: {screen: WebScene},
         Home: {screen: RemindScene},
         Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
+        Register: {screen: RegisterScene},
+        Platform: {screen: PlatformScene},
         Apply: {screen: ApplyScene},
         TestWeui: {screen: TestWeuiScene},
         User: {screen: UserScene},
@@ -350,6 +356,8 @@ class Navigator extends Component {
         [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
         [Config.ROUTE_STORE_RULE]: {screen: StoreRule},
         [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
+        [Config.PLATFORM_BIND]: {screen: PlatformBind},
+        [Config.BIND_PLATFORM_WEB_VIEW]: {screen: BindPlatformWebView},
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
@@ -403,7 +411,7 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
-
+          [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
         [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
           [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
           },

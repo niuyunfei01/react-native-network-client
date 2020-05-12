@@ -2877,6 +2877,19 @@ duplexify@^3.2.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
+dva-core@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.npm.taobao.org/dva-core/download/dva-core-2.0.2.tgz#7166ef879e335db018b942c9c0f2e1a5543851a0"
+  integrity sha1-cWbvh54zXbAYuULJwPLhpVQ4UaA=
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    flatten "^1.0.2"
+    global "^4.3.2"
+    invariant "^2.2.1"
+    is-plain-object "^2.0.3"
+    redux-saga "^0.16.0"
+    warning "^3.0.0"
+
 ecc-jsbn@~0.1.1:
   version "0.1.2"
   resolved "http://registry.npm.taobao.org/ecc-jsbn/download/ecc-jsbn-0.1.2.tgz#3a83a904e54353287874c564b7549386849a98c9"
@@ -3358,6 +3371,11 @@ find-up@^3.0.0:
   dependencies:
     locate-path "^3.0.0"
 
+flatten@^1.0.2:
+  version "1.0.3"
+  resolved "https://registry.npm.taobao.org/flatten/download/flatten-1.0.3.tgz#c1283ac9f27b368abc1e36d1ff7b04501a30356b"
+  integrity sha1-wSg6yfJ7Noq8HjbR/3sEUBowNWs=
+
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
   resolved "http://registry.npm.taobao.org/for-in/download/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -3561,6 +3579,14 @@ global@^4.3.0:
   dependencies:
     min-document "^2.19.0"
     process "~0.5.1"
+
+global@^4.3.2:
+  version "4.4.0"
+  resolved "https://registry.npm.taobao.org/global/download/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
+  integrity sha1-PnsQUXkAajI+1xqvyj6cV6XMZAY=
+  dependencies:
+    min-document "^2.19.0"
+    process "^0.11.10"
 
 globals@^11.1.0:
   version "11.11.0"
@@ -3881,7 +3907,7 @@ inquirer@^3.0.6:
     strip-ansi "^4.0.0"
     through "^2.3.6"
 
-invariant@^2.2.0, invariant@^2.2.2, invariant@^2.2.4:
+invariant@^2.2.0, invariant@^2.2.1, invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
   resolved "http://registry.npm.taobao.org/invariant/download/invariant-2.2.4.tgz?cache=0&other_urls=http%3A%2F%2Fregistry.npm.taobao.org%2Finvariant%2Fdownload%2Finvariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"
   integrity sha1-YQ88ksk1nOHbYW5TgAjSP/NRWOY=
@@ -4641,6 +4667,11 @@ js-pinyin@^0.1.9:
   version "0.1.9"
   resolved "http://registry.npm.taobao.org/js-pinyin/download/js-pinyin-0.1.9.tgz#cdf19335645ddb20d4630df1058aac25d256adfd"
   integrity sha1-zfGTNWRd2yDUYw3xBYqsJdJWrf0=
+
+js-sha1@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.npm.taobao.org/js-sha1/download/js-sha1-0.6.0.tgz#adbee10f0e8e18aa07cdea807cf08e9183dbc7f9"
+  integrity sha1-rb7hDw6OGKoHzeqAfPCOkYPbx/k=
 
 js-tokens@1.0.1:
   version "1.0.1"
@@ -6164,6 +6195,11 @@ process-nextick-args@~2.0.0:
   resolved "http://registry.npm.taobao.org/process-nextick-args/download/process-nextick-args-2.0.0.tgz#a37d732f4271b4ab1ad070d35508e8290788ffaa"
   integrity sha1-o31zL0JxtKsa0HDTVQjoKQeI/6o=
 
+process@^0.11.10:
+  version "0.11.10"
+  resolved "https://registry.npm.taobao.org/process/download/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
+  integrity sha1-czIwDoQBYb2j5podHZGn1LwW8YI=
+
 process@~0.5.1:
   version "0.5.2"
   resolved "http://registry.npm.taobao.org/process/download/process-0.5.2.tgz#1638d8a8e34c2f440a91db95ab9aeb677fc185cf"
@@ -6192,7 +6228,7 @@ prop-types@15.5.10:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
-prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2:
+prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "http://registry.npm.taobao.org/prop-types/download/prop-types-15.7.2.tgz?cache=0&other_urls=http%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types%2Fdownload%2Fprop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha1-UsQedbjIfnK52TYOAga5ncv/psU=
@@ -6375,6 +6411,13 @@ react-native-animatable@^1.2.3:
   dependencies:
     prop-types "^15.5.10"
 
+react-native-animatable@^1.2.4:
+  version "1.3.3"
+  resolved "https://registry.npmjs.org/react-native-animatable/-/react-native-animatable-1.3.3.tgz#a13a4af8258e3bb14d0a9d839917e9bb9274ec8a"
+  integrity sha512-2ckIxZQAsvWn25Ho+DK3d1mXIgj7tITkrS4pYDvx96WyOttSvzzFeQnM2od0+FUMzILbdHDsDEqZvnz1DYNQ1w==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-autocomplete-input@^3.6.0:
   version "3.6.0"
   resolved "http://registry.npm.taobao.org/react-native-autocomplete-input/download/react-native-autocomplete-input-3.6.0.tgz#24d29d8c3e156a86771c1db0d58f2fa5611eee06"
@@ -6408,6 +6451,14 @@ react-native-device-info@^0.11.0:
   version "0.11.0"
   resolved "http://registry.npm.taobao.org/react-native-device-info/download/react-native-device-info-0.11.0.tgz#e96dd0e3f8a7d7e3022c1f441f51fa912fdc7444"
   integrity sha1-6W3Q4/in1+MCLB9EH1H6kS/cdEQ=
+
+react-native-dialog@^5.6.0:
+  version "5.6.0"
+  resolved "https://registry.npmjs.org/react-native-dialog/-/react-native-dialog-5.6.0.tgz#8c36a1e9f397eba0cea88821ebcf92f029236a1a"
+  integrity sha512-pUTxHJHzErMY+JaDRSMKiCbJTEdy2Ik4hcNOwasOlxpj6S6tT5SonLsrLPGBCO0XpTOySE0qVzuikmKgUDZfig==
+  dependencies:
+    prop-types "^15.7.2"
+    react-native-modal "^9.0.0"
 
 react-native-dismiss-keyboard@1.0.0:
   version "1.0.0"
@@ -6526,7 +6577,15 @@ react-native-modal@3.1.0:
     prop-types "15.5.10"
     react-native-animatable "^1.2.3"
 
-"react-native-newrelic@github:Jeffliu/react-native-newrelic":
+react-native-modal@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.npmjs.org/react-native-modal/-/react-native-modal-9.0.0.tgz#0bfd0770361a2e5c6e0072bfdb0f1277f9662dba"
+  integrity sha512-j4xeIK9noHU/ksp2Ndc8NI1qJvjApToqGvqLEu2wtYeaISanbhtd0S3V4hZkSlCa3DZtegl6aaMZBLeH1q6xfA==
+  dependencies:
+    prop-types "^15.6.2"
+    react-native-animatable "^1.2.4"
+
+"react-native-newrelic@git+ssh://git@github.com/Jeffliu/react-native-newrelic.git":
   version "1.1.1"
   resolved "https://codeload.github.com/Jeffliu/react-native-newrelic/tar.gz/a1b64afe379b8da6d8a23948288a13c061d5d404"
   dependencies:
@@ -6908,6 +6967,11 @@ redux-persist@4.10.2:
     json-stringify-safe "^5.0.1"
     lodash "^4.17.4"
     lodash-es "^4.17.4"
+
+redux-saga@^0.16.0:
+  version "0.16.2"
+  resolved "https://registry.npm.taobao.org/redux-saga/download/redux-saga-0.16.2.tgz#993662e86bc945d8509ac2b8daba3a8c615cc971"
+  integrity sha1-mTZi6GvJRdhQmsK42ro6jGFcyXE=
 
 redux-thunk@^2.3.0:
   version "2.3.0"
@@ -8205,6 +8269,13 @@ walker@~1.0.5:
   integrity sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
   dependencies:
     makeerror "1.0.x"
+
+warning@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npm.taobao.org/warning/download/warning-3.0.0.tgz#32e5377cb572de4ab04753bdf8821c01ed605b7c"
+  integrity sha1-MuU3fLVy3kqwR1O9+IIcAe1gW3w=
+  dependencies:
+    loose-envify "^1.0.0"
 
 watch@~0.18.0:
   version "0.18.0"

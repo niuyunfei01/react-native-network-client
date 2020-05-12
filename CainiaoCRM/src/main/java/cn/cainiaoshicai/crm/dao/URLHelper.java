@@ -19,7 +19,9 @@ public class URLHelper {
             return "rc.waisongbang.com";
         } else if (SettingHelper.useFire5Host()){
             return "fire5.waisongbang.com";
-        } else if (SettingHelper.useFire7Host()){
+        } else if(SettingHelper.useFire5Host()){
+            return "fire4.waisongbang.com";
+        }else if (SettingHelper.useFire7Host()){
             return "fire7.waisongbang.com";
         } else {
             return "api.waisongbang.com";
