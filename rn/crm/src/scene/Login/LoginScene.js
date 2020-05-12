@@ -202,6 +202,9 @@ class LoginScene extends PureComponent {
         const sid = this.props.global ? this.props.global.currStoreId : 0;
         let params = {
           doneSelectStore: (storeId,flag=false) => {
+            console.log(storeId)
+            console.log(flag)
+            console.log("---------------")
             dispatch(getCommonConfig(token, storeId, (ok) => {
               if (ok) {
                 native.setCurrStoreId(storeId, (set_ok, msg) => {
@@ -254,6 +257,7 @@ class LoginScene extends PureComponent {
             if (!(storeId > 0)) {
               if(store_num === 1 && only_store_id > 0){//单店直接跳转
                 console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
+                storeId =only_store_id;
                 flag =true;
               } else {
                 navigation.navigate(Config.ROUTE_SELECT_STORE, params);
@@ -296,8 +300,10 @@ class LoginScene extends PureComponent {
             }])
           }
         })
-
+        console.log(storeId)
         dispatch(check_is_bind_ext({token:token,user_id:user.id,storeId:storeId}, (ok) => {
+          console.log(storeId)
+          console.log(ok)
           if(flag && ok){
             params.doneSelectStore(storeId,flag);
           }
