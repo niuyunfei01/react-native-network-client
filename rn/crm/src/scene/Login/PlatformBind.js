@@ -6,7 +6,7 @@ import Dialog from "react-native-dialog"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List} from 'antd-mobile-rn'
+import {List, WhiteSpace} from 'antd-mobile-rn'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 
@@ -48,45 +48,44 @@ class PlatformBind extends React.Component {
   constructor(props) {
     super(props)
     const params = this.props.navigation.state.params
-    console.log(params);
     this.state = {
       platformsList: [
         //TODO fix avatar for platforms
         {
           name: '美团',
           alias: 'mt',
-          avatar_url: 'http://s0.meituan.net/bs/fe-web-meituan/fa5f0f0/img/logo.png',
+          avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platform/3.jpg`,
           subtitle: '建议sku数量少于200的商户选用',
           enable: true,
         },
         {
           name: '饿了么',
           alias: 'ele',
-          avatar_url: '',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/4.jpg',
           subtitle: '建议sku数量少于200的商户选用',
           enable: true,
         },
         {
           name: '美团闪购',
           alias: 'sg',
-          avatar_url: 'https://awps-assets.meituan.net/reco/shangou_fe_web_portal/static/img/logo.38f11cc2.png',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/7.jpg',
           subtitle: '建议sku数量多于200的商户选用',
           enable: false,
         },
         {
           name: '饿了么开放平台',
           alias: 'ele-open',
-          avatar_url: '',
-          subtitle: '建议sku数量多于200的商户选用',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/1.jpg',
+          subtitle: '',
           enable: false,
         }
       ],
       dialogVisible: false,
       mtDeveloperId: '',
       businessId: 2,
-      ePoiId: params.ePoiId,
+      ePoiId: this.props.global.currStoreId,
       sign: '',
-      ePoiName: params.ePoiName,
+      ePoiName: '',
       timestamp: '',
       mtSignKey: '',
       eleClientId: '',
@@ -101,13 +100,15 @@ class PlatformBind extends React.Component {
   }
 
   fetchDevData() {
-    HttpUtils.get.bind(this.props)(`/api/get_dev_data?es_id=${this.state.ePoiId}&access_token=${this.state.accessToken}`)
+    HttpUtils.get.bind(this.props)(`/api/get_dev_data?offline_store_id=${this.state.ePoiId}&access_token=${this.state.accessToken}`)
       .then(res => {
         this.setState({
           mtDeveloperId: res.mtDeveloperId,
           mtSignKey: res.mtSignKey,
           eleClientId: res.eleClientId,
           eleRedirectUri: res.eleRedirectUri,
+          vendorId: res.vendorId,
+          ePoiName: res.ePoiName
         })
       })
   }
@@ -143,30 +144,33 @@ class PlatformBind extends React.Component {
     let returnArray = []
     platformsList.map((item, index) => {
         returnArray.push(
-          <Item
-            wrap
-            multipleLine
-            align="top"
-            arrow="horizontal"
-            thumb={item.avatar_url}
-            key={index}
-            onClick={() => {
-              if (item.enable && item.alias === 'mt') {
-                this.props.navigation.navigate('BindPlatformWebView', {
-                  url: this.makeMtUrl()
-                })
-              } else if (item.enable && item.alias === 'ele') {
-                this.props.navigation.navigate('BindPlatformWebView', {
-                  url: this.makeEleUrl()
-                })
-                console.log(this.makeEleUrl());
-              } else {
-                this.setState({dialogVisible: true})
-              }
-            }}>
-            {item.name}
-            <Brief>{item.subtitle}</Brief>
-          </Item>
+          <View>
+            <WhiteSpace size="lg"/>
+            <Item
+              wrap
+              multipleLine
+              align="top"
+              arrow="horizontal"
+              thumb={item.avatar_url}
+              key={index}
+              onClick={() => {
+                if (item.enable && item.alias === 'mt') {
+                  this.props.navigation.navigate('BindPlatformWebView', {
+                    url: this.makeMtUrl()
+                  })
+                } else if (item.enable && item.alias === 'ele') {
+                  this.props.navigation.navigate('BindPlatformWebView', {
+                    url: this.makeEleUrl()
+                  })
+                  console.log(this.makeEleUrl());
+                } else {
+                  this.setState({dialogVisible: true})
+                }
+              }}>
+              {item.name}
+              <Brief>{item.subtitle}</Brief>
+            </Item>
+          </View>
         )
       }
     )
