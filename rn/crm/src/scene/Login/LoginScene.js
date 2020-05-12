@@ -297,10 +297,7 @@ class LoginScene extends PureComponent {
             }])
           }
         })
-        console.log(storeId)
         dispatch(check_is_bind_ext({token:token,user_id:user.id,storeId:storeId}, (ok) => {
-          console.log(storeId)
-          console.log(ok)
           if(flag && ok){
             params.doneSelectStore(storeId,flag);
           }
