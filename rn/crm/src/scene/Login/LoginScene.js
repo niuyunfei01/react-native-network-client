@@ -254,6 +254,7 @@ class LoginScene extends PureComponent {
             if (!(storeId > 0)) {
               if(store_num === 1 && only_store_id > 0){//单店直接跳转
                 console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
+                storeId =only_store_id;
                 flag =true;
               } else {
                 navigation.navigate(Config.ROUTE_SELECT_STORE, params);
@@ -296,7 +297,6 @@ class LoginScene extends PureComponent {
             }])
           }
         })
-
         dispatch(check_is_bind_ext({token:token,user_id:user.id,storeId:storeId}, (ok) => {
           if(flag && ok){
             params.doneSelectStore(storeId,flag);
