@@ -287,10 +287,9 @@ export function getAddress(callback) {
 export function customerApply(params, callback) {
   return dispatch => {
     return addStores({device_uuid:getDeviceUUID(),...params})
-      .then(response => response.json())
-      .then(json => {
+      .then((response,json) => {
         console.log("customerApply res", json);
-        callback(true)
+        callback(true,response)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')

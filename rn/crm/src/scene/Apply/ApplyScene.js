@@ -182,7 +182,7 @@ class ApplyScene extends PureComponent {
       self.doneApply();
       if (success) {
         this.showSuccessToast(applySuccessMsg);
-        setTimeout(()=>this.props.navigation.goBack(),2000)
+        setTimeout(()=>this.props.navigation.goBack(2),2000)
       } else {
         this.showErrorToast(applyErrorMsg)
       }
