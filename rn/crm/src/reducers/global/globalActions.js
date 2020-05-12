@@ -11,10 +11,11 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt} from  "../../services/global"
+import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
+import {Alert} from "react-native";
 
 /**
  * ## Imports
@@ -253,6 +254,19 @@ export function platformList(user_id,callback) {
           callback(true, response)
         })
         .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function unBind(params,callback) {
+
+  return dispatch => {
+    return unbindExt(params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          Alert.alert('当前版本不支持！', error.reason)
           callback(false, '网络错误，请检查您的网络连接')
         })
   }

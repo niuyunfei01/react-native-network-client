@@ -1,4 +1,4 @@
-import {ScrollView, Image, Text,View} from 'react-native'
+import {ScrollView, Image, Text, View, Alert} from 'react-native'
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -56,7 +56,10 @@ class PlatformScene extends PureComponent {
         const right = [
             {
                 text: 'Delete',
-                onPress: () => console.log('delete'),
+                onPress: () => {
+                    this.props.actions.unBind({}, (success) => {
+                    })
+                },
                 style: { backgroundColor: 'red', color: 'white' },
             },
         ];
