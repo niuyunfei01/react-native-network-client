@@ -202,9 +202,6 @@ class LoginScene extends PureComponent {
         const sid = this.props.global ? this.props.global.currStoreId : 0;
         let params = {
           doneSelectStore: (storeId,flag=false) => {
-            console.log(storeId)
-            console.log(flag)
-            console.log("---------------")
             dispatch(getCommonConfig(token, storeId, (ok) => {
               if (ok) {
                 native.setCurrStoreId(storeId, (set_ok, msg) => {
