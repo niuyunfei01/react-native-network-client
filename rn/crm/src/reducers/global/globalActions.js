@@ -115,7 +115,7 @@ export function check_is_bind_ext(params, callback) {
 
   }
 }
-export function getCommonConfig(token, storeId, callback) {
+export  function  getCommonConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
@@ -186,7 +186,7 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
-export function signIn(mobile, password, callback) {
+export  function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
@@ -287,10 +287,9 @@ export function getAddress(callback) {
 export function customerApply(params, callback) {
   return dispatch => {
     return addStores({device_uuid:getDeviceUUID(),...params})
-      .then(response => response.json())
-      .then(json => {
+      .then((response,json) => {
         console.log("customerApply res", json);
-        callback(true)
+        callback(true,response)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')

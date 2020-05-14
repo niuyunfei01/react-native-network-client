@@ -72,8 +72,10 @@ const styles = StyleSheet.create({
 
 let {height, width} = Dimensions.get('window')
 
+
 function mapStateToProps(state) {
   return {
+    global:state.global,
     userProfile: state.global.currentUserPfile
   }
 }
@@ -108,12 +110,13 @@ class LoginScene extends PureComponent {
       loginType: BY_SMS,
       doingSign: false,
     };
-    this.onMobileChanged = this.onMobileChanged.bind(this);
     this.onLogin = this.onLogin.bind(this);
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
-    this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
-    this.doneReqSign = this.doneReqSign.bind(this)
-
+    this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this);
+    this.doneReqSign = this.doneReqSign.bind(this);
+    this.checkBindExt = this.checkBindExt.bind(this);
+    this.queryCommonConfig =this.queryCommonConfig.bind(this);
+    this.doneSelectStore = this.doneSelectStore.bind(this);
     const params = (this.props.navigation.state.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
@@ -155,21 +158,13 @@ class LoginScene extends PureComponent {
     this.setState({canAskReqSmsCode: false});
   }
 
-  onMobileChanged() {
-
-  }
-
   onLogin() {
-
     const loginType = this.state.loginType;
-
     if (!this.state.mobile) {
-
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
       ToastAndroid.show(msg, ToastAndroid.LONG)
       return false;
     }
-
     switch (loginType) {
       case BY_SMS:
         if (!this.state.verifyCode) {
@@ -189,136 +184,99 @@ class LoginScene extends PureComponent {
         ToastAndroid.show("error to log in!", ToastAndroid.LONG);
     }
   }
+  checkBindExt(){
 
-  _signIn(mobile, password, name) {
-    const self = this
-    this.setState({doingSign: true});
-
-    const {dispatch, navigation} = this.props;
-    dispatch(signIn(mobile, password, (ok, msg, token) => {
-      // console.log('sign in result:', ok, token);
-      this.doneReqSign();
-      if (ok) {
-        const sid = this.props.global ? this.props.global.currStoreId : 0;
-        let params = {
-          doneSelectStore: (storeId,flag=false) => {
-            dispatch(getCommonConfig(token, storeId, (ok) => {
-              if (ok) {
-                native.setCurrStoreId(storeId, (set_ok, msg) => {
-                  console.log('set_ok -> ', set_ok, msg);
-                  if (set_ok) {
-                    dispatch(setCurrentStore(storeId));
-                    console.log('this.next -> ', this.next);
-                    if(flag){
-                      navigation.navigate(Config.ROUTE_PLATFORM_LIST)
-                      return true;
-                    }
-                    if (Config.ROUTE_ORDERS === this.next || !this.next) {
-
-                      native.toOrders();
-                    } else {
-
-                      navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
-                    }
-
-                    tool.resetNavStack(navigation, Config.ROUTE_ALERT);
-                    return true;
-                  } else {
-                    ToastLong(msg);
-                    return false;
-                  }
-                });
-              } else {
-                ToastLong('选择店铺失败, 请稍候重试');
-                return false;
+  }
+   queryCommonConfig(){
+    let flag =false;
+    let {accessToken,currStoreId,currentUser} = this.props.global;
+     const {dispatch,navigation} = this.props;
+     dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+      if(ok){
+        let store_num = 0;
+        let only_store_id = currStoreId;
+        for (let store of Object.values(cfg.canReadStores)) {
+          if (store.id > 0) {
+            if(store_num > 2){
+              break;
+            }
+            store_num++;
+            only_store_id = store.id;
+          }
+        }
+        if (!(currStoreId > 0)) {
+          if(store_num === 1 && only_store_id > 0){//单店直接跳转
+            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
+            flag=true;
+            dispatch(check_is_bind_ext({token:accessToken,user_id:currentUser,storeId:only_store_id}, (ok) => {
+              if(flag && ok){
+                this.doneSelectStore(only_store_id,flag);
               }
             }));
-          },
-        };
+          } else {
+            navigation.navigate(Config.ROUTE_SELECT_STORE,{doneSelectStore:this.doneSelectStore});
+          }
+        } else {
+          this.doneSelectStore(currStoreId,flag);
+        }
+      } else {
+        ToastAndroid.show(err_msg, ToastAndroid.LONG);
+      }
+    }));
+  }
+     doneSelectStore (storeId,flag=false)  {
+       const {dispatch,navigation} = this.props;
+    console.log(1111111);
+    native.setCurrStoreId(storeId, (set_ok, msg) => {
+      console.log('set_ok -> ', set_ok, msg);
+      if (set_ok) {
+        dispatch(setCurrentStore(storeId));
+        console.log('this.next -> ', this.next);
+        if(flag){
+          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
+          return true;
+        }
+        if (Config.ROUTE_ORDERS === this.next || !this.next) {
 
-        let storeId = sid;
-        let flag =false
-        dispatch(getCommonConfig(token, storeId, (ok, err_msg, cfg) => {
-          if(ok){
-            let store_num = 0;
-            let only_store_id = storeId;
-            for (let store of Object.values(cfg.canReadStores)) {
-              if (store.id > 0) {
-                if(store_num > 2){
-                  break;
-                }
-                store_num++;
-                only_store_id = store.id;
-              }
-            }
-            if (!(storeId > 0)) {
-              if(store_num === 1 && only_store_id > 0){//单店直接跳转
-                console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
-                storeId =only_store_id;
-                flag =true;
-              } else {
-                navigation.navigate(Config.ROUTE_SELECT_STORE, params);
-              }
-            } else {
-              params.doneSelectStore(storeId);
-            }
-          } else {
-            ToastAndroid.show(err_msg, ToastAndroid.LONG);
-          }
-        }));
-          self.doSaveUserInfo(token)
-       const user= StorageUtil._get('user').then(user => {
-          if (user && Object.keys(user).length) {
-            _this.setUser(user)
-            resolve && resolve(user)
-          } else {
-            if (reject) {
-              reject()
-            } else {
-              Alert('错误', '获取用户信息失败，请重新登录', [{
-                text: '确定',
-                onPress: () => {
-                  native.logout()
-                  native.gotoLoginWithNoHistory()
-                }
-              }])
-            }
-          }
-        }).catch(e => {
-          if (reject) {
-            reject()
-          } else {
-            Alert('错误', '获取用户信息失败，请重新登录', [{
-              text: '确定',
-              onPress: () => {
-                native.logout()
-                native.gotoLoginWithNoHistory()
-              }
-            }])
-          }
-        })
-        dispatch(check_is_bind_ext({token:token,user_id:user.id,storeId:storeId}, (ok) => {
-          if(flag && ok){
-            params.doneSelectStore(storeId,flag);
-          }
-        }));
+          native.toOrders();
+        } else {
 
+          navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
+        }
+
+        tool.resetNavStack(navigation, Config.ROUTE_ALERT);
+        return true;
+      } else {
+        ToastLong(msg);
+        return false;
+      }
+    });
+}
+  async _signIn(mobile, password, name) {
+    this.setState({doingSign: true});
+    const {dispatch} = this.props;
+    this.doneReqSign();
+    await  dispatch( signIn(mobile, password, (ok, msg, token) => {
+      if (ok) {
+        this.doSaveUserInfo(token);
       } else {
         this.doneReqSign();
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
         return false;
       }
-    }))
+    }));
+     this.queryCommonConfig()
+
   }
 
   doneReqSign() {
     this.setState({doingSign: false})
   }
-
-  doSaveUserInfo (token) {
-     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
+   doSaveUserInfo (token) {
+    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
       GlobalUtil.setUser(res)
     })
+     return true;
   }
 
   render() {

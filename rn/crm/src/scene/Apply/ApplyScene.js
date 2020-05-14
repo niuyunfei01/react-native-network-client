@@ -92,7 +92,7 @@ class ApplyScene extends PureComponent {
       name: '',
       address: '',
       shopName: '',
-      referees_id:'',
+      referees_id:0,
       value: [],
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
@@ -152,10 +152,6 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(validEmptyShopName)
       return false
     }
-    if (!this.state.referrer_id) {
-      this.showErrorToast(validEmptyRefereesId)
-      return false
-    }
     if (!this.state.address) {
       this.showErrorToast(validEmptyAddress)
       return false
@@ -182,9 +178,10 @@ class ApplyScene extends PureComponent {
       self.doneApply();
       if (success) {
         this.showSuccessToast(applySuccessMsg);
-        setTimeout(()=>this.props.navigation.goBack(),2000)
+        setTimeout(()=>this.props.navigation.navigate('Login'),1000)
       } else {
         this.showErrorToast(applyErrorMsg)
+        setTimeout(()=>this.props.navigation.navigate('Login'),1000)
       }
     })
   }

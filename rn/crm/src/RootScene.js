@@ -158,6 +158,7 @@ class RootScene extends PureComponent {
       let diff_time = current_time - last_get_cfg_ts;
 
       if (diff_time > 300) {
+        console.log(11111);
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
 

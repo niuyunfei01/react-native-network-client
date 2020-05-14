@@ -101,6 +101,8 @@ export default {
    * @returns {Promise.<void>}
    */
   setCurrStoreId: async function (storeId, callback = function (){}) {
+    console.log(storeId);
+    console.log(callback);
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },
@@ -154,7 +156,7 @@ export default {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
-  
+
   updatePidApplyPrice: async function (pid, applyPrice, cb = function () {
   }) {
     await (NativeModules.ActivityStarter &&
@@ -175,7 +177,7 @@ export default {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.speakText(text, callback))
   },
-  
+
   playWarningSound: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.playWarningSound())
