@@ -9,6 +9,9 @@ import {keySort, makeObjToString} from "../../util/common"
 import {List, WhiteSpace} from 'antd-mobile-rn'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
+import NavigationItem from "../../widget/NavigationItem";
+import tool from "../../common/tool";
+import Config from "../../config";
 
 const Item = List.Item
 const Brief = Item.Brief
@@ -24,10 +27,21 @@ mapDispatchToProps = dispatch => {
   }
 }
 
+
+
 class PlatformBind extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: '绑定平台信息',
+      headerLeft: (
+          <NavigationItem
+              icon={require('../../img/a.png')}
+              position={'left'}
+              onPress={() =>{
+                navigation.navigate('Platform')
+              }}
+          />
+      )
     }
   }
   static propTypes = {

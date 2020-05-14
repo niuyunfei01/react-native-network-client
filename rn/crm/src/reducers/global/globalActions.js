@@ -115,7 +115,7 @@ export function check_is_bind_ext(params, callback) {
 
   }
 }
-export function getCommonConfig(token, storeId, callback) {
+export  function  getCommonConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
@@ -186,7 +186,7 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
-export function signIn(mobile, password, callback) {
+export  function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())

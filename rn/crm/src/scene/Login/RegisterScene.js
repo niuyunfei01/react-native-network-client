@@ -236,6 +236,8 @@ class RegisterScene extends PureComponent {
                                     verifyCode= verifyCode.replace(/[^\d]+/, '');
                                     this.setState({verifyCode})
                                 }}
+                                       type={"number"}
+                                       keyboardType="numeric"
                                        value={this.state.verifyCode}
                                        style={styles.input}
                                        placeholder={validCodePlaceHold}

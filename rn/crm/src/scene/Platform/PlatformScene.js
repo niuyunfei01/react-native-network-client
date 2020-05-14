@@ -20,7 +20,6 @@ mapDispatchToProps = dispatch => {
 }
 class PlatformScene extends PureComponent {
     static navigationOptions = ({navigation}) => {
-        console.log(navigation)
         return {
             headerTitle: '绑定平台信息',
             headerLeft: (
@@ -46,12 +45,19 @@ class PlatformScene extends PureComponent {
             sign: '',
             timestamp: ''
         }
+        this.queryPlatformList =this.queryPlatformList.bind(this)
     }
     componentDidMount () {
+       this.queryPlatformList();
+    }
+
+    queryPlatformList(){
         this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
-           this.setState({platformsList:response})
+            this.setState({platformsList:response})
         })
     }
+
+
     render() {
         const right = [
             {
@@ -103,7 +109,7 @@ class PlatformScene extends PureComponent {
                     fontSize: 25}}>绑定平台以后方可使用。</Text></View> : null}
                 <Button
                     onClick={() =>{
-                     this.props.navigation.navigate('PlatformBind')
+                     this.props.navigation.navigate('PlatformBind',{ onGoBack: () => this.queryPlatformList()})
                     }}
                     style={{backgroundColor: '#f5f5f9',
                     textAlignVertical: "center",
