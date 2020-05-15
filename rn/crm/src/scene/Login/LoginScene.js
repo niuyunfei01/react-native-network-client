@@ -189,7 +189,7 @@ class LoginScene extends PureComponent {
   }
    queryCommonConfig(){
     let flag =false;
-    let {accessToken,currStoreId,currentUser} = this.props.global;
+    let {accessToken,currStoreId} = this.props.global;
      const {dispatch,navigation} = this.props;
      dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if(ok){
@@ -208,6 +208,7 @@ class LoginScene extends PureComponent {
           if(store_num === 1 && only_store_id > 0){//单店直接跳转
             console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
             flag=true;
+            let {currentUser} = this.props.global;
             dispatch(check_is_bind_ext({token:accessToken,user_id:currentUser,storeId:only_store_id}, (ok) => {
               if(flag && ok){
                 this.doneSelectStore(only_store_id,flag);
