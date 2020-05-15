@@ -35,7 +35,7 @@ class PlatformBind extends React.Component {
       headerTitle: '绑定平台信息',
       headerLeft: (
           <NavigationItem
-              icon={require('../../img/a.png')}
+              icon={require('../../img/Public/back.png')}
               position={'left'}
               onPress={() =>{
                 navigation.navigate('Platform')

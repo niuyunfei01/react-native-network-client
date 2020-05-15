@@ -24,7 +24,7 @@ class PlatformScene extends PureComponent {
             headerTitle: '绑定平台信息',
             headerLeft: (
                 <NavigationItem
-                    icon={require('../../img/a.png')}
+                    icon={require('../../img/Public/back.png')}
                     position={'left'}
                     onPress={() =>{
                         navigation.navigate('MineScene')
