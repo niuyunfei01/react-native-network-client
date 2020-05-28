@@ -5,6 +5,7 @@ import {bindActionCreators} from "redux"
 import {connect} from "react-redux"
 import NavigationItem from "../../widget/NavigationItem"
 import PropType from "prop-types"
+import {native} from "../../common";
 
 mapStateToProps = (state) => {
   return {
@@ -41,6 +42,8 @@ class BindPlatformWebView extends React.Component {
       canGoBack: false,
     }
     this.do_go_back = this.do_go_back.bind(this)
+    this.receiveMessage = this.receiveMessage.bind(this)
+    window.addEventListener("message", this.receiveMessage, false);
   }
 
   postMessage = (obj) => {
@@ -51,6 +54,18 @@ class BindPlatformWebView extends React.Component {
   }
 
   onMessage = (e) => {
+    let _this = this
+    const msg = e.data
+    console.log('on message web view msg =>', msg)
+  }
+
+  receiveMessage = (e) => {
+    let data = e.data
+    console.log(e.data)
+    if (data.method === 'invokeCallbackAndReturnFlushedQueue'){
+      console.log('web view data =>', e)
+      console.log('web view data =>', e.data)
+    }
   }
 
   backHandler = () => {
@@ -121,6 +136,7 @@ class BindPlatformWebView extends React.Component {
   }
 
   componentWillUnmount() {
+    window.removeEventListener('message', this.receiveMessage)
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler)
   }
 
@@ -136,10 +152,12 @@ class BindPlatformWebView extends React.Component {
           onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
           automaticallyAdjustContentInsets={true}
           style={styles.webView}
-          source={this.state.source}
+          source={{html: `<iframe width="100%" height="100%" src="${this.state.source.uri}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`}}
+          // source={this.state.source}
           onLoadEnd={(e) => this.onLoadEnd(e)}
           scalesPageToFit
         />
+
       </View>
     )
   }
@@ -154,7 +172,7 @@ class BindPlatformWebView extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2c3e50',
+    backgroundColor: 'white',
   },
   webView: {
     flex: 1,

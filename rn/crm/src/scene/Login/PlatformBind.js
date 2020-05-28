@@ -180,7 +180,6 @@ class PlatformBind extends React.Component {
                   this.props.navigation.navigate('BindPlatformWebView', {
                     url: this.makeEleUrl()
                   })
-                  console.log(this.makeEleUrl());
                 } else {
                   this.setState({dialogVisible: true})
                 }
