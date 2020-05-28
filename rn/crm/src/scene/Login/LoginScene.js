@@ -227,7 +227,6 @@ class LoginScene extends PureComponent {
   }
      doneSelectStore (storeId,flag=false)  {
        const {dispatch,navigation} = this.props;
-    console.log(1111111);
     native.setCurrStoreId(storeId, (set_ok, msg) => {
       console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
