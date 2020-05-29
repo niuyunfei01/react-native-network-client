@@ -159,9 +159,10 @@ class StoreAddScene extends Component {
       bd_shop_id,
       city = undefined,
       city_code = undefined,
-      fn_price_controlled = 1
+      fn_price_controlled = 1,
+      reservation_order_print=-1,
+      order_print_time = 0,
     } = store_info || {};
-
     const {mine} = this.props;
     let user_list = mine.user_list[currVendorId];
 
@@ -216,8 +217,9 @@ class StoreAddScene extends Component {
       goToReset: false,
       user_list: user_list,
       userActionSheet: userActionSheet,
-
       isStartVisible: false,
+      reservation_order_print,
+      order_print_time,
       isEndVisible: false,
       selectCity: {
         cityId: city ? city_code : undefined,
@@ -666,12 +668,13 @@ class StoreAddScene extends Component {
       vice_mgr,
       call_not_print,
       ship_way,
+      reservation_order_print,
+      order_print_time,
       printer_cfg,
       auto_add_tips,
       user_list,
       createUserName
     } = this.state;
-
     let store_mgr_name;
     if (owner_id > 0) {
       const owner = user_list[owner_id];
@@ -1136,6 +1139,39 @@ class StoreAddScene extends Component {
               </CellBody>
             </Cell>
           </Cells>
+          <CellsTitle style={styles.cell_title}>预订单打印方式</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell
+                onPress={() => {
+                  this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME});
+                }}
+                customStyle={[styles.cell_row]}
+            >
+              <CellBody>
+                <Text style={styles.cell_label}>实时打印</Text>
+              </CellBody>
+              <CellFooter>
+                {Cts.RESERVATION_ORDER_PRINT_REAL_TIME === parseInt(reservation_order_print) ? (
+                    <Icon name="success_no_circle" style={{fontSize: 16}}/>
+                ) : null}
+              </CellFooter>
+            </Cell>
+            <Cell
+                onPress={() => {
+                  this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_AUTO});
+                }}
+                customStyle={[styles.cell_row]}
+            >
+              <CellBody>
+                <Text style={styles.cell_label}>送达前{order_print_time}分打印</Text>
+              </CellBody>
+              <CellFooter>
+                {Cts.RESERVATION_ORDER_PRINT_AUTO === parseInt(reservation_order_print) ? (
+                    <Icon name="success_no_circle" style={{fontSize: 16}}/>
+                ) : null}
+              </CellFooter>
+            </Cell>
+          </Cells>
 
           <CellsTitle style={styles.cell_title}>排单方式</CellsTitle>
           <Cells style={[styles.cell_box]}>
@@ -1385,6 +1421,7 @@ class StoreAddScene extends Component {
         bankcard_code,
         bankcard_address,
         bankcard_username,
+        reservation_order_print,
         remark
       } = this.state;
 
@@ -1408,6 +1445,7 @@ class StoreAddScene extends Component {
         vice_mgr: vice_mgr,
         remark: remark,
         bankcard_code: bankcard_code,
+        reservation_order_print: reservation_order_print,
         bankcard_address: bankcard_address,
         bankcard_username: bankcard_username
       };
