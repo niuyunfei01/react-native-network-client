@@ -57,10 +57,11 @@ class WebScene extends PureComponent {
 
   onMessage = (e) => {
     let _this = this;
+    console.log('web e =>', e);
     const msg = e.nativeEvent.data;
     console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
-      if (msg.indexOf('http') == 0) {
+      if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
       } else {
         try {
@@ -191,7 +192,9 @@ class WebScene extends PureComponent {
         url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
         console.log("log_picker url: ", url)
       }
-      this.setState({source: {uri: url, headers: {'Cache-Control': 'no-cache'}}})
+      let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
+      this.setState(state)
+      console.log('url', state)
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);

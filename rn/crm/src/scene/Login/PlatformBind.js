@@ -1,4 +1,4 @@
-import {Text, View, Linking} from 'react-native'
+import {Linking, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -10,7 +10,6 @@ import {List, WhiteSpace, WingBlank} from 'antd-mobile-rn'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import NavigationItem from "../../widget/NavigationItem";
-import tool from "../../common/tool";
 import Config from "../../config";
 
 const Item = List.Item
@@ -140,7 +139,8 @@ class PlatformBind extends React.Component {
     tempStr = makeObjToString(tempObj)
     let sign = sha1(this.state.mtSignKey + tempStr)
 
-    return `https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`
+    let dest = `https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`;
+    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
   makeEleUrl() {
@@ -173,7 +173,7 @@ class PlatformBind extends React.Component {
               key={index}
               onClick={() => {
                 if (item.enable && item.alias === 'mt') {
-                  this.props.navigation.navigate('BindPlatformWebView', {
+                  this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeMtUrl()
                   })
                 } else if (item.enable && item.alias === 'ele') {
